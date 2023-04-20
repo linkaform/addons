@@ -1,0 +1,3 @@
+[submodule "lkf_stock"]
+	path = lkf_stock
+	url = ./lkf_stock
