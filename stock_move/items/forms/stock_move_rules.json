@@ -1,0 +1,59 @@
+{
+    "meta": {
+        "limit": 1000,
+        "next": null,
+        "offset": 0,
+        "previous": null,
+        "total_count": 1
+    },
+    "objects": [
+        {
+            "form_id": 58161,
+            "id": "6093fb335e999c334f853c34",
+            "rules": [
+                {
+                    "conditions": [
+                        {
+                            "condition": "in=",
+                            "field": {
+                                "field_id": "60959ac116bc283a19b8c285",
+                                "id": "60959ac116bc283a19b8c285",
+                                "label": "seleccion",
+                                "type": "radio"
+                            },
+                            "value": "apagar"
+                        }
+                    ],
+                    "element_ids": [],
+                    "empty": false,
+                    "fields_ruled": [
+                        {
+                            "field_id": "6106bebcfb2aa041489659ec",
+                            "id": "6106bebcfb2aa041489659ec",
+                            "label": "Checkbox",
+                            "type": "checkbox"
+                        },
+                        {
+                            "field_id": "6101f00fe02b87dc7440a912",
+                            "id": "6101f00fe02b87dc7440a912",
+                            "label": "entero",
+                            "type": "integer"
+                        },
+                        {
+                            "field_id": "6101f00fe02b87dc7440a914",
+                            "id": "6101f00fe02b87dc7440a914",
+                            "label": "grupo",
+                            "type": "group"
+                        }
+                    ],
+                    "group_conditions": {},
+                    "name": "Regla 3",
+                    "operator": "and",
+                    "rule_id": "160212a280015e2",
+                    "rule_type": "disabled",
+                    "user_conditions": {}
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<lkf>
+    <properties>
+        <arguments a="b"/>
+        <cloud_path>public-client-13137/scripts/apymsa_settings.py</cloud_path>
+        <scriptArguments>
+            <item>
+                <label>a</label>
+                <value>val</value>
+            </item>
+            <item>
+                <label>key</label>
+                <value>value</value>
+            </item>
+        </scriptArguments>
+    </properties>
+</lkf>

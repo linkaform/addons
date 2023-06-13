@@ -1,0 +1,202 @@
+{
+"form_id": 98225,
+"id": "64469b9e1e3525034c36ca70",
+"workflows": [
+    {
+        "actions": [
+            {
+                "_id": "64469b9e1e3525034c36ca62",
+                "action_id": 7,
+                "action_settings": {},
+                "configuration": {
+                    "script": {
+                        "created_at": "2023-04-24T15:05:04.954227",
+                        "deleted_at": null,
+                        "end_date": null,
+                        "id": 99266,
+                        "is_fileShared": false,
+                        "itype": "script",
+                        "name": "admin_catalog_inventory_greenhouse.py",
+                        "start_date": "2023-04-24T15:05:04.952443",
+                        "updated_at": "2023-04-24T15:05:05.349520"
+                    },
+                    "user": "SCRIPT_OWNER"
+                },
+                "name": null
+            }
+        ],
+        "id": "64469b9e1e3525034c36ca64",
+        "name": "Admin Catalog",
+        "rules": {
+            "metadata": {
+                "connection": [],
+                "date": {
+                    "period": {
+                        "month": 1,
+                        "selected": false,
+                        "year": 2014
+                    },
+                    "range": {
+                        "end": "2023-04-25T06:00:00.000Z",
+                        "selected": false,
+                        "start": "2023-04-24T15:03:25.092Z"
+                    }
+                },
+                "grading": {},
+                "user": []
+            },
+            "record": {
+                "created": true,
+                "deleted": false,
+                "edited": true,
+                "run_multiple_times": true,
+                "runtime": "after"
+            },
+            "wf_fields": {
+                "operator": "all",
+                "triggers": []
+            }
+        }
+    },
+    {
+        "actions": [
+            {
+                "_id": "64469b9e1e3525034c36ca63",
+                "action_id": 7,
+                "action_settings": {},
+                "configuration": {
+                    "arguments": {},
+                    "integration": null,
+                    "script": {
+                        "created_at": "2023-04-24T15:08:52.166808",
+                        "deleted_at": null,
+                        "end_date": null,
+                        "id": 99267,
+                        "is_fileShared": false,
+                        "itype": "script",
+                        "name": "calculates_inventory_greenhouse.py",
+                        "start_date": "2023-04-24T15:08:52.165089",
+                        "updated_at": "2023-04-24T15:08:52.409099"
+                    },
+                    "scriptArguments": [
+                        {
+                            "label": null,
+                            "value": null
+                        }
+                    ],
+                    "scriptQuery": null,
+                    "selectedUser": null,
+                    "user": "RECORD_USER",
+                    "userOptions": [
+                        {
+                            "id": "SCRIPT_OWNER",
+                            "name": "Script owner"
+                        },
+                        {
+                            "id": "FORM_OWNER",
+                            "name": "Form owner"
+                        },
+                        {
+                            "id": "OWNER_ACCOUNT_EMAIL",
+                            "name": "Account owner"
+                        },
+                        {
+                            "id": "RECORD_USER",
+                            "name": "User that answers the form"
+                        }
+                    ]
+                },
+                "name": null
+            }
+        ],
+        "id": "64469b9e1e3525034c36ca67",
+        "name": "calculates",
+        "rules": {
+            "metadata": {
+                "connection": [],
+                "date": {
+                    "period": {
+                        "month": 1,
+                        "selected": false,
+                        "year": 2014
+                    },
+                    "range": {
+                        "end": "2023-04-25T06:00:00.000Z",
+                        "selected": false,
+                        "start": "2023-04-24T15:03:25.092Z"
+                    }
+                },
+                "grading": {},
+                "user": []
+            },
+            "record": {
+                "created": true,
+                "deleted": false,
+                "edited": true,
+                "run_multiple_times": true,
+                "runtime": "before"
+            },
+            "wf_fields": {
+                "operator": "all",
+                "triggers": []
+            }
+        }
+    },
+    {
+        "actions": [
+            {
+                "_id": "64495cb16916e31a5f36c9ec",
+                "action_id": 7,
+                "action_settings": {},
+                "configuration": {
+                    "script": {
+                        "created_at": "2022-07-08T16:32:10.455745",
+                        "deleted_at": null,
+                        "end_date": null,
+                        "id": 86402,
+                        "is_fileShared": false,
+                        "itype": "script",
+                        "name": "delete_catalog_inventory.py",
+                        "start_date": "2022-07-08T16:32:10.452857",
+                        "updated_at": "2022-07-08T16:32:10.780859"
+                    },
+                    "user": "SCRIPT_OWNER"
+                },
+                "name": "delete catalog"
+            }
+        ],
+        "id": "64495cb16916e31a5f36c9f3",
+        "name": "delete catalog",
+        "rules": {
+            "metadata": {
+                "connection": [],
+                "date": {
+                    "period": {
+                        "month": 1,
+                        "selected": false,
+                        "year": 2014
+                    },
+                    "range": {
+                        "end": "2023-04-26T05:00:00.000Z",
+                        "selected": false,
+                        "start": "2023-04-25T22:29:15.737Z"
+                    }
+                },
+                "grading": {},
+                "user": []
+            },
+            "record": {
+                "created": false,
+                "deleted": true,
+                "edited": false,
+                "run_multiple_times": true,
+                "runtime": "after"
+            },
+            "wf_fields": {
+                "operator": "all",
+                "triggers": []
+            }
+        }
+    }
+]
+}

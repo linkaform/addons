@@ -1,0 +1,50 @@
+{
+    "templates": [],
+    "confirmation": {},
+    "description": "",
+    "_rev": "2-9faf71d32920e2bc057e68ef9a320187",
+    "updated_at": "2023-05-29T19:08:09.137126+00:00Z",
+    "sync": {
+        "element_request": {},
+        "input_parameters": []
+    },
+    "filters": {},
+    "name": "Unidad de Medida",
+    "edit_public_records": false,
+    "created_at": "2023-05-29T19:08:09.137126+00:00Z",
+    "advanced_options": {},
+    "catalog_pages": [
+        {
+            "page_fields": [
+                {
+                    "field_type": "text",
+                    "properties": {
+                        "send_email": false,
+                        "size": "complete",
+                        "custom": null
+                    },
+                    "key": null,
+                    "catalog_fields": [],
+                    "field_id": "6474f819bbcd7572f293e1f9",
+                    "required": false,
+                    "fav": true,
+                    "related_catalog_key": [],
+                    "relation_type": null,
+                    "label": "Pieza",
+                    "catalog": {},
+                    "catalog_id": null,
+                    "view_fields": [],
+                    "options": [],
+                    "related_catalog": null
+                }
+            ],
+            "page_name": "PAGE 1",
+            "page_description": null,
+            "$$hashKey": "05A"
+        }
+    ],
+    "sync_last_update": null,
+    "_id": "6474f819bbcd7572f293e1f8",
+    "public": false,
+    "catalog_id": 102452
+}
