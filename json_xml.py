@@ -44,7 +44,7 @@ def json_to_xml(json_data):
 
 #file_path ='stock_move/items/catalogs'
 file_path ='stock_move/items/forms'
-file_name='warehouse_out.json'
+file_name='wharehouse_inventory_move_workflow.json'
 
 save_file = './{}/{}'.format(file_path, file_name.replace('.json', '.xml'))
 json_data = file(file_path, file_name)

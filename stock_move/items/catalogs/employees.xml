@@ -29,7 +29,7 @@
                             <view_index>0</view_index>
                             <couch_id>62c5ff0162a70c261328845c</couch_id>
                             <catalog_field_id>None</catalog_field_id>
-                            <catalog_id>{{catalogs.employees_teams.id}}</catalog_id>
+                            <catalog_id>{{catalog.employees_teams.id}}</catalog_id>
                             <view_fields>
                                 <item>62c5ff0162a70c261328845d</item>
                             </view_fields>
@@ -49,7 +49,7 @@
                             <field_type>text</field_type>
                             <view_index>1</view_index>
                             <catalog_field_id>62c5ff0162a70c261328845c</catalog_field_id>
-                            <catalog_id>{{catalogs.employees_teams.id}}</catalog_id>
+                            <catalog_id>{{catalog.employees_teams.id}}</catalog_id>
                             <view_fields/>
                         </catalog>
                         <options/>

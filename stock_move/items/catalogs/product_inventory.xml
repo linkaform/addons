@@ -55,7 +55,7 @@
                             <view_index>0</view_index>
                             <couch_id>61ef32bcdf0ec2ba73dec33c</couch_id>
                             <catalog_field_id>None</catalog_field_id>
-                            <catalog_id>{{catalogs.product_presentation.id}}</catalog_id>
+                            <catalog_id>{{catalog.product_presentation.id}}</catalog_id>
                             <filters/>
                             <name>Plant Recipe</name>
                         </catalog>
@@ -78,7 +78,7 @@
                             <field_type>text</field_type>
                             <view_index>1</view_index>
                             <catalog_field_id>61ef32bcdf0ec2ba73dec33c</catalog_field_id>
-                            <catalog_id>{{catalogs.product_presentation.id}}</catalog_id>
+                            <catalog_id>{{catalog.product_presentation.id}}</catalog_id>
                             <filters/>
                         </catalog>
                         <options/>
@@ -97,7 +97,7 @@
                             <field_type>text</field_type>
                             <view_index>2</view_index>
                             <catalog_field_id>61ef32bcdf0ec2ba73dec33c</catalog_field_id>
-                            <catalog_id>{{catalogs.product_presentation.id}}</catalog_id>
+                            <catalog_id>{{catalog.product_presentation.id}}</catalog_id>
                             <filters/>
                         </catalog>
                         <options/>
@@ -168,7 +168,7 @@
                             <view_index>0</view_index>
                             <couch_id>6442e4831198daf81456f273</couch_id>
                             <catalog_field_id>None</catalog_field_id>
-                            <catalog_id>{{catalogs.warehouse.id}}</catalog_id>
+                            <catalog_id>{{catalog.warehouse.id}}</catalog_id>
                             <filters/>
                             <name>Green House</name>
                         </catalog>
@@ -188,7 +188,7 @@
                             <field_type>text</field_type>
                             <view_index>1</view_index>
                             <catalog_field_id>6442e4831198daf81456f273</catalog_field_id>
-                            <catalog_id>{{catalogs.warehouse.id}}</catalog_id>
+                            <catalog_id>{{catalog.warehouse.id}}</catalog_id>
                             <filters/>
                         </catalog>
                         <options/>

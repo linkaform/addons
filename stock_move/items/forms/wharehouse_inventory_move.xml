@@ -119,7 +119,7 @@
                     <buttons_ids/>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{catalogs.product_inventory.id}}</catalog_id>
+                        <catalog_id>{{catalog.product_inventory.id}}</catalog_id>
                         <field_type>None</field_type>
                         <filters/>
                         <geofence>None</geofence>
@@ -207,7 +207,7 @@
                     <buttons_ids/>
                     <catalog>
                         <catalog_field_id>6442cbafb1b1234eb68ec178</catalog_field_id>
-                        <catalog_id>{{catalogs.product_inventory.id}}</catalog_id>
+                        <catalog_id>{{catalog.product_inventory.id}}</catalog_id>
                         <field_type>text</field_type>
                         <filters/>
                         <geofence>None</geofence>
@@ -283,7 +283,7 @@
                     <buttons_ids/>
                     <catalog>
                         <catalog_field_id>6442cbafb1b1234eb68ec178</catalog_field_id>
-                        <catalog_id>{{catalogs.product_inventory.id}}</catalog_id>
+                        <catalog_id>{{catalog.product_inventory.id}}</catalog_id>
                         <field_type>text</field_type>
                         <filters/>
                         <geofence>None</geofence>
@@ -359,7 +359,7 @@
                     <buttons_ids/>
                     <catalog>
                         <catalog_field_id>6442cbafb1b1234eb68ec178</catalog_field_id>
-                        <catalog_id>{{catalogs.product_inventory.id}}</catalog_id>
+                        <catalog_id>{{catalog.product_inventory.id}}</catalog_id>
                         <field_type>integer</field_type>
                         <filters/>
                         <geofence>None</geofence>
@@ -435,7 +435,7 @@
                     <buttons_ids/>
                     <catalog>
                         <catalog_field_id>6442cbafb1b1234eb68ec178</catalog_field_id>
-                        <catalog_id>{{catalogs.product_inventory.id}}</catalog_id>
+                        <catalog_id>{{catalog.product_inventory.id}}</catalog_id>
                         <field_type>text</field_type>
                         <filters/>
                         <geofence>None</geofence>
@@ -511,7 +511,7 @@
                     <buttons_ids/>
                     <catalog>
                         <catalog_field_id>6442cbafb1b1234eb68ec178</catalog_field_id>
-                        <catalog_id>{{catalogs.product_inventory.id}}</catalog_id>
+                        <catalog_id>{{catalog.product_inventory.id}}</catalog_id>
                         <field_type>text</field_type>
                         <filters/>
                         <geofence>None</geofence>
@@ -587,7 +587,7 @@
                     <buttons_ids/>
                     <catalog>
                         <catalog_field_id>6442cbafb1b1234eb68ec178</catalog_field_id>
-                        <catalog_id>{{catalogs.product_inventory.id}}</catalog_id>
+                        <catalog_id>{{catalog.product_inventory.id}}</catalog_id>
                         <field_type>integer</field_type>
                         <filters/>
                         <geofence>None</geofence>
