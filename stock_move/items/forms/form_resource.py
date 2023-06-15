@@ -14,6 +14,28 @@ class FormResource(Items):
     #     self.lkf = lkf_models
     #     self.settings = settings
 
+    def setup_workflows(self, module, conf_files, action):
+        for file_name in conf_files:
+            file_name = file_name.split('.')[0]
+            workflow_model = self.load_module_template_file(self.path, file_name)
+            # res = self.lkf.install_workflows(module, workflow_model, 'update')
+            if action == 'create':
+                res = self.lkf_api.upload_workflows(workflow_model, 'POST')
+            elif action =='update':
+                res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
+            res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
+
+    def setup_rules(self, module, conf_files, action):
+        for file_name in conf_files:
+            file_name = file_name.split('.')[0]
+            rules_model = self.load_module_template_file(self.path, file_name)
+            # res = self.lkf.install_workflows(module, workflow_model, 'update')
+            if action == 'create':
+                res = self.lkf_api.upload_rules(rules_model, 'POST')
+            elif action =='update':
+                res = self.lkf_api.upload_rules(rules_model, 'PATCH')
+            res = self.lkf_api.upload_rules(rules_model, 'PATCH')
+
 
     def install_forms(self, module, instalable_forms):
         if instalable_forms.get('install_order'):
@@ -24,8 +46,6 @@ class FormResource(Items):
         response = []
         for form_name in install_order:
             detail = instalable_forms[form_name]
-            print('detail', detail)
-            print('form_name', form_name)
             form_model = self.load_module_template_file(self.path, form_name)
             res = self.lkf.install_forms(module, form_name, form_model)
             response.append(
@@ -38,11 +58,11 @@ class FormResource(Items):
                         'lkf_response':res
                     }
                 )
-            print('res', res)
-            print('dir', dir(self.lkf))
-            print('dir data', self.lkf.module_data)
-            for config, file_name in detail.items():
-                print('config=', config)
-                print('file_name=', file_name)
+            if res['status'] in ('update','create','unchanged'):
+                for config, conf_files in detail.items():
+                    if config == 'workflow':
+                        self.setup_workflows(module, conf_files, res['status'])
+                    if config == 'rules':
+                        self.setup_rules(module, conf_files, res['status'])
         return response
  

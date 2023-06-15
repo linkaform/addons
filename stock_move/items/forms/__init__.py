@@ -17,7 +17,8 @@ def get_form_modules(all_items):
         file_name = file_ext[0]
         file_type = file_name.split('_')[-1]
         if file_type in ('data', 'demo', 'workflow', 'rules'):
-            data_file.append(file_name)
+            if file_name not in data_file:
+                data_file.append(file_name)
         else:
             form_file[file_name] = {'data':[],'workflow':[], 'rules':[], 'demo':[] }
     for item in list(form_file.keys()):

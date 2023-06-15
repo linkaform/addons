@@ -8,7 +8,7 @@ import settings
 from linkaform_api import utils
 
 print('Running modules with command: ', sys.argv)
-
+base_modules = ['stock_move',]
 load_modules = []
 try:
     f = open(".gitmodules", "r")
@@ -40,7 +40,7 @@ process = subprocess.Popen(args=cmd,
     stderr=subprocess.PIPE)
 output, error = process.communicate()
 
-
+load_modules += base_modules
 for module, git_url in submodules.items():
     print('module>>>', module)
     print('v', git_url)
@@ -106,11 +106,11 @@ def do_load_modules(load_modules):
         form_dict = forms.instalable_forms 
         if install.get('all') or install.get(module):
             # #scripts
-            # script_resource = scripts.ScriptResource(path=scripts.__path__[0], settings=settings)
-            # script_resource.install_scripts(module, script_dict)
+            script_resource = scripts.ScriptResource(path=scripts.__path__[0], settings=settings)
+            script_resource.install_scripts(module, script_dict)
             # # #catalog
-            # catalog_resource = catalogs.CatalogResource(path=catalogs.__path__[0], settings=settings)
-            # catalog_resource.install_catalogs(module, catalog_dict)
+            catalog_resource = catalogs.CatalogResource(path=catalogs.__path__[0], settings=settings)
+            catalog_resource.install_catalogs(module, catalog_dict)
             # #forms
             form_resource = forms.FormResource(path=forms.__path__[0], settings=settings)
             response += form_resource.install_forms(module, form_dict)
