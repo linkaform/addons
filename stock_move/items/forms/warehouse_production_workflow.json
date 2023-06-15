@@ -1,0 +1,355 @@
+{
+            "form_id": 94880,
+            "id": "63f9066854fe410e0ff809bc",
+            "workflows": [
+                {
+                    "actions": [
+                        {
+                            "_id": "63f906759e752d80bfd5ff20",
+                            "action_id": 2,
+                            "action_settings": {},
+                            "configuration": {
+                                "form": {
+                                    "deleted_at": null,
+                                    "id": 96071,
+                                    "name": "Inventory Out (Pull)"
+                                },
+                                "mapping": [
+                                    {
+                                        "etl": {
+                                            "conditions": []
+                                        },
+                                        "input": {
+                                            "field_type": "catalog-select",
+                                            "id": "61ef32bcdf0ec2ba73dec33d",
+                                            "type": "field_to_field",
+                                            "value": null
+                                        },
+                                        "output": {
+                                            "id": "61ef32bcdf0ec2ba73dec33d"
+                                        }
+                                    },
+                                    {
+                                        "etl": {
+                                            "conditions": []
+                                        },
+                                        "input": {
+                                            "field_type": "integer",
+                                            "id": "62e4bc58d9814e169a3f6beb",
+                                            "type": "field_to_field",
+                                            "value": null
+                                        },
+                                        "output": {
+                                            "id": "63f8e128694361f17f7b59d4"
+                                        }
+                                    },
+                                    {
+                                        "etl": {
+                                            "conditions": []
+                                        },
+                                        "input": {
+                                            "type": "value_to_field",
+                                            "value": "To Do"
+                                        },
+                                        "output": {
+                                            "id": "62e9d296cf8d5b373b24e028"
+                                        }
+                                    },
+                                    {
+                                        "etl": {
+                                            "conditions": []
+                                        },
+                                        "input": {
+                                            "field_type": null,
+                                            "id": "folio",
+                                            "type": "meta_to_meta",
+                                            "value": null
+                                        },
+                                        "output": {
+                                            "field_type": "text",
+                                            "id": "folio"
+                                        }
+                                    },
+                                    {
+                                        "etl": {
+                                            "conditions": []
+                                        },
+                                        "input": {
+                                            "field_type": "catalog-detail",
+                                            "id": "61ef32bcdf0ec2ba73dec33e",
+                                            "type": "field_to_field",
+                                            "value": null
+                                        },
+                                        "output": {
+                                            "id": "61ef32bcdf0ec2ba73dec341"
+                                        }
+                                    }
+                                ]
+                            },
+                            "name": null
+                        },
+                        {
+                            "_id": "64484263601e77d17556f335",
+                            "action_id": 4,
+                            "action_settings": {},
+                            "configuration": {
+                                "assignTo": {
+                                    "customUser": {
+                                        "email": "tere@magnoliagardens.com",
+                                        "first_name": "Teresa Benavides",
+                                        "id": 10716,
+                                        "username": "tere@magnoliagardens.com"
+                                    },
+                                    "field_id": "CUSTOM_USER",
+                                    "label": "User"
+                                },
+                                "push_notification": true
+                            },
+                            "name": null
+                        }
+                    ],
+                    "id": "63f906759e752d80bfd5ff21",
+                    "name": "Solicita planta",
+                    "rules": {
+                        "metadata": {
+                            "connection": [],
+                            "date": {
+                                "period": {
+                                    "month": 1,
+                                    "selected": false,
+                                    "year": 2014
+                                },
+                                "range": {
+                                    "end": "2023-02-25T06:00:00.000Z",
+                                    "selected": false,
+                                    "start": "2023-02-24T18:41:22.112Z"
+                                }
+                            },
+                            "grading": {},
+                            "user": []
+                        },
+                        "record": {
+                            "created": true,
+                            "deleted": false,
+                            "edited": true,
+                            "run_multiple_times": false,
+                            "runtime": "after"
+                        },
+                        "wf_fields": {
+                            "operator": "all",
+                            "triggers": [
+                                {
+                                    "condition": "not__empty=",
+                                    "form_id": null,
+                                    "other_value": null,
+                                    "prefix": "answer",
+                                    "trigger_field": {
+                                        "catalog": {
+                                            "catalog_field_id": "61ef32bcdf0ec2ba73dec33c",
+                                            "catalog_id": 80754,
+                                            "field_type": "text",
+                                            "filters": "",
+                                            "geofence": {
+                                                "distance": 0,
+                                                "field_id": null,
+                                                "key_field": null,
+                                                "on_create": false,
+                                                "on_edit": false
+                                            },
+                                            "last": false,
+                                            "related_catalog": {},
+                                            "view_fields": [],
+                                            "view_index": 1
+                                        },
+                                        "field_id": "61ef32bcdf0ec2ba73dec33d",
+                                        "group": {},
+                                        "label": "Plant Code",
+                                        "type": "catalog-select"
+                                    },
+                                    "value": " "
+                                },
+                                {
+                                    "condition": "not__empty=",
+                                    "form_id": null,
+                                    "other_value": null,
+                                    "prefix": "answer",
+                                    "trigger_field": {
+                                        "catalog": {},
+                                        "field_id": "62e4bc58d9814e169a3f6beb",
+                                        "group": {},
+                                        "label": "Requierd Qty Eaches",
+                                        "type": "integer"
+                                    },
+                                    "value": "NaN"
+                                },
+                                {
+                                    "condition": "in=",
+                                    "form_id": null,
+                                    "other_value": null,
+                                    "prefix": "answer",
+                                    "trigger_field": {
+                                        "catalog": {},
+                                        "field_id": "640114b2cc0899ba18000006",
+                                        "group": {},
+                                        "label": "Source",
+                                        "type": "radio"
+                                    },
+                                    "value": "lab"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "actions": [
+                        {
+                            "_id": "64484263601e77d17556f336",
+                            "action_id": 7,
+                            "action_settings": {},
+                            "configuration": {
+                                "script": {
+                                    "created_at": "2023-04-24T14:51:13.295296",
+                                    "deleted_at": null,
+                                    "end_date": null,
+                                    "id": 99264,
+                                    "is_fileShared": false,
+                                    "itype": "script",
+                                    "name": "calculates_production_greenhouse.py",
+                                    "start_date": "2023-04-24T14:51:13.292754",
+                                    "updated_at": "2023-04-25T16:22:26.726547"
+                                },
+                                "user": "SCRIPT_OWNER"
+                            },
+                            "name": "Calculate Production"
+                        }
+                    ],
+                    "id": "644699553e5f612cf65edd1f",
+                    "name": "Post Calc Prod",
+                    "rules": {
+                        "metadata": {
+                            "connection": [],
+                            "date": {
+                                "period": {
+                                    "month": 1,
+                                    "selected": false,
+                                    "year": 2014
+                                },
+                                "range": {
+                                    "end": "2023-04-25T06:00:00.000Z",
+                                    "selected": false,
+                                    "start": "2023-04-24T14:53:09.925Z"
+                                }
+                            },
+                            "grading": {},
+                            "user": []
+                        },
+                        "record": {
+                            "created": true,
+                            "deleted": false,
+                            "edited": true,
+                            "run_multiple_times": true,
+                            "runtime": "before"
+                        },
+                        "wf_fields": {
+                            "operator": "all",
+                            "triggers": [
+                                {
+                                    "condition": "not__empty=",
+                                    "form_id": null,
+                                    "other_value": null,
+                                    "prefix": "answer",
+                                    "trigger_field": {
+                                        "catalog": {
+                                            "catalog_field_id": "6442e4831198daf81456f273",
+                                            "catalog_id": 98234,
+                                            "field_type": "text",
+                                            "filters": "",
+                                            "geofence": null,
+                                            "last": false,
+                                            "related_catalog": {},
+                                            "view_fields": [],
+                                            "view_index": 1
+                                        },
+                                        "field_id": "6442e4831198daf81456f274",
+                                        "group": {},
+                                        "label": "Green House Name",
+                                        "type": "catalog-select"
+                                    },
+                                    "value": " "
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "actions": [
+                        {
+                            "_id": "64484263601e77d17556f337",
+                            "action_id": 4,
+                            "action_settings": {},
+                            "configuration": {
+                                "assignTo": {
+                                    "customUser": {
+                                        "email": "tere@magnoliagardens.com",
+                                        "first_name": "Teresa Benavides",
+                                        "id": 10716,
+                                        "username": "tere@magnoliagardens.com"
+                                    },
+                                    "field_id": "CUSTOM_USER",
+                                    "label": "User"
+                                },
+                                "push_notification": true
+                            },
+                            "name": null
+                        }
+                    ],
+                    "id": "64484263601e77d17556f340",
+                    "name": "Asignar a Tere",
+                    "rules": {
+                        "metadata": {
+                            "connection": [],
+                            "date": {
+                                "period": {
+                                    "month": 1,
+                                    "selected": false,
+                                    "year": 2014
+                                },
+                                "range": {
+                                    "end": "2023-04-26T05:00:00.000Z",
+                                    "selected": false,
+                                    "start": "2023-04-25T18:56:05.921Z"
+                                }
+                            },
+                            "grading": {},
+                            "user": []
+                        },
+                        "record": {
+                            "created": true,
+                            "deleted": false,
+                            "edited": true,
+                            "run_multiple_times": true,
+                            "runtime": "after"
+                        },
+                        "wf_fields": {
+                            "operator": "all",
+                            "triggers": [
+                                {
+                                    "condition": "in=",
+                                    "form_id": null,
+                                    "other_value": null,
+                                    "prefix": "answer",
+                                    "trigger_field": {
+                                        "catalog": {},
+                                        "field_id": "61f1fd95ef44501511f7f161",
+                                        "group": {},
+                                        "label": "Left Overs",
+                                        "type": "radio"
+                                    },
+                                    "value": "next_day"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }

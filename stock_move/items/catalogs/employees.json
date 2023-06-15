@@ -1,0 +1,80 @@
+{
+    "catalog": {
+        "templates": [],
+        "confirmation": {},
+        "description": "",
+        "_rev": "10-4cda63b5a2448d68d9896f45b8d476ae",
+        "updated_at": "2022-07-06T21:31:16.139130+00:00Z",
+        "sync": {
+            "element_request": {},
+            "input_parameters": []
+        },
+        "name": "Cutters",
+        "edit_public_records": false,
+        "created_at": "2022-07-06T21:31:16.139130+00:00Z",
+        "advanced_options": {},
+        "catalog_pages": [
+            {
+                "page_fields": [
+                    {
+                        "field_type": "catalog",
+                        "catalog_fields": [],
+                        "required": false,
+                        "field_id": "62c5ff0162a70c261328845c",
+                        "label": "Team",
+                        "catalog": {
+                            "catalog_fields": [],
+                            "filters": "",
+                            "view_index": 0,
+                            "couch_id": "62c5ff0162a70c261328845c",
+                            "catalog_field_id": null,
+                            "catalog_id": 86321,
+                            "view_fields": [
+                                "62c5ff0162a70c261328845d"
+                            ],
+                            "name": "Teams"
+                        },
+                        "properties": {}
+                    },
+                    {
+                        "field_type": "catalog-select",
+                        "required": false,
+                        "field_id": "62c5ff0162a70c261328845d",
+                        "label": "Team",
+                        "catalog": {
+                            "catalog_fields": [],
+                            "last": false,
+                            "filters": "",
+                            "field_type": "text",
+                            "view_index": 1,
+                            "catalog_field_id": "62c5ff0162a70c261328845c",
+                            "catalog_id": 86321,
+                            "view_fields": []
+                        },
+                        "options": [],
+                        "properties": {}
+                    },
+                    {
+                        "field_type": "text",
+                        "field_id": "62c5ff407febce07043024dd",
+                        "required": true,
+                        "fav": true,
+                        "label": "Cutter",
+                        "key": true,
+                        "properties": {
+                            "send_email": false,
+                            "size": "complete",
+                            "custom": null
+                        }
+                    }
+                ],
+                "page_description": null,
+                "page_name": "Page 1"
+            }
+        ],
+        "sync_last_update": null,
+        "_id": "62c5ff243c63280985580087",
+        "public": false,
+        "catalog_id": 86322
+    }
+}
