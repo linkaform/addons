@@ -1,10 +1,22 @@
 # coding: utf-8
-from stock_move import items
-from stock_move.items.catalogs.catalog_resource import CatalogResource
+from base import items
+from .catalog_resource import CatalogResource
 
+module = __name__.replace('.','/')
 
-install_order = ['unit_of_measure', 'product_product']
-donot_install = ['nouuse_unit_of_measure']
+install_order = [
+    'employees_teams',
+    'employees',
+    'product',
+    'warehouse',
+    'product_presentation',
+    'product_inventory',
+    ]
+donot_install = [
+    'nouuse_unit_of_measure',
+    'unit_of_measure',
+    'product_product',
+    ]
 
 def get_catalog_modules(all_items):
     data_file = []
@@ -38,6 +50,6 @@ def get_catalogs_to_install():
             catalogs_data.pop(n)
     return catalogs_data
 
-items_json = items.get_all_items_json('catalogs')
+items_json = items.get_all_items_json(module, 'catalogs')
 instalable_catalogs = get_catalogs_to_install()
 

@@ -1,6 +1,8 @@
 # coding: utf-8
-from stock_move import items
-from stock_move.items.forms.form_resource import FormResource
+from base import items
+from .form_resource import FormResource
+
+module = __name__.replace('.','/')
 
 install_order = ['stock_move']
 donot_install = ['stock_inventory', 'stock_move_warehouse']
@@ -38,7 +40,7 @@ def get_forms_to_install():
     return catalogs_data
 
 
-items_json = items.get_all_items_json('forms')
+items_json = items.get_all_items_json(module, 'forms')
 instalable_forms = get_forms_to_install()
 
 

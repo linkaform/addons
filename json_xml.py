@@ -20,9 +20,12 @@ def json_to_xml(json_data):
                 element = ET.SubElement(parent, key)
                 json_to_xml_elements(value, element)
         elif isinstance(data, list):
+            if data == []:
+                parent.text = '[]'
             for item in data:
                 element = ET.SubElement(parent, 'item')
                 json_to_xml_elements(item, element)
+
         else:
             if isinstance(data, str):
                 x = str(data.encode('utf-8').decode('utf-8'))
@@ -43,8 +46,8 @@ def json_to_xml(json_data):
 
 
 #file_path ='stock_move/items/catalogs'
-file_path ='stock_move/items/forms'
-file_name='wharehouse_inventory_move_workflow.json'
+file_path ='test/items/catalogs'
+file_name='employees.json'
 
 save_file = './{}/{}'.format(file_path, file_name.replace('.json', '.xml'))
 json_data = file(file_path, file_name)

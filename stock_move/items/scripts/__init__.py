@@ -1,9 +1,16 @@
 # coding: utf-8
-from stock_move import items
-from stock_move.items.scripts.script_resource import ScriptResource
+from base import items
+from .script_resource import ScriptResource
 
-install_order = ['the_script']
-donot_install = []
+module = __name__.replace('.','/')
+
+install_order = [
+    'inventory_move_warehouse_location',
+    'calculates_production_warehouse',
+    'inventory_move_warehouse_scrap'
+    ]
+
+donot_install = ['the_script']
 
 default_image = 'linkaform/python3_lkf:latest'
 
@@ -40,6 +47,6 @@ def get_scritps_to_install():
             scripts_data.pop(n)
     return scripts_data
 
-items_files = items.get_all_items_json('scripts')
+items_files = items.get_all_items_json(module, 'scripts')
 instalable_scripts = get_scritps_to_install()
 
