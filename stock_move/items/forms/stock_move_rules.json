@@ -1,59 +1,39 @@
-{
-    "meta": {
-        "limit": 1000,
-        "next": null,
-        "offset": 0,
-        "previous": null,
-        "total_count": 1
-    },
-    "objects": [
+{"id":"64890f3c5482af5b93057d8f",
+    "rules": [
+    {
+      "conditions": [
         {
-            "form_id": 58161,
-            "id": "6093fb335e999c334f853c34",
-            "rules": [
-                {
-                    "conditions": [
-                        {
-                            "condition": "in=",
-                            "field": {
-                                "field_id": "60959ac116bc283a19b8c285",
-                                "id": "60959ac116bc283a19b8c285",
-                                "label": "seleccion",
-                                "type": "radio"
-                            },
-                            "value": "apagar"
-                        }
-                    ],
-                    "element_ids": [],
-                    "empty": false,
-                    "fields_ruled": [
-                        {
-                            "field_id": "6106bebcfb2aa041489659ec",
-                            "id": "6106bebcfb2aa041489659ec",
-                            "label": "Checkbox",
-                            "type": "checkbox"
-                        },
-                        {
-                            "field_id": "6101f00fe02b87dc7440a912",
-                            "id": "6101f00fe02b87dc7440a912",
-                            "label": "entero",
-                            "type": "integer"
-                        },
-                        {
-                            "field_id": "6101f00fe02b87dc7440a914",
-                            "id": "6101f00fe02b87dc7440a914",
-                            "label": "grupo",
-                            "type": "group"
-                        }
-                    ],
-                    "group_conditions": {},
-                    "name": "Regla 3",
-                    "operator": "and",
-                    "rule_id": "160212a280015e2",
-                    "rule_type": "disabled",
-                    "user_conditions": {}
-                }
-            ]
+          "condition": "exact__number=",
+          "field": {
+            "field_id": "6442e2fbc0dd855fe856f1da",
+            "id": "6442e2fbc0dd855fe856f1da",
+            "label": "Sell Flats",
+            "type": "integer"
+          },
+          "value": 1
         }
-    ]
+      ],
+      "element_ids": [],
+      "empty": false,
+      "fields_ruled": [
+        {
+          "id": "61ef32bcdf0ec2ba73dec33d",
+          "type": "catalog-select",
+          "label": "Plant Code"
+        },
+        {
+          "id": "6209705080c17c97320e3383",
+          "type": "catalog-select",
+          "label": "Growing Media/Soil Type"
+        }
+      ],
+      "group_conditions": {},
+      "name": "Regla 1",
+      "operator": "and",
+      "rule_id": "23aa210312b92485",
+      "rule_type": "show",
+      "user_conditions": {}
+    }
+  ],
+  "form_id": "103188"
 }

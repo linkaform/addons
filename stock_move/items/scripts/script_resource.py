@@ -25,6 +25,7 @@ class ScriptResource(Items):
         else:
             install_order = []
         for script_name in install_order:
+            properites=None
             if instalable_scripts:
                 detail = instalable_scripts[script_name]
                 if detail.get('properties') and detail['properties']:
