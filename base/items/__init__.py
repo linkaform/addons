@@ -17,6 +17,7 @@ class LKFException(BaseException):
         return BaseException(msg)
 
 class Items(LKFException):
+
     def __init__(self, path, module, settings):
         self.path = path
         self.module = module
@@ -45,7 +46,7 @@ class Items(LKFException):
         xml_exists = self.file_exists(file_path, file_name, 'xml')
         print('file_path=', file_path)
         print('file_name=', file_name)
-        print('file_data=', file_data)
+        # print('file_data=', file_data)
         if xml_exists:
             json_file = self.lkf.read_template_file(file_path, f'{file_name}.xml', file_data)
             # json_file = self.read_xml_template(file_path, )
@@ -86,3 +87,11 @@ class Items(LKFException):
                     res.append(y)
         return res
 
+    def get_module_items(self):
+        return self.lkf.get_module_items(self.module)
+
+    def delete_item(self, item_id):
+        return self.lkf_api.delete_item(item_id)
+
+    def remove_module_items(self, remove_items):
+        return self.lkf.remove_module_items(remove_items)

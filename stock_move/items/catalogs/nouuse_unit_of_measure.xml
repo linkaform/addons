@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<lkf>
-  <templates />
-  <catalog_id>102453</catalog_id>
-  <confirmation>Texto normal</confirmation>
-  <descriptiona>Texto en comillado</descriptiona>
-  <description string='true' special='false'>12345</description>
-  <edit_public_records>False</edit_public_records>
-</lkf>  
