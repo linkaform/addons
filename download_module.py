@@ -5,25 +5,17 @@ import xml.dom.minidom
 from copy import deepcopy
 import urllib.request, re
 
+from uts import get_lkf_api, get_lkf_module
+
 from linkaform_api import utils
 import settings
+
 
 from json_xml import json_to_xml
 
 import simplejson
 
-#module_name = 'stock_move'
-APIKEY = 'e38ea1b666e739577e7c7c53abce771ae7ead028'
-USERNAME = 'linkaform@magnoliagardens.com'
-
-module_name = 'expenses'
-APIKEY = '72eb0279138949dab24fe4022d98ac4aafb826ca'
-USERNAME = 'rh@linkaform.com'
-settings.config['APIKEY'] = APIKEY
-settings.config['USERNAME'] = USERNAME
-settings.config['PROTOCOL'] =  'https'
-settings.config['HOST'] =  'app.linkaform.com'
-
+from settings import *
 
 items = {
     "forms":{
@@ -36,19 +28,26 @@ items = {
         #test
         #104304:None,
         #Viaticos
-        94192:None,
-        69620:None,
-        73387:None
+        # 94192:None,
+        # 69620:None,
+        # 73387:None
+        #Viaticos Local
+        # 104478:None, # Autorizacion
+        # 104492:None, # Entrga de anticipo
+        # 104479:None, # Registro de gastos
+        # 104480:None, # solicidud
         },
     "catalogs":{
+        # 104534:None,
     },
     "scripts":{
+        # 104489:None #expense util
     }
 }
 
+modules = {}
+
 installed_items = {'catalogs': {},'scripts':{}, 'forms':{}}
-
-
 
 def strip_chaaracters(string):
     pattern = r'[^a-zA-Z0-9_]'
@@ -152,6 +151,26 @@ def save_rule_xml(xml_data, form_name):
     root = tree.getroot()
     form_id = root.find('form_id')
     form_id.text = "{{ form." + form_name + ".id }}"
+    if root.findall("rules"):
+        for rules in root.find('rules'):
+            for r in list(rules):
+                if r.tag == 'fields_ruled':
+                    for frules in list(r):
+                        etype = frules.find('type')
+                        if etype.tag == 'type' and etype.text =='catalog':
+                            field_id = frules.find('field_id')
+                            catalog_field_id = field_id.text
+                            catalog_name = lkf_modules.get_item_name_obj_id(catalog_field_id, 'catalog')
+                            cname = None
+                            for name in catalog_name:
+                                cname = name.get('item_name')
+                            if not cname:
+                                elable = frules.find('label')
+                                cname = elable.text
+                            field_id.text = "{{ " + f"catalog.{cname}.obj_id" + "}}"
+
+    
+
     tree.write('./{}/items/forms/{}_rules.xml'.format(module_name, form_name), encoding="utf-8", xml_declaration=True)
     return True
 
@@ -236,7 +255,12 @@ def get_forms(download_forms={}):
         form_data_json = lkf_api.get_form_to_duplicate(form_id, jwt_settings_key='JWT_KEY')
         if form_data_json.get('fields'):
             form_data_json.pop('fields')
-        form_data_xml = json_to_xml(form_data_json)
+        try:
+            form_data_xml = json_to_xml(form_data_json)
+        except:
+            # print('form_data_json=',simplejson.dumps(form_data_json, indent=4))
+            print(stop)
+
         save_form_xml(form_data_xml, form_name)
 
         rules_json = lkf_api.get_form_rules(form_id, jwt_settings_key='JWT_KEY')
@@ -330,13 +354,10 @@ def get_catalogs(download_catalogs={}):
     global items, installed_items
     if not download_catalogs:
         download_catalogs = deepcopy(items['catalogs'])
-    print('download_catalogs', download_catalogs)
     for catalog_id, catalog_name in download_catalogs.items():
-        print('catalog_id', catalog_id)
-        print('catalog_name=', catalog_name)
+        print(';catalog name', catalog_name)
         catalog_json = lkf_api.get_catalog_id_fields(catalog_id, jwt_settings_key='JWT_KEY')
         catalog_json = catalog_json.get('catalog')
-        print('catalog_json=', catalog_json)
         if catalog_json.get('fields'):
             catalog_json.pop('fields')
         # import simplejson
@@ -363,7 +384,9 @@ def get_catalogs(download_catalogs={}):
         #     },
         # }
         if catalog_json.get('filters'):
-            catalog_json.pop('filters')
+            print('stop')
+            print('stop', stop)
+        #     catalog_json.pop('filters')
         res = drop_hashKey(catalog_json)
         # print('res=',simplejson.dumps(res, indent=4))  
         catalog_data_xml = json_to_xml(res)
@@ -384,17 +407,32 @@ def get_new_items(item_type):
         elif item_type == 'forms':
             get_forms(new_items)
 
+def set_module_items():
+    global items, modules
+    module_items = lkf_modules.fetch_installed_modules()
+    for itm in module_items:
+        module = itm['module']
+        modules[module] = modules.get(module,{ 'items':{"forms":{},"catalogs":{}, "scripts":{}} })
+        if itm['item_type'] == 'form':
+            modules[module]['items']['forms'][itm['item_id']] = itm['item_name']
+        items = modules[module]['items']
+    return True
 
 if __name__ == "__main__":
 
-
-    lkf_api = utils.Cache(settings)
-    user = lkf_api.get_jwt(api_key=APIKEY, get_user=True)
-    settings.config["JWT_KEY"] = user.get('jwt')
-    settings.config["ACCOUNT_ID"] = user['user']['parent_info']['id']
-    settings.config["USER"] = user['user']
-    get_forms()
-    get_catalogs()
-    print('asi va items', items)
-    get_scripts()
+    # settings.config["USERNAME"] = USERNAME
+    # lkf_api = utils.Cache(settings)
+    # user = lkf_api.get_jwt(api_key=settings.config['APIKEY'], get_user=True)
+    # settings.config["JWT_KEY"] = user.get('jwt')
+    # settings.config["ACCOUNT_ID"] = user['user']['parent_info']['id']
+    # settings.config["USER"] = user['user']
+    lkf_api = get_lkf_api()
+    lkf_modules = get_lkf_module()
+    set_module_items()
+    for module_name in modules:
+        print('module_name=', module_name)
+        get_forms()
+        get_catalogs()
+        print('asi va items', items)
+        #get_scripts()
 

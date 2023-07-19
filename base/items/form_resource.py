@@ -15,10 +15,9 @@ class FormResource(items.Items):
             # res = self.lkf.install_workflows(module, workflow_model, 'update')
             if action == 'create':
                 res = self.lkf_api.upload_workflows(workflow_model, 'POST')
-                print('WORKFLOW res=',res)
             elif action =='update':
                 res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
-            res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
+            #res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
 
     def setup_rules(self, conf_files, action):
         for file_name in conf_files:
@@ -29,7 +28,7 @@ class FormResource(items.Items):
                 res = self.lkf_api.upload_rules(rules_model, 'POST')
             elif action =='update':
                 res = self.lkf_api.upload_rules(rules_model, 'PATCH')
-            res = self.lkf_api.upload_rules(rules_model, 'PATCH')
+            #res = self.lkf_api.upload_rules(rules_model, 'PATCH')
 
     def install_forms(self, instalable_forms):
         if instalable_forms.get('install_order'):
@@ -38,8 +37,8 @@ class FormResource(items.Items):
             install_order = []
         install_order += [x  for x in instalable_forms.keys() if x not in install_order]
         response = []
-        print('instalable_forms=',instalable_forms)
         for form_name in install_order:
+            print('\n\n')
             detail = instalable_forms[form_name]
             form_model = self.load_module_template_file(self.path, form_name)
             res = self.lkf.install_forms(self.module, form_name, form_model)
@@ -53,14 +52,13 @@ class FormResource(items.Items):
                         'lkf_response':res
                     }
                 )
-            print('res=',res)
             if res.get('status') in ('update','create','unchanged'):
                 for config, conf_files in detail.items():
                     if config == 'workflow':
-                        print('isntalling workflows...')
-                        res['status'] = 'create'
+                        # res['status'] = 'create'
                         self.setup_workflows(conf_files, res['status'])
                     if config == 'rules':
+                        print('conf_files', conf_files)
                         self.setup_rules(conf_files, res['status'])
             elif res.get('status_code') == 400:
                 raise self.LKFException('Error installing form: {}. Error msg'.format(form_name, res['json']['error']))
@@ -86,7 +84,7 @@ class FormResource(items.Items):
                 file_type = file_name.split('_')[-1]
                 if file_name[:file_name.rfind('_')] == item:
                     #TODO hacer muylti extesion
-                    form_file[item][file_type].append('{}.json'.format(file_name))
+                    form_file[item][file_type].append('{}.{}'.format(file_name, file_ext[1]))
         return form_file
 
     def instalable_forms(self, install_order=None):

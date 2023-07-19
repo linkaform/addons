@@ -7,6 +7,8 @@ import settings
 
 from linkaform_api import utils
 
+from uts import get_lkf_api
+
 commands = sys.argv
 print('Running modules with command: ',commands)
 base_modules = ['stock_move',]
@@ -139,12 +141,7 @@ def uninstall_modules(uninstall_dict):
 
 
 
-lkf_api = utils.Cache(settings)
-user = lkf_api.get_jwt(api_key=settings.config['APIKEY'], get_user=True)
-settings.config["JWT_KEY"] = user.get('jwt')
-settings.config["ACCOUNT_ID"] = user['user']['parent_info']['id']
-settings.config["USER"] = user
-#print('settings.config["ACCOUNT_ID"]', settings.config["ACCOUNT_ID"])
+lkf_api = get_lkf_api()
 
 
 if 'uninstall' in commands:

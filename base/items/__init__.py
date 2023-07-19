@@ -44,9 +44,10 @@ class Items(LKFException):
 
     def load_module_template_file(self, file_path, file_name, file_data=None):
         xml_exists = self.file_exists(file_path, file_name, 'xml')
+        print('\n\n ====================')
         print('file_path=', file_path)
         print('file_name=', file_name)
-        # print('file_data=', file_data)
+        print('file_data=', file_data)
         if xml_exists:
             json_file = self.lkf.read_template_file(file_path, f'{file_name}.xml', file_data)
             # json_file = self.read_xml_template(file_path, )
@@ -81,6 +82,8 @@ class Items(LKFException):
                     if y == '__init__.py':
                         continue
                     if y.find('_resource.py') > 0:
+                        continue
+                    if y.find('_settings.py') > 0:
                         continue
                     if y.find('.pyc') > 0:
                         continue 
