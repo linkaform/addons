@@ -8,9 +8,26 @@ from base import items
 
 class CatalogResource(items.Items):
 
+    def load_info(self, files, file_type, module_info):
+        catalog_id = module_info.get('item_id')
+        for full_file_name in files:
+            file_name = full_file_name.split('.')[0]
+            if module_info.get(f'load_{file_type}',{}) and  module_info.get(f'load_{file_type}',{}).get(file_name):
+                continue
+            file = open('./{}/{}'.format(self.path, full_file_name))
+            file_data = simplejson.loads(file.read())
+            catalog_map = file_data['mapping']
+            spreadsheet_url = file_data['spreadsheet_url']
+            res = self.lkf_api.catalog_load_rows(catalog_id, catalog_map, spreadsheet_url)
+            if res.get('status_code') == 202:
+                update_query = {'_id': module_info['_id']}
+                item_info = {
+                    f'load_{file_type}': {file_name:True}
+                }
+                self.lkf.update(update_query, item_info)
+
     def install_catalogs(self, instalable_catalogs):
         install_order = []
-        print('instalable_catalogs',instalable_catalogs)
         if instalable_catalogs.get('install_order'):
             install_order = instalable_catalogs.pop('install_order')
         else:
@@ -21,9 +38,12 @@ class CatalogResource(items.Items):
             catalog_model = self.load_module_template_file(self.path, catalog_name)
             res = self.lkf.install_catalog(self.module, catalog_name, catalog_model)
             for file_type, files in detail.items():
-                for file_name in files:
-                    file = open('./{}/{}'.format(self.path, file_name))
-                    # catalog_json = self.load_items_file(file_type, file, 'json')
+                if file_type == 'data' and self.load_data:
+                    self.load_info(files, file_type, res )
+                if file_type == 'demo' and self.load_demo:
+                    self.load_info(files, file_type, res )
+                    
+                        # catalog_json = self.load_items_file(file_type, file, 'json')
 
     def get_catalog_modules(self, all_items):
         data_file = []

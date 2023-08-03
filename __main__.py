@@ -47,6 +47,7 @@ process = subprocess.Popen(args=cmd,
 output, error = process.communicate()
 
 load_modules += base_modules
+
 for module, git_url in submodules.items():
     print('module>>>', module)
     print('v', git_url)
@@ -75,48 +76,70 @@ def do_add_modules(module):
 #Este dato debe de venir del front
 # install = {'all':False, 'stock_move':False, 'test':True}
 install = {'all':False, 'stock_move':False, 'test':False, 'expenses':True}
+
+# load_data = True
 load_data = False
-load_demo = False
+load_demo = True
 
 def do_load_modules(load_modules):
     response = []
     for module in load_modules:
         # global forms
-        print('-'*35 + f' {module} ' + '-'*35)
+        print('-'*35 + f' Loding Module: {module} ' + '-'*35)
         ### Scripts
         scripts = importlib.import_module('{}.items.scripts'.format(module))
         if install.get('all') or install.get(module):
-            script_resource = scripts.ScriptResource(path=scripts.__path__[0], module=module, settings=settings)
+            script_resource = scripts.ScriptResource(
+                path=scripts.__path__[0], 
+                module=module, 
+                settings=settings,
+                load_demo=load_demo, 
+                load_data=load_data
+                )
             try:
                 install_order = scripts.install_order
             except:
                 install_order = []
             script_dict = script_resource.instalable_scripts(install_order)
             ###scripts
-            script_resource.install_scripts(script_dict)
+            if load_script:
+                script_resource.install_scripts(script_dict)
 
             ### Catalogs
             catalogs = importlib.import_module('{}.items.catalogs'.format(module))
-            catalog_resource = catalogs.CatalogResource(path=catalogs.__path__[0], module=module, settings=settings)
+            catalog_resource = catalogs.CatalogResource(
+                path=catalogs.__path__[0], 
+                module=module, 
+                settings=settings, 
+                load_demo=load_demo, 
+                load_data=load_data
+                )
             try:
                 install_order = catalogs.install_order
             except:
                 install_order = []
             catalog_dict = catalog_resource.instalable_catalogs(install_order)
             ### catalog
-            catalog_resource.install_catalogs(catalog_dict)
+            if load_catalog:
+                catalog_resource.install_catalogs(catalog_dict)
             
             ### Forms
             forms = importlib.import_module('{}.items.forms'.format(module))
-            form_resource = forms.FormResource(path=forms.__path__[0], module=module, settings=settings)
+            form_resource = forms.FormResource(
+                path=forms.__path__[0], 
+                module=module, 
+                settings=settings, 
+                load_demo=load_demo, 
+                load_data=load_data
+                )
             try:
                 install_order = forms.install_order
             except:
                 install_order = []
             form_dict = form_resource.instalable_forms(install_order)
             ###forms
-            response += form_resource.install_forms(form_dict)
-
+            if load_form:
+                response += form_resource.install_forms(form_dict)
 
 def uninstall_modules(uninstall_dict):
     from base import items 
@@ -139,12 +162,66 @@ def uninstall_modules(uninstall_dict):
             print('res...=',res)
             
 
-
-
 lkf_api = get_lkf_api()
 
+print('commands', commands)
 
-if 'uninstall' in commands:
-    uninstall_modules(install)
+
+load_data = False
+load_demo = False
+load_script  = False
+load_catalog = False
+load_form    = False
+
+ask_data =    True
+ask_demo =    True
+ask_script  = True
+ask_catalog = True
+ask_form    = True
+
+if 'script' in commands:
+    load_script = True
+    ask_script = False
+if 'catalog' in commands:
+    load_catalog = True
+    ask_catalog = False
+if 'form' in commands:
+    load_form = True
+    ask_form = False
+if 'demo' in commands:
+    load_demo = True
+    ask_demo = False
+if 'data' in commands:
+    load_data = True
+    ask_data = False
+
+
+
+def set_value(value):
+    if value == 'y' or value == 'Y':
+        return True
+    return False
+
+if ask_data:
+    load_demo = set_value(input("Load DEMO data [y/n] (default n):"))
+if ask_demo:    
+    load_data = set_value(input("Load DATA [y/n] (default n):"))
+if ask_form:    
+    load_form = set_value(input("Load Forms [y/n] (default n):"))
+if ask_catalog:    
+    load_catalog = set_value(input("Load Catalogs [y/n] (default n):"))
+if ask_script:    
+    load_script = set_value(input("Load Scripts [y/n] (default n):"))
+
+print('Running on ', '{}:-:'.format(settings.ENV)*300)
+environment =  set_value(input(f"We are running on {settings.ENV} Enviroment, are you sure [y/n] (default n):"))
+
+
+if not environment:
+    print('Ending session no enviornment confirmation found')
 else:
-    do_load_modules(load_modules)
+    if 'uninstall' in commands:
+        uninstall_modules(install)
+    else:
+        do_load_modules(load_modules)
+

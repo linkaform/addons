@@ -7,7 +7,6 @@ from linkaform_api import utils, lkf_models
 
 default_image = 'linkaform/python3_lkf:latest'
 
-print('------------------------')
 
 class LKFException(BaseException):
     def __init__(self, message, res=None):
@@ -18,12 +17,14 @@ class LKFException(BaseException):
 
 class Items(LKFException):
 
-    def __init__(self, path, module, settings):
+    def __init__(self, path, module, settings, load_data=False, load_demo=False):
         self.path = path
         self.module = module
         self.lkf_api = utils.Cache(settings)
         self.settings = settings
         self.lkf = lkf_models.LKFModules(self.settings)
+        self.load_data = load_data
+        self.load_demo = load_demo
         # self.LKFException()
         # self.lkf.get_installed_modues()
 
@@ -62,7 +63,6 @@ class Items(LKFException):
         # module = __name__.replace('.','/')
         # cmd = ['ls', './{}/{}/'.format(module, itype)]
         cmd = ['ls', './{}/items/{}'.format(self.module, itype)]
-        print('cmd=',cmd)
         process = subprocess.Popen(args=cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)

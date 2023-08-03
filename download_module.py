@@ -36,6 +36,7 @@ items = {
         # 104492:None, # Entrga de anticipo
         # 104479:None, # Registro de gastos
         # 104480:None, # solicidud
+        105520:None
         },
     "catalogs":{
         # 104534:None,
@@ -44,8 +45,21 @@ items = {
         # 104489:None #expense util
     }
 }
+items_obj_id = {
+    "forms":{
+        },
+    "catalogs":{
+    },
+    "scripts":{
+    }
+}
+
+modules = {'expenses':
+                { 'items':{"forms":{105520:None},"catalogs":{}, "scripts":{}} }
+}
 
 modules = {}
+
 
 installed_items = {'catalogs': {},'scripts':{}, 'forms':{}}
 
@@ -56,8 +70,20 @@ def strip_chaaracters(string):
     stripped_string = stripped_string.replace('__','_')
     return stripped_string.lower()
 
-def get_item_name(item_type, item_id, element=None, attribute='name'):
-    global items
+def get_item_name(item_type, item_id=None, element=None, attribute='name', item_obj_id=None):
+    global items, items_obj_id
+    if item_obj_id:
+        item = items_obj_id.get(item_type,{})
+        if item.get(item_obj_id) and item[item_obj_id]:
+            return item[item_obj_id]
+        else:
+            catalog_name = lkf_modules.get_item_name_obj_id(item_obj_id, 'catalog')
+            cname = None
+            for name in catalog_name:
+                cname = name.get('item_name')
+            if cname:
+                return cname
+            return None
     item_id = int(item_id)
     item = items.get(item_type,{})
     item_name = None
@@ -151,6 +177,7 @@ def save_rule_xml(xml_data, form_name):
     root = tree.getroot()
     form_id = root.find('form_id')
     form_id.text = "{{ form." + form_name + ".id }}"
+    print('form_name', form_name)
     if root.findall("rules"):
         for rules in root.find('rules'):
             for r in list(rules):
@@ -160,14 +187,18 @@ def save_rule_xml(xml_data, form_name):
                         if etype.tag == 'type' and etype.text =='catalog':
                             field_id = frules.find('field_id')
                             catalog_field_id = field_id.text
-                            catalog_name = lkf_modules.get_item_name_obj_id(catalog_field_id, 'catalog')
-                            cname = None
-                            for name in catalog_name:
-                                cname = name.get('item_name')
-                            if not cname:
+                            # catalog_name = lkf_modules.get_item_name_obj_id(catalog_field_id, 'catalog')
+                            catalog_name = get_item_name('catalogs', item_obj_id=catalog_field_id, element=field_id)
+                            print('catalog_field_id', catalog_field_id)
+                            print('catalog_name', catalog_name)
+                            # cname = None
+                            # for name in catalog_name:
+                            #     cname = name.get('item_name')
+                            if not catalog_name:
                                 elable = frules.find('label')
-                                cname = elable.text
-                            field_id.text = "{{ " + f"catalog.{cname}.obj_id" + "}}"
+                                catalog_name = elable.text
+                            field_id.text = "{{ " + f"catalog.{catalog_name}.obj_id" + "}}"
+                            print('field txt', "{{ " + f"catalog.{catalog_name}.obj_id" + "}}")
 
     
 
@@ -220,6 +251,10 @@ def save_workflow_xml(xml_data, form_name):
                             resource_uri = catalog.find('resource_uri')
                             resource_uri.text = "/api/infosync/get_catalogs/" + "{{ catalog." + catalog_name + ".id }}" + "/"
                     for assign in config.iter('assignTo'):
+                        catalog_field_id = assign.find('catalog_field_id')
+                        if catalog_field_id.text:
+                            catalog_name = get_item_name('catalogs', item_obj_id=catalog_field_id.text, element=catalog_field_id)
+                            catalog_field_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
                         for customUser in assign.iter('customUser'):
                             user_id = customUser.find('id')
                             user_id.text = str(settings.config["USER"]['id'])
@@ -256,9 +291,10 @@ def get_forms(download_forms={}):
         if form_data_json.get('fields'):
             form_data_json.pop('fields')
         try:
+            form_data_json = drop_hashKey(form_data_json)
             form_data_xml = json_to_xml(form_data_json)
         except:
-            # print('form_data_json=',simplejson.dumps(form_data_json, indent=4))
+            print('form_data_json=',form_data_json)
             print(stop)
 
         save_form_xml(form_data_xml, form_name)
@@ -355,13 +391,12 @@ def get_catalogs(download_catalogs={}):
     if not download_catalogs:
         download_catalogs = deepcopy(items['catalogs'])
     for catalog_id, catalog_name in download_catalogs.items():
-        print(';catalog name', catalog_name)
         catalog_json = lkf_api.get_catalog_id_fields(catalog_id, jwt_settings_key='JWT_KEY')
         catalog_json = catalog_json.get('catalog')
         if catalog_json.get('fields'):
             catalog_json.pop('fields')
         # import simplejson
-        # # print('catalog_json', simplejson.dumps(catalog_json, indent=4))  
+        # print('catalog_json', simplejson.dumps(catalog_json, indent=4))  
         # cc = {
         #     "temp":[],
         #     "3dict_solo":{},
@@ -383,10 +418,10 @@ def get_catalogs(download_catalogs={}):
         #         }
         #     },
         # }
-        if catalog_json.get('filters'):
-            print('stop')
-            print('stop', stop)
-        #     catalog_json.pop('filters')
+        # if catalog_json.get('filters'):
+        #     print('stop')
+        #     print('stop', stop)
+        # #     catalog_json.pop('filters')
         res = drop_hashKey(catalog_json)
         # print('res=',simplejson.dumps(res, indent=4))  
         catalog_data_xml = json_to_xml(res)
@@ -408,14 +443,25 @@ def get_new_items(item_type):
             get_forms(new_items)
 
 def set_module_items():
-    global items, modules
+    global items, modules, items_obj_id
     module_items = lkf_modules.fetch_installed_modules()
     for itm in module_items:
         module = itm['module']
-        modules[module] = modules.get(module,{ 'items':{"forms":{},"catalogs":{}, "scripts":{}} })
+        modules[module] = modules.get(module,{ 
+            'items':{"forms":{},"catalogs":{}, "scripts":{}} ,
+            'items_obj_id':{"forms":{},"catalogs":{}, "scripts":{}} ,
+            })
         if itm['item_type'] == 'form':
             modules[module]['items']['forms'][itm['item_id']] = itm['item_name']
-        items = modules[module]['items']
+        if itm['item_type'] == 'script':
+            modules[module]['items']['scripts'][itm['item_id']] = itm['item_name']
+        if itm['item_type'] == 'catalog':
+            modules[module]['items']['catalogs'][itm['item_id']] = itm['item_name']
+            if itm.get('item_obj_id'):
+                modules[module]['items_obj_id']['catalogs'][itm['item_obj_id']] = itm['item_name']
+        
+    items = modules[module]['items']
+    items_obj_id = modules[module]['items_obj_id']
     return True
 
 if __name__ == "__main__":
@@ -433,6 +479,6 @@ if __name__ == "__main__":
         print('module_name=', module_name)
         get_forms()
         get_catalogs()
-        print('asi va items', items)
-        #get_scripts()
+        #print('asi va items', items)
+        get_scripts()
 

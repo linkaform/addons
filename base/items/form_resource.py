@@ -35,8 +35,10 @@ class FormResource(items.Items):
             install_order = instalable_forms.pop('install_order', [])
         else:
             install_order = []
+        print('install_order=',install_order)
         install_order += [x  for x in instalable_forms.keys() if x not in install_order]
         response = []
+        print('install_order=',install_order)
         for form_name in install_order:
             print('\n\n')
             detail = instalable_forms[form_name]

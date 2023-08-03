@@ -1,0 +1,193 @@
+#!/bin/bash
+
+set -e
+set -u
+#set -o pipefail
+
+echo "" >.env
+_usage(){
+  APP=$(basename "$0")
+      echo
+      echo "Usage: $APP [options] <addons|test>"
+
+      echo "    Special options:"
+      echo
+      echo "      -i           load an secific image"
+      echo "      -a           load local linkaform_api as volume"
+      echo "      -r           relaod, alway need to be at the end of the options"
+      echo "      -h           help!!!!"
+      echo
+      echo "    Command "
+      echo "      $APP addons     Starts the addons development environment"
+      echo "      $APP test       Starts the testing environment"
+      echo
+      echo
+      exit 1
+}
+
+API_VOL=0
+IMAGE_NAME=0
+SHIFT=-1
+while getopts ':iar:ir:h' opt; do
+  case "$opt" in
+    a)
+      echo "Using local addons..."
+      if [ "$IMAGE_NAME" != "0" ]; then
+        SHIFT=0
+      else
+        SHIFT=-1
+      fi
+      API_VOL=1
+      ;;
+    i)
+      echo "Setting image..."
+      SHIFT=-0
+      IMAGE_NAME=$2
+      ;;
+    r)
+      echo "Relaoding..."
+      SHIFT=-1
+      if [ "$IMAGE_NAME" != "0" ]; then
+        CONTAINER_NAME=$3
+      else  
+        CONTAINER_NAME=$2
+        SHIFT=-2
+      fi
+      if [[ $CONTAINER_NAME == 'test' ]]; then
+        docker stop lkf_test && docker rm lkf_test
+      else
+        docker stop $CONTAINER_NAME && docker rm $CONTAINER_NAME
+      fi
+      ;;
+    h)
+     #help
+      echo "helpppp"
+      _usage
+      ;;
+    ?)
+      _usage
+      ;;
+  esac
+done
+
+echo "SHIFT" $SHIFT
+
+if [ "$IMAGE_NAME" != "0" ]; then
+  if [[ $# -ge 2 ]]; then
+    shift "$(($OPTIND $SHIFT))"
+  fi
+else
+  echo "no image ", $IMAGE_NAME
+  if [ $# -ge 2 ]; then
+    shift "$(($OPTIND $SHIFT))"
+  fi
+  IMAGE_NAME="linkaform/python3_lkf:develop"
+fi
+echo "IMAGE_NAME" $IMAGE_NAME
+
+
+_run_addons(){
+  echo "the command for was " $1
+  case $1 in
+    stop)
+      docker stop addons && docker rm addons
+    ;;
+    start)
+      containerID=$(docker ps | grep addons | awk '{print $1}')
+      echo "container ID" $containerID
+      if [ -z "$containerID" ]; then
+        echo "creating new container"
+        docker stop addons && docker rm addons
+        if [[ $2 == 0 ]] ; then
+          echo 'arranca'
+          docker run   -w /srv/addons/ \
+            -v `pwd`:/srv/addons \
+            -v ~/lkf/custom/:/srv/custom \
+            -v ~/.bash_history:/root/.bash_history \
+            --name addons \
+            -d  $IMAGE_NAME sleep infinity && \
+            docker exec -it addons bash
+        else
+          echo "Loading local addons"
+          docker run   -w /srv/addons/ \
+            -v `pwd`:/srv/addons \
+            -v ~/lkf/custom/:/srv/custom \
+            -v ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/  \
+            -v ~/.bash_history:/root/.bash_history \
+            --name addons \
+            -d $IMAGE_NAME sleep infinity && \
+            docker exec -it addons bash
+        fi
+      else
+        echo "Joinign existing"
+        docker exec -it $containerID bash ;
+      fi
+     ;;
+  esac
+
+}
+
+
+_run_tests(){
+  echo "the command for was " $1
+  case $1 in
+    stop)
+      docker stop lkf_test && docker rm lkf_test
+    ;;
+    start)
+      cd ~/lkf/addons/test/docker
+      containerID=$(docker ps | grep lkf_test | awk '{print $1}')
+      echo "container ID" $containerID
+      if [ -z "$containerID" ]; then
+        echo "creating new container"
+        docker stop lkf_test && docker rm lkf_test
+        docker-compose up -d
+        docker exec -it lkf_test bash
+      else
+        echo "Joinign existing"
+        docker exec -it $containerID bash ;
+      fi
+     ;;
+  esac
+
+}
+
+
+Command=""
+if [[ $# -gt 0 ]]; then
+  Command=$1
+
+fi
+
+echo "Command : $Command"
+#echo $Command >>.env
+
+Service=0
+if [[ $# -gt 1 ]]; then
+  Service=$2
+fi
+
+Branch=""
+if [[ $# -gt 2 ]]; then
+  Branch=$3
+fi
+
+
+
+
+case "$Command" in
+
+
+  addons)
+    echo "Addons > > > >" $API_VOL
+    _run_addons $Service $API_VOL
+  ;;
+
+  test)
+    echo "Loding testing environment . . . . + - / * "
+    _run_tests $Service
+  ;;
+  ?)
+   _usage
+   ;;
+esac
