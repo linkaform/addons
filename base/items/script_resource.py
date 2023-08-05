@@ -10,7 +10,12 @@ class ScriptResource(items.Items):
 
     def install_scripts(self, instalable_scripts):
         install_order = []
-        print('instalable_scripts-=',instalable_scripts)
+        inst = list(instalable_scripts.keys())
+        inst.sort()
+        print('########## Reading Scripts ############' )
+        for x in inst:
+            print(f"# {x} ".ljust(38) +'#')
+        print('#'*39 )
         if instalable_scripts.get('install_order'):
             install_order = instalable_scripts.pop('install_order')
         else:
