@@ -3,7 +3,7 @@ import simplejson
 
 from linkaform_api import utils, lkf_models
 
-from base import items 
+from lkf_addons import items 
 
 
 class CatalogResource(items.Items):
@@ -14,7 +14,7 @@ class CatalogResource(items.Items):
             file_name = full_file_name.split('.')[0]
             if module_info.get(f'load_{file_type}',{}) and  module_info.get(f'load_{file_type}',{}).get(file_name):
                 continue
-            file = open('./{}/{}'.format(self.path, full_file_name))
+            file = open('{}/{}'.format(self.path, full_file_name))
             file_data = simplejson.loads(file.read())
             catalog_map = file_data['mapping']
             spreadsheet_url = file_data['spreadsheet_url']
@@ -32,8 +32,11 @@ class CatalogResource(items.Items):
             install_order = instalable_catalogs.pop('install_order')
         else:
             install_order = []  
+        print('install_order    install_order=',install_order)
         install_order += [x  for x in instalable_catalogs.keys() if x not in install_order]
         for catalog_name in install_order:
+            print('instalable_catalogs=',instalable_catalogs)
+            print('catalog_name=',catalog_name)
             detail = instalable_catalogs[catalog_name]
             catalog_model = self.load_module_template_file(self.path, catalog_name)
             res = self.lkf.install_catalog(self.module, catalog_name, catalog_model)

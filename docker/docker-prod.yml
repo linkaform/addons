@@ -1,0 +1,22 @@
+version: '3.4'
+
+volumes:
+  infosync_media:
+
+
+networks:
+  linkaform:
+    external:
+      name: linkaform
+
+services:
+  lkf-addons:
+    restart: "no"
+    container_name: lkf-addons
+    image: linkaform/addons:latest
+    build:    
+     context: ../
+     dockerfile: ./Dockerfile
+     target: prod
+    stdin_open: true
+    tty: true

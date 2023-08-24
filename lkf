@@ -15,9 +15,10 @@ _usage(){
       echo "      -i           load an secific image"
       echo "      -a           load local linkaform_api as volume"
       echo "      -r           relaod, alway need to be at the end of the options"
+      echo "      -c           works on build command, it runs the build command with no-cache"
       echo "      -h           help!!!!"
       echo
-      echo "    Command "
+      echo "    Acction "
       echo "      $APP addons     Starts the addons development environment"
       echo "      $APP test       Starts the testing environment"
       echo
@@ -28,10 +29,11 @@ _usage(){
 API_VOL=0
 IMAGE_NAME=0
 SHIFT=-1
-while getopts ':iar:ir:h' opt; do
+NOCACHE=0
+while getopts ':iar:ir:c:h' opt; do
   case "$opt" in
     a)
-      echo "Using local addons..."
+      echo "Loding local API..."
       if [ "$IMAGE_NAME" != "0" ]; then
         SHIFT=0
       else
@@ -43,6 +45,10 @@ while getopts ':iar:ir:h' opt; do
       echo "Setting image..."
       SHIFT=-0
       IMAGE_NAME=$2
+      ;;
+    c)
+      echo "No-Cache build"
+      NOCACHE= 1
       ;;
     r)
       echo "Relaoding..."
@@ -56,7 +62,7 @@ while getopts ':iar:ir:h' opt; do
       if [[ $CONTAINER_NAME == 'test' ]]; then
         docker stop lkf_test && docker rm lkf_test
       else
-        docker stop $CONTAINER_NAME && docker rm $CONTAINER_NAME
+        docker stop lkf-addons && docker rm lkf-addons
       fi
       ;;
     h)
@@ -81,7 +87,7 @@ else
   if [ $# -ge 2 ]; then
     shift "$(($OPTIND $SHIFT))"
   fi
-  IMAGE_NAME="linkaform/python3_lkf:develop"
+  IMAGE_NAME="linkaform/addons:develop"
 fi
 echo "IMAGE_NAME" $IMAGE_NAME
 
@@ -90,33 +96,37 @@ _run_addons(){
   echo "the command for was " $1
   case $1 in
     stop)
-      docker stop addons && docker rm addons
+      docker stop lkf-addons && docker rm lkf-addons
     ;;
     start)
-      containerID=$(docker ps | grep addons | awk '{print $1}')
+      containerID=$(docker ps | grep lkf-addons | awk '{print $1}')
       echo "container ID" $containerID
       if [ -z "$containerID" ]; then
         echo "creating new container"
-        docker stop addons && docker rm addons
+        docker stop lkf-addons && docker rm lkf-addons
         if [[ $2 == 0 ]] ; then
           echo 'arranca'
-          docker run   -w /srv/addons/ \
-            -v `pwd`:/srv/addons \
-            -v ~/lkf/custom/:/srv/custom \
-            -v ~/.bash_history:/root/.bash_history \
-            --name addons \
-            -d  $IMAGE_NAME sleep infinity && \
-            docker exec -it addons bash
+          cd docker
+          docker-compose up -d lkf-addons && \
+          # docker run   -w /srv/addons/ \
+          #   -v `pwd`:/srv/addons \
+          #   -v ~/lkf/custom/:/srv/custom \
+          #   -v ~/.bash_history:/root/.bash_history \
+          #   --name addons \
+          #   -d  $IMAGE_NAME sleep infinity \
+          docker exec -it lkf-addons bash
         else
           echo "Loading local addons"
-          docker run   -w /srv/addons/ \
-            -v `pwd`:/srv/addons \
-            -v ~/lkf/custom/:/srv/custom \
-            -v ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/  \
-            -v ~/.bash_history:/root/.bash_history \
-            --name addons \
-            -d $IMAGE_NAME sleep infinity && \
-            docker exec -it addons bash
+          cd docker
+          docker-compose up -d lkf-addons && \
+          # docker run   -w /srv/addons/ \
+          #   -v `pwd`:/srv/addons \
+          #   -v ~/lkf/custom/:/srv/custom \
+          #   -v ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/  \
+          #   -v ~/.bash_history:/root/.bash_history \
+          #   --name addons \
+            # -d $IMAGE_NAME sleep infinity \
+            docker exec -it lkf-addons bash
         fi
       else
         echo "Joinign existing"
@@ -124,6 +134,75 @@ _run_addons(){
       fi
      ;;
   esac
+
+}
+
+_start_addons(){
+  echo "the command for was " $1
+  echo "the command for was 2" $2
+  case $1 in
+    test)
+      docker stop lkf-addons && docker rm lkf-addons
+    ;;
+    addons)
+      containerID=$(docker ps | grep lkf-addons | awk '{print $1}')
+      echo "container ID" $containerID
+      if [ -z "$containerID" ]; then
+        echo "creating new container"
+        docker stop lkf-addons && docker rm lkf-addons
+        if [[ $2 == 0 ]] ; then
+          echo 'arranca'
+          cd docker
+          docker-compose up -d lkf-addons && \
+          # docker run   -w /srv/addons/ \
+          #   -v `pwd`:/srv/addons \
+          #   -v ~/lkf/custom/:/srv/custom \
+          #   -v ~/.bash_history:/root/.bash_history \
+          #   --name addons \
+          #   -d  $IMAGE_NAME sleep infinity \
+          docker exec -it lkf-addons bash
+        else
+          echo "Loading local addons"
+          cd docker
+          docker-compose up -d lkf-addons && \
+          # docker run   -w /srv/addons/ \
+          #   -v `pwd`:/srv/addons \
+          #   -v ~/lkf/custom/:/srv/custom \
+          #   -v ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/  \
+          #   -v ~/.bash_history:/root/.bash_history \
+          #   --name addons \
+            # -d $IMAGE_NAME sleep infinity \
+            docker exec -it lkf-addons bash
+        fi
+      else
+        echo "Joinign existing"
+        docker exec -it $containerID bash ;
+      fi
+     ;;
+  esac
+
+}
+
+_build(){
+  echo "Environment: " $1
+  cd docker
+  case $1 in
+    dev)
+      if [ "$NOCACHE" != "0" ]; then
+        docker-compose build
+      else
+        docker-compose build --no-cache
+      fi
+    ;;
+    prod)
+      if [ "$NOCACHE" != "0" ]; then
+        docker-compose -f docker-prod.yml build
+      else
+        docker-compose -f docker-prod.yml build --no-cache
+      fi
+     ;;
+  esac
+  cd ..
 
 }
 
@@ -153,14 +232,14 @@ _run_tests(){
 }
 
 
-Command=""
+Acction=""
 if [[ $# -gt 0 ]]; then
-  Command=$1
+  Acction=$1
 
 fi
 
-echo "Command : $Command"
-#echo $Command >>.env
+echo "Acction : $Acction"
+#echo $Acction >>.env
 
 Service=0
 if [[ $# -gt 1 ]]; then
@@ -175,12 +254,20 @@ fi
 
 
 
-case "$Command" in
+case "$Acction" in
 
 
   addons)
     echo "Addons > > > >" $API_VOL
     _run_addons $Service $API_VOL
+  ;;
+  start)
+    echo "Addons" $API_VOL
+    _start_addons $Service $API_VOL
+  ;;
+  build)
+    echo "building addons image" 
+    _build $Service
   ;;
 
   test)

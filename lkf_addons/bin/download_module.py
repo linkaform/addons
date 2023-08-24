@@ -3,12 +3,17 @@
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
 from copy import deepcopy
-import urllib.request, re
-
-from uts import get_lkf_api, get_lkf_module
+import urllib.request, re, sys
 
 from linkaform_api import utils
+
+
+sys.path.append('/srv/scripts/addons/config/')
+sys.path.append('/srv/scripts/addons/modules')
+
 import settings
+from uts import get_lkf_api, get_lkf_module
+
 
 
 from json_xml import json_to_xml
@@ -62,6 +67,10 @@ modules = {}
 
 
 installed_items = {'catalogs': {},'scripts':{}, 'forms':{}}
+
+lkf_modules = None
+lkf_api = None
+
 
 def strip_chaaracters(string):
     pattern = r'[^a-zA-Z0-9_]'
@@ -168,7 +177,7 @@ def save_catalog_xml(xml_data, form_name):
                                         catalog_element.text = "{{ catalog." + catalog_name + ".obj_id }}"
                             if catalog_element.tag == 'name':
                                 catalog_element.text = "{{ catalog." + catalog_name + ".name }}"
-    tree.write('./{}/items/catalogs/{}.xml'.format(module_name, form_name), encoding="utf-8", xml_declaration=True)
+    tree.write('/srv/scripts/addons/modules/{}/items/catalogs/{}.xml'.format(module_name, form_name), encoding="utf-8", xml_declaration=True)
     return True
 
 def save_rule_xml(xml_data, form_name):
@@ -423,9 +432,10 @@ def get_catalogs(download_catalogs={}):
         #     print('stop', stop)
         # #     catalog_json.pop('filters')
         res = drop_hashKey(catalog_json)
-        # print('res=',simplejson.dumps(res, indent=4))  
+        #print('res=',simplejson.dumps(res, indent=4))  
         catalog_data_xml = json_to_xml(res)
         # print('catalog_data_xml',catalog_data_xml)  
+        print('catalog_name',catalog_name)  
         save_catalog_xml(catalog_data_xml, catalog_name)
     installed_items['catalogs'].update(download_catalogs)
     get_new_items('catalogs')
@@ -464,21 +474,36 @@ def set_module_items():
     items_obj_id = modules[module]['items_obj_id']
     return True
 
-if __name__ == "__main__":
-
-    # settings.config["USERNAME"] = USERNAME
-    # lkf_api = utils.Cache(settings)
-    # user = lkf_api.get_jwt(api_key=settings.config['APIKEY'], get_user=True)
-    # settings.config["JWT_KEY"] = user.get('jwt')
-    # settings.config["ACCOUNT_ID"] = user['user']['parent_info']['id']
-    # settings.config["USER"] = user['user']
+def download_modules(modules, options):
+    global lkf_api, lkf_modules, module_name
+    print('download_modules', modules)
+    print('download_modules', options)
     lkf_api = get_lkf_api()
     lkf_modules = get_lkf_module()
     set_module_items()
     for module_name in modules:
-        print('module_name=', module_name)
-        get_forms()
-        get_catalogs()
-        #print('asi va items', items)
-        get_scripts()
+        if 'forms' in options:
+            get_forms()
+        if 'catalogs' in options:
+            get_catalogs()
+        if 'scripts' in options:
+            get_scripts()
+
+# if __name__ == "__main__":
+
+#     # settings.config["USERNAME"] = USERNAME
+#     # lkf_api = utils.Cache(settings)
+#     # user = lkf_api.get_jwt(api_key=settings.config['APIKEY'], get_user=True)
+#     # settings.config["JWT_KEY"] = user.get('jwt')
+#     # settings.config["ACCOUNT_ID"] = user['user']['parent_info']['id']
+#     # settings.config["USER"] = user['user']
+#     lkf_api = get_lkf_api()
+#     lkf_modules = get_lkf_module()
+#     set_module_items()
+#     for module_name in modules:
+#         print('module_name=', module_name)
+#         get_forms()
+#         #get_catalogs()
+#         #print('asi va items', items)
+#         #get_scripts()
 

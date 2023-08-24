@@ -62,7 +62,7 @@ class Items(LKFException):
     def get_all_items_json(self, itype):
         # module = __name__.replace('.','/')
         # cmd = ['ls', './{}/{}/'.format(module, itype)]
-        cmd = ['ls', './{}/items/{}'.format(self.module, itype)]
+        cmd = ['ls', '/srv/scripts/addons/modules/{}/items/{}'.format(self.module, itype)]
         process = subprocess.Popen(args=cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)

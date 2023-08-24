@@ -3,7 +3,7 @@ import simplejson
 
 from linkaform_api import utils, lkf_models
 
-from base import items 
+from lkf_addons import items 
 
 
 class ScriptResource(items.Items):
@@ -33,7 +33,7 @@ class ScriptResource(items.Items):
     def get_script_modules(self, all_items):
         data_file = []
         form_file = {}
-        default_image='linkaform/python3_lkf:latest'
+        default_image='linkaform/addons:latest'
         for file in all_items:
             file_ext = file.split('.')
             if len(file_ext) != 2:

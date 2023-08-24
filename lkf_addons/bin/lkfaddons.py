@@ -1,42 +1,25 @@
+#!/usr/local/bin/python
 # coding: utf-8
-import sys
+import sys, os
 import subprocess
 import importlib
 
-import settings
-
 from linkaform_api import utils
+from download_module import download_modules
 
+sys.path.append('/srv/scripts/addons/config/')
+sys.path.append('/srv/scripts/addons/modules')
+
+import settings
 from uts import get_lkf_api
 
 commands = sys.argv
+commands.pop(0)
 print('Running modules with command: ',commands)
 base_modules = ['stock_move',]
 #base_modules = ['test',]
 base_modules = ['expenses',]
 load_modules = []
-
-try:
-    f = open(".gitmodules", "r")
-    gfile = f.readlines()
-    f.close()
-except:
-    gfile = []
-
-for line in gfile:
-    line =  line.replace("\n","")
-    if 'submodule' in line:
-        try:
-            name = line.replace('[','').replace(']','').split(' ')[1].replace('"','')
-        except: 
-            name = None
-        if name: load_modules.append(name) 
-
-submodules = {
-    'stock_move':'https://github.com/linkaform/lkf-stock.git',  
-    }
-
-# print('load_modules', load_modules)
 
 not_installed = []
 
@@ -48,13 +31,8 @@ output, error = process.communicate()
 
 load_modules += base_modules
 
-for module, git_url in submodules.items():
-    print('module>>>', module)
-    print('v', git_url)
-    if module not in load_modules: not_installed.append(module)
-
-def do_clone_modules(module):
-    cmd = ['git', 'clone', submodules[module]]
+def search_modules():
+    cmd = ['ls', '-b', '/srv/scripts/addons/modules']
     print('cmd', cmd)
     process = subprocess.Popen(args=cmd,
         stdout=subprocess.PIPE,
@@ -62,20 +40,11 @@ def do_clone_modules(module):
     output, error = process.communicate()
     print('output>>>>', output)
     print('error', error)
-
-def do_add_modules(module):
-    cmd = ['git', 'submodule', 'add', './{}'.format(module)]
-    print('cmd', cmd)
-    process = subprocess.Popen(args=cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-    output, error = process.communicate()
-    print('output>>>>', output)
-    print('error', error)
+    output = output.split(b'\n')
+    return [x.decode("utf-8")  for x in output if x]
 
 #Este dato debe de venir del front
 # install = {'all':False, 'stock_move':False, 'test':True}
-install = {'all':False, 'stock_move':False, 'test':False, 'expenses':True}
 
 # load_data = True
 load_data = False
@@ -83,10 +52,12 @@ load_demo = True
 
 def do_load_modules(load_modules):
     response = []
+    print('load_modules====', load_modules)
     for module in load_modules:
         # global forms
         print('-'*35 + f' Loding Module: {module} ' + '-'*35)
         ### Scripts
+        print('install', install)
         scripts = importlib.import_module('{}.items.scripts'.format(module))
         if install.get('all') or install.get(module):
             script_resource = scripts.ScriptResource(
@@ -106,6 +77,7 @@ def do_load_modules(load_modules):
                 script_resource.install_scripts(script_dict)
 
             ### Catalogs
+            print('modules' , module)
             catalogs = importlib.import_module('{}.items.catalogs'.format(module))
             catalog_resource = catalogs.CatalogResource(
                 path=catalogs.__path__[0], 
@@ -142,7 +114,9 @@ def do_load_modules(load_modules):
                 response += form_resource.install_forms(form_dict)
 
 def uninstall_modules(uninstall_dict):
-    from base import items 
+    # from base import items 
+    from lkf_addons import items
+    print('uninstlling...')
     for module, install in uninstall_dict.items():
         if install:
             item = items.Items(path=items.__path__[0], module=module, settings=settings)
@@ -179,6 +153,8 @@ ask_script  = True
 ask_catalog = True
 ask_form    = True
 
+
+
 if 'script' in commands:
     load_script = True
     ask_script = False
@@ -202,26 +178,85 @@ def set_value(value):
         return True
     return False
 
-if ask_data:
-    load_demo = set_value(input("Load DEMO data [y/n] (default n):"))
-if ask_demo:    
-    load_data = set_value(input("Load DATA [y/n] (default n):"))
-if ask_form:    
-    load_form = set_value(input("Load Forms [y/n] (default n):"))
-if ask_catalog:    
-    load_catalog = set_value(input("Load Catalogs [y/n] (default n):"))
-if ask_script:    
-    load_script = set_value(input("Load Scripts [y/n] (default n):"))
+print('commnads', commands)
 
-print('Running on ', '{}:-:'.format(settings.ENV)*300)
-environment =  set_value(input(f"We are running on {settings.ENV} Enviroment, are you sure [y/n] (default n):"))
+def get_modules_2_install(commands):
+    print('entrado')
+    modules = search_modules()
+    for idx, c in enumerate(commands):
+        if c == '--module' or c == '-m':
+            module = commands[idx+1]
+            if module in modules:
+                return module
+            else:
+                raise ValueError(f'No module found with name: {module}, available options are: {modules}')
+    return modules
 
 
-if not environment:
-    print('Ending session no enviornment confirmation found')
-else:
-    if 'uninstall' in commands:
-        uninstall_modules(install)
+install = {'all':False, 'stock_move':False, 'test':False, 'expenses':True}
+install = {}
+
+
+load_modules_options  = get_modules_2_install(commands)
+load_modules = []
+print('load_modules_options=',load_modules_options)
+if type(load_modules_options) == str:
+    load_modules_options = [load_modules_options,]
+
+for module in load_modules_options:
+    print('loadmodule', module)
+    load = set_value(input(f"*** {commands[0].title()} the module {module}:[y/n] (default n):"))
+    if load:
+        load_modules.append(module)
+        install[module] = True
     else:
-        do_load_modules(load_modules)
+        install[module] = False
+
+print('load_modules', load_modules)
+
+if __name__ == '__main__':
+    print('Running on ', '{}:-:'.format(settings.ENV)*300)
+    environment =  set_value(input(f"We are running on {settings.ENV} Enviroment, are you sure [y/n] (default n):"))
+
+    if not environment:
+        print('Ending session no enviornment confirmation found')
+    else:
+        if commands[0] == 'uninstall':
+            uninstall_modules(install)
+        elif commands[0] == 'install':
+            if ask_data:
+                load_demo = set_value(input("Load DEMO data [y/n] (default n):"))
+            if ask_demo:    
+                load_data = set_value(input("Load DATA [y/n] (default n):"))
+            if ask_form:    
+                load_form = set_value(input("Load Forms [y/n] (default n):"))
+            if ask_catalog:    
+                load_catalog = set_value(input("Load Catalogs [y/n] (default n):"))
+            if ask_script:    
+                load_script = set_value(input("Load Scripts [y/n] (default n):"))
+            install = {'all':True}
+            do_load_modules(load_modules)
+        elif commands[0] == 'download':
+            options = []
+            if ask_form:    
+                load_form = set_value(input("Download Forms [y/n] (default n):"))
+                if load_form:
+                    options.append('forms')
+            else:
+                options.append('forms')
+            if ask_catalog:    
+                load_catalog = set_value(input("Download Catalogs [y/n] (default n):"))
+                if load_catalog:
+                    options.append('catalogs')
+            else:
+                    options.append('catalogs')
+            if ask_script:    
+                load_script = set_value(input("Download Scripts [y/n] (default n):"))
+                if load_script:
+                    options.append('scripts')
+            else:
+                    options.append('scripts')
+
+            download_modules(load_modules, options)
+
 

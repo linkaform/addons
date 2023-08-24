@@ -3,7 +3,7 @@ import simplejson
 
 from linkaform_api import utils, lkf_models
 
-from base import items 
+from lkf_addons import items 
 
 
 class FormResource(items.Items):
@@ -63,6 +63,7 @@ class FormResource(items.Items):
                         print('conf_files', conf_files)
                         self.setup_rules(conf_files, res['status'])
             elif res.get('status_code') == 400:
+                print('res=',res)
                 raise self.LKFException('Error installing form: {}. Error msg'.format(form_name, res['json']['error']))
         return response
  
