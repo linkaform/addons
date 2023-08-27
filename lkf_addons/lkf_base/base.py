@@ -9,8 +9,6 @@ class LKF_Base():
     def __init__(self, settings):
         self.lkf_base = {}
         self.lkf_api = utils.Cache(settings)
-        #print('settings', dir(settings))
-        #print('config', settings.config)
         config = settings.config
         self.net = network.Network(settings)
         self.cr = self.net.get_collections()

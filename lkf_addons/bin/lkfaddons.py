@@ -201,16 +201,17 @@ load_modules_options  = get_modules_2_install(commands)
 load_modules = []
 print('load_modules_options=',load_modules_options)
 if type(load_modules_options) == str:
-    load_modules_options = [load_modules_options,]
-
-for module in load_modules_options:
-    print('loadmodule', module)
-    load = set_value(input(f"*** {commands[0].title()} the module {module}:[y/n] (default n):"))
-    if load:
-        load_modules.append(module)
-        install[module] = True
-    else:
-        install[module] = False
+    load_modules.append(load_modules_options)
+    install[load_modules_options] = True
+else:
+    for module in load_modules_options:
+        print('loadmodule', module)
+        load = set_value(input(f"*** {commands[0].title()} the module {module}:[y/n] (default n):"))
+        if load:
+            load_modules.append(module)
+            install[module] = True
+        else:
+            install[module] = False
 
 print('load_modules', load_modules)
 
