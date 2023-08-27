@@ -8,7 +8,7 @@ echo "" >.env
 _usage(){
   APP=$(basename "$0")
       echo
-      echo "Usage: $APP [options] <addons|test>"
+      echo "Usage: $APP [options] <start|stop> <addons|test>"
 
       echo "    Special options:"
       echo
@@ -19,8 +19,9 @@ _usage(){
       echo "      -h           help!!!!"
       echo
       echo "    Acction "
-      echo "      $APP addons     Starts the addons development environment"
-      echo "      $APP test       Starts the testing environment"
+      echo "      $APP <start|stop> addons     Starts the addons development environment"
+      echo "      $APP <start|stop> test       Starts the testing environment"
+      echo "      $APP build <prod|dev>      Starts the testing environment"
       echo
       echo
       exit 1

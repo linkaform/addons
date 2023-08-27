@@ -64,8 +64,8 @@ class Expenses(LKF_Base):
             'cant_dias':'61041d15d9ee55ab14965bb5',
             'autorizador':'62bf232626827cd253f9db16',
             'destino':'61041b50d9ee55ab14965000',
-            'fecha_salida':'61041b50d9ee55ab14965ba2',
-            'fecha_regreso':'61041b50d9ee55ab14965ba3',
+            'date_from':'61041b50d9ee55ab14965ba2',
+            'date_to':'61041b50d9ee55ab14965ba3',
             'status_solicitud':'61041d15d9ee55ab14965bb6',
             'status_gasto':'544d5b4e01a4de205e2b2169',
             'approved_amount':'61041d15d9ee55ab14965bb7',
@@ -104,68 +104,27 @@ class Expenses(LKF_Base):
             'cat_cargo_empleado':'6092c0ebd8b748522446af27',
             'cat_email_empleado':'6092c0ebd8b748522446af28',
             'tipo_solicitud':'649b512cbf4cc1fab1133b7a',
-            'estatus_solicitud_autorizacion':'62954ccb8e54c96dc34995a5',
+            'estatus_solicitud_autorizacion_uno':'62954ccb8e54c96dc34995a5',
+            'estatus_solicitud_autorizacion':'64e7eb0b402ad68c2cd368f0',
+            'reason_no_authorized':'6271bd58d96e7e7ab68d2c4b',
+            'folio_solicitudes':'64e7f571402ad68c2cd36956'
         }
 
     #Solicitud de Viaticos
 
+    def expense_valid_status(self):
+        return ['por_autorizar','en_autorizacion','en_proceso', 'autorizado', 'realizado','cerrada']
+    
     def get_cant_days(self, date_from, date_to):
         from_dt = datetime.strptime(date_from, '%Y-%m-%d')
         to_dt = datetime.strptime(date_to, '%Y-%m-%d')
         cant_days = to_dt - from_dt
         return int(cant_days.days)
 
-    def update_solicitud_form_catalog(self, current_record ):
-        #Actualza en el registro de la forma la solicitud creada....
-        folio = current_record['folio']
-        mango_query = {"selector":
-        {"answers":
-            {"$and":[
-                {self.fdict['cat_folio']: {'$eq': folio}}
-        ]}},
-        "limit":1,
-        "skip":0}
-        catalog_data = self.lkm.catalog_id('solicitudes_de_gastos')
-        catalog_id = catalog_data.get('id')
-        catalog_obj_id = catalog_data.get('obj_id')
-        date_from = current_record['answers'].get(self.fdict['fecha_salida'])
-        date_to = current_record['answers'].get(self.fdict['fecha_regreso'])
-        cant_dias = self.get_cant_days(date_from, date_to)
-        for x in range(3):
-            res = self.lkf_api.search_catalog( self.lkm.catalog_id('solicitudes_de_gastos', 'id'), mango_query, jwt_settings_key='JWT_KEY')
-            if not res:
-                time.sleep(x)
-        if not res:
-            print('todo crear registro de catalogo')
-            print('no se encontro el registro res=',mango_query)
-            return False
-        for r in res:
-            set_answers = {
-                catalog_obj_id:{
-                    self.fdict['cat_folio']: folio,
-                    self.fdict['cat_destino']: [ r.get(self.fdict['cat_destino']) ],
-                },
-                self.fdict['cant_dias']:cant_dias
-            }
-        print('set_answers', set_answers)
-        res_update = self.lkf_api.patch_multi_record(
-                    set_answers, current_record['form_id'], folios=[folio])
-
-        print('res_update', res_update)
-        status_code = False
-        for r in res_update.get('json',{}).get('objects',[]):
-            this_rec = r.get(folio)
-            status_code = this_rec.get('status_code')
-            if status_code:
-                break
-
-        print('status_code', status_code)
-        return status_code
-
     def validaciones_solicitud(self, answers):
         destino = answers.get(self.fdict['destino'])
-        dia_salida = answers.get(self.fdict['fecha_salida'])
-        dia_regreso = answers.get(self.fdict['fecha_regreso'])
+        dia_salida = answers.get(self.fdict['date_from'])
+        dia_regreso = answers.get(self.fdict['date_to'])
         msg_error_app = {}
         dia_salida_s = dia_salida.split('-')
         dia_regreso_s = dia_regreso.split('-')
@@ -274,7 +233,7 @@ class Expenses(LKF_Base):
         answers[self.fdict['total_gasto_moneda_sol']] = expense_total_sol
         return answers
 
-    def get_record_from_db(self, form_id, folio):
+    def query_record_from_db(self, form_id, folio):
         query = {
             'form_id': form_id,
             'folio': folio,
@@ -286,8 +245,7 @@ class Expenses(LKF_Base):
 
     def set_solicitud_data(self, folio, renew=False):
         if not self.SOL_DATA or renew:
-            print('actualizaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-            answers = self.get_record_from_db(self.FORM_ID_SOLICITUD, folio)
+            answers = self.query_record_from_db(self.FORM_ID_SOLICITUD, folio)
             if answers and len(answers):
                 if answers[0].get('answers'):
                     self.SOL_DATA = answers[0].pop('answers')
@@ -306,10 +264,10 @@ class Expenses(LKF_Base):
         diff_dates = fecha_actual - date_fecha_gasto
         return diff_dates.days > 15
 
-    def get_anticipo(self, folio_sol):
+    def query_get_anticipo(self, folio_sol):
         match_query  = {
             'form_id': self.FORM_ID_ENTREGA_EFECTIVO,
-            f'answers.{self.fdict["status_gasto"]}':'realizado',
+            f'answers.{self.fdict["status_gasto"]}':{"$ne": 'cancelado'},
             'deleted_at': {'$exists': False},
             }
         if folio_sol:
@@ -336,16 +294,15 @@ class Expenses(LKF_Base):
     def get_cash_expenses(self, expense_group):
         cash_expense = 0
         for expense in expense_group:
+            status = expense.get(self.fdict['grp_gasto_estatus'])
+            if status not in self.expense_valid_status():
+                continue
             payment_method = expense.get(self.fdict['metodo_pago'],'').lower()
-            print('payment_method', payment_method)
-            print('expense', expense)
-            amount = expense.get(self.fdict['total_gasto_moneda_sol'],0)
-            print('amount', amount)
+            #amount = expense.get(self.fdict['total_gasto_moneda_sol'],0)
+            amount = expense.get(self.fdict['grp_gasto_monto_aut'],0)
             if ('debito' in payment_method or 'efectivo' in payment_method )\
                 and amount > 0:
-                print('amoutn', amount)
                 cash_expense += amount
-        print('cash_expense', cash_expense)
         return cash_expense
 
     ### Catalogo
@@ -448,26 +405,38 @@ class Expenses(LKF_Base):
         #     })
         return True
 
-    def update_solicitud(self, folio, answers, run_validations=False):
+    def cerrar_solicitud(self, cash_balance, expense_group, force=False):
+        close = False
+        if not force:
+            date_to = self.SOL_DATA.get(self.fdict['date_to'], 0)
+            to_dt = datetime.strptime(date_to, '%Y-%m-%d')
+        if cash_balance >  -1 and cash_balance < 1:
+            close = True
+            for g in expense_group:
+                if g[self.fdict['grp_gasto_estatus']] != 'autorizado' or 
+                 g[self.fdict['grp_gasto_estatus']] != 'no_autorizado':
+                 close = False 
+                 break
+        return close
+
+    def update_solicitud(self, folio, run_validations=False):
         self.set_solicitud_data(folio)
         if run_validations:
-            self.valida_status_solicitud(folio)
+            #self.valida_status_solicitud(folio)
+            print('ya no se corre esta validacion')
         # fecha_fin = self.SOL_DATA.get('610419b5d28657c73e36fcd6', '')
-        expense_group = self.get_related_expenses_rec(folio)
-        print('expense_group',expense_group)
+        expense_group = self.query_related_expenses_rec(folio)
         monto_aprobado = self.SOL_DATA.get(self.fdict['approved_amount'], 0)
         gasto_ejecutado  = self.get_related_expenses(folio)
         monto_restante = round(monto_aprobado - gasto_ejecutado,2)
-        anticipo_efectivo = self.get_anticipo(folio)
+        anticipo_efectivo = self.query_get_anticipo(folio)
+        print('anticipo_efectivo', anticipo_efectivo)
+        # print('anticipo_efectivo', anticipo_efectivod)
         gasto_efectivo = self.get_cash_expenses(expense_group)
-        print('gasto_efectivo=', gasto_efectivo)
         monto_anticipo_restante = anticipo_efectivo - gasto_efectivo
         self.set_solicitud_catalog(folio)
-        update_db = self.cr.update_one({
-            'folio': folio,
-            'form_id': self.FORM_SOLICITUD_VIATICOS_ID,
-            'deleted_at': {'$exists': False}
-        },{'$set':{
+        close_order = self.cerrar_solicitud(monto_anticipo_restante, expense_group)
+        update_fields = {
             f'answers.{self.CATALOG_SOL_VIAJE_OBJ_ID}': {
                 self.fdict['cat_folio']: folio,
                 self.fdict['cat_destino']: [ self.SOL_DATA.get(self.fdict['cat_destino']) ],
@@ -479,16 +448,24 @@ class Expenses(LKF_Base):
             f"answers.{self.fdict['gasto_ejecutado']}":gasto_ejecutado,
             f"answers.{self.fdict['grp_gastos_viaje']}":expense_group
             }
-        })
+        if close_order:
+            update_fields.update({
+                f"answers.{self.fdict['status_solicitud']}":"cerrada",
+                })
+        update_db = self.cr.update_one({
+            'folio': folio,
+            'form_id': self.FORM_SOLICITUD_VIATICOS_ID,
+            'deleted_at': {'$exists': False}
+        },{'$set':update_fields})
         db_res = update_db.raw_result
-        print('raw_result',db_res)
         update_ok = db_res.get('updatedExisting')
+        print('update_ok', update_ok)
         if update_ok:
             self.set_solicitud_data(folio, renew=True)
             update_ok = self.update_expense_catalog_values(folio)
         return update_ok
 
-    def get_related_expenses_rec(self, folio_sol=None, answers={}):
+    def query_related_expenses_rec(self, folio_sol=None, answers={}, status=[]):
         match_query  = {
             'form_id': {'$in': [self.FORM_ID_GASTOS_VIAJE, self.FORM_ID_ENTREGA_EFECTIVO]},
             'deleted_at': {'$exists': False},
@@ -496,17 +473,20 @@ class Expenses(LKF_Base):
             #     {f'answers.{self.fdict["status_gasto"]}':'por_autorizar'}, 
             #     {f'answers.{self.fdict["status_gasto"]}':'autorizado'},
             #     {f'answers.{self.fdict["status_gasto"]}':'realizado'},
-            #     {f'answers.{self.fdict["status_gasto"]}':'realizado'},
             #     {f'answers.{self.fdict["status_gasto"]}':'error'},
             #     {f'answers.{self.fdict["status_gasto"]}':'en_autorizacion'},
             #     ]
             }
+        status_update = {"$or":[]}
+        for s in status:
+            status_update["$or"].append({f'answers.{self.fdict["status_gasto"]}':s})
+        if len(status_update["$or"]) > 0:
+            match_query.update(status_update)
+
         if folio_sol:
             match_query.update({
                 f'answers.{self.CATALOG_SOL_VIAJE_OBJ_ID}.610419b5d28657c73e36fcd3':folio_sol,
                 })
-        print("self.FORM_ID_ENTREGA_EFECTIVO",self.FORM_ID_ENTREGA_EFECTIVO)
-        # records = self.cr.find(match_query,{'answers':1, 'folio':1})
         query =[
             {'$match': match_query },
             {"$project":{
@@ -536,22 +516,10 @@ class Expenses(LKF_Base):
         res  = []
         #TODO SI NO EXISTE EL REGISTRO OSEA ES UNO NUEVO HAY QUE AGREGAR EL SET DEL CURREN RECORD
         this_set = {}
-        # if folio_sol:
-        #     this_set ={
-        #             "62aa1fa92c20405af671d120":"Pending", #folio
-        #             "583d8e10b43fdd6a4887f55b":answers.get("583d8e10b43fdd6a4887f55b"), #fecha
-        #             "aaaa1fa92c20405af671d123":answers.get(self.CATALOG_MONEDA_OBJ_ID,{}).get("62aa1fa92c20405af671d123"), #Moneda
-        #             "aaaa1fa92c20405af671d122":answers.get("544d5ad901a4de205f3934ed"), #Monteo en Moneda Extranjera
-        #             "62aa1fa92c20405af671d122":answers.get("544d5ad901a4de205f391111"), #Monto
-        #             "627bf0d5c651931d3c7eedd3":answers.get("627bf0d5c651931d3c7eedd3"), #Monto Autorizado
-        #             self.CATALOG_CONCEPTO_GASTO_OBJ_ID:{self.CATALOG_CONCEPTO_GASTO_OBJ_ID:answers.get(self.CATALOG_CONCEPTO_GASTO_OBJ_ID,{}).get("649b2a84dac4914e02aadb24")}, #Concepto
-        #             "62aa1fa92c20405af671d124":answers.get("544d5b4e01a4de205e2b2169"), #Estatus
-        #     }
         for r in records:
             res.append(r)
         if this_set:
             res.append(this_set)
-        print('res=',res)
         return res
 
     def get_related_expenses(self, folio_sol, this_expense=0, folio_rec=None, status=None, cash_only=False):
@@ -653,21 +621,61 @@ class Expenses(LKF_Base):
         for record in records_to_process:
             record[self.fdict['grp_gasto_estatus']] = 'autorizado'
             record[self.fdict['grp_gasto_monto_aut']] = record.get(self.fdict['grp_gasto_monto'],)
-            print('----------------------------')
-            print('record=',record)
-            print('----------------------------')
         return records_to_process
 
-    def get_autorization_data(self,  folio=None, autorizador={}):
+    def query_folios_to_exclude(self, folios):
+        match_query  = {
+            'form_id':  self.FORM_ID_AUTORIZACIONES,
+            'deleted_at': {'$exists': False},
+            # '$or':[
+            #      {f'answers.{self.fdict["estatus_solicitud_autorizacion"]}':'pendiente'}, 
+            #      {f'answers.{self.fdict["estatus_solicitud_autorizacion"]}':'autorizado'}, 
+            #      ]
+            }
+        query =[
+            {'$match': match_query },
+            {"$unwind":f"$answers.{self.fdict['grp_gastos_viaje']}"},
+            {"$match":{
+                f"answers.{self.fdict['grp_gastos_viaje']}.{self.fdict['grp_gasto_folio']}" : {"$in":folios}
+                }
+            },
+            {"$project":{
+                    "_id":0,
+                    "folio":f"$answers.{self.fdict['grp_gastos_viaje']}.{self.fdict['grp_gasto_folio']}",
+                }
+            }
+            ]
+        records = self.cr.aggregate(query )
+        return [r['folio'] for r in records]
+
+    def get_folios_to_exclude(self, records_to_process):
+        folios = []
+        for r in records_to_process:
+            if r.get(self.fdict['grp_gasto_folio']):
+                folios.append(r[self.fdict['grp_gasto_folio']])
+        folios_2_exclude = self.query_folios_to_exclude(folios)
+        if folios_2_exclude:
+            res = []
+            for idx, r in enumerate(records_to_process):
+                if r.get(self.fdict['grp_gasto_folio']) in folios_2_exclude:
+                    continue
+                res.append(r)
+        else:
+            res = records_to_process
+        return res
+
+    def get_autorization_data(self, folio=None, autorizador={}):
         # Preparo los registro a crear en la forma Autorización de Viáticos        
         records_to_process = []
         list_to_group = []
         record_to_create = []
-        print('folio===', folio)
+        print('folio===2', folio)
         if folio:
-            records_to_process = self.get_related_expenses_rec(folio)
+            records_to_process = self.query_related_expenses_rec(folio)
+            records_to_process = self.get_folios_to_exclude(records_to_process)
             print('records_to_process', records_to_process)
             if not records_to_process:
+                print(f'No more records to process for this folio: {folio}')
                 return []
             self.set_solicitud_data(folio)
             autorizador = self.get_autorizador()
@@ -687,16 +695,18 @@ class Expenses(LKF_Base):
             else:
                 new_record.update({self.fdict['tipo_solicitud']:"gasto"})
             new_record.update({
+                self.fdict['folio_solicitudes'] : folio,
                 self.fdict['cat_monto_total_aprobado'] : self.SOL_DATA.get(self.fdict['approved_amount']),
                 self.fdict['anticipo_efectivo'] : anticipo_efectivo,
                 self.fdict['gasto_ejecutado'] : gasto_ejecutado,
                 self.fdict['gasto_ejecutado_efectivo'] : gasto_efectivo,
                 self.fdict['monto_anticipo_restante'] : monto_anticipo_restante,
                 self.fdict['monto_restante'] : self.SOL_DATA.get(self.fdict['monto_restante']),
-                self.fdict['fecha_salida'] : date_from,
-                self.fdict['fecha_regreso'] : date_to,
+                self.fdict['date_from'] : date_from,
+                self.fdict['date_to'] : date_to,
                 self.fdict['cant_dias'] : cant_days,
-                self.fdict['estatus_solicitud_autorizacion'] : 'pendiente_por_autorizar',
+                self.fdict['estatus_solicitud_autorizacion_uno'] : 'pendiente',
+                self.fdict['estatus_solicitud_autorizacion'] : 'pendiente',
                 self.fdict['grp_gastos_viaje'] : self.update_records(records_to_process)
                 })
             record_to_create.append(new_record)
@@ -710,15 +720,18 @@ class Expenses(LKF_Base):
                 print('folios', folios)
                 new_record = {
                     self.CATALOG_EMPLEADOS_OBJ_ID : {self.fdict['cat_nombre_empleado']: employee},
-                    self.fdict['tipo_solicitud']:"gasto"
+                    self.fdict['tipo_solicitud']:"gasto",
+                    self.fdict['folio_solicitudes'] : folios,
                     }
                 for f in folios:
-                    records_to_process.append(self.get_related_expenses_rec(f))
-                    anticipo_efectivo += self.get_anticipo(f)
+                    records_to_process.append(self.query_related_expenses_rec(f))
+                    anticipo_efectivo += self.query_get_anticipo(f)
                     gasto_ejecutado += self.get_related_expenses(f)
+
 
                 if not records_to_process:
                     return []
+                records_to_process = self.get_folios_to_exclude(records_to_process)
                 gasto_efectivo = self.get_cash_expenses(records_to_process)
                 monto_anticipo_restante = anticipo_efectivo - gasto_efectivo
                 date_from, date_to = self.get_autorization_dates(records_to_process)
@@ -728,17 +741,17 @@ class Expenses(LKF_Base):
                     self.fdict['gasto_ejecutado'] : gasto_ejecutado,
                     self.fdict['gasto_ejecutado_efectivo'] : gasto_efectivo,
                     self.fdict['monto_anticipo_restante'] : monto_anticipo_restante,
-                    self.fdict['fecha_salida'] : date_from,
-                    self.fdict['fecha_regreso'] : date_to,
+                    self.fdict['date_from'] : date_from,
+                    self.fdict['date_to'] : date_to,
                     self.fdict['cant_dias'] : cant_days,
-                    self.fdict['estatus_solicitud_autorizacion'] : 'pendiente_por_autorizar',
+                    self.fdict['estatus_solicitud_autorizacion_uno'] : 'pendiente',
+                    self.fdict['estatus_solicitud_autorizacion'] : 'pendiente',
                     self.fdict['grp_gastos_viaje'] : self.update_records(records_to_process)
                     })
                 record_to_create.append(new_record)
- 
         return record_to_create
 
-    def autorizacion_viaticos(self, folio=None, autorizador={}):
+    def create_expense_authorization(self, folio=None, autorizador={}):
         print('folio===', folio)
         if not folio and not autorizador:
             msg_error_app.update({
@@ -767,8 +780,7 @@ class Expenses(LKF_Base):
             rec_folio = new_record.pop('folio')
             metadata['properties']['device_properties']['folio solicitud'] += rec_folio
             metadata.update({
-                "answers":new_record,
-                "folio":rec_folio + f'-{idx}'
+                "answers":new_record
                 })
             print('metadata=',metadata)
             res_create.append(self.lkf_api.post_forms_answers(metadata))
@@ -799,7 +811,6 @@ class Expenses(LKF_Base):
         folios = []
         for record in expenses:
             folio = record.get(self.fdict['grp_gasto_folio'])
-            print('folio=', folio)
             folios.append(folio)
         folios = [r[self.fdict['grp_gasto_folio']] for r in expenses if r.get(self.fdict['grp_gasto_folio'])]
         data = {self.fdict['status_gasto']: 'en_autorizacion'}
@@ -808,46 +819,61 @@ class Expenses(LKF_Base):
             data,
             self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE, folios=folios
             )
-        print('update result=', result)
         self.force_udpate(folios, data)
         #TODO SI NO SE ACTUALIZA FORZAR EN BASE DE DATOS.
         return result
 
-    def set_gasto_aprovado(self, dict_records_to_update, update=True):
+    def query_folio_form(self, folios):
+        query  = {
+            'folio':  {"$in":folios},
+            'deleted_at': {'$exists': False},
+            }
+        records = self.cr.find(query,{'form_id':1, 'folio':1} )
+        return {r['folio']:r['form_id'] for r in records}
+
+    def update_expense_data(self, dict_records_to_update, update=True):
         res = {}
         gasto_ejecutado_aprovado = 0
         gasto_ejecutado_efevo_aprovado = 0
         anticipo = 0
-        form_id = self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE
+        #form_id = self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE
+        form_ids = self.query_folio_form(list(dict_records_to_update.keys()))
         for folio, gasto in dict_records_to_update.items():
             res[folio] = {}
-
-            if gasto['status'] == 'no_autorizado':
-                gasto['monto_autorizado'] = 0
-            if gasto['status'] == 'autorizado':
-                if 'efectivo' in gasto['metodo_pago'] or 'debito' in gasto['metodo_pago']:
-                    if gasto['monto_autorizado'] > 0:
+            form_id = form_ids[folio]
+            if gasto[self.fdict['grp_gasto_estatus']] == 'no_autorizado':
+                gasto[self.fdict['grp_gasto_monto_aut']] = 0
+            if gasto[self.fdict['grp_gasto_estatus']] == 'autorizado':
+                if 'efectivo' in gasto[self.fdict['metodo_pago']] or 'debito' in gasto[self.fdict['metodo_pago']]:
+                    if form_id == self.FORM_ID_ENTREGA_EFECTIVO:
                         #si el monto es menor a 0 es un deposito
-                        gasto_ejecutado_efevo_aprovado += gasto['monto_autorizado']
-                        gasto_ejecutado_aprovado += gasto['monto_autorizado']
+                        anticipo += gasto[self.fdict['grp_gasto_monto_aut']]  * -1
+                        print('anticipooooooooooooooo', anticipo)
                     else:
                         #si el monto es menor a 0 es un deposito
-                        anticipo += gasto['monto_autorizado']
+                        gasto_ejecutado_efevo_aprovado += gasto[self.fdict['grp_gasto_monto_aut']]
+                        gasto_ejecutado_aprovado += gasto[self.fdict['grp_gasto_monto_aut']]
                 else:
-                    gasto_ejecutado_aprovado += gasto['monto_autorizado']
+                    gasto_ejecutado_aprovado += gasto[self.fdict['grp_gasto_monto_aut']]
 
-            res[folio]['form_id'] = form_id
+            res[folio]['form_id'] = form_ids[folio]
             if update:
+                print('update info', {
+                    self.fdict['status_gasto']: gasto[self.fdict['grp_gasto_estatus']],
+                    self.fdict['grp_gasto_monto_aut']: gasto[self.fdict['grp_gasto_monto_aut']],#monto aturoizado
+                    self.fdict['reason_no_authorized']: gasto.get(self.fdict['reason_no_authorized']),#motivo
+                    })
                 res_update = self.lkf_api.patch_multi_record(
                     {
-                    self.fdict['status_gasto']: gasto['status'],
-                    self.fdict['grp_gasto_monto_aut']: gasto['monto_autorizado'],#monto aturoizado
-                    '6271bd58d96e7e7ab68d2c4b': gasto.get('motivo_no_autorizado'),#motivo
-                    }, form_id, folios=[folio])
+                    self.fdict['status_gasto']: gasto[self.fdict['grp_gasto_estatus']],
+                    self.fdict['grp_gasto_monto_aut']: gasto[self.fdict['grp_gasto_monto_aut']],#monto aturoizado
+                    self.fdict['reason_no_authorized']: gasto.get(self.fdict['reason_no_authorized']),#motivo
+                    }, form_ids[folio], folios=[folio])
                 res[folio]['status_code'] = res_update.get('status_code')
         res['gasto_ejecutado_aprovado'] = gasto_ejecutado_aprovado
         res['gasto_ejecutado_efevo_aprovado'] = gasto_ejecutado_efevo_aprovado
-        res['anticipo'] = anticipo
+        res['anticipo_efectivo'] = anticipo
+        res['grp_gastos_viaje'] = list(dict_records_to_update.values())
         return res
 
     def update_autorization_records(self, answers):
@@ -855,38 +881,37 @@ class Expenses(LKF_Base):
         form_id = self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE
         # self.set_solicitud_data(folio)
         response = []
-        for viatico in answers.get(self.fdict('grp_gastos_viaje'), []):
+        for viatico in answers.get(self.fdict['grp_gastos_viaje'], []):
             folio_origen = viatico.get(self.fdict['grp_gasto_folio'], '')
             dict_records_to_update[folio_origen] = dict_records_to_update.get(folio_origen,{})
-            dict_records_to_update[folio_origen] = {
-                'status': viatico.get(self.fdict['grp_gasto_estatus'], ''),
-                'monto_autorizado': viatico.get(self.fdict['grp_gasto_monto_aut'], 0),
-                'motivo_no_autorizado': viatico.get('64a06441c375083cb0da8d4f', None),
-                'metodo_pago': viatico.get(self.fdict['metodo_pago'], None),
-            }
+            # dict_records_to_update[folio_origen].update({
+            #     'status': viatico.get(self.fdict['grp_gasto_estatus'], ''),
+            #     'monto_autorizado': viatico.get(self.fdict['grp_gasto_monto_aut'], 0),
+            #     'reason_no_authorized': viatico.get(self.fdict['reason_no_authorized'], None),
+            #     'metodo_pago': viatico.get(self.fdict['metodo_pago'], None),
+            # })
+            dict_records_to_update[folio_origen].update(viatico)
         entregas_efevo = 0
-        res = self.set_gasto_aprovado(dict_records_to_update, update=True)
+        res = self.update_expense_data(dict_records_to_update, update=True)
 
-        print('dict_records_to_update',dict_records_to_update)
-        print('res', res)
         reproces = False
-        for viatico in answers.get(self.fdict('grp_gastos_viaje'), []):
+        for viatico in answers.get(self.fdict['grp_gastos_viaje'], []):
             folio_origen = viatico.get(self.fdict['grp_gasto_folio'], '')
             if res.get(folio_origen):
                 print('status code', res[folio_origen]['status_code'])
                 if res[folio_origen]['status_code'] != 202:
-                    viatico[self.fdict['grp_gasto_estatus']] = 'en_proceso'
+                    viatico[self.fdict['grp_gasto_estatus']] = 'error'
                     dict_records_to_update.pop(folio_origen)
                     reproces = True
 
         if reproces:
-            res = self.set_gasto_aprovado(dict_records_to_update, update=False)
+            res = self.update_expense_data(dict_records_to_update, update=False)
 
-        print('res2', res)
-        answers[self.fdict['anticipo_efectivo']] = res['anticipo'] 
+        answers[self.fdict['anticipo_efectivo']] = res['anticipo_efectivo'] 
         answers[self.fdict['gasto_ejecutado']] = res['gasto_ejecutado_aprovado'] 
-        answers['649d02057880ff495311bcc0'] = res['gasto_ejecutado_efevo_aprovado'] 
-        answers[self.fdict['monto_anticipo_restante']] = res['anticipo'] - res['gasto_ejecutado_efevo_aprovado'] 
+        answers[self.fdict['gasto_ejecutado_efectivo']] = res['gasto_ejecutado_efevo_aprovado'] 
+        answers[self.fdict['monto_anticipo_restante']] = res['anticipo_efectivo'] - res['gasto_ejecutado_efevo_aprovado']
+        answers[self.fdict['grp_gastos_viaje']] = res['grp_gastos_viaje']
 
         return answers
 
