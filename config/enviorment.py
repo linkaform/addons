@@ -53,7 +53,3 @@ elif ENV == 'local':
             'AIRFLOW_HOST' : 'af.linkaform.com',
             #'AIRFLOW_HOST' : 'airflow.linkaform.com',
         })
-    
-
-
-

@@ -32,16 +32,29 @@ output, error = process.communicate()
 load_modules += base_modules
 
 def search_modules():
-    cmd = ['ls', '-b', '/srv/scripts/addons/modules']
-    print('cmd', cmd)
+    cmd = ['ls', '-d', '/srv/scripts/addons/modules/*/']
+    cmd = ['find', '/srv/scripts/addons/modules' , '-maxdepth', '1', '-type', 'd']
+    print('cmddddd', cmd)
     process = subprocess.Popen(args=cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     output, error = process.communicate()
     print('output>>>>', output)
     print('error', error)
+    res = []
     output = output.split(b'\n')
-    return [x.decode("utf-8")  for x in output if x]
+    print('output', output)
+    for x in output:
+        x = x.decode('utf-8')
+        print('x1',x)
+        x = x.replace('/srv/scripts/addons/modules','').strip('/')
+        print('x2',x)
+        if x.find('.') == 0:
+            continue
+        if x:
+            res.append(x)
+    print('res=',res)
+    return res
 
 #Este dato debe de venir del front
 # install = {'all':False, 'stock_move':False, 'test':True}
@@ -59,6 +72,7 @@ def do_load_modules(load_modules):
         ### Scripts
         print('install', install)
         scripts = importlib.import_module('{}.items.scripts'.format(module))
+        #TODO revisar porque no corren las reglas
         if install.get('all') or install.get(module):
             script_resource = scripts.ScriptResource(
                 path=scripts.__path__[0], 
@@ -178,6 +192,9 @@ def set_value(value):
         return True
     return False
 
+def set_value_id(value):
+    return value
+
 print('commnads', commands)
 
 def get_modules_2_install(commands):
@@ -246,7 +263,7 @@ if __name__ == '__main__':
             else:
                 options.append('forms')
             if ask_catalog:    
-                load_catalog = set_value(input("Download Catalogs [y/n] (default n):"))
+                load_catalog = set_value(input("Download Catalogs2 [y/n] (default n):"))
                 if load_catalog:
                     options.append('catalogs')
             else:
@@ -257,7 +274,19 @@ if __name__ == '__main__':
                     options.append('scripts')
             else:
                     options.append('scripts')
-
-            download_modules(load_modules, options)
+            download_items = {}
+            if not load_modules:
+                if load_form:
+                    form_id = set_value(input("Form id to download:"))
+                    download_items.update({'forms':{form_id:None}})
+                if load_catalog:
+                    catalog_id = set_value_id(input("Catalog id to download:"))
+                    print('inpuuutttt....', catalog_id)
+                    download_items.update({'catalogs':{catalog_id:None}})
+                if load_script:
+                    script_id = set_value(input("Script id to download:"))
+                    download_items.update({'scripts':{script_id:None}})
+            print('download_items========================',download_items)
+            download_modules(load_modules, options, items_ids=download_items)
 
 

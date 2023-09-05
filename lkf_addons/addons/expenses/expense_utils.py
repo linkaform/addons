@@ -64,6 +64,7 @@ class Expenses(LKF_Base):
             'cant_dias':'61041d15d9ee55ab14965bb5',
             'autorizador':'62bf232626827cd253f9db16',
             'destino':'61041b50d9ee55ab14965000',
+            'destino_otro':'61041b50d9ee55ab14965ba0',
             'date_from':'61041b50d9ee55ab14965ba2',
             'date_to':'61041b50d9ee55ab14965ba3',
             'status_solicitud':'61041d15d9ee55ab14965bb6',
@@ -189,7 +190,12 @@ class Expenses(LKF_Base):
         info_catalog = answers.get(self.CATALOG_SOL_VIAJE_OBJ_ID, {})
         folio = info_catalog.get(self.fdict['cat_folio'], '')
         destino = info_catalog.get(self.fdict['cat_destino'], '')
+        print('self.answers=', answers)
+        print('self.answers=', self.CATALOG_SOL_VIAJE_OBJ_ID)
+        print('self.info_catalog=', info_catalog)
+        print('self.SOL_DATA=', folio)
         self.set_solicitud_data(folio)
+        print('self.SOL_DATA=', self.SOL_DATA)
         if not self.SOL_DATA:
             msg_error_app = {
                 "6499b3586f2edb3da9155e3b":{"msg": [f"No se encontro en numero de solicitud {folio}, con destino: {destino} "], "label": "Numero de Solicitud", "error":[]},
@@ -246,6 +252,7 @@ class Expenses(LKF_Base):
     def set_solicitud_data(self, folio, renew=False):
         if not self.SOL_DATA or renew:
             answers = self.query_record_from_db(self.FORM_ID_SOLICITUD, folio)
+        
             if answers and len(answers):
                 if answers[0].get('answers'):
                     self.SOL_DATA = answers[0].pop('answers')
@@ -298,9 +305,10 @@ class Expenses(LKF_Base):
             if status not in self.expense_valid_status():
                 continue
             payment_method = expense.get(self.fdict['metodo_pago'],'').lower()
-            #amount = expense.get(self.fdict['total_gasto_moneda_sol'],0)
-            amount = expense.get(self.fdict['grp_gasto_monto_aut'],0)
-            if ('debito' in payment_method or 'efectivo' in payment_method )\
+            amount = expense.get(self.fdict['total_gasto_moneda_sol'],0)
+            if status == 'autorizado':
+                amount = expense.get(self.fdict['grp_gasto_monto_aut'],0)
+            if (payment_method.find('debito') >= 0 or payment_method.find('efectivo') >= 0)\
                 and amount > 0:
                 cash_expense += amount
         return cash_expense
@@ -410,10 +418,13 @@ class Expenses(LKF_Base):
         if not force:
             date_to = self.SOL_DATA.get(self.fdict['date_to'], 0)
             to_dt = datetime.strptime(date_to, '%Y-%m-%d')
+            delta_hr = (to_dt - datetime.today()).total_seconds()/3600
+            if delta_hr < 24:
+                return False
         if cash_balance >  -1 and cash_balance < 1:
             close = True
             for g in expense_group:
-                if g[self.fdict['grp_gasto_estatus']] != 'autorizado' or 
+                if g[self.fdict['grp_gasto_estatus']] != 'autorizado' and \
                  g[self.fdict['grp_gasto_estatus']] != 'no_autorizado':
                  close = False 
                  break
@@ -430,16 +441,19 @@ class Expenses(LKF_Base):
         gasto_ejecutado  = self.get_related_expenses(folio)
         monto_restante = round(monto_aprobado - gasto_ejecutado,2)
         anticipo_efectivo = self.query_get_anticipo(folio)
-        print('anticipo_efectivo', anticipo_efectivo)
         # print('anticipo_efectivo', anticipo_efectivod)
         gasto_efectivo = self.get_cash_expenses(expense_group)
         monto_anticipo_restante = anticipo_efectivo - gasto_efectivo
         self.set_solicitud_catalog(folio)
         close_order = self.cerrar_solicitud(monto_anticipo_restante, expense_group)
+        destino = self.SOL_DATA.get(self.fdict['destino'])
+        if destino == 'otro':
+            destino = self.SOL_DATA.get(self.fdict['destino_otro'])
+            
         update_fields = {
             f'answers.{self.CATALOG_SOL_VIAJE_OBJ_ID}': {
                 self.fdict['cat_folio']: folio,
-                self.fdict['cat_destino']: [ self.SOL_DATA.get(self.fdict['cat_destino']) ],
+                self.fdict['cat_destino']: [ destino ],
             },
             f"answers.{self.fdict['anticipo_efectivo']}":anticipo_efectivo,
             f"answers.{self.fdict['monto_anticipo_restante']}":monto_anticipo_restante,
@@ -838,13 +852,15 @@ class Expenses(LKF_Base):
         anticipo = 0
         #form_id = self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE
         form_ids = self.query_folio_form(list(dict_records_to_update.keys()))
+        print('form_ids', form_ids)
         for folio, gasto in dict_records_to_update.items():
             res[folio] = {}
             form_id = form_ids[folio]
             if gasto[self.fdict['grp_gasto_estatus']] == 'no_autorizado':
                 gasto[self.fdict['grp_gasto_monto_aut']] = 0
             if gasto[self.fdict['grp_gasto_estatus']] == 'autorizado':
-                if 'efectivo' in gasto[self.fdict['metodo_pago']] or 'debito' in gasto[self.fdict['metodo_pago']]:
+                if gasto[self.fdict['metodo_pago']].find('efectivo') >= 0 or \
+                 gasto[self.fdict['metodo_pago']].find('debito') >= 0:
                     if form_id == self.FORM_ID_ENTREGA_EFECTIVO:
                         #si el monto es menor a 0 es un deposito
                         anticipo += gasto[self.fdict['grp_gasto_monto_aut']]  * -1
@@ -857,6 +873,8 @@ class Expenses(LKF_Base):
                     gasto_ejecutado_aprovado += gasto[self.fdict['grp_gasto_monto_aut']]
 
             res[folio]['form_id'] = form_ids[folio]
+            print('acutalizanod forma', form_ids[folio])
+            print('acutalizanod folio', folio)
             if update:
                 print('update info', {
                     self.fdict['status_gasto']: gasto[self.fdict['grp_gasto_estatus']],
@@ -869,6 +887,7 @@ class Expenses(LKF_Base):
                     self.fdict['grp_gasto_monto_aut']: gasto[self.fdict['grp_gasto_monto_aut']],#monto aturoizado
                     self.fdict['reason_no_authorized']: gasto.get(self.fdict['reason_no_authorized']),#motivo
                     }, form_ids[folio], folios=[folio])
+                print('res_update', res_update)
                 res[folio]['status_code'] = res_update.get('status_code')
         res['gasto_ejecutado_aprovado'] = gasto_ejecutado_aprovado
         res['gasto_ejecutado_efevo_aprovado'] = gasto_ejecutado_efevo_aprovado

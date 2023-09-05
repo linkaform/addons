@@ -10,6 +10,7 @@ from linkaform_api import utils
 
 sys.path.append('/srv/scripts/addons/config/')
 sys.path.append('/srv/scripts/addons/modules')
+MODULES_PATH = '/srv/scripts/addons/modules'
 
 import settings
 from uts import get_lkf_api, get_lkf_module
@@ -140,7 +141,7 @@ def save_form_xml(xml_data, form_name):
                                 catalog_field_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
 
 
-    tree.write('./{}/items/forms/{}.xml'.format(module_name, form_name), encoding="utf-8", xml_declaration=True)
+    tree.write(f'{MODULES_PATH}/{module_name}/items/forms/{form_name}.xml', encoding="utf-8", xml_declaration=True)
     return True
 
 def save_catalog_xml(xml_data, form_name):
@@ -177,7 +178,8 @@ def save_catalog_xml(xml_data, form_name):
                                         catalog_element.text = "{{ catalog." + catalog_name + ".obj_id }}"
                             if catalog_element.tag == 'name':
                                 catalog_element.text = "{{ catalog." + catalog_name + ".name }}"
-    tree.write('/srv/scripts/addons/modules/{}/items/catalogs/{}.xml'.format(module_name, form_name), encoding="utf-8", xml_declaration=True)
+    tree.write(f'{MODULES_PATH}/{module_name}/items/catalogs/{form_name}.xml', encoding="utf-8", xml_declaration=True)
+
     return True
 
 def save_rule_xml(xml_data, form_name):
@@ -474,13 +476,18 @@ def set_module_items():
     items_obj_id = modules[module]['items_obj_id']
     return True
 
-def download_modules(modules, options):
-    global lkf_api, lkf_modules, module_name
+def download_modules(modules, options, items_ids={}):
+    global lkf_api, lkf_modules, module_name, items
     print('download_modules', modules)
-    print('download_modules', options)
+    print('download_options', options)
+    print('items_ids22222222222', items_ids)
+    if items_ids:
+        items = items_ids
+        modules = list(items.keys())
+    else:
+        lkf_modules = get_lkf_module()
+        set_module_items()
     lkf_api = get_lkf_api()
-    lkf_modules = get_lkf_module()
-    set_module_items()
     for module_name in modules:
         if 'forms' in options:
             get_forms()
