@@ -34,26 +34,19 @@ load_modules += base_modules
 def search_modules():
     cmd = ['ls', '-d', '/srv/scripts/addons/modules/*/']
     cmd = ['find', '/srv/scripts/addons/modules' , '-maxdepth', '1', '-type', 'd']
-    print('cmddddd', cmd)
     process = subprocess.Popen(args=cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     output, error = process.communicate()
-    print('output>>>>', output)
-    print('error', error)
     res = []
     output = output.split(b'\n')
-    print('output', output)
     for x in output:
         x = x.decode('utf-8')
-        print('x1',x)
         x = x.replace('/srv/scripts/addons/modules','').strip('/')
-        print('x2',x)
         if x.find('.') == 0:
             continue
         if x:
             res.append(x)
-    print('res=',res)
     return res
 
 #Este dato debe de venir del front
@@ -195,10 +188,8 @@ def set_value(value):
 def set_value_id(value):
     return value
 
-print('commnads', commands)
 
 def get_modules_2_install(commands):
-    print('entrado')
     modules = search_modules()
     for idx, c in enumerate(commands):
         if c == '--module' or c == '-m':
@@ -216,7 +207,6 @@ install = {}
 
 load_modules_options  = get_modules_2_install(commands)
 load_modules = []
-print('load_modules_options=',load_modules_options)
 if type(load_modules_options) == str:
     load_modules.append(load_modules_options)
     install[load_modules_options] = True
