@@ -213,6 +213,8 @@ class Expenses(LKF_Base):
             expense_total_sol = expense_total_currency
         approved_amount = self.SOL_DATA.get(self.fdict['approved_amount'])
         current_total_expense = self.get_related_expenses(folio, expense_total_sol)
+        print('current_total_expense=',current_total_expense)
+        print('approved_amount=',approved_amount)
         if current_total_expense > approved_amount:
             if self.SOL_DATA.get(self.fdict['allow_overdraft']) == 'no':
                 #DO NOT ALLOW OVERDRAFT!!!
@@ -231,10 +233,10 @@ class Expenses(LKF_Base):
                             self.fdict['expense_total']:{
                             "msg": [msg], "label": "Subtotal", "error":[]},
                         }
-                if self.fdict['close_on_overdraft'] == 'si':
-                    self.close_solicitud(folio, status='overdraft')
-        elif current_total_expense == approved_amount:
-            self.close_solicitud(folio, status='overdraft')
+        #         if self.fdict['close_on_overdraft'] == 'si':
+        #             self.close_solicitud(expense_total_currency, )
+        # elif current_total_expense == approved_amount:
+        #     self.close_solicitud(expense_total_currency, )
         answers[self.fdict['expense_total']] = expense_total_currency
         answers[self.fdict['total_gasto_moneda_sol']] = expense_total_sol
         return answers
@@ -413,7 +415,7 @@ class Expenses(LKF_Base):
         #     })
         return True
 
-    def cerrar_solicitud(self, cash_balance, expense_group, force=False):
+    def close_solicitud(self, cash_balance, expense_group, force=False):
         close = False
         if not force:
             date_to = self.SOL_DATA.get(self.fdict['date_to'], 0)
@@ -445,7 +447,7 @@ class Expenses(LKF_Base):
         gasto_efectivo = self.get_cash_expenses(expense_group)
         monto_anticipo_restante = anticipo_efectivo - gasto_efectivo
         self.set_solicitud_catalog(folio)
-        close_order = self.cerrar_solicitud(monto_anticipo_restante, expense_group)
+        close_order = self.close_solicitud(monto_anticipo_restante, expense_group)
         destino = self.SOL_DATA.get(self.fdict['destino'])
         if destino == 'otro':
             destino = self.SOL_DATA.get(self.fdict['destino_otro'])
