@@ -108,7 +108,7 @@ _run_addons(){
         if [[ $2 == 0 ]] ; then
           echo 'arranca'
           cd docker
-          docker-compose up -d lkf-addons && \
+          docker compose up -d lkf-addons && \
           # docker run   -w /srv/addons/ \
           #   -v `pwd`:/srv/addons \
           #   -v ~/lkf/custom/:/srv/custom \
@@ -119,7 +119,7 @@ _run_addons(){
         else
           echo "Loading local addons"
           cd docker
-          docker-compose up -d lkf-addons && \
+          docker compose up -d lkf-addons && \
           # docker run   -w /srv/addons/ \
           #   -v `pwd`:/srv/addons \
           #   -v ~/lkf/custom/:/srv/custom \
@@ -154,7 +154,7 @@ _start_addons(){
         if [[ $2 == 0 ]] ; then
           echo 'arranca'
           cd docker
-          docker-compose up -d lkf-addons && \
+          docker compose up -d lkf-addons && \
           # docker run   -w /srv/addons/ \
           #   -v `pwd`:/srv/addons \
           #   -v ~/lkf/custom/:/srv/custom \
@@ -165,7 +165,7 @@ _start_addons(){
         else
           echo "Loading local addons"
           cd docker
-          docker-compose up -d lkf-addons && \
+          docker compose up -d lkf-addons && \
           # docker run   -w /srv/addons/ \
           #   -v `pwd`:/srv/addons \
           #   -v ~/lkf/custom/:/srv/custom \
@@ -190,16 +190,16 @@ _build(){
   case $1 in
     dev)
       if [ "$NOCACHE" != "0" ]; then
-        docker-compose build
+        docker compose build
       else
-        docker-compose build --no-cache
+        docker compose build --no-cache
       fi
     ;;
     prod)
       if [ "$NOCACHE" != "0" ]; then
-        docker-compose -f docker-prod.yml build
+        docker compose -f docker-prod.yml build
       else
-        docker-compose -f docker-prod.yml build --no-cache
+        docker compose -f docker-prod.yml build --no-cache
       fi
      ;;
   esac
@@ -221,7 +221,7 @@ _run_tests(){
       if [ -z "$containerID" ]; then
         echo "creating new container"
         docker stop lkf_test && docker rm lkf_test
-        docker-compose up -d
+        docker compose up -d
         docker exec -it lkf_test bash
       else
         echo "Joinign existing"
