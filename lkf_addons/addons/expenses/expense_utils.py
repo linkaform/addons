@@ -126,6 +126,7 @@ class Expenses(base.LKF_Base):
 
     def validaciones_solicitud(self, answers):
         destino = answers.get(self.fdict['destino'])
+        answers[ fdict['destino_otro'] ] = destino.replace('_', ' ').title()
         dia_salida = answers.get(self.fdict['date_from'])
         dia_regreso = answers.get(self.fdict['date_to'])
         msg_error_app = {}
@@ -160,6 +161,7 @@ class Expenses(base.LKF_Base):
                 })
         if msg_error_app:
                 raise Exception(simplejson.dumps(msg_error_app))
+        
         return answers
 
     def currency_converter(self, from_curreny, expense_date, to_curreny, amount):
