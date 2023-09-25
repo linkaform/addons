@@ -15,6 +15,8 @@ services:
     container_name: lkf-addons
     hostname: lkf-addons
     image: linkaform/addons:latest
+    ports:
+      - "5001:5000"
     build:    
      context: ../
      dockerfile: ./Dockerfile
@@ -28,6 +30,7 @@ services:
       - ../config:/srv/scripts/addons/config
       - ../modules:/srv/scripts/addons/modules
       - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/ 
+      - /home/josepato/lkf/infosync_scripts/:/srv/infosync_scripts
     command: sleep infinity
     stdin_open: true
     tty: true

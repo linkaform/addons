@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 local_settings.py
+account_settings.py
 # C extensions
 *.so
 

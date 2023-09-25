@@ -11,7 +11,6 @@ from linkaform_api import utils
 sys.path.append('/srv/scripts/addons/config/')
 sys.path.append('/srv/scripts/addons/modules')
 MODULES_PATH = '/srv/scripts/addons/modules'
-
 import settings
 from uts import get_lkf_api, get_lkf_module
 
@@ -23,10 +22,18 @@ import simplejson
 
 from settings import *
 
-items = {
+force_items = {
     "forms":{
         #stock
-        # 98225:None,
+        99536:None
+        # 98225:"Inventory",
+        # 101628:"Inventory Adjustment",
+        # 98233:"Inventory Move",
+        # 98233:"Inventory Move",
+        # 100515:"Inventory Scrapping",
+        # 94880:"Production",
+        # 94878:"Production Planning",
+
         # 94880:None,
         # 94880:None,
         # 98233:None,
@@ -42,13 +49,17 @@ items = {
         # 104492:None, # Entrga de anticipo
         # 104479:None, # Registro de gastos
         # 104480:None, # solicidud
-        105520:None
+        #105520:None
         },
     "catalogs":{
         # 104534:None,
+        82555:None
     },
     "scripts":{
         # 104489:None #expense util
+        82555:None,
+        99563:None,
+
     }
 }
 items_obj_id = {
@@ -61,7 +72,7 @@ items_obj_id = {
 }
 
 modules = {'expenses':
-                { 'items':{"forms":{105520:None},"catalogs":{}, "scripts":{}} }
+                { 'items':{"forms":{},"catalogs":{}, "scripts":{}} }
 }
 
 modules = {}
@@ -140,7 +151,6 @@ def save_form_xml(xml_data, form_name):
                             if catalog_field_id != None and catalog_field_id.text != None:
                                 catalog_field_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
 
-
     tree.write(f'{MODULES_PATH}/{module_name}/items/forms/{form_name}.xml', encoding="utf-8", xml_declaration=True)
     return True
 
@@ -188,7 +198,6 @@ def save_rule_xml(xml_data, form_name):
     root = tree.getroot()
     form_id = root.find('form_id')
     form_id.text = "{{ form." + form_name + ".id }}"
-    print('form_name', form_name)
     if root.findall("rules"):
         for rules in root.find('rules'):
             for r in list(rules):
@@ -212,20 +221,19 @@ def save_rule_xml(xml_data, form_name):
                             print('field txt', "{{ " + f"catalog.{catalog_name}.obj_id" + "}}")
 
     
-
-    tree.write('./{}/items/forms/{}_rules.xml'.format(module_name, form_name), encoding="utf-8", xml_declaration=True)
+    tree.write(f'{MODULES_PATH}/{module_name}/items/forms/{form_name}_rules.xml', encoding="utf-8", xml_declaration=True)
     return True
 
 def save_workflow_xml(xml_data, form_name):
-    global module_name
+    global module_name, items
     tree = ET.ElementTree(ET.fromstring(xml_data))
     root = tree.getroot()
     form_id = root.find('form_id')
     form_id.text = "{{ form." + form_name + ".id }}"
     workflows = root.find('workflows')
     for workflow in list(workflows):
-        for items in workflow:
-            for actions in items.iter('actions'):
+        for w_items in workflow:
+            for actions in w_items.iter('actions'):
                 for action in actions:
                     config = action.find('configuration')
                     for script in config.iter('script'):
@@ -262,8 +270,9 @@ def save_workflow_xml(xml_data, form_name):
                             resource_uri = catalog.find('resource_uri')
                             resource_uri.text = "/api/infosync/get_catalogs/" + "{{ catalog." + catalog_name + ".id }}" + "/"
                     for assign in config.iter('assignTo'):
+                        print('assign', assign)
                         catalog_field_id = assign.find('catalog_field_id')
-                        if catalog_field_id.text:
+                        if catalog_field_id and catalog_field_id.text:
                             catalog_name = get_item_name('catalogs', item_obj_id=catalog_field_id.text, element=catalog_field_id)
                             catalog_field_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
                         for customUser in assign.iter('customUser'):
@@ -275,7 +284,7 @@ def save_workflow_xml(xml_data, form_name):
                             user_email.text = settings.config["USER"]['email']
                             user_username = customUser.find('username')
                             user_username.text = settings.config["USER"]['username']
-            for rules in items.iter('rules'):
+            for rules in w_items.iter('rules'):
                 for wf_fields in rules.iter('wf_fields'):
                     for triggers in wf_fields.iter('triggers'):
                         for trigger in triggers.iter('item'):
@@ -287,9 +296,8 @@ def save_workflow_xml(xml_data, form_name):
                                     cat_id.text = "{{ catalog." + catalog_name + ".id }}"
                                     catalog_field_id = trig_cat.find('catalog_field_id')
                                     catalog_field_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
-    
-    tree.write('./{}/items/forms/{}_workflow.xml'.format(module_name, form_name), encoding="utf-8", xml_declaration=True)
-    print('aqui guardo el workflow', './{}/items/forms/{}_workflow.xml'.format(module_name, form_name))
+    tree.write(f'{MODULES_PATH}/{module_name}/items/forms/{form_name}_workflow.xml', encoding="utf-8", xml_declaration=True)
+    print('items', items)
     return True
 
 def get_forms(download_forms={}):
@@ -297,6 +305,7 @@ def get_forms(download_forms={}):
     if not download_forms:
         download_forms = deepcopy(items['forms'])
     for form_id in list(download_forms.keys()):
+        print('form_id', form_id)
         form_name = get_item_name('forms', form_id)
         form_data_json = lkf_api.get_form_to_duplicate(form_id, jwt_settings_key='JWT_KEY')
         if form_data_json.get('fields'):
@@ -309,7 +318,6 @@ def get_forms(download_forms={}):
             print(stop)
 
         save_form_xml(form_data_xml, form_name)
-
         rules_json = lkf_api.get_form_rules(form_id, jwt_settings_key='JWT_KEY')
         if isinstance(rules_json, list):
             if rules_json and len(rules_json) > 0:
@@ -323,6 +331,8 @@ def get_forms(download_forms={}):
         # print('workflow_json=workflow_json',workflow_json)
     installed_items['forms'].update(download_forms)
     get_new_items('forms')
+    get_new_items('catalogs')
+    get_new_items('scripts')
 
 def download_file(url, destination):
     urllib.request.urlretrieve(url, destination)
@@ -333,12 +343,13 @@ def get_scripts(download_scritps={}):
     global module_name
     if not download_scritps:
         download_scritps = deepcopy(items['scripts'])
+    print('download_scritps',download_scritps)
     for script_id, script_name in download_scritps.items():
         script_data_json = lkf_api.get_item(script_id, 'script', jwt_settings_key='JWT_KEY')
         script_obj = script_data_json.get('data',[])
         if script_obj and len(script_obj) > 0:
             complete_name = script_obj[0].get('name')
-            destination = './{}/items/scripts/{}'.format(module_name, complete_name)
+            destination = f'{MODULES_PATH}/{module_name}/items/scripts/{complete_name}'
             url = "https://f001.backblazeb2.com/file/app-linkaform/public-client-{}/scripts/{}".format(account_id, complete_name)
             print('url=',url)
             download_file(url, destination)
@@ -454,47 +465,49 @@ def get_new_items(item_type):
         elif item_type == 'forms':
             get_forms(new_items)
 
-def set_module_items():
+def set_module_items(set_modules):
     global items, modules, items_obj_id
     module_items = lkf_modules.fetch_installed_modules()
-    for itm in module_items:
-        module = itm['module']
+    for module in set_modules:
         modules[module] = modules.get(module,{ 
-            'items':{"forms":{},"catalogs":{}, "scripts":{}} ,
-            'items_obj_id':{"forms":{},"catalogs":{}, "scripts":{}} ,
-            })
-        if itm['item_type'] == 'form':
-            modules[module]['items']['forms'][itm['item_id']] = itm['item_name']
-        if itm['item_type'] == 'script':
-            modules[module]['items']['scripts'][itm['item_id']] = itm['item_name']
-        if itm['item_type'] == 'catalog':
-            modules[module]['items']['catalogs'][itm['item_id']] = itm['item_name']
-            if itm.get('item_obj_id'):
-                modules[module]['items_obj_id']['catalogs'][itm['item_obj_id']] = itm['item_name']
-        
-    items = modules[module]['items']
-    items_obj_id = modules[module]['items_obj_id']
-    return True
+                    'items':{"forms":{},"catalogs":{}, "scripts":{}} ,
+                    'items_obj_id':{"forms":{},"catalogs":{}, "scripts":{}} ,
+                    })
+        for itm in module_items:
+            if itm.get('module') == module:
+                if itm['item_type'] == 'form':
+                    modules[module]['items']['forms'][itm['item_id']] = itm['item_name']
+                if itm['item_type'] == 'script':
+                    modules[module]['items']['scripts'][itm['item_id']] = itm['item_name']
+                if itm['item_type'] == 'catalog':
+                    modules[module]['items']['catalogs'][itm['item_id']] = itm['item_name']
+                    if itm.get('item_obj_id'):
+                        modules[module]['items_obj_id']['catalogs'][itm['item_obj_id']] = itm['item_name']
+        items = modules[module]['items']
+        items_obj_id = modules[module]['items_obj_id']
+        return True
 
 def download_modules(modules, options, items_ids={}):
     global lkf_api, lkf_modules, module_name, items
-    print('download_modules', modules)
-    print('download_options', options)
-    print('items_ids22222222222', items_ids)
+    print('Downloading modules:', modules)
+    print('Downloding items: ', options)
     if items_ids:
         items = items_ids
         modules = list(items.keys())
     else:
         lkf_modules = get_lkf_module()
-        set_module_items()
+        set_module_items(modules)
     lkf_api = get_lkf_api()
+    print('modules=', modules)
     for module_name in modules:
+        print('module_name=', module_name)
         if 'forms' in options:
-            get_forms()
+            print('Downloding itemsitemsitems: ', force_items)
+            get_forms(force_items['forms'])
         if 'catalogs' in options:
-            get_catalogs()
+            get_catalogs(force_items['catalgos'])
         if 'scripts' in options:
-            get_scripts()
+            get_scripts(force_items['scripts'])
 
 # if __name__ == "__main__":
 

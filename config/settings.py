@@ -1,9 +1,10 @@
 # coding: utf-8
 
-ENV = 'prod' 
 #ENV = 'preprod' 
-#ENV = 'local' 
-print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
+ENV = 'local' 
+#ENV = 'prod' 
+# print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
+from linkaform_api import settings
 
 config = {
     'COLLECTION' : 'form_answer',
@@ -34,10 +35,15 @@ config.update({
 })
 
 
+settings.config.update(config)
+
 from enviorment import *
+
+settings = update_settings(settings)
+
 try:
     from local_settings import *
-    print('loaidng local_settings')
+    # print('loaidng local_settings')
 except:
     print('local_settings... NOT FOUND!!!')
     print('create a file with you own local_settings, just import this file with from  settings import * ')

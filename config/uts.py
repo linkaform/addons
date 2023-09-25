@@ -5,6 +5,18 @@ from linkaform_api import utils, lkf_models
 import settings 
 
 
+def update_settings(settings):
+    lkf_api = utils.Cache(settings)
+    user = lkf_api.get_jwt(api_key=settings.config['APIKEY'], get_user=True)
+    settings.config["JWT_KEY"] = user.get('jwt')
+    settings.config["APIKEY_JWT_KEY"] = user.get('jwt')
+    account_id = user['user']['parent_info']['id']
+    settings.config["USER_ID"] = user['user']['id']
+    settings.config["ACCOUNT_ID"] = account_id
+    settings.config["USER"] = user['user']
+    settings.config["MONGODB_USER"] = 'account_{}'.format(account_id)
+    return settings
+
 def get_lkf_api():
     lkf_api = utils.Cache(settings)
     user = lkf_api.get_jwt(api_key=settings.config['APIKEY'], get_user=True)

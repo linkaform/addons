@@ -8,17 +8,17 @@ echo "" >.env
 _usage(){
   APP=$(basename "$0")
       echo
-      echo "Usage: $APP [options] <start|stop> <addons|test>"
+      echo "Usage: $APP [options] <action[start|stop|build> <enviorment[addons|test|prod|dev>"
 
       echo "    Special options:"
       echo
-      echo "      -i           load an secific image"
+      echo "      -i           load an specific image"
       echo "      -a           load local linkaform_api as volume"
       echo "      -r           relaod, alway need to be at the end of the options"
       echo "      -c           works on build command, it runs the build command with no-cache"
       echo "      -h           help!!!!"
       echo
-      echo "    Acction "
+      echo "    Acction & Enviorment"
       echo "      $APP <start|stop> addons     Starts the addons development environment"
       echo "      $APP <start|stop> test       Starts the testing environment"
       echo "      $APP build <prod|dev>      Starts the testing environment"
@@ -26,6 +26,7 @@ _usage(){
       echo
       exit 1
 }
+
 
 API_VOL=0
 IMAGE_NAME=0

@@ -7,7 +7,7 @@ from pytz import timezone
 
 from linkaform_api import settings, network, utils, lkf_models
 
-from lkf_addons.lkf_base.base import LKF_Base
+from linkaform_api import base
 
 
 def unlist(arg):
@@ -15,10 +15,10 @@ def unlist(arg):
         return unlist(arg[0])
     return arg
 
-class Expenses(LKF_Base):
+class Expenses(base.LKF_Base):
 
-    def __init__(self, settings, folio_solicitud=None):
-        LKF_Base.__init__(self, settings)
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None):
+        base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
         # self.lkf_api = utils.Cache(settings)
         # self.net = network.Network(settings)
         # self.cr = self.net.get_collections()
@@ -29,6 +29,8 @@ class Expenses(LKF_Base):
         # self.lkf_api_prod = utils.Cache(settings)
 
         self.CATALOG_SOL_VIAJE = self.lkm.catalog_id('solicitudes_de_gastos')
+        print('self.lkm',self.lkm)
+        print(' self.CATALOG_SOL_VIAJE .lkm', self.CATALOG_SOL_VIAJE )
         self.CATALOG_SOL_VIAJE_ID = self.CATALOG_SOL_VIAJE.get('id')
         self.CATALOG_SOL_VIAJE_OBJ_ID = self.CATALOG_SOL_VIAJE.get('obj_id')
         self.CATALOG_RESP_AUT = self.lkm.catalog_id('responsables_de_autorizar_gastos')
@@ -131,7 +133,7 @@ class Expenses(LKF_Base):
         dia_regreso_s = dia_regreso.split('-')
         dia = date(int(dia_salida_s[0]),int(dia_salida_s[1]),int(dia_salida_s[2]))
         dia_r = date(int(dia_regreso_s[0]),int(dia_regreso_s[1]),int(dia_regreso_s[2]))
-        cant_dias = (dia_r - dia).days
+        cant_dias = (dia_r - dia).days + 1
         answers[self.fdict['cant_dias']] = cant_dias
         anticipo_solicitado = answers.get(self.fdict['anticipo_solicitado'])
         approved_amount = answers.get(self.fdict['approved_amount'])
@@ -190,12 +192,7 @@ class Expenses(LKF_Base):
         info_catalog = answers.get(self.CATALOG_SOL_VIAJE_OBJ_ID, {})
         folio = info_catalog.get(self.fdict['cat_folio'], '')
         destino = info_catalog.get(self.fdict['cat_destino'], '')
-        print('self.answers=', answers)
-        print('self.answers=', self.CATALOG_SOL_VIAJE_OBJ_ID)
-        print('self.info_catalog=', info_catalog)
-        print('self.SOL_DATA=', folio)
         self.set_solicitud_data(folio)
-        print('self.SOL_DATA=', self.SOL_DATA)
         if not self.SOL_DATA:
             msg_error_app = {
                 "6499b3586f2edb3da9155e3b":{"msg": [f"No se encontro en numero de solicitud {folio}, con destino: {destino} "], "label": "Numero de Solicitud", "error":[]},
@@ -213,8 +210,10 @@ class Expenses(LKF_Base):
             expense_total_sol = expense_total_currency
         approved_amount = self.SOL_DATA.get(self.fdict['approved_amount'])
         current_total_expense = self.get_related_expenses(folio, expense_total_sol)
+        viaje_monto_restante = approved_amount - current_total_expense
         print('current_total_expense=',current_total_expense)
         print('approved_amount=',approved_amount)
+        #TODO cerrar solicutud si se sobregira y asi esta la configuiracion
         if current_total_expense > approved_amount:
             if self.SOL_DATA.get(self.fdict['allow_overdraft']) == 'no':
                 #DO NOT ALLOW OVERDRAFT!!!
@@ -330,6 +329,7 @@ class Expenses(LKF_Base):
                 ]}},
             "limit":1,
             "skip":0}
+            print('CATALOG_SOL_VIAJE_ID', self.CATALOG_SOL_VIAJE_ID)
             res = self.lkf_api.search_catalog( self.CATALOG_SOL_VIAJE_ID, mango_query)
             if res and len(res) > 0:
                 self.SOL_CATALOG = res[0]
@@ -374,6 +374,7 @@ class Expenses(LKF_Base):
         catalog_data['answers'].update(self.SOL_DATA.get(self.CATALOG_EMPLEADOS_OBJ_ID))
         #catalogo_metadata.update({'record_id': catalog_data.pop('_id'), '_rev': catalog_data['answers'].pop('_rev'), 'answers': catalog_data['answers']})
         res_update = self.lkf_api.bulk_patch_catalog([catalog_data,], self.CATALOG_SOL_VIAJE_ID)
+        print('catalog_data=',simplejson.dumps(catalog_data, indent=4))
         update_ok = False
         if res_update and len(res_update):
             res_update = res_update[0]
