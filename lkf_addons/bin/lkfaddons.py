@@ -14,7 +14,7 @@ from uts import get_lkf_api
 
 commands = sys.argv
 commands.pop(0)
-print('Running modules with command: ',commands)
+print('==== Running LinkaForm Module Manager ====')
 base_modules = ['stock_move',]
 #base_modules = ['test',]
 base_modules = ['expenses',]
@@ -147,7 +147,6 @@ def uninstall_modules(uninstall_dict):
 
 lkf_api = get_lkf_api()
 
-print('commands', commands)
 
 ask_4_items = True
 load_data = False

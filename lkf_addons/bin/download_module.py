@@ -25,7 +25,7 @@ from settings import *
 force_items = {
     "forms":{
         #stock
-        99536:None
+        #99536:None
         # 98225:"Inventory",
         # 101628:"Inventory Adjustment",
         # 98233:"Inventory Move",
@@ -53,12 +53,12 @@ force_items = {
         },
     "catalogs":{
         # 104534:None,
-        82555:None
+        #82555:None
     },
     "scripts":{
         # 104489:None #expense util
-        82555:None,
-        99563:None,
+        #82555:None,
+        #99563:None,
 
     }
 }
@@ -413,6 +413,7 @@ def get_catalogs(download_catalogs={}):
     if not download_catalogs:
         download_catalogs = deepcopy(items['catalogs'])
     for catalog_id, catalog_name in download_catalogs.items():
+        print('catalog_id', catalog_id)
         catalog_json = lkf_api.get_catalog_id_fields(catalog_id, jwt_settings_key='JWT_KEY')
         catalog_json = catalog_json.get('catalog')
         if catalog_json.get('fields'):
@@ -505,7 +506,7 @@ def download_modules(modules, options, items_ids={}):
             print('Downloding itemsitemsitems: ', force_items)
             get_forms(force_items['forms'])
         if 'catalogs' in options:
-            get_catalogs(force_items['catalgos'])
+            get_catalogs(force_items['catalogs'])
         if 'scripts' in options:
             get_scripts(force_items['scripts'])
 
