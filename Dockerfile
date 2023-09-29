@@ -3,7 +3,7 @@
 ####################################
 
 #FROM python:3.7-bullseye as develop
-FROM python:3.7-slim-bullseye as develop
+FROM python:3.7-slim-bullseye as addons-base
 
 MAINTAINER Linkaform
 
@@ -29,6 +29,14 @@ RUN apt-get update && \
     poppler-utils \
     mongodb-org-shell \
     mongodb-org-tools
+
+
+####################################
+# Image for develop                #
+####################################
+
+#FROM python:3.7-bullseye as develop
+FROM addons-base as develop
 
 
 COPY ./docker/requires.txt /tmp/
@@ -60,7 +68,7 @@ WORKDIR /srv/scripts/addons/modules
 ####################################
 # Image for prodcution             #
 ####################################
-FROM develop as prod
+FROM linkaform/addons:develop as prod
 
 MAINTAINER Linkaform
 
