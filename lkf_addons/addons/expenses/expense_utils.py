@@ -126,7 +126,7 @@ class Expenses(base.LKF_Base):
 
     def validaciones_solicitud(self, answers):
         destino = answers.get(self.fdict['destino'])
-        answers[ fdict['destino_otro'] ] = destino.replace('_', ' ').title()
+        answers[ self.fdict['destino_otro'] ] = destino.replace('_', ' ').title()
         dia_salida = answers.get(self.fdict['date_from'])
         dia_regreso = answers.get(self.fdict['date_to'])
         msg_error_app = {}
