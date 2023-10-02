@@ -27,8 +27,8 @@ class Stock(base.LKF_Base):
         self.CATALOG_PRODUCT_RECIPE_ID = self.CATALOG_PRODUCT_RECIPE.get('id')
         
         self.CATALOG_PRODUCT = self.lkm.catalog_id('plant_catalog')
-        self.CATALOG_PRODUCT_OBJ_ID = self.CATALOG_PRODUCT_RECIPE.get('obj_id')
-        self.CATALOG_PRODUCT_ID = self.CATALOG_PRODUCT_RECIPE.get('id')
+        self.CATALOG_PRODUCT_OBJ_ID = self.CATALOG_PRODUCT.get('obj_id')
+        self.CATALOG_PRODUCT_ID = self.CATALOG_PRODUCT.get('id')
 
         self.FORM_INVENTORY_ID = self.lkm.form_id('green_house_inventroy','id')
         self.PRODUCTION_FORM_ID = self.lkm.form_id('greenhouse_production','id')
@@ -133,6 +133,8 @@ class Stock(base.LKF_Base):
             'inv_adjust_grp_qty':'ad00000000000000000ad000',
             'inv_adjust_grp_in':'ad00000000000000000ad100',
             'inv_adjust_grp_out':'ad00000000000000000ad200',
+            'inv_adjust_comments':'64d05792c373f9b62f539d00',
+            'inv_adjust_grp_comments':'ad00000000000000000ad400',
             'inv_scrap_status':'644c1cb6dc502afa06c4423e',
             'inv_scrap_qty':'644bf9a04b1761305b080099',
             'inv_cuarentin_qty':'644bf9a04b1761305b080098',
@@ -740,6 +742,153 @@ class Stock(base.LKF_Base):
         record = self.cr.find_one(query_greenhouse_inventory, {'folio': 1, 'answers': 1, 'form_id': 1, 'user_id': 1})
         return record
 
+    def inventory_adjustment(self, folio, record):
+        answers = record['answers']
+        plants = answers.get(self.f['grading_group'])
+        #plants = current_record['answers']['644bf7ccfa9830903f087867']
+        warehouse = answers[self.CATALOG_WAREHOUSE_OBJ_ID][self.f['warehouse']]
+        print('warehouse2', warehouse)
+        
+        patch_records = []
+        metadata = self.lkf_api.get_metadata(self.FORM_INVENTORY_ID)
+        kwargs = {"force_lote":True, "inc_folio":folio }
+        properties = {
+                "device_properties":{
+                    "system": "Script",
+                    "process": "Inventroy Adjustment", 
+                    "accion": 'Inventroy Adjustment', 
+                    "folio carga": folio, 
+                    "archive": "green_house_adjustment.py",
+                },
+                    "kwargs": kwargs 
+            }
+        metadata.update({
+            'properties': properties,
+            'kwargs': kwargs,
+            'answers': {}
+            },
+        )
+        print('kwargs', kwargs)
+        search_codes = []
+        for plant in plants:
+            product_code = plant[self.CATALOG_PRODUCT_OBJ_ID][self.f['product_code']]
+            search_codes.append(product_code)
+
+
+        recipes = self.get_plant_recipe( search_codes, stage=[4, 'Ln72'] )
+        growth_weeks = 0
+
+        not_found = []
+        for idx, plant in enumerate(plants):
+            print('----------------------------------')
+            print('plant', plant)
+            status = plant[self.f['inv_adjust_grp_status']]
+            print('status', status)
+
+            if status == 'done':
+                print('skipping done plant code')
+                continue
+            lot_number = plant[self.f['product_lot']]
+            yearWeek = plant.get(self.f['product_lot_created_week'])
+            product_code = plant[self.CATALOG_PRODUCT_OBJ_ID][self.f['product_code']]
+            if recipes.get(product_code) and len(recipes[product_code]):
+                growth_weeks = recipes[product_code][0]['S4_growth_weeks']
+                soli_type = recipes[product_code][0].get('soil_type','RIVERBLEND')
+                start_size = recipes[product_code][0].get('recipes','Ln72')
+            else:
+                print('codes not found', product_code)
+                not_found.append(product_code)
+                plant[self.f['inv_adjust_grp_status']] = 'not_found'
+                continue
+
+            ready_date = lot_number
+            year = str(ready_date)[:4]
+            week = str(ready_date)[4:]
+            if not growth_weeks:
+                growth_weeks = int(week) -1
+
+            plant_ready_date = datetime.strptime('%04d-%02d-1'%(int(year), int(week)), '%Y-%W-%w')
+            if not yearWeek:
+                yearWeek = plant_ready_date - timedelta(weeks=growth_weeks)
+                yearWeek = int(yearWeek.strftime('%Y%W'))
+            else:
+                year = str(yearWeek)[:4]
+                week = str(yearWeek)[4:]
+                plant_date = datetime.strptime('%04d-%02d-1'%(int(year), int(week)), '%Y-%W-%w')
+                growth_weeks_diff = plant_ready_date - plant_date
+                growth_weeks = int(growth_weeks_diff.days/7)
+
+            exist = self.product_stock_exists(product_code=product_code, warehouse=warehouse, lot_number=lot_number)
+            print('exist', exist)
+            if exist:
+                print('product_code',product_code)
+                print('plant_code',exist['folio'])
+                print('id',exist['_id'])
+                print('lot_number',lot_number)
+                exist.update({'properties':properties, 'kwargs':kwargs, "set_id":idx})
+                patch_records.append(exist)
+
+                
+            else:
+                print('proque no lo encunra', product_code)
+                print('proque no lo warehouse', warehouse)
+                print('proque no lo lot_number', lot_number)
+                answers = {
+                    self.CATALOG_PRODUCT_RECIPE_OBJ_ID:{
+                        self.f['product_code']:product_code,
+                        self.f['reicpe_start_size']:start_size,
+                        self.f['reicpe_soil_type']:soli_type,
+                        },
+                    self.f['product_lot_created_week']:yearWeek,
+                    self.f['product_lot']:lot_number,
+                    self.f['product_growth_week']:growth_weeks,
+                    self.f['status']:"active",
+                    f"{self.CATALOG_WAREHOUSE_OBJ_ID}.{self.f['warehouse']}":warehouse
+                        }
+                metadata['answers'] = answers
+                response_sistema = self.lkf_api.post_forms_answers(metadata)
+                print('response_sistema=',response_sistema)
+                status_code = response_sistema.get('status_code',404)
+                print('status_code===',status_code)
+                if status_code == 201:
+                    plant[self.f['inv_adjust_grp_status']] = 'done'
+                else:
+                    error = response_sistema.get('json',{}).get('error', 'Unkown error')
+                    plant[self.f['inv_adjust_grp_status']] = 'error'
+                    plant[self.f['inv_adjust_grp_comments']] = f'Status Code: {status_code}, Error: {error}'
+
+        if patch_records:
+            answers_to_update = {
+                '620ad6247a217dbcb888d175': 'active',
+                }
+            print('folios', [x['folio'] for x in patch_records] )
+            response_patch_list = self.lkf_api.patch_record_list( patch_records )
+            #response_multi_patch = lkf_api.patch_multi_record(answers_to_update, 98225, folios=list(folios.keys()), threading=True)
+            print('response_patch_list', response_patch_list)
+            for idx, result in response_patch_list:
+                print('this idx=', idx)
+                print('this result', result)
+                set_id = patch_records[idx]['set_id']
+                status_code = result.get('status_code')
+                if status_code == 202:
+                    plants[set_id][self.f['inv_adjust_grp_status']] = 'done'
+                    plants[set_id][self.f['inv_adjust_grp_comments']] = ""
+                else:
+                    error = result.get('json',{}).get('error', 'Unkown error')
+                    plant[self.f['inv_adjust_grp_status']] = 'error'
+                    plant[self.f['inv_adjust_grp_comments']] = f'Status Code: {status_code}, Error: {error}'
+
+
+
+
+        record_id = record['_id']['$oid']
+        record['answers'][self.f['inv_adjust_status']] = 'done'
+        if not_found:
+            record['answers'][self.f['inv_adjust_comments']] = f'Codes not found: {not_found}'
+        print('end', record['answers'])
+        self.lkf_api.patch_record(record, record_id)
+
+
     def list_str_match(self, folio):
         if type(folio) == list:
             return {"$in":folio}
@@ -980,7 +1129,7 @@ class Stock(base.LKF_Base):
     def product_stock_exists(self, product_code, warehouse, location=None, lot_number=None, status=None):
         match_query = {
             "deleted_at":{"$exists":False},
-            "form_id": STOCK_FORM_ID,
+            "form_id": self.FORM_INVENTORY_ID,
             f"answers.{self.CATALOG_PRODUCT_RECIPE_OBJ_ID}.{self.f['product_code']}": product_code,
             }
         match_query.update({f"answers.{self.CATALOG_WAREHOUSE_OBJ_ID}.{self.f['warehouse']}":warehouse})      
