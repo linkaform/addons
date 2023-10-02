@@ -10,11 +10,36 @@ networks:
       name: linkaform
 
 services:
+  lkf-addons-base:
+    restart: "no"
+    container_name: lkf-addons
+    hostname: lkf-addons
+    image: linkaform/addons:base
+    ports:
+      - "5001:5000"
+    build:    
+     context: ../
+     dockerfile: ./Dockerfile
+     target: base
+    volumes:
+      - ../lkf_addons:/usr/local/lib/python3.7/site-packages/lkf_addons/
+      - ../lkf_addons/bin/lkfaddons.py:/usr/local/bin/lkfaddons.py
+      - ../lkf_addons/bin/download_module.py:/usr/local/bin/download_module.py
+      - ../lkf_addons/bin/json_xml.py:/usr/local/bin/json_xml.py
+      - ../lkf_addons/bin/xml_2_json.py:/usr/local/bin/xml_2_json.py
+      - ../config:/srv/scripts/addons/config
+      - ../modules:/srv/scripts/addons/modules
+      - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/ 
+      - /home/josepato/lkf/infosync_scripts/:/srv/infosync_scripts
+    command: sleep infinity
+    stdin_open: true
+    tty: true
+  
   lkf-addons:
     restart: "no"
     container_name: lkf-addons
     hostname: lkf-addons
-    image: linkaform/addons:latest
+    image: linkaform/addons:develop
     ports:
       - "5001:5000"
     build:    

@@ -191,10 +191,11 @@ _build(){
   case $1 in
     dev)
       if [ "$NOCACHE" != "0" ]; then
-        docker compose build
+        docker compose build lkf-addons
       else
-        docker compose build --no-cache
+        docker compose build --no-cache lkf-addons
       fi
+      docker push linkaform/addons:develop
     ;;
     prod)
       if [ "$NOCACHE" != "0" ]; then
@@ -202,12 +203,18 @@ _build(){
       else
         docker compose -f docker-prod.yml build --no-cache
       fi
+      docker push linkaform/addons:latest
      ;;
   esac
   cd ..
 
 }
 
+_udpate_container(){
+  #TODO, actualizar contenedor de addons corriendo en ambiente de pruebas
+  #docker cp stock_utils.py account_9908_linkaform.addons..latest:/usr/local/lib/python3.7/site-packages/lkf_addons/addons/stock/stock_utils.py
+  echo "TODO"
+}
 
 _run_tests(){
   echo "the command for was " $1
