@@ -57,15 +57,32 @@ load_demo = True
 
 def do_load_modules(load_modules):
     response = []
-    print('load_modules====', load_modules)
     for module in load_modules:
         # global forms
         print('-'*35 + f' Loding Module: {module} ' + '-'*35)
         ### Scripts
-        print('install', install)
-        scripts = importlib.import_module('{}.items.scripts'.format(module))
         #TODO revisar porque no corren las reglas
         if install.get('all') or install.get(module):
+            print('module', module)
+            try:
+                reports = importlib.import_module('{}.items.reports'.format(module))
+                report_resource = reports.ReportResource(
+                    path=reports.__path__[0], 
+                    module=module, 
+                    settings=settings,
+                    load_demo=load_demo, 
+                    load_data=load_data
+                    )
+                install_order = reports.install_order
+            except:
+                install_order = []
+            report_dict = report_resource.instalable_reports(install_order)
+            print('report_dict', report_dict)
+            ###reports
+            if load_reports:
+                report_resource.install_scripts(report_dict)
+            #####################################################################
+            scripts = importlib.import_module('{}.items.scripts'.format(module))
             script_resource = scripts.ScriptResource(
                 path=scripts.__path__[0], 
                 module=module, 
@@ -77,16 +94,12 @@ def do_load_modules(load_modules):
                 install_order = scripts.install_order
             except:
                 install_order = []
-            print('auiiii', install_order)
             script_dict = script_resource.instalable_scripts(install_order)
-            print('script_dict', script_dict)
-            print('load_script', load_script)
             ###scripts
             if load_script:
                 script_resource.install_scripts(script_dict)
 
             ### Catalogs
-            print('modules' , module)
             catalogs = importlib.import_module('{}.items.catalogs'.format(module))
             catalog_resource = catalogs.CatalogResource(
                 path=catalogs.__path__[0], 
@@ -132,17 +145,14 @@ def uninstall_modules(uninstall_dict):
             items_dict = item.get_module_items()
             remove_items = []
             for val in items_dict:
-                print('modules to uninstall', val)
+                print('Mudule to unistall: ', val)
                 item_id = val.get('item_id')
                 if item_id:
-                    print('item_id = ',item_id)
                     res = item.delete_item(item_id)
-                    print('res = ',res)
                     if res.get('status_code') == 204:
                         remove_items.append(item_id)
                     remove_items.append(item_id)
             res = item.remove_module_items(remove_items)
-            print('res...=',res)
             
 
 lkf_api = get_lkf_api()
@@ -152,6 +162,7 @@ ask_4_items = True
 load_data = False
 load_demo = False
 load_script  = False
+load_reports  = False
 load_catalog = False
 load_form    = False
 
@@ -219,6 +230,9 @@ preload_item = get_items_2_load(commands)
 if 'script' in commands or 'scripts' in commands:
     load_script = True
     ask_script = False
+if 'report' in commands or 'reports' in commands:
+    load_reports = True
+    ask_reports = False
 if 'catalog' in commands or 'catalogs' in commands:
     load_catalog = True
     ask_catalog = False
@@ -233,7 +247,7 @@ if 'data' in commands:
     ask_data = False
 
 if __name__ == '__main__':
-    print('Running on ', '{}:-:'.format(settings.ENV) * 10)
+    print('Running on:', '== {} =='.format(settings.ENV) * 10)
     environment = get_items_2_load(commands)
     if not environment:
         environment =  set_value(input(f"We are running on {settings.ENV} Enviroment, are you sure [y/n] (default n):"))
@@ -255,6 +269,8 @@ if __name__ == '__main__':
                         load_data = set_value(input("Load DATA [y/n] (default n):"))
                 if ask_script:    
                     load_script = set_value(input("Load Scripts [y/n] (default n):"))
+                if ask_reports:    
+                    load_reports = set_value(input("Load Reports [y/n] (default n):"))
             install = {'all':True}
             do_load_modules(load_modules)
         elif commands[0] == 'download':
@@ -280,6 +296,12 @@ if __name__ == '__main__':
                         options.append('scripts')
                 else:
                         options.append('scripts')
+                if ask_reports:    
+                    load_reports = set_value(input("Download Scripts [y/n] (default n):"))
+                    if load_reports:
+                        options.append('reports')
+                else:
+                        options.append('reports')
             download_items = {}
             if not load_modules:
                 if load_form:
@@ -287,12 +309,13 @@ if __name__ == '__main__':
                     download_items.update({'forms':{form_id:None}})
                 if load_catalog:
                     catalog_id = set_value_id(input("Catalog id to download:"))
-                    print('inpuuutttt....', catalog_id)
                     download_items.update({'catalogs':{catalog_id:None}})
                 if load_script:
                     script_id = set_value(input("Script id to download:"))
                     download_items.update({'scripts':{script_id:None}})
-            print('download_items========================',download_items)
+                if load_reports:
+                    script_id = set_value(input("Reports id to download:"))
+                    download_items.update({'reports':{script_id:None}})
             download_modules(load_modules, options, items_ids=download_items)
 
 

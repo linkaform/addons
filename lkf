@@ -16,12 +16,13 @@ _usage(){
       echo "      -a           load local linkaform_api as volume"
       echo "      -r           relaod, alway need to be at the end of the options"
       echo "      -c           works on build command, it runs the build command with no-cache"
+      echo "      -u           works on build command, upload image after build"
       echo "      -h           help!!!!"
       echo
       echo "    Acction & Enviorment"
       echo "      $APP <start|stop> addons     Starts the addons development environment"
       echo "      $APP <start|stop> test       Starts the testing environment"
-      echo "      $APP build <prod|dev>      Starts the testing environment"
+      echo "      $APP build <base|dev|local|prod>      Starts the testing environment"
       echo
       echo
       exit 1
@@ -32,7 +33,8 @@ API_VOL=0
 IMAGE_NAME=0
 SHIFT=-1
 NOCACHE=0
-while getopts ':iar:ir:c:h' opt; do
+UPLOAD=0
+while getopts ':iar:ir:c:u:h' opt; do
   case "$opt" in
     a)
       echo "Loding local API..."
@@ -50,7 +52,13 @@ while getopts ':iar:ir:c:h' opt; do
       ;;
     c)
       echo "No-Cache build"
-      NOCACHE= 1
+      SHIFT=-2
+      NOCACHE=1
+      ;;
+    u)
+      echo "Upload image after build"
+      SHIFT=-2
+      UPLOAD=1
       ;;
     r)
       echo "Relaoding..."
@@ -189,13 +197,37 @@ _build(){
   echo "Environment: " $1
   cd docker
   case $1 in
-    dev)
-      if [ "$NOCACHE" != "0" ]; then
-        docker compose build lkf-addons
+    base)
+      if [ "$NOCACHE" = "1" ]; then
+        docker compose build lkf-addons-base
       else
-        docker compose build --no-cache lkf-addons
+        docker compose build --no-cache lkf-addons-base
       fi
-      docker push linkaform/addons:develop
+     if [ "$UPLOAD" = "1" ]; then
+        docker push linkaform/addons:base
+      fi  
+    ;;
+    dev)
+      if [ "$NOCACHE" = "1" ]; then
+        docker compose build --no-cache lkf-addons
+      else
+        docker compose build lkf-addons
+      fi
+     if [ "$UPLOAD" = "1" ]; then
+        docker push linkaform/addons:develop
+      fi  
+    ;;
+    local)
+      if [ "$NOCACHE" = "1" ]; then
+        docker compose -f docker-prod.yml build --no-cache
+      else
+        docker compose -f docker-prod.yml build
+      fi
+      for CONTAINER_ID in $(docker ps | grep addons | awk '{print $1}') 
+      do
+        echo 'Stopping cotainers...'
+        docker stop $CONTAINER_ID && docker rm $CONTAINER_ID
+      done
     ;;
     prod)
       if [ "$NOCACHE" != "0" ]; then
@@ -203,7 +235,9 @@ _build(){
       else
         docker compose -f docker-prod.yml build --no-cache
       fi
-      docker push linkaform/addons:latest
+      if [ "$UPLOAD" = "1" ]; then
+        docker push linkaform/addons:latest
+      fi  
      ;;
   esac
   cd ..

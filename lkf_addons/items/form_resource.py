@@ -11,6 +11,7 @@ class FormResource(items.Items):
     def setup_workflows(self, conf_files, action):
         for file_name in conf_files:
             file_name = file_name.split('.')[0]
+            print('Installing Workflows: ', file_name)
             workflow_model = self.load_module_template_file(self.path, file_name)
             # res = self.lkf.install_workflows(module, workflow_model, 'update')
             if action == 'create':
@@ -23,6 +24,7 @@ class FormResource(items.Items):
         for file_name in conf_files:
             file_name = file_name.split('.')[0]
             rules_model = self.load_module_template_file(self.path, file_name)
+            print('Installing Rules: ',file_name )
             # res = self.lkf.install_workflows(module, workflow_model, 'update')
             if action == 'create':
                 res = self.lkf_api.upload_rules(rules_model, 'POST')
@@ -35,14 +37,20 @@ class FormResource(items.Items):
             install_order = instalable_forms.pop('install_order', [])
         else:
             install_order = []
-        print('install_order=',install_order)
         install_order += [x  for x in instalable_forms.keys() if x not in install_order]
         response = []
-        print('install_order=',install_order)
         for form_name in install_order:
-            print('\n\n')
+            print('Installing Form: ', form_name)
             detail = instalable_forms[form_name]
             form_model = self.load_module_template_file(self.path, form_name)
+            item_info = {
+                # 'created_by' : user,
+                'module': self.module,
+                # 'name': 'como lo ponomes',
+                'item_type': 'form',
+                'item_name':form_name,
+            }
+            item = self.lkf.serach_module_item(item_info)
             res = self.lkf.install_forms(self.module, form_name, form_model)
             response.append(
                     {
@@ -60,7 +68,6 @@ class FormResource(items.Items):
                         # res['status'] = 'create'
                         self.setup_workflows(conf_files, res['status'])
                     if config == 'rules':
-                        print('conf_files', conf_files)
                         self.setup_rules(conf_files, res['status'])
             elif res.get('status_code') == 400:
                 print('res=',res)

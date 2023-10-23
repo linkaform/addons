@@ -1,18 +1,23 @@
 # coding: utf-8
-from settings import ENV, config
+from settings import config
 
+
+#ENV = 'preprod' 
+ENV = 'local' 
+#ENV = 'prod' 
+# print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
 mongo_hosts = config.get('mongo_hosts')
 PROTOCOL = config.get('PROTOCOL')
 HOST = config.get('HOST')
 
 if ENV == 'prod':
     mongo_hosts = 'db2.linkaform.com:27017,db3.linkaform.com:27017,db4.linkaform.com:27017'
-    HOST = 'preprod.linkaform.com'
+    HOST = 'app.linkaform.com'
     PROTOCOL = 'https'
 
 elif ENV == 'preprod':
     mongo_hosts = 'dbs2.lkf.cloud:27918'
-    HOST = 'app.linkaform.com'
+    HOST = 'preprod.linkaform.com'
     PROTOCOL = 'https'
 
 

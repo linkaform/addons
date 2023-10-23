@@ -32,11 +32,9 @@ class CatalogResource(items.Items):
             install_order = instalable_catalogs.pop('install_order')
         else:
             install_order = []  
-        print('install_order    install_order=',install_order)
         install_order += [x  for x in instalable_catalogs.keys() if x not in install_order]
         for catalog_name in install_order:
-            print('instalable_catalogs=',instalable_catalogs)
-            print('catalog_name=',catalog_name)
+            print('Installing Catalog: ', catalog_name)
             detail = instalable_catalogs[catalog_name]
             catalog_model = self.load_module_template_file(self.path, catalog_name)
             res = self.lkf.install_catalog(self.module, catalog_name, catalog_model)

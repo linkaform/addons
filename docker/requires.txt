@@ -2,17 +2,19 @@ b2==1.4.2
 CouchDB-Linkaform
 -e git+https://github.com/linkaform/backbalze_utils.git#egg=backblaze_utils
 httplib2==0.12.1
-simplejson==3.16.0
 #facturapi
+Jinja2==3.1.2
 pdf2pptx
 pytz==2021.3
 PyJWT==2.6.0
 pydantic==1.10.2
 python-jwt
+pyexcel==0.7.0
 pyexcel-xlsx==0.6.0
 pyexcel-xlsxw==0.6.1
 psycopg2==2.9.3
 pymongo==3.13
+simplejson==3.16.0
 #sha-py
 requests
 haversine==2.5.1

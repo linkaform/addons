@@ -20,7 +20,7 @@ services:
     build:    
      context: ../
      dockerfile: ./Dockerfile
-     target: base
+     target: addons-base
     volumes:
       - ../lkf_addons:/usr/local/lib/python3.7/site-packages/lkf_addons/
       - ../lkf_addons/bin/lkfaddons.py:/usr/local/bin/lkfaddons.py
@@ -30,7 +30,8 @@ services:
       - ../config:/srv/scripts/addons/config
       - ../modules:/srv/scripts/addons/modules
       - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/ 
-      - /home/josepato/lkf/infosync_scripts/:/srv/infosync_scripts
+      - ../../lkf/infosync_scripts/:/srv/infosync_scripts
+      - ../../../.bash_history:/root/.bash_history
     command: sleep infinity
     stdin_open: true
     tty: true
@@ -55,7 +56,8 @@ services:
       - ../config:/srv/scripts/addons/config
       - ../modules:/srv/scripts/addons/modules
       - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/ 
-      - /home/josepato/lkf/infosync_scripts/:/srv/infosync_scripts
+      - ../../lkf/infosync_scripts/:/srv/infosync_scripts
+      - ../../../.bash_history:/root/.bash_history
     command: sleep infinity
     stdin_open: true
     tty: true

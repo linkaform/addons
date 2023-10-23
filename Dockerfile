@@ -1,8 +1,6 @@
 ####################################
 # Image for develop                #
 ####################################
-
-#FROM python:3.7-bullseye as develop
 FROM python:3.7-slim-bullseye as addons-base
 
 MAINTAINER Linkaform
@@ -16,7 +14,8 @@ RUN apt-get update && \
     gcc \
     gpg \
     curl \
-    git
+    git \
+    vim
 
 #mongo 5.0 tools
 RUN curl -fsSL https://pgp.mongodb.com/server-5.0.asc | gpg -o /usr/share/keyrings/mongodb-server-5.0.gpg --dearmor
@@ -34,9 +33,7 @@ RUN apt-get update && \
 ####################################
 # Image for develop                #
 ####################################
-
-#FROM python:3.7-bullseye as develop
-FROM addons-base as develop
+FROM linkaform/addons:base as develop
 
 
 COPY ./docker/requires.txt /tmp/
@@ -48,11 +45,9 @@ RUN pip install --upgrade pip
 RUN pip install -r /tmp/requires.txt
 
 
-RUN echo teesttt
-WORKDIR /tmp/
-ADD  https://f001.backblazeb2.com/file/lkf-resources/linkaform_api-3.0.tar.gz ./linkaform_api-3.0.tar.gz
-RUN pip install linkaform_api-3.0.tar.gz
 
+
+WORKDIR /tmp/
 ADD https://f001.backblazeb2.com/file/lkf-resources/backblaze_utils-0.1.tar.gz ./backblaze_utils-0.1.tar.gz 
 RUN pip install backblaze_utils-0.1.tar.gz
 
@@ -72,6 +67,10 @@ FROM linkaform/addons:develop as prod
 
 MAINTAINER Linkaform
 
+RUN echo teesttt
+WORKDIR /tmp/
+ADD  https://f001.backblazeb2.com/file/lkf-resources/linkaform_api-3.0.tar.gz ./linkaform_api-3.0.tar.gz
+RUN pip install linkaform_api-3.0.tar.gz
 
 #COPY ./docker/requires.txt /tmp/
 # TODO COPIAR TODO ADDONS Y HACER IMAGEN.... AQUI O EN SCIRPTS?
