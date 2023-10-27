@@ -120,9 +120,12 @@ class Stock(base.LKF_Base):
             'cat_stock_folio':'62c44f96dae331e750428732',
             'grading_group':'644bf7ccfa9830903f087867',
             'grading_move_type':'64d5550ec4909ab3c20c5806',
+            'grading_ready_year':'644bf9a04b1761305b080012',
+            'grading_ready_week':'644bf9a04b1761305b080011',
             'grading_ready_yearweek':'64edf8aeffeaaa1febca2a06',
             'grading_flats':'644bf9a04b1761305b080013',
             'grading_date':'000000000000000000000111',
+            'grading_type':'653885f30d80af8e8de0fe79',
             'move_dest_folio':'ffff00000000000000000001',
             'move_group':'6442e4537775ce64ef72dd69',
             'move_new_location':'644897497a16141f4e5ee0c3',
@@ -220,42 +223,16 @@ class Stock(base.LKF_Base):
             if production_status == 'progress':
                 force_lot = True
 
-            time_in = production.get(self.f['time_in'])
-            time_out = production.get(self.f['time_out'])
-            cutter = production.get(self.f['worker_obj_id'],{}).get(self.f['worker_name'])
-            d_time_in = datetime.strptime(time_in, '%H:%M:%S')
-            d_time_out = datetime.strptime(time_out, '%H:%M:%S')
-            secs = (d_time_out - d_time_in).total_seconds()
-            if secs < 0:
-                msg = "The time in and time out for the production set of the cutter: {}, is wrong.".format(cutter)
-                msg += " It was capture that see started at {} and finished at {}, having a difference of {} seconds.".format(time_in,
-                    time_out, secs)
-                msg_error_app = {
-                         self.f['time_in']: {"msg": [msg], "label": "Please time in. ", "error": []},
-                         self.f['time_out']: {"msg": [msg], "label": "Please time out. ", "error": []},
-                     }
-                raise Exception( simplejson.dumps( msg_error_app ) )
-
-            total_hours = secs / 60.0**2
-            lunch_brake = production.get(self.f['set_lunch_brake'])
-            if lunch_brake == 'sí' or lunch_brake == 'yes':
-                total_hours -= 0.5
-
+            total_hours = self.calc_work_hours(production)
             production[self.f['set_total_hours']] = round(total_hours, 2)
+
             total_produced += production[self.f['set_total_produced']]
             if production_status == 'progress':
                 containers_out = production[self.f['set_total_produced']]
             else:
                 containers_out = 0
-            if total_hours <= 0:
-                t_in = d_time_in.strftime('%H:%M')
-                t_out = d_time_out.strftime('%H:%M')
-                msg = "Double check your time in {} and time out {} input, of {}.".format(t_in, t_out, cutter)
-                msg_error_app = {
-                         self.f['time_in']: {"msg": [msg], "label": "Please check your Time In. Was there a lunch brake? ", "error": []},
-                         self.f['time_out']: {"msg": [msg], "label": "Please check your Time Out. Was there a lunch brake?", "error": []}
-                     }
-                raise Exception( simplejson.dumps( msg_error_app ) )
+
+
 
           
             qty_per_container = recipes.get(self.f['prod_qty_per_container'], [])
@@ -373,6 +350,39 @@ class Stock(base.LKF_Base):
             #greenhouse_inventory['kwargs'] = {'production':qty_produced}
         resp_update = self.lkf_api.patch_record(greenhouse_inventory, jwt_settings_key='APIKEY_JWT_KEY')
         return resp_update
+
+    def calc_work_hours(self, data):
+        time_in = data.get(self.f['time_in'])
+        time_out = data.get(self.f['time_out'])
+        cutter = data.get(self.f['worker_obj_id'],{}).get(self.f['worker_name'])
+        d_time_in = datetime.strptime(time_in, '%H:%M:%S')
+        d_time_out = datetime.strptime(time_out, '%H:%M:%S')
+        secs = (d_time_out - d_time_in).total_seconds()
+        if secs < 0:
+            msg = "The time in and time out for the production set of the cutter: {}, is wrong.".format(cutter)
+            msg += " It was capture that see started at {} and finished at {}, having a difference of {} seconds.".format(time_in,
+                time_out, secs)
+            msg_error_app = {
+                     self.f['time_in']: {"msg": [msg], "label": "Please time in. ", "error": []},
+                     self.f['time_out']: {"msg": [msg], "label": "Please time out. ", "error": []},
+                 }
+            raise Exception( simplejson.dumps( msg_error_app ) )
+
+        total_hours = secs / 60.0**2
+        lunch_brake = data.get(self.f['set_lunch_brake'])
+        if lunch_brake == 'sí' or lunch_brake == 'yes':
+            total_hours -= 0.5
+
+        if total_hours <= 0:
+            t_in = d_time_in.strftime('%H:%M')
+            t_out = d_time_out.strftime('%H:%M')
+            msg = "Double check your time in {} and time out {} input, of {}.".format(t_in, t_out, cutter)
+            msg_error_app = {
+                     self.f['time_in']: {"msg": [msg], "label": "Please check your Time In. Was there a lunch brake? ", "error": []},
+                     self.f['time_out']: {"msg": [msg], "label": "Please check your Time Out. Was there a lunch brake?", "error": []}
+                 }
+            raise Exception( simplejson.dumps( msg_error_app ) )
+        return total_hours
 
     def date_2_str(self, value):
         res=None
@@ -564,6 +574,10 @@ class Stock(base.LKF_Base):
         #GET INCOME PRODUCT
         stock = {}
         print('************************ stock **********************************')
+        print('product_code=',product_code)
+        print('warehouse=',warehouse)
+        print('lot_number=',lot_number)
+        print('date_to=',date_to)
         stock['adjustments'] = self.stock_adjustments_moves( product_code=product_code, lot_number=lot_number, \
             warehouse=warehouse , date_from=None, date_to=None, **kwargs)
         # if stock['adjustments']:
@@ -585,10 +599,7 @@ class Stock(base.LKF_Base):
         stock['scrapped'] = scrapped
         stock['cuarentin'] = cuarentin
 
-        scrapped, cuarentin = self.stock_scrap_group(product_code=product_code, warehouse=warehouse, location=location, \
-            lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs )
-        stock['scrapped'] += scrapped
-        stock['cuarentin'] += cuarentin
+
         # stock['sales']  = stock_sales(product_code=product_code, lot_number=lot_number, warehouse=warehouse )
         sales=0
         stock['sales'] = sales
@@ -600,6 +611,9 @@ class Stock(base.LKF_Base):
         stock = self.add_dicts(stock, cache_stock.get('cache',{}))
         stock['stock_in'] = stock['production'] + stock['move_in']
         stock['stock_out'] = stock['scrapped'] + stock['move_out'] + stock['sales']  + stock['cuarentin']
+        print('adjustments',stock['adjustments'] )
+        print('stock_out',stock['stock_out'] )
+        print('stock_in',stock['stock_in'] )
         stock['actuals'] = stock['stock_in'] - stock['stock_out'] + stock['adjustments']
         #update_stock(stock)
         stock['scrap_perc']  = 0
@@ -629,6 +643,7 @@ class Stock(base.LKF_Base):
         #         ready_date = answers[self.f['product_lot']]
 
         product_stock = self.get_product_stock(plant_code, warehouse=warehouse, lot_number=ready_date, kwargs=kwargs.get('kwargs',{}) )
+        print('product_stock=', product_stock)
         scrapped = product_stock['scrapped']
         overage = recipes[plant_code][0].get('S4_overage_rate')
         actual_flats_on_hand = product_stock['actuals']
@@ -720,6 +735,15 @@ class Stock(base.LKF_Base):
         match_query.update(self.get_product_map(query_dict, map_type='model_2_field_id'))
         return match_query
 
+    def get_grading_sublots(self, gradings):
+        grading_rec = {}
+        for grading in gradings:
+            lot_number = int(f"{grading.get(self.f['grading_ready_year'])}{grading.get(self.f['grading_ready_week'])}")
+            grading[self.f['grading_ready_yearweek']] = lot_number
+            grading_rec[lot_number] = grading_rec.get(lot_number,0)
+            grading_rec[lot_number] += grading[self.f['grading_flats']]
+        return grading_rec
+
     def get_record_greenhouse_inventory(self, ready_date, planting_house, plant_code):
         query_greenhouse_inventory = {
             'form_id': self.FORM_INVENTORY_ID,
@@ -745,12 +769,80 @@ class Stock(base.LKF_Base):
         res = self.lkf_api.search_catalog( self.CATALOG_WAREHOUSE_ID, mango_query)
         warehouse = [r[self.f['warehouse']] for r in res]
         return warehouse
+  
+    def gradings_validations(self):
+        answers = self.current_record.get('answers',{})
+        gradings = answers[self.f['grading_group']]
+        rec_date = answers[self.f['grading_date']]
+        scrap_qty = answers.get(self.f['inv_scrap_qty'],0)
+        grading_type = answers[self.f['grading_date']]
+        plant_info = answers[self.CATALOG_INVENTORY_OBJ_ID]
+        lot_number = plant_info.get(self.f['product_lot'])
+        product_code = plant_info.get(self.f['product_code'])
+        warehouse = plant_info.get(self.f['warehouse'])
+        product_stock = self.get_product_stock(product_code, warehouse=warehouse, lot_number=lot_number, date_to=rec_date)
+        print('product_stock=',product_stock)
+        grading_totals = self.get_grading_sublots(gradings)
+        print('grading_totals=', grading_totals)
+        totals = sum(x for x in grading_totals.values())
+        print('totals',totals)
+        totals += scrap_qty
+        acctual_containers = product_stock['actuals']
+
+        # if acctual_containers != totals:
+        #Validations
+        total_hours = self.calc_work_hours(answers)
+        self.current_record['answers'][self.f['set_total_hours']] = round(total_hours, 2)
+
+        if grading_type == 'complete'  and totals != acctual_containers:
+            #trying to move more containeres that there are...
+            msg = "Al realizar un grading completo, no debe de existir diferencia entre la cantidad total de flats de lote y del grading "
+            msg += "La cantidad de total de flats reportadas es de: {} y la cantdidad flats del lote es de: {}. ".format(totals, acctual_containers)
+            if scrap_qty:
+                msg += "Mas {} flats de scrap. ".format(scrap_qty)
+            msg += "Hay una diferencia de : {} favor de corregir".format(acctual_containers - totals)
+            msg_error_app = {
+                    "6441d33a153b3521f5b2afc9": {
+                        "msg": [msg],
+                        "label": "Please check your Actual Containers on Hand",
+                        "error":[]
+      
+                    }
+                }
+            raise Exception( simplejson.dumps( msg_error_app ) )
+
+        if totals > acctual_containers:
+            #trying to move more containeres that there are...
+            msg = "El total de flats que se le esta realizando grading es mayor a la cantidad acutal del lote."
+            msg += "La cantidad de total de flats reportadas es de: {} y la cantdidad flats del lote es de: {}. ".format(totals, acctual_containers)
+            if scrap_qty:
+                msg += "Mas {} flats de scrap. ".format(scrap_qty)            
+            msg += "Hay una diferencia de : {} favor de corregir".format(acctual_containers - totals)
+            msg_error_app = {
+                    "6441d33a153b3521f5b2afc9": {
+                        "msg": [msg],
+                        "label": "Please check your Actual Containers on Hand",
+                        "error":[]
+      
+                    }
+                }
+            raise Exception( simplejson.dumps( msg_error_app ) )
+        if scrap_qty:
+            self.cache_set({
+                        '_id': f'{product_code}_{lot_number}_{warehouse}',
+                        'scrapped': scrap_qty,
+                        'product_lot': lot_number,
+                        'product_code':product_code,
+                        'warehouse': warehouse
+                        })
+            self.update_calc_fields(product_code, warehouse, lot_number)
+        return answers
 
     def inventory_adjustment(self, folio, record):
         answers = record['answers']
         plants = answers.get(self.f['grading_group'])
-        #plants = current_record['answers']['644bf7ccfa9830903f087867']
         warehouse = answers[self.CATALOG_WAREHOUSE_OBJ_ID][self.f['warehouse']]
+        adjust_date = answers[self.f['grading_date']]
         comments = record['answers'].get(self.f['inv_adjust_comments'],'') 
         patch_records = []
         metadata = self.lkf_api.get_metadata(self.FORM_INVENTORY_ID)
@@ -779,7 +871,6 @@ class Stock(base.LKF_Base):
 
         # recipes = self.get_plant_recipe( search_codes, stage=[4, 'Ln72'] )
         # growth_weeks = 0
-
         latest_versions = versions = self.get_record_last_version(record)
         answers_version = latest_versions.get('answers',{})
         last_verions_products = {}
@@ -794,7 +885,7 @@ class Stock(base.LKF_Base):
                     'warehouse':warehouse
                 }
         for plant in plants:
-            product_code = plant['6205f7690e752ce25bb30102']['61ef32bcdf0ec2ba73dec33d']
+            product_code =  plant[self.CATALOG_PRODUCT_OBJ_ID][self.f['product_code']]
             search_codes.append(product_code)
         recipes = self.get_plant_recipe( search_codes, stage=[4, 'Ln72'] )
         growth_weeks = 0
@@ -807,7 +898,6 @@ class Stock(base.LKF_Base):
             adjust_in = plant.get(self.f['inv_adjust_grp_in'], 0)
             adjust_out = plant.get(self.f['inv_adjust_grp_out'], 0)
             product_code = plant[self.CATALOG_PRODUCT_OBJ_ID][self.f['product_code']]
-            print(f'=================={product_code}======================')
             verify = 0
             if adjust_qty or adjust_qty ==0:
                 verify +=1
@@ -817,7 +907,6 @@ class Stock(base.LKF_Base):
                 verify +=1
             if adjust_out:
                 verify +=1
-
             if verify > 1:
                 msg = f"You can have only ONE input on product {product_code} lot number {lot_number}."
                 msg +=  "Either the Actual Qty, the Adjusted In or the Adjusted Out."
@@ -831,12 +920,16 @@ class Stock(base.LKF_Base):
                 continue
 
             if last_verions_products.get(f'{product_code}_{warehouse}_{lot_number}'):
-                print('poping ' , f'{product_code}_{warehouse}_{lot_number}')
                 last_verions_products.pop(f'{product_code}_{warehouse}_{lot_number}')
             exist = self.product_stock_exists(product_code=product_code, warehouse=warehouse, lot_number=lot_number)
 
             if exist:
-                product_stock = self.get_product_stock(product_code, warehouse=warehouse, lot_number=lot_number ,**{'nin_folio':folio})
+                print('plant code', product_code)
+                print('plant warehouse', warehouse)
+                print('plant lot_number', lot_number)
+                print('plant adjust_date', adjust_date)
+                product_stock = self.get_product_stock(product_code, warehouse=warehouse, lot_number=lot_number, date_to=adjust_date, **{'nin_folio':folio})
+                print('product_stock',product_stock)
                 actuals = product_stock.get('actuals',0)
                 if adjust_qty or adjust_qty == 0:
                     cache_adjustment = adjust_qty - actuals
@@ -865,7 +958,7 @@ class Stock(base.LKF_Base):
                         })
                 plant[self.f['inv_adjust_grp_qty']] = adjust_qty
                 plant[self.f['inv_adjust_grp_in']] = adjust_in
-                plant[self.f['inv_adjust_grp_out']] = adjust_out
+                plant[self.f['inv_adjust_grp_out']] = abs(adjust_out)
                 response = self.update_calc_fields(product_code, warehouse, lot_number, folio=exist['folio'], **{'nin_folio':folio} )
                 if not response:
                     comments += f'Error updating product {product_code} lot {lot_number}. '
@@ -875,8 +968,6 @@ class Stock(base.LKF_Base):
                     plant[self.f['inv_adjust_grp_comments']] = ""
 
             else:
-                print('it dosent exist.....', product_code)
-                print('it dosent exist..... lot_number', lot_number)
                 if recipes.get(product_code) and len(recipes[product_code]):
                     growth_weeks = recipes[product_code][0]['S4_growth_weeks']
                     soli_type = recipes[product_code][0].get('soil_type','RIVERBLEND')
@@ -937,9 +1028,7 @@ class Stock(base.LKF_Base):
                         plant[self.f['inv_adjust_grp_comments']] = f'Recipe not found'
 
         if last_verions_products:
-            print('estso sobrron...', last_verions_products)
             for key, value in last_verions_products.items():
-                print('its updating a records...', key)
                 self.update_calc_fields(value['product_code'], value['warehouse'], value['lot_number'])
 
         record_id = record['_id']['$oid']
@@ -1781,10 +1870,10 @@ class Stock(base.LKF_Base):
 
     ### STOCK OUT'S
 
-    def stock_scrap(self, product_code=None, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None, status='done', **kwargs):
+    def stock_scrap(self, product_code, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None, status='done', **kwargs):
         match_query = {
             "deleted_at":{"$exists":False},
-            "form_id": self.SCRAP_FORM_ID,
+            "form_id": {"$in":[self.SCRAP_FORM_ID, self.GRADING_FORM_ID]}
             }
         if product_code:
             match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})    
@@ -1832,91 +1921,9 @@ class Stock(base.LKF_Base):
             result[pcode] = result.get(pcode, {'scrap':0,'cuarentin':0})        
             result[pcode]['scrap'] += r.get('total_scrap',0)
             result[pcode]['cuarentin'] += r.get('total_cuarentin',0)
-        if product_code:
-            result_scrap = result.get(product_code,{}).get('scrap',0)
-            result_cuarentin = result.get(product_code,{}).get('cuarentin',0) 
-            scrap, cuarentin = self.stock_scrap_group(product_code=product_code, warehouse=warehouse, location=location, \
-                lot_number=lot_number, date_from=date_from, date_to=date_to, status=status, kwargs=kwargs)
-            result_scrap += scrap
-            result_cuarentin += cuarentin
-            return result_scrap, result_cuarentin
-        else:
-            group_result = self.stock_scrap_group(product_code=product_code, warehouse=warehouse, location=location, \
-                lot_number=lot_number, date_from=date_from, date_to=date_to, status=status, kwargs=kwargs) 
-            for key, value in result.items():
-                if group_result.get(key):
-                    product_totals = group_result.pop(key)
-                    result[key]['scrap'] += product_totals.get('scrap',0)
-                    result[key]['cuarentin'] += product_totals.get('cuarentin',0)
-            if group_result:
-                result.update(group_result)
-            return result
-
-    def stock_scrap_group(self, product_code=None, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None, status='done', **kwargs):
-        if not self.GRADING_FORM_ID:
-            return 0
-        match_query = {
-            "deleted_at":{"$exists":False},
-            "form_id": self.GRADING_FORM_ID,
-            }
-        if product_code:
-            match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})    
-        if warehouse:
-            match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['warehouse']}":warehouse})    
-        if location:
-            match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_lot_location']}":location})    
-        if lot_number:
-            match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_lot']}":lot_number})    
-        if status:
-            match_query.update({f"answers.{self.f['inv_scrap_status']}":status})
-        if date_from or date_to:
-            match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
-        query= [
-            {'$match': match_query },
-            {'$unwind': '$answers.{}'.format({self.f['grading_group']})},
-            {'$match': {
-                f"answers.{self.f['grading_group']}.{self.f['grading_move_type']}": {'$in':['scrap', 'cuarentena', 'cuarentin']}
-                }
-            },
-            {'$project':
-                {'_id': 1,
-                    'product_code': f"$answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}",
-                    'move_type': f"$answers.{self.f['grading_group']}.{self.f['grading_move_type']}",
-                    'total': '$answers.{}.{}'.format({self.f['grading_group']}, self.f['grading_flats']),
-                    }
-            },
-            {'$group':
-                {'_id':
-                    { 
-                    'product_code': '$product_code',
-                    'move_type': '$move_type',
-                    },
-                  'total': {'$sum': '$total'},
-                  }
-            },
-            {'$project':
-                {'_id': 0,
-                'product_code': '$_id.product_code',
-                'move_type': '$_id.move_type',
-                'total': '$total',
-                }
-            },
-            {'$sort': {'product_code': 1}}
-            ]
-        res = self.cr.aggregate(query)
-        result = {}
-        for r in res:
-            pcode = r.get('product_code')
-            result[pcode] = result.get(pcode, {'scrap':0,'cuarentin':0})  
-            if r['move_type'] == 'scrap':
-                result[pcode]['scrap'] += r.get('total',0)
-            else:
-                result[pcode]['cuarentin'] += r.get('total',0)
-        if product_code:
-            result_scrap = result.get(product_code,{}).get('scrap',0)
-            result_cuarentin = result.get(product_code,{}).get('cuarentin',0)
-            return result_scrap , result_cuarentin
-        return result
+        result_scrap = result.get(product_code,{}).get('scrap',0)
+        result_cuarentin = result.get(product_code,{}).get('cuarentin',0) 
+        return result_scrap, result_cuarentin
 
     def stock_update(self, folio):
         match_query = {
@@ -1981,3 +1988,19 @@ class Stock(base.LKF_Base):
             if folio:
                 self.sync_catalog(folio)
         return update_res
+
+    def update_log_grading(self):
+        answers = self.current_record.get('answers',{})
+        gradings = answers[self.f['grading_group']]
+        rec_date = answers[self.f['grading_date']]
+        grading_type = answers[self.f['grading_date']]
+        plant_info = answers[self.CATALOG_INVENTORY_OBJ_ID]
+        product_lot = plant_info.get(self.f['product_lot'])
+        product_code = plant_info.get(self.f['product_code'])
+        warehouse = plant_info.get(self.f['warehouse'])
+        product_stock = self.get_product_stock(product_code, warehouse=warehouse, lot_number=product_lot)
+        print('product_stock=',product_stock)
+        grading_totals = self.get_grading_sublots(gradings)
+        totals = sum(x for x in grading_totals.values())
+        print('totals',totals)
+        acctual_containers = product_stock['actuals']

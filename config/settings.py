@@ -1,6 +1,9 @@
 # coding: utf-8
 
-
+#ENV = 'preprod' 
+ENV = 'local' 
+#ENV = 'prod' 
+# print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
 from linkaform_api import settings
 
 config = {

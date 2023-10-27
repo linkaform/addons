@@ -63,7 +63,7 @@ WORKDIR /srv/scripts/addons/modules
 ####################################
 # Image for prodcution             #
 ####################################
-FROM linkaform/addons:develop as prod
+FROM develop as prod
 
 MAINTAINER Linkaform
 
