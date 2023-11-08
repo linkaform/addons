@@ -26,7 +26,6 @@ def get_lkf_api():
     lkf_api = utils.Cache(settings)
     return lkf_api
 
-
 def get_lkf_module():
     lkf_api = get_lkf_api()
     settings = lkf_api.settings

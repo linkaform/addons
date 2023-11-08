@@ -16,7 +16,7 @@ _usage(){
       echo "      -a           load local linkaform_api as volume"
       echo "      -r           relaod, alway need to be at the end of the options"
       echo "      -c           works on build command, it runs the build command with no-cache"
-      echo "      -u           works on build command, upload image after build"
+      echo "      -p           works on build command, upload and publish image after build"
       echo "      -h           help!!!!"
       echo
       echo "    Acction & Enviorment"
@@ -34,7 +34,7 @@ IMAGE_NAME=0
 SHIFT=-1
 NOCACHE=0
 UPLOAD=0
-while getopts ':iar:ir:c:u:h' opt; do
+while getopts ':iar:ir:c:p:h' opt; do
   case "$opt" in
     a)
       echo "Loding local API..."
@@ -55,7 +55,7 @@ while getopts ':iar:ir:c:u:h' opt; do
       SHIFT=-2
       NOCACHE=1
       ;;
-    u)
+    p)
       echo "Upload image after build"
       SHIFT=-2
       UPLOAD=1
