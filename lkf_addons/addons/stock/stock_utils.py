@@ -8,8 +8,9 @@ from linkaform_api import base
 
 class Stock(base.LKF_Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None):
-        base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
+        # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
         self.name =  __class__.__name__
         self.settings = settings
 

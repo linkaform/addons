@@ -11,10 +11,11 @@ print('Cargando Stock..')
 class Stock(base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
-        base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
+        #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
         self.name =  __class__.__name__
         self.settings = settings
-
+        
         self.CATALOG_WAREHOUSE = self.lkm.catalog_id('warehouse')
         self.CATALOG_WAREHOUSE_ID = self.CATALOG_WAREHOUSE.get('id')
         self.CATALOG_WAREHOUSE_OBJ_ID = self.CATALOG_WAREHOUSE.get('obj_id')
@@ -573,11 +574,6 @@ class Stock(base.LKF_Base):
     def get_product_stock(self, product_code, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
         stock = {}
-        print('************************ stock **********************************')
-        print('product_code=',product_code)
-        print('warehouse=',warehouse)
-        print('lot_number=',lot_number)
-        print('date_to=',date_to)
         stock['adjustments'] = self.stock_adjustments_moves( product_code=product_code, lot_number=lot_number, \
             warehouse=warehouse , date_from=None, date_to=None, **kwargs)
         # if stock['adjustments']:
@@ -611,9 +607,6 @@ class Stock(base.LKF_Base):
         stock = self.add_dicts(stock, cache_stock.get('cache',{}))
         stock['stock_in'] = stock['production'] + stock['move_in']
         stock['stock_out'] = stock['scrapped'] + stock['move_out'] + stock['sales']  + stock['cuarentin']
-        print('adjustments',stock['adjustments'] )
-        print('stock_out',stock['stock_out'] )
-        print('stock_in',stock['stock_in'] )
         stock['actuals'] = stock['stock_in'] - stock['stock_out'] + stock['adjustments']
         #update_stock(stock)
         stock['scrap_perc']  = 0
@@ -764,8 +757,6 @@ class Stock(base.LKF_Base):
             }
         if warehouse_type:
             mango_query['selector'] = {'answers':{self.f['warehouse_type']: warehouse_type}}
-        else:
-            mango_query['selector'] = {"_id": {"$gt":None}}
         res = self.lkf_api.search_catalog( self.CATALOG_WAREHOUSE_ID, mango_query)
         warehouse = [r[self.f['warehouse']] for r in res]
         return warehouse
@@ -781,17 +772,15 @@ class Stock(base.LKF_Base):
         product_code = plant_info.get(self.f['product_code'])
         warehouse = plant_info.get(self.f['warehouse'])
         product_stock = self.get_product_stock(product_code, warehouse=warehouse, lot_number=lot_number, date_to=rec_date)
-        print('product_stock=',product_stock)
         grading_totals = self.get_grading_sublots(gradings)
-        print('grading_totals=', grading_totals)
         totals = sum(x for x in grading_totals.values())
-        print('totals',totals)
         totals += scrap_qty
         acctual_containers = product_stock['actuals']
 
         # if acctual_containers != totals:
         #Validations
         total_hours = self.calc_work_hours(answers)
+        print('total_hours=', total_hours)
         self.current_record['answers'][self.f['set_total_hours']] = round(total_hours, 2)
 
         if grading_type == 'complete'  and totals != acctual_containers:
@@ -841,6 +830,7 @@ class Stock(base.LKF_Base):
     def inventory_adjustment(self, folio, record):
         answers = record['answers']
         plants = answers.get(self.f['grading_group'])
+        print('answers=',answers)
         warehouse = answers[self.CATALOG_WAREHOUSE_OBJ_ID][self.f['warehouse']]
         adjust_date = answers[self.f['grading_date']]
         comments = record['answers'].get(self.f['inv_adjust_comments'],'') 
@@ -1605,7 +1595,7 @@ class Stock(base.LKF_Base):
         if product_code:
             match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})
         if lot_number:
-            match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_lot']}":lot_number})
+            match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_lot']}":int(lot_number)})
         if location:
             match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}":location})
         if status:
@@ -1619,7 +1609,7 @@ class Stock(base.LKF_Base):
                     'date': f"$answers.{self.f['grading_date']}",
                     'product_code': f"$answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}",
                     'lot_number': f"$answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_lot']}",
-                    'warhouse_from': f"$answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['warehouse']}",
+                    'warehouse_from': f"$answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['warehouse']}",
                     'warehouse_to':f"$answers.{self.f['move_new_location']}",
                     'move_type':{ "$cond":[ 
                         {"$eq":[ f"$answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['warehouse']}" , warehouse]}, 
@@ -1634,7 +1624,7 @@ class Stock(base.LKF_Base):
                     'date': "$date",
                     'product_code': "$product_code",
                     'lot_number': "$lot_number",
-                    'warhouse_from': "$warhouse_from",
+                    'warehouse_from': "$warehouse_from",
                     'warehouse_to': "$warehouse_to",
                     'move_type': "$move_type",
                     'qty_in' :{ "$cond":[ 
@@ -1667,6 +1657,7 @@ class Stock(base.LKF_Base):
             "form_id": self.ADJUIST_FORM_ID,
             f"answers.{self.f['inv_adjust_status']}":{"$ne":"cancel"}
             }
+
         inc_folio = kwargs.get("inc_folio")
         nin_folio = kwargs.get("nin_folio")
         if warehouse:
@@ -1684,7 +1675,7 @@ class Stock(base.LKF_Base):
         if product_code:
             match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.CATALOG_PRODUCT_OBJ_ID }.{self.f['product_code']}":product_code})
         if lot_number:
-            match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.f['product_lot']}":lot_number})
+            match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.f['product_lot']}":int(lot_number)})
         if location:
             match_query_stage2.update({f"answers.{self.CATALOG_PRODUCT_OBJ_ID}.{self.f['product_lot_location']}":location})
         query= [{'$match': match_query },
@@ -1717,11 +1708,11 @@ class Stock(base.LKF_Base):
                         {"$gt":[ f"$adjust_in" , 0]}, 
                         "In", 
                         "Out" ]},
-                'warhouse_from':{ "$cond":[ 
+                'warehouse_from':{ "$cond":[ 
                         {"$gt":[ f"$adjust_in" , 0]}, 
                         "Adujstment", 
                         warehouse ]},
-                'warhouse_to':{ "$cond":[ 
+                'warehouse_to':{ "$cond":[ 
                         {"$gt":[ f"$adjust_in" , 0]}, 
                         warehouse, 
                         "Adujstment" ]},
@@ -1748,12 +1739,13 @@ class Stock(base.LKF_Base):
             "form_id": self.PRODUCTION_FORM_ID,
             }
         match_query_stage2 = {}
+        print('lot_number', lot_number)
         if date_from or date_to:
             match_query_stage2.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=f"{self.f['production_group']}.{self.f['set_production_date']}"))
         if product_code:
             match_query.update({f"answers.{self.CATALOG_PRODUCT_RECIPE_OBJ_ID}.{self.f['product_code']}":product_code})
         if lot_number:
-            match_query.update({f"answers.{self.f['production_lote']}":lot_number})  
+            match_query.update({f"answers.{self.f['production_lote']}":int(lot_number)})  
         if warehouse:
             match_query.update({f"answers.{self.CATALOG_WAREHOUSE_OBJ_ID}.{self.f['warehouse']}":warehouse})    
         if location:
@@ -1765,6 +1757,7 @@ class Stock(base.LKF_Base):
             ]
         if match_query_stage2:
             query += [{'$match': match_query_stage2 }]
+        print(simplejson.dumps(query))
         query += [
             {'$project':
                 {'_id': 1,
@@ -1795,8 +1788,8 @@ class Stock(base.LKF_Base):
                 'folio': '$_id.folio',
                 'qty_in': '$total',
                 'move_type':'In',
-                'warhouse_from':"Production",
-                'warhouse_in':warehouse,
+                'warehouse_from':"Production",
+                'warehouse_to':warehouse,
                 }
             },
             {'$sort': {'date': 1}}
@@ -1824,7 +1817,7 @@ class Stock(base.LKF_Base):
         if location:
             match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_lot_location']}":location})    
         if lot_number:
-            match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_lot']}":lot_number})    
+            match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_lot']}":int(lot_number)})    
         if status:
             match_query.update({f"answers.{self.f['inv_scrap_status']}":status})
         if date_from or date_to:
