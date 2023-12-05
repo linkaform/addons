@@ -1,6 +1,4 @@
 # coding: utf-8
-
-
 # print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
 from linkaform_api import settings
 
