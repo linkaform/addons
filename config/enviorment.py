@@ -1,7 +1,6 @@
 # coding: utf-8
 from settings import config
 
-
 #ENV = 'preprod' 
 ENV = 'local' 
 #ENV = 'prod' 
