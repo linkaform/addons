@@ -8,7 +8,7 @@ echo "" >.env
 _usage(){
   APP=$(basename "$0")
       echo
-      echo "Usage: $APP [options] <action[start|stop|build> <enviorment[addons|test|prod|dev>"
+      echo "Usage: $APP [options] <action[start|stop|test|build> <enviorment[addons|test|prod|dev>"
 
       echo "    Special options:"
       echo
@@ -23,6 +23,7 @@ _usage(){
       echo "      $APP <start|stop> addons     Starts the addons development environment"
       echo "      $APP <start|stop> test       Starts the testing environment"
       echo "      $APP build <base|dev|local|prod>      Starts the testing environment"
+      echo "      $APP test                    Runs all tests"
       echo
       echo
       exit 1
@@ -118,25 +119,12 @@ _run_addons(){
           echo 'arranca'
           cd docker
           docker compose up -d lkf-addons && \
-          # docker run   -w /srv/addons/ \
-          #   -v `pwd`:/srv/addons \
-          #   -v ~/lkf/custom/:/srv/custom \
-          #   -v ~/.bash_history:/root/.bash_history \
-          #   --name addons \
-          #   -d  $IMAGE_NAME sleep infinity \
           docker exec -it lkf-addons bash
         else
           echo "Loading local addons"
           cd docker
           docker compose up -d lkf-addons && \
-          # docker run   -w /srv/addons/ \
-          #   -v `pwd`:/srv/addons \
-          #   -v ~/lkf/custom/:/srv/custom \
-          #   -v ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/  \
-          #   -v ~/.bash_history:/root/.bash_history \
-          #   --name addons \
-            # -d $IMAGE_NAME sleep infinity \
-            docker exec -it lkf-addons bash
+          docker exec -it lkf-addons bash
         fi
       else
         echo "Joinign existing"
@@ -149,10 +137,20 @@ _run_addons(){
 
 _start_addons(){
   echo "the command for was " $1
-  echo "the command for was 2" $2
   case $1 in
     test)
-      docker stop lkf-addons && docker rm lkf-addons
+      cd test/docker
+      containerID=$(docker ps | grep lkf-test | awk '{print $1}')
+      if [ -z "$containerID" ]; then
+        echo "creating new TEST container" 
+        docker stop lkf-test && docker rm lkf-test
+        docker compose up -d lkf-test && \
+        docker exec -it lkf-test bash
+      else
+        echo "Joinign existing TEST container... "
+        echo "Happy testing ;)"
+        docker exec -it $containerID bash ;
+        fi
     ;;
     addons)
       containerID=$(docker ps | grep lkf-addons | awk '{print $1}')
@@ -164,25 +162,12 @@ _start_addons(){
           echo 'arranca'
           cd docker
           docker compose up -d lkf-addons && \
-          # docker run   -w /srv/addons/ \
-          #   -v `pwd`:/srv/addons \
-          #   -v ~/lkf/custom/:/srv/custom \
-          #   -v ~/.bash_history:/root/.bash_history \
-          #   --name addons \
-          #   -d  $IMAGE_NAME sleep infinity \
           docker exec -it lkf-addons bash
         else
           echo "Loading local addons"
           cd docker
           docker compose up -d lkf-addons && \
-          # docker run   -w /srv/addons/ \
-          #   -v `pwd`:/srv/addons \
-          #   -v ~/lkf/custom/:/srv/custom \
-          #   -v ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/  \
-          #   -v ~/.bash_history:/root/.bash_history \
-          #   --name addons \
-            # -d $IMAGE_NAME sleep infinity \
-            docker exec -it lkf-addons bash
+          docker exec -it lkf-addons bash
         fi
       else
         echo "Joinign existing"
@@ -252,26 +237,9 @@ _udpate_container(){
 
 _run_tests(){
   echo "the command for was " $1
-  case $1 in
-    stop)
-      docker stop lkf_test && docker rm lkf_test
-    ;;
-    start)
-      cd ~/lkf/addons/test/docker
-      containerID=$(docker ps | grep lkf_test | awk '{print $1}')
-      echo "container ID" $containerID
-      if [ -z "$containerID" ]; then
-        echo "creating new container"
-        docker stop lkf_test && docker rm lkf_test
-        docker compose up -d
-        docker exec -it lkf_test bash
-      else
-        echo "Joinign existing"
-        docker exec -it $containerID bash ;
-      fi
-     ;;
-  esac
-
+  cd ~/lkf/addons/test/docker
+  docker stop lkf-do-test && docker rm lkf-do-test
+  docker compose up lkf-do-test
 }
 
 
