@@ -1,0 +1,23 @@
+version: '3.4'
+
+
+services:
+  lkf_test:
+    restart: "no"
+    container_name: lkf_test
+    image: linkaform/lkf_test:develop
+    volumes:
+      - ../:/srv/lkf_test/
+      # - ../../config/:/srv/config
+      - ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/
+      - ../../config:/srv/scripts/addons/config
+      # - ../:/srv/lkf_test/config/
+      #- ../:/srv/addons
+    build:
+     context: ./
+     dockerfile: Dockerfile
+     target: develop
+    # command: pytest
+    working_dir: /srv/lkf_test
+    stdin_open: true
+    tty: true
