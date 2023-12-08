@@ -373,6 +373,8 @@ class Expenses(base.LKF_Base):
             amount = expense.get(self.f['total_gasto_moneda_sol'],0)
             if status == 'autorizado':
                 amount = expense.get(self.f['grp_gasto_monto_aut'],0)
+            if amount == None:
+                amount = 0
             if (payment_method.find('debito') >= 0 or payment_method.find('efectivo') >= 0)\
                 and amount > 0:
                 cash_expense += amount
@@ -604,7 +606,7 @@ class Expenses(base.LKF_Base):
                         {"$eq":["$form_id",self.FORM_BANK_TRANSACTIONS]},
                         {'$multiply': [f"$answers.{self.f['total_gasto_moneda_sol']}",-1]},
                         f"$answers.{self.f['total_gasto_moneda_sol']}"]}, #Monto
-                    self.f['grp_gasto_monto_aut']:f"$answers.{self.f['grp_gasto_monto_aut']}", #Monto Autorizado
+                    self.f['grp_gasto_monto_aut']:{'$ifNull':[f"$answers.{self.f['grp_gasto_monto_aut']}",0]},#Monto Autorizado
                     f"{self.CATALOG_CONCEPTO_GASTO_OBJ_ID}.{self.f['concepto']}":f"$answers.{self.CATALOG_CONCEPTO_GASTO_OBJ_ID}.{self.f['concepto']}", #Concepto
                     self.f['grp_gasto_estatus']:f"$answers.{self.f['status_gasto']}", #Estatus
                     self.f['metodo_pago']:f"$answers.{self.f['metodo_pago']}", #Metodo de Pgo
