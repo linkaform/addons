@@ -42,6 +42,7 @@ class FormResource(items.Items):
         for form_name in install_order:
             print('Installing Form: ', form_name)
             detail = instalable_forms[form_name]
+            print('self.path=', self.path)
             form_model = self.load_module_template_file(self.path, form_name)
             item_info = {
                 # 'created_by' : user,
@@ -51,6 +52,8 @@ class FormResource(items.Items):
                 'item_name':form_name,
             }
             item = self.lkf.serach_module_item(item_info)
+            print('item=', item)
+            print('item=', self.module)
             res = self.lkf.install_forms(self.module, form_name, form_model)
             response.append(
                     {

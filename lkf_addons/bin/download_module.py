@@ -409,10 +409,15 @@ def drop_hashKey(catalog_json):
     return res
 
 def get_catalogs(download_catalogs={}):
+    print('get catalogs...')
     global items, installed_items
     if not download_catalogs:
         download_catalogs = deepcopy(items['catalogs'])
+    print('download_catalogs', download_catalogs)
+    print('download_catalogs', download_catalogsd)
     for catalog_id, catalog_name in download_catalogs.items():
+        print('get catalog_id...',catalog_id)
+        print('get catalog_name...',catalog_name)
         catalog_json = lkf_api.get_catalog_id_fields(catalog_id, jwt_settings_key='JWT_KEY')
         catalog_json = catalog_json.get('catalog')
         if catalog_json.get('fields'):
@@ -473,6 +478,8 @@ def set_module_items(set_modules):
                     'items_obj_id':{"forms":{},"catalogs":{}, "scripts":{}} ,
                     })
         for itm in module_items:
+            print('module_items=', itm)
+            print('module_items=', itmd)
             if itm.get('module') == module:
                 if itm['item_type'] == 'form':
                     modules[module]['items']['forms'][itm['item_id']] = itm['item_name']
@@ -497,11 +504,13 @@ def download_modules(modules, options, items_ids={}):
     lkf_api = get_lkf_api()
     for module_name in modules:
         print('Downloading Module: ', module_name)
-        if 'forms' in options:
+        print('Downloading options: ', options)
+        if 'forms' in options or 'form' in options:
             get_forms(force_items['forms'])
-        if 'catalogs' in options:
+        if 'catalogs' in options or 'catalog' in options:
+            print('------------------')
             get_catalogs(force_items['catalogs'])
-        if 'scripts' in options:
+        if 'scripts' in options or 'script' in options:
             get_scripts(force_items['scripts'])
 
 # if __name__ == "__main__":

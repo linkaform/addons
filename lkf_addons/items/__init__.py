@@ -46,6 +46,8 @@ class Items(LKFException):
     def load_module_template_file(self, file_path, file_name, file_data=None):
         xml_exists = self.file_exists(file_path, file_name, 'xml')
         if xml_exists:
+            print('file_path', file_path)
+            print('file_path', file_name)
             json_file = self.lkf.read_template_file(file_path, f'{file_name}.xml', file_data)
             # json_file = self.read_xml_template(file_path, )
         elif self.file_exists(file_path, file_name, 'json'):
@@ -55,10 +57,12 @@ class Items(LKFException):
             raise LKFException('No file with name: {} found, at path: {}'.format(file_name, file_path))
         return json_file
 
-    def get_all_items_json(self, itype):
+    def get_all_items_json(self, itype, sub_dir=None):
         # module = __name__.replace('.','/')
         # cmd = ['ls', './{}/{}/'.format(module, itype)]
-        cmd = ['ls', '/srv/scripts/addons/modules/{}/items/{}'.format(self.module, itype)]
+        cmd = ['ls',  '/srv/scripts/addons/modules/{}/items/{}/'.format(self.module, itype)]
+        if sub_dir:
+            cmd[1] = cmd[1] + '{}/'.format(sub_dir)
         process = subprocess.Popen(args=cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
@@ -68,6 +72,19 @@ class Items(LKFException):
             output = output.split()
             for x in output:
                 y = x.decode('utf-8')
+                if y[:1] == '_':
+                    continue
+                    if y.find('.pyc') > 0:
+                        continue 
+                if y.find('.') < 0:
+                    this_level = {y:[]}
+                    if sub_dir:
+                        l_sub_dir = '{}/{}'.format(sub_dir, y)
+                    else:
+                        l_sub_dir = y
+                    this_level[y] += self.get_all_items_json(itype, sub_dir=l_sub_dir)
+                    if this_level[y]:
+                        res.append(this_level)
                 if y.find('.json') > 0:
                     res.append(y)
                 if y.find('.xml') > 0:
@@ -75,14 +92,6 @@ class Items(LKFException):
                 if y.find('.csv') > 0:
                     res.append(y)
                 if y.find('.py') > 0:
-                    if y == '__init__.py':
-                        continue
-                    if y.find('_resource.py') > 0:
-                        continue
-                    if y.find('_settings.py') > 0:
-                        continue
-                    if y.find('.pyc') > 0:
-                        continue 
                     res.append(y)
         return res
 

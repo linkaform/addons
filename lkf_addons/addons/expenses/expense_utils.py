@@ -244,6 +244,7 @@ class Expenses(base.LKF_Base):
             for res in res_create:
                 if res.get('status_code') == 201 or True:
                     self.update_expense_status(new_record.get(self.f['grp_gastos_viaje']))
+        print('rescreate-', res_create)
         return res_create
     
     def currency_converter(self, from_curreny, expense_date, to_curreny, amount):
