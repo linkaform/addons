@@ -120,11 +120,11 @@ class Expenses(base.LKF_Base):
 
         }
 
-    def do_solicitud_close(self, form, folio, status_id=None):
+    def do_solicitud_close(self, form, folio, status_id=None, force_close=False):
         #check if it can be close
         balance = self.get_balance(folio)
         print('balance', balance)
-        if balance.get('balance') == 0:
+        if balance.get('balance') == 0 or force_close:
             #Cierra Entrega de Efectivo
             query_answers = self.get_answer_value(f"{self.CATALOG_SOL_VIAJE_OBJ_ID}.{self.f['cat_folio']}", folio)
             res = self.get_records(self.FORM_BANK_TRANSACTIONS, query_answers=query_answers, select_columns=['folio'])
@@ -146,7 +146,7 @@ class Expenses(base.LKF_Base):
 
         else:
             self.balance_solicitud(folio, balance)
-        print('balance', balancessop )
+        #print('balance', balancessop )
         #cierra solicitud
         #self.do_records_close(form, folio, status_id=None)
 
@@ -160,6 +160,19 @@ class Expenses(base.LKF_Base):
 
     def do_bank_transaction(self, folio, balance):
         print('do_bank_transaction')
+
+    def update_bank_transaction(self, catalog_obj_id, field_id_folio, value_field_folio, new_deposito_solicitado):
+        record_bank_transaction = self.cr.find_one({
+            "form_id": self.FORM_BANK_TRANSACTIONS,
+            "deleted_at": {'$exists': False},
+            f"answers.{catalog_obj_id}.{field_id_folio}": value_field_folio,
+            f"answers.{self.f['status_gasto']}": {'$nin': ['realizado', 'cancelado']}
+        }, {'folio': 1, 'answers': 1, 'form_id': 1})
+        if not record_bank_transaction:
+            return False
+        record_bank_transaction['answers'][self.f['deposito_solicitado']] = new_deposito_solicitado
+        res_update = self.lkf_api.patch_record(record_bank_transaction)
+        return res_update
 
     def balance_solicitud(self, folio, balance):
         #Acomoda informacion para hacer el registro de la tranaccion del banco
@@ -183,31 +196,34 @@ class Expenses(base.LKF_Base):
         print('type', type(self.SOL_DATA))
         cash_balance = balance.get('cash_balance')
         print('cash_balance', cash_balance)
-        answers = {
-            self.f['fecha_gasto']:'2023-11-01',
-            catalog_obj_id:catalog_solicitud,
-            catalog_employee_obj_id:self.SOL_DATA.get(catalog_employee_obj_id),
-            self.CATALOG_CONCEPTO_GASTO_OBJ_ID:{self.f['concepto']:'deposito'},
-            self.f['motivo']:'Devolucion',
-            self.f['deposito_solicitado']:cash_balance * -1,
-            self.f['metodo_pago'] : 'deposito_a_cuenta_o_tarjeta_de_debito',
-            self.f['status_gasto'] :'en_proceso'
-        }
-        print('answers', answers)
-        metadata = self.lkf_api.get_metadata(self.FORM_BANK_TRANSACTIONS)
-        metadata.update({
-            'properties': {
-                "device_properties":{
-                    "system": "Script",
-                    "process": "Devolucion de caja",
-                    "folio":folio,
-                    "archive": "expense_utils.py"
-                }
-            },
-        })
-        metadata['answers'] = answers
-        res = self.lkf_api.post_forms_answers(metadata)
-        print('res=0',res)
+
+        if balance.get('balance', 0) < 0:
+            # Probablemente esto sea correcto pero mejor revisar con JP
+            answers = {
+                self.f['fecha_gasto']:'2023-11-01',
+                catalog_obj_id:catalog_solicitud,
+                catalog_employee_obj_id:self.SOL_DATA.get(catalog_employee_obj_id),
+                self.CATALOG_CONCEPTO_GASTO_OBJ_ID:{self.f['concepto']:'deposito'},
+                self.f['motivo']:'Devolucion',
+                self.f['deposito_solicitado']:cash_balance * -1,
+                self.f['metodo_pago'] : 'deposito_a_cuenta_o_tarjeta_de_debito',
+                self.f['status_gasto'] :'en_proceso'
+            }
+            print('answers', answers)
+            metadata = self.lkf_api.get_metadata(self.FORM_BANK_TRANSACTIONS)
+            metadata.update({
+                'properties': {
+                    "device_properties":{
+                        "system": "Script",
+                        "process": "Devolucion de caja",
+                        "folio":folio,
+                        "archive": "expense_utils.py"
+                    }
+                },
+            })
+            metadata['answers'] = answers
+            res = self.lkf_api.post_forms_answers(metadata)
+            print('res=0',res)
 
 
     def create_expense_authorization(self, folio=None, autorizador={}):
@@ -364,6 +380,7 @@ class Expenses(base.LKF_Base):
         return answers
 
     def get_cash_expenses(self, expense_group):
+        print('........ get_cash_expenses')
         cash_expense = 0
         for expense in expense_group:
             status = expense.get(self.f['grp_gasto_estatus'])
@@ -371,6 +388,7 @@ class Expenses(base.LKF_Base):
                 continue
             payment_method = expense.get(self.f['metodo_pago'],'').lower()
             amount = expense.get(self.f['total_gasto_moneda_sol'],0)
+            print('-------------  amount =',amount)
             if status == 'autorizado':
                 amount = expense.get(self.f['grp_gasto_monto_aut'],0)
             if amount == None:
@@ -969,6 +987,7 @@ class Expenses(base.LKF_Base):
         return diff_dates.days > 15
 
     def validaciones_solicitud(self):
+        print('... expense_utils base de addons')
         answers = self.current_record.get('answers')
         destino = answers.get(self.f['destino'])
         answers[ self.f['destino_otro'] ] = destino.replace('_', ' ').title()
