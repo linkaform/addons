@@ -41,9 +41,14 @@ class FormResource(items.Items):
         response = []
         for form_name in install_order:
             print('Installing Form: ', form_name)
+            print('Installing Form: ', instalable_forms)
             detail = instalable_forms[form_name]
-            print('self.path=', self.path)
-            form_model = self.load_module_template_file(self.path, form_name)
+            if detail.get('path'):
+                this_path = '{}/{}'.format(self.path, detail['path'])
+            else:
+                this_path = self.path
+            print('self.path=',this_path)
+            form_model = self.load_module_template_file(this_path, form_name)
             item_info = {
                 # 'created_by' : user,
                 'module': self.module,
@@ -54,7 +59,7 @@ class FormResource(items.Items):
             item = self.lkf.serach_module_item(item_info)
             print('item=', item)
             print('item=', self.module)
-            res = self.lkf.install_forms(self.module, form_name, form_model)
+            res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'))
             response.append(
                     {
                         'module':self.module,
@@ -77,10 +82,18 @@ class FormResource(items.Items):
                 raise self.LKFException('Error installing form: {}. Error msg'.format(form_name, res['json']['error']))
         return response
  
-    def get_form_modules(self, all_items):
+    def get_form_modules(self, all_items, parent_path=None):
         data_file = []
         form_file = {}
+        print('parent_path',parent_path)
         for file in all_items:
+            if type(file) == dict:
+                path = list(file.keys())[0]
+                if parent_path:
+                    path = '{}/{}'.format(parent_path, path)
+                form_file.update(self.get_form_modules(list(file.values())[0], parent_path=path))
+                continue
+            print('file=', file)
             file_ext = file.split('.')
             if len(file_ext) != 2:
                 print('Not a supported file', file)
@@ -92,6 +105,8 @@ class FormResource(items.Items):
                     data_file.append(file_name)
             else:
                 form_file[file_name] = {'data':[],'workflow':[], 'rules':[], 'demo':[] }
+                if parent_path:
+                    form_file[file_name].update({'path':parent_path})
         for item in list(form_file.keys()):
             for file_name in data_file:
                 file_type = file_name.split('_')[-1]
@@ -102,6 +117,7 @@ class FormResource(items.Items):
 
     def instalable_forms(self, install_order=None):
         items_json = self.get_all_items_json('forms')
+        print('items_json', items_json)
         forms_data = self.get_form_modules(items_json)
         if install_order:
             forms_data['install_order'] = install_order
