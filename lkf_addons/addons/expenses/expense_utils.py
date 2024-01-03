@@ -124,7 +124,9 @@ class Expenses(base.LKF_Base):
         #check if it can be close
         balance = self.get_balance(folio)
         print('balance', balance)
-        if balance.get('balance') == 0 or force_close:
+        # Se cierra la solicitud si el balance es igual a cero y no se permite sobre giro
+        # o bien, si se fuerza el cierre
+        if ( balance.get('balance') == 0 and self.SOL_DATA.get(self.f['allow_overdraft'], '') != 'si' ) or force_close:
             #Cierra Entrega de Efectivo
             query_answers = self.get_answer_value(f"{self.CATALOG_SOL_VIAJE_OBJ_ID}.{self.f['cat_folio']}", folio)
             res = self.get_records(self.FORM_BANK_TRANSACTIONS, query_answers=query_answers, select_columns=['folio'])
@@ -144,7 +146,8 @@ class Expenses(base.LKF_Base):
             #Cierra Autorizacion
             #self.do_records_close(self.FORM_ID_AUTORIZACIONES, self.current_record.get('folio'))
 
-        else:
+            #else:
+            # Registro de transaccion del banco en caso de que se haya gastado menos del anticipo en efectivo que se otorgó
             self.balance_solicitud(folio, balance)
         #print('balance', balancessop )
         #cierra solicitud
@@ -197,15 +200,15 @@ class Expenses(base.LKF_Base):
         cash_balance = balance.get('cash_balance')
         print('cash_balance', cash_balance)
 
-        if balance.get('balance', 0) < 0:
+        if cash_balance:
             # Probablemente esto sea correcto pero mejor revisar con JP
             answers = {
-                self.f['fecha_gasto']:'2023-11-01',
+                self.f['fecha_gasto']: datetime.now( tz=timezone('America/Monterrey') ).strftime('%Y-%m-%d'),
                 catalog_obj_id:catalog_solicitud,
                 catalog_employee_obj_id:self.SOL_DATA.get(catalog_employee_obj_id),
-                self.CATALOG_CONCEPTO_GASTO_OBJ_ID:{self.f['concepto']:'deposito'},
+                self.CATALOG_CONCEPTO_GASTO_OBJ_ID:{self.f['concepto']:'Deposito'},
                 self.f['motivo']:'Devolucion',
-                self.f['deposito_solicitado']:cash_balance * -1,
+                self.f['deposito_solicitado']:cash_balance,
                 self.f['metodo_pago'] : 'deposito_a_cuenta_o_tarjeta_de_debito',
                 self.f['status_gasto'] :'en_proceso'
             }
@@ -369,6 +372,9 @@ class Expenses(base.LKF_Base):
                             self.f['expense_total']:{
                             "msg": [msg], "label": "Subtotal", "error":[]},
                         }
+                    elif current_total_expense == (approved_amount + overdraft_limit):
+                        if self.SOL_DATA.get(self.f['close_on_overdraft']) == 'si':
+                            self.do_solicitud_close(self.FORM_ID_SOLICITUD, folio, force_close=True)
         #         if self.f['close_on_overdraft'] == 'si':
         #             self.close_solicitud(expense_total_currency, )
         # elif current_total_expense == approved_amount:
@@ -940,6 +946,10 @@ class Expenses(base.LKF_Base):
         self.set_solicitud_catalog(folio)
         if run_validations:
             close_order = self.valida_status_solicitud(folio, monto_restante)
+
+        if self.SOL_DATA.get(self.f['allow_overdraft']) == 'si':
+            close_order = False
+
         destino = self.SOL_DATA.get(self.f['destino'])
         if destino == 'otro':
             destino = self.SOL_DATA.get(self.f['destino_otro'])
