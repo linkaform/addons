@@ -201,3 +201,10 @@ Depending you choice
 
 Once you are up and running, you can **download, install and upgrade** LinkaForm modules using the `lkfaddons` util.
 
+# lkfaddons util
+
+### Install addons
+
+```
+lkf
+

@@ -121,6 +121,7 @@ def do_load_modules(load_modules):
             ### Forms
             if load_form:
                 forms = importlib.import_module('{}.items.forms'.format(module))
+                print('module=', module)
                 form_resource = forms.FormResource(
                     path=forms.__path__[0], 
                     module=module, 
@@ -165,7 +166,7 @@ def uninstall_modules(uninstall_dict):
             items_dict = item.get_module_items()
             remove_items = []
             for val in items_dict:
-                print('Mudule to unistall: ', val)
+                print('Module to unistall: ', val)
                 item_id = val.get('item_id')
                 if item_id:
                     res = item.delete_item(item_id)
