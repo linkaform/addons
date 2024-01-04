@@ -2,8 +2,8 @@
 from settings import config
 
 #ENV = 'preprod' 
-ENV = 'local' 
-#ENV = 'prod' 
+#ENV = 'local' 
+ENV = 'prod' 
 # print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
 mongo_hosts = config.get('mongo_hosts')
 PROTOCOL = config.get('PROTOCOL')
