@@ -23,6 +23,7 @@ _usage(){
       echo "      $APP <start|stop> addons     Starts the addons development environment"
       echo "      $APP <start|stop> test       Starts the testing environment"
       echo "      $APP build <base|dev|local|prod>      Starts the testing environment"
+      echo "      $APP restart <preprod|prod> <account_id>      Starts the account container on given environment"
       echo "      $APP test                    Runs all tests"
       echo
       echo
@@ -87,20 +88,17 @@ while getopts ':iar:ir:c:p:h' opt; do
   esac
 done
 
-echo "SHIFT" $SHIFT
 
 if [ "$IMAGE_NAME" != "0" ]; then
   if [[ $# -ge 2 ]]; then
     shift "$(($OPTIND $SHIFT))"
   fi
 else
-  echo "no image ", $IMAGE_NAME
   if [ $# -ge 2 ]; then
     shift "$(($OPTIND $SHIFT))"
   fi
   IMAGE_NAME="linkaform/addons:develop"
 fi
-echo "IMAGE_NAME" $IMAGE_NAME
 
 
 _run_addons(){
@@ -229,6 +227,20 @@ _build(){
 
 }
 
+_restart(){
+  echo "Environment: " $Enviorment
+  echo "Account_id: " $Account_id
+  case $Enviorment in
+    prod)
+      echo 'Running update...'
+      ssh -i $HOME/.ssh/$Account_id _lkf_docker_remote@ansible.linkaform.com
+    ;;
+    preprod)
+      ssh -i $HOME/.ssh/$Account_id _lkf_docker_remote@ansible.linkaform.com preprod
+     ;;
+  esac
+}
+
 _udpate_container(){
   #TODO, actualizar contenedor de addons corriendo en ambiente de pruebas
   #docker cp stock_utils.py account_9908_linkaform.addons..latest:/usr/local/lib/python3.7/site-packages/lkf_addons/addons/stock/stock_utils.py
@@ -249,7 +261,6 @@ if [[ $# -gt 0 ]]; then
 
 fi
 
-echo "Acction : $Acction"
 #echo $Acction >>.env
 
 Service=0
@@ -261,9 +272,6 @@ Branch=""
 if [[ $# -gt 2 ]]; then
   Branch=$3
 fi
-
-
-
 
 case "$Acction" in
 
@@ -277,10 +285,16 @@ case "$Acction" in
     _start_addons $Service $API_VOL
   ;;
   build)
-    echo "building addons image" 
+    echo "Building addons image" 
     _build $Service
   ;;
-
+  restart)
+    Account_id=$Branch
+    Enviorment=$Service
+    echo "Restarting addons container of the account: $Account_id"
+    echo "Environment: $Enviorment "
+    _restart $Service
+  ;;
   test)
     echo "Loding testing environment . . . . + - / * "
     _run_tests $Service
