@@ -20,6 +20,8 @@ def update_settings(settings):
 def get_lkf_api():
     lkf_api = utils.Cache(settings)
     user = lkf_api.get_jwt(api_key=settings.config['APIKEY'], get_user=True)
+    if not user:
+        raise ('User not found or incorrecto APIKEY ')
     settings.config["JWT_KEY"] = user.get('jwt')
     settings.config["ACCOUNT_ID"] = user['user']['parent_info']['id']
     settings.config["USER"] = user['user']
