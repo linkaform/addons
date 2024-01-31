@@ -1010,6 +1010,7 @@ class Expenses(base.LKF_Base):
         update_ok = db_res.get('updatedExisting')
         if update_ok:
             self.set_solicitud_data(folio, renew=True)
+            self.SOL_DATA.update({ ii.split('answers.')[1]: vv for ii, vv in update_fields.items() if 'answers.' in ii })
             update_ok = self.update_expense_catalog_values(folio)
         return update_ok
 
