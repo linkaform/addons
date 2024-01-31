@@ -105,6 +105,7 @@ class Expenses(base.LKF_Base):
             'grp_gastos_viaje':'62aa1ed283d55ab39a49bd2d',
             'impuestos':'62914e2d855e9abc32eabc18',
             'metodo_pago':'5893798cb43fdd4b53ab6e1e',
+            'pagado_por': '65a0925c6a3fdf3e32659bb8',
             'monto_anticipo_restante':'649d02057880ff495300bcc1',
             'monto_restante':'629fb33a8758b5808890b22f',
             'motivo':'650ce3ce7f5e7a3c7349aeaf',
@@ -123,7 +124,7 @@ class Expenses(base.LKF_Base):
     def do_solicitud_close(self, form, folio, status_id=None, force_close=False):
         #check if it can be close
         balance = self.get_balance(folio)
-        print('balance', balance)
+        print('En cierre de solicitud ... balance =', balance)
         # Se cierra la solicitud si el balance es igual a cero y no se permite sobre giro
         # o bien, si se fuerza el cierre
         if ( balance.get('balance') == 0 and self.SOL_DATA.get(self.f['allow_overdraft'], '') != 'si' ) or force_close:
@@ -142,6 +143,10 @@ class Expenses(base.LKF_Base):
 
             #Cierra Solicitud
             self.do_records_close(form, folio)
+
+            # Actualizo el catalogo
+            if force_close:
+                self.update_expense_catalog_values(folio)
     
             #Cierra Autorizacion
             #self.do_records_close(self.FORM_ID_AUTORIZACIONES, self.current_record.get('folio'))
@@ -209,7 +214,8 @@ class Expenses(base.LKF_Base):
                 self.CATALOG_CONCEPTO_GASTO_OBJ_ID:{self.f['concepto']:'Deposito'},
                 self.f['motivo']:'Devolucion',
                 self.f['deposito_solicitado']:cash_balance,
-                self.f['metodo_pago'] : 'deposito_a_cuenta_o_tarjeta_de_debito',
+                # self.f['metodo_pago'] : 'deposito_a_cuenta_o_tarjeta_de_debito',
+                self.f['pagado_por'] : 'compañia',
                 self.f['status_gasto'] :'en_proceso'
             }
             print('answers', answers)
@@ -393,14 +399,16 @@ class Expenses(base.LKF_Base):
             status = expense.get(self.f['grp_gasto_estatus'])
             if status not in self.expense_valid_status():
                 continue
-            payment_method = expense.get(self.f['metodo_pago'],'').lower()
+            # payment_method = expense.get(self.f['metodo_pago'],'').lower()
+            payment_method = expense.get(self.f['pagado_por'],'').lower()
             amount = expense.get(self.f['total_gasto_moneda_sol'],0)
-            print('-------------  amount =',amount)
             if status == 'autorizado':
                 amount = expense.get(self.f['grp_gasto_monto_aut'],0)
             if amount == None:
                 amount = 0
-            if (payment_method.find('debito') >= 0 or payment_method.find('efectivo') >= 0)\
+            print(f'-------------  amount = {amount} payment_method= {payment_method}')
+            # if (payment_method.find('debito') >= 0 or payment_method.find('efectivo') >= 0)\
+            if payment_method == 'empleado' \
                 and amount > 0:
                 cash_expense += amount
         return cash_expense
@@ -424,12 +432,15 @@ class Expenses(base.LKF_Base):
             #excluir el gasto de este registro del quiery el gasto de este registro
             match_query.update({'folio':{'$ne':folio_rec}})
         if cash_only:
-            match_query.update( {"$or":[
-                # {f'answers.self.f['metodo_pago']':'Efectivo - Debito'},
-                {f'answers.{self.f["metodo_pago"]}':{ '$regex': 'efectivo', '$options': 'i',}},
-                {f'answers.{self.f["metodo_pago"]}':{ '$regex': 'debito',   '$options': 'i',}},
-                # {f'answers.5893798cb43fdd4b53ab6e1e':'Efectivo - Debito'},
-                ]})
+            # match_query.update( {"$or":[
+            #     # {f'answers.self.f['metodo_pago']':'Efectivo - Debito'},
+            #     {f'answers.{self.f["metodo_pago"]}':{ '$regex': 'efectivo', '$options': 'i',}},
+            #     {f'answers.{self.f["metodo_pago"]}':{ '$regex': 'debito',   '$options': 'i',}},
+            #     # {f'answers.5893798cb43fdd4b53ab6e1e':'Efectivo - Debito'},
+            #     ]})
+            match_query.update({
+                f'answers.{self.f["pagado_por"]}': 'empleado'
+            })
         records = self.cr.aggregate([
             {'$match': match_query },
             {'$project':{
@@ -551,7 +562,14 @@ class Expenses(base.LKF_Base):
                 self.f['cant_dias'] : cant_days,
                 self.f['estatus_solicitud_autorizacion_uno'] : 'pendiente',
                 self.f['estatus_solicitud_autorizacion'] : 'pendiente',
-                self.f['grp_gastos_viaje'] : self.update_records(records_to_process)
+                self.f['grp_gastos_viaje'] : self.update_records(records_to_process),
+                self.CATALOG_SOL_VIAJE_OBJ_ID: {
+                    self.f['cat_folio']: folio,
+                    self.f['cat_destino']: [new_record.get(self.f['destino']).replace('_', ' ').title()],
+                    self.f['fecha_salida']: [new_record.get(self.f['date_from'])],
+                    self.f['fecha_regreso']: [new_record.get(self.f['date_to'])],
+                    self.f['cat_monto_total_aprobado']: [new_record.get(self.f['approved_amount'])]
+                }
                 })
             record_to_create.append(new_record)
         else:
@@ -634,7 +652,8 @@ class Expenses(base.LKF_Base):
                     self.f['grp_gasto_monto_aut']:{'$ifNull':[f"$answers.{self.f['grp_gasto_monto_aut']}",0]},#Monto Autorizado
                     f"{self.CATALOG_CONCEPTO_GASTO_OBJ_ID}.{self.f['concepto']}":f"$answers.{self.CATALOG_CONCEPTO_GASTO_OBJ_ID}.{self.f['concepto']}", #Concepto
                     self.f['grp_gasto_estatus']:f"$answers.{self.f['status_gasto']}", #Estatus
-                    self.f['metodo_pago']:f"$answers.{self.f['metodo_pago']}", #Metodo de Pgo
+                    # self.f['metodo_pago']:f"$answers.{self.f['metodo_pago']}", #Metodo de Pgo
+                    self.f['pagado_por']:f"$answers.{self.f['pagado_por']}", #Pagado por
                 }
             },
             {"$sort":{f"answers.{self.f['fecha_gasto']}":1}}
@@ -807,6 +826,7 @@ class Expenses(base.LKF_Base):
         return answers
 
     def update_expense_catalog_values(self, folio):
+        print('... ... Actualizando catalogo al estatus =', self.SOL_DATA.get(self.f['status_solicitud'],"").replace('_', ' ').title())
         self.set_solicitud_data(folio)
         self.set_solicitud_catalog(folio)
         catalog_data = {}
@@ -872,8 +892,9 @@ class Expenses(base.LKF_Base):
             if gasto[self.f['grp_gasto_estatus']] == 'no_autorizado':
                 gasto[self.f['grp_gasto_monto_aut']] = 0
             if gasto[self.f['grp_gasto_estatus']] == 'autorizado':
-                if gasto[self.f['metodo_pago']].find('efectivo') >= 0 or \
-                 gasto[self.f['metodo_pago']].find('debito') >= 0:
+                # if gasto[self.f['metodo_pago']].find('efectivo') >= 0 or \
+                #  gasto[self.f['metodo_pago']].find('debito') >= 0:
+                if gasto[self.f['pagado_por']] == 'empleado':
                     if form_id == self.FORM_BANK_TRANSACTIONS:
                         #si el monto es menor a 0 es un deposito
                         anticipo += gasto[self.f['grp_gasto_monto_aut']]  * -1
@@ -943,6 +964,7 @@ class Expenses(base.LKF_Base):
         monto_restante = round(monto_aprobado - gasto_ejecutado,2)
         anticipo_efectivo = self.query_get_transactions(folio)
         gasto_efectivo = self.get_cash_expenses(expense_group)
+        print('--- --- --- --- gasto_efectivo =',gasto_efectivo)
         monto_anticipo_restante = anticipo_efectivo - gasto_efectivo
         self.set_solicitud_catalog(folio)
         if run_validations:
