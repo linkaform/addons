@@ -24,11 +24,10 @@ class ScriptResource(items.Items):
             properites=None
             if instalable_scripts:
                 detail = instalable_scripts[script_name]
-                print('detail', detail)
                 if detail.get('properties') and detail['properties']:
                     properites = self.load_module_template_file(self.path,  detail['properties'])
                 image = detail.get('image')
-                this_path = '{}/{}'.format(self.path, detail['path'])
+                # this_path = '{}/{}'.format(self.path, detail['path'])
                 if detail.get('path'):
                     this_path = '{}/{}'.format(self.path, detail['path'])
                 else:
@@ -41,7 +40,6 @@ class ScriptResource(items.Items):
         form_file = {}
         default_image='linkaform/addons:latest'
         for file in all_items:
-            print('file', file)
             if type(file) == dict:
                 path = list(file.keys())[0]
                 if parent_path:
@@ -73,7 +71,6 @@ class ScriptResource(items.Items):
 
     def instalable_scripts(self, install_order=None):
         items_files = self.get_all_items_json('scripts')
-        print('items_json', items_files)
         scripts_data = self.get_script_modules(items_files)
         if install_order:
             scripts_data['install_order'] = install_order

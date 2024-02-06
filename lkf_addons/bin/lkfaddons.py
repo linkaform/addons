@@ -79,8 +79,6 @@ def do_load_modules(load_modules):
         print('-'*35 + f' Loding Module: {module} ' + '-'*35)
         #TODO revisar porque no corren las reglas
         if install.get('all') or install.get(module):
-            print('module', module)
-
             #####################################################################
             ### Scripts
             if load_script:
@@ -121,7 +119,6 @@ def do_load_modules(load_modules):
             ### Forms
             if load_form:
                 forms = importlib.import_module('{}.items.forms'.format(module))
-                print('module=', module)
                 form_resource = forms.FormResource(
                     path=forms.__path__[0], 
                     module=module, 
@@ -152,7 +149,6 @@ def do_load_modules(load_modules):
                 except:
                     install_order = []
                 report_dict = report_resource.instalable_reports(install_order)
-                print('report_dict', report_dict)
                 ###reports
                 report_resource.install_scripts(report_dict)
 

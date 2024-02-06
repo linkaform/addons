@@ -14,7 +14,11 @@ class CatalogResource(items.Items):
             file_name = full_file_name.split('.')[0]
             if module_info.get(f'load_{file_type}',{}) and  module_info.get(f'load_{file_type}',{}).get(file_name):
                 continue
-            file = open('{}/{}'.format(self.path, full_file_name))
+            try:
+                file = open('{}/{}'.format(self.path, full_file_name))
+            except FileNotFoundError:
+                print(f'File not found {full_file_name}, continue')
+                return False
             file_data = simplejson.loads(file.read())
             catalog_map = file_data['mapping']
             spreadsheet_url = file_data['spreadsheet_url']
@@ -36,13 +40,12 @@ class CatalogResource(items.Items):
         for catalog_name in install_order:
             print('Installing Catalog: ', catalog_name)
             detail = instalable_catalogs[catalog_name]
-            print('self.path', self.path)
-            print('self.detail', detail)
             if detail.get('path'):
                 this_path = '{}/{}'.format(self.path, detail['path'])
             else:
                 this_path = self.path
             catalog_model = self.load_module_template_file(this_path, catalog_name)
+            
             res = self.lkf.install_catalog(self.module, catalog_name, catalog_model, local_path=detail.get('path'))
             for file_type, files in detail.items():
                 if file_type == 'data' and self.load_data:
@@ -86,11 +89,9 @@ class CatalogResource(items.Items):
 
     def instalable_catalogs(self, install_order=None):
         items_json = self.get_all_items_json('catalogs')
-        print('items_json', items_json)
         catalogs_data = self.get_catalog_modules(items_json)
         if install_order:
             catalogs_data['install_order'] = install_order
         else:
             catalogs_data['install_order'] = list(catalogs_data.keys())
-        print('catalogs_data===',catalogs_data)
         return catalogs_data

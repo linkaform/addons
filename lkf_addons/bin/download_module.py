@@ -24,41 +24,13 @@ from settings import *
 
 force_items = {
     "forms":{
-        #stock
-        #99536:None
-        # 98225:"Inventory",
-        # 101628:"Inventory Adjustment",
-        # 98233:"Inventory Move",
-        # 98233:"Inventory Move",
-        # 100515:"Inventory Scrapping",
-        # 94880:"Production",
-        # 94878:"Production Planning",
-
-        # 94880:None,
-        # 94880:None,
-        # 98233:None,
-        # 98229:None,
-        #test
-        #104304:None,
-        #Viaticos
-        # 94192:None,
-        # 69620:None,
-        # 73387:None
-        #Viaticos Local
-        # 104478:None, # Autorizacion
-        # 104492:None, # Entrga de anticipo
-        # 104479:None, # Registro de gastos
-        # 104480:None, # solicidud
-        #105520:None
+        # 113874:None
         },
     "catalogs":{
-        # 104534:None,
-        #82555:None
+        # 114101:None,
+        # 114114:None,
     },
     "scripts":{
-        # 104489:None #expense util
-        #82555:None,
-        #99563:None,
 
     }
 }
@@ -83,13 +55,134 @@ installed_items = {'catalogs': {},'scripts':{}, 'forms':{}}
 lkf_modules = None
 lkf_api = None
 
+def download_file(url, destination):
+    urllib.request.urlretrieve(url, destination)
 
-def strip_chaaracters(string):
-    pattern = r'[^a-zA-Z0-9_]'
-    string = string.replace(' ','_').replace('.py','')
-    stripped_string = re.sub(pattern, '', string)
-    stripped_string = stripped_string.replace('__','_')
-    return stripped_string.lower()
+def download_modules(modules, options, items_ids={}):
+    global lkf_api, lkf_modules, module_name, items
+    if items_ids:
+        items = items_ids
+        modules = list(items.keys())
+    else:
+        lkf_modules = get_lkf_module()
+        set_module_items(modules)
+    lkf_api = get_lkf_api()
+    for module_name in modules:
+        if 'forms' in options or 'form' in options:
+            get_forms(force_items['forms'])
+        if 'catalogs' in options or 'catalog' in options:
+            print('------------------')
+            get_catalogs(force_items['catalogs'])
+        if 'scripts' in options or 'script' in options:
+            get_scripts(force_items['scripts'])
+
+def drop_hashKey(catalog_json):
+    res = {}
+    if isinstance(catalog_json, dict):
+        for key, value in catalog_json.items():
+            if isinstance(value, list):
+                if len(value) > 0:
+                    rlist = []
+                    for y in value:
+                        rlist.append(drop_hashKey(y))
+                    key = update_key(key)
+                    res.update({key:rlist})
+                else:
+                    if not key =='$$hashKey':
+                        key = update_key(key)
+                        res.update({key:value})
+            elif type(value) ==dict:
+                if len(value) > 0:
+                    key = update_key(key)
+                    res.update({key:drop_hashKey(value)})
+                else:
+                    if not key =='$$hashKey':
+                        key = update_key(key)
+                        res.update({key:value})
+            else:
+                if not key =='$$hashKey':
+                    key = update_key(key)
+                    res.update({key:value})
+    elif type(catalog_json) == list:
+        if len(catalog_json) > 0:
+            zlist = []
+            for x in catalog_json:
+                zlist.append(drop_hashKey(x))
+            return zlist
+    else:
+        if not catalog_json =='$$hashKey':
+            return catalog_json
+    return res
+
+def get_catalogs(download_catalogs={}):
+    print('Fetching catalogs...')
+    global items, installed_items
+    if not download_catalogs:
+        download_catalogs = deepcopy(items['catalogs'])
+    print('downloading catalog_name...',download_catalogs)
+    for catalog_id, catalog_name in download_catalogs.items():
+        catalog_name = get_item_name('catalogs', catalog_id)
+        catalog_json = lkf_api.get_catalog_id_fields(catalog_id, jwt_settings_key='JWT_KEY')
+        catalog_json = catalog_json.get('catalog')
+        if catalog_json.get('fields'):
+            catalog_json.pop('fields')
+        res = drop_hashKey(catalog_json)
+        #print('res=',simplejson.dumps(res, indent=4))  
+        catalog_data_xml = json_to_xml(res)
+        # print('catalog_data_xml',catalog_data_xml)  
+        print('Catalog Name: ',catalog_name)  
+        save_catalog_xml(catalog_data_xml, catalog_name)
+    installed_items['catalogs'].update(download_catalogs)
+    get_new_items('catalogs')
+
+def get_forms(download_forms={}):
+    global items
+    if not download_forms:
+        download_forms = deepcopy(items['forms'])
+    print('download_forms', download_forms)
+    for form_id in list(download_forms.keys()):
+        form_name = get_item_name('forms', form_id)
+        form_data_json = lkf_api.get_form_to_duplicate(form_id, jwt_settings_key='JWT_KEY')
+        if not form_data_json:
+            print('************* WARNING ************* : Form_id not found', form_id)
+            continue
+        if form_data_json.get('fields'):
+            form_data_json.pop('fields')
+        try:
+            form_data_json = drop_hashKey(form_data_json)
+            form_data_xml = json_to_xml(form_data_json)
+        except:
+            print('form_data_json=',form_data_json)
+            self.LKFException(form_data_json)
+
+        save_form_xml(form_data_xml, form_name)
+        rules_json = lkf_api.get_form_rules(form_id, jwt_settings_key='JWT_KEY')
+        if isinstance(rules_json, list):
+            if rules_json and len(rules_json) > 0:
+               rules_xml = json_to_xml(rules_json[0])
+               save_rule_xml(rules_xml, form_name)
+        workflow_json = lkf_api.get_form_workflows(form_id, jwt_settings_key='JWT_KEY')
+        if isinstance(workflow_json, list):
+            if workflow_json and len(workflow_json) > 0:
+                workflow_xml = json_to_xml(workflow_json[0])
+                print('Form Name: ',form_name)  
+                save_workflow_xml(workflow_xml, form_name)
+        # print('workflow_json=workflow_json',workflow_json)
+    installed_items['forms'].update(download_forms)
+    get_new_items('forms')
+    get_new_items('catalogs')
+    get_new_items('scripts')
+
+def get_new_items(item_type):
+    global items, installed_items
+    new_items = deepcopy(items[item_type])
+    for item_id in list(installed_items[item_type].keys()):
+        new_items.pop(item_id)
+    if new_items:
+        if item_type == 'catalogs':
+            get_catalogs(new_items)
+        elif item_type == 'forms':
+            get_forms(new_items)
 
 def get_item_name(item_type, item_id=None, element=None, attribute='name', item_obj_id=None):
     global items, items_obj_id
@@ -126,6 +219,24 @@ def get_item_name(item_type, item_id=None, element=None, attribute='name', item_
     items[item_type][item_id] = item_name
     return item_name
 
+def get_scripts(download_scritps={}):
+    global items
+    account_id = settings.config["ACCOUNT_ID"]
+    global module_name
+    if not download_scritps:
+        download_scritps = deepcopy(items['scripts'])
+    for script_id, script_name in download_scritps.items():
+        print('Download Script: ',script_name)
+        script_data_json = lkf_api.get_item(script_id, 'script', jwt_settings_key='JWT_KEY')
+        script_obj = script_data_json.get('data',[])
+        if script_obj and len(script_obj) > 0:
+            complete_name = script_obj[0].get('name')
+            destination = f'{MODULES_PATH}/{module_name}/items/scripts/{complete_name}'
+            url = "https://f001.backblazeb2.com/file/app-linkaform/public-client-{}/scripts/{}".format(account_id, complete_name)
+            print('url=',url)
+            download_file(url, destination)
+    return True
+
 def save_form_xml(xml_data, form_name):
     global items, module_name
     tree = ET.ElementTree(ET.fromstring(xml_data))
@@ -151,7 +262,8 @@ def save_form_xml(xml_data, form_name):
                             if catalog_field_id != None and catalog_field_id.text != None:
                                 catalog_field_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
 
-    tree.write(f'{MODULES_PATH}/{module_name}/items/forms/{form_name}.xml', encoding="utf-8", xml_declaration=True)
+    print('writhing .... ', f'{MODULES_PATH}/{module_name}/items/forms/{form_name}.xml')
+    a = tree.write(f'{MODULES_PATH}/{module_name}/items/forms/{form_name}.xml', encoding="utf-8", xml_declaration=True)
     return True
 
 def save_catalog_xml(xml_data, form_name):
@@ -299,61 +411,34 @@ def save_workflow_xml(xml_data, form_name):
     #print('items', items)
     return True
 
-def get_forms(download_forms={}):
-    global items
-    if not download_forms:
-        download_forms = deepcopy(items['forms'])
-    for form_id in list(download_forms.keys()):
-        #print('form_id', form_id)
-        form_name = get_item_name('forms', form_id)
-        form_data_json = lkf_api.get_form_to_duplicate(form_id, jwt_settings_key='JWT_KEY')
-        if form_data_json.get('fields'):
-            form_data_json.pop('fields')
-        try:
-            form_data_json = drop_hashKey(form_data_json)
-            form_data_xml = json_to_xml(form_data_json)
-        except:
-            print('form_data_json=',form_data_json)
-            print(stop)
+def set_module_items(set_modules):
+    global items, modules, items_obj_id
+    module_items = lkf_modules.fetch_installed_modules()
+    for module in set_modules:
+        modules[module] = modules.get(module,{ 
+                    'items':{"forms":{},"catalogs":{}, "scripts":{}} ,
+                    'items_obj_id':{"forms":{},"catalogs":{}, "scripts":{}} ,
+                    })
+        for itm in module_items:
+            if itm.get('module') == module:
+                if itm['item_type'] == 'form':
+                    modules[module]['items']['forms'][itm['item_id']] = itm['item_name']
+                if itm['item_type'] == 'script':
+                    modules[module]['items']['scripts'][itm['item_id']] = itm['item_name']
+                if itm['item_type'] == 'catalog':
+                    modules[module]['items']['catalogs'][itm['item_id']] = itm['item_name']
+                    if itm.get('item_obj_id'):
+                        modules[module]['items_obj_id']['catalogs'][itm['item_obj_id']] = itm['item_name']
+        items = modules[module]['items']
+        items_obj_id = modules[module]['items_obj_id']
+        return True
 
-        save_form_xml(form_data_xml, form_name)
-        rules_json = lkf_api.get_form_rules(form_id, jwt_settings_key='JWT_KEY')
-        if isinstance(rules_json, list):
-            if rules_json and len(rules_json) > 0:
-               rules_xml = json_to_xml(rules_json[0])
-               save_rule_xml(rules_xml, form_name)
-        workflow_json = lkf_api.get_form_workflows(form_id, jwt_settings_key='JWT_KEY')
-        if isinstance(workflow_json, list):
-            if workflow_json and len(workflow_json) > 0:
-                workflow_xml = json_to_xml(workflow_json[0])
-                print('Form Name: ',form_name)  
-                save_workflow_xml(workflow_xml, form_name)
-        # print('workflow_json=workflow_json',workflow_json)
-    installed_items['forms'].update(download_forms)
-    get_new_items('forms')
-    get_new_items('catalogs')
-    get_new_items('scripts')
-
-def download_file(url, destination):
-    urllib.request.urlretrieve(url, destination)
-
-def get_scripts(download_scritps={}):
-    global items
-    account_id = settings.config["ACCOUNT_ID"]
-    global module_name
-    if not download_scritps:
-        download_scritps = deepcopy(items['scripts'])
-    for script_id, script_name in download_scritps.items():
-        print('Download Script: ',script_name)
-        script_data_json = lkf_api.get_item(script_id, 'script', jwt_settings_key='JWT_KEY')
-        script_obj = script_data_json.get('data',[])
-        if script_obj and len(script_obj) > 0:
-            complete_name = script_obj[0].get('name')
-            destination = f'{MODULES_PATH}/{module_name}/items/scripts/{complete_name}'
-            url = "https://f001.backblazeb2.com/file/app-linkaform/public-client-{}/scripts/{}".format(account_id, complete_name)
-            print('url=',url)
-            download_file(url, destination)
-    return True
+def strip_chaaracters(string):
+    pattern = r'[^a-zA-Z0-9_]'
+    string = string.replace(' ','_').replace('.py','')
+    stripped_string = re.sub(pattern, '', string)
+    stripped_string = stripped_string.replace('__','_')
+    return stripped_string.lower()
 
 def update_key(key):
     key = key.replace('$','amp_')
@@ -369,165 +454,3 @@ def update_key(key):
     elif type(key) == int or type(key) == float:
         key = 'num_{}'.format(key)
     return key
-
-def drop_hashKey(catalog_json):
-    res = {}
-    if isinstance(catalog_json, dict):
-        for key, value in catalog_json.items():
-            if isinstance(value, list):
-                if len(value) > 0:
-                    rlist = []
-                    for y in value:
-                        rlist.append(drop_hashKey(y))
-                    key = update_key(key)
-                    res.update({key:rlist})
-                else:
-                    if not key =='$$hashKey':
-                        key = update_key(key)
-                        res.update({key:value})
-            elif type(value) ==dict:
-                if len(value) > 0:
-                    key = update_key(key)
-                    res.update({key:drop_hashKey(value)})
-                else:
-                    if not key =='$$hashKey':
-                        key = update_key(key)
-                        res.update({key:value})
-            else:
-                if not key =='$$hashKey':
-                    key = update_key(key)
-                    res.update({key:value})
-    elif type(catalog_json) == list:
-        if len(catalog_json) > 0:
-            zlist = []
-            for x in catalog_json:
-                zlist.append(drop_hashKey(x))
-            return zlist
-    else:
-        if not catalog_json =='$$hashKey':
-            return catalog_json
-    return res
-
-def get_catalogs(download_catalogs={}):
-    print('get catalogs...')
-    global items, installed_items
-    if not download_catalogs:
-        download_catalogs = deepcopy(items['catalogs'])
-    print('download_catalogs', download_catalogs)
-    print('download_catalogs', download_catalogsd)
-    for catalog_id, catalog_name in download_catalogs.items():
-        print('get catalog_id...',catalog_id)
-        print('get catalog_name...',catalog_name)
-        catalog_json = lkf_api.get_catalog_id_fields(catalog_id, jwt_settings_key='JWT_KEY')
-        catalog_json = catalog_json.get('catalog')
-        if catalog_json.get('fields'):
-            catalog_json.pop('fields')
-        # import simplejson
-        # print('catalog_json', simplejson.dumps(catalog_json, indent=4))  
-        # cc = {
-        #     "temp":[],
-        #     "3dict_solo":{},
-        #     "2test":"testxot",
-        #     "5filters": {
-        #         "6Liners": {
-        #             "$and": [
-        #                 {
-        #                     "6205f73281bb36a6f1573358": {
-        #                         "$eq": "Ln50"
-        #                     }
-        #                 },
-        #                 {
-        #                     "6205f73281bb36a6f1573358": {
-        #                         "$eq": "Ln72"
-        #                     }
-        #                 }
-        #             ]
-        #         }
-        #     },
-        # }
-        # if catalog_json.get('filters'):
-        #     print('stop')
-        #     print('stop', stop)
-        # #     catalog_json.pop('filters')
-        res = drop_hashKey(catalog_json)
-        #print('res=',simplejson.dumps(res, indent=4))  
-        catalog_data_xml = json_to_xml(res)
-        # print('catalog_data_xml',catalog_data_xml)  
-        print('Catalog Name: ',catalog_name)  
-        save_catalog_xml(catalog_data_xml, catalog_name)
-    installed_items['catalogs'].update(download_catalogs)
-    get_new_items('catalogs')
-
-def get_new_items(item_type):
-    global items, installed_items
-    new_items = deepcopy(items[item_type])
-    for item_id in list(installed_items[item_type].keys()):
-        new_items.pop(item_id)
-    if new_items:
-        if item_type == 'catalogs':
-            get_catalogs(new_items)
-        elif item_type == 'forms':
-            get_forms(new_items)
-
-def set_module_items(set_modules):
-    global items, modules, items_obj_id
-    module_items = lkf_modules.fetch_installed_modules()
-    for module in set_modules:
-        modules[module] = modules.get(module,{ 
-                    'items':{"forms":{},"catalogs":{}, "scripts":{}} ,
-                    'items_obj_id':{"forms":{},"catalogs":{}, "scripts":{}} ,
-                    })
-        for itm in module_items:
-            print('module_items=', itm)
-            print('module_items=', itmd)
-            if itm.get('module') == module:
-                if itm['item_type'] == 'form':
-                    modules[module]['items']['forms'][itm['item_id']] = itm['item_name']
-                if itm['item_type'] == 'script':
-                    modules[module]['items']['scripts'][itm['item_id']] = itm['item_name']
-                if itm['item_type'] == 'catalog':
-                    modules[module]['items']['catalogs'][itm['item_id']] = itm['item_name']
-                    if itm.get('item_obj_id'):
-                        modules[module]['items_obj_id']['catalogs'][itm['item_obj_id']] = itm['item_name']
-        items = modules[module]['items']
-        items_obj_id = modules[module]['items_obj_id']
-        return True
-
-def download_modules(modules, options, items_ids={}):
-    global lkf_api, lkf_modules, module_name, items
-    if items_ids:
-        items = items_ids
-        modules = list(items.keys())
-    else:
-        lkf_modules = get_lkf_module()
-        set_module_items(modules)
-    lkf_api = get_lkf_api()
-    for module_name in modules:
-        print('Downloading Module: ', module_name)
-        print('Downloading options: ', options)
-        if 'forms' in options or 'form' in options:
-            get_forms(force_items['forms'])
-        if 'catalogs' in options or 'catalog' in options:
-            print('------------------')
-            get_catalogs(force_items['catalogs'])
-        if 'scripts' in options or 'script' in options:
-            get_scripts(force_items['scripts'])
-
-# if __name__ == "__main__":
-
-#     # settings.config["USERNAME"] = USERNAME
-#     # lkf_api = utils.Cache(settings)
-#     # user = lkf_api.get_jwt(api_key=settings.config['APIKEY'], get_user=True)
-#     # settings.config["JWT_KEY"] = user.get('jwt')
-#     # settings.config["ACCOUNT_ID"] = user['user']['parent_info']['id']
-#     # settings.config["USER"] = user['user']
-#     lkf_api = get_lkf_api()
-#     lkf_modules = get_lkf_module()
-#     set_module_items()
-#     for module_name in modules:
-#         print('module_name=', module_name)
-#         get_forms()
-#         #get_catalogs()
-#         #print('asi va items', items)
-#         #get_scripts()
-

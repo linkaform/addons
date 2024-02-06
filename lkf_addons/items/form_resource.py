@@ -8,22 +8,27 @@ from lkf_addons import items
 
 class FormResource(items.Items):
 
-    def setup_workflows(self, conf_files, action):
+    def setup_workflows(self, conf_files, action, path=None):
+        if not path:
+            path = self.path
         for file_name in conf_files:
             file_name = file_name.split('.')[0]
             print('Installing Workflows: ', file_name)
-            workflow_model = self.load_module_template_file(self.path, file_name)
+            workflow_model = self.load_module_template_file(path, file_name)
             # res = self.lkf.install_workflows(module, workflow_model, 'update')
+            print('action action: ', action)
             if action == 'create':
                 res = self.lkf_api.upload_workflows(workflow_model, 'POST')
             elif action =='update':
                 res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
             #res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
 
-    def setup_rules(self, conf_files, action):
+    def setup_rules(self, conf_files, action, path=None):
+        if not path:
+            path = self.path
         for file_name in conf_files:
             file_name = file_name.split('.')[0]
-            rules_model = self.load_module_template_file(self.path, file_name)
+            rules_model = self.load_module_template_file(path, file_name)
             print('Installing Rules: ',file_name )
             # res = self.lkf.install_workflows(module, workflow_model, 'update')
             if action == 'create':
@@ -33,7 +38,7 @@ class FormResource(items.Items):
             #res = self.lkf_api.upload_rules(rules_model, 'PATCH')
 
     def install_forms(self, instalable_forms):
-        if instalable_forms.get('install_order'):
+        if instalable_forms.get('install_order') or instalable_forms.get('install_order') == []:
             install_order = instalable_forms.pop('install_order', [])
         else:
             install_order = []
@@ -41,13 +46,11 @@ class FormResource(items.Items):
         response = []
         for form_name in install_order:
             print('Installing Form: ', form_name)
-            print('Installing Form: ', instalable_forms)
             detail = instalable_forms[form_name]
             if detail.get('path'):
                 this_path = '{}/{}'.format(self.path, detail['path'])
             else:
                 this_path = self.path
-            print('self.path=',this_path)
             form_model = self.load_module_template_file(this_path, form_name)
             item_info = {
                 # 'created_by' : user,
@@ -57,8 +60,6 @@ class FormResource(items.Items):
                 'item_name':form_name,
             }
             item = self.lkf.serach_module_item(item_info)
-            print('item=', item)
-            print('item=', self.module)
             res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'))
             response.append(
                     {
@@ -74,18 +75,20 @@ class FormResource(items.Items):
                 for config, conf_files in detail.items():
                     if config == 'workflow':
                         # res['status'] = 'create'
-                        self.setup_workflows(conf_files, res['status'])
+                        self.setup_workflows(conf_files, res['status'], this_path)
                     if config == 'rules':
-                        self.setup_rules(conf_files, res['status'])
+                        self.setup_rules(conf_files, res['status'], this_path)
             elif res.get('status_code') == 400:
                 print('res=',res)
-                raise self.LKFException('Error installing form: {}. Error msg'.format(form_name, res['json']['error']))
+                print('form_name=',form_name)
+                error = res.get('json',{}).get('error','Please try again!!!')
+                print('error=',error)
+                raise self.LKFException(f'Error installing form: {form_name}. Error msg {error}')
         return response
  
     def get_form_modules(self, all_items, parent_path=None):
         data_file = []
         form_file = {}
-        print('parent_path',parent_path)
         for file in all_items:
             if type(file) == dict:
                 path = list(file.keys())[0]
@@ -93,7 +96,6 @@ class FormResource(items.Items):
                     path = '{}/{}'.format(parent_path, path)
                 form_file.update(self.get_form_modules(list(file.values())[0], parent_path=path))
                 continue
-            print('file=', file)
             file_ext = file.split('.')
             if len(file_ext) != 2:
                 print('Not a supported file', file)
@@ -117,7 +119,6 @@ class FormResource(items.Items):
 
     def instalable_forms(self, install_order=None):
         items_json = self.get_all_items_json('forms')
-        print('items_json', items_json)
         forms_data = self.get_form_modules(items_json)
         if install_order:
             forms_data['install_order'] = install_order

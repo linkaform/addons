@@ -5,8 +5,10 @@ import math, simplejson, time
 from copy import deepcopy
 
 from linkaform_api import base
+# from lkf_addons.addons.employee.employee_utils import Employee
 
 print('Cargando Stock..')
+
 
 class Stock(base.LKF_Base):
 
@@ -15,7 +17,6 @@ class Stock(base.LKF_Base):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
         self.name =  __class__.__name__
         self.settings = settings
-        
         self.CATALOG_WAREHOUSE = self.lkm.catalog_id('warehouse')
         self.CATALOG_WAREHOUSE_ID = self.CATALOG_WAREHOUSE.get('id')
         self.CATALOG_WAREHOUSE_OBJ_ID = self.CATALOG_WAREHOUSE.get('obj_id')
@@ -24,11 +25,11 @@ class Stock(base.LKF_Base):
         self.CATALOG_INVENTORY_ID = self.CATALOG_INVENTORY.get('id')
         self.CATALOG_INVENTORY_OBJ_ID = self.CATALOG_INVENTORY.get('obj_id')
 
-        self.CATALOG_PRODUCT_RECIPE = self.lkm.catalog_id('plant_recipe')
+        self.CATALOG_PRODUCT_RECIPE = self.lkm.catalog_id('product_recipe')
         self.CATALOG_PRODUCT_RECIPE_OBJ_ID = self.CATALOG_PRODUCT_RECIPE.get('obj_id')
         self.CATALOG_PRODUCT_RECIPE_ID = self.CATALOG_PRODUCT_RECIPE.get('id')
         
-        self.CATALOG_PRODUCT = self.lkm.catalog_id('plant_catalog')
+        self.CATALOG_PRODUCT = self.lkm.catalog_id('product_catalog')
         self.CATALOG_PRODUCT_OBJ_ID = self.CATALOG_PRODUCT.get('obj_id')
         self.CATALOG_PRODUCT_ID = self.CATALOG_PRODUCT.get('id')
 
@@ -55,97 +56,99 @@ class Stock(base.LKF_Base):
         # self.f is use to realte a human name to a objectId where the ObjectId
         # ex: self.f = {'key':'ObjectId'}
 
-        self.f = {
-            #'warehouse_catalog_obj_id':'6442e4831198daf81456f273',
-            'warehouse_type':'6514f51b6cfe23860299abfa',
-            'warehouse':'6442e4831198daf81456f274',
-            'product_recipe':'61ef32bcdf0ec2ba73dec33c',
-            'product_code':'61ef32bcdf0ec2ba73dec33d',
-            'product_name':'61ef32bcdf0ec2ba73dec33e',
-            'product_estimated_ready_date':'6442e25f13879061894b4bb1',
-            'product_lot_created_week':'620a9ee0a449b98114f61d75',
-            'product_growth_week':'645576e878f3060d1f7fc61b',
-            'product_grading_pending':'644c36f1d20db114694a495a',
-            'product_container_type':'6441d33a153b3521f5b2afcb',
-            'product_lot':'620a9ee0a449b98114f61d77',
-            'product_lot_produced':'6271dc35e84e2577579eafeb',
-            'product_lot_move_in':'620ad6247a217dbcb888d000',
-            'product_lot_scrapped':'620ad6247a217dbcb888d16d',
-            'product_lot_move_out':'620ad6247a217dbcb888d17e',
-            'product_lot_sales':'6442e2fbc0dd855fe856f1da',
-            'product_lot_cuarentin':'6442e2fbc0dd855fe856fddd',
-            'product_lot_actuals':'6441d33a153b3521f5b2afc9',
-            'product_lot_adjustments':'aaaaa0000000000000000000',
-            'production':'6271dc35e84e2577579eafeb',
-            'scrap_perc':'6442e25f13879061894b4bb3',
-            'scrapped':'620ad6247a217dbcb888d16d',
-            'move_in':'620ad6247a217dbcb888d000',
-            'move_out':'620ad6247a217dbcb888d17e',
-            'sales':'6442e2fbc0dd855fe856f1da',
-            'status':'620ad6247a217dbcb888d175',
-            'cuarentin':'6442e2fbc0dd855fe856fddd',
+        self.f.update( {
             'actuals':'6441d33a153b3521f5b2afc9',
             'adjustments':'aaaaa0000000000000000000',
-            'product_lot_per_scrap':'6442e25f13879061894b4bb3',
-            'product_lot_proyected_qty':'6442e25f13879061894b4bb2',
-            'product_lot_location':'63c9f28ddaebf7e9b4522551',
-            'inventory_status':'620ad6247a217dbcb888d175',
-            'prod_qty_per_container':'6205f73281bb36a6f157335b',
-            'production_lote':'63f8f4cad090912501be306a',
-            'production_year':'61f1da41b112fe4e7fe8582f',
-            'production_week':'62e8343e236c89c216a7cec3',
-            'production_group':'61f1fab3ce39f01fe8a7ca8c',
-            'production_status':'62e9890c5dec95745c618fc3',
-            'time_in':'61f1fcf8c66d2990c8fc7cc5',
-            'time_out':'61f1fcf8c66d2990c8fc7cc6',
-            'worker_obj_id':'62c5ff243c63280985580087',
-            'worker_name':'62c5ff407febce07043024dd',
-            'set_lunch_brake':'62c6017ff9f71e2a589fb679',
-            'set_total_produced':'61f1fcf8c66d2990c8fc7cc3',
-            'set_total_hours':'61f1fcf8c66d2990c8fc7cc7',
-            'set_products_per_hours':'61f1fcf8c66d2990c8fc7cc9',
-            'set_production_date':'61f1fcf8c66d2990c8fc7cc4',
-            'total_produced':'64ed5839a405d8f6378edf5f',
-            'reicpe_growth_weeks':'6205f73281bb36a6f1573357',
-            'reicpe_productiviy':'6209705080c17c97320e337f',
-            'reicpe_container':'6209705080c17c97320e3382',
-            'reicpe_per_container':'6205f73281bb36a6f157335b',
-            'reicpe_mult_rate':'6205f73281bb36a6f157334d',
-            'reicpe_overage':'6205f73281bb36a6f1573353',
-            'reicpe_start_week':'6209705080c17c97320e3380',
-            'reicpe_end_week':'6209705080c17c97320e3381',
-            'reicpe_start_size':'6205f73281bb36a6f1573358',
-            'reicpe_stage':'621fca56ee94313e8d8c5e2e',
-            'reicpe_soil_type':'6209705080c17c97320e3383',
-            'recipe_type':'63483f8e2c8c769718b102b1',
             'cat_stock_folio':'62c44f96dae331e750428732',
+            'cuarentin':'6442e2fbc0dd855fe856fddd',
+            'grading_date':'000000000000000000000111',
+            'grading_flats':'644bf9a04b1761305b080013',
             'grading_group':'644bf7ccfa9830903f087867',
             'grading_move_type':'64d5550ec4909ab3c20c5806',
-            'grading_ready_year':'644bf9a04b1761305b080012',
             'grading_ready_week':'644bf9a04b1761305b080011',
+            'grading_ready_year':'644bf9a04b1761305b080012',
             'grading_ready_yearweek':'64edf8aeffeaaa1febca2a06',
-            'grading_flats':'644bf9a04b1761305b080013',
-            'grading_date':'000000000000000000000111',
             'grading_type':'653885f30d80af8e8de0fe79',
-            'move_dest_folio':'ffff00000000000000000001',
-            'move_group':'6442e4537775ce64ef72dd69',
-            'move_new_location':'644897497a16141f4e5ee0c3',
-            'move_group_qty':'6442e4cc45983bf1778ec17d',
-            'inv_group':'644bf504f595b744814a4990',
-            'inv_group_readyweek':'644bf6c2d281661b082b6348',
-            'inv_group_flats':'644bf6c2d281661b082b6349',
-            'inv_adjust_status':'6442e4537775ce64ef72dd6a',
-            'inv_adjust_grp_status':'ad00000000000000000ad999',
-            'inv_adjust_grp_qty':'ad00000000000000000ad000',
-            'inv_adjust_grp_in':'ad00000000000000000ad100',
-            'inv_adjust_grp_out':'ad00000000000000000ad200',
             'inv_adjust_comments':'64d05792c373f9b62f539d00',
             'inv_adjust_grp_comments':'ad00000000000000000ad400',
-            'inv_scrap_status':'644c1cb6dc502afa06c4423e',
-            'inv_scrap_qty':'644bf9a04b1761305b080099',
+            'inv_adjust_grp_in':'ad00000000000000000ad100',
+            'inv_adjust_grp_out':'ad00000000000000000ad200',
+            'inv_adjust_grp_qty':'ad00000000000000000ad000',
+            'inv_adjust_grp_status':'ad00000000000000000ad999',
+            'inv_adjust_status':'6442e4537775ce64ef72dd6a',
             'inv_cuarentin_qty':'644bf9a04b1761305b080098',
+            'inventory_status':'620ad6247a217dbcb888d175',
+            'inv_group':'644bf504f595b744814a4990',
+            'inv_group_flats':'644bf6c2d281661b082b6349',
+            'inv_group_readyweek':'644bf6c2d281661b082b6348',
             'inv_move_qty':'6442e4537775ce64ef72dd68',
-        }
+            'inv_scrap_qty':'644bf9a04b1761305b080099',
+            'inv_scrap_status':'644c1cb6dc502afa06c4423e',
+            'move_dest_folio':'ffff00000000000000000001',
+            'move_group':'6442e4537775ce64ef72dd69',
+            'move_group_qty':'6442e4cc45983bf1778ec17d',
+            'move_in':'620ad6247a217dbcb888d000',
+            'move_new_location':'644897497a16141f4e5ee0c3',
+            'move_out':'620ad6247a217dbcb888d17e',
+            'prod_qty_per_container':'6205f73281bb36a6f157335b',
+            'product_code':'61ef32bcdf0ec2ba73dec33d',
+            'product_container_type':'6441d33a153b3521f5b2afcb',
+            'product_estimated_ready_date':'6442e25f13879061894b4bb1',
+            'product_grading_pending':'644c36f1d20db114694a495a',
+            'product_growth_week':'645576e878f3060d1f7fc61b',
+            'production':'6271dc35e84e2577579eafeb',
+            'weekly_production_group':'62e4babc46ff76c5a6bee76c',
+            'production_group':'61f1fab3ce39f01fe8a7ca8c',
+            'production_lote':'63f8f4cad090912501be306a',
+            'production_per_container_in':'aa0000000000000000000001',
+            'production_status':'62e9890c5dec95745c618fc3',
+            'production_week':'62e8343e236c89c216a7cec3',
+            'production_year':'61f1da41b112fe4e7fe8582f',
+            'production_requier_containers':'62e4bc58d9814e169a3f6beb',
+            'product_lot':'620a9ee0a449b98114f61d77',
+            'product_lot_actuals':'6441d33a153b3521f5b2afc9',
+            'product_lot_adjustments':'aaaaa0000000000000000000',
+            'product_lot_created_week':'620a9ee0a449b98114f61d75',
+            'product_lot_cuarentin':'6442e2fbc0dd855fe856fddd',
+            'product_lot_location':'63c9f28ddaebf7e9b4522551',
+            'product_lot_move_in':'620ad6247a217dbcb888d000',
+            'product_lot_move_out':'620ad6247a217dbcb888d17e',
+            'product_lot_per_scrap':'6442e25f13879061894b4bb3',
+            'product_lot_produced':'6271dc35e84e2577579eafeb',
+            'product_lot_proyected_qty':'6442e25f13879061894b4bb2',
+            'product_lot_sales':'6442e2fbc0dd855fe856f1da',
+            'product_lot_scrapped':'620ad6247a217dbcb888d16d',
+            'product_name':'61ef32bcdf0ec2ba73dec33e',
+            'product_recipe':'61ef32bcdf0ec2ba73dec33c',
+            'recipe_type':'63483f8e2c8c769718b102b1',
+            'reicpe_container':'6209705080c17c97320e3382',
+            'reicpe_end_week':'6209705080c17c97320e3381',
+            'reicpe_growth_weeks':'6205f73281bb36a6f1573357',
+            'reicpe_mult_rate':'6205f73281bb36a6f157334d',
+            'reicpe_overage':'6205f73281bb36a6f1573353',
+            'reicpe_per_container':'6205f73281bb36a6f157335b',
+            'reicpe_productiviy':'6209705080c17c97320e337f',
+            'reicpe_soil_type':'6209705080c17c97320e3383',
+            'reicpe_stage':'621fca56ee94313e8d8c5e2e',
+            'reicpe_start_size':'6205f73281bb36a6f1573358',
+            'reicpe_start_week':'6209705080c17c97320e3380',
+            'sales':'6442e2fbc0dd855fe856f1da',
+            'scrapped':'620ad6247a217dbcb888d16d',
+            'scrap_perc':'6442e25f13879061894b4bb3',
+            'set_lunch_brake':'62c6017ff9f71e2a589fb679',
+            'set_production_date':'61f1fcf8c66d2990c8fc7cc4',
+            'set_products_per_hours':'61f1fcf8c66d2990c8fc7cc9',
+            'set_total_hours':'61f1fcf8c66d2990c8fc7cc7',
+            'set_total_produced':'61f1fcf8c66d2990c8fc7cc3',
+            'status':'620ad6247a217dbcb888d175',
+            'time_in':'61f1fcf8c66d2990c8fc7cc5',
+            'time_out':'61f1fcf8c66d2990c8fc7cc6',
+            'total_produced':'64ed5839a405d8f6378edf5f',
+            'warehouse':'6442e4831198daf81456f274',
+            'warehouse_type':'6514f51b6cfe23860299abfa',
+            'worker_name':'62c5ff407febce07043024dd',
+            'worker_obj_id':'62c5ff243c63280985580087',
+        })
 
     def add_dicts(self, dict1, dict2):
         for key in dict1:
@@ -174,6 +177,7 @@ class Stock(base.LKF_Base):
                         })
         move_qty = scrap_qty + cuarentin_qty
         if move_qty > actuals:
+            self.sync_catalog(folio_inventory)
             msg = f"You are trying to move {move_qty} units, and on the stock there is only {actuals}, please check you numbers"
             msg_error_app = {
                     f"{self.f['inv_scrap_qty']}": {
@@ -228,6 +232,7 @@ class Stock(base.LKF_Base):
             production[self.f['set_total_hours']] = round(total_hours, 2)
 
             total_produced += production[self.f['set_total_produced']]
+            print('total produced', total_produced)
             if production_status == 'progress':
                 containers_out = production[self.f['set_total_produced']]
             else:
@@ -746,11 +751,11 @@ class Stock(base.LKF_Base):
             raise Exception('No folio providen for query')
         return query
 
-    def get_grading(self, folio, answers):
+    def get_grading(self):
         match_query ={ 
          'form_id': self.GREENHOUSE_GRADING_ID,  
          'deleted_at' : {'$exists':False},
-         f'answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f["cat_stock_folio"]}': folio
+         f'answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f["cat_stock_folio"]}': self.folio
          } 
         query = [
             {'$match': match_query},
@@ -789,6 +794,9 @@ class Stock(base.LKF_Base):
         recipe_s2 = []
         recipe_s3 = []
         recipe_s4 = []
+        stage = [2,] if stage == 'S2' else stage
+        stage = [3,] if stage == 'S3' else stage
+        stage = [4,] if stage == 'S4' else stage
         if 2 in stage:
             mango_query = self.plant_recipe_query(all_codes, "S2", "S2", recipe_type)
             recipe_s2 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query)
@@ -899,6 +907,10 @@ class Stock(base.LKF_Base):
 
     def get_product_stock(self, product_code, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
+        print(f'**************Get Stock: {product_code}****************')
+        print('lot_number', lot_number)
+        print('warehouse', warehouse)
+        print('location', location)
         stock = {'actuals':0}
         if date_from:
             initial_stock = self.get_product_stock(product_code, warehouse=warehouse, location=location, \
@@ -913,7 +925,8 @@ class Stock(base.LKF_Base):
         #     stock['adjustments'] = 0
 
         stock['production'] = self.stock_production(date_from =date_from, date_to=date_to ,\
-             product_code=product_code, lot_number=lot_number, warehouse=warehouse )
+             product_code=product_code, lot_number=lot_number, warehouse=warehouse, location=location )
+        print('stock production....',stock['production'])
         stock['move_in'] = self.stock_moves('in', product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, **kwargs)
         #GET PRODUCT EXITS
@@ -932,8 +945,11 @@ class Stock(base.LKF_Base):
         # stock['adjustments'] += self.stock_adjustments_moves(product_code=product_code, lot_number=lot_number, \
         #     warehouse=warehouse , date_from=None, date_to=None)
         if (product_code and warehouse and lot_number) or True:
-            cache_stock = self.cache_get({'_id':f"{product_code}_{lot_number}_{warehouse}","_one":True, },**kwargs)
-        print('stock=', stock)
+            if location:
+                cache_stock = self.cache_get({'_id':f"{product_code}_{lot_number}_{warehouse}_{location}","_one":True, },**kwargs)
+            else:
+                cache_stock = self.cache_get({'_id':f"{product_code}_{lot_number}_{warehouse}","_one":True, },**kwargs)
+        print('cache_stock=', cache_stock)
         stock = self.add_dicts(stock, cache_stock.get('cache',{}))
         stock['stock_in'] = stock['production'] + stock['move_in']
         stock['stock_out'] = stock['scrapped'] + stock['move_out'] + stock['sales']  + stock['cuarentin']
@@ -942,18 +958,26 @@ class Stock(base.LKF_Base):
         stock['scrap_perc']  = 0
         if stock.get('stock_in') and stock.get('scrapped'):
             stock['scrap_perc'] = round(stock.get('scrapped',0)/stock.get('stock_in',1),2)
+        print('stock=', stock)
         return stock
 
-    def get_product_info(self, answers, folio=None,  **kwargs):
-        warehouse = answers[self.CATALOG_WAREHOUSE_OBJ_ID][self.f['warehouse']]
-        plant_code = answers.get(self.f['product_recipe'], {}).get(self.f['product_code'], '')
-        yearWeek = str(answers[self.f['product_lot_created_week']])
+    def get_product_info(self, **kwargs):
+        print('self.CATALOG_WAREHOUSE_OBJ_ID',self.CATALOG_WAREHOUSE_OBJ_ID)
+        print('self.warehouse',self.f['warehouse'])
+        print('answres=', self.answers)
+        try:
+            warehouse = self.answers[self.CATALOG_WAREHOUSE_OBJ_ID][self.f['warehouse']]
+            plant_code = self.answers.get(self.f['product_recipe'], {}).get(self.f['product_code'], '')
+        except Exception as e:
+            print('**********************************************')
+            self.LKFException('Warehosue and product code are requierd')
+        yearWeek = str(self.answers[self.f['product_lot_created_week']])
         year = yearWeek[:4]
         week = yearWeek[4:]
         recipes = self.get_plant_recipe( [plant_code,], stage=[4, 'Ln72'] )
         recipe = self.select_S4_recipe(recipes[plant_code], week)
         grow_weeks = recipe.get('S4_growth_weeks')
-        ready_date = answers.get(self.f['product_lot'])
+        ready_date = self.answers.get(self.f['product_lot'])
         # if kwargs.get('kwargs',{}).get("force_lote") and answers.get(self.f['product_lot']):
         #     ready_date = answers.get(self.f['product_lot'])
         #     print('FOORCE LOTEEEEE')
@@ -971,7 +995,7 @@ class Stock(base.LKF_Base):
         overage = recipes[plant_code][0].get('S4_overage_rate')
         actual_flats_on_hand = product_stock['actuals']
         proyected_flats_on_hand = math.floor(( 1 - overage) * actual_flats_on_hand)
-        lot_size = self.current_record['answers'].get(self.f['product_lot_produced'],0)
+        lot_size = self.answers.get(self.f['product_lot_produced'],0)
         if lot_size == 0:
             perc_scrapped = 0
         else:
@@ -982,28 +1006,32 @@ class Stock(base.LKF_Base):
         if real_flats_proyected < proyected_flats_on_hand:
             proyected_flats_on_hand = real_flats_proyected
 
-        answers[self.f['product_lot_produced']] = product_stock['production']
-        answers[self.f['product_lot_move_in']] = product_stock['move_in']
-        answers[self.f['product_lot_scrapped']] = product_stock['scrapped']
-        answers[self.f['product_lot_move_out']] = product_stock['move_out']
-        answers[self.f['product_lot_sales']] = product_stock['sales']
-        answers[self.f['product_lot_cuarentin']] = product_stock['cuarentin']
-        answers[self.f['product_lot_actuals']] = product_stock['actuals']
-        answers[self.f['product_lot_adjustments']] = product_stock['adjustments']
+        self.answers[self.f['product_lot_produced']] = product_stock['production']
+        self.answers[self.f['product_lot_move_in']] = product_stock['move_in']
+        self.answers[self.f['product_lot_scrapped']] = product_stock['scrapped']
+        self.answers[self.f['product_lot_move_out']] = product_stock['move_out']
+        self.answers[self.f['product_lot_sales']] = product_stock['sales']
+        self.answers[self.f['product_lot_cuarentin']] = product_stock['cuarentin']
+        self.answers[self.f['product_lot_actuals']] = product_stock['actuals']
+        self.answers[self.f['product_lot_adjustments']] = product_stock['adjustments']
 
-        answers[self.f['product_lot_per_scrap']] = perc_scrapped
-        answers[self.f['product_lot_proyected_qty']] = proyected_flats_on_hand
-        answers[self.f['product_lot_per_scrap']] = perc_scrapped       
-        answers[self.f['product_lot']] = ready_date
-        if answers[self.f['product_lot_actuals']] <= 0:
-            answers[self.f['inventory_status']] = 'done'
+        self.answers[self.f['product_lot_per_scrap']] = perc_scrapped
+        self.answers[self.f['product_lot_proyected_qty']] = proyected_flats_on_hand
+        self.answers[self.f['product_lot_per_scrap']] = perc_scrapped       
+        self.answers[self.f['product_lot']] = ready_date
+        if self.answers[self.f['product_lot_actuals']] <= 0:
+            self.answers[self.f['inventory_status']] = 'done'
         else:
-            answers[self.f['inventory_status']] = 'active'
-        answers.update({self.f['inv_group']:self.get_grading(folio, answers)})
-        return answers
+            self.answers[self.f['inventory_status']] = 'active'
+        self.answers.update({self.f['inv_group']:self.get_grading()})
+        return self.answers
 
     def get_inventory_record_by_folio(self, folio, form_id ):
         #use to be get_inventory_flow
+        if not folio:
+            folio = self.folio
+        if not form_id:
+            form_id = self.form_id
         record_inventory = self.cr.find_one({
             'form_id': form_id,
             'deleted_at': {'$exists': False},
@@ -1398,6 +1426,8 @@ class Stock(base.LKF_Base):
             date_to=current_answers[self.f['grading_date']], **{"nin_folio":current_record.get('folio')})
         # This are the actuals as they were on that date not including this move.
         acctual_containers = inv.get('actuals')
+        print('acutals', inv)
+        print('acctual_containers', acctual_containers)
         relocated_containers = sum( [s.get(self.f['move_group_qty'], 0) for s in current_answers.get(self.f['move_group'])] )
         flats_to_move = current_answers.get(self.f['inv_move_qty'])
 
@@ -2068,7 +2098,8 @@ class Stock(base.LKF_Base):
         if location:
             query_dict.update({'location':location,})
 
-        stock = self.get_product_stock(product_code, warehouse=warehouse, lot_number=lot_number, **kwargs)
+        stock = self.get_product_stock(product_code, warehouse=warehouse, lot_number=lot_number,location=location, **kwargs)
+        print('stock', stock)
         #production = self.stock_production( product_code=product_code, lot_number=lot_number)
         #scrap , cuarentine = self.stock_scrap( product_code=product_code, lot_number=lot_number, status='done')
         # if production:

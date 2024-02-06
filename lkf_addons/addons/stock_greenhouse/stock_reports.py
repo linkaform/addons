@@ -6,7 +6,6 @@ from copy import deepcopy
 
 from .stock_utils import Stock
 
-print('Cargando Reports')
 
 from linkaform_api import base
 

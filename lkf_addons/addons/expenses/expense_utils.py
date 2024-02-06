@@ -64,7 +64,7 @@ class Expenses(base.LKF_Base):
         self.SOL_DATA = {}
         if folio_solicitud:
             self.SOL_DATA = self.set_solicitud_data(folio_solicitud)
-        self.f = {
+        self.f.update( {
             'allow_overdraft':'64dd637965b8662fabb5ac2d',
             'anticipo_efectivo':'649d02057880ff495300bcc0',
             'deposito_entregado':'544d5ad901a4de205f391111',
@@ -117,8 +117,7 @@ class Expenses(base.LKF_Base):
             'subtotal':'62914e2d855e9abc32eabc17',
             'tipo_solicitud':'649b512cbf4cc1fab1133b7a',
             'total_gasto_moneda_sol':'544d5ad901a4de205f391111',
-
-        }
+        })
 
     def do_solicitud_close(self, form, folio, status_id=None, force_close=False):
         #check if it can be close
