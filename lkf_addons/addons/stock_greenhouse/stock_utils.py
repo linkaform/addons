@@ -14,6 +14,7 @@ class Stock(base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
+        print('luego aqui....')
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
         self.name =  __class__.__name__
         self.settings = settings
@@ -26,12 +27,12 @@ class Stock(base.LKF_Base):
         self.CATALOG_INVENTORY_OBJ_ID = self.CATALOG_INVENTORY.get('obj_id')
 
         self.CATALOG_PRODUCT_RECIPE = self.lkm.catalog_id('product_recipe')
-        self.CATALOG_PRODUCT_RECIPE_OBJ_ID = self.CATALOG_PRODUCT_RECIPE.get('obj_id')
         self.CATALOG_PRODUCT_RECIPE_ID = self.CATALOG_PRODUCT_RECIPE.get('id')
+        self.CATALOG_PRODUCT_RECIPE_OBJ_ID = self.CATALOG_PRODUCT_RECIPE.get('obj_id')
         
         self.CATALOG_PRODUCT = self.lkm.catalog_id('product_catalog')
-        self.CATALOG_PRODUCT_OBJ_ID = self.CATALOG_PRODUCT.get('obj_id')
         self.CATALOG_PRODUCT_ID = self.CATALOG_PRODUCT.get('id')
+        self.CATALOG_PRODUCT_OBJ_ID = self.CATALOG_PRODUCT.get('obj_id')
 
         self.FORM_INVENTORY_ID = self.lkm.form_id('green_house_inventroy','id')
         self.PRODUCTION_FORM_ID = self.lkm.form_id('greenhouse_production','id')
@@ -43,7 +44,6 @@ class Stock(base.LKF_Base):
 
 
         self.FORM_CATALOG_DIR = {
-            81503:80755, #Inventory Flow (lab): Catalog Invetory Lab #TODO
             self.FORM_INVENTORY_ID:self.CATALOG_INVENTORY_ID, #Inventory Flow (greenHouse)
             }
         # self.CATALOG_SOL_VIAJE_ID = self.CATALOG_SOL_VIAJE.get('id')
@@ -155,8 +155,8 @@ class Stock(base.LKF_Base):
             dict1[key] += dict2.get(key,0)
         return dict1
 
-    def do_scrap(self, record):
-        answers = record.get('answers')
+    def do_scrap(self):
+        answers = self.answers
         scrap_qty = answers.get(self.f['inv_scrap_qty'], 0)
         cuarentin_qty = answers.get(self.f['inv_cuarentin_qty'], 0)
         product_info = answers.get(self.CATALOG_INVENTORY_OBJ_ID,{})
@@ -917,7 +917,7 @@ class Stock(base.LKF_Base):
                 lot_number=lot_number, date_to=date_from,  **kwargs)
             stock['actuals'] += initial_stock.get('actuals',0)
         stock['adjustments'] = self.stock_adjustments_moves( product_code=product_code, lot_number=lot_number, \
-            warehouse=warehouse , date_from=date_from, date_to=date_to, **kwargs)
+            warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -934,7 +934,8 @@ class Stock(base.LKF_Base):
         stock['move_out'] = self.stock_moves('out', product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, **kwargs)
         scrapped, cuarentin = self.stock_scrap(product_code=product_code, warehouse=warehouse, location=location, \
-            lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs )    
+            lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs )  
+        print('scrapped',scrapped)  
         stock['scrapped'] = scrapped
         stock['cuarentin'] = cuarentin
 
@@ -1026,7 +1027,7 @@ class Stock(base.LKF_Base):
         self.answers.update({self.f['inv_group']:self.get_grading()})
         return self.answers
 
-    def get_inventory_record_by_folio(self, folio, form_id ):
+    def get_inventory_record_by_folio(self, folio=None, form_id=None ):
         #use to be get_inventory_flow
         if not folio:
             folio = self.folio
@@ -1039,12 +1040,16 @@ class Stock(base.LKF_Base):
         }, {'answers': 1, 'folio': 1, 'form_id': 1, '_id': 1})
         return record_inventory
 
-    def get_invtory_record_by_product(self, form_id, ready_date, planting_house, plant_code):
+    def get_invtory_record_by_product(self, form_id, lot_number, planting_house, plant_code):
         #use to be get_record_greenhouse_inventory
+        if lot_number_type == str:
+            lot_number = str(lot_number)
+        else:
+            lot_number = int(lot_number)
         query_greenhouse_inventory = {
             'form_id': form_id,
             'deleted_at': {'$exists': False},
-            f"answers.{self.f['product_lot']}": int(ready_date),
+            f"answers.{self.f['product_lot']}": int(lot_number),
             f"answers.{self.CATALOG_WAREHOUSE_OBJ_ID}.{self.f['warehouse']}": planting_house,
             f"answers.{self.CATALOG_PRODUCT_RECIPE_OBJ_ID}.{self.f['product_code']}": plant_code,
         }
@@ -1414,15 +1419,22 @@ class Stock(base.LKF_Base):
 
     def move_location(self, current_record):
         current_answers = current_record['answers']
+        print('current_answers', current_answers)
         plant_info = current_answers.get(self.CATALOG_INVENTORY_OBJ_ID,{})
         folio_inventory = plant_info.get(self.f['cat_stock_folio'])
+        print('CATALOG_INVENTORY_OBJ_ID', self.CATALOG_INVENTORY_OBJ_ID)
+        print('plant_info', plant_info)
+        print('folio_inventory', folio_inventory)
         product_lot = plant_info.get(self.f['product_lot'])
         product_code = plant_info.get(self.f['product_code'])
         warehouse = plant_info.get(self.f['warehouse'])
+        location = plant_info.get(self.f['warehouse_location'])
         record_inventory_flow = self.get_inventory_record_by_folio(folio_inventory, form_id=self.FORM_INVENTORY_ID )
+        print('folio_inventory', folio_inventory)
+        print('folio_inventory form id', self.FORM_INVENTORY_ID )
         inv_record = record_inventory_flow.get('answers')
         #gets the invetory as it was on that date...
-        inv = self.get_product_stock(product_code, warehouse=warehouse, lot_number=product_lot, 
+        inv = self.get_product_stock(product_code, warehouse=warehouse, location=location, lot_number=product_lot, 
             date_to=current_answers[self.f['grading_date']], **{"nin_folio":current_record.get('folio')})
         # This are the actuals as they were on that date not including this move.
         acctual_containers = inv.get('actuals')
@@ -1459,6 +1471,7 @@ class Stock(base.LKF_Base):
         current_green_house = plant_info.get(self.f['warehouse'])
         dest_gh_select = current_answers.get(self.f['move_new_location'])
         dest_warehouse = ""
+        print('dest_gh_select',dest_gh_select)
         for x in dest_gh_select.split('_'):
             if dest_warehouse:
                 dest_warehouse += " "
@@ -1551,6 +1564,8 @@ class Stock(base.LKF_Base):
         return dest_folio
 
     def plant_recipe_query(self, all_codes, start_size, reicpe_stage, recipe_type='Main'):
+        if not recipe_type:
+            recipe_type='Main'
         mango_query = {
             "selector": {
                 "answers": {
@@ -1562,11 +1577,13 @@ class Stock(base.LKF_Base):
             "skip": 0
                     }
         if all_codes:
-            mango_query['selector']['answers'].update({self.f['product_code']: {"$in": all_codes},})
+            if len(all_codes) == 1:
+                mango_query['selector']['answers'].update({self.f['product_code']:  all_codes[0] })
+            else:
+                mango_query['selector']['answers'].update({self.f['product_code']: {"$in": all_codes},})
         return mango_query
 
     def process_record_to_catalog(self, current_record ):
-        answers = current_record['answers']
         # Obtengo los campos de la forma
         form_fields = self.lkf_api.get_form_id_fields(current_record['form_id'], jwt_settings_key='APIKEY_JWT_KEY')
         fields = form_fields[0]['fields']
@@ -1576,13 +1593,13 @@ class Stock(base.LKF_Base):
             field_id = field.get('field_id', '')
             if field.get('field_type', '') == 'catalog-select':
                 catalog_field_id = field.get('catalog', {}).get('catalog_field_id', '')
-                answers[ field_id ] = answers.get(catalog_field_id, {}).get(field_id)
+                self.answers[ field_id ] = self.answers.get(catalog_field_id, {}).get(field_id)
 
             elif field.get('field_type', '') == 'catalog-detail':
                 catalog_field_id = field.get('catalog', {}).get('catalog_field_id', '')
-                val_catalog_answers = answers.get(catalog_field_id, {}).get(field_id, [])
+                val_catalog_answers = self.answers.get(catalog_field_id, {}).get(field_id, [])
                 if val_catalog_answers:
-                    answers[ field_id ] = val_catalog_answers
+                    self.answers[ field_id ] = val_catalog_answers
 
         # Obtengo los campos del catalogo
         catalog_fields = self.lkf_api.get_catalog_id_fields( self.CATALOG_INVENTORY_ID, jwt_settings_key='APIKEY_JWT_KEY' )
@@ -1598,7 +1615,7 @@ class Stock(base.LKF_Base):
         for id_field in dict_idfield_typefield:
             if id_field in (self.f['product_recipe'], self.CATALOG_WAREHOUSE_OBJ_ID):
                 continue
-            val_in_record = answers.get( id_field, False )
+            val_in_record = self.answers.get( id_field, False )
             val_in_record_org = val_in_record
             if val_in_record or val_in_record == 0:
                 info_field_cat = dict_idfield_typefield[ id_field ]
@@ -1624,7 +1641,7 @@ class Stock(base.LKF_Base):
         if record_catalog:
             info_record_catalog = record_catalog[0]
 
-            if answers.get(self.f['product_lot_actuals'], 1) <= 0:
+            if self.answers.get(self.f['product_lot_actuals'], 1) <= 0:
                 # Se elimina el registro del catalogo
                 response_delete_catalog = self.lkf_api.delete_catalog_record(self.CATALOG_INVENTORY_ID, info_record_catalog.pop('_id'), info_record_catalog.pop('_rev'), jwt_settings_key='APIKEY_JWT_KEY')
                 return True
@@ -1760,7 +1777,7 @@ class Stock(base.LKF_Base):
             result[pcode]['total'] = r.get('total',0)
         return result  
 
-    def stock_adjustments_moves(self, product_code=None, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None, **kwargs):
+    def stock_adjustments_moves(self, product_code=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None, **kwargs):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.ADJUIST_FORM_ID,
