@@ -282,7 +282,6 @@ if __name__ == '__main__':
         environment = get_items_2_load(commands)
         if not environment:
             environment =  set_value(input(f"We are running on {settings.ENV} Enviroment, are you sure [y/n] (default n):"))
-
         if not environment:
             print('Ending session no enviornment confirmation found')
         else:

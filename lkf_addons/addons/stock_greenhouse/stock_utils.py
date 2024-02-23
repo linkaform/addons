@@ -14,7 +14,6 @@ class Stock(base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
-        print('luego aqui....')
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
         self.name =  __class__.__name__
         self.settings = settings
@@ -241,7 +240,7 @@ class Stock(base.LKF_Base):
 
 
           
-            qty_per_container = recipes.get(self.f['prod_qty_per_container'], [])
+            qty_per_container = recipe.get(self.f['prod_qty_per_container'], [])
             if qty_per_container:
                 if type(qty_per_container) == list and qty_per_container[0]:
                     qty_per_container = int( qty_per_container[0] )
@@ -787,7 +786,7 @@ class Stock(base.LKF_Base):
         res = self.cr.aggregate(query)
         return [r for r in res]
 
-    def get_plant_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main'):
+    def get_product_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main'):
         if type(all_codes) == str and all_codes:
             all_codes = [all_codes.upper(),]
         recipe = {}
@@ -797,11 +796,13 @@ class Stock(base.LKF_Base):
         stage = [2,] if stage == 'S2' else stage
         stage = [3,] if stage == 'S3' else stage
         stage = [4,] if stage == 'S4' else stage
+        print('stage', stage)
         if 2 in stage:
             mango_query = self.plant_recipe_query(all_codes, "S2", "S2", recipe_type)
             recipe_s2 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query)
         if 3 in stage:
             mango_query = self.plant_recipe_query(all_codes, "S3", "S2", recipe_type)
+            print('mango_query', mango_query)
             recipe_s3 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query)
         if 4 in stage:
             if 'Ln72' in stage:
@@ -809,6 +810,7 @@ class Stock(base.LKF_Base):
             else:
                 mango_query = self.plant_recipe_query(all_codes, "S4", "S3", recipe_type)
             recipe_s4 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query, jwt_settings_key='APIKEY_JWT_KEY')
+        print('recipe_s3', recipe_s3)
         if recipe_s2 and not recipe:
             for this_recipe in recipe_s2:
                 plant_code = this_recipe.get(self.f['product_code'])
@@ -822,11 +824,14 @@ class Stock(base.LKF_Base):
                     'S2_mult_rate':this_recipe.get(self.f['reicpe_mult_rate']),
                     'S2_overage':this_recipe.get(self.f['reicpe_overage']),
                     'plant_code':this_recipe.get(self.f['product_code'],),
+                    'product_code':this_recipe.get(self.f['product_code'],),
                     'plant_name':this_recipe.get(self.f['product_name'],['',])[0],
+                    'product_name':this_recipe.get(self.f['product_name'],['',])[0],
                     'start_week' : this_recipe.get(self.f['reicpe_start_week']),
                     'end_week' : this_recipe.get(self.f['reicpe_end_week']),
                     'start_size': this_recipe.get(self.f['reicpe_start_size']),
                     'stage': this_recipe.get(self.f['reicpe_stage']),
+                    'recipe_type': this_recipe.get(self.f['recipe_type']),
                     })
         if recipe_s3  and not recipe:
             for this_recipe in recipe_s3:
@@ -847,6 +852,7 @@ class Stock(base.LKF_Base):
                     'end_week' : this_recipe.get(self.f['reicpe_end_week']),
                     'start_size': this_recipe.get(self.f['reicpe_start_size']),
                     'stage': this_recipe.get(self.f['reicpe_stage']),
+                    'recipe_type': this_recipe.get(self.f['recipe_type']),
                     }
                     )
         if recipe_s4  and not recipe:
@@ -868,13 +874,17 @@ class Stock(base.LKF_Base):
                     'end_week' : this_recipe.get(self.f['reicpe_end_week']),
                     'start_size': this_recipe.get(self.f['reicpe_start_size']),
                     'stage': this_recipe.get(self.f['reicpe_stage']),
-                    'soil_type': this_recipe.get(self.f['reicpe_soil_type'])
+                    'soil_type': this_recipe.get(self.f['reicpe_soil_type']),
+                    'recipe_type': this_recipe.get(self.f['recipe_type']),
                     }
                     )
         if not recipe:
             return {}
         return recipe
     
+    def get_plant_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main' ):
+        return self.get_product_recipe(all_codes, stage=stage, recipe_type=recipe_type )
+
     def get_product_map(self, values_dict, map_type='model_2_field_id'):
         '''
         values_dict: has the values of the stock model
@@ -907,11 +917,22 @@ class Stock(base.LKF_Base):
 
     def get_product_stock(self, product_code, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
-        print(f'**************Get Stock: {product_code}****************')
-        print('lot_number', lot_number)
-        print('warehouse', warehouse)
-        print('location', location)
+        # print(f'**************Get Stock: {product_code}****************')
+        # print('lot_number', lot_number)
+        # print('warehouse', warehouse)
+        # print('location', location)
+        lot_number = self.validate_value(lot_number)
+        warehouse = self.validate_value(warehouse)
+        location = self.validate_value(location)
         stock = {'actuals':0}
+        if (product_code and warehouse and lot_number) or True:
+            if location:
+                cache_stock = self.cache_get({'_id':f"{product_code}_{lot_number}_{warehouse}_{location}","_one":True, },**kwargs)
+            else:
+                cache_stock = self.cache_get({'_id':f"{product_code}_{lot_number}_{warehouse}","_one":True, },**kwargs)
+        print('cache_stock=', cache_stock)
+        kwargs.update(cache_stock.get('kwargs',{}))
+
         if date_from:
             initial_stock = self.get_product_stock(product_code, warehouse=warehouse, location=location, \
                 lot_number=lot_number, date_to=date_from,  **kwargs)
@@ -930,12 +951,13 @@ class Stock(base.LKF_Base):
         stock['move_in'] = self.stock_moves('in', product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, **kwargs)
         #GET PRODUCT EXITS
+        print('stock IN....',stock['move_in'])
 
         stock['move_out'] = self.stock_moves('out', product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, **kwargs)
         scrapped, cuarentin = self.stock_scrap(product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs )  
-        print('scrapped',scrapped)  
+        print('stock scrapped',scrapped)  
         stock['scrapped'] = scrapped
         stock['cuarentin'] = cuarentin
 
@@ -945,12 +967,7 @@ class Stock(base.LKF_Base):
         stock['sales'] = sales
         # stock['adjustments'] += self.stock_adjustments_moves(product_code=product_code, lot_number=lot_number, \
         #     warehouse=warehouse , date_from=None, date_to=None)
-        if (product_code and warehouse and lot_number) or True:
-            if location:
-                cache_stock = self.cache_get({'_id':f"{product_code}_{lot_number}_{warehouse}_{location}","_one":True, },**kwargs)
-            else:
-                cache_stock = self.cache_get({'_id':f"{product_code}_{lot_number}_{warehouse}","_one":True, },**kwargs)
-        print('cache_stock=', cache_stock)
+
         stock = self.add_dicts(stock, cache_stock.get('cache',{}))
         stock['stock_in'] = stock['production'] + stock['move_in']
         stock['stock_out'] = stock['scrapped'] + stock['move_out'] + stock['sales']  + stock['cuarentin']
@@ -993,7 +1010,8 @@ class Stock(base.LKF_Base):
         product_stock = self.get_product_stock(plant_code, warehouse=warehouse, lot_number=ready_date, kwargs=kwargs.get('kwargs',{}) )
         print('product_stock=', product_stock)
         scrapped = product_stock['scrapped']
-        overage = recipes[plant_code][0].get('S4_overage_rate')
+        overage = recipe.get('S4_overage_rate',0)
+        print('recipe', recipe)
         actual_flats_on_hand = product_stock['actuals']
         proyected_flats_on_hand = math.floor(( 1 - overage) * actual_flats_on_hand)
         lot_size = self.answers.get(self.f['product_lot_produced'],0)
@@ -1042,7 +1060,7 @@ class Stock(base.LKF_Base):
 
     def get_invtory_record_by_product(self, form_id, lot_number, planting_house, plant_code):
         #use to be get_record_greenhouse_inventory
-        if lot_number_type == str:
+        if type(lot_number) == str:
             lot_number = str(lot_number)
         else:
             lot_number = int(lot_number)
@@ -1056,18 +1074,18 @@ class Stock(base.LKF_Base):
         record = self.cr.find_one(query_greenhouse_inventory, {'folio': 1, 'answers': 1, 'form_id': 1, 'user_id': 1})
         return record
 
-    def get_record_catalog_del(self, form_id, folio=None):
+    def get_record_catalog_del(self):
         mango_query = {
             "selector":{"answers": {}},
             "limit":1000,
             "skip":0
             }
-        if folio:
-            mango_query['selector']['answers'].update({self.f['cat_stock_folio']:folio})
+        if self.folio:
+            mango_query['selector']['answers'].update({self.f['cat_stock_folio']:self.folio})
         else:
             mango_query['selector']['answers'].update({self.f['inventory_status']: "Done"})
-            
-        res = self.lkf_api.search_catalog( self.FORM_CATALOG_DIR[form_id], mango_query, jwt_settings_key='APIKEY_JWT_KEY')
+        print('mango query', mango_query)
+        res = self.lkf_api.search_catalog( self.FORM_CATALOG_DIR[self.form_id], mango_query, jwt_settings_key='APIKEY_JWT_KEY')
         return res
 
     def get_record_catalog(self,  folio ):
@@ -1243,7 +1261,6 @@ class Stock(base.LKF_Base):
         #     search_codes.append(product_code)
 
 
-        # recipes = self.get_plant_recipe( search_codes, stage=[4, 'Ln72'] )
         # growth_weeks = 0
         latest_versions = versions = self.get_record_last_version(record)
         answers_version = latest_versions.get('answers',{})
@@ -1428,7 +1445,7 @@ class Stock(base.LKF_Base):
         product_lot = plant_info.get(self.f['product_lot'])
         product_code = plant_info.get(self.f['product_code'])
         warehouse = plant_info.get(self.f['warehouse'])
-        location = plant_info.get(self.f['warehouse_location'])
+        location = plant_info.get(self.f.get('warehouse_location'))
         record_inventory_flow = self.get_inventory_record_by_folio(folio_inventory, form_id=self.FORM_INVENTORY_ID )
         print('folio_inventory', folio_inventory)
         print('folio_inventory form id', self.FORM_INVENTORY_ID )
@@ -1673,6 +1690,9 @@ class Stock(base.LKF_Base):
         return exist
 
     def select_S4_recipe(self, plant_recipe, plant_week):
+        print('plant_recipe', plant_recipe)
+        if type(plant_recipe) == dict:
+            plant_recipe = [plant_recipe,]
         for recipe in plant_recipe:
             start_week = recipe.get('start_week')
             end_week = recipe.get('end_week')
@@ -1783,6 +1803,9 @@ class Stock(base.LKF_Base):
             "form_id": self.ADJUIST_FORM_ID,
             f"answers.{self.f['inv_adjust_status']}":{"$ne":"cancel"}
             }
+        lot_number = self.validate_value(lot_number)
+        warehouse = self.validate_value(warehouse)
+        location = self.validate_value(location)
         inc_folio = kwargs.get("inc_folio")
         nin_folio = kwargs.get("nin_folio")
         if warehouse:
@@ -1798,6 +1821,8 @@ class Stock(base.LKF_Base):
                 {f"answers.{self.f['grading_group']}.{self.f['inv_adjust_grp_status']}": "done"},
                 {"folio":inc_folio}
                 ]}
+        print('lot_number', lot_number)
+        print('location', location)
         if product_code:
             match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.CATALOG_PRODUCT_OBJ_ID }.{self.f['product_code']}":product_code})
         if lot_number:
@@ -2154,3 +2179,8 @@ class Stock(base.LKF_Base):
         grading_totals = self.get_grading_sublots(gradings)
         totals = sum(x for x in grading_totals.values())
         acctual_containers = product_stock['actuals']
+
+    def validate_value(self, value):
+        if value == 'false' or value == 'null':
+            return  False
+        return value

@@ -40,12 +40,8 @@ COPY ./docker/requires.txt /tmp/
 COPY ./lkf_addons/bin/lkfaddons.py /usr/local/bin/lkfaddons
 RUN chmod a+x /usr/local/bin/lkfaddons
 
-
 RUN pip install --upgrade pip
 RUN pip install -r /tmp/requires.txt
-
-
-
 
 WORKDIR /tmp/
 ADD https://f001.backblazeb2.com/file/lkf-resources/backblaze_utils-0.1.tar.gz ./backblaze_utils-0.1.tar.gz 

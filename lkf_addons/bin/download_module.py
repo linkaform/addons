@@ -24,7 +24,7 @@ from settings import *
 
 force_items = {
     "forms":{
-        #113820:None
+        # 114564:None
         },
     "catalogs":{
         # 114101:None,
@@ -121,13 +121,14 @@ def get_catalogs(download_catalogs={}):
         download_catalogs = deepcopy(items['catalogs'])
     print('downloading catalog_name...',download_catalogs)
     for catalog_id, catalog_name in download_catalogs.items():
+        print('catalog_name...',catalog_name)
         catalog_name = get_item_name('catalogs', catalog_id)
         catalog_json = lkf_api.get_catalog_id_fields(catalog_id, jwt_settings_key='JWT_KEY')
         catalog_json = catalog_json.get('catalog')
         if catalog_json.get('fields'):
             catalog_json.pop('fields')
         res = drop_hashKey(catalog_json)
-        #print('res=',simplejson.dumps(res, indent=4))  
+        # print('res=',simplejson.dumps(res, indent=4))  
         catalog_data_xml = json_to_xml(res)
         # print('catalog_data_xml',catalog_data_xml)  
         print('Catalog Name: ',catalog_name)  
