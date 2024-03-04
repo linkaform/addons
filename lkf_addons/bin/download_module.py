@@ -24,10 +24,23 @@ from settings import *
 
 force_items = {
     "forms":{
-        # 114564:None
+         107578:None,
+         # 114466:None,
+         # 115958:None,
+         # 107815:None,
+         # 115957:None,
+         # 107578:None,
+         # 114462:None,
         },
     "catalogs":{
-        # 114101:None,
+        # 116004:None,
+        # 115950:None,
+        # 116000:None,
+        # 107693:None,
+        # 114468:None,
+        # 114465:None,
+        # 114464:None,
+        # 114827:None,
         # 114114:None,
     },
     "scripts":{
@@ -58,8 +71,9 @@ lkf_api = None
 def download_file(url, destination):
     urllib.request.urlretrieve(url, destination)
 
-def download_modules(modules, options, items_ids={}):
+def download_modules(modules, options, items_ids={}, download_related=False):
     global lkf_api, lkf_modules, module_name, items
+    print('item_obj_id',items_ids)
     if items_ids:
         items = items_ids
         modules = list(items.keys())
@@ -69,7 +83,7 @@ def download_modules(modules, options, items_ids={}):
     lkf_api = get_lkf_api()
     for module_name in modules:
         if 'forms' in options or 'form' in options:
-            get_forms(force_items['forms'])
+            get_forms(force_items['forms'], download_related=download_related)
         if 'catalogs' in options or 'catalog' in options:
             print('------------------')
             get_catalogs(force_items['catalogs'])
@@ -124,6 +138,10 @@ def get_catalogs(download_catalogs={}):
         print('catalog_name...',catalog_name)
         catalog_name = get_item_name('catalogs', catalog_id)
         catalog_json = lkf_api.get_catalog_id_fields(catalog_id, jwt_settings_key='JWT_KEY')
+        if not catalog_json.get('catalog'):
+            print(f'Catalog : {catalog_name} NOT found')
+            print('Skipping its download')
+            continue
         catalog_json = catalog_json.get('catalog')
         if catalog_json.get('fields'):
             catalog_json.pop('fields')
@@ -131,12 +149,11 @@ def get_catalogs(download_catalogs={}):
         # print('res=',simplejson.dumps(res, indent=4))  
         catalog_data_xml = json_to_xml(res)
         # print('catalog_data_xml',catalog_data_xml)  
-        print('Catalog Name: ',catalog_name)  
         save_catalog_xml(catalog_data_xml, catalog_name)
     installed_items['catalogs'].update(download_catalogs)
     get_new_items('catalogs')
 
-def get_forms(download_forms={}):
+def get_forms(download_forms={}, download_related=False):
     global items
     if not download_forms:
         download_forms = deepcopy(items['forms'])
@@ -170,9 +187,10 @@ def get_forms(download_forms={}):
                 save_workflow_xml(workflow_xml, form_name)
         # print('workflow_json=workflow_json',workflow_json)
     installed_items['forms'].update(download_forms)
-    get_new_items('forms')
-    get_new_items('catalogs')
-    get_new_items('scripts')
+    if download_related:
+        get_new_items('forms')
+        get_new_items('catalogs')
+        get_new_items('scripts')
 
 def get_new_items(item_type):
     global items, installed_items

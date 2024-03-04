@@ -7,8 +7,6 @@ from copy import deepcopy
 from linkaform_api import base
 # from lkf_addons.addons.employee.employee_utils import Employee
 
-print('Cargando Stock..')
-
 
 class Stock(base.LKF_Base):
 
@@ -176,7 +174,7 @@ class Stock(base.LKF_Base):
                         })
         move_qty = scrap_qty + cuarentin_qty
         if move_qty > actuals:
-            self.sync_catalog(folio_inventory)
+            #self.sync_catalog(folio_inventory)
             msg = f"You are trying to move {move_qty} units, and on the stock there is only {actuals}, please check you numbers"
             msg_error_app = {
                     f"{self.f['inv_scrap_qty']}": {
@@ -187,7 +185,10 @@ class Stock(base.LKF_Base):
                     }
                 }
             raise Exception( simplejson.dumps( msg_error_app ) )  
-        return self.update_calc_fields(product_code, warehouse, product_lot, folio=folio_inventory)
+        res = self.update_stock(answers={}, form_id=self.FORM_INVENTORY_ID, folios=stock_record['folio'] )
+        return res.get(stock_record['folio'],{}) 
+        # return self.update_calc_fields(product_code, warehouse, product_lot, folio=folio_inventory)
+        #return self.update_calc_fields(product_code, warehouse, product_lot, folio=folio_inventory)
 
     def calc_actuals(self, stock):
         stock_in  = stock.get('production', 0 ) + stock.get('move_in')
@@ -917,10 +918,10 @@ class Stock(base.LKF_Base):
 
     def get_product_stock(self, product_code, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
-        # print(f'**************Get Stock: {product_code}****************')
-        # print('lot_number', lot_number)
-        # print('warehouse', warehouse)
-        # print('location', location)
+        print(f'**************Get Stock: {product_code}****************')
+        print('lot_number', lot_number)
+        print('warehouse', warehouse)
+        print('location', location)
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         location = self.validate_value(location)
@@ -932,13 +933,15 @@ class Stock(base.LKF_Base):
                 cache_stock = self.cache_get({'_id':f"{product_code}_{lot_number}_{warehouse}","_one":True, },**kwargs)
         print('cache_stock=', cache_stock)
         kwargs.update(cache_stock.get('kwargs',{}))
-
+        kwargs.update(cache_stock.get('cache',{}).get('kwargs',{}))
+        print('kwargs', kwargs)
         if date_from:
             initial_stock = self.get_product_stock(product_code, warehouse=warehouse, location=location, \
                 lot_number=lot_number, date_to=date_from,  **kwargs)
             stock['actuals'] += initial_stock.get('actuals',0)
         stock['adjustments'] = self.stock_adjustments_moves( product_code=product_code, lot_number=lot_number, \
             warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
+        print('adjustments',  stock['adjustments'])
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -1228,6 +1231,7 @@ class Stock(base.LKF_Base):
                         'warehouse': warehouse
                         })
             self.update_calc_fields(product_code, warehouse, lot_number)
+            res = self.update_stock(answers={}, form_id=self.FORM_INVENTORY_ID, folios=stock_record['folio'] )
         return answers
 
     def inventory_adjustment(self, folio, record):
@@ -1447,7 +1451,6 @@ class Stock(base.LKF_Base):
         warehouse = plant_info.get(self.f['warehouse'])
         location = plant_info.get(self.f.get('warehouse_location'))
         record_inventory_flow = self.get_inventory_record_by_folio(folio_inventory, form_id=self.FORM_INVENTORY_ID )
-        print('folio_inventory', folio_inventory)
         print('folio_inventory form id', self.FORM_INVENTORY_ID )
         inv_record = record_inventory_flow.get('answers')
         #gets the invetory as it was on that date...
@@ -1527,7 +1530,15 @@ class Stock(base.LKF_Base):
 
 
         dest_warehouse_inventory = self.get_invtory_record_by_product(self.FORM_INVENTORY_ID, product_lot, dest_warehouse, product_code)
-        dest_folio = None
+        dest_folio = []
+        dest_folio_update = []
+        cache_from_location ={
+            '_id': f'{product_code}_{product_lot}_{warehouse}',
+            'move_out':flats_to_move,
+            'lot_number':product_lot,
+            'product_code':product_code,
+            'warehouse': warehouse,
+        }
         self.cache_set({
             '_id': f'{product_code}_{product_lot}_{dest_warehouse}',
             'move_in':flats_to_move,
@@ -1575,9 +1586,14 @@ class Stock(base.LKF_Base):
             # response, update_rec = update_origin_log(record_inventory_flow, inv_record, flats_to_move, acctual_containers)
             print('TODO=', dest_warehouse_inventory)
             dest_folio = dest_warehouse_inventory.get('folio')
-            self.update_calc_fields(product_code,  dest_warehouse, product_lot, folio=dest_folio)
+            dest_folio_update = dest_warehouse_inventory.get('folio')
+            #self.update_calc_fields(product_code,  dest_warehouse, product_lot, folio=dest_folio)
             # dest_warehouse_inventory['answers'][self.f['product_lot_actuals']] += flats_to_move
             # response = lkf_api.patch_record(dest_warehouse_inventory, jwt_settings_key='USER_JWT_KEY')
+        self.cache_set(cache_from_location)
+        self.update_stock(folios=folio_inventory)
+        if dest_folio_update:
+            self.update_stock(folios=dest_folio_update)
         return dest_folio
 
     def plant_recipe_query(self, all_codes, start_size, reicpe_stage, recipe_type='Main'):
@@ -1666,10 +1682,13 @@ class Stock(base.LKF_Base):
             info_record_catalog.update(dict_answers_to_catalog)
 
 
+            print('catalogo_metadata=', info_record_catalog)
+            print('ready year week=', info_record_catalog.get('620a9ee0a449b98114f61d75'))
             catalogo_metadata.update({'record_id': info_record_catalog.pop('_id'), '_rev': info_record_catalog.pop('_rev'), 'answers': info_record_catalog})
             response_update_catalog = self.lkf_api.bulk_patch_catalog([catalogo_metadata,], self.CATALOG_INVENTORY_ID, jwt_settings_key='APIKEY_JWT_KEY')
         else:
             catalogo_metadata.update({'answers': dict_answers_to_catalog})
+            print('catalogo_metadata=', catalogo_metadata)
             res_crea_cat = self.lkf_api.post_catalog_answers(catalogo_metadata, jwt_settings_key='APIKEY_JWT_KEY')
         return True
 
@@ -2179,6 +2198,15 @@ class Stock(base.LKF_Base):
         grading_totals = self.get_grading_sublots(gradings)
         totals = sum(x for x in grading_totals.values())
         acctual_containers = product_stock['actuals']
+
+    def update_stock(self, answers={}, form_id=None, folios="" ):
+        if not answers:
+            answers={"udpate":True}
+        if not form_id:
+            form_id = self.FORM_INVENTORY_ID
+        if type(folios) in [str, ]:
+            folios = [folios,]
+        return self.lkf_api.patch_multi_record( answers=answers, form_id=form_id, folios=folios, threading=True )
 
     def validate_value(self, value):
         if value == 'false' or value == 'null':

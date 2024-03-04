@@ -54,6 +54,8 @@ ask_catalog = True
 ask_form    = True
 ask_reports = True
 
+download_related = False
+
 def search_modules():
     cmd = ['ls', '-d', '/srv/scripts/addons/modules/*/']
     cmd = ['find', '/srv/scripts/addons/modules' , '-maxdepth', '1', '-type', 'd']
@@ -192,6 +194,9 @@ def get_modules_2_install(commands):
 
 def get_items_2_load(commands):
     global ask_4_items
+    for idx, c in enumerate(commands):
+        if c == '-r':
+            download_related = True
     for idx, c in enumerate(commands):
         if c == '--item' or c == '-i':
             ask_4_items = False
@@ -346,6 +351,6 @@ if __name__ == '__main__':
                     if load_reports:
                         script_id = set_value(input("Reports id to download:"))
                         download_items.update({'reports':{script_id:None}})
-                download_modules(load_modules, options, items_ids=download_items)
+                download_modules(load_modules, options, items_ids=download_items, download_related=download_related)
 
 

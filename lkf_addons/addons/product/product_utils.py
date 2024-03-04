@@ -15,9 +15,7 @@ class Product(base.LKF_Base):
         self.PRODUCT_ID = self.PRODUCT.get('id')
         self.PRODUCT_OBJ_ID = self.PRODUCT.get('obj_id')
 
-        self.PRODUCT_RECIPE = self.lkm.catalog_id('product_recipe')
-        self.PRODUCT_RECIPE_ID = self.PRODUCT_RECIPE.get('id')
-        self.PRODUCT_RECIPE_OBJ_ID = self.PRODUCT_RECIPE.get('obj_id')
+
 
         self.WAREHOUSE = self.lkm.catalog_id('warehouse')
         self.WAREHOUSE_ID = self.WAREHOUSE.get('id')
@@ -36,7 +34,23 @@ class Product(base.LKF_Base):
         self.WAREHOUSE_LOCATION_DEST_ID = self.WAREHOUSE_LOCATION_DEST.get('id')
         self.WAREHOUSE_LOCATION_DEST_OBJ_ID = self.WAREHOUSE_LOCATION_DEST.get('obj_id')
 
+        try:
+            self.SKU = self.lkm.catalog_id('sku_catalog')
+            self.SKU_ID = self.SKU.get('id')
+            self.SKU_OBJ_ID = self.SKU.get('obj_id')
+        except:
+            self.SKU = self.lkm.catalog_id('product_recipe')
+            self.SKU_ID = self.SKU.get('id')
+            self.SKU_OBJ_ID = self.SKU.get('obj_id')
 
+        ###### Depricated ######
+        try:
+            self.PRODUCT_RECIPE = self.lkm.catalog_id('product_recipe')
+            self.PRODUCT_RECIPE_ID = self.PRODUCT_RECIPE.get('id')
+            self.PRODUCT_RECIPE_OBJ_ID = self.PRODUCT_RECIPE.get('obj_id')
+        except:
+            self.PRODUCT_RECIPE_ID = self.SKU.get('id')
+            self.PRODUCT_RECIPE_OBJ_ID = self.SKU.get('obj_id')
 
         self.f.update( {
             'product_code':'61ef32bcdf0ec2ba73dec33d',
@@ -44,6 +58,16 @@ class Product(base.LKF_Base):
             'product_category':'61ef32bcdf0ec2ba73dec342',
             'product_type':'61ef32bcdf0ec2ba73dec343',
             'product_recipe':'61ef32bcdf0ec2ba73dec33c',
+            'product_sku':'65dec64a3199f9a040829243',
+            'product_department':'621fc992a7ebfd603a8c5e2e',
+            'sku':'65dec64a3199f9a040829243',
+            'sku_color':'621fca56ee94313e8d8c5e2e',
+            'sku_image':'65dec64a3199f9a040829244',
+            'sku_note':'6205f73281bb36a6f157335c',
+            'sku_package':'6209705080c17c97320e3382',
+            'sku_percontainer':'6205f73281bb36a6f157335b',
+            'sku_size':'6205f73281bb36a6f1573358',
+            'sku_source':'6205f73281bb36a6f157335a',
             'warehouse':'6442e4831198daf81456f274',
             'warehouse_dest':'65bdc71b3e183f49761a33b9',
             'warehouse_location':'65ac6fbc070b93e656bd7fbe',
