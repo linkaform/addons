@@ -22,8 +22,6 @@ class FormResource(items.Items):
                 res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
                 if res.get('status_code') == 404:
                     res = self.lkf_api.upload_workflows(workflow_model, 'POST')
-
-            print('res workflow', res)
             #res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
 
     def setup_rules(self, conf_files, action, path=None):
