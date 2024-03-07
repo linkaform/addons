@@ -16,11 +16,14 @@ class FormResource(items.Items):
             print('Installing Workflows: ', file_name)
             workflow_model = self.load_module_template_file(path, file_name)
             # res = self.lkf.install_workflows(module, workflow_model, 'update')
-            print('action action: ', action)
             if action == 'create':
                 res = self.lkf_api.upload_workflows(workflow_model, 'POST')
             elif action =='update':
                 res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
+                if res.get('status_code') == 404:
+                    res = self.lkf_api.upload_workflows(workflow_model, 'POST')
+
+            print('res workflow', res)
             #res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
 
     def setup_rules(self, conf_files, action, path=None):
@@ -35,6 +38,8 @@ class FormResource(items.Items):
                 res = self.lkf_api.upload_rules(rules_model, 'POST')
             elif action =='update':
                 res = self.lkf_api.upload_rules(rules_model, 'PATCH')
+                if res.get('status_code') == 404:
+                    res = self.lkf_api.upload_rules(rules_model, 'POST')
             #res = self.lkf_api.upload_rules(rules_model, 'PATCH')
 
     def install_forms(self, instalable_forms):
