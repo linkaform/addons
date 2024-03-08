@@ -83,6 +83,7 @@ def do_load_modules(load_modules):
         if install.get('all') or install.get(module):
             #####################################################################
             ### Scripts
+            print('load_reports', load_reports)
             if load_script:
                 scripts = importlib.import_module('{}.items.scripts'.format(module))
                 script_resource = scripts.ScriptResource(
@@ -138,8 +139,14 @@ def do_load_modules(load_modules):
 
             ### Reports
             if load_reports:
+                print('mdule', module)
+                print('module', module)
+                print('settings', settings)
+                print('load_demo', load_demo)
+                print('load_data', load_data)
                 try:
                     reports = importlib.import_module('{}.items.reports'.format(module))
+                    print('reports', reports.__path__[0])
                     report_resource = reports.ReportResource(
                         path=reports.__path__[0], 
                         module=module, 
@@ -148,11 +155,12 @@ def do_load_modules(load_modules):
                         load_data=load_data
                         )
                     install_order = reports.install_order
-                except:
+                except Exception as e:
+                    print('excetp???', e)
                     install_order = []
                 report_dict = report_resource.instalable_reports(install_order)
                 ###reports
-                report_resource.install_scripts(report_dict)
+                report_resource.install_reports(report_dict)
 
 def uninstall_modules(uninstall_dict):
     # from base import items 
@@ -279,7 +287,7 @@ if __name__ == '__main__':
             load_data = True
             ask_data = False
         if 'report' in commands:
-            load_reports = False
+            load_reports = True
             ask_reports = False
 
 

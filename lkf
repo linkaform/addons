@@ -23,7 +23,8 @@ _usage(){
       echo "      $APP <start|stop> addons     Starts the addons development environment"
       echo "      $APP <start|stop> test       Starts the testing environment"
       echo "      $APP build <base|dev|local|prod>      Starts the testing environment"
-      echo "      $APP restart <preprod|prod> <account_id>      Starts the account container on given environment"
+      echo "      $APP restart <preprod|prod> <account_id>  [depricated] use update"
+      echo "      $APP update <preprod|prod> <account_id>  Update a given account addons containers image on given environment"
       echo "      $APP test                    Runs all tests"
       echo
       echo
@@ -227,7 +228,11 @@ _build(){
 
 }
 
+
 _restart(){
+  _update
+}
+_update(){
   case $Enviorment in
     prod)
       echo 'Running update...'
@@ -288,6 +293,13 @@ case "$Acction" in
     _build $Service
   ;;
   restart)
+    Account_id=$Branch
+    Enviorment=$Service
+    echo "Restarting addons container of the account: $Account_id"
+    echo "Environment: $Enviorment "
+    _restart $Service
+  ;;
+  update)
     Account_id=$Branch
     Enviorment=$Service
     echo "Restarting addons container of the account: $Account_id"
