@@ -16,7 +16,7 @@ _usage(){
       echo "      -a           load local linkaform_api as volume"
       echo "      -r           relaod, alway need to be at the end of the options"
       echo "      -c           works on build command, it runs the build command with no-cache"
-      echo "      -p           works on build command, upload and publish image after build"
+      echo "      -p           works on build command, upload, publish and updates image after build"
       echo "      -h           help!!!!"
       echo
       echo "    Acction & Enviorment"
@@ -37,6 +37,7 @@ IMAGE_NAME=0
 SHIFT=-1
 NOCACHE=0
 UPLOAD=0
+UPDATE=0
 while getopts ':iar:ir:c:p:h' opt; do
   case "$opt" in
     a)
@@ -179,6 +180,7 @@ _start_addons(){
 
 _build(){
   echo "Environment: " $1
+
   cd docker
   case $1 in
     base)
@@ -224,8 +226,11 @@ _build(){
       fi  
      ;;
   esac
-  cd ..
-
+  Enviorment=$1
+  if [[ $# -gt 2 ]]; then
+    echo "Account_id: " $2
+    _update
+  fi
 }
 
 
@@ -277,6 +282,9 @@ if [[ $# -gt 2 ]]; then
   Branch=$3
 fi
 
+
+echo "Action", $Acction
+
 case "$Acction" in
 
 
@@ -289,19 +297,20 @@ case "$Acction" in
     _start_addons $Service $API_VOL
   ;;
   build)
+    Account_id=$Branch
     echo "Building addons image" 
-    _build $Service
+    _build $Service $Account_id
   ;;
   restart)
-    Account_id=$Branch
     Enviorment=$Service
+    Account_id=$Branch
     echo "Restarting addons container of the account: $Account_id"
     echo "Environment: $Enviorment "
     _restart $Service
   ;;
   update)
-    Account_id=$Branch
     Enviorment=$Service
+    Account_id=$Branch
     echo "Restarting addons container of the account: $Account_id"
     echo "Environment: $Enviorment "
     _restart $Service
