@@ -54,6 +54,7 @@ ask_catalog = True
 ask_form    = True
 ask_reports = True
 
+kwargs = {}
 download_related = False
 
 def search_modules():
@@ -74,7 +75,7 @@ def search_modules():
             res.append(x)
     return res
 
-def do_load_modules(load_modules):
+def do_load_modules(load_modules, **kwargs):
     response = []
     for module in load_modules:
         # global forms
@@ -83,7 +84,6 @@ def do_load_modules(load_modules):
         if install.get('all') or install.get(module):
             #####################################################################
             ### Scripts
-            print('load_reports', load_reports)
             if load_script:
                 scripts = importlib.import_module('{}.items.scripts'.format(module))
                 script_resource = scripts.ScriptResource(
@@ -99,7 +99,7 @@ def do_load_modules(load_modules):
                     install_order = []
                 script_dict = script_resource.instalable_scripts(install_order)
                 ###scripts
-                script_resource.install_scripts(script_dict)
+                script_resource.install_scripts(script_dict, **kwargs)
 
             ### Catalogs
             if load_catalog:
@@ -117,7 +117,7 @@ def do_load_modules(load_modules):
                     install_order = []
                 catalog_dict = catalog_resource.instalable_catalogs(install_order)
                 ### catalog
-                catalog_resource.install_catalogs(catalog_dict)
+                catalog_resource.install_catalogs(catalog_dict, **kwargs)
             
             ### Forms
             if load_form:
@@ -135,7 +135,7 @@ def do_load_modules(load_modules):
                     install_order = []
                 form_dict = form_resource.instalable_forms(install_order)
                 ###forms
-                response += form_resource.install_forms(form_dict)
+                response += form_resource.install_forms(form_dict, **kwargs)
 
             ### Reports
             if load_reports:
@@ -144,9 +144,10 @@ def do_load_modules(load_modules):
                 print('settings', settings)
                 print('load_demo', load_demo)
                 print('load_data', load_data)
-                try:
+                #try:
+                if True:
                     reports = importlib.import_module('{}.items.reports'.format(module))
-                    print('reports', reports.__path__[0])
+                    print('rssssssssssssssseports', reports.__path__)
                     report_resource = reports.ReportResource(
                         path=reports.__path__[0], 
                         module=module, 
@@ -155,12 +156,12 @@ def do_load_modules(load_modules):
                         load_data=load_data
                         )
                     install_order = reports.install_order
-                except Exception as e:
-                    print('excetp???', e)
-                    install_order = []
+                # except Exception as e:
+                #     print('excetp???', e)
+                #     install_order = []
                 report_dict = report_resource.instalable_reports(install_order)
                 ###reports
-                report_resource.install_reports(report_dict)
+                report_resource.install_reports(report_dict, **kwargs)
 
 def uninstall_modules(uninstall_dict):
     # from base import items 
@@ -246,7 +247,6 @@ install = {}
 
 if __name__ == '__main__':
 
-
     print('commands', commands)
     if not commands or '-h' in commands or '--help' in commands:
         print_help()
@@ -290,11 +290,19 @@ if __name__ == '__main__':
             load_reports = True
             ask_reports = False
 
+        if '-f' in commands:
+            kwargs.update({'force':True})
 
         print('Running on:', '== {} =='.format(settings.ENV) * 10)
         environment = get_items_2_load(commands)
-        if not environment:
+        if not environment or environment == 'prod' or settings.ENV == 'prod':
             environment =  set_value(input(f"We are running on {settings.ENV} Enviroment, are you sure [y/n] (default n):"))
+        if settings.ENV  == 'prod':
+            sure = set_value(input(f"REALLY SURE to set enviornment to  {settings.ENV} [y/n] (default n):"))
+            if sure:
+                print('ok doing installation')
+            else:
+                raise('Stoping installation')
         if not environment:
             print('Ending session no enviornment confirmation found')
         else:
@@ -314,8 +322,13 @@ if __name__ == '__main__':
                         load_script = set_value(input("Load Scripts [y/n] (default n):"))
                     if ask_reports:    
                         load_reports = set_value(input("Load Reports [y/n] (default n):"))
+                else:
+                    if load_catalog:
+                        load_demo = set_value(input("Load DEMO data [y/n] (default n):"))
+                        load_data = set_value(input("Load DATA [y/n] (default n):"))
+
                 install = {'all':True}
-                do_load_modules(load_modules)
+                do_load_modules(load_modules, **kwargs)
             elif commands[0] == 'download':
                 options = []
                 if preload_item:

@@ -8,14 +8,14 @@ from lkf_addons import items
 
 class ScriptResource(items.Items):
 
-    def install_scripts(self, instalable_scripts):
+    def install_scripts(self, instalable_scripts, **kwargs):
         install_order = []
         inst = list(instalable_scripts.keys())
         inst.sort()
-        print('########## Reading Scripts ############' )
+        print('################ Reading Scripts ################' )
         for x in inst:
-            print(f"# {x} ".ljust(38) +'#')
-        print('#'*39 )
+            print(f"# {x} ".ljust(48) +'#')
+        print('#'*49 )
         if instalable_scripts.get('install_order'):
             install_order = instalable_scripts.pop('install_order')
         else:
@@ -33,7 +33,7 @@ class ScriptResource(items.Items):
                 else:
                     this_path = self.path
                 script_location = '{}/{}.{}'.format(this_path, script_name, detail.get('file_ext'))
-                res = self.lkf.install_script(self.module, script_location, image=image, script_properties=properites, local_path=detail.get('path'))
+                res = self.lkf.install_script(self.module, script_location, image=image, script_properties=properites, local_path=detail.get('path'), **kwargs)
 
     def get_script_modules(self, all_items, parent_path=None):
         data_file = []

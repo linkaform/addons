@@ -8,7 +8,7 @@ from lkf_addons import items
 
 class FormResource(items.Items):
 
-    def setup_workflows(self, conf_files, action, path=None):
+    def setup_workflows(self, conf_files, action, path=None, **kwargs):
         if not path:
             path = self.path
         for file_name in conf_files:

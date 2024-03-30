@@ -15,9 +15,9 @@ class CatalogResource(items.Items):
             if module_info.get(f'load_{file_type}',{}) and  module_info.get(f'load_{file_type}',{}).get(file_name):
                 continue
             try:
-                file = open('{}/{}'.format(self.path, full_file_name))
+                file = open('{}/{}'.format(self.this_path, full_file_name))
             except FileNotFoundError:
-                print(f'File not found {full_file_name}, continue')
+                print(f'File not found {self.this_path + full_file_name}, continue')
                 return False
             file_data = simplejson.loads(file.read())
             catalog_map = file_data['mapping']
@@ -30,7 +30,7 @@ class CatalogResource(items.Items):
                 }
                 self.lkf.update(update_query, item_info)
 
-    def install_catalogs(self, instalable_catalogs):
+    def install_catalogs(self, instalable_catalogs, **kwargs):
         install_order = []
         if instalable_catalogs.get('install_order'):
             install_order = instalable_catalogs.pop('install_order')
@@ -45,12 +45,13 @@ class CatalogResource(items.Items):
             else:
                 this_path = self.path
             catalog_model = self.load_module_template_file(this_path, catalog_name)
-            
+            self.this_path = this_path
             res = self.lkf.install_catalog(self.module, catalog_name, catalog_model, local_path=detail.get('path'))
             for file_type, files in detail.items():
                 if file_type == 'data' and self.load_data:
                     self.load_info(files, file_type, res )
                 if file_type == 'demo' and self.load_demo:
+                    print('demo file', catalog_name)
                     self.load_info(files, file_type, res )
                     
                         # catalog_json = self.load_items_file(file_type, file, 'json')

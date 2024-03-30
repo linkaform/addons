@@ -83,6 +83,7 @@ def download_modules(modules, options, items_ids={}, download_related=False):
     lkf_api = get_lkf_api()
     for module_name in modules:
         if 'forms' in options or 'form' in options:
+            print('download_related', download_related)
             get_forms(force_items['forms'], download_related=download_related)
         if 'catalogs' in options or 'catalog' in options:
             print('------------------')
@@ -229,9 +230,13 @@ def get_item_name(item_type, item_id=None, element=None, attribute='name', item_
     if not item_name:
         item_type_dict = {'catalogs':'catalog','scripts':'script', 'forms':'form', 'reports':'report'}
         item_obj = lkf_api.get_item(item_id, item_type_dict[item_type])
+        print('item_id', item_id)
+        print('item_type_dict[item_type]', item_type_dict[item_type])
+        print('item0011', item_obj)
         item_obj = item_obj.get('data',[])
         item_json={}
         if item_obj and len(item_obj) > 0:
+            print('item00', item_obj)
             item_json = item_obj[0]
         item_name = item_json.get('name', 'no_name')
     item_name = strip_chaaracters(item_name)
@@ -270,6 +275,7 @@ def save_form_xml(xml_data, form_name):
                 for cprop in list(catalog_element):
                     is_catalog = True
                     if cprop.tag == 'catalog_id':
+                        
                         catalog_name = get_item_name('catalogs', cprop.text, field, attribute='label')
                         cprop.text = "{{ catalog." + catalog_name + ".id }}"
                         field_type = field.find('field_type')
