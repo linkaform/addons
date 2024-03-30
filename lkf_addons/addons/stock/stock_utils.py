@@ -8,10 +8,10 @@ from copy import deepcopy
 from linkaform_api import base
 
 from lkf_addons.addons.employee.employee_utils import Employee
-from lkf_addons.addons.product.product_utils import Product
+from lkf_addons.addons.product.product_utils import Product, Warehouse
 
 
-class Stock(base.LKF_Base):
+class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
@@ -19,13 +19,19 @@ class Stock(base.LKF_Base):
         self.name =  __class__.__name__
         self.settings = settings
 
-        self.CATALOG_INVENTORY = self.lkm.catalog_id('stock_inventory')
-        self.CATALOG_INVENTORY_ID = self.CATALOG_INVENTORY.get('id')
-        self.CATALOG_INVENTORY_OBJ_ID = self.CATALOG_INVENTORY.get('obj_id')
+
+        self.STOCK_INVENTORY = self.lkm.catalog_id('stock_inventory')
+        self.STOCK_INVENTORY_ID = self.STOCK_INVENTORY.get('id')
+        self.STOCK_INVENTORY_OBJ_ID = self.STOCK_INVENTORY.get('obj_id')
 
         # self.STOCK_INVENTORY = self.lkm.catalog_id('stock_inventory')
         # self.STOCK_INVENTORY_ID = self.STOCK_INVENTORY.get('id')
         # self.STOCK_INVENTORY_OBJ_ID = self.STOCK_INVENTORY.get('obj_id')
+        ###### depricated ######
+        self.CATALOG_INVENTORY = self.lkm.catalog_id('stock_inventory')
+        self.CATALOG_INVENTORY_ID = self.CATALOG_INVENTORY.get('id')
+        self.CATALOG_INVENTORY_OBJ_ID = self.CATALOG_INVENTORY.get('obj_id')
+        ########################
 
         self.FORM_INVENTORY_ID = self.lkm.form_id('stock_inventory','id')
         self.ADJUIST_FORM_ID = self.lkm.form_id('stock_inventory_adjustment','id')
@@ -34,16 +40,16 @@ class Stock(base.LKF_Base):
         self.MOVE_NEW_PRODUCTION_ID = self.lkm.form_id('stock_move_new_production','id')
         self.PRODUCTION_FORM_ID = self.lkm.form_id('stock_production','id')
         self.SCRAP_FORM_ID = self.lkm.form_id('stock_scrapping','id')
-        self.STOCK_MANY_LOCATION_2_ONE = self.lkm.form_id('stock_workorders_seleccion_de_producto','id')
-        self.STOCK_ONE_MANY_ONE = self.lkm.form_id('stock_move_one_many_one_location','id')
+        self.STOCK_MANY_LOCATION_2_ONE = self.lkm.form_id('stock_move_many_one_one','id')
+        self.STOCK_MANY_ONE_ONE = self.lkm.form_id('stock_move_many_one_one','id')
+        self.STOCK_ONE_MANY_ONE = self.lkm.form_id('stock_move_one_many_one','id')
 
+        self.STOCK_ONE_MANY_ONE_FORMS = [self.STOCK_ONE_MANY_ONE,self.STOCK_MANY_ONE_ONE]
 
         self.FORM_CATALOG_DIR = {
             self.FORM_INVENTORY_ID: self.CATALOG_INVENTORY_ID, #Inventory Flow (greenHouse)
             }
-        # self.CATALOG_SOL_VIAJE_ID = self.CATALOG_SOL_VIAJE.get('id')
-        # self.CATALOG_SOL_VIAJE_OBJ_ID = self.CATALOG_SOL_VIAJE.get('obj_id')
-        # self.FORM_ID_SOLICITUD = self.lkm.form_id('solicitud_de_viticos','id')
+
 
         self.SOL_METADATA = {}
         self.SOL_CATALOG = {}
@@ -80,6 +86,7 @@ class Stock(base.LKF_Base):
             'inv_scrap_qty':'644bf9a04b1761305b080099',
             'inv_scrap_status':'644c1cb6dc502afa06c4423e',
             'inventory_status':'620ad6247a217dbcb888d175',
+            'lot_number':'620a9ee0a449b98114f61d77',
             'media_lot':'62e948f79928ba006783dc5c',
             'media_name':'61ef43c226fd42cc223c98f7',
             'move_dest_folio':'ffff00000000000000000001',
@@ -172,6 +179,7 @@ class Stock(base.LKF_Base):
             'set_total_hours':'61f1fcf8c66d2990c8fc7cc7',
             'set_total_produced':'61f1fcf8c66d2990c8fc7cc3',
             'status':'620ad6247a217dbcb888d175',
+            'stock_status':'6442e4537775ce64ef72dd6a',
             'time_in':'61f1fcf8c66d2990c8fc7cc5',
             'time_out':'61f1fcf8c66d2990c8fc7cc6',
             'total_produced':'64ed5839a405d8f6378edf5f',
@@ -953,7 +961,7 @@ class Stock(base.LKF_Base):
 
     def get_product_stock(self, product_code, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
-        print(f'**************Get Stock: {product_code}****************')
+        print(f'**33************Get Stock: {product_code}****************')
         print('product_code', product_code)
         print('sku', sku)
         print('lot_number', lot_number)
@@ -962,7 +970,7 @@ class Stock(base.LKF_Base):
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         location = self.validate_value(location)
-        stock = {'actuals':0}
+        stock = {'actuals':0,'production':0, 'stock_in':0, 'stock_out':0, 'scrapped':0, 'cuarentin':0}
         if (product_code and warehouse and lot_number) or True:
             if location:
                 cache_stock = self.cache_get({'_id':f"{product_code}_{sku}_{lot_number}_{warehouse}_{location}","_one":True, },**kwargs)
@@ -977,23 +985,27 @@ class Stock(base.LKF_Base):
         stock['adjustments'] = self.stock_adjustments_moves( product_code=product_code, sku=sku, lot_number=lot_number, \
             warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
         print('stock adjustments', stock['adjustments'])
+        stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
+        print('stock move_in', stock['move_in'])
+        stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
+        print('stock move_out', stock['move_out'])
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
         # else:
         #     stock['adjustments'] = 0
 
-        stock['production'] = self.stock_production(date_from =date_from, date_to=date_to ,\
-             product_code=product_code, sku=sku, lot_number=lot_number, warehouse=warehouse, location=location )
-        print('stock production....',stock['production'])
-        stock['move_in'] = self.stock_moves('in', product_code=product_code, lot_number=lot_number, sku=sku, \
-            warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
-        #GET PRODUCT EXITS
-        print('stock IN....',stock['move_in'])
+        # stock['production'] = self.stock_production(date_from =date_from, date_to=date_to ,\
+        #      product_code=product_code, sku=sku, lot_number=lot_number, warehouse=warehouse, location=location )
+        # print('stock production....',stock['production'])
+        # stock['move_in'] = self.stock_moves('in', product_code=product_code, lot_number=lot_number, sku=sku, \
+        #     warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
+        # #GET PRODUCT EXITS
+        # print('stock IN....',stock['move_in'])
 
-        stock['move_out'] = self.stock_moves('out', product_code=product_code, sku=sku, lot_number=lot_number, \
-            warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
-        print('stock OUT....',stock['move_out'])
+        # stock['move_out'] = self.stock_moves('out', product_code=product_code, sku=sku, lot_number=lot_number, \
+        #     warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
+        # print('stock OUT....',stock['move_out'])
         scrapped, cuarentin = self.stock_scrap(product_code=product_code, sku=sku, lot_number=lot_number, \
             warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, status='done', **kwargs )  
         print('stock scrapped',scrapped)  
@@ -1757,6 +1769,100 @@ class Stock(base.LKF_Base):
                 sets.append(tset)
         return sets
 
+    def stock_one_many_one(self, move_type, product_code=None, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None, status='done', **kwargs):
+        unwind =None
+        if move_type not in ('in','out'):
+            raise('Move type only accepts values "in" or "out" ')
+        match_query = {
+            "deleted_at":{"$exists":False},
+            }
+        query_forms = self.STOCK_ONE_MANY_ONE_FORMS
+        if len(query_forms) > 1:
+            form_query = {"form_id":{"$in":query_forms}}
+        else:
+            form_query = {"form_id":self.STOCK_ONE_MANY_ONE_FORMS[0]}
+        match_query.update(form_query)
+        if date_from or date_to:
+            match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
+
+        unwind = {'$unwind': '$answers.{}'.format(self.f['move_group'])}
+        unwind_query = {}
+        # print('move type.................', move_type)
+        # print('warehouse', warehouse)
+        # print('location', location)
+        # print('product_code', product_code)
+        # print('lot_number', lot_number)
+        inc_folio = kwargs.get("inc_folio")
+        nin_folio = kwargs.get("nin_folio")
+        if inc_folio:
+            match_query.update({"folio":inc_folio})
+        if nin_folio:
+            match_query.update({"folio": {"$ne":nin_folio }})
+
+        if move_type =='in':
+            if warehouse:
+                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_dest']}":warehouse})
+            if location:
+                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_location_dest']}":location})        
+        if move_type =='out':
+            if warehouse:
+                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})
+            if location:
+                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})
+       
+        if product_code:
+            unwind_query.update({f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})    
+        if sku:
+            unwind_query.update({f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['sku']}":sku})    
+        if lot_number:
+            unwind_query.update({f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['lot_number']}":lot_number})    
+        if status:
+            match_query.update({f"answers.{self.f['stock_status']}":status})
+
+        if date_from or date_to:
+            match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
+
+       
+        project = {'$project':
+                {'_id': 1,
+                    'product_code': f"$answers.{self.f['move_group']}.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}",
+                    'total': f"$answers.{self.f['move_group']}.{self.f['move_group_qty']}",
+                    }
+            }
+        
+
+        query= [{'$match': match_query }]
+        query.append(unwind)
+        query.append({'$match': unwind_query })
+        query.append(project)
+        query += [
+            {'$group':
+                {'_id':
+                    { 'product_code': '$product_code',
+                      },
+                  'total': {'$sum': '$total'},
+                  }
+            },
+            {'$project':
+                {'_id': 0,
+                'product_code': '$_id.product_code',
+                'total': '$total',
+                }
+            },
+            {'$sort': {'product_code': 1}}
+            ]
+        res = self.cr.aggregate(query)
+        result = {}
+        # if move_type == 'in':
+        #     print('query=', simplejson.dumps(query, indent=3))
+        for r in res:
+            pcode = r.get('product_code')
+            result[pcode] = result.get(pcode, 0)        
+            result[pcode] += r.get('total',0)
+        if product_code:
+            result = result.get(product_code,0)
+        return result 
+
     def stock_adjustments(self, product_code=None, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None, **kwargs):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -1852,9 +1958,9 @@ class Stock(base.LKF_Base):
                 {"folio":inc_folio}
                 ]}
         if product_code:
-            match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.SKU_OBJ_ID }.{self.f['product_code']}":product_code})
+            match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
         if sku:
-            match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.SKU_OBJ_ID }.{self.f['sku']}":sku})
+            match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.SKU_OBJ_ID}.{self.f['sku']}":sku})
         if lot_number:
             match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.f['product_lot']}":lot_number})
         query= [{'$match': match_query },
@@ -1888,7 +1994,6 @@ class Stock(base.LKF_Base):
             },
             {'$sort': {'product_code': 1}}
             ]
-        # print('query=', simplejson.dumps(query, indent=3))
         res = self.cr.aggregate(query)
         result = 0
         for r in res:
