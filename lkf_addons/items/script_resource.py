@@ -8,14 +8,14 @@ from lkf_addons import items
 
 class ScriptResource(items.Items):
 
-    def install_scripts(self, instalable_scripts):
+    def install_scripts(self, instalable_scripts, **kwargs):
         install_order = []
         inst = list(instalable_scripts.keys())
         inst.sort()
-        print('########## Reading Scripts ############' )
+        print('################ Reading Scripts ################' )
         for x in inst:
-            print(f"# {x} ".ljust(38) +'#')
-        print('#'*39 )
+            print(f"# {x} ".ljust(48) +'#')
+        print('#'*49 )
         if instalable_scripts.get('install_order'):
             install_order = instalable_scripts.pop('install_order')
         else:
@@ -24,24 +24,22 @@ class ScriptResource(items.Items):
             properites=None
             if instalable_scripts:
                 detail = instalable_scripts[script_name]
-                print('detail', detail)
                 if detail.get('properties') and detail['properties']:
                     properites = self.load_module_template_file(self.path,  detail['properties'])
                 image = detail.get('image')
-                this_path = '{}/{}'.format(self.path, detail['path'])
+                # this_path = '{}/{}'.format(self.path, detail['path'])
                 if detail.get('path'):
                     this_path = '{}/{}'.format(self.path, detail['path'])
                 else:
                     this_path = self.path
                 script_location = '{}/{}.{}'.format(this_path, script_name, detail.get('file_ext'))
-                res = self.lkf.install_script(self.module, script_location, image=image, script_properties=properites, local_path=detail.get('path'))
+                res = self.lkf.install_script(self.module, script_location, image=image, script_properties=properites, local_path=detail.get('path'), **kwargs)
 
     def get_script_modules(self, all_items, parent_path=None):
         data_file = []
         form_file = {}
         default_image='linkaform/addons:latest'
         for file in all_items:
-            print('file', file)
             if type(file) == dict:
                 path = list(file.keys())[0]
                 if parent_path:
@@ -73,7 +71,6 @@ class ScriptResource(items.Items):
 
     def instalable_scripts(self, install_order=None):
         items_files = self.get_all_items_json('scripts')
-        print('items_json', items_files)
         scripts_data = self.get_script_modules(items_files)
         if install_order:
             scripts_data['install_order'] = install_order

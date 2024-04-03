@@ -25,6 +25,7 @@ The addons repo has the basic configuration and basic LinkaForm modules, the res
 LinkaForm modules are configure as submodules, to download modules as submodule just run:
 
 ```
+cd addons
 git submodule update --init modules
 git fetch --recurse-submodules
 git pull --recurse-submodule

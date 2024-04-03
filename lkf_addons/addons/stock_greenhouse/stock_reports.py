@@ -6,7 +6,6 @@ from copy import deepcopy
 
 from .stock_utils import Stock
 
-print('Cargando Reports')
 
 from linkaform_api import base
 
@@ -22,18 +21,18 @@ class Reports(base.LKF_Report, Stock):
             "limit":10000,
             "skip":0
         }
+        print('este....')
         if 'products' in filters:
             res = self.lkf_api.search_catalog( self.CATALOG_PRODUCT_ID, mango_query)
-            self.json['productCode'] = [x.get(self.f['product_code']) for x in res]
+            self.json['productCode'] = [x.get(self.f['product_code']) for x in res if x.get(self.f['product_code'])]
         if 'inventory' in filters:
             if product_code:
                 mango_query['selector'] = {f"answers.{self.f['product_code']}":product_code}
             res = self.lkf_api.search_catalog( self.CATALOG_INVENTORY_ID, mango_query)
-            self.json['lotNumber'] = [x.get(self.f['product_lot']) for x in res]
-
+            self.json['lotNumber'] = [x.get(self.f['product_lot']) for x in res if x.get(self.f['product_lot'])]
         if 'warehouse' in filters:
             res = self.lkf_api.search_catalog( self.CATALOG_WAREHOUSE_ID, mango_query)
-            self.json['warehouse'] = [x.get(self.f['warehouse']) for x in res]
+            self.json['warehouse'] = [x.get(self.f['warehouse']) for x in res if x.get(self.f['warehouse'])]
         return True
 
     def get_inventory_moves(self):
@@ -74,6 +73,12 @@ class Reports(base.LKF_Report, Stock):
         print('warehouse_to', warehouse_to)
         print('date_from', date_from)
         print('date_since', date_since)
+        warehouse_from = self.validate_value(warehouse_from)
+        warehouse_to = self.validate_value(warehouse_to)
+        date_from = self.validate_value(date_from)
+        date_since = self.validate_value(date_since)
+        lot_number = self.validate_value(lot_number)
+        product_code = self.validate_value(product_code)
         moves = {}
         if warehouse_from and warehouse_to:
             moves = self.detail_stock_moves(warehouse=[warehouse_from, warehouse_to], move_type=['out','in'], product_code=product_code, \
@@ -153,28 +158,40 @@ class Reports(base.LKF_Report, Stock):
         if type(warehouse) == str and warehouse != '':
             warehouse = [warehouse,]
         move_type = None
-        print('product_code=', product_code)
         if not product_code:
-            raise ('prduct code is missing...')
+            self.LKFException('prduct code is missing...')
         stock = self.get_product_stock(product_code, lot_number=lot_number, date_from=date_from, date_to=date_to)
 
         if not warehouse or warehouse == '':
             warehouse = self.get_warehouse('Stock')
         result = []
+
+        product_code = self.validate_value(product_code)
+        lot_number = self.validate_value(lot_number)
+        warehouse = self.validate_value(warehouse)
+        date_since = self.validate_value(date_since)
         for idx, wh in enumerate(warehouse):
+            # if wh != 'Lab B':
+            #     continue
             print(f'============ Warehouse: {wh} ==========================')
 
             if not date_from and not date_since:
                  initial_stock = {'actuals': 0}
             else:
                 initial_stock = self.get_product_stock(product_code, warehouse=wh, lot_number=lot_number,  date_to=date_since)
+            # print('initial_stock........',initial_stock)
+            # print('acrrranca........')
             moves = self.detail_stock_moves(wh, product_code=product_code, lot_number=lot_number, date_from=date_from, date_to=date_to)
             moves = self.detail_adjustment_moves(wh, product_code=product_code, lot_number=lot_number, \
                 date_from=date_from, date_to=date_to, **{'result':moves})
+            # moves = self.detail_many_one_one(wh, product_code=product_code, lot_number=lot_number, date_from=date_from, date_to=date_to)
             moves = self.detail_production_moves(wh, product_code=product_code, lot_number=lot_number, \
                 date_from=date_from, date_to=date_to, **{'result':moves})
             moves = self.detail_scrap_moves(wh, product_code=product_code, lot_number=lot_number, \
                 date_from=date_from, date_to=date_to, **{'result':moves})
+            #todo scrap out many one many
+            #entrega de planta team leader
+            # pull outs
             warehouse_data = { "id":idx, "warehouse":wh, "qty_out_table":"Initial", 
                 "balance_table":initial_stock.get('actuals'),
                 "serviceHistory": self.set_kardex_order(initial_stock.get('actuals'), moves)
