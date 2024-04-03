@@ -894,7 +894,7 @@ class Expenses(base.LKF_Base):
             if gasto[self.f['grp_gasto_estatus']] == 'autorizado':
                 # if gasto[self.f['metodo_pago']].find('efectivo') >= 0 or \
                 #  gasto[self.f['metodo_pago']].find('debito') >= 0:
-                if gasto[self.f['pagado_por']] == 'empleado':
+                if gasto.get(self.f['pagado_por']):
                     if form_id == self.FORM_BANK_TRANSACTIONS:
                         #si el monto es menor a 0 es un deposito
                         anticipo += gasto[self.f['grp_gasto_monto_aut']]  * -1
@@ -999,7 +999,7 @@ class Expenses(base.LKF_Base):
         if self.cache_read({'cache.solicitud':folio, '_one':True}):
             self.do_solicitud_close(self.FORM_ID_SOLICITUD, folio)
             update_fields.update({self.f['status_solicitud']:self.close_status})
-        self.do_solicitud_close(self.FORM_ID_SOLICITUD, folio)
+        #self.do_solicitud_close(self.FORM_ID_SOLICITUD, folio)
 
         update_db = self.cr.update_one({
             'folio': folio,
