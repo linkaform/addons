@@ -19,6 +19,7 @@ class Employee(base.LKF_Base):
         self.TEAM_ID = self.TEAM.get('id')
         self.TEAM_OBJ_ID = self.TEAM.get('obj_id')
         self.f.update( {
+            'worker_name':'62c5ff407febce07043024dd',
             'team_name':'62c5ff0162a70c261328845d',
             }
             )

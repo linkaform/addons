@@ -96,6 +96,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             'move_new_location':'644897497a16141f4e5ee0c3',
             'move_out':'620ad6247a217dbcb888d17e',
             'move_status':'62e9d296cf8d5b373b24e028',
+            'move_qty_requested':'65e1169689c0e0790f8843f1',
             'new_location_containers':'6319404d1b3cefa880fefcc8',
             'new_location_group':'63193fc51b3cefa880fefcc7',
             'new_location_racks':'c24000000000000000000001',
@@ -985,9 +986,9 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         stock['adjustments'] = self.stock_adjustments_moves( product_code=product_code, sku=sku, lot_number=lot_number, \
             warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
         print('stock adjustments', stock['adjustments'])
-        stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
+        stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         print('stock move_in', stock['move_in'])
-        stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
+        stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         print('stock move_out', stock['move_out'])
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
@@ -1787,11 +1788,13 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
         unwind = {'$unwind': '$answers.{}'.format(self.f['move_group'])}
         unwind_query = {}
-        # print('move type.................', move_type)
-        # print('warehouse', warehouse)
-        # print('location', location)
-        # print('product_code', product_code)
-        # print('lot_number', lot_number)
+        unwind_stage = []
+        print('move type.................', move_type)
+        print('warehouse', warehouse)
+        print('location', location)
+        print('product_code', product_code)
+        print('sku', sku)
+        print('lot_number', lot_number)
         inc_folio = kwargs.get("inc_folio")
         nin_folio = kwargs.get("nin_folio")
         if inc_folio:
@@ -1811,29 +1814,45 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})
        
         if product_code:
-            unwind_query.update({f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})    
+            p_code_query = {"$or":[
+                {f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code},
+                {f"answers.{self.f['move_group']}.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code}
+            ]
+            }
+            unwind_stage.append({'$match': p_code_query })
         if sku:
-            unwind_query.update({f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['sku']}":sku})    
+            sku_query = {"$or":[
+                {f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['sku']}":sku},
+                {f"answers.{self.f['move_group']}.{self.SKU_OBJ_ID}.{self.f['sku']}":sku}
+            ]
+            }
+            unwind_stage.append({'$match': sku_query })
         if lot_number:
-            unwind_query.update({f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['lot_number']}":lot_number})    
+            lot_number_query = {"$or":[
+                {f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['lot_number']}":lot_number},
+                {f"answers.{self.f['move_group']}.{self.SKU_OBJ_ID}.{self.f['lot_number']}":lot_number},
+                {f"answers.{self.f['move_group']}.{self.f['lot_number']}":lot_number}
+            ]
+            }
+            unwind_stage.append({'$match': lot_number_query })
         if status:
             match_query.update({f"answers.{self.f['stock_status']}":status})
-
+        if status:
+            unwind_query.update({f"answers.{self.f['move_group']}.{self.f['inv_adjust_grp_status']}":status})
         if date_from or date_to:
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
-
-       
         project = {'$project':
                 {'_id': 1,
                     'product_code': f"$answers.{self.f['move_group']}.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}",
                     'total': f"$answers.{self.f['move_group']}.{self.f['move_group_qty']}",
                     }
             }
-        
-
         query= [{'$match': match_query }]
         query.append(unwind)
-        query.append({'$match': unwind_query })
+        if unwind_query:
+            query.append({'$match': unwind_query })
+        if unwind_stage:
+            query += unwind_stage
         query.append(project)
         query += [
             {'$group':
@@ -1853,8 +1872,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             ]
         res = self.cr.aggregate(query)
         result = {}
-        # if move_type == 'in':
-        #     print('query=', simplejson.dumps(query, indent=3))
+        if move_type == 'in':
+            print('query=', simplejson.dumps(query, indent=3))
         for r in res:
             pcode = r.get('product_code')
             result[pcode] = result.get(pcode, 0)        
