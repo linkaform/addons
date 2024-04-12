@@ -12,7 +12,7 @@ networks:
 services:
   lkf-addons-base:
     restart: "no"
-    container_name: lkf-addons
+    container_name: lkf-addons-base
     hostname: lkf-addons
     image: linkaform/addons:base
     ports:
