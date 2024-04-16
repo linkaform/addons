@@ -50,6 +50,10 @@ class Expenses(base.LKF_Base):
         self.CATALOG_CONCEPTO_GASTO = self.lkm.catalog_id('conceptos_de_gastos')
         self.CATALOG_CONCEPTO_GASTO_ID = self.CATALOG_CONCEPTO_GASTO.get('id')
         self.CATALOG_CONCEPTO_GASTO_OBJ_ID = self.CATALOG_CONCEPTO_GASTO.get('obj_id')
+
+        self.CATALOG_DESTINOS = self.lkm.catalog_id('destinos')
+        self.CATALOG_DESTINOS_ID = self.CATALOG_DESTINOS.get('id')
+        self.CATALOG_DESTINOS_OBJ_ID = self.CATALOG_DESTINOS.get('obj_id')
         
         self.FORM_ID_SOLICITUD = self.lkm.form_id('solicitud_de_viticos','id')
         self.FORM_ID_AUTORIZACIONES = self.lkm.form_id('autorizacin_de_viaticos','id')
@@ -74,6 +78,7 @@ class Expenses(base.LKF_Base):
             'cant_dias':'61041d15d9ee55ab14965bb5',
             'cat_cargo_empleado':'6092c0ebd8b748522446af27',
             'cat_destino':'610419b5d28657c73e36fcd4',
+            'cat_destinos': '66107030fc70de34c53e622d',
             'cat_email_empleado':'6092c0ebd8b748522446af28',
             'cat_folio':'610419b5d28657c73e36fcd3',
             'cat_moneda':'62aa1fa92c20405af671d123',
@@ -95,6 +100,7 @@ class Expenses(base.LKF_Base):
             'fecha_regreso':'610419b5d28657c73e36fcd6',
             'folio_solicitudes':'64e7f571402ad68c2cd36956',
             'gasto_ejecutado_efectivo':'649d02057880ff495311bcc0',
+            'gasto_ejecutado_compania':'661a892ac628a5e9f5880955',
             'gasto_ejecutado':'629fb33a8758b5808890b22e',
             'grp_gasto_estatus':'62aa1fa92c20405af671d124',
             'grp_gasto_folio':'62aa1fa92c20405af671d120',
@@ -119,6 +125,9 @@ class Expenses(base.LKF_Base):
             'tipo_solicitud':'649b512cbf4cc1fab1133b7a',
             'total_gasto_moneda_sol':'544d5ad901a4de205f391111',
         })
+
+    def str_to_date(self, str_date):
+        return datetime.strptime(str_date, '%Y-%m-%d')
 
     def do_solicitud_close(self, form, folio, status_id=None, force_close=False):
         #check if it can be close
@@ -181,6 +190,16 @@ class Expenses(base.LKF_Base):
         res_update = self.lkf_api.patch_record(record_bank_transaction)
         return res_update
 
+    def review_devolucion_exists(self, fecha_anticipo, folio_viatico, cash_to_back):
+        record_devolution  = self.cr.find_one({
+            'form_id': self.FORM_BANK_TRANSACTIONS,
+            'deleted_at': {'$exists': False},
+            f'answers.{self.CATALOG_SOL_VIAJE_OBJ_ID}.{self.f["cat_folio"]}':folio_viatico,
+            f'answers.{self.f["fecha_gasto"]}':fecha_anticipo,
+            f'answers.{self.f["deposito_solicitado"]}':cash_to_back,
+        }, {'folio': 1})
+        return record_devolution
+
     def balance_solicitud(self, folio, balance):
         #Acomoda informacion para hacer el registro de la tranaccion del banco
         self.set_solicitud_data(folio)
@@ -191,7 +210,8 @@ class Expenses(base.LKF_Base):
         print('catalog=',catalog)
         catalog_solicitud = {
             self.f['cat_folio']:catalog.get(self.f['cat_folio']),
-            self.f['cat_destino']:catalog.get(self.f['cat_destino']),
+            # self.f['cat_destino']:catalog.get(self.f['cat_destino']),
+            self.f['cat_destinos']:catalog.get(self.f['cat_destinos']),
             # self.f['fecha_salida']:[catalog.get(self.f['fecha_salida']),],
             # self.f['fecha_regreso']:[catalog.get(self.f['fecha_regreso']),],
             # self.f['approved_amount']:[catalog.get(self.f['approved_amount']),]
@@ -205,9 +225,16 @@ class Expenses(base.LKF_Base):
         print('cash_balance', cash_balance)
 
         if cash_balance:
+            str_today = datetime.now( tz=timezone('America/Monterrey') ).strftime('%Y-%m-%d')
+            # Antes de crear la Devolucion. Necesito revisar si ya existe un registro con el mismo:
+            # Fecha de anticipo, folio de solicitud, motivo y anticipo solicitado
+            exists_devolucion = self.review_devolucion_exists( str_today, folio, cash_balance )
+            if exists_devolucion:
+                print('Ya existe un registro de Devolucion... ya no se va a crear')
+                return False
             # Probablemente esto sea correcto pero mejor revisar con JP
             answers = {
-                self.f['fecha_gasto']: datetime.now( tz=timezone('America/Monterrey') ).strftime('%Y-%m-%d'),
+                self.f['fecha_gasto']: str_today,
                 catalog_obj_id:catalog_solicitud,
                 catalog_employee_obj_id:self.SOL_DATA.get(catalog_employee_obj_id),
                 self.CATALOG_CONCEPTO_GASTO_OBJ_ID:{self.f['concepto']:'Deposito'},
@@ -338,7 +365,8 @@ class Expenses(base.LKF_Base):
         info_catalog = answers.get(self.CATALOG_SOL_VIAJE_OBJ_ID, {})
         folio = info_catalog.get(self.f['cat_folio'], '')
         record_folio =  self.current_record.get('folio')
-        destino = info_catalog.get(self.f['cat_destino'], '')
+        # destino = info_catalog.get(self.f['cat_destino'], '')
+        destino = info_catalog.get(self.f['cat_destinos'], '')
         self.set_solicitud_data(folio)
         msg_error_app={}
         if not self.SOL_DATA:
@@ -394,6 +422,7 @@ class Expenses(base.LKF_Base):
     def get_cash_expenses(self, expense_group):
         print('........ get_cash_expenses')
         cash_expense = 0
+        company_expense = 0
         for expense in expense_group:
             status = expense.get(self.f['grp_gasto_estatus'])
             if status not in self.expense_valid_status():
@@ -407,10 +436,14 @@ class Expenses(base.LKF_Base):
                 amount = 0
             print(f'-------------  amount = {amount} payment_method= {payment_method}')
             # if (payment_method.find('debito') >= 0 or payment_method.find('efectivo') >= 0)\
-            if payment_method == 'empleado' \
-                and amount > 0:
-                cash_expense += amount
-        return cash_expense
+            # if payment_method == 'empleado' and amount > 0:
+            #     cash_expense += amount
+            if amount > 0:
+                if payment_method == 'empleado':
+                    cash_expense += amount
+                else:
+                    company_expense += amount
+        return cash_expense, company_expense
 
     def get_related_expenses(self, folio_sol, this_expense=0, folio_rec=None, status=None, cash_only=False):
         #TODO QUERY ALL EXPENSES
@@ -473,6 +506,8 @@ class Expenses(base.LKF_Base):
             if not date_from:
                 date_from = r.get(self.f['fecha_gasto'])
                 date_to = r.get(self.f['fecha_gasto'])
+            if not date_from and not date_to:
+                return date_from, date_to
             date_from = this_date if this_date < date_from else date_from
             date_to = this_date if this_date > date_to else date_to
         return date_from, date_to
@@ -540,10 +575,11 @@ class Expenses(base.LKF_Base):
             new_record['folio'] = folio
             gasto_ejecutado = self.SOL_DATA.get(self.f['gasto_ejecutado'],0)
             gasto_efectivo = self.SOL_DATA.get(self.f['gasto_ejecutado_efectivo'],0)
+            gasto_compania = self.SOL_DATA.get(self.f['gasto_ejecutado_compania'],0)
             anticipo_efectivo = self.SOL_DATA.get(self.f['anticipo_efectivo'],0)
             monto_anticipo_restante = anticipo_efectivo - gasto_efectivo
             date_from, date_to = self.get_autorization_dates(records_to_process)
-            cant_days = self.get_cant_days(date_from, date_to)
+            cant_days = self.get_cant_days(date_from, date_to) if (date_from and date_to) else 0
             if self.SOL_METADATA['form_id'] == self.FORM_ID_SOLICITUD:
                 new_record.update({self.f['tipo_solicitud']:"viatico"})
             else:
@@ -554,6 +590,7 @@ class Expenses(base.LKF_Base):
                 self.f['anticipo_efectivo'] : anticipo_efectivo,
                 self.f['gasto_ejecutado'] : gasto_ejecutado,
                 self.f['gasto_ejecutado_efectivo'] : gasto_efectivo,
+                self.f['gasto_ejecutado_compania'] : gasto_compania,
                 self.f['monto_anticipo_restante'] : monto_anticipo_restante,
                 self.f['monto_restante'] : self.SOL_DATA.get(self.f['monto_restante']),
                 self.f['date_from'] : date_from,
@@ -564,7 +601,8 @@ class Expenses(base.LKF_Base):
                 self.f['grp_gastos_viaje'] : self.update_records(records_to_process),
                 self.CATALOG_SOL_VIAJE_OBJ_ID: {
                     self.f['cat_folio']: folio,
-                    self.f['cat_destino']: [new_record.get(self.f['destino']).replace('_', ' ').title()],
+                    # self.f['cat_destino']: [new_record.get(self.f['destino']).replace('_', ' ').title()],
+                    self.f['cat_destinos']: [new_record.get(self.CATALOG_DESTINOS_OBJ_ID,{}).get(self.f['cat_destinos'])],
                     self.f['fecha_salida']: [new_record.get(self.f['date_from'])],
                     self.f['fecha_regreso']: [new_record.get(self.f['date_to'])],
                     self.f['cat_monto_total_aprobado']: [new_record.get(self.f['approved_amount'])]
@@ -590,7 +628,7 @@ class Expenses(base.LKF_Base):
                 if not records_to_process:
                     return []
                 records_to_process = self.get_folios_to_exclude(records_to_process)
-                gasto_efectivo = self.get_cash_expenses(records_to_process)
+                gasto_efectivo, gasto_compania = self.get_cash_expenses(records_to_process)
                 monto_anticipo_restante = anticipo_efectivo - gasto_efectivo
                 date_from, date_to = self.get_autorization_dates(records_to_process)
                 cant_days = self.get_cant_days(date_from, date_to)
@@ -598,6 +636,7 @@ class Expenses(base.LKF_Base):
                     self.f['anticipo_efectivo'] : anticipo_efectivo,
                     self.f['gasto_ejecutado'] : gasto_ejecutado,
                     self.f['gasto_ejecutado_efectivo'] : gasto_efectivo,
+                    self.f['gasto_ejecutado_compania'] : gasto_compania,
                     self.f['monto_anticipo_restante'] : monto_anticipo_restante,
                     self.f['date_from'] : date_from,
                     self.f['date_to'] : date_to,
@@ -642,8 +681,8 @@ class Expenses(base.LKF_Base):
                     #"62aa1fa92c20405af671d122":"$answers.544d5ad901a4de205f391111", #Monto
                     self.f['grp_gasto_monto']:{"$cond" :[
                         {"$eq":["$form_id",self.FORM_BANK_TRANSACTIONS]},
-                        {'$multiply': [f"$answers.{self.f['total_gasto_moneda_sol']}",-1]},
-                        f"$answers.{self.f['total_gasto_moneda_sol']}"]}, #Monto
+                        {'$ifNull': [ {'$multiply': [f"$answers.{self.f['total_gasto_moneda_sol']}",-1]}, 0 ]},
+                        {'$ifNull': [ f"$answers.{self.f['total_gasto_moneda_sol']}", 0 ] }]}, #Monto
                     self.f['total_gasto_moneda_sol']:{"$cond" :[
                         {"$eq":["$form_id",self.FORM_BANK_TRANSACTIONS]},
                         {'$multiply': [f"$answers.{self.f['total_gasto_moneda_sol']}",-1]},
@@ -818,6 +857,7 @@ class Expenses(base.LKF_Base):
         answers[self.f['anticipo_efectivo']] = res['anticipo_efectivo'] 
         answers[self.f['gasto_ejecutado']] = res['gasto_ejecutado_aprovado'] 
         answers[self.f['gasto_ejecutado_efectivo']] = res['gasto_ejecutado_efevo_aprovado'] 
+        answers[self.f['gasto_ejecutado_compania']] = res['gasto_ejecutado_compania_aprovado'] 
         answers[self.f['monto_anticipo_restante']] = res['anticipo_efectivo'] - res['gasto_ejecutado_efevo_aprovado']
         answers[self.f['grp_gastos_viaje']] = res['grp_gastos_viaje']
         
@@ -843,6 +883,7 @@ class Expenses(base.LKF_Base):
             self.f['anticipo_efectivo']: self.SOL_DATA.get(self.f['anticipo_efectivo'], 0), 
             self.f['gasto_ejecutado']: self.SOL_DATA.get(self.f['gasto_ejecutado'], 0), 
             self.f['gasto_ejecutado_efectivo']: self.SOL_DATA.get(self.f['gasto_ejecutado_efectivo'], 0), 
+            self.f['gasto_ejecutado_compania']: self.SOL_DATA.get(self.f['gasto_ejecutado_compania'], 0), 
             self.f['monto_anticipo_restante']: self.SOL_DATA.get(self.f['monto_anticipo_restante'], 0), 
             self.f['monto_restante']: self.SOL_DATA.get(self.f['monto_restante'], 0), 
             self.f['expense_kind']: self.SOL_DATA.get(self.f['expense_kind']), 
@@ -882,6 +923,7 @@ class Expenses(base.LKF_Base):
         folio_solicitud = self.get_solicitu_folios(all_folios)
         gasto_ejecutado_aprovado = 0
         gasto_ejecutado_efevo_aprovado = 0
+        gasto_ejecutado_compania_aprovado = 0
         anticipo = 0
         #form_id = self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE
         form_ids = self.query_folio_form(list(dict_records_to_update.keys()))
@@ -899,7 +941,10 @@ class Expenses(base.LKF_Base):
                         anticipo += gasto[self.f['grp_gasto_monto_aut']]  * -1
                     else:
                         #si el monto es menor a 0 es un deposito
-                        gasto_ejecutado_efevo_aprovado += gasto[self.f['grp_gasto_monto_aut']]
+                        if gasto[ self.f['pagado_por'] ] == 'empleado':
+                            gasto_ejecutado_efevo_aprovado += gasto[self.f['grp_gasto_monto_aut']]
+                        else:
+                            gasto_ejecutado_compania_aprovado += gasto[self.f['grp_gasto_monto_aut']]
                         gasto_ejecutado_aprovado += gasto[self.f['grp_gasto_monto_aut']]
                 else:
                     gasto_ejecutado_aprovado += gasto[self.f['grp_gasto_monto_aut']]
@@ -923,6 +968,7 @@ class Expenses(base.LKF_Base):
                 res[folio]['status_code'] = res_update.get('status_code')
         res['gasto_ejecutado_aprovado'] = gasto_ejecutado_aprovado
         res['gasto_ejecutado_efevo_aprovado'] = gasto_ejecutado_efevo_aprovado
+        res['gasto_ejecutado_compania_aprovado'] = gasto_ejecutado_compania_aprovado
         res['anticipo_efectivo'] = anticipo
         res['grp_gastos_viaje'] = list(dict_records_to_update.values())
         for f_solicitud in update_solicitud:
@@ -962,8 +1008,8 @@ class Expenses(base.LKF_Base):
         gasto_ejecutado  = self.get_related_expenses(folio)
         monto_restante = round(monto_aprobado - gasto_ejecutado,2)
         anticipo_efectivo = self.query_get_transactions(folio)
-        gasto_efectivo = self.get_cash_expenses(expense_group)
-        print('--- --- --- --- gasto_efectivo =',gasto_efectivo)
+        gasto_efectivo, gasto_compania = self.get_cash_expenses(expense_group)
+        print(f'--- --- --- --- gasto_efectivo = {gasto_efectivo} gasto_compania = {gasto_compania}')
         monto_anticipo_restante = anticipo_efectivo - gasto_efectivo
         self.set_solicitud_catalog(folio)
         if run_validations:
@@ -972,19 +1018,22 @@ class Expenses(base.LKF_Base):
         if self.SOL_DATA.get(self.f['allow_overdraft']) == 'si':
             close_order = False
 
-        destino = self.SOL_DATA.get(self.f['destino'])
-        if destino == 'otro':
-            destino = self.SOL_DATA.get(self.f['destino_otro'])
+        # destino = self.SOL_DATA.get(self.f['destino'])
+        destino = self.SOL_DATA.get(self.CATALOG_DESTINOS_OBJ_ID, {}).get( self.f['cat_destinos'] )
+        # if destino == 'otro':
+        #     destino = self.SOL_DATA.get(self.f['destino_otro'])
             
         update_fields = {
             f'answers.{self.CATALOG_SOL_VIAJE_OBJ_ID}': {
                 self.f['cat_folio']: folio,
-                self.f['cat_destino']: [ destino ],
+                # self.f['cat_destino']: [ destino ],
+                self.f['cat_destinos']: [ destino ],
             },
             f"answers.{self.f['anticipo_efectivo']}":anticipo_efectivo,
             f"answers.{self.f['monto_anticipo_restante']}":monto_anticipo_restante,
             f"answers.{self.f['monto_restante']}":monto_restante,
             f"answers.{self.f['gasto_ejecutado_efectivo']}":gasto_efectivo,
+            f"answers.{self.f['gasto_ejecutado_compania']}":gasto_compania,
             f"answers.{self.f['gasto_ejecutado']}":gasto_ejecutado,
             f"answers.{self.f['grp_gastos_viaje']}":expense_group
             }
@@ -1022,8 +1071,10 @@ class Expenses(base.LKF_Base):
     def validaciones_solicitud(self):
         print('... expense_utils base de addons')
         answers = self.current_record.get('answers')
-        destino = answers.get(self.f['destino'])
-        answers[ self.f['destino_otro'] ] = destino.replace('_', ' ').title()
+        #destino = answers.get(self.f['destino'])
+        destino = answers.get(self.CATALOG_DESTINOS_OBJ_ID, {}).get( self.f['cat_destinos'] )
+        #answers[ self.f['destino_otro'] ] = destino.replace('_', ' ').title()
+        answers[ self.f['cat_destinos'] ] = destino
         dia_salida = answers.get(self.f['date_from'])
         dia_regreso = answers.get(self.f['date_to'])
         msg_error_app = {}
