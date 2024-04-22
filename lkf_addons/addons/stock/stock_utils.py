@@ -35,16 +35,21 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
         self.FORM_INVENTORY_ID = self.lkm.form_id('stock_inventory','id')
         self.ADJUIST_FORM_ID = self.lkm.form_id('stock_inventory_adjustment','id')
-        self.STOCK_MOVE_FORM_ID = self.lkm.form_id('stock_inventory_move','id')
-        self.STOCK_MANY_LOCATION_OUT = self.lkm.form_id('stock_move_many_out','id')
-        self.MOVE_NEW_PRODUCTION_ID = self.lkm.form_id('stock_move_new_production','id')
-        self.PRODUCTION_FORM_ID = self.lkm.form_id('stock_production','id')
+        # self.STOCK_MOVE_FORM_ID = self.lkm.form_id('stock_inventory_move','id')
+        # self.STOCK_MANY_LOCATION_OUT = self.lkm.form_id('stock_move_many_out','id')
+        # self.MOVE_NEW_PRODUCTION_ID = self.lkm.form_id('stock_move_new_production','id')
+        # self.PRODUCTION_FORM_ID = self.lkm.form_id('stock_production','id')
         self.SCRAP_FORM_ID = self.lkm.form_id('stock_scrapping','id')
-        self.STOCK_MANY_LOCATION_2_ONE = self.lkm.form_id('stock_move_many_one_one','id')
-        self.STOCK_MANY_ONE_ONE = self.lkm.form_id('stock_move_many_one_one','id')
+        # self.STOCK_MANY_LOCATION_2_ONE = self.lkm.form_id('stock_move_many_one_one','id')
+        # self.STOCK_MANY_ONE_ONE = self.lkm.form_id('stock_move_many_one_one','id')
         self.STOCK_ONE_MANY_ONE = self.lkm.form_id('stock_move_one_many_one','id')
+        self.STOCK_IN_ONE_MANY_ONE = self.lkm.form_id('recepcion_de_materiales_de_proveedor','id')
 
-        self.STOCK_ONE_MANY_ONE_FORMS = [self.STOCK_ONE_MANY_ONE,self.STOCK_MANY_ONE_ONE]
+        self.STOCK_ONE_MANY_ONE_FORMS = [
+            self.STOCK_ONE_MANY_ONE,
+            # self.STOCK_MANY_ONE_ONE,
+            self.STOCK_IN_ONE_MANY_ONE
+            ]
 
         self.FORM_CATALOG_DIR = {
             self.FORM_INVENTORY_ID: self.CATALOG_INVENTORY_ID, #Inventory Flow (greenHouse)
@@ -962,12 +967,12 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def get_product_stock(self, product_code, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
-        print(f'**33************Get Stock: {product_code}****************')
-        print('product_code', product_code)
-        print('sku', sku)
-        print('lot_number', lot_number)
-        print('warehouse', warehouse)
-        print('location', location)
+        # print(f'**33************Get Stock: {product_code}****************')
+        # print('product_code', product_code)
+        # print('sku', sku)
+        # print('lot_number', lot_number)
+        # print('warehouse', warehouse)
+        # print('location', location)
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         location = self.validate_value(location)
@@ -978,18 +983,20 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             else:
                 cache_stock = self.cache_get({'_id':f"{product_code}_{sku}_{lot_number}_{warehouse}","_one":True, },**kwargs)
         kwargs.update(cache_stock.get('kwargs',{}))
-
+        kwargs.update(cache_stock.get('cache',{}).get('kwargs',{}))
+        if cache_stock.get('cache',{}).get('record_id'):
+            kwargs.update({"record_id":cache_stock['cache']['record_id']})
         if date_from:
             initial_stock = self.get_product_stock(product_code, sku=sku, lot_number=lot_number, \
                 warehouse=warehouse, location=location, date_to=date_from,  **kwargs)
             stock['actuals'] += initial_stock.get('actuals',0)
         stock['adjustments'] = self.stock_adjustments_moves( product_code=product_code, sku=sku, lot_number=lot_number, \
             warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
-        print('stock adjustments', stock['adjustments'])
+        # print('stock adjustments', stock['adjustments'])
         stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
-        print('stock move_in', stock['move_in'])
+        # print('stock move_in', stock['move_in'])
         stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
-        print('stock move_out', stock['move_out'])
+        # print('stock move_out', stock)
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -1009,7 +1016,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         # print('stock OUT....',stock['move_out'])
         scrapped, cuarentin = self.stock_scrap(product_code=product_code, sku=sku, lot_number=lot_number, \
             warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, status='done', **kwargs )  
-        print('stock scrapped',scrapped)  
+        # print('stock scrapped',scrapped)  
         stock['scrapped'] = scrapped
         stock['cuarentin'] = cuarentin
 
@@ -1028,13 +1035,10 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         stock['scrap_perc']  = 0
         if stock.get('stock_in') and stock.get('scrapped'):
             stock['scrap_perc'] = round(stock.get('scrapped',0)/stock.get('stock_in',1),2)
-        print('stock=', stock)
+        # print('stock=', stock)
         return stock
 
     def get_product_info(self, **kwargs):
-        print('self.WAREHOUSE_OBJ_ID',self.WAREHOUSE_OBJ_ID)
-        print('self.warehouse',self.f['warehouse'])
-        print('answres=', self.answers)
         try:
             warehouse = self.answers[self.WAREHOUSE_OBJ_ID][self.f['warehouse']]
             plant_code = self.answers.get(self.f['product_recipe'], {}).get(self.f['product_code'], '')
@@ -1843,7 +1847,11 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
         project = {'$project':
                 {'_id': 1,
-                    'product_code': f"$answers.{self.f['move_group']}.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}",
+                    'product_code':{"$ifNull":[
+                        f"$answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_code']}",
+                        f"$answers.{self.f['move_group']}.{self.SKU_OBJ_ID}.{self.f['product_code']}",
+                    ]
+                    } ,
                     'total': f"$answers.{self.f['move_group']}.{self.f['move_group_qty']}",
                     }
             }
@@ -2018,6 +2026,21 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         for r in res:
             result = r.get('total', 0)        
         return result  
+  
+    def stock_kwargs_query(self, **kwargs):
+        match_query = {}
+        inc_folio = kwargs.get("inc_folio")
+        nin_folio = kwargs.get("nin_folio")
+        record_id = kwargs.get("record_id")
+
+        if inc_folio:
+            match_query.update({"folio":inc_folio})
+        if nin_folio:
+            match_query.update({"folio": {"$ne":nin_folio }})
+
+        if record_id:
+            match_query.update({"_id": {"$ne": ObjectId(record_id) }})
+        return match_query
   
     def stock_moves(self, move_type, product_code=None, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None, status='done', **kwargs):
         unwind =None

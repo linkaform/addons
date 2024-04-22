@@ -17,6 +17,7 @@ class FormResource(items.Items):
             workflow_model = self.load_module_template_file(path, file_name)
             # res = self.lkf.install_workflows(module, workflow_model, 'update')
             if action == 'create':
+            # if True:
                 res = self.lkf_api.upload_workflows(workflow_model, 'POST')
             elif action =='update':
                 res = self.lkf_api.upload_workflows(workflow_model, 'PATCH')
@@ -82,10 +83,7 @@ class FormResource(items.Items):
                     if config == 'rules':
                         self.setup_rules(conf_files, res['status'], this_path)
             elif res.get('status_code') == 400:
-                print('res=',res)
-                print('form_name=',form_name)
                 error = res.get('json',{}).get('error','Please try again!!!')
-                print('error=',error)
                 raise self.LKFException(f'Error installing form: {form_name}. Error msg {error}')
         return response
  

@@ -55,6 +55,31 @@ class Product(base.LKF_Base):
     def una_funcion_product(self):
         return True
 
+
+    def get_product(self, product_code):
+        return self.get_product_field(self, product_code, pfield='*')
+
+    def get_product_field(self, product_code, pfield='product_name'):
+        product_field = None
+        mango_query = {
+            "selector": {
+                "answers": {
+                    self.f['product_code']: {"$eq": product_code},
+                    } ,
+                },
+            "limit": 1,
+            "skip": 0
+                }
+        record = self.lkf_api.search_catalog(self.PRODUCT_ID, mango_query)
+        if record and len(record) > 0:
+            rec = record[0]
+            if product_field == '*':
+                return rec
+            product_field = rec.get(self.f[pfield])
+        return product_field
+
+
+
 class Warehouse(base.LKF_Base):
 
 
