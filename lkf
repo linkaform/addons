@@ -241,10 +241,10 @@ _update(){
   case $Enviorment in
     prod)
       echo 'Running update...'
-      ssh -i $HOME/.ssh/$Account_id _lkf_docker_remote@ansible.linkaform.com
+      ssh -i $HOME/.ssh/$Account_id _lkf_docker_remote@ansible.linkaform.com prod
     ;;
     preprod)
-      ssh -i $HOME/.ssh/${Account_id}_preprod _lkf_docker_remote@ansible.linkaform.com
+      ssh -i $HOME/.ssh/${Account_id} _lkf_docker_remote@ansible.linkaform.com preprod
      ;;
   esac
 }
