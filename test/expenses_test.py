@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
-
+from datetime import datetime, timedelta
 from linkaform_api import utils, network, lkf_models
 from linkaform_api import base
 
@@ -51,6 +51,16 @@ FORM_BANK_TRANSACTIONS = lkm.form_id('entrega_de_efectivo','id')
 VARS = {'gasto':[]}
 SOL = {}
 
+desde = datetime.now() + timedelta(days=1)
+fecha_gasto = desde + timedelta(days=1)
+hasta = desde + timedelta(days=7)
+desde = desde.strftime('%Y-%m-%d')
+hasta = hasta.strftime('%Y-%m-%d')
+fecha_gasto = fecha_gasto.strftime('%Y-%m-%d')
+
+monto_solicitado = 5000
+anticipo_solicitado = 1500
+monto_autorizado = 5000
 
 class TestExpenses():
 
@@ -73,30 +83,54 @@ class TestExpenses():
             "form_id":FORM_SOLICITUD_VIATICOS,
             "geolocation":[25.6583943,-100.3834899],"start_timestamp":1690262982.602,"end_timestamp":1690263046.524,
             "answers":{
-                "61041d15d9ee55ab14965bb6":"solicitado",
+                # "61041d15d9ee55ab14965bb6":"solicitado",
+                # "64dd637965b8662fabb5ac2d": "no",
+                # "64dd637965b8662fabb5ac2f": "no",
+                # CATALOG_EMPLEADOS_OBJ_ID:{ #catalogo de empleados
+                #     "6092c0ebd8b748522446af26": "Obi-Wan Kenobi",
+                #     "6092c0ebd8b748522446af27": ["Jedi Master"],
+                #     "6092c0ebd8b748522446af28": ["obi@starwars.com"]},
+                # CATALOG_MONEDA_OBJ_ID:{ #catalogo de monedas
+                #     "62aa1fa92c20405af671d123":"MXN"},
+                # CATALOG_RESP_AUT_OBJ_ID:{ #catalogo de autorizadores
+                #     "62bf232626827cd253f9db16":"Yoda",
+                #     "62bf232626827cd253f9db17":["yoda@starwars.com"]},
+                # "61041b50d9ee55ab14965000": "mexico",
+                # "61041b50d9ee55ab14965ba1": "cita_cliente",
+                # "61041b50d9ee55ab14965ba2": "2023-12-19",
+                # "61041b50d9ee55ab14965ba3": "2023-12-23",
+                # "61041b50d9ee55ab14965ba4": "autobus",
+                # "61041c9a9242368dd3965da2": 1000,
+                # "61041b8370c14c09eff167ae": 5000,
+                # "544d5ad901a4de205f392000": 1500,
+                # "62ea709180209ea195b75221": {
+                #     "file_name": "Kenovi",
+                #     "file_url": "https://f001.backblazeb2.com/file/app-linkaform/public-client-20/108431/62ea709180209ea195b75221/65807f460f1a4c2a7ab74315.png"
+                # }
+                "61041b50d9ee55ab14965ba2": desde, # Fecha de salida
+                "61041b50d9ee55ab14965ba3": hasta, # Fecha de regreso
+                "61041b8370c14c09eff167ae": monto_solicitado, # Monto solicitado
+                "544d5ad901a4de205f392000": anticipo_solicitado, # Anticipo solicitado
+                "61041b50d9ee55ab14965ba4": "autobus",
+                "61041d15d9ee55ab14965bb6": "solicitado",
                 "64dd637965b8662fabb5ac2d": "no",
-                "64dd637965b8662fabb5ac2f": "no",
-                CATALOG_EMPLEADOS_OBJ_ID:{ #catalogo de empleados
+                "64fa5166c8b495bb779da16a": {
                     "6092c0ebd8b748522446af26": "Obi-Wan Kenobi",
                     "6092c0ebd8b748522446af27": ["Jedi Master"],
-                    "6092c0ebd8b748522446af28": ["obi@starwars.com"]},
-                CATALOG_MONEDA_OBJ_ID:{ #catalogo de monedas
-                    "62aa1fa92c20405af671d123":"MXN"},
-                CATALOG_RESP_AUT_OBJ_ID:{ #catalogo de autorizadores
-                    "62bf232626827cd253f9db16":"Yoda",
-                    "62bf232626827cd253f9db17":["yoda@starwars.com"]},
-                "61041b50d9ee55ab14965000": "mexico",
-                "61041b50d9ee55ab14965ba1": "cita_cliente",
-                "61041b50d9ee55ab14965ba2": "2023-12-19",
-                "61041b50d9ee55ab14965ba3": "2023-12-23",
-                "61041b50d9ee55ab14965ba4": "autobus",
-                "61041c9a9242368dd3965da2": 1000,
-                "61041b8370c14c09eff167ae": 5000,
-                "544d5ad901a4de205f392000": 1500,
-                "62ea709180209ea195b75221": {
-                    "file_name": "Kenovi",
-                    "file_url": "https://f001.backblazeb2.com/file/app-linkaform/public-client-20/108431/62ea709180209ea195b75221/65807f460f1a4c2a7ab74315.png"
-                }
+                    "6092c0ebd8b748522446af28": ["obi@starwars.com"]
+                },
+                "6619729f25ff7f92e88148a6": {
+                    "66107030fc70de34c53e622d": "Mexico"
+                },
+                "64fa516ac8b495bb779da16c": {
+                    "62aa1fa92c20405af671d123": "MXN"
+                },
+                "64fa5164cf0df6e57fa88b0b": {
+                    "62bf232626827cd253f9db16": "Pra-Tre Veter ",
+                    "62bf232626827cd253f9db17": ["pratre@starwars.com"]
+                },
+                "61041b50d9ee55ab14965ba1": "capacitación",
+                "62aa1fa92c20405af671d124": None
             },
             "folio":None,
             "properties":{
@@ -113,52 +147,61 @@ class TestExpenses():
     def test_aprueba_solicitud(self):
         #self.test_crea_solicitud()
         #global VARS
-        metadata = {
-            "form_id":FORM_SOLICITUD_VIATICOS,
-            "geolocation":[25.6583943,-100.3834899],"start_timestamp":1690391904.746,"end_timestamp":1690391923.696,
-            "answers":  {
-                 "61041d15d9ee55ab14965bb6":"autorizado",
-                CATALOG_EMPLEADOS_OBJ_ID:{ #catalogo de empleados
-                    "6092c0ebd8b748522446af26": "Obi-Wan Kenobi",
-                    "6092c0ebd8b748522446af27": ["Jedi Master"],
-                    "6092c0ebd8b748522446af28": ["obi@starwars.com"]},
-                CATALOG_MONEDA_OBJ_ID:{ #catalogo de monedas
-                    "62aa1fa92c20405af671d123":"MXN"},
-                CATALOG_RESP_AUT_OBJ_ID:{ #catalogo de autorizadores
-                    "62bf232626827cd253f9db16":"Yoda",
-                    "62bf232626827cd253f9db17":["yoda@starwars.com"]},
-                "61041b50d9ee55ab14965000":"mexico",
-                "61041b50d9ee55ab14965ba1":"cita_cliente",
-                "61041b50d9ee55ab14965ba2":"2023-12-19",
-                "61041b50d9ee55ab14965ba3": "2023-12-23",
-                "61041b50d9ee55ab14965ba4":"autobus",
-                "61041b8370c14c09eff167ae":5000,
-                "649ccd3e7880ff495300bca5":0,
-                "61041d15d9ee55ab14965bb7": 5000,
-                "544d5ad901a4de205f392000": 1500,
-                "61041b50d9ee55ab14965ba0": "Mexico",
-                "61041c9a9242368dd3965da2": 1000,
-                "61041d15d9ee55ab14965bb5": 5,
-                "62ea709180209ea195b75221": {
-                    "file_name": "Kenovi",
-                    "file_url": "https://f001.backblazeb2.com/file/app-linkaform/public-client-20/108431/62ea709180209ea195b75221/65807f460f1a4c2a7ab74315.png"
-                },
-                "64dd637965b8662fabb5ac2d": "no",
-                "64dd637965b8662fabb5ac2f": "no",
-                "62aa1fa92c20405af671d124": None,
-                "62ea709180209ea195b75222": {
-                    "file_name": "Yoda",
-                    "file_url": "https://f001.backblazeb2.com/file/app-linkaform/public-client-20/108431/62ea709180209ea195b75222/6580801c0f1a4c2a7ab74325.png"
-                }
+        # metadata = {
+        #     "form_id":FORM_SOLICITUD_VIATICOS,
+        #     "geolocation":[25.6583943,-100.3834899],"start_timestamp":1690391904.746,"end_timestamp":1690391923.696,
+        #     "answers":  {
+        #          "61041d15d9ee55ab14965bb6":"autorizado",
+        #         CATALOG_EMPLEADOS_OBJ_ID:{ #catalogo de empleados
+        #             "6092c0ebd8b748522446af26": "Obi-Wan Kenobi",
+        #             "6092c0ebd8b748522446af27": ["Jedi Master"],
+        #             "6092c0ebd8b748522446af28": ["obi@starwars.com"]},
+        #         CATALOG_MONEDA_OBJ_ID:{ #catalogo de monedas
+        #             "62aa1fa92c20405af671d123":"MXN"},
+        #         CATALOG_RESP_AUT_OBJ_ID:{ #catalogo de autorizadores
+        #             "62bf232626827cd253f9db16":"Yoda",
+        #             "62bf232626827cd253f9db17":["yoda@starwars.com"]},
+        #         "61041b50d9ee55ab14965000":"mexico",
+        #         "61041b50d9ee55ab14965ba1":"cita_cliente",
+        #         "61041b50d9ee55ab14965ba2":"2023-12-19",
+        #         "61041b50d9ee55ab14965ba3": "2023-12-23",
+        #         "61041b50d9ee55ab14965ba4":"autobus",
+        #         "61041b8370c14c09eff167ae":5000,
+        #         "649ccd3e7880ff495300bca5":0,
+        #         "61041d15d9ee55ab14965bb7": 5000,
+        #         "544d5ad901a4de205f392000": 1500,
+        #         "61041b50d9ee55ab14965ba0": "Mexico",
+        #         "61041c9a9242368dd3965da2": 1000,
+        #         "61041d15d9ee55ab14965bb5": 5,
+        #         "62ea709180209ea195b75221": {
+        #             "file_name": "Kenovi",
+        #             "file_url": "https://f001.backblazeb2.com/file/app-linkaform/public-client-20/108431/62ea709180209ea195b75221/65807f460f1a4c2a7ab74315.png"
+        #         },
+        #         "64dd637965b8662fabb5ac2d": "no",
+        #         "64dd637965b8662fabb5ac2f": "no",
+        #         "62aa1fa92c20405af671d124": None,
+        #         "62ea709180209ea195b75222": {
+        #             "file_name": "Yoda",
+        #             "file_url": "https://f001.backblazeb2.com/file/app-linkaform/public-client-20/108431/62ea709180209ea195b75222/6580801c0f1a4c2a7ab74325.png"
+        #         }
 
-            },
-            "_id":VARS['solicitud']['id'],
-            "properties":{
-                "device_properties":{"system":"Testing"},
-                },
-            "geolocation_method":{"method":"HTML5","accuracy":1742.3649855282526}}
-        res_create =  lkf_api.patch_record(metadata)
-        assert res_create['status_code'] == 202
+        #     },
+        #     "_id":VARS['solicitud']['id'],
+        #     "properties":{
+        #         "device_properties":{"system":"Testing"},
+        #         },
+        #     "geolocation_method":{"method":"HTML5","accuracy":1742.3649855282526}}
+        record_solicitud = cr.find_one({
+            'form_id': FORM_SOLICITUD_VIATICOS,
+            'deleted_at': {'$exists': False},
+            'folio': VARS['solicitud']['folio']
+        },{'form_id': 1, 'folio': 1, 'answers': 1})
+        assert record_solicitud != None
+        record_solicitud['answers']['61041d15d9ee55ab14965bb7'] = monto_autorizado
+        record_solicitud['answers']["61041d15d9ee55ab14965bb6"] = "autorizado"
+
+        res_update =  lkf_api.patch_record(record_solicitud)
+        assert res_update['status_code'] == 202
         time.sleep(10)
         solnum = VARS['solicitud']['folio']
         sol_catalog = self.search_catalogo_solicitud(solnum)
@@ -168,8 +211,8 @@ class TestExpenses():
         #filter_by_folio = {'answers.64fa516c95f2011d20462578.610419b5d28657c73e36fcd3': VARS['solicitud']['folio']}
         record_anticipo_solicitado = self.get_record_from_db(FORM_BANK_TRANSACTIONS, VARS['solicitud']['folio'])
         for anticipo in record_anticipo_solicitado:
-            anticipo['answers']['583d8e10b43fdd6a4887f55b'] = '2023-12-19'
-            anticipo['answers']['544d5ad901a4de205f391111'] = anticipo['answers']['544d5ad901a4de205f392000']
+            anticipo['answers']['583d8e10b43fdd6a4887f55b'] = desde
+            anticipo['answers']['544d5ad901a4de205f391111'] = anticipo_solicitado
             anticipo['answers']['544d5b4e01a4de205e2b2169'] = 'realizado'
             anticipo['properties'] = {"device_properties":{"system":"Testing"}}
             res_update = lkf_api.patch_record(anticipo)
@@ -182,7 +225,7 @@ class TestExpenses():
         total_empleado = 0
         CANT_GASTOS = 5
         for x in range(CANT_GASTOS):
-            gasto = (x +1) * 100
+            gasto = (x + 1) * 100
             total_empleado += gasto
             res = self.create_registros_de_gasto(num=VARS['solicitud']['folio'], gasto=gasto, pagado_por="empleado")
             assert res['status_code'] == 201
@@ -226,13 +269,17 @@ class TestExpenses():
                     continue
                 FOUND_GASTOS +=1
                 print('gastos....', FOUND_GASTOS)
-                if desc == 2 or desc ==4:
-                    status = 'no_autorizado'
-                    gto_autorizdo = 0
-                else:
-                    status = 'autorizado'
-                    gasto['627bf0d5c651931d3c7eedd3'] = round(gasto['62aa1fa92c20405af671d122'] * (1-(desc/10.1)),2)
-                    gto_autorizdo = f'descuento de {(1-(desc/10.1))}'
+                # if desc == 2 or desc ==4:
+                #     status = 'no_autorizado'
+                #     gto_autorizdo = 0
+                # else:
+                #     status = 'autorizado'
+                #     #gasto['627bf0d5c651931d3c7eedd3'] = round(gasto['62aa1fa92c20405af671d122'] * (1-(desc/10.1)),2)
+                #     gasto['627bf0d5c651931d3c7eedd3'] = gasto['62aa1fa92c20405af671d122']
+                #     gto_autorizdo = f'descuento de {(1-(desc/10.1))}'
+                status = 'autorizado'
+                gasto['627bf0d5c651931d3c7eedd3'] = gasto['62aa1fa92c20405af671d122']
+                gto_autorizdo = f'descuento de {(1-(desc/10.1))}'
                 
                 gasto['64a06441c375083cb0da8d4f'] = gto_autorizdo
                 gasto['62aa1fa92c20405af671d124'] = status
@@ -277,7 +324,7 @@ class TestExpenses():
             assert 'Search Catalog Folio Not Found' == 'Not Found'
         SOL[num] = {}
         SOL[num]['folio'] = res.get('610419b5d28657c73e36fcd3')
-        SOL[num]['destino'] = res.get('610419b5d28657c73e36fcd4')
+        SOL[num]['destino'] = res.get('66107030fc70de34c53e622d')
         SOL[num]['fecha_salida'] = res.get('610419b5d28657c73e36fcd5')
         SOL[num]['fecha_regreso'] = res.get('610419b5d28657c73e36fcd6')
         SOL[num]['monto_aprobado'] = res.get('610419e33a05c520d90814d3',0)
@@ -302,7 +349,7 @@ class TestExpenses():
                 "65a0925c6a3fdf3e32659bb8":pagado_por,
                 "544d5b4e01a4de205e2b2169":"por_autorizar",
                 CATALOG_SOLICITUD_OBJ_ID :{
-                    "610419b5d28657c73e36fcd4":SOL[num]['destino'],
+                    "66107030fc70de34c53e622d":SOL[num]['destino'],
                     "610419b5d28657c73e36fcd3":SOL[num]['folio'],
                     "610419b5d28657c73e36fcd5":[SOL[num]['fecha_salida']],
                     "610419b5d28657c73e36fcd6":[SOL[num]['fecha_regreso']],
@@ -314,7 +361,7 @@ class TestExpenses():
                 },
                 CATALOG_CONCEPTO_GASTO_OBJ_ID:{"649b2a84dac4914e02aadb24":"Comida"},
                 "610420eea79102768d9659b4":[],
-                "583d8e10b43fdd6a4887f55b":"2023-12-20",
+                "583d8e10b43fdd6a4887f55b":fecha_gasto,
                 "610878f5bff8b3329fed6130":"cena",
                 "62914e2d855e9abc32eabc16":"Purebas",
                 "64e6474175eab52e0956ae3f":"Establecimiento  - {}".format(gasto),

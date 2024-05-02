@@ -1041,8 +1041,8 @@ class Expenses(base.LKF_Base):
             update_fields.update({
                 f"answers.{self.f['status_solicitud']}":"en_aprobacion",
                 })
-            if background:
-                self.create_expense_authorization(folio)
+            # if background:
+            #     self.create_expense_authorization(folio)
 
         if self.cache_read({'cache.solicitud':folio, '_one':True}):
             self.do_solicitud_close(self.FORM_ID_SOLICITUD, folio)
@@ -1055,11 +1055,15 @@ class Expenses(base.LKF_Base):
             'deleted_at': {'$exists': False}
         },{'$set':update_fields})
         db_res = update_db.raw_result
+        print('db_res =',db_res)
         update_ok = db_res.get('updatedExisting')
         if update_ok:
+            print('entra al update_ok...')
             self.set_solicitud_data(folio, renew=True)
             self.SOL_DATA.update({ ii.split('answers.')[1]: vv for ii, vv in update_fields.items() if 'answers.' in ii })
             update_ok = self.update_expense_catalog_values(folio)
+        if close_order and background:
+            self.create_expense_authorization(folio)
         return update_ok
 
     def validar_fecha_vencida(self, fecha_gasto):
