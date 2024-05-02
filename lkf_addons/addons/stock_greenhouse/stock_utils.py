@@ -220,7 +220,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         recipe = self.select_S4_recipe(recipes[plant_code], week)
         grow_weeks = recipe.get('S4_growth_weeks')
         ready_date = production_date + timedelta(weeks=grow_weeks)
-        lot_number = int(ready_date.strftime('%Y%W'))
+        calc_lot_number = int(ready_date.strftime('%Y%W'))
+        lot_number = self.answers.get(self.f['production_lote'], calc_lot_number)
 
         total_produced =0
         #64ed5839a405d8f6378edf5f
@@ -996,15 +997,13 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
         # else:
         #     stock['adjustments'] = 0
-
         stock['production'] = self.stock_production(date_from =date_from, date_to=date_to ,\
-             product_code=product_code, lot_number=lot_number, warehouse=warehouse, location=location )
+             product_code=product_code, lot_number=lot_number, warehouse=warehouse, location=location, **kwargs )
         # print('stock production....',stock['production'])
         stock['move_in'] = self.stock_moves('in', product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, **kwargs)
         #GET PRODUCT EXITS
-        # print('stock IN....',stock['move_in'])
-
+        print('stock IN....',stock['move_in'])
         stock['move_out'] = self.stock_moves('out', product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, **kwargs)
         # print('stock OUT....',stock['move_out'])
@@ -1998,16 +1997,14 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         location = self.validate_value(location)
-        inc_folio = kwargs.get("inc_folio")
-        nin_folio = kwargs.get("nin_folio")
+        inc_folio = kwargs.pop("inc_folio") if kwargs.get("inc_folio") else None
+        match_query.update(self.stock_kwargs_query(**kwargs))
         if warehouse:
             match_query.update({f"answers.{self.CATALOG_WAREHOUSE_OBJ_ID}.{self.f['warehouse']}":warehouse})      
         if date_from or date_to:
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
         match_query_stage2 = {}
         # match_query_stage2 = {f"answers.{self.f['grading_group']}.{self.f['inv_adjust_grp_status']}": "done"}
-        if nin_folio:
-            match_query.update({"folio": {"$ne":nin_folio }})
         if inc_folio:
             match_query_stage2 = {"$or": [
                 {f"answers.{self.f['grading_group']}.{self.f['inv_adjust_grp_status']}": "done"},
@@ -2061,12 +2058,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             "deleted_at":{"$exists":False},
             "form_id": self.STOCK_MOVE_FORM_ID,
             }
-        inc_folio = kwargs.get("inc_folio")
-        nin_folio = kwargs.get("nin_folio")
-        if inc_folio:
-            match_query.update({"folio":inc_folio})
-        if nin_folio:
-            match_query.update({"folio": {"$ne":nin_folio }})
+        match_query.update(self.stock_kwargs_query(**kwargs))
         if product_code:
             match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})
         if move_type =='out':
@@ -2148,12 +2140,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             }
         unwind = {'$unwind': '$answers.{}'.format(self.f['inv_group'])}
         unwind_query = {}
-        inc_folio = kwargs.get("inc_folio")
-        nin_folio = kwargs.get("nin_folio")
-        if inc_folio:
-            match_query.update({"folio":inc_folio})
-        if nin_folio:
-            match_query.update({"folio": {"$ne":nin_folio }})
+        match_query.update(self.stock_kwargs_query(**kwargs))
         if status:
             match_query.update({f"answers.{self.f['inv_adjust_status']}":status})
         if date_from or date_to:
@@ -2227,6 +2214,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             "deleted_at":{"$exists":False},
             "form_id": self.PRODUCTION_FORM_ID,
             }
+        match_query.update(self.stock_kwargs_query(**kwargs))
         match_query_stage2 = {}
         if date_from or date_to:
             match_query_stage2.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=f"{self.f['production_group']}.{self.f['set_production_date']}"))
