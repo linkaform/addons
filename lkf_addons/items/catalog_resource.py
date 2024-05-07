@@ -51,7 +51,6 @@ class CatalogResource(items.Items):
                 if file_type == 'data' and self.load_data:
                     self.load_info(files, file_type, res )
                 if file_type == 'demo' and self.load_demo:
-                    print('demo file', catalog_name)
                     self.load_info(files, file_type, res )
                     
                         # catalog_json = self.load_items_file(file_type, file, 'json')

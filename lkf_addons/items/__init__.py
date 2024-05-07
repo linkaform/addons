@@ -46,7 +46,6 @@ class Items(LKFException):
     def load_module_template_file(self, file_path, file_name, file_data=None):
         xml_exists = self.file_exists(file_path, file_name, 'xml')
         if xml_exists:
-            print('file_data',file_data)
             json_file = self.lkf.read_template_file(file_path, f'{file_name}.xml', file_data)
             # json_file = self.read_xml_template(file_path, )
         elif self.file_exists(file_path, file_name, 'json'):

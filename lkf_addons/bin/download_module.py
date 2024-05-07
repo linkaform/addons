@@ -257,7 +257,6 @@ def get_scripts(download_scritps={}):
             complete_name = script_obj[0].get('name')
             destination = f'{MODULES_PATH}/{module_name}/items/scripts/{complete_name}'
             url = "https://f001.backblazeb2.com/file/app-linkaform/public-client-{}/scripts/{}".format(account_id, complete_name)
-            print('url=',url)
             download_file(url, destination)
     return True
 
