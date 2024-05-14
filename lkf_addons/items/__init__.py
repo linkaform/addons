@@ -246,7 +246,6 @@ class Items(LKFException):
             self.LKFException(msg)
         return True
 
-
     def get_child_element(self, parent_xml, child_tag):
         """
         Retrieves the first child element with the specified tag from the given parent XML element.
@@ -274,7 +273,6 @@ class Items(LKFException):
         # Find the first child element with the specified tag
         child_element = parent_xml.find(child_tag)
         return child_element
-
 
     def get_child_element_from_file(self, file_path, child_tag):
         """
@@ -317,7 +315,6 @@ class Items(LKFException):
             # Return all children of the found element
             return list(parent_element)
 
-
     def get_inherit_attributes(self, inherit_file_path):
         # Load the XML file
         tree = ET.parse(inherit_file_path)
@@ -330,7 +327,6 @@ class Items(LKFException):
         # Extract all attributes of the 'inherit' element
         attributes = inherit.attrib
         return attributes
-
 
     def load_module_template_file(self, file_path, file_name, file_data=None, inherit_attr={}):
         modules_path = file_path.replace(ADDONS_PATH, MODULES_PATH)
@@ -400,7 +396,6 @@ class Items(LKFException):
             elif item not in result:
                 result.append(item)
         return result
-
 
     def get_anddons_and_modules_items(self, itype, sub_dir=None):
         res_addons = self.get_all_items_json(itype, sub_dir=sub_dir, path=ADDONS_PATH)
