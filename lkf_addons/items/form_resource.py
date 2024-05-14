@@ -49,7 +49,6 @@ class FormResource(items.Items):
         install_order += [x  for x in instalable_forms.keys() if x not in install_order]
         response = []
         for form_name in install_order:
-            print('Installing Form: ', form_name)
             detail = instalable_forms[form_name]
             if detail.get('path'):
                 this_path = '{}/{}'.format(self.path, detail['path'])
@@ -119,7 +118,7 @@ class FormResource(items.Items):
         return form_file
 
     def instalable_forms(self, install_order=None):
-        items_json = self.get_all_items_json('forms')
+        items_json = self.get_anddons_and_modules_items('forms')
         forms_data = self.get_form_modules(items_json)
         if install_order:
             forms_data['install_order'] = install_order

@@ -4,9 +4,13 @@ import sys, os
 import subprocess
 import importlib
 
-from linkaform_api import utils
-from download_module import download_modules
+from linkaform_api import utils, lkf_object
+from linkaform_api.lkf_object import LKFBase 
 
+from download_module import download_modules
+from download_module import ADDONS_PATH, MODULES_PATH
+
+sys.path.append(ADDONS_PATH)
 sys.path.append('/srv/scripts/addons/config/')
 sys.path.append('/srv/scripts/addons/modules')
 
@@ -57,23 +61,7 @@ ask_reports = True
 kwargs = {}
 download_related = False
 
-def search_modules():
-    cmd = ['ls', '-d', '/srv/scripts/addons/modules/*/']
-    cmd = ['find', '/srv/scripts/addons/modules' , '-maxdepth', '1', '-type', 'd']
-    process = subprocess.Popen(args=cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-    output, error = process.communicate()
-    res = []
-    output = output.split(b'\n')
-    for x in output:
-        x = x.decode('utf-8')
-        x = x.replace('/srv/scripts/addons/modules','').strip('/')
-        if x.find('.') == 0 or x.find('_') ==0:
-            continue
-        if x:
-            res.append(x)
-    return res
+
 
 def do_load_modules(load_modules, **kwargs):
     response = []
@@ -85,6 +73,7 @@ def do_load_modules(load_modules, **kwargs):
             #####################################################################
             ### Scripts
             if load_script:
+                print('module', module)
                 scripts = importlib.import_module('{}.items.scripts'.format(module))
                 script_resource = scripts.ScriptResource(
                     path=scripts.__path__[0], 
@@ -147,7 +136,6 @@ def do_load_modules(load_modules, **kwargs):
                 #try:
                 if True:
                     reports = importlib.import_module('{}.items.reports'.format(module))
-                    print('rssssssssssssssseports', reports.__path__)
                     report_resource = reports.ReportResource(
                         path=reports.__path__[0], 
                         module=module, 
@@ -191,11 +179,15 @@ def set_value_id(value):
     return value
 
 def get_modules_2_install(commands):
-    modules = search_modules()
+    lkf_base = LKFBase()
+    addons = lkf_base.search_modules(path=ADDONS_PATH)
+    modules = lkf_base.search_modules(path=MODULES_PATH)
+    all_modules = list(set(addons)|set(modules))
+    all_modules.sort()
     for idx, c in enumerate(commands):
         if c == '--module' or c == '-m':
             module = commands[idx+1]
-            if module in modules:
+            if module in all_modules:
                 return module
             else:
                 raise ValueError(f'No module found with name: {module}, available options are: {modules}')
@@ -294,6 +286,7 @@ if __name__ == '__main__':
             kwargs.update({'force':True})
 
         print('Running on:', '== {} =='.format(settings.ENV) * 10)
+        print('With User:', '== {} =='.format(settings.config['USERNAME']))
         environment = get_items_2_load(commands)
         if not environment or environment == 'prod' or settings.ENV == 'prod':
             environment =  set_value(input(f"We are running on {settings.ENV} Enviroment, are you sure [y/n] (default n):"))

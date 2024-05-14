@@ -324,6 +324,249 @@ class Reports(base.LKF_Report, Stock):
             result[epoch].append(r)
         return result
 
+    def detail_one_many_one(self, warehouse=None, product_code=None, lot_number=None,  location=None, date_from=None, date_to=None, status='done', **kwargs):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": {"$in":self.STOCK_ONE_MANY_ONE_FORMS}
+            }
+        unwind_query = {}
+        if date_from or date_to:
+            match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=f"{self.f['grading_date']}"))
+        #Stage 1 Match
+        if status:
+            match_query.update({f"answers.{self.f['inv_adjust_status']}":status})
+        if warehouse:
+            match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})    
+        if location:
+            match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})    
+        
+        query= [{'$match': match_query },]
+        
+        #Stage 2 Match
+        if product_code:
+            unwind_query.update({f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})
+        if lot_number:
+            unwind_query.update({f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_lot']}":lot_number})  
+        if unwind_query:
+            query += [
+            {'$unwind': f"$answers.{self.f['move_group']}"},
+            {'$match': unwind_query }
+            ]
+        query += [
+            {'$project':
+                {'_id': 1,
+                    'folio': "$folio",
+                    'form_id':'$form_id',
+                    'created_at': "$created_at",
+                    'date': f"$answers.{self.f['grading_date']}",
+                    'product_code': f"$answers.{self.SKU_OBJ_ID}.{self.f['product_code']}",
+                    'lot_number': f"$answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_lot']}",
+                    'warehouse_from': f"$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
+                    'warehouse_location_from': f"$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}",
+                    'warehouse_to':f"$answers.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_dest']}",
+                    'warehouse_location_to':f"$answers.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_location_dest']}",
+                    'move_type':{ "$cond":[ 
+                        {"$eq":[ f"$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}" , warehouse]}, 
+                        "Out", 
+                        "In" ]},
+                    'qty':f"$answers.{self.f['move_group']}.{self.f['move_group_qty']}"
+                    }
+            },
+            {'$project':
+                {'_id': 1,
+                    'folio': "$folio",
+                    'form_id':'$form_id',
+                    'created_at': "$created_at",
+                    'date': "$date",
+                    'product_code': "$product_code",
+                    'lot_number': "$lot_number",
+                    'warehouse_from': "$warehouse_from",
+                    'warehouse_location_from': "$warehouse_location_from",
+                    'warehouse_to': "$warehouse_to",
+                    'warehouse_location_to': "$warehouse_location_to",
+                    'move_type': "$move_type",
+                    'qty_in' :{ "$cond":[ 
+                        {"$eq":[ "$move_type" , "In"]}, 
+                        "$qty", 
+                        0 ]},
+                    'qty_out' :{ "$cond":[ 
+                        {"$eq":[ "$move_type" , "Out"]}, 
+                       "$qty", 
+                        0 ]},
+                    }
+            },
+            {'$sort': {'date': 1}}
+            ]
+        print('OMO query=', simplejson.dumps(query, indent=4))
+        res = self.cr.aggregate(query)
+        if kwargs.get('result'):
+            result = kwargs['result']
+        else:
+            result = {}
+
+        for r in res:
+            print('r=',r)
+            if r['form_id'] == self.STOCK_MANY_LOCATION_OUT:
+                warehouse_to = 'Pull'
+                warehouse_location_to = 'Greenhouse'
+            r['created_at'] = str(r['created_at'])
+            epoch = self.date_2_epoch(r.get('date'))
+            if r.get('warehouse_to'):
+                r['warehouse_to'] = r['warehouse_to'].replace('_', ' ').title()
+            else:
+                r['warehouse_to'] = warehouse_to
+
+            if r.get('warehouse_location_to'):
+                r['warehouse_to'] += f" / {r['warehouse_location_to']}"
+            elif warehouse_location_to:
+                r['warehouse_to'] += f" / {warehouse_location_to}"
+
+            if r.get('warehouse_location_from'):
+                r['warehouse_from'] += f" / {r['warehouse_location_from']}"
+
+            result[epoch] = result.get(epoch,[])
+            result[epoch].append(r)
+        return result
+
+    def detail_production_moves(self, warehouse=None, product_code=None, lot_number=None,  location=None, date_from=None, date_to=None, status='posted', **kwargs):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.PRODUCTION_FORM_ID,
+            }
+        match_query_stage2 = {}
+        if date_from or date_to:
+            match_query_stage2.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=f"{self.f['production_group']}.{self.f['set_production_date']}"))
+        if product_code:
+            match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+        if lot_number:
+            match_query.update({f"answers.{self.f['production_lote']}":lot_number})  
+        if warehouse:
+            match_query.update({f"answers.{self.WAREHOUSE_OBJ_ID}.{self.f['warehouse']}":warehouse})    
+        if location:
+            match_query_stage2.update({f"answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_lot_location']}":location})    
+        if status:
+            match_query_stage2.update({f"answers.{self.f['production_group']}.{self.f['production_status']}":status})
+        query= [{'$match': match_query },
+            {'$unwind': f"$answers.{self.f['production_group']}"},
+            ]
+        if match_query_stage2:
+            query += [{'$match': match_query_stage2 }]
+        query += [
+            {'$project':
+                {'_id': 1,
+                    'folio':'$folio',
+                    'date': f"$answers.{self.f['production_group']}.{self.f['set_production_date']}",
+                    'product_code': f"$answers.{self.SKU_OBJ_ID}.{self.f['product_code']}",
+                    'lot_number':f"$answers.{self.f['production_lote']}",
+                    'total': f"$answers.{self.f['production_group']}.{self.f['set_total_produced']}",
+                    }
+            },
+            {'$group':
+                {'_id':
+                    { 
+                        'id': '$_id',
+                        'product_code': '$product_code',
+                        'date': '$date',
+                        'lot_number': '$lot_number',
+                        'folio': '$folio',
+                      },
+                  'total': {'$sum': '$total'},
+                  }
+            },
+            {'$project':
+                {'_id': '$_id.id',
+                'product_code': '$_id.product_code',
+                'date': '$_id.date',
+                'lot_number': '$_id.lot_number',
+                'folio': '$_id.folio',
+                'qty_in': '$total',
+                'move_type':'In',
+                'warehouse_from':"Production",
+                'warehouse_to':warehouse,
+                }
+            },
+            {'$sort': {'date': 1}}
+            ]
+        res = self.cr.aggregate(query)
+        if kwargs.get('result'):
+            result = kwargs['result']
+        else:
+            result = {}
+        for r in res:
+            epoch = self.date_2_epoch(r.get('date'))
+            result[epoch] = result.get(epoch,[])
+            result[epoch].append(r)
+        return result
+
+    def detail_scrap_moves(self, warehouse=None, product_code=None, lot_number=None, location=None, date_from=None, date_to=None, status='done', **kwargs):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": {"$in":[self.SCRAP_FORM_ID, self.GRADING_FORM_ID]}
+            }
+        print('warehouse', warehouse)
+        if product_code:
+            match_query.update({f"answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})    
+        if warehouse:
+            match_query.update({f"answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['warehouse']}":warehouse})    
+        if location:
+            match_query.update({f"answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_lot_location']}":location})    
+        if lot_number:
+            match_query.update({f"answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_lot']}":lot_number})    
+        if status:
+            match_query.update({f"answers.{self.f['inv_scrap_status']}":status})
+        if date_from or date_to:
+            match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
+        query= [
+            {'$match': match_query },
+            {'$project':
+                {'_id': 1,
+                    'date': f"$answers.{self.f['grading_date']}",
+                    'created_at': "$created_at",
+                    'product_code': f"$answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_code']}",
+                    'lot_number': f"$answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_lot']}",
+                    'warehouse_from': f"$answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['warehouse']}",
+                    'scrap': f"$answers.{self.f['inv_scrap_qty']}",
+                    'cuarentin': f"$answers.{self.f['inv_cuarentin_qty']}",
+                    'warehouse_to':'Scrap',
+                    }
+            },
+            {'$sort': {'date': 1}}
+            ]
+        res = self.cr.aggregate(query)
+        move_type = kwargs.get('move_type')
+        if kwargs.get('result'):
+            result = kwargs['result']
+        else:
+            result = {}
+        for r in res:
+            r['created_at'] = str(r['created_at'])
+            epoch = self.date_2_epoch(r.get('date'))
+            result[epoch] = result.get(epoch,[])
+            cuarentine = r.get('cuarentin',0)
+            scrap = r.get('scrap',0)
+            print('r=',r)
+            print('scrap=',scrap)
+            if cuarentine:
+                r.update({
+                    'warehouse_to': "Cuarentin",
+                    'qty_out':cuarentine,
+                    })
+                result[epoch].append(r)
+            if scrap:
+                if move_type == 'in':
+                    if r['warehouse_to'] != 'Scrap':
+                        continue
+                if move_type == 'out':
+                    if r['warehouse_from'] != 'Scrap':
+                        continue
+                print('qty out', scrap)
+                r.update({
+                    'warehouse_to': "Scrap",
+                    'qty_out':scrap,
+                    })
+                result[epoch].append(r)
+        return result
+
     def get_report_filters(self, filters=[], product_code=None):
         mango_query = {"selector":
             {"_id":

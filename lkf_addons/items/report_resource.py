@@ -97,8 +97,8 @@ class ReportResource(items.Items):
                     form_file[item][file_type] = file_name
         return form_file
 
-    def instalable_reports(self, install_order=None):
-        items_files = self.get_all_items_json('reports')
+    def instalable_reports(self, install_order=None, path='/srv/scripts/addons/modules'):
+        items_files = self.get_anddons_and_modules_items('reports' )
         reports_data = self.get_report_modules(items_files)
         if install_order:
             reports_data['install_order'] = install_order

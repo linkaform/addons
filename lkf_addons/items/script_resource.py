@@ -70,7 +70,7 @@ class ScriptResource(items.Items):
         return form_file
 
     def instalable_scripts(self, install_order=None):
-        items_files = self.get_all_items_json('scripts')
+        items_files = self.get_anddons_and_modules_items('scripts')
         scripts_data = self.get_script_modules(items_files)
         if install_order:
             scripts_data['install_order'] = install_order

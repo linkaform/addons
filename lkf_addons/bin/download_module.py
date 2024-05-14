@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import os
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
 from copy import deepcopy
@@ -11,6 +12,9 @@ from linkaform_api import utils
 sys.path.append('/srv/scripts/addons/config/')
 sys.path.append('/srv/scripts/addons/modules')
 MODULES_PATH = '/srv/scripts/addons/modules'
+ADDONS_PATH = '/usr/local/lib/python3.7/site-packages/lkf_addons/addons'
+
+
 import settings
 from uts import get_lkf_api, get_lkf_module
 
@@ -24,26 +28,20 @@ from settings import *
 
 force_items = {
     "forms":{
-         #100515:None,
-         # 114466:None,
-         # 115958:None,
-         # 107815:None,
-         # 115957:None,
-         # 107578:None,
-         # 114462:None,
+        117904:None,
+        117685:None,
+        116635:None,
+        116110:None,
+        116771:None,
+        116113:None,
+
         },
     "catalogs":{
-        # 116004:None,
-        # 115950:None,
-        # 116000:None,
-        # 107693:None,
-        # 114468:None,
-        # 114465:None,
-        # 114464:None,
-        # 114827:None,
-        # 114114:None,
-    },
+        116106:None,
+
+ },
     "scripts":{
+    116098:None
 
     }
 }
@@ -69,11 +67,15 @@ lkf_modules = None
 lkf_api = None
 
 def download_file(url, destination):
+    print('destination', destination)
+    file_path = destination.split('/')
+    file_path.pop(-1)
+    file_path = '/'.join(file_path)
+    os.makedirs(file_path, exist_ok=True)
     urllib.request.urlretrieve(url, destination)
 
 def download_modules(modules, options, items_ids={}, download_related=False):
     global lkf_api, lkf_modules, module_name, items
-    print('item_obj_id',items_ids)
     if items_ids:
         items = items_ids
         modules = list(items.keys())
@@ -83,7 +85,7 @@ def download_modules(modules, options, items_ids={}, download_related=False):
     lkf_api = get_lkf_api()
     for module_name in modules:
         if 'forms' in options or 'form' in options:
-            print('download_related', download_related)
+            print('Download Related Forms : ', download_related)
             get_forms(force_items['forms'], download_related=download_related)
         if 'catalogs' in options or 'catalog' in options:
             print('------------------')
@@ -134,10 +136,11 @@ def get_catalogs(download_catalogs={}):
     global items, installed_items
     if not download_catalogs:
         download_catalogs = deepcopy(items['catalogs'])
-    print('downloading catalog_name...',download_catalogs)
+    print('Downloading Catalogs : ',download_catalogs)
     for catalog_id, catalog_name in download_catalogs.items():
-        print('catalog_name...',catalog_name)
+        print('\n')
         catalog_name = get_item_name('catalogs', catalog_id)
+        print(f'Downloading Catalog Name: {catalog_name} with id: {catalog_id}')
         catalog_json = lkf_api.get_catalog_id_fields(catalog_id, jwt_settings_key='JWT_KEY')
         if not catalog_json.get('catalog'):
             print(f'Catalog : {catalog_name} NOT found')
@@ -161,6 +164,8 @@ def get_forms(download_forms={}, download_related=False):
     print('download_forms', download_forms)
     for form_id in list(download_forms.keys()):
         form_name = get_item_name('forms', form_id)
+        print('\n')
+        print(f'         Downloading form: {form_name} with id: {form_id}')
         form_data_json = lkf_api.get_form_to_duplicate(form_id, jwt_settings_key='JWT_KEY')
         if not form_data_json:
             print('************* WARNING ************* : Form_id not found', form_id)
@@ -184,11 +189,12 @@ def get_forms(download_forms={}, download_related=False):
         if isinstance(workflow_json, list):
             if workflow_json and len(workflow_json) > 0:
                 workflow_xml = json_to_xml(workflow_json[0])
-                print('Form Name: ',form_name)  
                 save_workflow_xml(workflow_xml, form_name)
         # print('workflow_json=workflow_json',workflow_json)
     installed_items['forms'].update(download_forms)
     if download_related:
+        print('\n')
+        print('>>>>>>>>>>>>>>>>>> Downloading Related Files <<<<<<<<<<<<<<<<<<<<<<<')
         get_new_items('forms')
         get_new_items('catalogs')
         get_new_items('scripts')
@@ -230,14 +236,16 @@ def get_item_name(item_type, item_id=None, element=None, attribute='name', item_
     if not item_name:
         item_type_dict = {'catalogs':'catalog','scripts':'script', 'forms':'form', 'reports':'report'}
         item_obj = lkf_api.get_item(item_id, item_type_dict[item_type])
-        print('item_id', item_id)
-        print('item_type_dict[item_type]', item_type_dict[item_type])
-        print('item0011', item_obj)
         item_obj = item_obj.get('data',[])
         item_json={}
         if item_obj and len(item_obj) > 0:
-            print('item00', item_obj)
-            item_json = item_obj[0]
+            try:
+                item_json = item_obj[0]
+            except:
+                msg = "Something went wrong, plese check that the item_id: {} "
+                msg += "The most common thing here is that the id does not exists and someone is seraching for it"
+                msg += "See who is tring to search form it!!!"
+                raise(msg)
         item_name = item_json.get('name', 'no_name')
     item_name = strip_chaaracters(item_name)
     items[item_type][item_id] = item_name
@@ -255,7 +263,7 @@ def get_scripts(download_scritps={}):
         script_obj = script_data_json.get('data',[])
         if script_obj and len(script_obj) > 0:
             complete_name = script_obj[0].get('name')
-            destination = f'{MODULES_PATH}/{module_name}/items/scripts/{complete_name}'
+            destination = f'{MODULES_PATH}/{module_name}/items/scripts/_downloads/{complete_name}'
             url = "https://f001.backblazeb2.com/file/app-linkaform/public-client-{}/scripts/{}".format(account_id, complete_name)
             download_file(url, destination)
     return True
@@ -274,7 +282,6 @@ def save_form_xml(xml_data, form_name):
                 for cprop in list(catalog_element):
                     is_catalog = True
                     if cprop.tag == 'catalog_id':
-                        
                         catalog_name = get_item_name('catalogs', cprop.text, field, attribute='label')
                         cprop.text = "{{ catalog." + catalog_name + ".id }}"
                         field_type = field.find('field_type')
@@ -286,8 +293,9 @@ def save_form_xml(xml_data, form_name):
                             if catalog_field_id != None and catalog_field_id.text != None:
                                 catalog_field_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
 
-    print('writhing .... ', f'{MODULES_PATH}/{module_name}/items/forms/{form_name}.xml')
-    a = tree.write(f'{MODULES_PATH}/{module_name}/items/forms/{form_name}.xml', encoding="utf-8", xml_declaration=True)
+    #a = tree.write(f'{MODULES_PATH}/{module_name}/items/forms/downloads/{form_name}.xml', encoding="utf-8", xml_declaration=True)
+    file_name = f'{form_name}.xml'
+    save_file(tree, module_name, 'forms', file_name)
     return True
 
 def save_catalog_xml(xml_data, form_name):
@@ -324,8 +332,21 @@ def save_catalog_xml(xml_data, form_name):
                                         catalog_element.text = "{{ catalog." + catalog_name + ".obj_id }}"
                             if catalog_element.tag == 'name':
                                 catalog_element.text = "{{ catalog." + catalog_name + ".name }}"
-    tree.write(f'{MODULES_PATH}/{module_name}/items/catalogs/{form_name}.xml', encoding="utf-8", xml_declaration=True)
+    #tree.write(f'{MODULES_PATH}/{module_name}/items/catalogs/downloads/{form_name}.xml', encoding="utf-8", xml_declaration=True)
+    file_name = f'{form_name}.xml'
+    save_file(tree, module_name, 'catalog', file_name)
+    return True
 
+def save_file(tree, module_name, item_type, file_name):
+    file_path = f'{MODULES_PATH}/{module_name}/items/{item_type}/_downloads'
+    try:
+        os.makedirs(file_path, exist_ok=True)
+    except OSError as e:
+        # Handle the error in case of any other OS related issues
+        msg = f"Error creating directory {file_path} msg: {e}"
+        raise(msg)
+    print('saving file on .... ', f'{file_path}/{file_name}')
+    tree.write(f'{file_path}/{file_name}', encoding="utf-8", xml_declaration=True)
     return True
 
 def save_rule_xml(xml_data, form_name):
@@ -356,8 +377,9 @@ def save_rule_xml(xml_data, form_name):
                             field_id.text = "{{ " + f"catalog.{catalog_name}.obj_id" + "}}"
                             #print('field txt', "{{ " + f"catalog.{catalog_name}.obj_id" + "}}")
 
-    
-    tree.write(f'{MODULES_PATH}/{module_name}/items/forms/{form_name}_rules.xml', encoding="utf-8", xml_declaration=True)
+    # tree.write(f'{MODULES_PATH}/{module_name}/items/forms/downloads/{form_name}_rules.xml', encoding="utf-8", xml_declaration=True)
+    file_name = f'{form_name}_rules.xml'
+    save_file(tree, module_name, 'forms', file_name)
     return True
 
 def save_workflow_xml(xml_data, form_name):
@@ -431,8 +453,10 @@ def save_workflow_xml(xml_data, form_name):
                                     cat_id.text = "{{ catalog." + catalog_name + ".id }}"
                                     catalog_field_id = trig_cat.find('catalog_field_id')
                                     catalog_field_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
-    tree.write(f'{MODULES_PATH}/{module_name}/items/forms/{form_name}_workflow.xml', encoding="utf-8", xml_declaration=True)
-    #print('items', items)
+    
+    #tree.write(f'{MODULES_PATH}/{module_name}/items/forms/downloads/{form_name}_workflow.xml', encoding="utf-8", xml_declaration=True)
+    file_name = f'{form_name}_workflow.xml'
+    save_file(tree, module_name, 'forms', file_name)
     return True
 
 def set_module_items(set_modules):

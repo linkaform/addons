@@ -87,8 +87,9 @@ class CatalogResource(items.Items):
                     form_file[item][file_type].append(file)
         return form_file
 
-    def instalable_catalogs(self, install_order=None):
-        items_json = self.get_all_items_json('catalogs')
+    def instalable_catalogs(self, install_order=None, path='/srv/scripts/addons/modules'):
+        items_json = self.get_anddons_and_modules_items('catalogs')
+        
         catalogs_data = self.get_catalog_modules(items_json)
         if install_order:
             catalogs_data['install_order'] = install_order
