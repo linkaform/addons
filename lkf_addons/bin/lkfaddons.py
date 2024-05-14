@@ -73,7 +73,6 @@ def do_load_modules(load_modules, **kwargs):
             #####################################################################
             ### Scripts
             if load_script:
-                print('module', module)
                 scripts = importlib.import_module('{}.items.scripts'.format(module))
                 script_resource = scripts.ScriptResource(
                     path=scripts.__path__[0], 
