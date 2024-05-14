@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.checkin_checkout_casetas.id }}</form_id>
+    <id>663c00579e0fe2c750f27499</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>663bffc28d00553254f274e0</field_id>
+                        <group_id>None</group_id>
+                        <id>663bffc28d00553254f274e0</id>
+                        <label>Estatus</label>
+                        <type>radio</type>
+                    </field>
+                    <value>salida</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>663bffc28d00553254f274e2</field_id>
+                    <group_id>None</group_id>
+                    <id>663bffc28d00553254f274e2</id>
+                    <label>Fecha y hora Checkout</label>
+                    <type>datetime</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar fecha checkout</name>
+            <operator>and</operator>
+            <rule_id>15cb1ef12030231c</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

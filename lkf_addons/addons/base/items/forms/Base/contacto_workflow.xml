@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.contacto.id }}</form_id>
+    <id>663a810fe48382c5b1230915</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>663a810fe48382c5b123090e</_id>
+                    <action_id>12</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <synched_catalogs>
+                            <item>
+                                <couch_id>663a8079e48382c5b123090c</couch_id>
+                                <id>117958</id>
+                                <name>Contacto</name>
+                            </item>
+                        </synched_catalogs>
+                    </configuration>
+                    <name>Sync Contact</name>
+                </item>
+            </actions>
+            <id>663a810fe48382c5b123090f</id>
+            <name>Sync Catalog</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-05-08T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-05-07T19:28:52.294Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
