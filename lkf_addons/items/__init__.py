@@ -246,7 +246,6 @@ class Items(LKFException):
             self.LKFException(msg)
         return True
 
-
     def get_child_element(self, parent_xml, child_tag):
         """
         Retrieves the first child element with the specified tag from the given parent XML element.
@@ -274,7 +273,6 @@ class Items(LKFException):
         # Find the first child element with the specified tag
         child_element = parent_xml.find(child_tag)
         return child_element
-
 
     def get_child_element_from_file(self, file_path, child_tag):
         """
@@ -317,7 +315,6 @@ class Items(LKFException):
             # Return all children of the found element
             return list(parent_element)
 
-
     def get_inherit_attributes(self, inherit_file_path):
         # Load the XML file
         tree = ET.parse(inherit_file_path)
@@ -330,7 +327,6 @@ class Items(LKFException):
         # Extract all attributes of the 'inherit' element
         attributes = inherit.attrib
         return attributes
-
 
     def load_module_template_file(self, file_path, file_name, file_data=None, inherit_attr={}):
         modules_path = file_path.replace(ADDONS_PATH, MODULES_PATH)
@@ -372,23 +368,40 @@ class Items(LKFException):
         # else:
         #     raise LKFException('No file with name: {} found, at path: {}'.format(file_name, file_path))
 
+    def merge_addons_modules(self, list1, list2):
+        result = []
+        # Helper function to find if a dictionary exists in the result and returns its index
+        def find_dict_in_list(dict_item, list_of_items):
+            for index, item in enumerate(list_of_items):
+                if isinstance(item, dict) and item.keys() == dict_item.keys():
+                    return index
+            return -1
+        # Function to merge two dictionaries
+        def merge_dicts(dict1, dict2):
+            for key in dict2:
+                if key in dict1:
+                    # Assuming values in these dictionaries are lists
+                    dict1[key] = list(set(dict1[key] + dict2[key]))
+                else:
+                    dict1[key] = dict2[key]
+            return dict1
+        # Add items from both lists into result
+        for item in list1 + list2:
+            if isinstance(item, dict):
+                idx = find_dict_in_list(item, result)
+                if idx >= 0:
+                    result[idx] = merge_dicts(result[idx], item)
+                else:
+                    result.append(item)
+            elif item not in result:
+                result.append(item)
+        return result
+
     def get_anddons_and_modules_items(self, itype, sub_dir=None):
         res_addons = self.get_all_items_json(itype, sub_dir=sub_dir, path=ADDONS_PATH)
         res_modules = self.get_all_items_json(itype, sub_dir=sub_dir, path=MODULES_PATH)
-        for r in res_addons:
-            if type(r) == dict:
-                #esta dentro de un directorio, buscar el directorio dentro del modulos..
-                for k in list(r.keys()):
-                    for m in res_modules:
-                        if type(m) == dict:
-                            for km in list(m.keys()):
-                                if km == k:
-                                    #TODO, FOLDER DEL FOLDER....
-                                    r[k] = list(set(r[k]) | set(m[km]))
-                        else:
-                            if not m in res_addons:
-                                res_addons.append(m)
-        return res_addons
+        addons_modules = self.merge_addons_modules(res_addons,res_modules)
+        return addons_modules
 
     def get_all_items_json(self, itype, sub_dir=None, path=MODULES_PATH):
         search_path = f'{path}/{self.module}/items/{itype}/'

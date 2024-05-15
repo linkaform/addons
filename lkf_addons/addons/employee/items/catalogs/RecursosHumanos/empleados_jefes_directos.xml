@@ -1,0 +1,1315 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
+    <description />
+    <_rev>38-65f2e6e5c26eeb1e994e3f4caf994c34</_rev>
+    <updated_at>2024-05-08T19:33:02.934135+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Empleados Jefes Directos</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-05-08T19:33:02.934135+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>663bd36eb19b7fb7d9e97ccb</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Nombre completo</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>images</field_type>
+                    <required>True</required>
+                    <field_id>663bd4f719b0aab097e97cde</field_id>
+                    <properties>
+                        <date_format />
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <min_images_count>0</min_images_count>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                        <fieldId>[]</fieldId>
+                        <location_decimals>None</location_decimals>
+                        <metadata>[]</metadata>
+                    </properties>
+                    <label>Fotografía del empleado</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd5c0b6e749213859eb6b</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>RFC</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd5c0b6e749213859eb6c</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>CURP</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd5c0b6e749213859eb6d</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>NSS</label>
+                </item>
+                <item>
+                    <field_type>date</field_type>
+                    <required>False</required>
+                    <field_id>663bd5c0b6e749213859eb6e</field_id>
+                    <properties>
+                        <format>vertical</format>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Fecha de nacimiento</label>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <required>False</required>
+                    <field_id>663bd5c0b6e749213859eb6f</field_id>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>femenino</value>
+                            <label>Femenino</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>masculino</value>
+                            <label>Masculino</label>
+                        </item>
+                    </options>
+                    <label>Género</label>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <required>False</required>
+                    <field_id>663bd5c0b6e749213859eb70</field_id>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>primaria_trunca</value>
+                            <label>PRIMARIA TRUNCA</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>primaria_concluida</value>
+                            <label>PRIMARIA CONCLUIDA</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>secundaria_trunca</value>
+                            <label>SECUNDARIA TRUNCA</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>secundaria_concluida</value>
+                            <label>SECUNDARIA CONCLUIDA</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>bachillerato_trunco</value>
+                            <label>BACHILLERATO TRUNCO</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>bachillerato_concluido</value>
+                            <label>BACHILLERATO CONCLUIDO</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>nivel_superior_trunca</value>
+                            <label>NIVEL SUPERIOR TRUNCA</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>nivel_superior_concluida</value>
+                            <label>NIVEL SUPERIOR CONCLUIDA</label>
+                        </item>
+                    </options>
+                    <label>Nivel de estudios</label>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <required>False</required>
+                    <field_id>663bd5c0b6e749213859eb71</field_id>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>activo</value>
+                            <label>Activo</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>inactivo</value>
+                            <label>Inactivo</label>
+                        </item>
+                    </options>
+                    <label>Estatus dentro de la empresa</label>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <field_id>663bd5c0b6e749213859eb72</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Estatus de disponibilidad</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>disponible</value>
+                            <label>Disponible</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>no_disponible</value>
+                            <label>No disponible</label>
+                        </item>
+                    </options>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_name>Datos generales</page_name>
+            <page_description>None</page_description>
+        </item>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>663a7e0fe48382c5b1230902</item>
+                        <item>663a7dd6e48382c5b12308ff</item>
+                        <item>663a7ca6e48382c5b12308fa</item>
+                        <item>663e5c8cf5b8a7ce8211ed0c</item>
+                        <item>663a7f79e48382c5b123090a</item>
+                        <item>663a7ee1e48382c5b1230905</item>
+                        <item>663a7f67e48382c5b1230908</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.contacto.obj_id }}</field_id>
+                    <label>Domicilio</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>663a7e0fe48382c5b1230901</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.contacto.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.contacto.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>663a7e0fe48382c5b1230901</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre de la Dirección</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663a7e0fe48382c5b1230902</field_id>
+                    <label>Direccion</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663a7dd6e48382c5b12308ff</field_id>
+                    <label>Nombre Estado</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663a7ca6e48382c5b12308fa</field_id>
+                    <label>Pais</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663e5c8cf5b8a7ce8211ed0c</field_id>
+                    <label>Geolocalizacion</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>geolocation</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663a7f79e48382c5b123090a</field_id>
+                    <label>Colonia</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663a7ee1e48382c5b1230905</field_id>
+                    <label>Codigo Postal</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663a7f67e48382c5b1230908</field_id>
+                    <label>Tipo de Contacto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>select</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+            </page_fields>
+            <page_name_tab>page_name2</page_name_tab>
+            <page_name>Domicilio</page_name>
+        </item>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>[]</catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.compaia.obj_id }}</field_id>
+                    <label>Empresa</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>663a8153e48382c5b1230918</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.compaia.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.compaia.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.compaia.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663a8153e48382c5b1230918</field_id>
+                    <label>Compañia</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.compaia.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.compaia.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb972a</field_id>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>soltero(a)</value>
+                            <label>Soltero(a)</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>casado(a)</value>
+                            <label>Casado(a)</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>viudo(a)</value>
+                            <label>Viudo(a)</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>unión_libre</value>
+                            <label>Unión libre</label>
+                        </item>
+                    </options>
+                    <label>Estado civil</label>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb972b</field_id>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <size>small</size>
+                        <step>1</step>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Número de empleado</label>
+                </item>
+                <item>
+                    <field_type>datetime</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb972c</field_id>
+                    <properties>
+                        <format>vertical</format>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Fecha de ingreso</label>
+                </item>
+                <item>
+                    <field_type>datetime</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb972d</field_id>
+                    <properties>
+                        <format>vertical</format>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Fecha de antigüedad</label>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb972e</field_id>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>permanente</value>
+                            <label>Permanente</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>eventual</value>
+                            <label>Eventual</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>planta</value>
+                            <label>Planta</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>becario</value>
+                            <label>Becario</label>
+                        </item>
+                    </options>
+                    <label>Tipo de contrato</label>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>datetime</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb972f</field_id>
+                    <properties>
+                        <format>vertical</format>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Vencimiento de contrato</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb9730</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Antigüedad</label>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb9731</field_id>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <size>small</size>
+                        <step>1</step>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Días pendientes de vacaciones</label>
+                </item>
+                <item>
+                    <field_type>datetime</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb9732</field_id>
+                    <properties>
+                        <format>vertical</format>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Fecha de baja</label>
+                </item>
+                <item>
+                    <field_type>datetime</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb9733</field_id>
+                    <properties>
+                        <format>vertical</format>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Fecha de baja ante el IMSS</label>
+                </item>
+                <item>
+                    <field_type>textarea</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb9734</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Motivo de baja</label>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <required>False</required>
+                    <field_id>663bd7f1d30e66d8d7cb9735</field_id>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>abandono_de_empleo</value>
+                            <label>Abandono de empleo</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>boletinado</value>
+                            <label>Boletinado</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>cancelación_de_tramite_de_alta</value>
+                            <label>Cancelación de tramite de alta</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>fallecimiento</value>
+                            <label>Fallecimiento</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>finiquito</value>
+                            <label>Finiquito</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>jubilación</value>
+                            <label>Jubilación</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>petición_del_contratista</value>
+                            <label>Petición del contratista</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>proceso_legal</value>
+                            <label>Proceso legal</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>renuncia_voluntaria</value>
+                            <label>Renuncia voluntaria</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>termino_de_contrato</value>
+                            <label>Termino de contrato</label>
+                        </item>
+                    </options>
+                    <label>Tipo de baja</label>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_name_tab>page_name3</page_name_tab>
+            <page_name>Detalles de contratación</page_name>
+        </item>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>[]</catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.configuracin_de_departamentos_y_puestos.obj_id }}</field_id>
+                    <label>Puesto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.configuracin_de_departamentos_y_puestos.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracin_de_departamentos_y_puestos.id }}</catalog_id>
+                        <view_fields>
+                            <item>663bc4ed8a6b120eab4d7f1e</item>
+                            <item>663bc4c79b8046ce89e97cf4</item>
+                        </view_fields>
+                        <name>{{ catalog.configuracin_de_departamentos_y_puestos.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663bc4ed8a6b120eab4d7f1e</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre del departamento</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.configuracin_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracin_de_departamentos_y_puestos.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663bc4c79b8046ce89e97cf4</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre del puesto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.configuracin_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracin_de_departamentos_y_puestos.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <required>False</required>
+                    <field_id>663bd83cbcceab348af27423</field_id>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>campo</value>
+                            <label>Campo</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>oficina</value>
+                            <label>Oficina</label>
+                        </item>
+                    </options>
+                    <label>Horario de trabajo</label>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_name_tab>page_name4</page_name_tab>
+            <page_name>Puesto de trabajo</page_name>
+        </item>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>select</field_type>
+                    <required>False</required>
+                    <field_id>663bd91e75151ab4554d7f87</field_id>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>azteca</value>
+                            <label>AZTECA</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>banamex</value>
+                            <label>BANAMEX</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>banbajio</value>
+                            <label>BANBAJIO</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>banca_mifel</value>
+                            <label>BANCA MIFEL</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>bancomer</value>
+                            <label>BANCOMER</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>bancoppel</value>
+                            <label>BANCOPPEL</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>banorte</value>
+                            <label>BANORTE</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>banregio</value>
+                            <label>BANREGIO</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>bbva</value>
+                            <label>BBVA</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>becario</value>
+                            <label>BECARIO</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>cheque</value>
+                            <label>CHEQUE</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>hsbc</value>
+                            <label>HSBC</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>pendiente</value>
+                            <label>PENDIENTE</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>santander</value>
+                            <label>SANTANDER</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>scotiabank</value>
+                            <label>SCOTIABANK</label>
+                        </item>
+                    </options>
+                    <label>Banco</label>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd91e75151ab4554d7f88</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Sucursal</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd91e75151ab4554d7f89</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Cuenta bancaria</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd91e75151ab4554d7f8a</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Clabe interbancaria</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd91e75151ab4554d7f8b</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Número de tarjeta</label>
+                </item>
+            </page_fields>
+            <page_name_tab>page_name5</page_name_tab>
+            <page_name>Datos bancarios</page_name>
+        </item>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>email</field_type>
+                    <required>False</required>
+                    <field_id>663bd91e75151ab4554d7f8c</field_id>
+                    <properties>
+                        <email_configuration>{}</email_configuration>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Correo Personal</label>
+                </item>
+                <item>
+                    <field_type>email</field_type>
+                    <required>False</required>
+                    <field_id>663bd91e75151ab4554d7f8d</field_id>
+                    <properties>
+                        <email_configuration>{}</email_configuration>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Correo empresarial</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd91e75151ab4554d7f8f</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Teléfono personal</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd91e75151ab4554d7f8e</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Teléfono empresarial</label>
+                </item>
+            </page_fields>
+            <page_name_tab>page_name6</page_name_tab>
+            <page_name>Formas de contacto</page_name>
+        </item>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>files</field_type>
+                    <required>False</required>
+                    <field_id>663bd466b19b7fb7d9e97cd4</field_id>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <mime_types>[]</mime_types>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                    <label>CV</label>
+                </item>
+                <item>
+                    <field_type>files</field_type>
+                    <required>False</required>
+                    <field_id>663bd466b19b7fb7d9e97cd5</field_id>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <mime_types>[]</mime_types>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                    <label>ACTA DE NACIMIENTO</label>
+                </item>
+                <item>
+                    <field_type>files</field_type>
+                    <required>False</required>
+                    <field_id>663bd466b19b7fb7d9e97cd6</field_id>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <mime_types>[]</mime_types>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                    <label>CURP PDF</label>
+                </item>
+                <item>
+                    <field_type>files</field_type>
+                    <required>False</required>
+                    <field_id>663bd466b19b7fb7d9e97cd7</field_id>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <mime_types>[]</mime_types>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                    <label>RFC PDF</label>
+                </item>
+                <item>
+                    <field_type>files</field_type>
+                    <required>False</required>
+                    <field_id>663bd466b19b7fb7d9e97cd8</field_id>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <mime_types>[]</mime_types>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                    <label>CONSTANCIA DE SITUACIÓN FISCAL</label>
+                </item>
+                <item>
+                    <field_type>files</field_type>
+                    <required>False</required>
+                    <field_id>663bd466b19b7fb7d9e97cd9</field_id>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <mime_types>[]</mime_types>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                    <label>NSS PDF</label>
+                </item>
+                <item>
+                    <field_type>files</field_type>
+                    <required>False</required>
+                    <field_id>663bd466b19b7fb7d9e97cda</field_id>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <mime_types>[]</mime_types>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                    <label>INE</label>
+                </item>
+                <item>
+                    <field_type>files</field_type>
+                    <required>False</required>
+                    <field_id>663bd466b19b7fb7d9e97cdb</field_id>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <mime_types>[]</mime_types>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                    <label>COMPROBANTE DE DOMICILIO</label>
+                </item>
+            </page_fields>
+            <page_name_tab>page_name7</page_name_tab>
+            <page_name>Documentos</page_name>
+        </item>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>663bd466b19b7fb7d9e97cdc</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>ID usuario</label>
+                </item>
+            </page_fields>
+            <page_name_tab>page_name8</page_name_tab>
+            <page_name>Link</page_name>
+        </item>
+    </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>663bd36eb19b7fb7d9e97cca</_id>
+    <public>False</public>
+    <catalog_id>118417</catalog_id>
+</lkf>

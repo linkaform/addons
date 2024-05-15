@@ -52,9 +52,14 @@ RUN pip install backblaze_utils-0.1.tar.gz
 #WORKDIR /usr/local/bin/backblaze_utils
 RUN rm /tmp/*.tar.gz
 
+RUN adduser --home /srv/scripts/ --uid 1000 --disabled-password nonroot
 RUN mkdir -p /srv/scripts/addons/modules
 RUN mkdir -p /srv/scripts/addons/config
+RUN chown -R 1000:1000 /srv/scripts
 WORKDIR /srv/scripts/addons/modules
+
+
+USER nonroot
 
 ####################################
 # Image for prodcution             #
@@ -63,6 +68,8 @@ FROM develop as prod
 
 MAINTAINER Linkaform
 
+
+USER root
 RUN echo teesttt
 WORKDIR /tmp/
 ADD  https://f001.backblazeb2.com/file/lkf-resources/linkaform_api-3.0.tar.gz ./linkaform_api-3.0.tar.gz
@@ -73,5 +80,6 @@ RUN pip install linkaform_api-3.0.tar.gz
 COPY /lkf_addons /usr/local/lib/python3.7/site-packages/lkf_addons/
 COPY ./config /srv/scripts/addons/config
 
+USER nonroot
 
 #RUN pip install -r /tmp/requires.txt

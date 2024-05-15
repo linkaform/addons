@@ -2,6 +2,9 @@
 # print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
 from linkaform_api import settings
 
+MODULES_PATH = '/srv/scripts/addons/modules'
+ADDONS_PATH = '/usr/local/lib/python3.7/site-packages/lkf_addons/addons'
+
 config = {
     'COLLECTION' : 'form_answer',
     # 'MONGODB_REPLICASET': 'linkaform_replica',
