@@ -48,6 +48,10 @@ FORM_REGISTROS_DE_GASTOS_DE_VIAJE  = lkm.form_id('registros_de_gastos_de_viaje',
 FORM_AUTORIZACION_DE_VIATICOS = lkm.form_id('autorizacin_de_viaticos','id')
 FORM_BANK_TRANSACTIONS = lkm.form_id('entrega_de_efectivo','id')
 
+CATALOG_DESTINOS = lkm.catalog_id('destinos')
+CATALOG_DESTINOS_ID = CATALOG_DESTINOS.get('id')
+CATALOG_DESTINOS_OBJ_ID = CATALOG_DESTINOS.get('obj_id')
+
 VARS = {'gasto':[]}
 SOL = {}
 
@@ -114,18 +118,18 @@ class TestExpenses():
                 "61041b50d9ee55ab14965ba4": "autobus",
                 "61041d15d9ee55ab14965bb6": "solicitado",
                 "64dd637965b8662fabb5ac2d": "no",
-                "64fa5166c8b495bb779da16a": {
+                CATALOG_EMPLEADOS_OBJ_ID: {
                     "6092c0ebd8b748522446af26": "Obi-Wan Kenobi",
                     "6092c0ebd8b748522446af27": ["Jedi Master"],
                     "6092c0ebd8b748522446af28": ["obi@starwars.com"]
                 },
-                "6619729f25ff7f92e88148a6": {
+                CATALOG_DESTINOS_OBJ_ID: {
                     "66107030fc70de34c53e622d": "Mexico"
                 },
-                "64fa516ac8b495bb779da16c": {
+                CATALOG_MONEDA_OBJ_ID: {
                     "62aa1fa92c20405af671d123": "MXN"
                 },
-                "64fa5164cf0df6e57fa88b0b": {
+                CATALOG_RESP_AUT_OBJ_ID: {
                     "62bf232626827cd253f9db16": "Pra-Tre Veter ",
                     "62bf232626827cd253f9db17": ["pratre@starwars.com"]
                 },
@@ -140,6 +144,7 @@ class TestExpenses():
             }
 
         res_create =  lkf_api.post_forms_answers(metadata)
+        print('CATALOG_DESTINOS_OBJ_ID =',CATALOG_DESTINOS_OBJ_ID)
         print('res_create',res_create)
         assert res_create['status_code'] == 201
         VARS['solicitud'] = {'id':res_create['json']['id'],'folio':res_create['json']['folio']}

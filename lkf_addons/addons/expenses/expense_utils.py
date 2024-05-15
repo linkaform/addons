@@ -1010,6 +1010,8 @@ class Expenses(base.LKF_Base):
         anticipo_efectivo = self.query_get_transactions(folio)
         gasto_efectivo, gasto_compania = self.get_cash_expenses(expense_group)
         print(f'--- --- --- --- gasto_efectivo = {gasto_efectivo} gasto_compania = {gasto_compania}')
+        print(f'--- --- monto_aprobado = {monto_aprobado} - gasto_ejecutado = {gasto_ejecutado}')
+        print(f'--- --- monto_restante = {monto_restante}')
         monto_anticipo_restante = anticipo_efectivo - gasto_efectivo
         self.set_solicitud_catalog(folio)
         if run_validations:
