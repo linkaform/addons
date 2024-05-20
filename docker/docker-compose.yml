@@ -39,6 +39,8 @@ services:
     container_name: lkf-addons
     hostname: lkf-addons
     image: linkaform/addons:develop
+    networks:
+     linkaform:
     ports:
       - "5001:5000"
     build:    

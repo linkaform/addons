@@ -127,11 +127,9 @@ def do_load_modules(load_modules, **kwargs):
 
             ### Reports
             if load_reports:
-                print('mdule', module)
-                print('module', module)
-                print('settings', settings)
-                print('load_demo', load_demo)
-                print('load_data', load_data)
+                print('Module: ', module)
+                print('Load Demo info: ', load_demo)
+                print('Load Module Data: ', load_data)
                 #try:
                 if True:
                     reports = importlib.import_module('{}.items.reports'.format(module))

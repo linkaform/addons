@@ -28,20 +28,20 @@ from settings import *
 
 force_items = {
     "forms":{
-        117904:None,
-        117685:None,
-        116635:None,
-        116110:None,
-        116771:None,
-        116113:None,
+        # 117904:None,
+        # 117685:None,
+        # 116635:None,
+        # 116110:None,
+        # 116771:None,
+        # 116113:None,
 
         },
     "catalogs":{
-        116106:None,
+        # 116106:None,
 
  },
     "scripts":{
-    116098:None
+    # 116098:None
 
     }
 }
@@ -161,11 +161,10 @@ def get_forms(download_forms={}, download_related=False):
     global items
     if not download_forms:
         download_forms = deepcopy(items['forms'])
-    print('download_forms', download_forms)
     for form_id in list(download_forms.keys()):
         form_name = get_item_name('forms', form_id)
         print('\n')
-        print(f'         Downloading form: {form_name} with id: {form_id}')
+        print(f'Downloading form: {form_name} with id: {form_id}')
         form_data_json = lkf_api.get_form_to_duplicate(form_id, jwt_settings_key='JWT_KEY')
         if not form_data_json:
             print('************* WARNING ************* : Form_id not found', form_id)
@@ -176,7 +175,6 @@ def get_forms(download_forms={}, download_related=False):
             form_data_json = drop_hashKey(form_data_json)
             form_data_xml = json_to_xml(form_data_json)
         except:
-            print('form_data_json=',form_data_json)
             self.LKFException(form_data_json)
 
         save_form_xml(form_data_xml, form_name)
@@ -432,15 +430,24 @@ def save_workflow_xml(xml_data, form_name):
                         if catalog_field_id and catalog_field_id.text:
                             catalog_name = get_item_name('catalogs', item_obj_id=catalog_field_id.text, element=catalog_field_id)
                             catalog_field_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
-                        for customUser in assign.iter('customUser'):
-                            user_id = customUser.find('id')
-                            user_id.text = str(settings.config["USER"]['id'])
-                            user_first_name = customUser.find('first_name')
-                            user_first_name.text = settings.config["USER"]['first_name']
-                            user_email = customUser.find('email')
-                            user_email.text = settings.config["USER"]['email']
-                            user_username = customUser.find('username')
-                            user_username.text = settings.config["USER"]['username']
+                        # for customUser in assign.iter('customUser'):
+                        #     try:
+                        #         user_id = customUser.find('id')
+                        #         user_id.text = user_id.text
+                        #     except:
+                        #         print('no user id found on workflow')
+                        #     user_first_name = customUser.find('first_name')
+                        #     # user_first_name.text = settings.config["USER"]['first_name']
+                        #     user_first_name.text = user_first_name.text
+
+                        #     user_email = customUser.find('email')
+                        #     # user_email.text = settings.config["USER"]['email']
+                        #     user_email.text = user_email.text
+                            
+                        #     user_username = customUser.find('username')
+                        #     # user_username.text = settings.config["USER"]['username']
+                        #     user_username.text = user_username.text
+
             for rules in w_items.iter('rules'):
                 for wf_fields in rules.iter('wf_fields'):
                     for triggers in wf_fields.iter('triggers'):
