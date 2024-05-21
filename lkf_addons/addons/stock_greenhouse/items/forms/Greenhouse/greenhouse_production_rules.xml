@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.greenhouse_production.id }}</form_id>
+    <id>65e61e1772782a814cdfd8ad</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>61f1da41b112fe4e7fe8582f</field_id>
+                        <group_id>None</group_id>
+                        <id>61f1da41b112fe4e7fe8582f</id>
+                        <label>Production Year</label>
+                        <type>integer</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>61f1da41b112fe4e7fe8582f</field_id>
+                        <group_id>None</group_id>
+                        <id>61f1da41b112fe4e7fe8582f</id>
+                        <label>Production Year</label>
+                        <type>integer</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>61f1fcf8c66d2990c8fc7cc7</field_id>
+                    <group_id>61f1fab3ce39f01fe8a7ca8c</group_id>
+                    <id>61f1fcf8c66d2990c8fc7cc7</id>
+                    <label>Total Hours</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>64ed5839a405d8f6378edf5f</field_id>
+                    <group_id>None</group_id>
+                    <id>64ed5839a405d8f6378edf5f</id>
+                    <label>Total Producced</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>61f1fcf8c66d2990c8fc7cc9</field_id>
+                    <group_id>61f1fab3ce39f01fe8a7ca8c</group_id>
+                    <id>61f1fcf8c66d2990c8fc7cc9</id>
+                    <label>Plants per Hour</label>
+                    <type>decimal</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Calc fields</name>
+            <operator>or</operator>
+            <rule_id>1950efa1486b1d</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>61f1da41b112fe4e7fe8582f</field_id>
+                        <group_id>None</group_id>
+                        <id>61f1da41b112fe4e7fe8582f</id>
+                        <label>Production Year</label>
+                        <type>integer</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>61f1da41b112fe4e7fe8582f</field_id>
+                        <group_id>None</group_id>
+                        <id>61f1da41b112fe4e7fe8582f</id>
+                        <label>Production Year</label>
+                        <type>integer</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>62e9890c5dec95745c618fc3</field_id>
+                    <group_id>61f1fab3ce39f01fe8a7ca8c</group_id>
+                    <id>62e9890c5dec95745c618fc3</id>
+                    <label>Production Status</label>
+                    <type>select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Operation fields</name>
+            <operator>or</operator>
+            <rule_id>22a286e8641c75</rule_id>
+            <rule_type>disabled</rule_type>
+            <user_conditions>
+                <condition>exclude</condition>
+                <users>
+                    <item>
+                        <user_id>9908</user_id>
+                        <user_name>Magnolia Gardens</user_name>
+                    </item>
+                </users>
+            </user_conditions>
+        </item>
+    </rules>
+</lkf>

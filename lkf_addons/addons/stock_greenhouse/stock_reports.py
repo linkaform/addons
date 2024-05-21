@@ -196,7 +196,9 @@ class Reports(base.LKF_Report, Stock):
                 "balance_table":initial_stock.get('actuals'),
                 "serviceHistory": self.set_kardex_order(initial_stock.get('actuals'), moves)
                 }
-            result.append(warehouse_data)
+            print('varehouse edata0, ',warehouse_data)
+            if warehouse_data.get("balance_table") or warehouse_data.get('serviceHistory'):
+                result.append(warehouse_data)
             #scrap = self.detail_stock_move(wh)
             #todo_gradinscraping
             # print('moves=', moves)

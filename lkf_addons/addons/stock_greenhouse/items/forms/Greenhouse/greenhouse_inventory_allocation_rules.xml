@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.greenhouse_inventory_allocation.id }}</form_id>
+    <id>65e80730a5f9dab78febc3e5</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>653ab90763da77a3319a9ee0</field_id>
+                        <group_id>644bf504f595b744814a4990</group_id>
+                        <id>653ab90763da77a3319a9ee0</id>
+                        <label>Inventario Correcto</label>
+                        <type>radio</type>
+                    </field>
+                    <value>no</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>653ab90763da77a3319a9ee1</field_id>
+                    <group_id>644bf504f595b744814a4990</group_id>
+                    <id>653ab90763da77a3319a9ee1</id>
+                    <label>Cantidad Correcta de Lote</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>inventerio correcto</name>
+            <operator>and</operator>
+            <rule_id>a0d1314229b259d</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

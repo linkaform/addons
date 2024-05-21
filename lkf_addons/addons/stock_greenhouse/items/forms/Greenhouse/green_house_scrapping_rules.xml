@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.green_house_scrapping.id }}</form_id>
+    <id>6553a6c8019894b82897559b</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>64d52fd23c48fc6e08d47507</field_id>
+                        <group_id>None</group_id>
+                        <id>64d52fd23c48fc6e08d47507</id>
+                        <label>Tipo de movimiento</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>scrap</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>644bf9a04b1761305b080099</field_id>
+                    <group_id>None</group_id>
+                    <id>644bf9a04b1761305b080099</id>
+                    <label>Scrap Flats</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Rule 1</name>
+            <operator>and</operator>
+            <rule_id>13e2b6f10ac13c4</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>64d52fd23c48fc6e08d47507</field_id>
+                        <group_id>None</group_id>
+                        <id>64d52fd23c48fc6e08d47507</id>
+                        <label>Tipo de movimiento</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>cuarentena</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>644bf9a04b1761305b080098</field_id>
+                    <group_id>None</group_id>
+                    <id>644bf9a04b1761305b080098</id>
+                    <label>Cuarentin Flats</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6464fdf6580382fa6879875f</field_id>
+                    <group_id>None</group_id>
+                    <id>6464fdf6580382fa6879875f</id>
+                    <label>Cuarentin Reason</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>cuarentin</name>
+            <operator>and</operator>
+            <rule_id>11c518fd1a8e2148</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

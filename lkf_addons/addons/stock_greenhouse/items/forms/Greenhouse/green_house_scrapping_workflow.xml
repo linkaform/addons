@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.green_house_scrapping.id }}</form_id>
+    <id>65ce3d0d4f70f15e5e9dd4ab</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>65ce3d0d4f70f15e5e9dd4a4</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2022-09-13T03:30:00.654118</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.inventory_move_scrap.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.inventory_move_scrap.name }}</name>
+                            <start_date>2022-09-13T03:30:00.651793</start_date>
+                            <updated_at>2024-02-15T16:33:56.825867</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>Do Scrap</name>
+                </item>
+            </actions>
+            <id>65ce3d0d4f70f15e5e9dd4a5</id>
+            <name>Do Scrap</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-02-14T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-02-13T16:07:28.703Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>before</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

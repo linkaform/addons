@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.green_house_grading.id }}</form_id>
+    <id>65383498d73c51e16e9a9ed8</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>000000000000000000000111</field_id>
+                        <group_id>None</group_id>
+                        <id>000000000000000000000111</id>
+                        <label>Date</label>
+                        <type>datetime</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>000000000000000000000111</field_id>
+                        <group_id>None</group_id>
+                        <id>000000000000000000000111</id>
+                        <label>Date</label>
+                        <type>datetime</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>64edf8aeffeaaa1febca2a06</field_id>
+                    <group_id>None</group_id>
+                    <id>64edf8aeffeaaa1febca2a06</id>
+                    <label>Ready YearWeek</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>61f1fcf8c66d2990c8fc7cc9</field_id>
+                    <group_id>61f1fab3ce39f01fe8a7ca8c</group_id>
+                    <id>61f1fcf8c66d2990c8fc7cc9</id>
+                    <label>Flats per Hour</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>61f1fcf8c66d2990c8fc7cc7</field_id>
+                    <group_id>61f1fab3ce39f01fe8a7ca8c</group_id>
+                    <id>61f1fcf8c66d2990c8fc7cc7</id>
+                    <label>Total Hours</label>
+                    <type>decimal</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Fields to hidel</name>
+            <operator>or</operator>
+            <rule_id>46d15681e7d10d0</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>gt__number=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>644bf9a04b1761305b080099</field_id>
+                        <group_id>None</group_id>
+                        <id>644bf9a04b1761305b080099</id>
+                        <label>Scrap Flats</label>
+                        <type>integer</type>
+                    </field>
+                    <value>0</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.scrap_reasons.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>64ef91d300ccfc8da7751c47</id>
+                    <label>Motivo de Scrap</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>64ef91d300ccfc8da7751c47</catalog_id>
+                    <field_id>64ef91d300ccfc8da7751c49</field_id>
+                    <group_id>None</group_id>
+                    <id>64ef91d300ccfc8da7751c49</id>
+                    <label>Reason</label>
+                    <type>catalog-select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Motivo de Scrap</name>
+            <operator>and</operator>
+            <rule_id>ba1b8c1977a0b</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

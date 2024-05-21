@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.greenhouse_inventory_allocation.id }}</form_id>
+    <id>65e8101747e59e75c4f64163</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>65e8101747e59e75c4f6415c</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2024-03-05T05:08:32.603899</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.stock_move_many_2_one.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.stock_move_many_2_one.name }}</name>
+                            <start_date>2024-03-05T05:08:32.601651</start_date>
+                            <updated_at>2024-03-05T05:08:32.860833</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>Allocation</name>
+                </item>
+            </actions>
+            <id>65e8101747e59e75c4f6415d</id>
+            <name>Allocation</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-03-06T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-03-06T05:36:30.217Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>before</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
