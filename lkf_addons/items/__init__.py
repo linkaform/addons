@@ -246,6 +246,22 @@ class Items(LKFException):
             self.LKFException(msg)
         return True
 
+    def file_path_to_load(self,  file_name, detail):
+        if detail.get('path'):
+            file_path = '{}/{}'.format(self.path, detail['path'])
+        else:
+            file_path = self.path
+        modules_path = file_path.replace(ADDONS_PATH, MODULES_PATH)
+        if self.file_exists(modules_path, file_name, 'py'):
+            search_file_path = '{}/{}.{}'.format(modules_path, file_name, 'py')
+        elif self.file_exists(file_path, file_name, 'py'):
+            print('los scripts que estan en addons path no se instalan ya que viven como libreria dentro del contend=edr')
+            # search_file_path = '{}/{}.{}'.format(file_path, file_name, 'py')
+            search_file_path = None
+        else:
+            search_file_path = None
+        return search_file_path
+
     def get_child_element(self, parent_xml, child_tag):
         """
         Retrieves the first child element with the specified tag from the given parent XML element.
@@ -341,6 +357,9 @@ class Items(LKFException):
             file_path = full_file_path.replace(f'{file_name}.xml','')
             json_file = self.lkf.read_template_file(file_path, f'{file_name}.xml', file_data)
             # json_file = self.read_xml_template(file_path, )
+            json_file = self.lkf.lkf_api.xml_to_json(json_file)
+        elif self.file_exists(search_file_path, file_name, 'xml'):
+            json_file = self.lkf.read_template_file(search_file_path, f'{file_name}.xml', file_data)
             json_file = self.lkf.lkf_api.xml_to_json(json_file)
         elif self.file_exists(file_path, file_name, 'json'):
             json_file = open('./{}/{}.json'.format(file_path, file_name))

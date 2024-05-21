@@ -14,27 +14,31 @@ class ReportResource(items.Items):
         install_order = []
         inst = list(instalable_reports.keys())
         inst.sort()
+        if 'install_order' in inst:
+            inst.pop(inst.index('install_order'))
         print('########## Reading Reports ############' )
         for x in inst:
             print(f"# {x} ".ljust(38) +'#')
         print('#'*39 )
         if instalable_reports.get('install_order'):
-            install_order = instalable_reports.pop('install_order')
+            inst_order = instalable_reports.pop('install_order')
         else:
-            install_order = []
+            inst_order = []
         xml_reports=[]
+        for item in inst_order + inst:
+            if item not in install_order:
+                install_order.append(item)
         for report_name_ext in install_order:
+            if report_name_ext.find('__') < 0:
+                report_name_ext += '__py'
             report_name = report_name_ext.split('__')[0]
             properites=None
             if instalable_reports:
                 detail = instalable_reports[report_name_ext]
                 if detail.get('properties') and detail['properties']:
                     properites = self.load_module_template_file(self.path,  detail['properties'])
-                if detail.get('path'):
-                    this_path = '{}/{}'.format(self.path, detail['path'])
-                else:
-                    this_path = self.path
-                report_location = '{}/{}.{}'.format(this_path, report_name, detail.get('file_ext'))
+                report_location = self.file_path_to_load(report_name, detail)
+                # report_location = '{}/{}.{}'.format(this_path, report_name, detail.get('file_ext'))
                 if detail.get('file_ext') == 'xml':
                     xml_reports.append(report_name_ext)
                 elif detail.get('file_ext') == 'py':
@@ -59,8 +63,9 @@ class ReportResource(items.Items):
                 else:
                     this_path = self.path
                 report_location = '{}/{}.{}'.format(this_path, report_name, detail.get('file_ext'))
-            report_model = self.load_module_template_file(this_path,  report_name)
-            res = self.lkf.install_report(self.module, report_name, report_location, report_model, local_path=detail.get('path'))
+            
+                report_model = self.load_module_template_file(this_path,  report_name)
+                res = self.lkf.install_report(self.module, report_name, report_location, report_model, local_path=detail.get('path'))
 
     def get_report_modules(self, all_items, parent_path=None):
         data_file = []
@@ -100,8 +105,9 @@ class ReportResource(items.Items):
     def instalable_reports(self, install_order=None, path='/srv/scripts/addons/modules'):
         items_files = self.get_anddons_and_modules_items('reports' )
         reports_data = self.get_report_modules(items_files)
+        reports_data['install_order'] = []
         if install_order:
-            reports_data['install_order'] = install_order
+            reports_data['install_order'] += install_order
         else:
-            reports_data['install_order'] = list(reports_data.keys())
+            reports_data['install_order'] += list(reports_data.keys())
         return reports_data

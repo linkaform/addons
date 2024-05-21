@@ -28,11 +28,14 @@ class ScriptResource(items.Items):
                     properites = self.load_module_template_file(self.path,  detail['properties'])
                 image = detail.get('image')
                 # this_path = '{}/{}'.format(self.path, detail['path'])
-                if detail.get('path'):
-                    this_path = '{}/{}'.format(self.path, detail['path'])
-                else:
-                    this_path = self.path
-                script_location = '{}/{}.{}'.format(this_path, script_name, detail.get('file_ext'))
+                # if detail.get('path'):
+                #     this_path = '{}/{}'.format(self.path, detail['path'])
+                # else:
+                #     this_path = self.path
+                # print('this_path',this_path)
+                # print('this_path',this_pathd)
+                script_location =  self.file_path_to_load(script_name, detail)
+                # script_location = '{}/{}.{}'.format(this_path, script_name, detail.get('file_ext'))
                 res = self.lkf.install_script(self.module, script_location, image=image, script_properties=properites, local_path=detail.get('path'), **kwargs)
 
     def get_script_modules(self, all_items, parent_path=None):

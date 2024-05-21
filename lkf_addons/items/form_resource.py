@@ -48,6 +48,10 @@ class FormResource(items.Items):
             install_order = []
         install_order += [x  for x in instalable_forms.keys() if x not in install_order]
         response = []
+        print('install_order', install_order)
+
+        # install_order = ['green_house_inventory_move']
+
         for form_name in install_order:
             detail = instalable_forms[form_name]
             if detail.get('path'):
