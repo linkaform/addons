@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>{}</confirmation>
+    <description />
+    <_rev>4-5c65652c1327d8a3ddf8dd0cd1dde7eb</_rev>
+    <updated_at>2024-05-18T01:27:02.465109+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Gafetes</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-05-18T01:27:02.465109+00:00Z</created_at>
+    <advanced_options>{}</advanced_options>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>664803e6d79bc1dfd33885e1</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>ID de Gafet</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <properties>{}</properties>
+                    <key>None</key>
+                    <catalog_fields>
+                        <item>663e5c57f5b8a7ce8211ed0b</item>
+                    </catalog_fields>
+                    <field_id>{{ catalog.ubicaciones.obj_id }}</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Ubicacion</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>663e5c57f5b8a7ce8211ed0b</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.ubicaciones.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.ubicaciones.name }}</name>
+                    </catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Ubicación</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>images</field_type>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>664803e6d79bc1dfd33885e2</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>QR</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+            </page_fields>
+            <page_name>Página 1</page_name>
+            <page_description>None</page_description>
+        </item>
+    </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>664803e6d79bc1dfd33885e0</_id>
+    <public>False</public>
+    <catalog_id>118883</catalog_id>
+</lkf>

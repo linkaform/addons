@@ -1,0 +1,286 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
+    <description />
+    <_rev>46-cf3c5cba937f0de6e378b0f0e325b73d</_rev>
+    <updated_at>2024-03-04T22:55:24.015617+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Definicion de Permisos</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-03-04T22:55:24.015617+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>662962bb203407ab90c886e4</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Nombre del permiso o certificación</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>checkbox</field_type>
+                    <field_id>662962bb203407ab90c886e5</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Requerimientos</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>cuenta_con_vigencia</value>
+                            <label>Cuenta Con Vigencia</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>requiere_examen</value>
+                            <label>Requiere Examen</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>comprobante_foto</value>
+                            <label>Comprobante Foto</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>comprobante_de_documento</value>
+                            <label>Comprobante de Documento</label>
+                        </item>
+                    </options>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <field_id>662962bb203407ab90c886e6</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Vigencia</label>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>select</field_type>
+                    <field_id>662962bb203407ab90c886e7</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Vigencia Expresada en:</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>días</value>
+                            <label>Días</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>semanas</value>
+                            <label>Semanas</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>meses</value>
+                            <label>Meses</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>años</value>
+                            <label>Años</label>
+                        </item>
+                    </options>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>files</field_type>
+                    <field_id>662962bb203407ab90c886e8</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Ejemplo de documento del permiso/certificación</label>
+                    <properties>
+                        <date_format>None</date_format>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <mime_types>
+                            <item>doc</item>
+                            <item>docx</item>
+                            <item>odt</item>
+                            <item>xls</item>
+                            <item>xml</item>
+                            <item>xlsx</item>
+                            <item>ppt</item>
+                            <item>zip</item>
+                            <item>txt</item>
+                            <item>pptx</item>
+                            <item>pdf</item>
+                        </mime_types>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data>None</text_data>
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>images</field_type>
+                    <field_id>662962bb203407ab90c886e9</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Ejemplo en imagen</label>
+                    <properties>
+                        <date_format />
+                        <image_origin>
+                            <from_draw>False</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <min_images_count>0</min_images_count>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                        <fieldId>[]</fieldId>
+                        <location_decimals>None</location_decimals>
+                        <metadata>[]</metadata>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>[]</catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.definicion_de_examenes.obj_id }}</field_id>
+                    <label>Examen</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>66297e1579900d9018c886ad</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.definicion_de_examenes.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_examenes.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.definicion_de_examenes.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>66297e1579900d9018c886ad</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre del examen</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.definicion_de_examenes.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_examenes.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>select</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <field_id>662962bb203407ab90c886eb</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Estado del permiso/certificación</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>activo</value>
+                            <label>Activo</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>cancelado</value>
+                            <label>Cancelado</label>
+                        </item>
+                    </options>
+                </item>
+            </page_fields>
+            <page_name>Página 1</page_name>
+            <page_description>None</page_description>
+        </item>
+    </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>65e6515ce63f84c46cc5342e</_id>
+    <public>False</public>
+    <catalog_id>116106</catalog_id>
+</lkf>

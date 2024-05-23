@@ -739,7 +739,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.scrap_reasons.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -821,7 +821,7 @@
                         <catalog_field_id>{{ catalog.scrap_reasons.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.scrap_reasons.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -897,7 +897,7 @@
                         <catalog_field_id>{{ catalog.scrap_reasons.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.scrap_reasons.id }}</catalog_id>
                         <field_type>textarea</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -973,7 +973,7 @@
                         <catalog_field_id>{{ catalog.scrap_reasons.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.scrap_reasons.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1316,5 +1316,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1709701672.0</updated_at>
+    <updated_at>1716250782.0</updated_at>
 </lkf>

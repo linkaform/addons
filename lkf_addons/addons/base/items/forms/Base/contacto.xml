@@ -1004,8 +1004,8 @@
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
-                    <default>True</default>
-                    <default_value>activo</default_value>
+                    <default>False</default>
+                    <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
                     <field_id>663a7f67e48382c5b1230909</field_id>
@@ -1078,7 +1078,7 @@
                     <visible>True</visible>
                 </item>
             </page_fields>
-            <page_name>Datos Generales</page_name>
+            <page_name>Datos</page_name>
             <page_type>fields</page_type>
         </item>
     </form_pages>
@@ -1114,5 +1114,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1715401608.0</updated_at>
+    <updated_at>1716403130.0</updated_at>
 </lkf>

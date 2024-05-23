@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.notas.id }}</form_id>
+    <id>6647fb9a310c2febae3885bb</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6647f9eb6eefdb1840684dc1</field_id>
+                        <group_id>None</group_id>
+                        <id>6647f9eb6eefdb1840684dc1</id>
+                        <label>Estatus</label>
+                        <type>radio</type>
+                    </field>
+                    <value>cerrado</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6647fadc96f80017ac38864a</field_id>
+                    <group_id>None</group_id>
+                    <id>6647fadc96f80017ac38864a</id>
+                    <label>Fecha y hora de cierre</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6647fb1874c1a87eb02a9037</field_id>
+                    <group_id>None</group_id>
+                    <id>6647fb1874c1a87eb02a9037</id>
+                    <label>Comentarios</label>
+                    <type>group</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.configuracion_areas_y_empleados.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>663fb92aa3e9bfc6aecb96fd</id>
+                    <label>Guardia que  cierra la nota</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>663bd36eb19b7fb7d9e97ccb</field_id>
+                    <group_id>None</group_id>
+                    <id>663bd36eb19b7fb7d9e97ccb</id>
+                    <label>Nombre completo</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6647fb38da07bf430e273ea2</field_id>
+                    <group_id>None</group_id>
+                    <id>6647fb38da07bf430e273ea2</id>
+                    <label>Comentario</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar campos para el cierre de la nota</name>
+            <operator>and</operator>
+            <rule_id>224e1aaf21ca20f5</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

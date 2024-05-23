@@ -1,9 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <templates>[]</templates>
-    <confirmation>{}</confirmation>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
     <description />
-    <_rev>2-a1e37d37c393317057e9d3b431f40c3f</_rev>
+    <_rev>4-da894c5596522b6097d6c1c3797611c2</_rev>
     <updated_at>2024-05-10T18:30:59.492027+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -13,77 +17,83 @@
     <name>Pais</name>
     <edit_public_records>False</edit_public_records>
     <created_at>2024-05-10T18:30:59.492027+00:00Z</created_at>
-    <advanced_options>{}</advanced_options>
+    <advanced_options>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
     <catalog_pages>
         <item>
             <page_fields>
                 <item>
                     <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <key>True</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>663a7ca6e48382c5b12308fa</field_id>
-                    <required>False</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>False</required>
+                    <field_id>663a7ca6e48382c5b12308fa</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Nombre del pais</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>True</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <key>False</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>663a7ca6e48382c5b12308fb</field_id>
-                    <required>False</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>False</required>
+                    <field_id>663a7ca6e48382c5b12308fb</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Codigo de Pais</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>False</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>integer</field_type>
-                    <properties>
-                        <number_of_decimals>2</number_of_decimals>
-                        <size>small</size>
-                        <step>1</step>
-                        <custom>None</custom>
-                    </properties>
-                    <key>None</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>663a7ca6e48382c5b12308fc</field_id>
-                    <required>False</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>False</required>
+                    <field_id>663a7ca6e48382c5b12308fc</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Codigo Marcacion</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>

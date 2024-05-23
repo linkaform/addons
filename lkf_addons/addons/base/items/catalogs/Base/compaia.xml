@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>1-1df6f23ecfeb56bceeda0317c6f5cf93</_rev>
+    <_rev>2-b690008b311eca1617cf1da2ddc0e1b8</_rev>
     <updated_at>2024-05-10T18:31:01.328657+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -24,10 +24,6 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>118584</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>663e67e5e31b56ed1d832f5c</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -53,8 +49,12 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_description>None</page_description>
             <page_name>Página 1</page_name>
+            <page_description>None</page_description>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>663e67e5e31b56ed1d832f5c</_id>
+    <public>False</public>
+    <catalog_id>118584</catalog_id>
 </lkf>

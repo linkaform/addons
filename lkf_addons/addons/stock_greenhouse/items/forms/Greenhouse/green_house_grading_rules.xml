@@ -43,19 +43,27 @@
                 </item>
                 <item>
                     <catalog_id>None</catalog_id>
+                    <field_id>61f1fcf8c66d2990c8fc7cc7</field_id>
+                    <group_id>None</group_id>
+                    <id>61f1fcf8c66d2990c8fc7cc7</id>
+                    <label>Total Hours</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
                     <field_id>61f1fcf8c66d2990c8fc7cc9</field_id>
-                    <group_id>61f1fab3ce39f01fe8a7ca8c</group_id>
+                    <group_id>None</group_id>
                     <id>61f1fcf8c66d2990c8fc7cc9</id>
                     <label>Flats per Hour</label>
                     <type>decimal</type>
                 </item>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>61f1fcf8c66d2990c8fc7cc7</field_id>
-                    <group_id>61f1fab3ce39f01fe8a7ca8c</group_id>
-                    <id>61f1fcf8c66d2990c8fc7cc7</id>
-                    <label>Total Hours</label>
-                    <type>decimal</type>
+                    <field_id>64ed5839a405d8f6378edf5f</field_id>
+                    <group_id>None</group_id>
+                    <id>64ed5839a405d8f6378edf5f</id>
+                    <label>Total Flats Graded</label>
+                    <type>integer</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>

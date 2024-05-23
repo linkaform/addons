@@ -6,21 +6,6 @@
         <item>
             <actions>
                 <item>
-                    <_id>663bde51c0cb768cf5f27465</_id>
-                    <action_id>12</action_id>
-                    <action_settings>{}</action_settings>
-                    <configuration>
-                        <synched_catalogs>
-                            <item>
-                                <couch_id>663bbf98b23abe4f4a59eb4d</couch_id>
-                                <id>118397</id>
-                                <name>Empleados</name>
-                            </item>
-                        </synched_catalogs>
-                    </configuration>
-                    <name>Sincronizar forma empleados a catálogo empleados</name>
-                </item>
-                <item>
                     <_id>663bf4419ac0d7087559ebf3</_id>
                     <action_id>9</action_id>
                     <action_settings>{}</action_settings>
@@ -337,7 +322,7 @@
                                 </etl>
                                 <input>
                                     <field_type>radio</field_type>
-                                    <id>663bcd72cb24017b604d7f2a</id>
+                                    <id>663fa630583de096e9326cc0</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>
@@ -351,7 +336,7 @@
                                 </etl>
                                 <input>
                                     <field_type>datetime</field_type>
-                                    <id>663bcd72cb24017b604d7f2b</id>
+                                    <id>663fa630583de096e9326cc1</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>
@@ -365,7 +350,7 @@
                                 </etl>
                                 <input>
                                     <field_type>text</field_type>
-                                    <id>663bcd72cb24017b604d7f2c</id>
+                                    <id>663fa630583de096e9326cc2</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>
@@ -379,7 +364,7 @@
                                 </etl>
                                 <input>
                                     <field_type>integer</field_type>
-                                    <id>663bcd72cb24017b604d7f2d</id>
+                                    <id>663fa630583de096e9326cc3</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>
@@ -393,7 +378,7 @@
                                 </etl>
                                 <input>
                                     <field_type>datetime</field_type>
-                                    <id>663bcd72cb24017b604d7f2e</id>
+                                    <id>663fa630583de096e9326cc4</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>
@@ -407,7 +392,7 @@
                                 </etl>
                                 <input>
                                     <field_type>datetime</field_type>
-                                    <id>663bcd72cb24017b604d7f2f</id>
+                                    <id>663fa630583de096e9326cc5</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>
@@ -421,7 +406,7 @@
                                 </etl>
                                 <input>
                                     <field_type>textarea</field_type>
-                                    <id>663bcd72cb24017b604d7f30</id>
+                                    <id>663fa630583de096e9326cc6</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>
@@ -435,7 +420,7 @@
                                 </etl>
                                 <input>
                                     <field_type>radio</field_type>
-                                    <id>663bcd72cb24017b604d7f31</id>
+                                    <id>663fa630583de096e9326cc7</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>
@@ -737,13 +722,41 @@
                                     <id>663bd466b19b7fb7d9e97cdc</id>
                                 </output>
                             </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>radio</field_type>
+                                    <id>663bcbe2274189281359eb78</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>663bd5c0b6e749213859eb72</id>
+                                </output>
+                            </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>catalog-detail</field_type>
+                                    <id>663e5c8cf5b8a7ce8211ed0c</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>663e5c8cf5b8a7ce8211ed0c</id>
+                                </output>
+                            </item>
                         </mapping>
                     </configuration>
                     <name>Sincronizar forma empleados a catálogo empleados Jefes Directos</name>
                 </item>
             </actions>
             <id>663bde51c0cb768cf5f27466</id>
-            <name>Sincronizar empleados</name>
+            <name>Sincronizar empleados jefes directos</name>
             <rules>
                 <metadata>
                     <connection>[]</connection>
@@ -764,7 +777,7 @@
                 </metadata>
                 <record>
                     <created>True</created>
-                    <deleted>False</deleted>
+                    <deleted>True</deleted>
                     <edited>True</edited>
                     <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
@@ -779,7 +792,7 @@
                             <prefix>answer</prefix>
                             <trigger_field>
                                 <catalog>{}</catalog>
-                                <field_id>663bc191ed1cbf47cdcb976e</field_id>
+                                <field_id>62c5ff407febce07043024dd</field_id>
                                 <group>{}</group>
                                 <label>Nombre completo</label>
                                 <type>text</type>
@@ -787,6 +800,57 @@
                             <value> </value>
                         </item>
                     </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>663fa7df7c5c02e3ff4d7fd0</_id>
+                    <action_id>12</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <synched_catalogs>
+                            <item>
+                                <couch_id>663bbf98b23abe4f4a59eb4d</couch_id>
+                                <id>118397</id>
+                                <name>Empleados</name>
+                            </item>
+                        </synched_catalogs>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>663fa7df7c5c02e3ff4d7fd4</id>
+            <name>Sincronizar empleados</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-05-12T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-05-11T16:03:21.478Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
                 </wf_fields>
             </rules>
         </item>

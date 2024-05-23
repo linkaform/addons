@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.definicion_de_permisos.id }}</form_id>
+    <id>662980f5f44f5ac4acf8cb71</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>663eb79b00c102e9ffcb9733</_id>
+                    <action_id>12</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <synched_catalogs>
+                            <item>
+                                <couch_id>65e6515ce63f84c46cc5342e</couch_id>
+                                <id>116106</id>
+                                <name>Definición de permisos</name>
+                            </item>
+                        </synched_catalogs>
+                    </configuration>
+                    <name>Sincronizar definición de permisos</name>
+                </item>
+            </actions>
+            <id>662980f5f44f5ac4acf8cb6f</id>
+            <name>Sincronizar forma a catálogo definición de permisos</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-04-25T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-04-24T21:59:57.093Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

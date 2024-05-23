@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.bitacora_rondines.id }}</form_id>
+    <id>6639b4f99dda06897df27443</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6639b2744bb44059fc59eb62</field_id>
+                        <group_id>None</group_id>
+                        <id>6639b2744bb44059fc59eb62</id>
+                        <label>Estatus del recorrido</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6639b47565d8e5c06fe97cf3</field_id>
+                    <group_id>None</group_id>
+                    <id>6639b47565d8e5c06fe97cf3</id>
+                    <label>Duración del recorrido</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar campo duración</name>
+            <operator>and</operator>
+            <rule_id>a851e2ecefa57</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6639b2744bb44059fc59eb62</field_id>
+                        <group_id>None</group_id>
+                        <id>6639b2744bb44059fc59eb62</id>
+                        <label>Estatus del recorrido</label>
+                        <type>radio</type>
+                    </field>
+                    <value>cancelado</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6639b6180bb793945af2742d</field_id>
+                    <group_id>None</group_id>
+                    <id>6639b6180bb793945af2742d</id>
+                    <label>Motivo de la cancelación</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Cancelación del recorrido</name>
+            <operator>and</operator>
+            <rule_id>25c21d1b1ba89b1</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

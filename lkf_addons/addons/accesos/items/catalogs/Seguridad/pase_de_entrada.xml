@@ -1,0 +1,616 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
+    <description />
+    <_rev>25-4b9df92c3830ffb4c530a6363ea50ee7</_rev>
+    <updated_at>2024-05-13T19:23:27.061064+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Pase de Entrada</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-05-13T19:23:27.061064+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
+    <catalog_id>118666</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>664268affe2844e472e97cef</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>radio</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>True</fav>
+                    <required>True</required>
+                    <field_id>662c262cace163ca3ed3bb3a</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Selección de Visitante</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>alta_de_nuevo_visitante</value>
+                            <label>Alta de Nuevo Visitante</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>buscar_visitantes_registrados</value>
+                            <label>Buscar visitantes registrados</label>
+                        </item>
+                    </options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>663a7e0fe48382c5b1230902</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.ubicaciones.obj_id }}</field_id>
+                    <label>Ubicación</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.ubicaciones.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
+                        <view_fields>
+                            <item>663e5c57f5b8a7ce8211ed0b</item>
+                        </view_fields>
+                        <name>{{ catalog.ubicaciones.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Ubicación</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <required>False</required>
+                    <field_id>663a7e0fe48382c5b1230902</field_id>
+                    <label>Direccion</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>5ea069562f8250acf7d83aca</item>
+                        <item>5ea35de83ab7dad56c66e045</item>
+                        <item>65ce34985fa9df3dbf9dd2d0</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.visita_autorizada.obj_id }}</field_id>
+                    <label>Pase a Nombre de:</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.visita_autorizada.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.visita_autorizada.id }}</catalog_id>
+                        <view_fields>
+                            <item>5ea0693a0c12d5a8e43d37df</item>
+                        </view_fields>
+                        <name>{{ catalog.visita_autorizada.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>5ea0693a0c12d5a8e43d37df</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre Completo</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.visita_autorizada.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <required>False</required>
+                    <field_id>5ea069562f8250acf7d83aca</field_id>
+                    <label>Email</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.visita_autorizada.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <required>False</required>
+                    <field_id>5ea35de83ab7dad56c66e045</field_id>
+                    <label>Foto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <field_type>images</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.visita_autorizada.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <required>False</required>
+                    <field_id>65ce34985fa9df3dbf9dd2d0</field_id>
+                    <label>Identificación</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <field_type>images</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.visita_autorizada.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>662c2937108836dec6d92580</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre Completo</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>email</field_type>
+                    <field_id>662c2937108836dec6d92581</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Email</label>
+                    <properties>
+                        <email_configuration>{}</email_configuration>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>662c2937108836dec6d92582</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Teléfono</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>66357d5e4f00f9018ce97ce9</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Empresa</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>661dc67e901906b7e9b73bac</item>
+                        <item>662962bb203407ab90c886e4</item>
+                        <item>662962bb203407ab90c886e5</item>
+                        <item>662962bb203407ab90c886e6</item>
+                        <item>662962bb203407ab90c886e7</item>
+                        <item>66297e1579900d9018c886ad</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</field_id>
+                    <label>Tipo de Pase</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.configuracion_de_perfiles.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
+                        <view_fields>
+                            <item>661dc67e901906b7e9b73bac</item>
+                        </view_fields>
+                        <name>{{ catalog.configuracion_de_perfiles.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>661dc67e901906b7e9b73bac</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre del perfil</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>662962bb203407ab90c886e4</field_id>
+                    <label>Nombre del permiso o certificación</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>662962bb203407ab90c886e5</field_id>
+                    <label>Requerimientos</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>checkbox</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>662962bb203407ab90c886e6</field_id>
+                    <label>Vigencia</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>integer</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>662962bb203407ab90c886e7</field_id>
+                    <label>Vigencia Expresada en</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>select</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>66297e1579900d9018c886ad</field_id>
+                    <label>Nombre del examen</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <field_id>662c304fad7432d296d92581</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Visita de</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>fecha_fija</value>
+                            <label>Fecha fija</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>rango_de_fechas</value>
+                            <label>Rango de fechas</label>
+                        </item>
+                    </options>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>datetime</field_type>
+                    <field_id>662c304fad7432d296d92582</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Fecha y hora de visita</label>
+                    <properties>
+                        <custom>None</custom>
+                        <format>vertical</format>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>datetime</field_type>
+                    <field_id>662c304fad7432d296d92583</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Fecha y hora hasta</label>
+                    <properties>
+                        <custom>None</custom>
+                        <format>vertical</format>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <field_id>662c304fad7432d296d92584</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Días de acceso</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>cualquier_día</value>
+                            <label>Cualquier día</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>limitar_días_de_acceso</value>
+                            <label>Limitar días de acceso</label>
+                        </item>
+                    </options>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <field_id>6635380dc9b3e7db4d59eb49</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Limitar número de accesos a:</label>
+                    <properties>
+                        <help_text>True</help_text>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>checkbox</field_type>
+                    <field_id>662c304fad7432d296d92585</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Seleccione los días de acceso</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>lunes</value>
+                            <label>Lunes</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>martes</value>
+                            <label>Martes</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>miércoles</value>
+                            <label>Miércoles</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>jueves</value>
+                            <label>Jueves</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>viernes</value>
+                            <label>Viernes</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>sábado</value>
+                            <label>Sábado</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>domingo</value>
+                            <label>Domingo</label>
+                        </item>
+                    </options>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <field_id>66353daa223b8a43d7f274b5</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Estatus del pase</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>activo</value>
+                            <label>Activo</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>vencido</value>
+                            <label>Vencido</label>
+                        </item>
+                    </options>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>images</field_type>
+                    <required>False</required>
+                    <field_id>64ef5b5fff1bec97d2ca27b6</field_id>
+                    <properties>
+                        <date_format />
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <min_images_count>0</min_images_count>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                        <fieldId>[]</fieldId>
+                        <location_decimals>None</location_decimals>
+                        <metadata>[]</metadata>
+                    </properties>
+                    <label>QR</label>
+                </item>
+            </page_fields>
+            <page_name>Página 1</page_name>
+            <page_description>None</page_description>
+        </item>
+    </catalog_pages>
+</lkf>

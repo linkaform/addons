@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.contratistas.id }}</form_id>
+    <id>664ce1306e0a93ee34e70124</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>65fc814fb170488cf4d44c55</field_id>
+                        <group_id>None</group_id>
+                        <id>65fc814fb170488cf4d44c55</id>
+                        <label>Estatus del contratista</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>65fc814fb170488cf4d44c55</field_id>
+                        <group_id>None</group_id>
+                        <id>65fc814fb170488cf4d44c55</id>
+                        <label>Estatus del contratista</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>65fc814fb170488cf4d44c51</field_id>
+                    <group_id>None</group_id>
+                    <id>65fc814fb170488cf4d44c51</id>
+                    <label>Razón social</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>65fc814fb170488cf4d44c52</field_id>
+                    <group_id>None</group_id>
+                    <id>65fc814fb170488cf4d44c52</id>
+                    <label>RFC</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>65fc814fb170488cf4d44c53</field_id>
+                    <group_id>None</group_id>
+                    <id>65fc814fb170488cf4d44c53</id>
+                    <label>Email contratista</label>
+                    <type>email</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>663cebbe200dc8983df27573</field_id>
+                    <group_id>None</group_id>
+                    <id>663cebbe200dc8983df27573</id>
+                    <label>Teléfono contratista</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>65fc814fb170488cf4d44c54</field_id>
+                    <group_id>None</group_id>
+                    <id>65fc814fb170488cf4d44c54</id>
+                    <label>Servicios a Prestar</label>
+                    <type>checkbox</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Deshabilitar</name>
+            <operator>or</operator>
+            <rule_id>58e25851021df2</rule_id>
+            <rule_type>disabled</rule_type>
+            <user_conditions>
+                <condition>exclude</condition>
+                <users>
+                    <item>
+                        <user_id>20</user_id>
+                        <user_name>Linkaform RH</user_name>
+                    </item>
+                </users>
+            </user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>664ce0d8eb5090c56a684eb0</field_id>
+                        <group_id>None</group_id>
+                        <id>664ce0d8eb5090c56a684eb0</id>
+                        <label>Estatus Solicitud</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>664ce0d8eb5090c56a684eb0</field_id>
+                        <group_id>None</group_id>
+                        <id>664ce0d8eb5090c56a684eb0</id>
+                        <label>Estatus Solicitud</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>65fc814fb170488cf4d44c55</field_id>
+                    <group_id>None</group_id>
+                    <id>65fc814fb170488cf4d44c55</id>
+                    <label>Estatus del contratista</label>
+                    <type>radio</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar</name>
+            <operator>or</operator>
+            <rule_id>bd41d8bdd11ad4</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>
+                <condition>exclude</condition>
+                <users>
+                    <item>
+                        <user_id>20</user_id>
+                        <user_name>Linkaform RH</user_name>
+                    </item>
+                </users>
+            </user_conditions>
+        </item>
+    </rules>
+</lkf>

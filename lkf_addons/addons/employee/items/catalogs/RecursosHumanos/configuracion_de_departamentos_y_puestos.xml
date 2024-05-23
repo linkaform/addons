@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
+    <description />
+    <_rev>9-a9dc57133db4dbd901895cf29b736008</_rev>
+    <updated_at>2024-05-08T18:31:27.338888+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Configuracion de Departamentos y Puestos</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-05-08T18:31:27.338888+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
+    <catalog_id>118403</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>663bc4ff1dd81914ac59ebbe</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>[]</catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.departamentos.obj_id }}</field_id>
+                    <label>Departamentos</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>663bc4ed8a6b120eab4d7f1e</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.departamentos.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.departamentos.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.departamentos.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>663bc4ed8a6b120eab4d7f1e</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre del departamento</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.departamentos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.departamentos.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>[]</catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.puestos.obj_id }}</field_id>
+                    <label>Puestos</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>663bc4c79b8046ce89e97cf4</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.puestos.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.puestos.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.puestos.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>663bc4c79b8046ce89e97cf4</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre del puesto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.puestos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.puestos.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+            </page_fields>
+            <page_name>Página 1</page_name>
+            <page_description>None</page_description>
+        </item>
+    </catalog_pages>
+</lkf>

@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
+    <description />
+    <_rev>8-b002c58c58c8a3bdb84ceab52843bdc5</_rev>
+    <updated_at>2024-05-07T04:10:48.389024+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Lista de Equipos</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-05-07T04:10:48.389024+00:00Z</created_at>
+    <advanced_options>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>6639a9d9d38959539f59eb9f</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Tipo de equipo</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_name>Página 1</page_name>
+            <page_description>None</page_description>
+        </item>
+    </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>6639a9c8ef0f8a05224d7f3f</_id>
+    <public>False</public>
+    <catalog_id>118290</catalog_id>
+</lkf>

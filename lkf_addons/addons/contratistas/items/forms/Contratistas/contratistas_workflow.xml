@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.contratistas.id }}</form_id>
+    <id>65fc81ac161abbbf1b2c1b1e</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>663ebcb0f35c974fc9f27428</_id>
+                    <action_id>12</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <synched_catalogs>
+                            <item>
+                                <couch_id>65e6515a0cdec66503719105</couch_id>
+                                <id>116101</id>
+                                <name>Contratistas</name>
+                            </item>
+                        </synched_catalogs>
+                    </configuration>
+                    <name>Sincronizar contratista</name>
+                </item>
+            </actions>
+            <id>65fc81ac161abbbf1b2c1b18</id>
+            <name>Sincronizar registros de  contratistas</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-03-22T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-03-21T18:50:04.394Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>65fc814fb170488cf4d44c55</field_id>
+                                <group>{}</group>
+                                <label>Estatus del contratista</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>autorizado</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>664ce090af693d8e0f2a8fd0</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>Bienvendio, porfavor llena todos los campos solicitados para tramitar tu alta de contratista. &lt;br&gt;
+Puede, ir llenando tu solicitud en partes, enviendo tu registro cada vez que subas cambios. &lt;br&gt;
+Una vez completada la solicitud, actualizar el estatus a "Completada" para que esta pueda ser autorizada.
+
+Para ver tu solicitud entra &lt;a href="{{record_url}}?token={{expiration_token}}&amp;form_id={% raw %}{{record.form_id}}{% endraw %}"&gt;aqui&lt;/a&gt;</body>
+                        <email_fields>
+                            <item>
+                                <field_id>65fc814fb170488cf4d44c53</field_id>
+                                <group_id>None</group_id>
+                                <label>Email contratista</label>
+                            </item>
+                        </email_fields>
+                        <emails>
+                            <item>josepato@linkaform.com</item>
+                        </emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>False</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>Completa tu alta de contratista !!!</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>Enviar Correo</name>
+                </item>
+            </actions>
+            <id>664ce090af693d8e0f2a8fd4</id>
+            <name>Envió de correo electrónico para autorizar estatus del contratista</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-05-22T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-05-21T17:47:24.389Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>65fc814fb170488cf4d44c55</field_id>
+                                <group>{}</group>
+                                <label>Estatus del contratista</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>no_autorizado</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

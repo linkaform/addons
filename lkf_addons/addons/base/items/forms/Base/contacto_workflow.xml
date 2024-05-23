@@ -6,23 +6,23 @@
         <item>
             <actions>
                 <item>
-                    <_id>663a810fe48382c5b123090e</_id>
+                    <_id>663f96fbcb0693676bcb977d</_id>
                     <action_id>12</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>663a8079e48382c5b123090c</couch_id>
-                                <id>117958</id>
+                                <couch_id>663e67e69eea5494f4cb96e4</couch_id>
+                                <id>118586</id>
                                 <name>Contacto</name>
                             </item>
                         </synched_catalogs>
                     </configuration>
-                    <name>Sync Contact</name>
+                    <name>None</name>
                 </item>
             </actions>
-            <id>663a810fe48382c5b123090f</id>
-            <name>Sync Catalog</name>
+            <id>663f96fbcb0693676bcb977e</id>
+            <name>Sincronizar registros de contacto</name>
             <rules>
                 <metadata>
                     <connection>[]</connection>
@@ -33,9 +33,9 @@
                             <year>2014</year>
                         </period>
                         <range>
-                            <end>2024-05-08T06:00:00.000Z</end>
+                            <end>2024-05-12T06:00:00.000Z</end>
                             <selected>False</selected>
-                            <start>2024-05-07T19:28:52.294Z</start>
+                            <start>2024-05-11T16:03:21.478Z</start>
                         </range>
                     </date>
                     <grading>{}</grading>

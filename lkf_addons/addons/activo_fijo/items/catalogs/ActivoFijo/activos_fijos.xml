@@ -1,0 +1,313 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <redirect_url>default</redirect_url>
+        <button_message>Mandar respuestas</button_message>
+    </confirmation>
+    <description />
+    <_rev>35-8633315e5e4e1704d55ce3e6dd0e82cb</_rev>
+    <updated_at>2024-05-15T20:00:16.734432+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Activos Fijos</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-05-15T20:00:16.734432+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <config>False</config>
+            <required>False</required>
+            <manual>False</manual>
+        </folio>
+    </advanced_options>
+    <catalog_id>118764</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>66451450284cb860eaf2e04c</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>[]</catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</field_id>
+                    <label>Ubicación del activo</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>663e5c57f5b8a7ce8211ed0b</item>
+                            <item>663e5d44f5b8a7ce8211ed0f</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.areas_dentro_de_la_ubicacion.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Ubicación</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Nombre de Area</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <properties>{}</properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>{{ catalog.lista_de_equipos.obj_id }}</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Tipo de equipo</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>6639a9d9d38959539f59eb9f</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.lista_de_equipos.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_equipos.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.lista_de_equipos.name }}</name>
+                    </catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>6639a9d9d38959539f59eb9f</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Tipo de equipo</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.lista_de_equipos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_equipos.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>6646373dda020fe797cafa20</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Nombre del equipo</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>6646393c3fa8b818265d0323</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Marca</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>6646393c3fa8b818265d0324</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Modelo</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>6646393c3fa8b818265d0325</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Número de serie/placa</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>images</field_type>
+                    <field_id>6646393c3fa8b818265d0326</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Imagen del equipo</label>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>date</field_type>
+                    <field_id>6646393c3fa8b818265d0327</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Fecha de adquisición</label>
+                    <properties>
+                        <custom>None</custom>
+                        <format>vertical</format>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>date</field_type>
+                    <field_id>6646393c3fa8b818265d0328</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Fecha y hora del último mantenimiento</label>
+                    <properties>
+                        <custom>None</custom>
+                        <format>vertical</format>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>[]</catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</field_id>
+                    <label>Asignado a</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
+                        <view_fields>
+                            <item>62c5ff407febce07043024dd</item>
+                        </view_fields>
+                        <name>{{ catalog.configuracion_areas_y_empleados.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>62c5ff407febce07043024dd</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre completo</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <field_id>6646393c3fa8b818265d0329</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Estatus</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>disponible</value>
+                            <label>Disponible</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>no_disponible</value>
+                            <label>No disponible</label>
+                        </item>
+                    </options>
+                </item>
+            </page_fields>
+            <page_description>None</page_description>
+            <page_name>Página 1</page_name>
+        </item>
+    </catalog_pages>
+</lkf>

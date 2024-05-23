@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>64-9ae5d65833a3352b6bb79860de228484</_rev>
+    <_rev>79-8385f27d30df4d85129d0cbdcb3a13dc</_rev>
     <updated_at>2024-05-08T18:08:24.284414+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -25,6 +25,10 @@
             <config>False</config>
         </folio>
     </advanced_options>
+    <catalog_id>118397</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>663bbf98b23abe4f4a59eb4d</_id>
+    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -265,21 +269,20 @@
                     </options>
                 </item>
             </page_fields>
-            <page_description>None</page_description>
             <page_name>Datos generales</page_name>
+            <page_description>None</page_description>
         </item>
         <item>
             <page_fields>
                 <item>
                     <field_type>catalog</field_type>
                     <catalog_fields>
-                        <item>663e5c8cf5b8a7ce8211ed0c</item>
-                        <item>663a7e0fe48382c5b1230902</item>
-                        <item>663a7dd6e48382c5b12308ff</item>
-                        <item>663a7ca6e48382c5b12308fa</item>
                         <item>663a7f67e48382c5b1230908</item>
-                        <item>663a7dd6e48382c5b1230900</item>
+                        <item>663a7ca6e48382c5b12308fa</item>
+                        <item>663a7dd6e48382c5b12308ff</item>
+                        <item>663a7e0fe48382c5b1230902</item>
                         <item>663a7f79e48382c5b123090a</item>
+                        <item>663e5c8cf5b8a7ce8211ed0c</item>
                     </catalog_fields>
                     <required>False</required>
                     <field_id>{{ catalog.contacto.obj_id }}</field_id>
@@ -321,14 +324,13 @@
                     <field_type>catalog-detail</field_type>
                     <properties>{}</properties>
                     <required>False</required>
-                    <field_id>663e5c8cf5b8a7ce8211ed0c</field_id>
-                    <label>Geolocalizacion</label>
+                    <field_id>663a7f67e48382c5b1230908</field_id>
+                    <label>Tipo de Contacto</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <last>True</last>
                         <view_fields>[]</view_fields>
-                        <field_type>geolocation</field_type>
-                        <view_index>1</view_index>
+                        <field_type>select</field_type>
+                        <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
                         <filters />
@@ -339,8 +341,8 @@
                     <field_type>catalog-detail</field_type>
                     <properties>{}</properties>
                     <required>False</required>
-                    <field_id>663a7e0fe48382c5b1230902</field_id>
-                    <label>Direccion</label>
+                    <field_id>663a7ca6e48382c5b12308fa</field_id>
+                    <label>Pais</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <view_fields>[]</view_fields>
@@ -373,42 +375,8 @@
                     <field_type>catalog-detail</field_type>
                     <properties>{}</properties>
                     <required>False</required>
-                    <field_id>663a7ca6e48382c5b12308fa</field_id>
-                    <label>Pais</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <view_fields>[]</view_fields>
-                        <field_type>text</field_type>
-                        <view_index>0</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
-                    </catalog>
-                    <options>[]</options>
-                </item>
-                <item>
-                    <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
-                    <required>False</required>
-                    <field_id>663a7f67e48382c5b1230908</field_id>
-                    <label>Tipo de Contacto</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <view_fields>[]</view_fields>
-                        <field_type>select</field_type>
-                        <view_index>0</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
-                    </catalog>
-                    <options>[]</options>
-                </item>
-                <item>
-                    <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
-                    <required>False</required>
-                    <field_id>663a7dd6e48382c5b1230900</field_id>
-                    <label>Codigo de Estado</label>
+                    <field_id>663a7e0fe48382c5b1230902</field_id>
+                    <label>Direccion</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <view_fields>[]</view_fields>
@@ -431,6 +399,24 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663e5c8cf5b8a7ce8211ed0c</field_id>
+                    <label>Geolocalizacion</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>geolocation</field_type>
+                        <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
                         <filters />
@@ -483,8 +469,16 @@
                 </item>
                 <item>
                     <field_type>radio</field_type>
-                    <required>False</required>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
                     <field_id>663bcd72cb24017b604d7f26</field_id>
+                    <required>False</required>
+                    <fav>False</fav>
+                    <label>Estado civil</label>
                     <options>
                         <item>
                             <points>None</points>
@@ -511,13 +505,6 @@
                             <label>Unión libre</label>
                         </item>
                     </options>
-                    <label>Estado civil</label>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
                 </item>
                 <item>
                     <field_type>integer</field_type>
@@ -573,6 +560,7 @@
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
                     <field_id>663bd36eb19b7fb7d9e97ccb</field_id>
                     <required>False</required>
                     <fav>True</fav>
@@ -580,20 +568,19 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.empleados_jefes_directos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.empleados_jefes_directos.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters />
                     </catalog>
                     <options>[]</options>
-                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>radio</field_type>
                     <required>False</required>
-                    <field_id>663bcd72cb24017b604d7f2a</field_id>
+                    <field_id>663fa630583de096e9326cc0</field_id>
                     <options>
                         <item>
                             <points>None</points>
@@ -631,7 +618,7 @@
                 <item>
                     <field_type>datetime</field_type>
                     <required>False</required>
-                    <field_id>663bcd72cb24017b604d7f2b</field_id>
+                    <field_id>663fa630583de096e9326cc1</field_id>
                     <properties>
                         <custom>None</custom>
                         <format>vertical</format>
@@ -641,7 +628,7 @@
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
-                    <field_id>663bcd72cb24017b604d7f2c</field_id>
+                    <field_id>663fa630583de096e9326cc2</field_id>
                     <properties>
                         <send_email>False</send_email>
                         <custom>None</custom>
@@ -652,7 +639,7 @@
                 <item>
                     <field_type>integer</field_type>
                     <required>False</required>
-                    <field_id>663bcd72cb24017b604d7f2d</field_id>
+                    <field_id>663fa630583de096e9326cc3</field_id>
                     <properties>
                         <number_of_decimals>2</number_of_decimals>
                         <custom>None</custom>
@@ -664,7 +651,7 @@
                 <item>
                     <field_type>datetime</field_type>
                     <required>False</required>
-                    <field_id>663bcd72cb24017b604d7f2e</field_id>
+                    <field_id>663fa630583de096e9326cc4</field_id>
                     <properties>
                         <custom>None</custom>
                         <format>vertical</format>
@@ -674,7 +661,7 @@
                 <item>
                     <field_type>datetime</field_type>
                     <required>False</required>
-                    <field_id>663bcd72cb24017b604d7f2f</field_id>
+                    <field_id>663fa630583de096e9326cc5</field_id>
                     <properties>
                         <custom>None</custom>
                         <format>vertical</format>
@@ -684,7 +671,7 @@
                 <item>
                     <field_type>textarea</field_type>
                     <required>False</required>
-                    <field_id>663bcd72cb24017b604d7f30</field_id>
+                    <field_id>663fa630583de096e9326cc6</field_id>
                     <properties>
                         <send_email>False</send_email>
                         <custom>None</custom>
@@ -695,7 +682,7 @@
                 <item>
                     <field_type>radio</field_type>
                     <required>False</required>
-                    <field_id>663bcd72cb24017b604d7f31</field_id>
+                    <field_id>663fa630583de096e9326cc7</field_id>
                     <options>
                         <item>
                             <points>None</points>
@@ -776,20 +763,20 @@
                     <field_type>catalog</field_type>
                     <catalog_fields>[]</catalog_fields>
                     <required>False</required>
-                    <field_id>{{ catalog.configuracin_de_departamentos_y_puestos.obj_id }}</field_id>
+                    <field_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</field_id>
                     <label>Puesto</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <filters />
                         <view_index>0</view_index>
-                        <couch_id>{{ catalog.configuracin_de_departamentos_y_puestos.obj_id }}</couch_id>
+                        <couch_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracin_de_departamentos_y_puestos.id }}</catalog_id>
+                        <catalog_id>{{ catalog.configuracion_de_departamentos_y_puestos.id }}</catalog_id>
                         <view_fields>
                             <item>663bc4ed8a6b120eab4d7f1e</item>
                             <item>663bc4c79b8046ce89e97cf4</item>
                         </view_fields>
-                        <name>{{ catalog.configuracin_de_departamentos_y_puestos.name }}</name>
+                        <name>{{ catalog.configuracion_de_departamentos_y_puestos.name }}</name>
                     </catalog>
                     <properties>{}</properties>
                 </item>
@@ -805,8 +792,8 @@
                         <filters />
                         <field_type>text</field_type>
                         <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.configuracin_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracin_de_departamentos_y_puestos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_departamentos_y_puestos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <options>[]</options>
@@ -824,8 +811,8 @@
                         <filters />
                         <field_type>text</field_type>
                         <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.configuracin_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracin_de_departamentos_y_puestos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_departamentos_y_puestos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <options>[]</options>
@@ -1353,8 +1340,4 @@
             <page_name>Link</page_name>
         </item>
     </catalog_pages>
-    <sync_last_update>None</sync_last_update>
-    <_id>663bbf98b23abe4f4a59eb4d</_id>
-    <public>False</public>
-    <catalog_id>118397</catalog_id>
 </lkf>

@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.bitacora_de_fallas.id }}</form_id>
+    <id>663999491c05532cef326d1a</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>66397e2c59c2600b1df2742c</field_id>
+                        <group_id>None</group_id>
+                        <id>66397e2c59c2600b1df2742c</id>
+                        <label>Estatus de la falla</label>
+                        <type>radio</type>
+                    </field>
+                    <value>resuelto</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>663998f8df1f40254af27430</field_id>
+                    <group_id>None</group_id>
+                    <id>663998f8df1f40254af27430</id>
+                    <label>Fecha y hora de solución</label>
+                    <type>datetime</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>and</operator>
+            <rule_id>8d774e1bf7b08</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

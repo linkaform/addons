@@ -28,16 +28,14 @@ from settings import *
 
 force_items = {
     "forms":{
-        # 117904:None,
-        # 117685:None,
-        # 116635:None,
-        # 116110:None,
-        # 116771:None,
-        # 116113:None,
+        # 118588:None,
 
         },
     "catalogs":{
-        # 116106:None,
+        # 118584:None,
+        # 118583:None,
+        # 118585:None,
+        # 118586:None
 
  },
     "scripts":{
@@ -89,7 +87,7 @@ def download_modules(modules, options, items_ids={}, download_related=False):
             get_forms(force_items['forms'], download_related=download_related)
         if 'catalogs' in options or 'catalog' in options:
             print('------------------')
-            get_catalogs(force_items['catalogs'])
+            get_catalogs(force_items['catalogs'], download_related=download_related)
         if 'scripts' in options or 'script' in options:
             get_scripts(force_items['scripts'])
 
@@ -131,7 +129,7 @@ def drop_hashKey(catalog_json):
             return catalog_json
     return res
 
-def get_catalogs(download_catalogs={}):
+def get_catalogs(download_catalogs={}, download_related=False):
     print('Fetching catalogs...')
     global items, installed_items
     if not download_catalogs:
@@ -155,7 +153,8 @@ def get_catalogs(download_catalogs={}):
         # print('catalog_data_xml',catalog_data_xml)  
         save_catalog_xml(catalog_data_xml, catalog_name)
     installed_items['catalogs'].update(download_catalogs)
-    get_new_items('catalogs')
+    if download_related:
+        get_new_items('catalogs')
 
 def get_forms(download_forms={}, download_related=False):
     global items
@@ -430,6 +429,7 @@ def save_workflow_xml(xml_data, form_name):
                         if catalog_field_id and catalog_field_id.text:
                             catalog_name = get_item_name('catalogs', item_obj_id=catalog_field_id.text, element=catalog_field_id)
                             catalog_field_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
+                        #TODO DO: Si tiene un custom user , gravarlo en carpeta private
                         # for customUser in assign.iter('customUser'):
                         #     try:
                         #         user_id = customUser.find('id')

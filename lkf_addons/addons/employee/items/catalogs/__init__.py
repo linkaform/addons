@@ -4,6 +4,5 @@ from lkf_addons.items.catalog_resource import CatalogResource
 install_order = ['teams', 
                 'puestos',
                 'departamentos',
-                'configuracin_de_departamentos_y_puestos', 
-                'employee_direct_boss',
+                'configuracion_de_departamentos_y_puestos', 
                 'empleados_jefes_directos']

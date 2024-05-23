@@ -1,0 +1,199 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>{}</confirmation>
+    <description />
+    <_rev>8-de95d6d669c690483bbf886525e32a39</_rev>
+    <updated_at>2024-05-18T01:37:48.384286+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Configuracion de Gafetes y Lockers</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-05-18T01:37:48.384286+00:00Z</created_at>
+    <advanced_options>{}</advanced_options>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>catalog</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>
+                        <item>663e5c57f5b8a7ce8211ed0b</item>
+                        <item>663e5d44f5b8a7ce8211ed0f</item>
+                        <item>66480101786e8cdb66e70124</item>
+                    </catalog_fields>
+                    <fav>None</fav>
+                    <required>False</required>
+                    <field_id>{{ catalog.lockers.obj_id }}</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.lockers.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.lockers.id }}</catalog_id>
+                        <view_fields>
+                            <item>663e5c57f5b8a7ce8211ed0b</item>
+                            <item>663e5d44f5b8a7ce8211ed0f</item>
+                            <item>66480101786e8cdb66e70124</item>
+                        </view_fields>
+                        <related_catalog>
+                            <childs>
+                                <item>664803e6d79bc1dfd33885e0</item>
+                            </childs>
+                        </related_catalog>
+                        <name>{{ catalog.lockers.name }}</name>
+                    </catalog>
+                    <relation_type>None</relation_type>
+                    <label>Locker</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Ubicación</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.lockers.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lockers.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre de Area</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.lockers.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lockers.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>66480101786e8cdb66e70124</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>ID locker</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>3</view_index>
+                        <catalog_field_id>{{ catalog.lockers.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lockers.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>664803e6d79bc1dfd33885e1</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.gafetes.obj_id }}</field_id>
+                    <label>Gafete</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.gafetes.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.gafetes.id }}</catalog_id>
+                        <view_fields>
+                            <item>664803e6d79bc1dfd33885e1</item>
+                        </view_fields>
+                        <related_catalog>
+                            <related_fields>
+                                <item>663e5c57f5b8a7ce8211ed0b</item>
+                            </related_fields>
+                            <catalog_id>118882</catalog_id>
+                        </related_catalog>
+                        <name>{{ catalog.gafetes.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>664803e6d79bc1dfd33885e1</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>ID de Gafet</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.gafetes.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.gafetes.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <field_id>664807294f62334c9d273ed2</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Estatus</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>disponible</value>
+                            <label>Disponible</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>no_disponible</value>
+                            <label>No disponible</label>
+                        </item>
+                    </options>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_description>None</page_description>
+            <page_name>Página 1</page_name>
+        </item>
+    </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>6648066c944ad52a14e70146</_id>
+    <public>False</public>
+    <catalog_id>118884</catalog_id>
+</lkf>

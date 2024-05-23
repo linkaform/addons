@@ -106,7 +106,7 @@
                     <created>True</created>
                     <deleted>True</deleted>
                     <edited>True</edited>
-                    <run_multiple_times>False</run_multiple_times>
+                    <run_multiple_times>True</run_multiple_times>
                     <runtime>before</runtime>
                 </record>
                 <wf_fields>

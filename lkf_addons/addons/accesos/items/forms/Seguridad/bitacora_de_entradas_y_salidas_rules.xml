@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.bitacora_de_entradas_y_salidas.id }}</form_id>
+    <id>65cbe06cfb981b2d079f47e2</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>66358a5e50e5c61267832f90</field_id>
+                        <group_id>None</group_id>
+                        <id>66358a5e50e5c61267832f90</id>
+                        <label>Estatus</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>65cbe03c6c78b071a59f481e</field_id>
+                    <group_id>None</group_id>
+                    <id>65cbe03c6c78b071a59f481e</id>
+                    <label>Duración</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Oculta campo duración</name>
+            <operator>and</operator>
+            <rule_id>1105233916192111</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>66358a5e50e5c61267832f90</field_id>
+                        <group_id>None</group_id>
+                        <id>66358a5e50e5c61267832f90</id>
+                        <label>Estatus</label>
+                        <type>radio</type>
+                    </field>
+                    <value>registrar_salida</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>663ff887fb484baab9f27479</field_id>
+                    <group_id>None</group_id>
+                    <id>663ff887fb484baab9f27479</id>
+                    <label>NOTA:</label>
+                    <type>description</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.areas_dentro_de_la_ubicacion_salidas.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>663fb45992f2c5afcfe97ca7</id>
+                    <label>Caseta de salida</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>663fb45992f2c5afcfe97ca8</field_id>
+                    <group_id>None</group_id>
+                    <id>663fb45992f2c5afcfe97ca8</id>
+                    <label>Nombre de Area</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662c51eb194f1cb7a91e5af0</field_id>
+                    <group_id>None</group_id>
+                    <id>662c51eb194f1cb7a91e5af0</id>
+                    <label>Fecha y hora de salida</label>
+                    <type>datetime</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar campos para salida</name>
+            <operator>and</operator>
+            <rule_id>1b4a2520bcd476</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
