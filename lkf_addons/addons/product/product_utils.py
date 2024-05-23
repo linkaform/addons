@@ -134,6 +134,9 @@ class Warehouse(base.LKF_Base):
 
     def warehouse_type(self, warehouse_name):
         answers = {f"{self.f['warehouse']}":warehouse_name}
+        print('==== Consultando el catalogo')
+        print('WAREHOUSE_ID =',self.WAREHOUSE_ID)
+        print('answers =',answers)
         catalog_record = self.lkf_api.search_catalog_answers(self.WAREHOUSE_ID, answers,  jwt_settings_key='APIKEY_JWT_KEY',**{'limit':1})
         if not catalog_record:
             self.LKFException(f"Warehouse: {warehouse_name}, not found or dont have the correct access, please check with you admin")

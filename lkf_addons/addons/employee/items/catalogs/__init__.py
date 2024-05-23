@@ -5,4 +5,6 @@ install_order = ['teams',
                 'puestos',
                 'departamentos',
                 'configuracion_de_departamentos_y_puestos', 
-                'empleados_jefes_directos']
+                'empleados_jefes_directos',
+                'employee'
+                ]
