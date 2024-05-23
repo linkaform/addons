@@ -1,0 +1,16 @@
+{
+    "mapping":{
+        "Codigo de Producto":"61ef32bcdf0ec2ba73dec33d",
+        "Nombre de Producto":"61ef32bcdf0ec2ba73dec33e",
+        "Imagen":"65dec8423199f9a040829245",
+        "Codigo de Barras":"010101010101010101010101",
+        "Type":"61ef32bcdf0ec2ba73dec343",
+        "Categoria":"61ef32bcdf0ec2ba73dec342",
+        "Tamaño por defecto":"61ef32bcdf0ec2ba73dec344",
+        "Unidad de Medida":"65dec8423199f9a040829246",
+        "Unidad de Medida de Compra":"65dec8423199f9a040829247",
+        "Puede ser":"65dec8423199f9a040829248",
+        "Status":"65dec8423199f9a040829249"
+        },
+        "spreadsheet_url":"https://docs.google.com/spreadsheets/d/1m6kJpRxAojN-Wj0CorKQfuNkODaNVfF1QDoTVo-cLeY/edit#gid=0"
+}

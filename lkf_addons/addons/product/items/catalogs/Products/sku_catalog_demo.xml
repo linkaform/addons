@@ -1,0 +1,15 @@
+{
+    "mapping":{
+        "Product Code":"61ef32bcdf0ec2ba73dec33d",
+        "Nombre de Producto":"61ef32bcdf0ec2ba73dec33e",
+        "SKU":"65dec64a3199f9a040829243",
+        "Department":"621fc992a7ebfd603a8c5e2e",
+        "Size":"6205f73281bb36a6f1573358",
+        "Color":"621fca56ee94313e8d8c5e2e",
+        "Source":"6205f73281bb36a6f157335a",
+        "Empaque":"6209705080c17c97320e3382",
+        "Qty per Container":"6205f73281bb36a6f157335b",
+        "Note":"6205f73281bb36a6f157335c"
+        },
+        "spreadsheet_url":"https://docs.google.com/spreadsheets/d/1MYJpjW1LlEGzAegYMlqjtqOAxExtDbscm5tAGor3pZE/edit#gid=0"
+}

@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>Your info was successfully captured!</message>
+        <button_message>Send</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
+    <description />
+    <_rev>6-63a8705b6827c6d91bc0f2718db67e8e</_rev>
+    <updated_at>2024-01-26T20:21:57.154150+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Warehouse Locations</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-01-26T20:21:57.154150+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>catalog</field_type>
+                    <properties>{}</properties>
+                    <key>False</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>{{ catalog.warehouse.obj_id }}</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Warehouse</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>6442e4831198daf81456f274</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.warehouse.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.warehouse.id }}</catalog_id>
+                        <filters>None</filters>
+                        <name>{{ catalog.warehouse.name }}</name>
+                    </catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>6442e4831198daf81456f274</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Warehouse Name</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.warehouse.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.warehouse.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>65ac6fbc070b93e656bd7fbe</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Location</label>
+                    <key>True</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <field_id>65c12898feb41e0fcd1a33b7</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Rack Capacity</label>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <size>small</size>
+                        <step>1</step>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_name>Page 1</page_name>
+            <page_description>None</page_description>
+        </item>
+    </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>65b414650ade76b12c6631b4</_id>
+    <public>False</public>
+    <catalog_id>113818</catalog_id>
+</lkf>
