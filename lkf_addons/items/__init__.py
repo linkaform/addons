@@ -255,7 +255,7 @@ class Items(LKFException):
         if self.file_exists(modules_path, file_name, 'py'):
             search_file_path = '{}/{}.{}'.format(modules_path, file_name, 'py')
         elif self.file_exists(file_path, file_name, 'py'):
-            print('los scripts que estan en addons path no se instalan ya que viven como libreria dentro del contend=edr')
+            print('los scripts que estan en addons path no se instalan ya que viven como libreria dentro del contendedr')
             # search_file_path = '{}/{}.{}'.format(file_path, file_name, 'py')
             search_file_path = None
         else:
