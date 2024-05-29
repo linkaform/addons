@@ -41,14 +41,14 @@ class FormResource(items.Items):
                     res = self.lkf_api.upload_rules(rules_model, 'POST')
             #res = self.lkf_api.upload_rules(rules_model, 'PATCH')
 
-    def install_forms(self, instalable_forms):
+    def install_forms(self, instalable_forms, **kwargs):
         if instalable_forms.get('install_order') or instalable_forms.get('install_order') == []:
             install_order = instalable_forms.pop('install_order', [])
         else:
             install_order = []
         install_order += [x  for x in instalable_forms.keys() if x not in install_order]
         response = []
-        print('install_order', install_order)
+        print('Install Order: ', install_order)
 
         # install_order = ['green_house_inventory_move']
 
@@ -58,6 +58,7 @@ class FormResource(items.Items):
                 this_path = '{}/{}'.format(self.path, detail['path'])
             else:
                 this_path = self.path
+            print('Installig Form: ' ,form_name)
             form_model = self.load_module_template_file(this_path, form_name)
             item_info = {
                 # 'created_by' : user,

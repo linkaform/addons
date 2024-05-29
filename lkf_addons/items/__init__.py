@@ -153,7 +153,6 @@ class Items(LKFException):
         # Find all 'item' elements under 'search_element' (this is where the items are nested)
         if inherit_attr.get('parent'):
             x = inherit_attr.get("parent")
-            print('search_element ahora es el padre...',)
             search_element = root.find(f'.//{x}')
             if search_element is None:
                 msg =  "No 'page_fields' found"

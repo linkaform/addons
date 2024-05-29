@@ -28,11 +28,12 @@ from settings import *
 
 force_items = {
     "forms":{
+        #119180:None,
         # 118588:None,
 
         },
     "catalogs":{
-        # 118584:None,
+        #119180:None,
         # 118583:None,
         # 118585:None,
         # 118586:None
@@ -242,7 +243,7 @@ def get_item_name(item_type, item_id=None, element=None, attribute='name', item_
                 msg = "Something went wrong, plese check that the item_id: {} "
                 msg += "The most common thing here is that the id does not exists and someone is seraching for it"
                 msg += "See who is tring to search form it!!!"
-                raise(msg)
+                raise msg
         item_name = item_json.get('name', 'no_name')
     item_name = strip_chaaracters(item_name)
     items[item_type][item_id] = item_name
@@ -389,8 +390,15 @@ def save_workflow_xml(xml_data, form_name):
     for workflow in list(workflows):
         for w_items in workflow:
             for actions in w_items.iter('actions'):
+                #seaches on every action type and replaces values
                 for action in actions:
                     config = action.find('configuration')
+                    body = config.find('body')
+                    if hasattr(body,'text'):
+                        body.text = "{% raw %} " + body.text + " {% endraw %}" 
+                    subject = config.find('subject')
+                    if hasattr(subject,'text'):
+                        subject.text = "{% raw %} " + subject.text + " {% endraw %}" 
                     for script in config.iter('script'):
                         script_id = script.find('id')
                         script_name = get_item_name('scripts', script_id.text, script, attribute='name')
@@ -447,7 +455,13 @@ def save_workflow_xml(xml_data, form_name):
                         #     user_username = customUser.find('username')
                         #     # user_username.text = settings.config["USER"]['username']
                         #     user_username.text = user_username.text
-
+                    for synched_catalogs in config.iter('synched_catalogs'):
+                        for item in synched_catalogs.iter('item'):
+                            catalog_id = item.find('id')
+                            catalog_obj_id = item.find('couch_id')
+                            catalog_name = get_item_name('catalogs', catalog_id.text, catalog_id, attribute='name')
+                            catalog_id.text = "{{ catalog." + catalog_name + ".id }}"
+                            catalog_obj_id.text = "{{ catalog." + catalog_name + ".obj_id }}"
             for rules in w_items.iter('rules'):
                 for wf_fields in rules.iter('wf_fields'):
                     for triggers in wf_fields.iter('triggers'):

@@ -62,10 +62,34 @@ kwargs = {}
 download_related = False
 
 
+def get_module_dependencies(module, depend_modules):
+    print('dependecies', module)
+    res = []
+    try:
+        this_m = importlib.import_module(f'{module}')
+        this_obj = this_m
+        if hasattr(this_obj, 'depends'):
+            if this_obj.depends not in depend_modules:
+                res = this_obj.depends
+        else:
+            res = []
+    except:
+            res = []
+    return res
 
 def do_load_modules(load_modules, **kwargs):
     response = []
-    for module in load_modules:
+    depend_modules = []
+    if kwargs.get('dependencies'):
+        for module in load_modules:
+            depend_modules += get_module_dependencies(module, depend_modules)
+        for module in load_modules:
+            if module not in depend_modules:
+                depend_modules.append(module)
+        print('Installing Denpendencies: ', depend_modules)
+    else:
+        depend_modules = load_modules
+    for module in depend_modules:
         # global forms
         print('-'*35 + f' Loding Module: {module} ' + '-'*35)
         #TODO revisar porque no corren las reglas
@@ -219,6 +243,8 @@ def print_help():
     print('-m, --module:')
     print('        stands for module, you con type -m module_name -m module_name')
     print('        or can type the module names separated by a " " module_name module_name')
+    print('-d, --depends:')
+    print('        install module dependencies')
     print('-i, --item:')
     print('        stands for items, you can speficy to load or download only speficif items')
     print('        Available values are, forms, catalogs, scripts, reports')
@@ -282,6 +308,11 @@ if __name__ == '__main__':
         if '-f' in commands:
             kwargs.update({'force':True})
 
+        if '-d' in commands:
+            kwargs.update({'dependencies':True})
+        else:
+            kwargs.update({'dependencies':False})
+
         print('Running on:', '== {} =='.format(settings.ENV) * 10)
         print('With User:', '== {} =='.format(settings.config['USERNAME']))
         environment = get_items_2_load(commands)
@@ -331,7 +362,7 @@ if __name__ == '__main__':
                     else:
                         options.append('forms')
                     if ask_catalog:    
-                        load_catalog = set_value(input("Download Catalogs2 [y/n] (default n):"))
+                        load_catalog = set_value(input("Download Catalogs [y/n] (default n):"))
                         if load_catalog:
                             options.append('catalogs')
                     else:
@@ -343,7 +374,7 @@ if __name__ == '__main__':
                     else:
                             options.append('scripts')
                     if ask_reports:    
-                        load_reports = set_value(input("Download Scripts [y/n] (default n):"))
+                        load_reports = set_value(input("Download Reports [y/n] (default n):"))
                         if load_reports:
                             options.append('reports')
                     else:
