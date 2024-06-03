@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
-    <form_id>{{ form.areas_dentro_de_la_ubicacion.id }}</form_id>
+    <form_id>{{ form.areas_de_las_ubicaciones.id }}</form_id>
     <id>65fb72e27ebfed31b5cde722</id>
     <workflows>
         <item>
@@ -12,8 +12,8 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>663e6e5ddb059967eecb96fa</couch_id>
-                                <id>118591</id>
+                                <couch_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</couch_id>
+                                <id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</id>
                                 <name>Areas Dentro de la Ubicacion</name>
                             </item>
                         </synched_catalogs>
@@ -62,25 +62,25 @@
                     <action_settings>{}</action_settings>
                     <configuration>
                         <catalog>
-                            <couch_id>{{ catalog.areas_dentro_de_la_ubicacion_salidas.obj_id }}</couch_id>
+                            <couch_id>{{ catalog.areas_de_las_ubicaciones_salidas.obj_id }}</couch_id>
                             <created_at>1715450969</created_at>
                             <created_by_id>20</created_by_id>
                             <deleted_at>None</deleted_at>
                             <end_date>None</end_date>
                             <form_id>118608</form_id>
                             <group_id>None</group_id>
-                            <id>{{ catalog.areas_dentro_de_la_ubicacion_salidas.id }}</id>
+                            <id>{{ catalog.areas_de_las_ubicaciones_salidas.id }}</id>
                             <is_fileShared>False</is_fileShared>
                             <is_shared>False</is_shared>
                             <is_shared_from_connection>False</is_shared_from_connection>
                             <is_shared_root>False</is_shared_root>
                             <itype>catalog</itype>
                             <leaf_node>True</leaf_node>
-                            <name>{{ catalog.areas_dentro_de_la_ubicacion_salidas.name }}</name>
+                            <name>{{ catalog.areas_de_las_ubicaciones_salidas.name }}</name>
                             <owner_id>20</owner_id>
                             <parent_id>None</parent_id>
                             <perm>can_manage_item</perm>
-                            <resource_uri>/api/infosync/get_catalogs/{{ catalog.areas_dentro_de_la_ubicacion_salidas.id }}/</resource_uri>
+                            <resource_uri>/api/infosync/get_catalogs/{{ catalog.areas_de_las_ubicaciones_salidas.id }}/</resource_uri>
                             <shared_id>None</shared_id>
                             <start_date>2024-05-11T18:12:21.880579+00:00</start_date>
                             <updated_at>1715451141</updated_at>

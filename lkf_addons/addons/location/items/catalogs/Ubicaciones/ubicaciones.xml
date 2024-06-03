@@ -7,8 +7,8 @@
         <button_message>Mandar respuestas</button_message>
     </confirmation>
     <description />
-    <_rev>13-af11ace3c92d66b4a48f238160e4425b</_rev>
-    <updated_at>2024-05-10T18:58:38.054172+00:00Z</updated_at>
+    <_rev>4-46b75327058936b21e5303f85c259d80</_rev>
+    <updated_at>2024-05-23T17:41:43.570286+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Ubicaciones</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-10T18:58:38.054172+00:00Z</created_at>
+    <created_at>2024-05-23T17:41:43.570286+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,10 +25,6 @@
             <manual>False</manual>
         </folio>
     </advanced_options>
-    <catalog_id>118592</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>663e6e5e8ad9bb1e7859ebb1</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -75,7 +71,7 @@
                         <couch_id>{{ catalog.contacto.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                         <name>{{ catalog.contacto.name }}</name>
                     </catalog>
                     <properties>{}</properties>
@@ -95,7 +91,7 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -112,7 +108,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -129,7 +125,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -146,7 +142,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -163,7 +159,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -180,7 +176,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -198,7 +194,7 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -207,4 +203,8 @@
             <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>664f7fd73e59756b3c62ff30</_id>
+    <public>False</public>
+    <catalog_id>119122</catalog_id>
 </lkf>

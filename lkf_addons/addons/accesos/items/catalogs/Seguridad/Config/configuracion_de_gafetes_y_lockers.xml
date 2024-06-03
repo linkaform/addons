@@ -3,8 +3,8 @@
     <templates>[]</templates>
     <confirmation>{}</confirmation>
     <description />
-    <_rev>8-de95d6d669c690483bbf886525e32a39</_rev>
-    <updated_at>2024-05-18T01:37:48.384286+00:00Z</updated_at>
+    <_rev>2-8ea6e0fc50487476ec7e8bdc9c921318</_rev>
+    <updated_at>2024-05-23T18:37:21.277500+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -12,7 +12,7 @@
     <filters>{}</filters>
     <name>Configuracion de Gafetes y Lockers</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-18T01:37:48.384286+00:00Z</created_at>
+    <created_at>2024-05-23T18:37:21.277500+00:00Z</created_at>
     <advanced_options>{}</advanced_options>
     <catalog_pages>
         <item>
@@ -30,7 +30,7 @@
                     <field_id>{{ catalog.lockers.obj_id }}</field_id>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.lockers.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -65,7 +65,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.lockers.obj_id }}</catalog_field_id>
@@ -84,7 +84,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.lockers.obj_id }}</catalog_field_id>
@@ -103,7 +103,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>3</view_index>
                         <catalog_field_id>{{ catalog.lockers.obj_id }}</catalog_field_id>
@@ -123,7 +123,7 @@
                     <label>Gafete</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.gafetes.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -150,7 +150,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.gafetes.obj_id }}</catalog_field_id>
@@ -193,7 +193,7 @@
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>6648066c944ad52a14e70146</_id>
+    <_id>664f8ce1aa9907e44a490ee3</_id>
     <public>False</public>
-    <catalog_id>118884</catalog_id>
+    <catalog_id>119171</catalog_id>
 </lkf>

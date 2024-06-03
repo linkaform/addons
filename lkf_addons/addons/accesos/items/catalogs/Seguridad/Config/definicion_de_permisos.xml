@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>46-cf3c5cba937f0de6e378b0f0e325b73d</_rev>
-    <updated_at>2024-03-04T22:55:24.015617+00:00Z</updated_at>
+    <_rev>2-a2378f79d91fc77ca37f8a496a15c4d7</_rev>
+    <updated_at>2024-05-23T18:37:17.651231+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Definicion de Permisos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-03-04T22:55:24.015617+00:00Z</created_at>
+    <created_at>2024-05-23T18:37:17.651231+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -183,14 +183,14 @@
                     <fav>True</fav>
                     <label>Ejemplo en imagen</label>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>False</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -198,7 +198,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -223,7 +223,7 @@
                         <couch_id>{{ catalog.definicion_de_examenes.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.definicion_de_examenes.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                         <name>{{ catalog.definicion_de_examenes.name }}</name>
                     </catalog>
                     <properties>{}</properties>
@@ -243,7 +243,7 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.definicion_de_examenes.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.definicion_de_examenes.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -275,12 +275,12 @@
                     </options>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>65e6515ce63f84c46cc5342e</_id>
+    <_id>664f8cddaa9907e44a490ed9</_id>
     <public>False</public>
-    <catalog_id>116106</catalog_id>
+    <catalog_id>119166</catalog_id>
 </lkf>

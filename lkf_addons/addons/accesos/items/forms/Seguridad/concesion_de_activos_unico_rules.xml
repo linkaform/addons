@@ -79,7 +79,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.configuracion_areas_y_empleados_apoyo.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>663fb92aa3e9bfc6aecb96fd</id>
+                    <id>664f81a23e59756b3c62ff5a</id>
                     <label>Persona</label>
                     <type>catalog</type>
                 </item>
@@ -131,9 +131,9 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>{{ catalog.areas_dentro_de_la_ubicacion_salidas.obj_id}}</field_id>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones_salidas.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>663fb45992f2c5afcfe97ca7</id>
+                    <id>664f7fdb3e59756b3c62ff36</id>
                     <label>Área</label>
                     <type>catalog</type>
                 </item>

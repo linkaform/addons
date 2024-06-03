@@ -12,9 +12,9 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>65e6515ce63f84c46cc5342e</couch_id>
-                                <id>116106</id>
-                                <name>Definición de permisos</name>
+                                <couch_id>{{ catalog.definicion_de_permisos.obj_id }}</couch_id>
+                                <id>{{ catalog.definicion_de_permisos.id }}</id>
+                                <name>Definicion de Permisos</name>
                             </item>
                         </synched_catalogs>
                     </configuration>

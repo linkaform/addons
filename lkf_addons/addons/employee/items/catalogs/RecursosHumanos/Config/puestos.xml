@@ -3,16 +3,16 @@
     <templates>[]</templates>
     <confirmation>{}</confirmation>
     <description />
-    <_rev>2-c018379aa2f3eabc064f48e16a77391b</_rev>
-    <updated_at>2024-05-10T18:58:35.675363+00:00Z</updated_at>
+    <_rev>6-37785a326ce30444b99db06d59633c2e</_rev>
+    <updated_at>2024-05-23T17:44:48.490276+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
     </sync>
     <filters>{}</filters>
-    <name>Tipo de Areas</name>
+    <name>Puestos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-10T18:58:35.675363+00:00Z</created_at>
+    <created_at>2024-05-23T17:44:48.490276+00:00Z</created_at>
     <advanced_options>{}</advanced_options>
     <catalog_pages>
         <item>
@@ -24,14 +24,14 @@
                         <size>complete</size>
                         <custom>None</custom>
                     </properties>
-                    <key>True</key>
+                    <key>None</key>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>663e5e68f5b8a7ce8211ed18</field_id>
+                    <field_id>663bc4c79b8046ce89e97cf4</field_id>
                     <required>False</required>
                     <fav>True</fav>
                     <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
-                    <label>Tipo de Area</label>
+                    <label>Nombre del puesto</label>
                     <catalog>{}</catalog>
                     <catalog_id>None</catalog_id>
                     <view_fields>[]</view_fields>
@@ -39,12 +39,12 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>PAGE 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>663e6e5bdb501876bd326c55</_id>
+    <_id>664f80903e59756b3c62ff50</_id>
     <public>False</public>
-    <catalog_id>118590</catalog_id>
+    <catalog_id>119132</catalog_id>
 </lkf>

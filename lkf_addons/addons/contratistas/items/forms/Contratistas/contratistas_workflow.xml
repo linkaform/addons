@@ -12,8 +12,8 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>65e6515a0cdec66503719105</couch_id>
-                                <id>116101</id>
+                                <couch_id>{{ catalog.contratistas.obj_id }}</couch_id>
+                                <id>{{ catalog.contratistas.id }}</id>
                                 <name>Contratistas</name>
                             </item>
                         </synched_catalogs>
@@ -76,11 +76,11 @@
                     <action_id>5</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
-                        <body>Bienvendio, porfavor llena todos los campos solicitados para tramitar tu alta de contratista. &lt;br&gt;
+                        <body>{% raw %}Bienvendio, porfavor llena todos los campos solicitados para tramitar tu alta de contratista. &lt;br&gt;
 Puede, ir llenando tu solicitud en partes, enviendo tu registro cada vez que subas cambios. &lt;br&gt;
 Una vez completada la solicitud, actualizar el estatus a "Completada" para que esta pueda ser autorizada.
 
-Para ver tu solicitud entra &lt;a href="{{record_url}}?token={{expiration_token}}&amp;form_id={% raw %}{{record.form_id}}{% endraw %}"&gt;aqui&lt;/a&gt;</body>
+Para ver tu solicitud entra &lt;a href="?token=&amp;form_id={{record.form_id}}"&gt;aqui&lt;/a&gt;{% endraw %}</body>
                         <email_fields>
                             <item>
                                 <field_id>65fc814fb170488cf4d44c53</field_id>

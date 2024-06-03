@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>2-b690008b311eca1617cf1da2ddc0e1b8</_rev>
-    <updated_at>2024-05-10T18:31:01.328657+00:00Z</updated_at>
+    <_rev>4-b7e324d4bf6133fb58531618034305ad</_rev>
+    <updated_at>2024-05-23T17:40:36.928354+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Compañia</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-10T18:31:01.328657+00:00Z</created_at>
+    <created_at>2024-05-23T17:40:36.928354+00:00Z</created_at>
     <advanced_options>
         <folio>
             <manual>False</manual>
@@ -49,12 +49,12 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>663e67e5e31b56ed1d832f5c</_id>
+    <_id>664f7f943e59756b3c62ff23</_id>
     <public>False</public>
-    <catalog_id>118584</catalog_id>
+    <catalog_id>119115</catalog_id>
 </lkf>

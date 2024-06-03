@@ -83,7 +83,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.visita_autorizada.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>65e6515a7cc2c9fe60dfd8b7</id>
+                    <id>664f8ce1aa9907e44a490ee5</id>
                     <label>Pase a Nombre de:</label>
                     <type>catalog</type>
                 </item>

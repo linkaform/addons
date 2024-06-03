@@ -41,7 +41,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.configuracion_areas_y_empleados.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>663fb92aa3e9bfc6aecb96fd</id>
+                    <id>664f81a33e59756b3c62ff5c</id>
                     <label>Guardia que  cierra la nota</label>
                     <type>catalog</type>
                 </item>

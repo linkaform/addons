@@ -1,23 +1,29 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <templates>[]</templates>
-    <confirmation>{}</confirmation>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
     <description />
-    <_rev>1-f2f8c52eefc7bfc88552079a4ec61622</_rev>
-    <updated_at>2024-05-08T18:08:23.228405+00:00Z</updated_at>
+    <_rev>2-90760238508e8c78e8d39ec3b30a7d29</_rev>
+    <updated_at>2024-05-23T18:37:16.268371+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
     </sync>
     <filters>{}</filters>
-    <name>Teams</name>
+    <name>Lista de fallas</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-08T18:08:23.228405+00:00Z</created_at>
-    <advanced_options>{}</advanced_options>
-    <catalog_id>118396</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>663bbf9784a5e7b192cb977d</_id>
-    <public>False</public>
+    <created_at>2024-05-23T18:37:16.268371+00:00Z</created_at>
+    <advanced_options>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
     <catalog_pages>
         <item>
             <page_fields>
@@ -28,14 +34,14 @@
                         <size>complete</size>
                         <custom>None</custom>
                     </properties>
-                    <key>True</key>
+                    <key>None</key>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>62c5ff0162a70c261328845d</field_id>
+                    <field_id>66397bae9e8b08289a59ec86</field_id>
                     <required>False</required>
                     <fav>True</fav>
                     <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
-                    <label>Team Name</label>
+                    <label>Tipo de falla</label>
                     <catalog>{}</catalog>
                     <catalog_id>None</catalog_id>
                     <view_fields>[]</view_fields>
@@ -44,7 +50,11 @@
                 </item>
             </page_fields>
             <page_description>None</page_description>
-            <page_name>Page 1</page_name>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>664f8cdcaa9907e44a490ed1</_id>
+    <public>False</public>
+    <catalog_id>119162</catalog_id>
 </lkf>

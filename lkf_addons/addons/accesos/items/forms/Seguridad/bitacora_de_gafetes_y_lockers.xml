@@ -14,7 +14,7 @@
         <message>FORM_CAPTURED</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1709592943.0</created_at>
+    <created_at>1716489472.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -216,7 +216,7 @@
                         <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -290,9 +290,9 @@
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion.id }}</catalog_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>
@@ -314,7 +314,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</field_id>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</field_id>
                     <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -374,8 +374,8 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>text</field_type>
                         <filters />
                         <geofence>None</geofence>
@@ -453,7 +453,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.pase_de_entrada.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>
@@ -539,7 +539,7 @@
                         <catalog_field_id>{{ catalog.pase_de_entrada.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.pase_de_entrada.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -615,7 +615,7 @@
                         <catalog_field_id>{{ catalog.pase_de_entrada.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.pase_de_entrada.id }}</catalog_id>
                         <field_type>radio</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -691,7 +691,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_gafetes_y_lockers.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>
@@ -776,7 +776,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_gafetes_y_lockers.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_gafetes_y_lockers.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -852,7 +852,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_gafetes_y_lockers.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_gafetes_y_lockers.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -928,7 +928,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_gafetes_y_lockers.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_gafetes_y_lockers.id }}</catalog_id>
                         <field_type>radio</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1105,7 +1105,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/116114/</resource_uri>
+    <resource_uri>/api/infosync/form/119183/</resource_uri>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>
@@ -1125,5 +1125,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1716319788.0</updated_at>
+    <updated_at>1716844823.0</updated_at>
 </lkf>

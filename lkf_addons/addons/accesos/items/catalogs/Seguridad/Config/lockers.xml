@@ -46,7 +46,7 @@
                         <item>663e5c57f5b8a7ce8211ed0b</item>
                         <item>663e5d44f5b8a7ce8211ed0f</item>
                     </catalog_fields>
-                    <field_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</field_id>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</field_id>
                     <required>False</required>
                     <fav>None</fav>
                     <related_catalog_key>[]</related_catalog_key>
@@ -57,12 +57,12 @@
                         <filters />
                         <view_index>0</view_index>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion.id }}</catalog_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <view_fields>
                             <item>663e5c57f5b8a7ce8211ed0b</item>
                             <item>663e5d44f5b8a7ce8211ed0f</item>
                         </view_fields>
-                        <name>{{ catalog.areas_dentro_de_la_ubicacion.name }}</name>
+                        <name>{{ catalog.areas_de_las_ubicaciones.name }}</name>
                     </catalog>
                     <catalog_id>None</catalog_id>
                     <view_fields>[]</view_fields>
@@ -82,8 +82,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <filters />
                     </catalog>
                     <options>[]</options>
@@ -101,8 +101,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <filters />
                     </catalog>
                     <options>[]</options>

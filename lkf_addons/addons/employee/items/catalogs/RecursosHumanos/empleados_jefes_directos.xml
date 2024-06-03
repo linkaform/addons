@@ -7,8 +7,8 @@
         <button_message>Mandar respuestas</button_message>
     </confirmation>
     <description />
-    <_rev>44-5bcecf8f3de537c47b3072bad37ad41a</_rev>
-    <updated_at>2024-05-08T19:33:02.934135+00:00Z</updated_at>
+    <_rev>6-25929df957563dfe9a0ca67f387ec925</_rev>
+    <updated_at>2024-05-23T17:44:49.669287+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Empleados Jefes Directos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-08T19:33:02.934135+00:00Z</created_at>
+    <created_at>2024-05-23T17:44:49.669287+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -54,9 +54,9 @@
                     <required>True</required>
                     <field_id>663bd4f719b0aab097e97cde</field_id>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <location_decimals>None</location_decimals>
@@ -72,7 +72,7 @@
                         <min_images_count>0</min_images_count>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -265,8 +265,8 @@
                     </options>
                 </item>
             </page_fields>
-            <page_name>Datos generales</page_name>
             <page_description>None</page_description>
+            <page_name>Datos generales</page_name>
         </item>
         <item>
             <page_fields>
@@ -285,7 +285,7 @@
                     <label>Domicilio</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.contacto.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -306,7 +306,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
@@ -323,7 +323,7 @@
                     <label>Tipo de Contacto</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>select</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
@@ -340,7 +340,7 @@
                     <label>Pais</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
@@ -357,7 +357,7 @@
                     <label>Nombre Estado</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
@@ -374,7 +374,7 @@
                     <label>Direccion</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
@@ -391,7 +391,7 @@
                     <label>Colonia</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
@@ -409,7 +409,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>geolocation</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
@@ -433,7 +433,7 @@
                     <label>Empresa</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.compaia.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -453,7 +453,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.compaia.obj_id }}</catalog_field_id>
@@ -731,7 +731,7 @@
                         <couch_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_departamentos_y_puestos.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                         <name>{{ catalog.configuracion_de_departamentos_y_puestos.name }}</name>
                     </catalog>
                     <properties>{}</properties>
@@ -751,7 +751,7 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_departamentos_y_puestos.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -770,7 +770,7 @@
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_departamentos_y_puestos.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -1017,14 +1017,14 @@
                     <required>False</required>
                     <field_id>663bd466b19b7fb7d9e97cd4</field_id>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1032,7 +1032,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1049,14 +1049,14 @@
                     <required>False</required>
                     <field_id>663bd466b19b7fb7d9e97cd5</field_id>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1064,7 +1064,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1081,14 +1081,14 @@
                     <required>False</required>
                     <field_id>663bd466b19b7fb7d9e97cd6</field_id>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1096,7 +1096,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1113,14 +1113,14 @@
                     <required>False</required>
                     <field_id>663bd466b19b7fb7d9e97cd7</field_id>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1128,7 +1128,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1145,14 +1145,14 @@
                     <required>False</required>
                     <field_id>663bd466b19b7fb7d9e97cd8</field_id>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1160,7 +1160,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1177,14 +1177,14 @@
                     <required>False</required>
                     <field_id>663bd466b19b7fb7d9e97cd9</field_id>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1192,7 +1192,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1209,14 +1209,14 @@
                     <required>False</required>
                     <field_id>663bd466b19b7fb7d9e97cda</field_id>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1224,7 +1224,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1241,14 +1241,14 @@
                     <required>False</required>
                     <field_id>663bd466b19b7fb7d9e97cdb</field_id>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1256,7 +1256,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1291,7 +1291,7 @@
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>663bd36eb19b7fb7d9e97cca</_id>
+    <_id>664f80913e59756b3c62ff56</_id>
     <public>False</public>
-    <catalog_id>118417</catalog_id>
+    <catalog_id>119135</catalog_id>
 </lkf>

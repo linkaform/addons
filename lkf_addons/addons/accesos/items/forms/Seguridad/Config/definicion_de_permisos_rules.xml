@@ -135,7 +135,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.definicion_de_examenes.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>66297e1579900d9018c886ab</id>
+                    <id>664f8cddaa9907e44a490ed7</id>
                     <label>Examen</label>
                     <type>catalog</type>
                 </item>

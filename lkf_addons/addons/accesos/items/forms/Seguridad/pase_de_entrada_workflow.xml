@@ -109,7 +109,7 @@
                     <action_id>5</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
-                        <body>&lt;!doctype html&gt;
+                        <body>{% raw %}&lt;!doctype html&gt;
 &lt;html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -687,15 +687,15 @@
                                                         &lt;tr&gt;
                                                             &lt;td valign="top" class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;"&gt;
                                                                 &lt;div style="text-align: justify;"&gt;
-                                                                    &lt;p&gt;Hola, {% raw %}{{record.answers.662c2937108836dec6d92580}}{% endraw%}.&lt;/p&gt;
-                                                                    &lt;p&gt;Has sido invitado a visitar a {% raw %}{{record.answers.663bd36eb19b7fb7d9e97cca.663bd36eb19b7fb7d9e97ccb}}{% endraw %}.&lt;/p&gt;
+                                                                    &lt;p&gt;Hola, {{record.answers.662c2937108836dec6d92580}}.&lt;/p&gt;
+                                                                    &lt;p&gt;Has sido invitado a visitar a {{record.answers.663bd36eb19b7fb7d9e97cca.663bd36eb19b7fb7d9e97ccb}}.&lt;/p&gt;
                                                                     &lt;p&gt;&lt;strong&gt;Detalles de la visita:&lt;/strong&gt;&lt;/p&gt;
                                                                     &lt;ul&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Lugar: &lt;/strong&gt;{% raw %}{{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}}{% endraw %}&lt;/p&gt;&lt;/li&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{% raw %}{{record.answers.663e6e5ddb059967eecb96fa.663a7e0fe48382c5b1230902}}{% endraw %}&lt;/p&gt;&lt;/li&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{% raw %}{{record.answers.662c304fad7432d296d92582}}{% endraw %}&lt;/p&gt;&lt;/li&gt;
+                                                                        &lt;li&gt;&lt;strong&gt;Lugar: &lt;/strong&gt;{{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}}&lt;/p&gt;&lt;/li&gt;
+                                                                        &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.663e6e5ddb059967eecb96fa.663a7e0fe48382c5b1230902}}&lt;/p&gt;&lt;/li&gt;
+                                                                        &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/p&gt;&lt;/li&gt;
                                                                     &lt;/ul&gt;
-                                                                    &lt;p&gt;Se ha creado un pre-registro y ahora está pendiente de su asignación. Por favor, complete sus datos de registro en este &lt;a href="https://srv.linkaform.com/solucion_accesos/registro_ingreso.html?Folio={% raw %}{{record.folio}}{% endraw %}"&gt;enlace&lt;/a&gt;.&lt;/p&gt;&lt;br&gt;
+                                                                    &lt;p&gt;Se ha creado un pre-registro y ahora está pendiente de su asignación. Por favor, complete sus datos de registro en este &lt;a href="https://srv.linkaform.com/solucion_accesos/registro_ingreso.html?Folio={{record.folio}}"&gt;enlace&lt;/a&gt;.&lt;/p&gt;&lt;br&gt;
                                                                     &lt;p&gt;Saludos cordiales, &lt;strong&gt;LinkaForm.&lt;/strong&gt;&lt;/p&gt;
                                                                 &lt;/div&gt;
                                                             &lt;/td&gt;
@@ -758,7 +758,8 @@
         &lt;/table&gt;
     &lt;/center&gt;
 &lt;/body&gt;
-&lt;/html&gt;</body>
+&lt;/html&gt;
+{% endraw%}</body>
                         <email_fields>[]</email_fields>
                         <emails>
                             <item>EMAIL_FIELD_VALUE</item>
@@ -833,7 +834,7 @@
                     <action_id>5</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
-                        <body>&lt;!doctype html&gt;
+                        <body>{% raw %}&lt;!doctype html&gt;
 &lt;html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -1411,17 +1412,17 @@
                                                         &lt;tr&gt;
                                                             &lt;td valign="top" class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;"&gt;
                                                                 &lt;div style="text-align: justify;"&gt;
-                                                                    &lt;p&gt;Hola, {% raw %}{{record.answers.65e6515a7cc2c9fe60dfd8b7.5ea0693a0c12d5a8e43d37df}}{% endraw %}.&lt;/p&gt;
-                                                                    &lt;p&gt;Has sido invitado a visitar a {% raw %}{{record.answers.663bd36eb19b7fb7d9e97cca.663bd36eb19b7fb7d9e97ccb}}{% endraw %}.&lt;/p&gt;
+                                                                    &lt;p&gt;Hola, {{record.answers.65e6515a7cc2c9fe60dfd8b7.5ea0693a0c12d5a8e43d37df}}.&lt;/p&gt;
+                                                                    &lt;p&gt;Has sido invitado a visitar a {{record.answers.663bd36eb19b7fb7d9e97cca.663bd36eb19b7fb7d9e97ccb}}.&lt;/p&gt;
                                                                     &lt;p&gt;&lt;strong&gt;Detalles de la visita:&lt;/strong&gt;&lt;/p&gt;
                                                                     &lt;ul&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Lugar: &lt;/strong&gt;{% raw %}{{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}}{% endraw %}&lt;/p&gt;&lt;/li&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{% raw %}{{record.answers.663e6e5ddb059967eecb96fa.663a7e0fe48382c5b1230902}}{% endraw %}&lt;/p&gt;&lt;/li&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{% raw %}{{record.answers.662c304fad7432d296d92582}}{% endraw %}&lt;/p&gt;&lt;/li&gt;
+                                                                        &lt;li&gt;&lt;strong&gt;Lugar: &lt;/strong&gt;{{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}}&lt;/p&gt;&lt;/li&gt;
+                                                                        &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.663e6e5ddb059967eecb96fa.663a7e0fe48382c5b1230902}}&lt;/p&gt;&lt;/li&gt;
+                                                                        &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/p&gt;&lt;/li&gt;
                                                                     &lt;/ul&gt;
-                                                                    &lt;p&gt;Usted tiene un &lt;strong&gt;tipo de pase&lt;/strong&gt;de {% raw %}{{record.answers.6622a77449da38df8a4686cf.661dc67e901906b7e9b73bac}}{% endraw %}&lt;/p&gt;, favor de traer los siguientes documentos para su ingreso.&lt;/p&gt;
+                                                                    &lt;p&gt;Usted tiene un &lt;strong&gt;tipo de pase&lt;/strong&gt;de {{record.answers.6622a77449da38df8a4686cf.661dc67e901906b7e9b73bac}}&lt;/p&gt;, favor de traer los siguientes documentos para su ingreso.&lt;/p&gt;
                                                                     &lt;ul&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Documentos:&lt;/strong&gt;{% raw %}{{record.answers.6622a77449da38df8a4686cf.6622a5a362891857eef2eb59}}{% endraw %}&lt;/p&gt;&lt;/li&gt;
+                                                                        &lt;li&gt;&lt;strong&gt;Documentos:&lt;/strong&gt;{{record.answers.6622a77449da38df8a4686cf.6622a5a362891857eef2eb59}}&lt;/p&gt;&lt;/li&gt;
                                                                     &lt;/ul&gt;
                                                                     &lt;p&gt;Saludos cordiales, &lt;strong&gt;LinkaForm.&lt;/strong&gt;&lt;/p&gt;
                                                                 &lt;/div&gt;
@@ -1485,7 +1486,7 @@
         &lt;/table&gt;
     &lt;/center&gt;
 &lt;/body&gt;
-&lt;/html&gt;</body>
+&lt;/html&gt;{% endraw %}</body>
                         <email_fields>
                             <item>
                                 <field_id>662c2937108836dec6d92581</field_id>
@@ -1501,7 +1502,7 @@
                         <send_attachments>False</send_attachments>
                         <send_pdf>True</send_pdf>
                         <sender>RECORD_USER</sender>
-                        <subject>Pase de entrada para {% raw %}{{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}}{% endraw %}</subject>
+                        <subject>{% raw %}Pase de entrada para {{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}}{% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
@@ -1566,8 +1567,8 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>664268affe2844e472e97cef</couch_id>
-                                <id>118666</id>
+                                <couch_id>{{ catalog.pase_de_entrada.obj_id }}</couch_id>
+                                <id>{{ catalog.pase_de_entrada.id }}</id>
                                 <name>Pase de Entrada</name>
                             </item>
                         </synched_catalogs>

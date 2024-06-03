@@ -65,7 +65,7 @@
                 </item>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>{{ catalog.areas_dentro_de_la_ubicacion_salidas.obj_id}}</field_id>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones_salidas.obj_id}}</field_id>
                     <group_id>None</group_id>
                     <id>663fb45992f2c5afcfe97ca7</id>
                     <label>Caseta de salida</label>

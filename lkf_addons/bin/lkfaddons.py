@@ -251,6 +251,8 @@ def print_help():
     print('        you can select multilple values separatede by a " "')
     print('-e, --env:')
     print('        stands for environment, values are prod, local, preprod')
+    print('-r:')
+    print('        download related items.')    
     print('-h, --help:')
     print('        Heeelp!!!')
     print('\n')

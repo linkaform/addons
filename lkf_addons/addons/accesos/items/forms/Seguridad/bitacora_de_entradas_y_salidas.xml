@@ -14,7 +14,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1709592943.0</created_at>
+    <created_at>1716489480.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -124,10 +124,7 @@
                         <watermark_enable>False</watermark_enable>
                     </properties>
                     <required>True</required>
-                    <rules>
-                        <item>1105233916192111</item>
-                        <item>1b4a2520bcd476</item>
-                    </rules>
+                    <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
                     <visible>True</visible>
@@ -139,7 +136,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>
@@ -227,7 +224,7 @@
                         <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -301,7 +298,7 @@
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion.id }}</catalog_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>None</field_type>
                         <filters>Filtro_casetas</filters>
                         <geofence>None</geofence>
@@ -328,7 +325,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</field_id>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</field_id>
                     <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -388,8 +385,8 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.areas_dentro_de_la_ubicacion.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>text</field_type>
                         <filters />
                         <geofence>None</geofence>
@@ -467,7 +464,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.pase_de_entrada.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>
@@ -559,7 +556,7 @@
                         <catalog_field_id>{{ catalog.pase_de_entrada.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.pase_de_entrada.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -635,7 +632,7 @@
                         <catalog_field_id>{{ catalog.pase_de_entrada.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.pase_de_entrada.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -711,7 +708,7 @@
                         <catalog_field_id>{{ catalog.pase_de_entrada.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.pase_de_entrada.id }}</catalog_id>
                         <field_type>radio</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -787,7 +784,7 @@
                         <catalog_field_id>{{ catalog.pase_de_entrada.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.pase_de_entrada.id }}</catalog_id>
                         <field_type>images</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -871,7 +868,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>6622a77449da38df8a4686cf</item>
+                        <item>664f8ce0aa9907e44a490ee1</item>
                         <item>662962bb203407ab90c886e4</item>
                         <item>662962bb203407ab90c886e5</item>
                         <item>662962bb203407ab90c886e6</item>
@@ -940,7 +937,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>
@@ -1032,7 +1029,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -1111,7 +1108,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>checkbox</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1190,7 +1187,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>integer</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1269,7 +1266,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>select</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1348,7 +1345,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1730,14 +1727,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>1b4a2520bcd476</rule_id>
-                            <rule_index>1</rule_index>
-                            <rule_type>show</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -1888,7 +1878,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_gafetes_y_lockers.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>
@@ -1975,7 +1965,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_gafetes_y_lockers.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_gafetes_y_lockers.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -2051,7 +2041,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_gafetes_y_lockers.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_gafetes_y_lockers.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -2127,7 +2117,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_gafetes_y_lockers.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_gafetes_y_lockers.id }}</catalog_id>
                         <field_type>radio</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -2288,18 +2278,11 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>1b4a2520bcd476</rule_id>
-                            <rule_index>1</rule_index>
-                            <rule_type>show</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion_salidas.id }}</catalog_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones_salidas.id }}</catalog_id>
                         <field_type>None</field_type>
                         <filters>Filtro_casetas</filters>
                         <geofence>None</geofence>
@@ -2321,7 +2304,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>{{ catalog.areas_dentro_de_la_ubicacion_salidas.obj_id }}</field_id>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones_salidas.obj_id }}</field_id>
                     <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -2378,20 +2361,13 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>1b4a2520bcd476</rule_id>
-                            <rule_index>1</rule_index>
-                            <rule_type>show</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.areas_dentro_de_la_ubicacion_salidas.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_dentro_de_la_ubicacion_salidas.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones_salidas.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones_salidas.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -2527,14 +2503,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>1b4a2520bcd476</rule_id>
-                            <rule_index>1</rule_index>
-                            <rule_type>show</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -2600,14 +2569,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>1105233916192111</rule_id>
-                            <rule_index>0</rule_index>
-                            <rule_type>invisible</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -2689,7 +2651,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/116113/</resource_uri>
+    <resource_uri>/api/infosync/form/119185/</resource_uri>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>
@@ -2709,5 +2671,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1716393501.0</updated_at>
+    <updated_at>1716844881.0</updated_at>
 </lkf>

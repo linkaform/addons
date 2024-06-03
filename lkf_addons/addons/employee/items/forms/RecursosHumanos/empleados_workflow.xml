@@ -797,7 +797,7 @@
                                 <label>Nombre completo</label>
                                 <type>text</type>
                             </trigger_field>
-                            <value> </value>
+                            <value>null</value>
                         </item>
                     </triggers>
                 </wf_fields>
@@ -812,8 +812,8 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>663bbf98b23abe4f4a59eb4d</couch_id>
-                                <id>118397</id>
+                                <couch_id>{{ catalog.employee.obj_id }}</couch_id>
+                                <id>{{ catalog.employee.id }}</id>
                                 <name>Empleados</name>
                             </item>
                         </synched_catalogs>

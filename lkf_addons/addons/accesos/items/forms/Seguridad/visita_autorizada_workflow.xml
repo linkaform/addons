@@ -12,8 +12,8 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>65e6515a7cc2c9fe60dfd8b7</couch_id>
-                                <id>116102</id>
+                                <couch_id>{{ catalog.visita_autorizada.obj_id }}</couch_id>
+                                <id>{{ catalog.visita_autorizada.id }}</id>
                                 <name>Visita Autorizada</name>
                             </item>
                         </synched_catalogs>
@@ -46,41 +46,6 @@
                     <deleted>True</deleted>
                     <edited>True</edited>
                     <run_multiple_times>True</run_multiple_times>
-                    <runtime>after</runtime>
-                </record>
-                <wf_fields>
-                    <operator>all</operator>
-                    <triggers>[]</triggers>
-                </wf_fields>
-            </rules>
-        </item>
-        <item>
-            <actions>[]</actions>
-            <id>664b6e0b3042447eb4e70129</id>
-            <name>None</name>
-            <rules>
-                <metadata>
-                    <connection>[]</connection>
-                    <date>
-                        <period>
-                            <month>1</month>
-                            <selected>False</selected>
-                            <year>2014</year>
-                        </period>
-                        <range>
-                            <end>2024-05-21T06:00:00.000Z</end>
-                            <selected>False</selected>
-                            <start>2024-05-20T15:36:06.112Z</start>
-                        </range>
-                    </date>
-                    <grading>{}</grading>
-                    <user>[]</user>
-                </metadata>
-                <record>
-                    <created>False</created>
-                    <deleted>False</deleted>
-                    <edited>False</edited>
-                    <run_multiple_times>False</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>

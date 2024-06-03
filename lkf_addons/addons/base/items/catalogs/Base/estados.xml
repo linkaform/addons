@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>6-ad50ae4849977ffc2f51d6f6e1da5606</_rev>
-    <updated_at>2024-05-10T18:31:01.735413+00:00Z</updated_at>
+    <_rev>4-f823035e0d05dee35315af2d0e1ac150</_rev>
+    <updated_at>2024-05-23T17:40:33.465881+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Estados</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-10T18:31:01.735413+00:00Z</created_at>
+    <created_at>2024-05-23T17:40:33.465881+00:00Z</created_at>
     <advanced_options>
         <folio>
             <manual>False</manual>
@@ -124,12 +124,12 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>663e67e594dd167aa1f2746a</_id>
+    <_id>664f7f913e59756b3c62ff21</_id>
     <public>False</public>
-    <catalog_id>118585</catalog_id>
+    <catalog_id>119114</catalog_id>
 </lkf>

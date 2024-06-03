@@ -3,8 +3,8 @@
     <templates>[]</templates>
     <confirmation>{}</confirmation>
     <description />
-    <_rev>4-5c65652c1327d8a3ddf8dd0cd1dde7eb</_rev>
-    <updated_at>2024-05-18T01:27:02.465109+00:00Z</updated_at>
+    <_rev>2-b2f1bde995d01a07c2870ef9d556145e</_rev>
+    <updated_at>2024-05-23T18:37:15.774305+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -12,7 +12,7 @@
     <filters>{}</filters>
     <name>Gafetes</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-18T01:27:02.465109+00:00Z</created_at>
+    <created_at>2024-05-23T18:37:15.774305+00:00Z</created_at>
     <advanced_options>{}</advanced_options>
     <catalog_pages>
         <item>
@@ -60,7 +60,7 @@
                         <couch_id>{{ catalog.ubicaciones.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                         <name>{{ catalog.ubicaciones.name }}</name>
                     </catalog>
                     <catalog_id>None</catalog_id>
@@ -83,16 +83,16 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
                 <item>
                     <field_type>images</field_type>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <location_decimals>None</location_decimals>
@@ -108,7 +108,7 @@
                         <min_images_count>0</min_images_count>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -129,12 +129,12 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>664803e6d79bc1dfd33885e0</_id>
+    <_id>664f8cdbaa9907e44a490ecf</_id>
     <public>False</public>
-    <catalog_id>118883</catalog_id>
+    <catalog_id>119160</catalog_id>
 </lkf>

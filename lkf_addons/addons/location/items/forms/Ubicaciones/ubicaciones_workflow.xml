@@ -12,8 +12,8 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>663e6e5e8ad9bb1e7859ebb1</couch_id>
-                                <id>118592</id>
+                                <couch_id>{{ catalog.ubicaciones.obj_id }}</couch_id>
+                                <id>{{ catalog.ubicaciones.id }}</id>
                                 <name>Ubicaciones</name>
                             </item>
                         </synched_catalogs>
@@ -43,7 +43,7 @@
                 </metadata>
                 <record>
                     <created>True</created>
-                    <deleted>False</deleted>
+                    <deleted>True</deleted>
                     <edited>True</edited>
                     <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>

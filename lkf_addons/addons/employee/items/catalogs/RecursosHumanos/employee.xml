@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>79-8385f27d30df4d85129d0cbdcb3a13dc</_rev>
-    <updated_at>2024-05-08T18:08:24.284414+00:00Z</updated_at>
+    <_rev>10-35be00679e090bc7966996168b743463</_rev>
+    <updated_at>2024-05-23T17:44:50.682128+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Empleados</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-08T18:08:24.284414+00:00Z</created_at>
+    <created_at>2024-05-23T17:44:50.682128+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,10 +25,6 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>118397</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>663bbf98b23abe4f4a59eb4d</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -39,7 +35,7 @@
                         <custom>None</custom>
                         <size>complete</size>
                     </properties>
-                    <key>True</key>
+                    <key>False</key>
                     <catalog_fields>[]</catalog_fields>
                     <field_id>62c5ff407febce07043024dd</field_id>
                     <required>True</required>
@@ -57,10 +53,12 @@
                     <field_type>images</field_type>
                     <required>True</required>
                     <field_id>663bcbe2274189281359eb70</field_id>
+                    <label>Fotografía del empleado</label>
+                    <key>False</key>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <location_decimals>None</location_decimals>
@@ -76,61 +74,72 @@
                         <min_images_count>0</min_images_count>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
                     </properties>
-                    <label>Fotografía del empleado</label>
                 </item>
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>663bcbe2274189281359eb71</field_id>
+                    <label>RFC</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <size>complete</size>
                         <custom>None</custom>
                     </properties>
-                    <label>RFC</label>
                 </item>
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>663bcbe2274189281359eb72</field_id>
+                    <label>CURP</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <size>complete</size>
                         <custom>None</custom>
                     </properties>
-                    <label>CURP</label>
                 </item>
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>663bcbe2274189281359eb73</field_id>
+                    <label>NSS</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <size>complete</size>
                         <custom>None</custom>
                     </properties>
-                    <label>NSS</label>
                 </item>
                 <item>
                     <field_type>date</field_type>
                     <required>False</required>
                     <field_id>663bcbe2274189281359eb74</field_id>
+                    <label>Fecha de nacimiento</label>
+                    <key>False</key>
                     <properties>
                         <format>vertical</format>
                         <custom>None</custom>
                     </properties>
-                    <label>Fecha de nacimiento</label>
                 </item>
                 <item>
                     <field_type>radio</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
                     <required>False</required>
                     <field_id>663bcbe2274189281359eb75</field_id>
+                    <label>Género</label>
+                    <key>False</key>
                     <options>
                         <item>
                             <points>None</points>
@@ -145,18 +154,19 @@
                             <label>Masculino</label>
                         </item>
                     </options>
-                    <label>Género</label>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
                     <properties>
                         <selected>None</selected>
                         <openChoice>False</openChoice>
                         <orientation>vertical</orientation>
                         <custom>None</custom>
                     </properties>
-                </item>
-                <item>
-                    <field_type>radio</field_type>
                     <required>False</required>
                     <field_id>663bcbe2274189281359eb76</field_id>
+                    <label>Nivel de estudios</label>
+                    <key>False</key>
                     <options>
                         <item>
                             <points>None</points>
@@ -207,18 +217,19 @@
                             <label>NIVEL SUPERIOR CONCLUIDA</label>
                         </item>
                     </options>
-                    <label>Nivel de estudios</label>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
                     <properties>
                         <selected>None</selected>
                         <openChoice>False</openChoice>
                         <orientation>vertical</orientation>
                         <custom>None</custom>
                     </properties>
-                </item>
-                <item>
-                    <field_type>radio</field_type>
                     <required>False</required>
                     <field_id>663bcbe2274189281359eb77</field_id>
+                    <label>Estatus dentro de la empresa</label>
+                    <key>False</key>
                     <options>
                         <item>
                             <points>None</points>
@@ -233,13 +244,6 @@
                             <label>Inactivo</label>
                         </item>
                     </options>
-                    <label>Estatus dentro de la empresa</label>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
                 </item>
                 <item>
                     <field_type>radio</field_type>
@@ -253,6 +257,7 @@
                     <required>False</required>
                     <fav>True</fav>
                     <label>Estatus de disponibilidad</label>
+                    <key>False</key>
                     <options>
                         <item>
                             <points>None</points>
@@ -296,9 +301,10 @@
                         <couch_id>{{ catalog.contacto.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                         <name>{{ catalog.contacto.name }}</name>
                     </catalog>
+                    <key>False</key>
                     <properties>{}</properties>
                 </item>
                 <item>
@@ -316,7 +322,7 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -333,7 +339,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -350,7 +356,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -367,7 +373,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -384,7 +390,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -401,7 +407,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -419,7 +425,7 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -444,9 +450,10 @@
                         <couch_id>{{ catalog.compaia.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.compaia.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                         <name>{{ catalog.compaia.name }}</name>
                     </catalog>
+                    <key>False</key>
                     <properties>{}</properties>
                 </item>
                 <item>
@@ -457,7 +464,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.compaia.obj_id }}</catalog_field_id>
@@ -479,6 +486,7 @@
                     <required>False</required>
                     <fav>False</fav>
                     <label>Estado civil</label>
+                    <key>False</key>
                     <options>
                         <item>
                             <points>None</points>
@@ -510,33 +518,36 @@
                     <field_type>integer</field_type>
                     <required>False</required>
                     <field_id>663bcd72cb24017b604d7f27</field_id>
+                    <label>Número de empleado</label>
+                    <key>False</key>
                     <properties>
                         <number_of_decimals>2</number_of_decimals>
                         <custom>None</custom>
                         <step>1</step>
                         <size>small</size>
                     </properties>
-                    <label>Número de empleado</label>
                 </item>
                 <item>
                     <field_type>datetime</field_type>
                     <required>False</required>
                     <field_id>663bcd72cb24017b604d7f28</field_id>
+                    <label>Fecha de ingreso</label>
+                    <key>False</key>
                     <properties>
                         <custom>None</custom>
                         <format>vertical</format>
                     </properties>
-                    <label>Fecha de ingreso</label>
                 </item>
                 <item>
                     <field_type>datetime</field_type>
                     <required>False</required>
                     <field_id>663bcd72cb24017b604d7f29</field_id>
+                    <label>Fecha de antigüedad</label>
+                    <key>False</key>
                     <properties>
                         <custom>None</custom>
                         <format>vertical</format>
                     </properties>
-                    <label>Fecha de antigüedad</label>
                 </item>
                 <item>
                     <field_type>catalog</field_type>
@@ -546,7 +557,7 @@
                     <label>Jefe directo</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.empleados_jefes_directos.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -556,6 +567,7 @@
                         </view_fields>
                         <name>{{ catalog.empleados_jefes_directos.name }}</name>
                     </catalog>
+                    <key>False</key>
                     <properties>{}</properties>
                 </item>
                 <item>
@@ -573,14 +585,22 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.empleados_jefes_directos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.empleados_jefes_directos.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
                 <item>
                     <field_type>radio</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
                     <required>False</required>
                     <field_id>663fa630583de096e9326cc0</field_id>
+                    <label>Tipo de contrato</label>
+                    <key>False</key>
                     <options>
                         <item>
                             <points>None</points>
@@ -607,82 +627,89 @@
                             <label>Becario</label>
                         </item>
                     </options>
-                    <label>Tipo de contrato</label>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
                 </item>
                 <item>
                     <field_type>datetime</field_type>
                     <required>False</required>
                     <field_id>663fa630583de096e9326cc1</field_id>
+                    <label>Vencimiento de contrato</label>
+                    <key>False</key>
                     <properties>
                         <custom>None</custom>
                         <format>vertical</format>
                     </properties>
-                    <label>Vencimiento de contrato</label>
                 </item>
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>663fa630583de096e9326cc2</field_id>
+                    <label>Antigüedad</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <custom>None</custom>
                         <size>complete</size>
                     </properties>
-                    <label>Antigüedad</label>
                 </item>
                 <item>
                     <field_type>integer</field_type>
                     <required>False</required>
                     <field_id>663fa630583de096e9326cc3</field_id>
+                    <label>Días pendientes de vacaciones</label>
+                    <key>False</key>
                     <properties>
                         <number_of_decimals>2</number_of_decimals>
                         <custom>None</custom>
                         <step>1</step>
                         <size>small</size>
                     </properties>
-                    <label>Días pendientes de vacaciones</label>
                 </item>
                 <item>
                     <field_type>datetime</field_type>
                     <required>False</required>
                     <field_id>663fa630583de096e9326cc4</field_id>
+                    <label>Fecha de baja</label>
+                    <key>False</key>
                     <properties>
                         <custom>None</custom>
                         <format>vertical</format>
                     </properties>
-                    <label>Fecha de baja</label>
                 </item>
                 <item>
                     <field_type>datetime</field_type>
                     <required>False</required>
                     <field_id>663fa630583de096e9326cc5</field_id>
+                    <label>Fecha de baja ante el IMSS</label>
+                    <key>False</key>
                     <properties>
                         <custom>None</custom>
                         <format>vertical</format>
                     </properties>
-                    <label>Fecha de baja ante el IMSS</label>
                 </item>
                 <item>
                     <field_type>textarea</field_type>
                     <required>False</required>
                     <field_id>663fa630583de096e9326cc6</field_id>
+                    <label>Motivo de baja</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <custom>None</custom>
                         <size>complete</size>
                     </properties>
-                    <label>Motivo de baja</label>
                 </item>
                 <item>
                     <field_type>radio</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
                     <required>False</required>
                     <field_id>663fa630583de096e9326cc7</field_id>
+                    <label>Tipo de baja</label>
+                    <key>False</key>
                     <options>
                         <item>
                             <points>None</points>
@@ -745,13 +772,6 @@
                             <label>Termino de contrato</label>
                         </item>
                     </options>
-                    <label>Tipo de baja</label>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
                 </item>
             </page_fields>
             <page_name_tab>page_name3</page_name_tab>
@@ -767,7 +787,7 @@
                     <label>Puesto</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -778,6 +798,7 @@
                         </view_fields>
                         <name>{{ catalog.configuracion_de_departamentos_y_puestos.name }}</name>
                     </catalog>
+                    <key>False</key>
                     <properties>{}</properties>
                 </item>
                 <item>
@@ -789,7 +810,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
@@ -808,7 +829,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
@@ -820,8 +841,16 @@
                 </item>
                 <item>
                     <field_type>radio</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
                     <required>False</required>
                     <field_id>663bce04499149d3c7832fb1</field_id>
+                    <label>Horario de trabajo</label>
+                    <key>False</key>
                     <options>
                         <item>
                             <points>None</points>
@@ -836,13 +865,6 @@
                             <label>Oficina</label>
                         </item>
                     </options>
-                    <label>Horario de trabajo</label>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
                 </item>
             </page_fields>
             <page_name_tab>page_name4</page_name_tab>
@@ -852,8 +874,16 @@
             <page_fields>
                 <item>
                     <field_type>select</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
                     <required>False</required>
                     <field_id>663bd294f5a9e8b408cb9708</field_id>
+                    <label>Banco</label>
+                    <key>False</key>
                     <options>
                         <item>
                             <points>None</points>
@@ -952,57 +982,54 @@
                             <label>SCOTIABANK</label>
                         </item>
                     </options>
-                    <label>Banco</label>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
                 </item>
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>663bd294f5a9e8b408cb9709</field_id>
+                    <label>Sucursal</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <size>complete</size>
                         <custom>None</custom>
                     </properties>
-                    <label>Sucursal</label>
                 </item>
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>663bd294f5a9e8b408cb970a</field_id>
+                    <label>Cuenta bancaria</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <size>complete</size>
                         <custom>None</custom>
                     </properties>
-                    <label>Cuenta bancaria</label>
                 </item>
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>663bd294f5a9e8b408cb970b</field_id>
+                    <label>Clabe interbancaria</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <size>complete</size>
                         <custom>None</custom>
                     </properties>
-                    <label>Clabe interbancaria</label>
                 </item>
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>663bd294f5a9e8b408cb970c</field_id>
+                    <label>Número de tarjeta</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <size>complete</size>
                         <custom>None</custom>
                     </properties>
-                    <label>Número de tarjeta</label>
                 </item>
             </page_fields>
             <page_name_tab>page_name5</page_name_tab>
@@ -1014,47 +1041,51 @@
                     <field_type>email</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f6f</field_id>
+                    <label>Correo Personal</label>
+                    <key>False</key>
                     <properties>
                         <email_configuration>{}</email_configuration>
                         <send_email>False</send_email>
                         <custom>None</custom>
                         <size>complete</size>
                     </properties>
-                    <label>Correo Personal</label>
                 </item>
                 <item>
                     <field_type>email</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f70</field_id>
+                    <label>Correo empresarial</label>
+                    <key>False</key>
                     <properties>
                         <email_configuration>{}</email_configuration>
                         <send_email>False</send_email>
                         <custom>None</custom>
                         <size>complete</size>
                     </properties>
-                    <label>Correo empresarial</label>
                 </item>
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f72</field_id>
+                    <label>Teléfono personal</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <custom>None</custom>
                         <size>complete</size>
                     </properties>
-                    <label>Teléfono personal</label>
                 </item>
                 <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f71</field_id>
+                    <label>Teléfono empresarial</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
                         <custom>None</custom>
                         <size>complete</size>
                     </properties>
-                    <label>Teléfono empresarial</label>
                 </item>
             </page_fields>
             <page_name_tab>page_name6</page_name_tab>
@@ -1066,15 +1097,17 @@
                     <field_type>files</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f73</field_id>
+                    <label>CV</label>
+                    <key>False</key>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1082,7 +1115,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1092,21 +1125,22 @@
                         <mime_types>[]</mime_types>
                         <metadata>[]</metadata>
                     </properties>
-                    <label>CV</label>
                 </item>
                 <item>
                     <field_type>files</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f74</field_id>
+                    <label>ACTA DE NACIMIENTO</label>
+                    <key>False</key>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1114,7 +1148,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1124,21 +1158,22 @@
                         <mime_types>[]</mime_types>
                         <metadata>[]</metadata>
                     </properties>
-                    <label>ACTA DE NACIMIENTO</label>
                 </item>
                 <item>
                     <field_type>files</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f75</field_id>
+                    <label>CURP PDF</label>
+                    <key>False</key>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1146,7 +1181,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1156,21 +1191,22 @@
                         <mime_types>[]</mime_types>
                         <metadata>[]</metadata>
                     </properties>
-                    <label>CURP PDF</label>
                 </item>
                 <item>
                     <field_type>files</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f76</field_id>
+                    <label>RFC PDF</label>
+                    <key>False</key>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1178,7 +1214,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1188,21 +1224,22 @@
                         <mime_types>[]</mime_types>
                         <metadata>[]</metadata>
                     </properties>
-                    <label>RFC PDF</label>
                 </item>
                 <item>
                     <field_type>files</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f77</field_id>
+                    <label>CONSTANCIA DE SITUACIÓN FISCAL</label>
+                    <key>False</key>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1210,7 +1247,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1220,21 +1257,22 @@
                         <mime_types>[]</mime_types>
                         <metadata>[]</metadata>
                     </properties>
-                    <label>CONSTANCIA DE SITUACIÓN FISCAL</label>
                 </item>
                 <item>
                     <field_type>files</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f78</field_id>
+                    <label>NSS PDF</label>
+                    <key>False</key>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1242,7 +1280,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1252,21 +1290,22 @@
                         <mime_types>[]</mime_types>
                         <metadata>[]</metadata>
                     </properties>
-                    <label>NSS PDF</label>
                 </item>
                 <item>
                     <field_type>files</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f79</field_id>
+                    <label>INE</label>
+                    <key>False</key>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1274,7 +1313,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1284,21 +1323,22 @@
                         <mime_types>[]</mime_types>
                         <metadata>[]</metadata>
                     </properties>
-                    <label>INE</label>
                 </item>
                 <item>
                     <field_type>files</field_type>
                     <required>False</required>
                     <field_id>663bd32d7fb8869bbc4d7f7a</field_id>
+                    <label>COMPROBANTE DE DOMICILIO</label>
+                    <key>False</key>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -1306,7 +1346,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -1316,7 +1356,6 @@
                         <mime_types>[]</mime_types>
                         <metadata>[]</metadata>
                     </properties>
-                    <label>COMPROBANTE DE DOMICILIO</label>
                 </item>
             </page_fields>
             <page_name_tab>page_name7</page_name_tab>
@@ -1325,19 +1364,53 @@
         <item>
             <page_fields>
                 <item>
-                    <field_type>text</field_type>
-                    <required>False</required>
+                    <field_type>integer</field_type>
                     <field_id>663bd32d7fb8869bbc4d7f7b</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>ID de Usaurio</label>
+                    <key>False</key>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <size>small</size>
+                        <step>1</step>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>6653f3709c6d89925dc04b2e</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Username</label>
+                    <key>False</key>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
-                    <label>ID usuario</label>
+                </item>
+                <item>
+                    <field_type>email</field_type>
+                    <field_id>6653f3709c6d89925dc04b2f</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>email</label>
+                    <key>False</key>
+                    <properties>
+                        <email_configuration>{}</email_configuration>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
                 </item>
             </page_fields>
             <page_name_tab>page_name8</page_name_tab>
             <page_name>Link</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>664f80923e59756b3c62ff58</_id>
+    <public>False</public>
+    <catalog_id>119136</catalog_id>
 </lkf>

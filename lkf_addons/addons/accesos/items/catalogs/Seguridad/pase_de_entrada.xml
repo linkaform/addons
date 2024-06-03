@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>25-4b9df92c3830ffb4c530a6363ea50ee7</_rev>
-    <updated_at>2024-05-13T19:23:27.061064+00:00Z</updated_at>
+    <_rev>2-1898f4dc18e088fe00b72754a148aa84</_rev>
+    <updated_at>2024-05-23T18:37:23.800262+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Pase de Entrada</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-13T19:23:27.061064+00:00Z</created_at>
+    <created_at>2024-05-23T18:37:23.800262+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,10 +25,6 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>118666</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>664268affe2844e472e97cef</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -77,7 +73,7 @@
                     <label>Ubicación</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.ubicaciones.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -98,7 +94,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
@@ -115,7 +111,7 @@
                     <label>Direccion</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
@@ -137,7 +133,7 @@
                     <label>Pase a Nombre de:</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.visita_autorizada.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -158,7 +154,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
@@ -175,7 +171,7 @@
                     <label>Email</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
@@ -192,7 +188,7 @@
                     <label>Foto</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>images</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
@@ -209,7 +205,7 @@
                     <label>Identificación</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>images</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
@@ -283,7 +279,7 @@
                     <label>Tipo de Pase</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.configuracion_de_perfiles.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -304,7 +300,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
@@ -328,7 +324,7 @@
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -346,7 +342,7 @@
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -364,7 +360,7 @@
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -381,7 +377,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -399,7 +395,7 @@
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -582,14 +578,14 @@
                     <required>False</required>
                     <field_id>64ef5b5fff1bec97d2ca27b6</field_id>
                     <properties>
-                        <date_format />
+                        <date_format>None</date_format>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
                         <multi_selection>True</multi_selection>
-                        <file_name />
+                        <file_name>None</file_name>
                         <max_images_count>10</max_images_count>
                         <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
@@ -597,7 +593,7 @@
                         <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
-                            <text_data />
+                            <text_data>None</text_data>
                             <font_size>None</font_size>
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
@@ -609,8 +605,12 @@
                     <label>QR</label>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>664f8ce3aa9907e44a490ee7</_id>
+    <public>False</public>
+    <catalog_id>119173</catalog_id>
 </lkf>
