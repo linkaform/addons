@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.registros_de_gastos.id }}</form_id>
+    <id>63a35f1ea8ffcdee6859a45d</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>63a3605e39ed3ac682ebc100</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <arguments>{}</arguments>
+                        <integration>None</integration>
+                        <script>
+                            <created_at>2023-09-07T22:40:27.989290</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.calcula_total_gastos.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.calcula_total_gastos.name }}</name>
+                            <start_date>2023-09-07T22:40:27.987637</start_date>
+                            <updated_at>2023-12-05T18:54:52.217724</updated_at>
+                        </script>
+                        <scriptArguments>
+                            <item>
+                                <label>None</label>
+                                <value>None</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
+                        <user>RECORD_USER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
+                            </item>
+                            <item>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
+                            </item>
+                            <item>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
+                            </item>
+                            <item>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
+                            </item>
+                        </userOptions>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>63a35f1ea8ffcdee6859a45b</id>
+            <name>calcula totales</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2022-12-22T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2022-12-21T19:29:58.114Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>before</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>64e6e03475eab52e0956b1a4</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2023-09-07T22:40:27.989290</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.calcula_total_gastos.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.calcula_total_gastos.name }}</name>
+                            <start_date>2023-09-07T22:40:27.987637</start_date>
+                            <updated_at>2023-12-05T18:54:52.217724</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>Actualiza Solicitud</name>
+                </item>
+            </actions>
+            <id>64e6e03475eab52e0956b1a8</id>
+            <name>Actualiza Solicitud</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2023-08-24T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2023-08-24T04:32:42.125Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

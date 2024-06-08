@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.autorizacin_de_viticos.id }}</form_id>
+    <id>64b8141d7f73f08d48aaf37f</id>
+    <rules>[]</rules>
+</lkf>

@@ -34,6 +34,10 @@ class Employee(base.LKF_Base):
         self.CONF_AREA_EMPLEADOS_AP_CAT_ID = self.CONF_AREA_EMPLEADOS_AP_CAT.get('id')
         self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID = self.CONF_AREA_EMPLEADOS_AP_CAT.get('obj_id')
 
+        self.EMPLEADOS_JEFES_DIRECTOS = self.lkm.catalog_id('empleados_jefes_directos')
+        self.EMPLEADOS_JEFES_DIRECTOS_ID = self.EMPLEADOS_JEFES_DIRECTOS.get('id')
+        self.EMPLEADOS_JEFES_DIRECTOS_OBJ_ID = self.EMPLEADOS_JEFES_DIRECTOS.get('obj_id')
+
         self.employee_fields = {
             'worker_name':'62c5ff407febce07043024dd',
             'worker_name_apoyo':'663bd36eb19b7fb7d9e97ccb',

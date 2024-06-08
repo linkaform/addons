@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.entrega_de_efectivo_4.id }}</form_id>
+    <id>64bee0e51c0d42542478e0cc</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>64bee11d0c2899258e1822f5</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <arguments>{}</arguments>
+                        <integration>None</integration>
+                        <script>
+                            <created_at>2023-09-07T22:40:29.669765</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.entrega_efectivo.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.entrega_efectivo.name }}</name>
+                            <start_date>2023-09-07T22:40:29.668154</start_date>
+                            <updated_at>2023-12-05T18:54:52.545083</updated_at>
+                        </script>
+                        <scriptArguments>
+                            <item>
+                                <label>None</label>
+                                <value>None</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
+                        <user>SCRIPT_OWNER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
+                            </item>
+                            <item>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
+                            </item>
+                            <item>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
+                            </item>
+                            <item>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
+                            </item>
+                        </userOptions>
+                    </configuration>
+                    <name>Ejecuta script</name>
+                </item>
+            </actions>
+            <id>64bee11d0c2899258e1822f7</id>
+            <name>entrega de efectivo</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2023-07-25T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2023-07-24T20:35:48.164Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>544d5b4e01a4de205e2b2169</field_id>
+                                <group>{}</group>
+                                <label>Status del Anticipo</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>realizado</value>
+                        </item>
+                        <item>
+                            <condition>gt__number=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>544d5ad901a4de205f391111</field_id>
+                                <group>{}</group>
+                                <label>Anticipo Entregado</label>
+                                <type>decimal</type>
+                            </trigger_field>
+                            <value>0</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>6581bfce1ecedc43557dd648</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2023-12-18T16:49:22.701681</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.add_info_sol_viaticos.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.add_info_sol_viaticos.name }}</name>
+                            <start_date>2023-12-18T16:49:22.700543</start_date>
+                            <updated_at>2023-12-20T23:26:41.353984</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>6581bfce1ecedc43557dd64c</id>
+            <name>Add info catalogo</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2023-12-20T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2023-12-19T16:07:08.346Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>False</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>before</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
