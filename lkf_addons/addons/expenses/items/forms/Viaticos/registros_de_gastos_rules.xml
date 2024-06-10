@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.registros_de_gastos.id }}</form_id>
+    <id>61087b79ce26189fd98e1f9b</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>649b2a84dac4914e02aadb24</field_id>
+                        <group_id>None</group_id>
+                        <id>649b2a84dac4914e02aadb24</id>
+                        <label>Concepto</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value>Comida</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>610878f5bff8b3329fed6130</field_id>
+                    <group_id>None</group_id>
+                    <id>610878f5bff8b3329fed6130</id>
+                    <label>Tipo de Comida</label>
+                    <type>select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar Tipo de Alimentos</name>
+            <operator>and</operator>
+            <rule_id>13731e92f6ef67</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>583d8e10b43fdd6a4887f55b</field_id>
+                        <group_id>None</group_id>
+                        <id>583d8e10b43fdd6a4887f55b</id>
+                        <label>Fecha del Gasto</label>
+                        <type>date</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>583d8e10b43fdd6a4887f55b</field_id>
+                        <group_id>None</group_id>
+                        <id>583d8e10b43fdd6a4887f55b</id>
+                        <label>Fecha del Gasto</label>
+                        <type>date</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>544d5ad901a4de205f3934ed</field_id>
+                    <group_id>None</group_id>
+                    <id>544d5ad901a4de205f3934ed</id>
+                    <label>Total gasto</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>544d5ad901a4de205f391111</field_id>
+                    <group_id>None</group_id>
+                    <id>544d5ad901a4de205f391111</id>
+                    <label>Total Gasto en Moneda Solicitud</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6271bd58d96e7e7ab68d2c4b</field_id>
+                    <group_id>None</group_id>
+                    <id>6271bd58d96e7e7ab68d2c4b</id>
+                    <label>Motivo no Autorizado</label>
+                    <type>textarea</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>627bf0d5c651931d3c7eedd3</field_id>
+                    <group_id>None</group_id>
+                    <id>627bf0d5c651931d3c7eedd3</id>
+                    <label>Monto autorizado</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>544d5b4e01a4de205e2b216a</field_id>
+                    <group_id>None</group_id>
+                    <id>544d5b4e01a4de205e2b216a</id>
+                    <label>Comentarios:</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar Totales y rellenados por Script</name>
+            <operator>or</operator>
+            <rule_id>15ccfc124b02351</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>583d8e10b43fdd6a4887f55b</field_id>
+                        <group_id>None</group_id>
+                        <id>583d8e10b43fdd6a4887f55b</id>
+                        <label>Fecha del Gasto</label>
+                        <type>date</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>583d8e10b43fdd6a4887f55b</field_id>
+                        <group_id>None</group_id>
+                        <id>583d8e10b43fdd6a4887f55b</id>
+                        <label>Fecha del Gasto</label>
+                        <type>date</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>62914e2d855e9abc32eabc18</field_id>
+                    <group_id>None</group_id>
+                    <id>62914e2d855e9abc32eabc18</id>
+                    <label>Impuestos</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>62914e2d855e9abc32eabc19</field_id>
+                    <group_id>None</group_id>
+                    <id>62914e2d855e9abc32eabc19</id>
+                    <label>Propina</label>
+                    <type>decimal</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar datos no deseados</name>
+            <operator>or</operator>
+            <rule_id>17c720a348a1804</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>583d8e10b43fdd6a4887f55b</field_id>
+                        <group_id>None</group_id>
+                        <id>583d8e10b43fdd6a4887f55b</id>
+                        <label>Fecha del Gasto</label>
+                        <type>date</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>583d8e10b43fdd6a4887f55b</field_id>
+                        <group_id>None</group_id>
+                        <id>583d8e10b43fdd6a4887f55b</id>
+                        <label>Fecha del Gasto</label>
+                        <type>date</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>544d5b4e01a4de205e2b2169</field_id>
+                    <group_id>None</group_id>
+                    <id>544d5b4e01a4de205e2b2169</id>
+                    <label>Status del Gasto</label>
+                    <type>select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Deshabilitar Estatus</name>
+            <operator>or</operator>
+            <rule_id>4d911636106b8</rule_id>
+            <rule_type>disabled</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

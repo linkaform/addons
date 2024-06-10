@@ -5,9 +5,12 @@ import time
 from copy import deepcopy
 from pytz import timezone
 
-from linkaform_api import settings, network, utils, lkf_models
+# from linkaform_api import settings, network, utils, lkf_models
 
 from linkaform_api import base
+
+from lkf_addons.addons.employee.employee_utils import Employee
+from lkf_addons.addons.base.base_util import Base
 
 
 def unlist(arg):
@@ -15,11 +18,14 @@ def unlist(arg):
         return unlist(arg[0])
     return arg
 
-class Expenses(base.LKF_Base):
+class Expenses(Base, Employee, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+        # Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
+        # Employee.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
+
         # self.lkf_api = utils.Cache(settings)
         # self.net = network.Network(settings)
         # self.cr = self.net.get_collections()
@@ -37,11 +43,11 @@ class Expenses(base.LKF_Base):
         self.CATALOG_SOL_VIAJE_OBJ_ID = self.CATALOG_SOL_VIAJE.get('obj_id')
         self.CATALOG_RESP_AUT = self.lkm.catalog_id('responsables_de_autorizar_gastos')
         self.CATALOG_RESP_AUT_ID = self.CATALOG_RESP_AUT.get('id')
-        self.CATALOG_RESP_AUT_OBJ_ID = self.CATALOG_RESP_AUT.get('obj_id')
+        # self.CATALOG_RESP_AUT_OBJ_ID = self.CATALOG_RESP_AUT.get('obj_id')
         
-        self.CATALOG_EMPLEADOS = self.lkm.catalog_id('catalogo_de_empleados')
-        self.CATALOG_EMPLEADOS_ID = self.CATALOG_EMPLEADOS.get('id')
-        self.CATALOG_EMPLEADOS_OBJ_ID = self.CATALOG_EMPLEADOS.get('obj_id')
+        # self.CATALOG_EMPLEADOS = self.lkm.catalog_id('catalogo_de_empleados')
+        # self.CATALOG_EMPLEADOS_ID = self.CATALOG_EMPLEADOS.get('id')
+        # self.CATALOG_EMPLEADOS_OBJ_ID = self.CATALOG_EMPLEADOS.get('obj_id')
         
         self.CATALOG_MONEDA = self.lkm.catalog_id('moneda')
         self.CATALOG_MONEDA_ID = self.CATALOG_MONEDA.get('id')
@@ -51,17 +57,19 @@ class Expenses(base.LKF_Base):
         self.CATALOG_CONCEPTO_GASTO_ID = self.CATALOG_CONCEPTO_GASTO.get('id')
         self.CATALOG_CONCEPTO_GASTO_OBJ_ID = self.CATALOG_CONCEPTO_GASTO.get('obj_id')
 
-        self.CATALOG_DESTINOS = self.lkm.catalog_id('destinos')
-        self.CATALOG_DESTINOS_ID = self.CATALOG_DESTINOS.get('id')
-        self.CATALOG_DESTINOS_OBJ_ID = self.CATALOG_DESTINOS.get('obj_id')
+        # self.CATALOG_DESTINOS = self.lkm.catalog_id('estados')
+        # self.CATALOG_DESTINOS_ID = self.CATALOG_DESTINOS.get('id')
+        # self.CATALOG_DESTINOS_OBJ_ID = self.CATALOG_DESTINOS.get('obj_id')
         
         self.FORM_ID_SOLICITUD = self.lkm.form_id('solicitud_de_viticos','id')
-        self.FORM_ID_AUTORIZACIONES = self.lkm.form_id('autorizacin_de_viaticos','id')
-        self.FORM_ID_GASTOS_VIAJE = self.lkm.form_id('registros_de_gastos_de_viaje','id')
-        self.FORM_BANK_TRANSACTIONS = self.lkm.form_id('entrega_de_efectivo','id')
-        self.FORM_ID_GASTOS = self.lkm.form_id('registros_de_gastos_de_viaje','id') #CAMBIAR POR SOLO GASTOS
-        self.FORM_SOLICITUD_VIATICOS_ID = self.lkm.form_id('solicitud_de_viticos','id') 
-        self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE = self.lkm.form_id('registros_de_gastos_de_viaje')['id']
+        self.FORM_ID_AUTORIZACIONES = self.lkm.form_id('autorizacin_de_viticos','id')
+        self.FORM_BANK_TRANSACTIONS = self.lkm.form_id('entrega_de_efectivo_4','id')
+        
+        # self.FORM_ID_GASTOS_VIAJE = self.lkm.form_id('registros_de_gastos_de_viaje','id')
+        self.FORM_ID_GASTOS = self.lkm.form_id('registros_de_gastos','id') #CAMBIAR POR SOLO GASTOS
+        # self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE = self.lkm.form_id('registros_de_gastos_de_viaje')['id']
+        
+        # self.FORM_SOLICITUD_VIATICOS_ID = self.lkm.form_id('solicitud_de_viticos','id') 
 
         self.SOL_METADATA = {}
         self.SOL_CATALOG = {}
@@ -74,11 +82,11 @@ class Expenses(base.LKF_Base):
             'deposito_entregado':'544d5ad901a4de205f391111',
             'deposito_solicitado':'544d5ad901a4de205f392000',
             'approved_amount':'61041d15d9ee55ab14965bb7',
-            'autorizador':'62bf232626827cd253f9db16',
+            'autorizador':'663bd36eb19b7fb7d9e97ccb',
             'cant_dias':'61041d15d9ee55ab14965bb5',
             'cat_cargo_empleado':'6092c0ebd8b748522446af27',
             'cat_destino':'610419b5d28657c73e36fcd4',
-            'cat_destinos': '66107030fc70de34c53e622d',
+            'cat_destinos': '663a7dd6e48382c5b12308ff',
             'cat_email_empleado':'6092c0ebd8b748522446af28',
             'cat_folio':'610419b5d28657c73e36fcd3',
             'cat_moneda':'62aa1fa92c20405af671d123',
@@ -145,9 +153,9 @@ class Expenses(base.LKF_Base):
             self.do_records_close(self.FORM_BANK_TRANSACTIONS, folios_efectivo, status_id=self.f['status_gasto'])
 
             #Cierra Registro de Gastos
-            res = self.get_records(self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE, query_answers=query_answers, select_columns=['folio'])
+            res = self.get_records(self.FORM_ID_GASTOS, query_answers=query_answers, select_columns=['folio'])
             folio_gastos = [r['folio'] for r in res if r.get('folio')]
-            self.do_records_close(self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE, folio_gastos, status_id=self.f['status_gasto'])
+            self.do_records_close(self.FORM_ID_GASTOS, folio_gastos, status_id=self.f['status_gasto'])
 
             #Cierra Solicitud
             self.do_records_close(form, folio)
@@ -177,18 +185,18 @@ class Expenses(base.LKF_Base):
     def do_bank_transaction(self, folio, balance):
         print('do_bank_transaction')
 
-    def update_bank_transaction(self, catalog_obj_id, field_id_folio, value_field_folio, new_deposito_solicitado):
-        record_bank_transaction = self.cr.find_one({
-            "form_id": self.FORM_BANK_TRANSACTIONS,
-            "deleted_at": {'$exists': False},
-            f"answers.{catalog_obj_id}.{field_id_folio}": value_field_folio,
-            f"answers.{self.f['status_gasto']}": {'$nin': ['realizado', 'cancelado']}
-        }, {'folio': 1, 'answers': 1, 'form_id': 1})
-        if not record_bank_transaction:
-            return False
-        record_bank_transaction['answers'][self.f['deposito_solicitado']] = new_deposito_solicitado
-        res_update = self.lkf_api.patch_record(record_bank_transaction)
-        return res_update
+    # def update_bank_transaction(self, catalog_obj_id, field_id_folio, value_field_folio, new_deposito_solicitado):
+    #     record_bank_transaction = self.cr.find_one({
+    #         "form_id": self.FORM_BANK_TRANSACTIONS,
+    #         "deleted_at": {'$exists': False},
+    #         f"answers.{catalog_obj_id}.{field_id_folio}": value_field_folio,
+    #         f"answers.{self.f['status_gasto']}": {'$nin': ['realizado', 'cancelado']}
+    #     }, {'folio': 1, 'answers': 1, 'form_id': 1})
+    #     if not record_bank_transaction:
+    #         return False
+    #     record_bank_transaction['answers'][self.f['deposito_solicitado']] = new_deposito_solicitado
+    #     res_update = self.lkf_api.patch_record(record_bank_transaction)
+    #     return res_update
 
     def review_devolucion_exists(self, fecha_anticipo, folio_viatico, cash_to_back):
         record_devolution  = self.cr.find_one({
@@ -217,7 +225,7 @@ class Expenses(base.LKF_Base):
             # self.f['approved_amount']:[catalog.get(self.f['approved_amount']),]
         }
 
-        catalog_employee_obj_id = self.CATALOG_EMPLEADOS_OBJ_ID
+        catalog_employee_obj_id = self.EMPLOYEE_OBJ_ID
         print('solicitud=', self.SOL_DATA)
         print('catalog_employee_obj_id=', catalog_employee_obj_id)
         print('type', type(self.SOL_DATA))
@@ -326,7 +334,7 @@ class Expenses(base.LKF_Base):
             set_answers.update({f'answers.{key}':value})
         res = self.cr.update_many( {
             'folio': {"$in":folios},
-            'form_id': self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE,
+            'form_id': self.FORM_ID_GASTOS,
             'deleted_at': {'$exists': False}
             },
             {'$set':set_answers}
@@ -335,8 +343,8 @@ class Expenses(base.LKF_Base):
 
     def get_autorizador(self, folio_solicitud=None):
         if self.SOL_DATA:
-            record = self.SOL_DATA.get(self.CATALOG_RESP_AUT_OBJ_ID)
-        auth_catalog = record.get('answers',{}).get(self.CATALOG_RESP_AUT_OBJ_ID)
+            record = self.SOL_DATA.get(self.EMPLEADOS_JEFES_DIRECTOS_OBJ_ID)
+        auth_catalog = record.get('answers',{}).get(self.EMPLEADOS_JEFES_DIRECTOS_OBJ_ID)
         return auth_catalog
     
     def get_cant_days(self, date_from, date_to):
@@ -452,7 +460,7 @@ class Expenses(base.LKF_Base):
         elif isinstance(status, str):
             status = [status, ]
         match_query  = {
-                    'form_id': self.FORM_ID_GASTOS_VIAJE,
+                    'form_id': self.FORM_ID_GASTOS,
                     'deleted_at': {'$exists': False},
                     f'answers.{self.f["status_gasto"]}': {'$nin':status},
                 }
@@ -513,7 +521,7 @@ class Expenses(base.LKF_Base):
         return date_from, date_to
 
     def get_solicitudes_autorizador(self, autorizador):
-        name = autorizador.get(self.CATALOG_RESP_AUT_OBJ_ID,{}).get(self.f["autorizador"])
+        name = autorizador.get(self.EMPLEADOS_JEFES_DIRECTOS_OBJ_ID,{}).get(self.f["autorizador"])
         match_query  = {
             'form_id': self.FORM_ID_SOLICITUD,
             'deleted_at': {'$exists': False},
@@ -522,14 +530,14 @@ class Expenses(base.LKF_Base):
                 {f'answers.{self.f["status_gasto"]}':'vencida'},
                 {f'answers.{self.f["status_gasto"]}':'sobregirada'},
                 ],
-            f'answers.{self.CATALOG_RESP_AUT_OBJ_ID}.{self.f["autorizador"]}': name
+            f'answers.{self.EMPLEADOS_JEFES_DIRECTOS_OBJ_ID}.{self.f["autorizador"]}': name
             }
         query =[
             {'$match': match_query },
             {"$project":{
                     "_id":0,
                     'folio':"$folio", #folio
-                    'employee':f"$answers.{self.CATALOG_EMPLEADOS_OBJ_ID}.{self.f['cat_nombre_empleado']}"
+                    'employee':f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['cat_nombre_empleado']}"
                     }
                 },
             {'$group':{
@@ -602,7 +610,7 @@ class Expenses(base.LKF_Base):
                 self.CATALOG_SOL_VIAJE_OBJ_ID: {
                     self.f['cat_folio']: folio,
                     # self.f['cat_destino']: [new_record.get(self.f['destino']).replace('_', ' ').title()],
-                    self.f['cat_destinos']: [new_record.get(self.CATALOG_DESTINOS_OBJ_ID,{}).get(self.f['cat_destinos'])],
+                    self.f['cat_destinos']: [new_record.get(self.ESTADO_OBJ_ID,{}).get(self.f['cat_destinos'])],
                     self.f['fecha_salida']: [new_record.get(self.f['date_from'])],
                     self.f['fecha_regreso']: [new_record.get(self.f['date_to'])],
                     self.f['cat_monto_total_aprobado']: [new_record.get(self.f['approved_amount'])]
@@ -615,7 +623,7 @@ class Expenses(base.LKF_Base):
             gasto_ejecutado = 0
             for employee, folios in folios_by_employee.items():
                 new_record = {
-                    self.CATALOG_EMPLEADOS_OBJ_ID : {self.f['cat_nombre_empleado']: employee},
+                    self.EMPLOYEE_OBJ_ID : {self.f['cat_nombre_empleado']: employee},
                     self.f['tipo_solicitud']:"gasto",
                     self.f['folio_solicitudes'] : folios,
                     }
@@ -650,7 +658,7 @@ class Expenses(base.LKF_Base):
 
     def query_related_expenses_rec(self, folio_sol=None, answers={}, status=[]):
         match_query  = {
-            'form_id': {'$in': [self.FORM_ID_GASTOS_VIAJE, self.FORM_BANK_TRANSACTIONS]},
+            'form_id': {'$in': [self.FORM_ID_GASTOS, self.FORM_BANK_TRANSACTIONS]},
             'deleted_at': {'$exists': False},
             # '$or':[
             #     {f'answers.{self.f["status_gasto"]}':'por_autorizar'}, 
@@ -823,7 +831,7 @@ class Expenses(base.LKF_Base):
         Realiza caluclos y actualiza los registros de gasto segun si fueron autorizados  o no
         """
         dict_records_to_update = {}
-        form_id = self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE
+        form_id = self.FORM_ID_GASTOS
         # self.set_solicitud_data(folio)
         response = []
         for viatico in answers.get(self.f['grp_gastos_viaje'], []):
@@ -838,7 +846,7 @@ class Expenses(base.LKF_Base):
             dict_records_to_update[folio_origen].update(viatico)
         entregas_efevo = 0
         #atualiza los registros de gastos
-        res = self.update_expense_data(dict_records_to_update, update=True)
+        res = self.update_expense_data(dict_records_to_update, update=True, force_close_sol=True)
 
         reproces = False
         for gasto in answers.get(self.f['grp_gastos_viaje'], []):
@@ -852,7 +860,7 @@ class Expenses(base.LKF_Base):
 
         if reproces:
             #reporoces si hubo algun error
-            res = self.update_expense_data(dict_records_to_update, update=False)
+            res = self.update_expense_data(dict_records_to_update, update=False, force_close_sol=True)
 
         answers[self.f['anticipo_efectivo']] = res['anticipo_efectivo'] 
         answers[self.f['gasto_ejecutado']] = res['gasto_ejecutado_aprovado'] 
@@ -889,9 +897,10 @@ class Expenses(base.LKF_Base):
             self.f['expense_kind']: self.SOL_DATA.get(self.f['expense_kind']), 
             self.f['cat_status']: self.SOL_DATA.get(self.f['status_solicitud'],"").replace('_', ' ').title(), 
             })
-        catalog_data['answers'].update(self.SOL_DATA.get(self.CATALOG_EMPLEADOS_OBJ_ID))
+        catalog_data['answers'].update(self.SOL_DATA.get(self.EMPLOYEE_OBJ_ID))
         #catalogo_metadata.update({'record_id': catalog_data.pop('_id'), '_rev': catalog_data['answers'].pop('_rev'), 'answers': catalog_data['answers']})
         res_update = self.lkf_api.bulk_patch_catalog([catalog_data,], self.CATALOG_SOL_VIAJE_ID)
+        print('res_update catalog =',res_update)
         update_ok = False
         if res_update and len(res_update):
             res_update = res_update[0]
@@ -904,7 +913,7 @@ class Expenses(base.LKF_Base):
     def get_solicitu_folios(self, all_folios):
         res = {}
         records = self.get_records(
-            form_id=self.FORM_ID_GASTOS_VIAJE, 
+            form_id=self.FORM_ID_GASTOS, 
             folio=all_folios,
             select_columns=['folio',f"answers.{self.CATALOG_SOL_VIAJE_OBJ_ID}.{self.f['cat_folio']}"]
             )
@@ -913,7 +922,7 @@ class Expenses(base.LKF_Base):
             res[r['folio']] = folio_solicitud
         return res
 
-    def update_expense_data(self, dict_records_to_update, update=True):
+    def update_expense_data(self, dict_records_to_update, update=True, force_close_sol=False):
         """
 
         """
@@ -925,7 +934,7 @@ class Expenses(base.LKF_Base):
         gasto_ejecutado_efevo_aprovado = 0
         gasto_ejecutado_compania_aprovado = 0
         anticipo = 0
-        #form_id = self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE
+        #form_id = self.FORM_ID_GASTOS
         form_ids = self.query_folio_form(list(dict_records_to_update.keys()))
         for folio, gasto in dict_records_to_update.items():
             res[folio] = {}
@@ -973,7 +982,7 @@ class Expenses(base.LKF_Base):
         res['grp_gastos_viaje'] = list(dict_records_to_update.values())
         for f_solicitud in update_solicitud:
             if update:
-                self.update_solicitud(f_solicitud)
+                self.update_solicitud(f_solicitud, force_close_sol=force_close_sol)
         return res
 
     def update_expense_status(self, expenses):
@@ -986,19 +995,22 @@ class Expenses(base.LKF_Base):
         result = []
         result = self.lkf_api.patch_multi_record(
             data,
-            self.FORM_REGISTRO_DE_GASTOS_DE_VIAJE, folios=folios
+            self.FORM_ID_GASTOS, folios=folios
             )
         self.force_udpate(folios, data)
         #TODO SI NO SE ACTUALIZA FORZAR EN BASE DE DATOS.
         return result
 
+    def update_expense_values(self):
+        self.answers.update( { self.f['nombre_del_campo']: 'valor_del_campo' } )
+    
     def update_records(self, records_to_process):
         for record in records_to_process:
             record[self.f['grp_gasto_estatus']] = 'autorizado'
             record[self.f['grp_gasto_monto_aut']] = record.get(self.f['grp_gasto_monto'],)
         return records_to_process
 
-    def update_solicitud(self, folio, run_validations=False, background=False):
+    def update_solicitud(self, folio, run_validations=False, background=False, force_close_sol=False):
         self.set_solicitud_data(folio)
         close_order = False
         # fecha_fin = self.SOL_DATA.get('610419b5d28657c73e36fcd6', '')
@@ -1021,7 +1033,7 @@ class Expenses(base.LKF_Base):
             close_order = False
 
         # destino = self.SOL_DATA.get(self.f['destino'])
-        destino = self.SOL_DATA.get(self.CATALOG_DESTINOS_OBJ_ID, {}).get( self.f['cat_destinos'] )
+        destino = self.SOL_DATA.get(self.ESTADO_OBJ_ID, {}).get( self.f['cat_destinos'] )
         # if destino == 'otro':
         #     destino = self.SOL_DATA.get(self.f['destino_otro'])
             
@@ -1040,8 +1052,10 @@ class Expenses(base.LKF_Base):
             f"answers.{self.f['grp_gastos_viaje']}":expense_group
             }
         if close_order:
+            # Revisar si hay registro de autorizacion y si ya esta autorizado pues cerrar porque lo vuelve a poner como En Aprobacion
+            is_authorized_expense = self.authorized_expense(folio)
             update_fields.update({
-                f"answers.{self.f['status_solicitud']}":"en_aprobacion",
+                f"answers.{self.f['status_solicitud']}": "en_aprobacion" if not is_authorized_expense else "cerrada" ,
                 })
             # if background:
             #     self.create_expense_authorization(folio)
@@ -1053,7 +1067,7 @@ class Expenses(base.LKF_Base):
 
         update_db = self.cr.update_one({
             'folio': folio,
-            'form_id': self.FORM_SOLICITUD_VIATICOS_ID,
+            'form_id': self.FORM_ID_SOLICITUD,
             'deleted_at': {'$exists': False}
         },{'$set':update_fields})
         db_res = update_db.raw_result
@@ -1068,6 +1082,15 @@ class Expenses(base.LKF_Base):
             self.create_expense_authorization(folio)
         return update_ok
 
+    def authorized_expense(self, folio_sol):
+        record_authorization = self.cr.find_one({
+            "form_id": self.FORM_ID_AUTORIZACIONES,
+            "deleted_at": {'$exists': False},
+            f"answers.{self.CATALOG_SOL_VIAJE_OBJ_ID}.{self.f['cat_folio']}": folio_sol,
+            f"answers.{self.f['estatus_solicitud_autorizacion_uno']}" : 'autorizado'
+        }, {'folio': 1})
+        return record_authorization
+
     def validar_fecha_vencida(self, fecha_gasto):
         date_fecha_gasto = datetime.strptime(fecha_gasto, '%Y-%m-%d')
         fecha_actual = datetime.now()
@@ -1078,7 +1101,7 @@ class Expenses(base.LKF_Base):
         print('... expense_utils base de addons')
         answers = self.current_record.get('answers')
         #destino = answers.get(self.f['destino'])
-        destino = answers.get(self.CATALOG_DESTINOS_OBJ_ID, {}).get( self.f['cat_destinos'] )
+        destino = answers.get(self.ESTADO_OBJ_ID, {}).get( self.f['cat_destinos'] )
         #answers[ self.f['destino_otro'] ] = destino.replace('_', ' ').title()
         answers[ self.f['cat_destinos'] ] = destino
         dia_salida = answers.get(self.f['date_from'])
