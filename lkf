@@ -237,14 +237,17 @@ _build(){
 _restart(){
   _update
 }
+
 _update(){
+  echo 'Running update...'
   case $Enviorment in
     prod)
-      echo 'Running update...'
-      env -i ssh -i $HOME/.ssh/$Account_id _lkf_docker_remote@ansible.linkaform.com prod addons
+      env -i ssh -i $HOME/.ssh/$Account_id _lkf_docker_remote@ansible.linkaform.com prod $IMAGE_NAME
     ;;
     preprod)
-      env -i ssh -i $HOME/.ssh/${Account_id} _lkf_docker_remote@ansible.linkaform.com preprod addons
+      echo 'Running Account_id...' $Account_id
+      echo 'Running IMAGE_NAME...' $IMAGE_NAME
+      env -i ssh -i $HOME/.ssh/${Account_id} _lkf_docker_remote@ansible.linkaform.com preprod $IMAGE_NAME
      ;;
   esac
 }
@@ -284,6 +287,7 @@ fi
 
 
 echo "Action", $Acction
+echo "IMAGE_NAME", $IMAGE_NAME
 
 case "$Acction" in
 
@@ -306,13 +310,25 @@ case "$Acction" in
     Account_id=$Branch
     echo "Restarting addons container of the account: $Account_id"
     echo "Environment: $Enviorment "
+    echo "Image Name: $Enviorment "
     _restart $Service
   ;;
   update)
     Enviorment=$Service
     Account_id=$Branch
+    IMAGE_NAME='addons'
+    if [[ $# -gt 3 ]]; then
+      IMAGE_NAME=$2
+      Enviorment=$3
+      Account_id=$4
+      echo 'aqi...'
+    fi
+    echo 'IMAGE_NAME...' $IMAGE_NAME
+    echo 'Enviorment...' $Enviorment
+    echo 'Account_id...' $Account_id
     echo "Restarting addons container of the account: $Account_id"
     echo "Environment: $Enviorment "
+    echo "IMAGE_NAME: $IMAGE_NAME "
     _restart $Service
   ;;
   test)

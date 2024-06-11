@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from linkaform_api import base
+from lkf_addons.addons.base.base_util import Base
 
 
-class Product(base.LKF_Base):
+class Product(Base, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
@@ -55,7 +56,6 @@ class Product(base.LKF_Base):
     def una_funcion_product(self):
         return True
 
-
     def get_product(self, product_code):
         return self.get_product_field(self, product_code, pfield='*')
 
@@ -80,7 +80,7 @@ class Product(base.LKF_Base):
 
 
 
-class Warehouse(base.LKF_Base):
+class Warehouse(Base ,base.LKF_Base):
 
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):

@@ -1,7 +1,9 @@
 ####################################
 # Image for develop                #
 ####################################
-FROM python:3.7-slim-bullseye as addons-base
+#FROM python:3.7-slim-bullseye as addons-base
+FROM python:3.10.14-bullseye as addons-base
+
 
 MAINTAINER Linkaform
 
@@ -77,7 +79,7 @@ RUN pip install linkaform_api-3.0.tar.gz
 
 #COPY ./docker/requires.txt /tmp/
 # TODO COPIAR TODO ADDONS Y HACER IMAGEN.... AQUI O EN SCIRPTS?
-COPY /lkf_addons /usr/local/lib/python3.7/site-packages/lkf_addons/
+COPY /lkf_addons /usr/local/lib/python3.10/site-packages/lkf_addons/
 COPY ./config /srv/scripts/addons/config
 
 USER nonroot

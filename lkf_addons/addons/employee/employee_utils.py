@@ -3,10 +3,10 @@ import sys, simplejson
 
 from linkaform_api import settings
 from linkaform_api import base
-#from lkf_addons.addons.base.base_util import Base
+from lkf_addons.addons.base.base_util import Base
 
 
-class Employee(base.LKF_Base):
+class Employee(Base, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
@@ -58,6 +58,8 @@ class Employee(base.LKF_Base):
                 }
 
         self.f.update(self.employee_fields)
+
+
 
     def _get_match_q(self, field_id, value):
         if type(value) == list:

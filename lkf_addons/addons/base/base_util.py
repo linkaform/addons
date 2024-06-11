@@ -28,6 +28,10 @@ class Base(base.LKF_Base):
         self.COUNTRY_ID = self.COUNTRY.get('id')
         self.COUNTRY_OBJ_ID = self.COUNTRY.get('obj_id')
 
+        self.TIMEZONE = self.lkm.catalog_id('timezone')
+        self.TIMEZONE_ID = self.TIMEZONE.get('id')
+        self.TIMEZONE_OBJ_ID = self.TIMEZONE.get('obj_id')
+
         self.f.update( {
             'address_name':'663a7e0fe48382c5b1230901',
             'address_image':'663a808be48382c5b123090d',
@@ -43,6 +47,7 @@ class Base(base.LKF_Base):
             'email':'663a7ee1e48382c5b1230907',
             'phone':'663a7ee1e48382c5b1230906',
             'zip_code':'663a7ee1e48382c5b1230905',
-
+            'timezone':'665e4f90c4cf32cb52ebe15c',
+            'cat_timezone':f'{self.TIMEZONE_OBJ_ID}.665e4f90c4cf32cb52ebe15c',
         }
         )
