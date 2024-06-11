@@ -27,7 +27,7 @@ services:
       - ../lkf_addons/bin/xml_2_json.py:/usr/local/bin/xml_2_json.py
       - ../config:/srv/scripts/addons/config
       - ../modules:/srv/scripts/addons/modules
-      - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/ 
+      - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/ 
       - ../../lkf/infosync_scripts/:/srv/infosync_scripts
       - ../../../.bash_history:/root/.bash_history
     command: sleep infinity
@@ -55,7 +55,7 @@ services:
       - ../lkf_addons/bin/xml_2_json.py:/usr/local/bin/xml_2_json.py
       - ../config:/srv/scripts/addons/config
       - ../modules:/srv/scripts/addons/modules
-      - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/ 
+      - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/ 
       - ../../lkf/infosync_scripts/:/srv/infosync_scripts
       - ../../../.bash_history:/root/.bash_history
     command: sleep infinity
