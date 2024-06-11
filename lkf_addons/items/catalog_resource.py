@@ -15,11 +15,18 @@ class CatalogResource(items.Items):
             if module_info.get(f'load_{file_type}',{}) and  module_info.get(f'load_{file_type}',{}).get(file_name):
                 continue
             try:
-                file = open('{}/{}'.format(self.this_path, full_file_name))
+                #file = open('{}/{}'.format(self.this_path, full_file_name))
+                print('file=', '{}/{}'.format(self.this_path, full_file_name))
+                # file_read = file.read()
+                with open('{}/{}'.format(self.this_path, full_file_name), "r") as file:
+                    file_data = simplejson.loads(file.read())
             except FileNotFoundError:
                 print(f'File not found {self.this_path + full_file_name}, continue')
                 return False
-            file_data = simplejson.loads(file.read())
+
+            print('file file_data', file_data)
+
+
             catalog_map = file_data['mapping']
             spreadsheet_url = file_data['spreadsheet_url']
             res = self.lkf_api.catalog_load_rows(catalog_id, catalog_map, spreadsheet_url)
@@ -31,6 +38,7 @@ class CatalogResource(items.Items):
                 self.lkf.update(update_query, item_info)
 
     def install_catalogs(self, instalable_catalogs, **kwargs):
+        print('********************* Installing Catalogs **************************')
         install_order = []
         if instalable_catalogs.get('install_order'):
             install_order = instalable_catalogs.pop('install_order')
