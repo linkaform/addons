@@ -24,9 +24,6 @@ class CatalogResource(items.Items):
                 print(f'File not found {self.this_path + full_file_name}, continue')
                 return False
 
-            print('file file_data', file_data)
-
-
             catalog_map = file_data['mapping']
             spreadsheet_url = file_data['spreadsheet_url']
             res = self.lkf_api.catalog_load_rows(catalog_id, catalog_map, spreadsheet_url)

@@ -10,9 +10,9 @@ from linkaform_api.lkf_object import LKFBase
 from download_module import download_modules
 from download_module import ADDONS_PATH, MODULES_PATH
 
-sys.path.append(ADDONS_PATH)
-sys.path.append('/srv/scripts/addons/config/')
-sys.path.append('/srv/scripts/addons/modules')
+# sys.path.append(ADDONS_PATH)
+# sys.path.append('/srv/scripts/addons/config/')
+# sys.path.append('/srv/scripts/addons/modules')
 
 import settings
 from uts import get_lkf_api
@@ -253,6 +253,8 @@ def print_help():
     print('        stands for environment, values are prod, local, preprod')
     print('-r:')
     print('        download related items.')    
+    print('-y')
+    print('        yes to all item types instalations.') 
     print('-h, --help:')
     print('        Heeelp!!!')
     print('\n')
@@ -309,7 +311,20 @@ if __name__ == '__main__':
 
         if '-f' in commands:
             kwargs.update({'force':True})
-
+        if '-y' in commands:
+            ask_form = False
+            load_form = True
+            ask_script = False
+            load_script = True
+            ask_catalog = False
+            load_catalog = True
+            ask_demo = False
+            load_demo = True
+            ask_data = False
+            load_data = True
+            ask_reports = False
+            load_reports = True
+            kwargs.update({'yes':True})
         if '-d' in commands:
             kwargs.update({'dependencies':True})
         else:
