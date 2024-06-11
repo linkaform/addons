@@ -20,7 +20,7 @@ services:
      dockerfile: ./Dockerfile
      target: addons-base
     volumes:
-      - ../lkf_addons:/usr/local/lib/python3.7/site-packages/lkf_addons/
+      - ../lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons/
       - ../lkf_addons/bin/lkfaddons.py:/usr/local/bin/lkfaddons.py
       - ../lkf_addons/bin/download_module.py:/usr/local/bin/download_module.py
       - ../lkf_addons/bin/json_xml.py:/usr/local/bin/json_xml.py
@@ -48,7 +48,7 @@ services:
      dockerfile: ./Dockerfile
      target: develop
     volumes:
-      - ../lkf_addons:/usr/local/lib/python3.7/site-packages/lkf_addons/
+      - ../lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons/
       - ../lkf_addons/bin/lkfaddons.py:/usr/local/bin/lkfaddons.py
       - ../lkf_addons/bin/download_module.py:/usr/local/bin/download_module.py
       - ../lkf_addons/bin/json_xml.py:/usr/local/bin/json_xml.py
