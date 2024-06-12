@@ -9,10 +9,14 @@ import urllib.request, re, sys
 from linkaform_api import utils
 
 
-sys.path.append('/srv/scripts/addons/config/')
-sys.path.append('/srv/scripts/addons/modules')
 MODULES_PATH = '/srv/scripts/addons/modules'
-ADDONS_PATH = '/usr/local/lib/python3.7/site-packages/lkf_addons/addons'
+ADDONS_PATH = '/usr/local/lib/python3.10/site-packages/lkf_addons/addons'
+if ADDONS_PATH not in sys.path:
+    sys.path.append(ADDONS_PATH)
+if '/srv/scripts/addons/config/' not in sys.path:
+    sys.path.append('/srv/scripts/addons/config/')
+if '/srv/scripts/addons/modules' not in sys.path:
+    sys.path.append('/srv/scripts/addons/modules')
 
 
 import settings

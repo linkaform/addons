@@ -42,6 +42,7 @@ class FormResource(items.Items):
             #res = self.lkf_api.upload_rules(rules_model, 'PATCH')
 
     def install_forms(self, instalable_forms, **kwargs):
+        print('********************* Installing Forms **************************')
         if instalable_forms.get('install_order') or instalable_forms.get('install_order') == []:
             install_order = instalable_forms.pop('install_order', [])
         else:

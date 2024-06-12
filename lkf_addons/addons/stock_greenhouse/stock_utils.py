@@ -9,7 +9,6 @@ from linkaform_api import base
 from lkf_addons.addons.employee.employee_utils import Employee
 from lkf_addons.addons.product.product_utils import Product, Warehouse
 
-
 class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):

@@ -3,7 +3,7 @@
 from linkaform_api import settings
 
 MODULES_PATH = '/srv/scripts/addons/modules'
-ADDONS_PATH = '/usr/local/lib/python3.7/site-packages/lkf_addons/addons'
+ADDONS_PATH = '/usr/local/lib/python3.10/site-packages/lkf_addons/addons'
 
 config = {
     'COLLECTION' : 'form_answer',

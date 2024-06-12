@@ -3,10 +3,10 @@ import sys, simplejson
 
 from linkaform_api import settings
 from linkaform_api import base
-#from lkf_addons.addons.base.base_util import Base
+from lkf_addons.addons.base.base_util import Base
 
 
-class Employee(base.LKF_Base):
+class Employee(Base, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
@@ -40,7 +40,7 @@ class Employee(base.LKF_Base):
 
         self.employee_fields = {
             'worker_name':'62c5ff407febce07043024dd',
-            'worker_name_apoyo':'663bd36eb19b7fb7d9e97ccb',
+            'worker_name_b':'663bd36eb19b7fb7d9e97ccb',
             'team_name':'62c5ff0162a70c261328845d',
             'areas_group':'663cf9d77500019d1359eb9f',
             'user_id':'663bd32d7fb8869bbc4d7f7b',
@@ -54,9 +54,12 @@ class Employee(base.LKF_Base):
             'fecha_nacimiento':'663bcbe2274189281359eb74',
             'genero':'663bcbe2274189281359eb75',
             'status_en_empresa':'663bcbe2274189281359eb77',
+            'cat_timezone':self.f['cat_timezone'],
                 }
 
         self.f.update(self.employee_fields)
+
+
 
     def _get_match_q(self, field_id, value):
         if type(value) == list:
@@ -65,8 +68,7 @@ class Employee(base.LKF_Base):
             res  = {f"answers.{field_id}": value}
         return res
 
-
-    def get_employee_data(self, name=None, user_id=None, username=None, email=None):
+    def get_employee_data(self, name=None, user_id=None, username=None, email=None,  get_one=False):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.EMPLEADOS,
@@ -84,7 +86,7 @@ class Employee(base.LKF_Base):
             {'$project': self.proyect_format(self.employee_fields)},
             {'$sort':{'worker_name':1}},
             ]
-        return self.format_cr_result(self.cr.aggregate(query))
+        return self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
 
     def get_user_boot(self, search_default=True, **kwargs):
         if kwargs.get('user_id'):
@@ -116,6 +118,8 @@ class Employee(base.LKF_Base):
                     }
             }
             ]
+        print('query=', query)
+        print('area=', self.f['area'])
         res = self.cr.aggregate(query)
         caseta = None
         for x in res:
@@ -126,12 +130,15 @@ class Employee(base.LKF_Base):
             caseta = self.get_user_boot(search_default=False)
         return caseta
 
-    def get_users_by_location_area(self, location_name=None, area_name=None, **kwargs):
+    def get_users_by_location_area(self, location_name=None, area_name=None, user_id=None, **kwargs):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
             }
-
+        if user_id:
+            match_query.update({
+                f"answers.{self.EMPLOYEE_OBJ_ID}.{self.f['user_id']}":user_id
+                })
         unwind = {'$unwind': f"$answers.{self.f['areas_group']}"}
         query= [
             {'$match': match_query },

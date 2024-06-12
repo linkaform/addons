@@ -22,6 +22,8 @@ class ReportResource(items.Items):
         print('#'*39 )
         if instalable_reports.get('install_order'):
             inst_order = instalable_reports.pop('install_order')
+            if 'install_order' in inst_order:
+                inst_order.pop(inst_order.index('install_order'))
         else:
             inst_order = []
         xml_reports=[]
