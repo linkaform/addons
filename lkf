@@ -90,7 +90,6 @@ while getopts ':iar:ir:c:p:h' opt; do
   esac
 done
 
-
 if [ "$IMAGE_NAME" != "0" ]; then
   if [[ $# -ge 2 ]]; then
     shift "$(($OPTIND $SHIFT))"
@@ -242,12 +241,14 @@ _update(){
   echo 'Running update...'
   case $Enviorment in
     prod)
+    echo '--------------'
       env -i ssh -i $HOME/.ssh/$Account_id _lkf_docker_remote@ansible.linkaform.com prod $IMAGE_NAME
     ;;
     preprod)
       echo 'Running Account_id...' $Account_id
       echo 'Running IMAGE_NAME...' $IMAGE_NAME
-      env -i ssh -i $HOME/.ssh/${Account_id} _lkf_docker_remote@ansible.linkaform.com preprod $IMAGE_NAME
+
+      echo env -i ssh -i $HOME/.ssh/${Account_id} _lkf_docker_remote@ansible.linkaform.com preprod $IMAGE_NAME
      ;;
   esac
 }
@@ -287,7 +288,6 @@ fi
 
 
 echo "Action", $Acction
-echo "IMAGE_NAME", $IMAGE_NAME
 
 case "$Acction" in
 
@@ -318,17 +318,15 @@ case "$Acction" in
     Account_id=$Branch
     IMAGE_NAME='addons'
     if [[ $# -gt 3 ]]; then
-      IMAGE_NAME=$2
-      Enviorment=$3
-      Account_id=$4
-      echo 'aqi...'
+      IMAGE_NAME=$4
+      Enviorment=$2
+      Account_id=$3
     fi
     echo 'IMAGE_NAME...' $IMAGE_NAME
     echo 'Enviorment...' $Enviorment
     echo 'Account_id...' $Account_id
     echo "Restarting addons container of the account: $Account_id"
     echo "Environment: $Enviorment "
-    echo "IMAGE_NAME: $IMAGE_NAME "
     _restart $Service
   ;;
   test)
