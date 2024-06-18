@@ -897,12 +897,14 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         stage = [2,] if stage == 'S2' else stage
         stage = [3,] if stage == 'S3' else stage
         stage = [4,] if stage == 'S4' else stage
+        
         if 2 in stage:
             mango_query = self.plant_recipe_query(all_codes, "S2", "S2", recipe_type)
             recipe_s2 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query)
         if 3 in stage:
             mango_query = self.plant_recipe_query(all_codes, "S3", "S2", recipe_type)
             recipe_s3 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query)
+
         if 4 in stage:
             if 'Ln72' in stage:
                 mango_query = self.plant_recipe_query(all_codes, "Ln72", "S4", recipe_type)
@@ -1915,8 +1917,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if type(plant_recipe) == dict:
             plant_recipe = [plant_recipe,]
         for recipe in plant_recipe:
-            start_week = recipe.get('start_week')
-            end_week = recipe.get('end_week')
+            start_week = recipe.get('start_week',1)
+            end_week = recipe.get('end_week',53)
             if int(plant_week) >= int(start_week) and int(plant_week) <= int(end_week):
                 return recipe
         return {}
