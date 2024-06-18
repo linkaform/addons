@@ -22,12 +22,22 @@ def json_to_xml(json_data):
         if isinstance(data, dict):
             if data:
                 for key, value in data.items():
+                    new_val = {}
                     if key == 'pdfName':
                         if '{{' in value:
                             value = "{% raw %} " + value + " {% endraw %} "
                     if key == '$$hashKey':
                         parent.remove(ET.SubElement(parent, key))
                         continue
+                    if key =='filters':
+                        if isinstance(value, dict):
+                            new_val = {}
+                            for k, v in value.items():
+                                if k and '/' in k:
+                                    new_val.update({k.replace('/','__slash__'):v})
+                                else:
+                                    new_val.update({k:v})
+                        value = new_val
                     element = ET.SubElement(parent, key)
                     json_to_xml_elements(value, element)
             else:
