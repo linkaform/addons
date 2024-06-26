@@ -31,6 +31,8 @@ RUN apt-get update && \
     mongodb-org-shell \
     mongodb-org-tools
 
+COPY ./secrets/lkf_jwt_key.pub /etc/ssl/certs/lkf_jwt_key.pub
+
 
 ####################################
 # Image for develop                #
