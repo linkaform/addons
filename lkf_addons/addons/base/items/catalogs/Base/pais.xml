@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>4-6b58a916d619ac2f4b5845f9c0082647</_rev>
-    <updated_at>2024-05-23T17:40:21.871627+00:00Z</updated_at>
+    <_rev>2-ea5bb18f5c9bfb9c254d299ece1a9b27</_rev>
+    <updated_at>2024-06-19T15:50:39.354328+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Pais</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T17:40:21.871627+00:00Z</created_at>
+    <created_at>2024-06-19T15:50:39.354328+00:00Z</created_at>
     <advanced_options>
         <folio>
             <manual>False</manual>
@@ -32,7 +32,7 @@
                     <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
                     <fav>True</fav>
-                    <required>False</required>
+                    <required>True</required>
                     <field_id>663a7ca6e48382c5b12308fa</field_id>
                     <catalog>{}</catalog>
                     <relation_type>None</relation_type>
@@ -42,6 +42,7 @@
                     <catalog_id>None</catalog_id>
                     <key>True</key>
                     <properties>
+                        <help_text>False</help_text>
                         <send_email>False</send_email>
                         <custom>None</custom>
                         <size>complete</size>
@@ -97,7 +98,7 @@
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>664f7f853e59756b3c62ff1f</_id>
+    <_id>6672fe4f16aa8d53ef22b32d</_id>
     <public>False</public>
-    <catalog_id>119113</catalog_id>
+    <catalog_id>120251</catalog_id>
 </lkf>

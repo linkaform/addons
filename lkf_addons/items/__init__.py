@@ -442,6 +442,8 @@ class Items(LKFException):
                 # y = x.decode('utf-8')
                 if '_inherit' in y:
                     continue
+                if y == 'i18n':
+                    continue
                 if y[:1] == '_':
                     continue
                     if y.find('.pyc') > 0:

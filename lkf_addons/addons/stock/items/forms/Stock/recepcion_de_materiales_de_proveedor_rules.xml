@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.recepcion_de_materiales_de_proveedor.id }}</form_id>
+    <id>6626f08c2a6a044d637176c5</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>6626ee3d2a6a044d6371751f</catalog_id>
+                        <field_id>6442e4831198daf81456f274</field_id>
+                        <group_id>None</group_id>
+                        <id>6442e4831198daf81456f274</id>
+                        <label>Warehouse Name</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.sku_catalog.obj_id}}</field_id>
+                    <group_id>6442e4537775ce64ef72dd69</group_id>
+                    <id>6626ee332a6a044d63717517</id>
+                    <label>Producto</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>6626ee332a6a044d63717517</catalog_id>
+                    <field_id>61ef32bcdf0ec2ba73dec33d</field_id>
+                    <group_id>6442e4537775ce64ef72dd69</group_id>
+                    <id>61ef32bcdf0ec2ba73dec33d</id>
+                    <label>Product Code</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6442e4cc45983bf1778ec17d</field_id>
+                    <group_id>6442e4537775ce64ef72dd69</group_id>
+                    <id>6442e4cc45983bf1778ec17d</id>
+                    <label>Cantidad</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>and</operator>
+            <rule_id>1dab4b8e9caef</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

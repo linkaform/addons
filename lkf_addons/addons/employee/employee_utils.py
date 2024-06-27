@@ -40,6 +40,8 @@ class Employee(Base, base.LKF_Base):
 
         self.employee_fields = {
             'worker_name':'62c5ff407febce07043024dd',
+            'worker_department':'663bc4ed8a6b120eab4d7f1e',
+            'worker_position':'663bc4c79b8046ce89e97cf4',
             'worker_name_b':'663bd36eb19b7fb7d9e97ccb',
             'team_name':'62c5ff0162a70c261328845d',
             'areas_group':'663cf9d77500019d1359eb9f',
@@ -86,6 +88,7 @@ class Employee(Base, base.LKF_Base):
             {'$project': self.proyect_format(self.employee_fields)},
             {'$sort':{'worker_name':1}},
             ]
+        print('match_query', match_query)
         return self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
 
     def get_user_boot(self, search_default=True, **kwargs):
@@ -118,8 +121,8 @@ class Employee(Base, base.LKF_Base):
                     }
             }
             ]
-        print('query=', query)
-        print('area=', self.f['area'])
+        # print('query=', simplejson.dumps(query, indent=3))
+        # print('area=', self.f['area'])
         res = self.cr.aggregate(query)
         caseta = None
         for x in res:
@@ -131,6 +134,8 @@ class Employee(Base, base.LKF_Base):
         return caseta
 
     def get_users_by_location_area(self, location_name=None, area_name=None, user_id=None, **kwargs):
+        print('location_name', location_name)
+        print('area_name', area_name)
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
@@ -154,7 +159,7 @@ class Employee(Base, base.LKF_Base):
                 f"answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}": area_name
                 })
         if not unwind_query:
-            mgs = "You musts specify either Location Name, Area Name or both"
+            msg = "You musts specify either Location Name, Area Name or both"
             return self.LKFException(msg)
         query += [{'$match': unwind_query }]
         query += [
@@ -170,5 +175,7 @@ class Employee(Base, base.LKF_Base):
                     }
                 }
             ]
+        print('query=', simplejson.dumps(query, indent=4))
+        print('query=', self.cr)
         res = self.cr.aggregate(query)
         return [x for x in res]

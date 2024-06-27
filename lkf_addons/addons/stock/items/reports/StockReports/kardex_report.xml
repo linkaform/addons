@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <name>Lab Kardex Report</name>
+    <report_filename>https://srv.linkaform.com/tissueculture/kardex_inventario.html</report_filename>
+    <report_path>/account_10612/</report_path>
+    <has_parameters>False</has_parameters>
+    <report_filetype>html</report_filetype>
+    <report_properties>
+        <embedded>True</embedded>
+    </report_properties>
+    <properties>
+        <script_id>{{ report_script.kardex_report.id }}</script_id>
+        <arguments>
+            <argument1>value22</argument1>
+        </arguments>
+        <embedded>True</embedded>
+    </properties>
+</lkf>

@@ -3,7 +3,7 @@
 from linkaform_api import base
 
 
-class ModuleName(base.LKF_Base):
+class Promotoria(base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)

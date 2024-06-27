@@ -67,7 +67,7 @@ class Location(Base, base.LKF_Base):
             location_address = x
         return location_address
 
-    def get_area_address(self, area_name, location_name):
+    def get_area_address(self, location_name, area_name):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.AREAS_DE_LAS_UBICACIONES,
@@ -104,3 +104,4 @@ class Location(Base, base.LKF_Base):
         if not area_address:
             area_address = self.get_location_address(location_name)
         return area_address
+

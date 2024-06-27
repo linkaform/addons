@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.visita_de_tienda.id }}</form_id>
+    <id>66734f9d16aa8d53ef22b351</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>5f2dd4a0a8825c4116c96fd3</field_id>
+                        <group_id>5f20bb82c5857a2c37501b78</group_id>
+                        <id>5f2dd4a0a8825c4116c96fd3</id>
+                        <label>Productos Caducados</label>
+                        <type>radio</type>
+                    </field>
+                    <value>sí</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f2dd4a0a8825c4116c96fd4</field_id>
+                    <group_id>5f20bb82c5857a2c37501b78</group_id>
+                    <id>5f2dd4a0a8825c4116c96fd4</id>
+                    <label>Cantidad de productos caducados</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f5655831759eb6c838c5d1d</field_id>
+                    <group_id>5f20bb82c5857a2c37501b78</group_id>
+                    <id>5f5655831759eb6c838c5d1d</id>
+                    <label>Fecha de productos caducados</label>
+                    <type>date</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>and</operator>
+            <rule_id>11831ef5aeed69</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

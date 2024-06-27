@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>4-f823035e0d05dee35315af2d0e1ac150</_rev>
-    <updated_at>2024-05-23T17:40:33.465881+00:00Z</updated_at>
+    <_rev>2-3f3dd446126179ba555a3cf2fda0369e</_rev>
+    <updated_at>2024-06-19T15:50:46.340171+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Estados</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T17:40:33.465881+00:00Z</created_at>
+    <created_at>2024-06-19T15:50:46.340171+00:00Z</created_at>
     <advanced_options>
         <folio>
             <manual>False</manual>
@@ -30,6 +30,7 @@
                 <item>
                     <field_type>text</field_type>
                     <properties>
+                        <help_text>False</help_text>
                         <send_email>False</send_email>
                         <size>complete</size>
                         <custom>None</custom>
@@ -37,7 +38,7 @@
                     <key>True</key>
                     <catalog_fields>[]</catalog_fields>
                     <field_id>663a7dd6e48382c5b12308ff</field_id>
-                    <required>False</required>
+                    <required>True</required>
                     <fav>True</fav>
                     <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
@@ -73,7 +74,9 @@
                     <field_type>catalog</field_type>
                     <properties>{}</properties>
                     <key>False</key>
-                    <catalog_fields>[]</catalog_fields>
+                    <catalog_fields>
+                        <item>663a7ca6e48382c5b12308fa</item>
+                    </catalog_fields>
                     <field_id>{{ catalog.pais.obj_id }}</field_id>
                     <required>False</required>
                     <fav>None</fav>
@@ -89,7 +92,7 @@
                         <couch_id>{{ catalog.pais.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.pais.id }}</catalog_id>
-                        <filters>None</filters>
+                        <filters>{}</filters>
                         <name>{{ catalog.pais.name }}</name>
                     </catalog>
                     <catalog_id>None</catalog_id>
@@ -103,7 +106,7 @@
                     <key>None</key>
                     <catalog_fields>[]</catalog_fields>
                     <field_id>663a7ca6e48382c5b12308fa</field_id>
-                    <required>False</required>
+                    <required>True</required>
                     <fav>True</fav>
                     <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
@@ -116,7 +119,7 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.pais.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.pais.id }}</catalog_id>
-                        <filters>None</filters>
+                        <filters>{}</filters>
                     </catalog>
                     <catalog_id>None</catalog_id>
                     <view_fields>[]</view_fields>
@@ -129,7 +132,7 @@
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>664f7f913e59756b3c62ff21</_id>
+    <_id>6672fe5616aa8d53ef22b32f</_id>
     <public>False</public>
-    <catalog_id>119114</catalog_id>
+    <catalog_id>120252</catalog_id>
 </lkf>

@@ -1,0 +1,257 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.stock_inventory_adjustment.id }}</form_id>
+    <id>{{ form.stock_inventory_adjustment.obj_id }}</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>ad00000000000000000ad999</field_id>
+                        <group_id>None</group_id>
+                        <id>ad00000000000000000ad999</id>
+                        <label>Adjust Status</label>
+                        <type>select</type>
+                    </field>
+                    <value>done</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>ad00000000000000000ad000</field_id>
+                    <group_id>None</group_id>
+                    <id>ad00000000000000000ad000</id>
+                    <label>Actual Qty</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>ad00000000000000000ad100</field_id>
+                    <group_id>None</group_id>
+                    <id>ad00000000000000000ad100</id>
+                    <label>Adjust In</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>ad00000000000000000ad200</field_id>
+                    <group_id>None</group_id>
+                    <id>ad00000000000000000ad200</id>
+                    <label>Adjust Out</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>620a9ee0a449b98114f61d77</field_id>
+                    <group_id>None</group_id>
+                    <id>620a9ee0a449b98114f61d77</id>
+                    <label>Ready YearWeek</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>61ef32bcdf0ec2ba73dec33d</field_id>
+                    <group_id>None</group_id>
+                    <id>61ef32bcdf0ec2ba73dec33d</id>
+                    <label>Plant Code</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>ad00000000000000000ad400</field_id>
+                    <group_id>None</group_id>
+                    <id>ad00000000000000000ad400</id>
+                    <label>Comments</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Disable qty</name>
+            <operator>and</operator>
+            <rule_id>f3716931e7c1eb6</rule_id>
+            <rule_type>disabled</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>ad00000000000000000ad999</field_id>
+                        <group_id>None</group_id>
+                        <id>ad00000000000000000ad999</id>
+                        <label>Adjust Status</label>
+                        <type>select</type>
+                    </field>
+                    <value>todo</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>ad00000000000000000ad999</field_id>
+                    <group_id>None</group_id>
+                    <id>ad00000000000000000ad999</id>
+                    <label>Adjust Status</label>
+                    <type>select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Disable Status</name>
+            <operator>and</operator>
+            <rule_id>211cb1f10bda69</rule_id>
+            <rule_type>disabled</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6442e4537775ce64ef72dd6a</field_id>
+                        <group_id>None</group_id>
+                        <id>6442e4537775ce64ef72dd6a</id>
+                        <label>Status</label>
+                        <type>select</type>
+                    </field>
+                    <value>done</value>
+                </item>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6442e4537775ce64ef72dd6a</field_id>
+                        <group_id>None</group_id>
+                        <id>6442e4537775ce64ef72dd6a</id>
+                        <label>Status</label>
+                        <type>select</type>
+                    </field>
+                    <value>cancel</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>000000000000000000000111</field_id>
+                    <group_id>None</group_id>
+                    <id>000000000000000000000111</id>
+                    <label>Date</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.warehouse.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>65dd7827a5a5723f76947b78</id>
+                    <label>Green House</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6442e4831198daf81456f274</field_id>
+                    <group_id>None</group_id>
+                    <id>6442e4831198daf81456f274</id>
+                    <label>Green House Name</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>644bf7ccfa9830903f087867</field_id>
+                    <group_id>None</group_id>
+                    <id>644bf7ccfa9830903f087867</id>
+                    <label>Plants</label>
+                    <type>group</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>64d05792c373f9b62f539d00</field_id>
+                    <group_id>None</group_id>
+                    <id>64d05792c373f9b62f539d00</id>
+                    <label>Comments</label>
+                    <type>textarea</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.product_catalog.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>65dd7826a5a5723f76947b74</id>
+                    <label>Plant</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>61ef32bcdf0ec2ba73dec33d</field_id>
+                    <group_id>None</group_id>
+                    <id>61ef32bcdf0ec2ba73dec33d</id>
+                    <label>Plant Code</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>620a9ee0a449b98114f61d77</field_id>
+                    <group_id>None</group_id>
+                    <id>620a9ee0a449b98114f61d77</id>
+                    <label>Ready YearWeek</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>ad00000000000000000ad000</field_id>
+                    <group_id>None</group_id>
+                    <id>ad00000000000000000ad000</id>
+                    <label>Actual Qty</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>ad00000000000000000ad200</field_id>
+                    <group_id>None</group_id>
+                    <id>ad00000000000000000ad200</id>
+                    <label>Adjust Out</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>ad00000000000000000ad400</field_id>
+                    <group_id>None</group_id>
+                    <id>ad00000000000000000ad400</id>
+                    <label>Comments</label>
+                    <type>textarea</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>ad00000000000000000ad100</field_id>
+                    <group_id>None</group_id>
+                    <id>ad00000000000000000ad100</id>
+                    <label>Adjust In</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>ad00000000000000000ad999</field_id>
+                    <group_id>None</group_id>
+                    <id>ad00000000000000000ad999</id>
+                    <label>Adjust Status</label>
+                    <type>select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Disable Adjustment</name>
+            <operator>or</operator>
+            <rule_id>70f1f3785614bc</rule_id>
+            <rule_type>disabled</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

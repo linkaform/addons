@@ -37,7 +37,8 @@ def json_to_xml(json_data):
                                     new_val.update({k.replace('/','__slash__'):v})
                                 else:
                                     new_val.update({k:v})
-                        value = new_val
+                        if new_val:
+                            value = new_val
                     element = ET.SubElement(parent, key)
                     json_to_xml_elements(value, element)
             else:

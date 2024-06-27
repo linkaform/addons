@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>{}</confirmation>
+    <description />
+    <_rev>2-a2de834527d2113195070775b3c1f5e7</_rev>
+    <updated_at>2024-06-19T15:50:49.432965+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Municipio</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-06-19T15:50:49.432965+00:00Z</created_at>
+    <advanced_options>{}</advanced_options>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>True</fav>
+                    <required>True</required>
+                    <field_id>667230f316aa8d53ef22b2c0</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Municipio</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>True</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>663a7dd6e48382c5b12308ff</item>
+                        <item>663a7ca6e48382c5b12308fa</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.estados.obj_id }}</field_id>
+                    <label>Estado</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters>{}</filters>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.estados.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.estados.id }}</catalog_id>
+                        <view_fields>
+                            <item>663a7dd6e48382c5b12308ff</item>
+                            <item>663a7ca6e48382c5b12308fa</item>
+                        </view_fields>
+                        <name>{{ catalog.estados.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663a7dd6e48382c5b12308ff</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Nombre Estado</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters>{}</filters>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.estados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.estados.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663a7ca6e48382c5b12308fa</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Pais</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters>{}</filters>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.estados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.estados.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+            </page_fields>
+            <page_description>None</page_description>
+            <page_name>Página 1</page_name>
+        </item>
+    </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>6672fe5916aa8d53ef22b331</_id>
+    <public>False</public>
+    <catalog_id>120253</catalog_id>
+</lkf>

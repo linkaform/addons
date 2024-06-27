@@ -180,9 +180,9 @@ _start_addons(){
 _build(){
   echo "Environment: " $1
 
-  cd docker
   case $1 in
     base)
+      cd docker
       if [ "$NOCACHE" = "1" ]; then
         docker compose build lkf-addons-base
       else
@@ -193,6 +193,7 @@ _build(){
       fi  
     ;;
     dev)
+      cd docker
       if [ "$NOCACHE" = "1" ]; then
         docker compose build --no-cache lkf-addons
       else
@@ -203,6 +204,7 @@ _build(){
       fi  
     ;;
     local)
+      cd docker
       if [ "$NOCACHE" = "1" ]; then
         docker compose -f docker-prod.yml build --no-cache
       else
@@ -215,6 +217,7 @@ _build(){
       done
     ;;
     prod)
+      cd docker
       if [ "$NOCACHE" != "0" ]; then
         docker compose -f docker-prod.yml build
       else
@@ -222,6 +225,17 @@ _build(){
       fi
       if [ "$UPLOAD" = "1" ]; then
         docker push linkaform/addons:latest
+      fi  
+     ;;
+    test)
+      cd test/docker
+      if [ "$NOCACHE" = "1" ]; then
+        docker compose build lkf-test
+      else
+        docker compose build --no-cache lkf-test
+      fi
+     if [ "$UPLOAD" = "1" ]; then
+        docker push linkaform/lkf_test:develop
       fi  
      ;;
   esac

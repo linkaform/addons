@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.stock_scrapping.id }}</form_id>
+    <id>{{ form.stock_scrapping.obj_id }}</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>gt__number=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>644bf9a04b1761305b080098</field_id>
+                        <group_id>None</group_id>
+                        <id>644bf9a04b1761305b080098</id>
+                        <label>Cuarentin Flats</label>
+                        <type>integer</type>
+                    </field>
+                    <value>0</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6464fdf6580382fa6879875f</field_id>
+                    <group_id>None</group_id>
+                    <id>6464fdf6580382fa6879875f</id>
+                    <label>Cuarentin Reason</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Show Cuarentin Reason</name>
+            <operator>and</operator>
+            <rule_id>b2df751bd71ead</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>gt__number=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>644bf9a04b1761305b080098</field_id>
+                        <group_id>None</group_id>
+                        <id>644bf9a04b1761305b080098</id>
+                        <label>Cuarentin Flats</label>
+                        <type>integer</type>
+                    </field>
+                    <value>0</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6464fdf6580382fa6879875f</field_id>
+                    <group_id>None</group_id>
+                    <id>6464fdf6580382fa6879875f</id>
+                    <label>Cuarentin Reason</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requier Cuarentin Reason</name>
+            <operator>and</operator>
+            <rule_id>ced20c873a1794</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>64d52fd23c48fc6e08d47507</field_id>
+                        <group_id>None</group_id>
+                        <id>64d52fd23c48fc6e08d47507</id>
+                        <label>Tipo de movimiento</label>
+                        <type>radio</type>
+                    </field>
+                    <value>cuarentena</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>644bf9a04b1761305b080098</field_id>
+                    <group_id>None</group_id>
+                    <id>644bf9a04b1761305b080098</id>
+                    <label>Cuarentin Flats</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Cuarentin</name>
+            <operator>and</operator>
+            <rule_id>ff61ce3a071b13</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>64d52fd23c48fc6e08d47507</field_id>
+                        <group_id>None</group_id>
+                        <id>64d52fd23c48fc6e08d47507</id>
+                        <label>Tipo de movimiento</label>
+                        <type>radio</type>
+                    </field>
+                    <value>scrap</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>644bf9a04b1761305b080099</field_id>
+                    <group_id>None</group_id>
+                    <id>644bf9a04b1761305b080099</id>
+                    <label>Scrap Flats</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Scrap</name>
+            <operator>and</operator>
+            <rule_id>aa1668242223b8</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

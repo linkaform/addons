@@ -1658,12 +1658,10 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         form_id = self.FORM_INVENTORY_ID
         product_code, sku, lot_number, warehouse, location = self.get_product_lot_location()
         res = self.get_invtory_record_by_product(form_id, product_code, sku,  lot_number, warehouse, location, **{'get_many':True})
-        print('res', len(res))
         delete_records = []
         if len(res) >= 1:
             res.pop(0)
         for x in res:
-            print('x',x.get('_id'))
             delete_records.append(x['_id'])
         if delete_records:
             print('aqui va a borrar *********************************************')

@@ -40,7 +40,7 @@ class CatalogResource(items.Items):
         if instalable_catalogs.get('install_order'):
             install_order = instalable_catalogs.pop('install_order')
         else:
-            install_order = []  
+            install_order = []
         install_order += [x  for x in instalable_catalogs.keys() if x not in install_order]
         for catalog_name in install_order:
             print('Installing Catalog: ', catalog_name)

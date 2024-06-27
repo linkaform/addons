@@ -217,17 +217,17 @@ def get_modules_2_install(commands):
 def get_items_2_load(commands):
     global ask_4_items
     for idx, c in enumerate(commands):
-        if c == '-r':
+        if c.strip() == '-r':
             download_related = True
     for idx, c in enumerate(commands):
-        if c == '--item' or c == '-i':
+        if c.strip() == '--item' or c.strip() == '-i':
             ask_4_items = False
             return commands[idx+1]
     return False
 
 def get_enviorment_2_load(commands):
     for idx, c in enumerate(commands):
-        if c == '--env' or c == '-e':
+        if c.strip() == '--env' or c.strip() == '-e':
             return commands[idx+1]
     return False
 
@@ -267,6 +267,7 @@ install = {}
 if __name__ == '__main__':
 
     print('commands', commands)
+    item_ids = []
     if not commands or '-h' in commands or '--help' in commands:
         print_help()
     else:
@@ -311,6 +312,8 @@ if __name__ == '__main__':
 
         if '-f' in commands:
             kwargs.update({'force':True})
+        if '-id' in commands:
+            item_ids = commands[(commands.index('-id') + 1 )].split(',')
         if '-y' in commands:
             ask_form = False
             load_form = True
@@ -400,10 +403,17 @@ if __name__ == '__main__':
                 if not load_modules:
                     if load_form:
                         form_id = set_value(input("Form id to download:"))
-                        download_items.update({'forms':{form_id:None}})
+                        if item_ids and preload_item == 'form':
+                            download_items.update({'forms':{item_ids:None}})
+                        else:
+                            download_items.update({'forms':{form_id:None}})
+
                     if load_catalog:
                         catalog_id = set_value_id(input("Catalog id to download:"))
-                        download_items.update({'catalogs':{catalog_id:None}})
+                        if item_ids and preload_item == 'form':
+                            download_items.update({'catalogs':{catalog_id:None}})
+                        else:
+                            download_items.update({'catalogs':{catalog_id:None}})
                     if load_script:
                         script_id = set_value(input("Script id to download:"))
                         download_items.update({'scripts':{script_id:None}})

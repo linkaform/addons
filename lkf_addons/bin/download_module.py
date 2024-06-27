@@ -32,19 +32,19 @@ from settings import *
 
 force_items = {
     "forms":{
-        #119180:None,
-        # 118588:None,
+        #61083:None,
+        #59308:None,
 
         },
     "catalogs":{
-        #119180:None,
-        # 118583:None,
-        # 118585:None,
+        # 120221:None,
+        #108637:None,
+        #59446:None,
         # 118586:None
 
  },
     "scripts":{
-    # 116098:None
+    #116418:None
 
     }
 }
@@ -62,7 +62,6 @@ modules = {'expenses':
 }
 
 modules = {}
-
 
 installed_items = {'catalogs': {},'scripts':{}, 'forms':{}}
 
@@ -91,7 +90,6 @@ def download_modules(modules, options, items_ids={}, download_related=False):
             print('Download Related Forms : ', download_related)
             get_forms(force_items['forms'], download_related=download_related)
         if 'catalogs' in options or 'catalog' in options:
-            print('------------------')
             get_catalogs(force_items['catalogs'], download_related=download_related)
         if 'scripts' in options or 'script' in options:
             get_scripts(force_items['scripts'])
@@ -154,6 +152,7 @@ def get_catalogs(download_catalogs={}, download_related=False):
             catalog_json.pop('fields')
         res = drop_hashKey(catalog_json)
         # print('res=',simplejson.dumps(res, indent=4))  
+        # print('res=',res)  
         catalog_data_xml = json_to_xml(res)
         # print('catalog_data_xml',catalog_data_xml)  
         save_catalog_xml(catalog_data_xml, catalog_name)
