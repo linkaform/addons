@@ -55,6 +55,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
         self.BITACORA_ACCESOS = self.lkm.form_id('bitacora_de_entradas_y_salidas','id')
+        self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
 
         
         self.last_check_in = []
@@ -77,6 +78,13 @@ class Accesos(Employee, Location, base.LKF_Base):
         self.VISITA_AUTORIZADA_CAT = self.lkm.catalog_id('visita_autorizada')
         self.VISITA_AUTORIZADA_CAT_ID = self.VISITA_AUTORIZADA_CAT.get('id')
         self.VISITA_AUTORIZADA_CAT_OBJ_ID = self.VISITA_AUTORIZADA_CAT.get('obj_id')
+        self.PASE_ENTRADA_CAT = self.lkm.catalog_id('pase_de_entrada')
+        self.PASE_ENTRADA_ID = self.PASE_ENTRADA_CAT.get('id')
+        self.PASE_ENTRADA_OBJ_ID = self.PASE_ENTRADA_CAT.get('obj_id')
+
+        self.CONFIG_PERFILES = self.lkm.catalog_id('configuracion_de_perfiles')
+        self.CONFIG_PERFILES_ID = self.CONFIG_PERFILES.get('id')
+        self.CONFIG_PERFILES_OBJ_ID = self.CONFIG_PERFILES.get('obj_id')
         # self.CONF_PERFIL = self.lkm.catalog_id('configuracion_de_perfiles','id')
         # self.CONF_PERFIL_ID = self.CONF_PERFIL.get('id')
         # self.CONF_PERFIL_OBJ_ID = self.CONF_PERFIL.get('obj_id')
@@ -90,15 +98,31 @@ class Accesos(Employee, Location, base.LKF_Base):
         ## Module Fields ##
         ''' self.mf : Estos son los campos que deseas mantener solo dentro de este modulo '''
         mf = {
-            'grupo_visitados': "663d4ba61b14fab90559ebb0",
-            'tipo_visita_pase': "662c304fad7432d296d92581",
-            'fecha_desde_visita': "662c304fad7432d296d92582",
-            'fecha_hasta_visita': "662c304fad7432d296d92583",
             'config_dia_de_acceso': "662c304fad7432d296d92584",
             'config_limitar_acceso': "6635380dc9b3e7db4d59eb49",
             'config_dias_acceso': "662c304fad7432d296d92585",
+            'curp': "5ea0897550b8dfe1f4d83a9f",
+            'email_vsita': "5ea069562f8250acf7d83aca",
+            'empresa':'64ecc95271803179d68ee081',
+            'fecha_desde_visita': "662c304fad7432d296d92582",
+            'fecha_hasta_visita': "662c304fad7432d296d92583",
+            'foto':'5ea35de83ab7dad56c66e045',
+            'guard_group':'663fae53fa005c70de59eb95',
+            'grupo_visitados': "663d4ba61b14fab90559ebb0",
+            'identificacion':'65ce34985fa9df3dbf9dd2d0',
+            'nombre_visita': "5ea0693a0c12d5a8e43d37df",
+            'nombre_perfil': "661dc67e901906b7e9b73bac",
+            'rfc':"64ecc95271803179d68ee081",
+            'status_visita':'5ea1bd280ae8bad095055e61',
+            'telefono':'661ea59c15baf5666f32360e',
+            'tipo_de_guardia': "6684484fa5fd62946c12e006",
+            'tipo_registro': "66358a5e50e5c61267832f90",
+            'tipo_visita_pase': "662c304fad7432d296d92581",
+            'fecha_entrada': "662c51eb194f1cb7a91e5aef",
+
+
         }
-        self.mf =mf
+        self.mf = mf
         ## Form Fields ##
         '''
         self.form_name : En esta seccion podras agrupar todos los campos ya sea por forma o como dease
@@ -125,7 +149,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             'checkin_type': '663bffc28d00553254f274e0',
             'checkin_date':'663bffc28d00553254f274e1',
             'checkout_date':'663bffc28d00553254f274e2',
-            'guard_group':'663fae53fa005c70de59eb95',
+            'guard_group': mf['guard_group'],
             'employee_position':'665f482cc9a2f8acf685c20b',
             'cat_created_by': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'created_by': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
@@ -153,17 +177,18 @@ class Accesos(Employee, Location, base.LKF_Base):
         # self.pase_entrada_fields.update(self.pase_grupo_vehiculos)
         self.pase_entrada_fields.update({
             'ubicacion': f"{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
-            'nombre_visita': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.5ea0693a0c12d5a8e43d37df",
-            'email_vsita': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.5ea069562f8250acf7d83aca",
-            'curp': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.5ea0897550b8dfe1f4d83a9f",
-            'telefono': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.661ea59c15baf5666f32360e",
-            'foto': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.5ea35de83ab7dad56c66e045",
-            'identificacion': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.65ce34985fa9df3dbf9dd2d0",
-            'empresa': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.64ecc95271803179d68ee081",
-            'status_visita': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.5ea1bd280ae8bad095055e61",
-            # 'nombre_perfil': f"{self.PERFIL_ENTRADA_OBJ_ID}.661dc67e901906b7e9b73bac",
+            'nombre_visita': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['nombre_visita']}",
+            'email_vsita': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['email_vsita']}",
+            'curp': self.unlist(f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['curp']}"),
+            'rfc': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['rfc']}",
+            'telefono': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['telefono']}",
+            'foto': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['foto']}",
+            'identificacion': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['identificacion']}",
+            'empresa': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['empresa']}",
+            'status_visita': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['status_visita']}",
+            'nombre_perfil': f"{self.CONFIG_PERFILES_OBJ_ID}.{mf['nombre_perfil']}",
             'grupo_visitados': self.mf['grupo_visitados'],
-            'nombre_perfil': f"{self.mf['grupo_visitados']}{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
+            #'nombre_perfil': f"{self.mf['grupo_visitados']}{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'worker_department': f"{self.mf['grupo_visitados']}{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'worker_position': f"{self.mf['grupo_visitados']}{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
             'tipo_visita_pase': self.mf['tipo_visita_pase'],
@@ -174,6 +199,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             'config_limitar_acceso': self.mf['config_limitar_acceso'],
             'config_dias_acceso': self.mf['config_dias_acceso'],
             })
+
         self.notes_project_fields = {
             'location': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
             'area': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
@@ -184,6 +210,7 @@ class Accesos(Employee, Location, base.LKF_Base):
 
         self.notes_project_fields.update(self.notes_fields)
         
+        self.bitacora_acceos = {}
         
         ## Fields ##
         '''
@@ -208,30 +235,61 @@ class Accesos(Employee, Location, base.LKF_Base):
         _single_leading_underscore: 
         weak “internal use” indicator. E.g. from M import * does not import objects whose names start with an underscore.
     '''
-    def _do_access(self, access_pass):
+    def _do_access(self, access_pass, location, area, vehiculo, equipo):
         '''
         Registra el acceso del pase de entra a ubicacion
         solo puede ser ejecutado despues de revisar los accesos
         '''
-        print('creating reacord')
-        print('creating reacord', access_pass)
-        self.lkf_api.get_metadata(form_id=self.BITACORA_ACCESOS)
+        employee =  self.get_employee_data(email=self.user.get('email'), get_one=True)
+        metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_ACCESOS)
+        metadata.update({
+            'properties': {
+                "device_properties":{
+                    "System": "Script",
+                    "Module": "Accesos",
+                    "Process": "Ingreso de Personal",
+                    "Action": 'Do Access',
+                    "File": "accesos/app.py"
+                }
+            },
+        })
+        # metadata['folio'] = self.create_poruction_lot_number()
+        print('access_pass', access_pass)
+        pse = {
+                f"{self.mf['nombre_visita']}": access_pass['nombre_visita'],
+                f"{self.mf['curp']}":access_pass['curp'],
+                f"{self.mf['nombre_perfil']}": access_pass['nombre_perfil'],
+                f"{self.mf['email_vsita']}":access_pass['email_vsita'],
+                f"{self.mf['foto']}":access_pass['foto'],
+                f"{self.mf['identificacion']}":access_pass['identificacion'],
+                f"{self.mf['empresa']}":access_pass['empresa'],
+                f"{self.mf['status_visita']}":access_pass['status_visita'],
+                }
+        answers = {
+            f"{self.mf['tipo_registro']}": self.get_tipo_registro(access_pass),
+            f"{self.UBICACIONES_CAT_OBJ_ID}":{f"{self.f['location']}":location},
+            f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}":{f"{self.f['area']}":area},
+            f"{self.PASE_ENTRADA_OBJ_ID}":pse,
+            f"{self.mf['fecha_entrada']}":self.today_str(employee.get('timezone', 'America/Monterrey'), date_format='datetime'),
+        }
+        # print('answers', simplejson.dumps(answers, indent=4))
+        metadata.update({'answers':answers})
+        print('answers', simplejson.dumps(metadata, indent=4))
+        response_create = self.lkf_api.post_forms_answers(metadata)
+        print('response_create',response_create)
 
-
-
-    def do_access(self, qr_code, location, area):
+    def do_access(self, qr_code, location, area, vehiculo, equipo):
         '''
         Valida pase de entrada y crea registro de entrada al pase
         '''
         print('me quede ahceidno la vaildacion y el registro de entrada')
-        print('falta agregar a la forma, con que vehiuclo y equipos entra')
         if not qr_code and not location and not area:
             return False
         access_pass = self.search_pass(qr_code)
-        val_location = self.validate_access_pass_location(access_pass)
+        val_location = self.validate_access_pass_location(access_pass, location)
         val_certificados = self.validate_certificados(qr_code, location)
         pass_dates = self.validate_pass_dates(access_pass)
-        res = self._do_access(access_pass)
+        res = self._do_access(access_pass,  location, area, vehiculo, equipo)
 
     def do_checkin(self, location, area, employee_list=[]):
         if not self.is_boot_available(location, area):
@@ -267,6 +325,9 @@ class Accesos(Employee, Location, base.LKF_Base):
                 'answers': checkin
             })
         resp_create = self.lkf_api.post_forms_answers(data)
+        #TODO agregar nombre del Guardia Quien hizo el checkin
+        if resp_create.get('status_code') == 201:
+            resp_create['json'].update({'boot_status':{'guard_on_duty':user_data['name']}})
         return resp_create
 
     def do_checkout(self, checkin_id=None, location=None, area=None, guards=[]):
@@ -331,6 +392,39 @@ class Accesos(Employee, Location, base.LKF_Base):
             checkin.update({self.f['guard_group']:[]})
         return checkin
 
+    def config_get_guards_positions(self):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.PUESTOS_GUARDIAS,
+            }        
+        unwind = {'$unwind': f"$answers.{self.f['guard_group']}"}
+        query = [
+            {'$match': match_query },
+            {'$unwind': f"$answers.{self.f['guard_group']}"},
+            {'$project':{
+                "_id":0,
+                'tipo_de_guardia': f"$answers.{self.f['guard_group']}.{self.mf['tipo_de_guardia']}",
+                'puesto': f"$answers.{self.f['guard_group']}.{self.PUESTOS_OBJ_ID}.{self.f['worker_position']}"
+                }
+            },
+            {'$unwind': f"$tipo_de_guardia"},
+            {'$group':{
+                '_id':{
+                    'tipo_de_guardia':'$tipo_de_guardia'
+                    },
+                'puestos': {'$addToSet':'$puesto'}
+                }
+            },
+            {'$project':{
+                "_id":0,
+                'tipo_de_guardia': '$_id.tipo_de_guardia',
+                'puestos': '$puestos',
+                }
+            },
+            {'$sort': {'tipo_de_guardia':1}}
+            ]
+        return self.format_cr_result(self.cr.aggregate(query))
+
     def get_access_pass(self, qr_code):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -372,6 +466,25 @@ class Accesos(Employee, Location, base.LKF_Base):
             {'$limit':1}
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
+
+    def get_user_last_checkin(self, user_id=False):
+        if not user_id:
+            user_id = self.user.get('user_id')
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.CHECKIN_CASETAS,
+            "created_by_id": user_id
+            }
+        query = [
+            {'$match': match_query },
+            {'$project': self.proyect_format(self.checkin_fields)},
+            {'$sort':{'updated_at':-1}},
+            {'$limit':1}
+            ]
+        return self.format_cr_result(self.cr.aggregate(query), get_one=True)
+
+    def get_tipo_registro(self, access_pass):
+        return 'registrar_entrada'
 
     def is_boot_available(self, location, area):
         self.last_check_in = self.get_last_checkin(location, area)
@@ -425,7 +538,6 @@ class Accesos(Employee, Location, base.LKF_Base):
         print('-------------- search_access_pass')
         complete_qr = {}
         # location = 'Planta Monterrey'
-        qr_code = '66563787d2f0b4fb84768be5'
         # print('match_query', simplejson.dumps(query, indent=4))
         complete_qr['pass'] = {
             'tipo': 'Contratista Tipo XZ',
@@ -472,6 +584,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         return complete_qr
 
     def validate_access_pass_location(self, access_pass, location, ):
+        #TODO
         if access_pass:
             return True
         else:
