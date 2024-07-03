@@ -94,7 +94,7 @@ class Employee(Base, base.LKF_Base):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
 
-    def get_user_boot(self, search_default=True, **kwargs):
+    def get_user_booth(self, search_default=True, **kwargs):
         if kwargs.get('user_id'):
             user_id = kwargs['user_id']
         else:
@@ -135,7 +135,7 @@ class Employee(Base, base.LKF_Base):
             else:
                 user_booths.append(x)
         if not caseta and search_default:
-            caseta, user_booths_tmp = self.get_user_boot(search_default=False)
+            caseta, user_booths_tmp = self.get_user_booth(search_default=False)
         if not search_default and not caseta:
             if user_booths:
                 caseta = user_booths[0]
