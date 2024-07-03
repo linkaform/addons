@@ -15,6 +15,8 @@ bash
 
 # cd ~/lkf/addons
 ~/lkf/addons# ./lkf build base
+~/lkf/addons# ./lkf build dev
+~/lkf/addons# ./lkf build local
 
 ```
 
