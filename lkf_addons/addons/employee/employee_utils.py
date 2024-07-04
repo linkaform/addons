@@ -53,7 +53,7 @@ class Employee(Base, base.LKF_Base):
             'username': '6653f3709c6d89925dc04b2e',
             'email':'6653f3709c6d89925dc04b2f',
             'area_default':'6653f2d49c6d89925dc04b27',
-            'picutre':'663bcbe2274189281359eb70',
+            'picture':'663bcbe2274189281359eb70',
             'rfc':'663bcbe2274189281359eb71',
             'curp':'663bcbe2274189281359eb72',
             'nss':'663bcbe2274189281359eb73',
@@ -187,7 +187,8 @@ class Employee(Base, base.LKF_Base):
                     'employee': f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_name']}",
                     'user_id': {'$first':f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['user_id']}"},
                     'marcada_como': f"$answers.{self.f['areas_group']}.{self.f['area_default']}",
-                    'position': f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_position']}"
+                    'position': f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_position']}",
+                    'picture': f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['picture']}"
                     }
                 }
             ]
