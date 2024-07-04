@@ -26,6 +26,10 @@ class Employee(Base, base.LKF_Base):
         self.TEAM_ID = self.TEAM.get('id')
         self.TEAM_OBJ_ID = self.TEAM.get('obj_id')
 
+        self.PUESTOS = self.lkm.catalog_id('puestos')
+        self.PUESTOS_ID = self.PUESTOS.get('id')
+        self.PUESTOS_OBJ_ID = self.PUESTOS.get('obj_id')
+
         self.CONF_AREA_EMPLEADOS_CAT = self.lkm.catalog_id('configuracion_areas_y_empleados')
         self.CONF_AREA_EMPLEADOS_CAT_ID = self.CONF_AREA_EMPLEADOS_CAT.get('id')
         self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID = self.CONF_AREA_EMPLEADOS_CAT.get('obj_id')
@@ -88,10 +92,9 @@ class Employee(Base, base.LKF_Base):
             {'$project': self.proyect_format(self.employee_fields)},
             {'$sort':{'worker_name':1}},
             ]
-        print('match_query', match_query)
         return self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
 
-    def get_user_boot(self, search_default=True, **kwargs):
+    def get_user_booth(self, search_default=True, **kwargs):
         if kwargs.get('user_id'):
             user_id = kwargs['user_id']
         else:
@@ -123,19 +126,25 @@ class Employee(Base, base.LKF_Base):
             ]
         # print('query=', simplejson.dumps(query, indent=3))
         # print('area=', self.f['area'])
-        res = self.cr.aggregate(query)
+        res = self.format_cr(self.cr.aggregate(query))
         caseta = None
+        user_booths = []
         for x in res:
-            caseta = x
-            if caseta:
-                break
+            if x['marcada_como'] == 'default' and not caseta:
+                caseta = x
+            else:
+                user_booths.append(x)
         if not caseta and search_default:
-            caseta = self.get_user_boot(search_default=False)
-        return caseta
+            caseta, user_booths_tmp = self.get_user_booth(search_default=False)
+        if not search_default and not caseta:
+            if user_booths:
+                caseta = user_booths[0]
+        if not caseta:
+            msg = f'No existe caseta configurada para usuario id: {user_id}'
+            self.LKFException(msg)
+        return caseta, user_booths
 
     def get_users_by_location_area(self, location_name=None, area_name=None, user_id=None, **kwargs):
-        print('location_name', location_name)
-        print('area_name', area_name)
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
@@ -158,6 +167,12 @@ class Employee(Base, base.LKF_Base):
             unwind_query.update({
                 f"answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}": area_name
                 })
+        if kwargs.get('position'):
+            positions = kwargs.get('position')
+            match_query.update({
+                f"answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_position']}":{"$in":positions}
+                })
+            #TODO BUSCAR SOLO LOS DE ESTE PUESTO
         if not unwind_query:
             msg = "You musts specify either Location Name, Area Name or both"
             return self.LKFException(msg)
@@ -171,11 +186,9 @@ class Employee(Base, base.LKF_Base):
                     'location': f"$answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                     'employee': f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_name']}",
                     'user_id': {'$first':f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['user_id']}"},
-                    'marcada_como': f"$answers.{self.f['areas_group']}.{self.f['area_default']}"
+                    'marcada_como': f"$answers.{self.f['areas_group']}.{self.f['area_default']}",
+                    'position': f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_position']}"
                     }
                 }
             ]
-        print('query=', simplejson.dumps(query, indent=4))
-        print('query=', self.cr)
-        res = self.cr.aggregate(query)
-        return [x for x in res]
+        return self.format_cr_result(self.cr.aggregate(query))

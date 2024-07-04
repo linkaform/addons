@@ -601,7 +601,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         print('aqui va a asginmar el folio', self.folio)
         # metadata['folio'] = self.create_poruction_lot_number()
         metadata.update({'answers':new_production})
-        response_create = self.lkf_api.post_forms_answers(metadata, jwt_settings_key='USER_JWT_KEY')
+        response_create = self.lkf_api.post_forms_answers(metadata)
         return response_create
 
     def del_catalog_record(self, record_catalog, form_id):
