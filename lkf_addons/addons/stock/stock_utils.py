@@ -854,6 +854,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 all_sku.append(sku.upper())
         skus = {}
         mango_query = self.product_sku_query(all_sku)
+        print('SKU_ID =',self.SKU_ID)
+        print('mango_query =',mango_query)
         sku_finds = self.lkf_api.search_catalog(self.SKU_ID, mango_query)
         for this_sku in sku_finds:
                 product_code = this_sku.get(self.f['product_code'])
@@ -2221,7 +2223,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             res =  deepcopy(product)
         res[self.SKU_OBJ_ID ][self.f['reicpe_container']] = recipe['sku_package']
         res[self.SKU_OBJ_ID ][self.f['reicpe_per_container']] = recipe['sku_per_package']
-        res[self.SKU_OBJ_ID ][self.f['product_name']] = recipe['product_name']
+        res[self.SKU_OBJ_ID ][self.f['product_name']] = [recipe['product_name'],]
         return res
 
     def set_lot_ready_week(self, lot_ready_week, gradin_totals):
