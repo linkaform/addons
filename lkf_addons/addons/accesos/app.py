@@ -109,12 +109,13 @@ class Accesos(Employee, Location, base.LKF_Base):
             'config_dia_de_acceso': "662c304fad7432d296d92584",
             'config_limitar_acceso': "6635380dc9b3e7db4d59eb49",
             'config_dias_acceso': "662c304fad7432d296d92585",
-            'codigo_user': "6685da34f065523d8d09052b",
+            'codigo_qr':'6685da34f065523d8d09052b',
             'curp': "5ea0897550b8dfe1f4d83a9f",
             'documento': "663e5470424ad55e32832eec",
             'email_vsita': "5ea069562f8250acf7d83aca",
             'empresa':'64ecc95271803179d68ee081',
             'fecha_desde_visita': "662c304fad7432d296d92582",
+            'fecha_entrada': "662c51eb194f1cb7a91e5aef",
             'fecha_hasta_visita': "662c304fad7432d296d92583",
             'foto':'5ea35de83ab7dad56c66e045',
             'gafete':'663e530af52d352956832f72',
@@ -130,7 +131,6 @@ class Accesos(Employee, Location, base.LKF_Base):
             'tipo_registro': "66358a5e50e5c61267832f90",
             'tipo_visita_pase': "662c304fad7432d296d92581",
             'ubicacion': "663e5c57f5b8a7ce8211ed0b",
-            'fecha_entrada': "662c51eb194f1cb7a91e5aef",
 
 
         }
@@ -178,7 +178,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             'ubicacion':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
             'caseta_entrada':f"{self.mf['catalog_caseta']}.{self.mf['caseta']}",
             'gafete':f"{self.mf['gafete']}",
-            'codigo_user':f"{self.mf['codigo_user']}",
+            'codigo_qr':f"{self.mf['codigo_qr']}",
             'documento':f"{self.mf['documento']}",
             'caseta_salida':f"{self.mf['catalog_caseta_salida']}.{self.mf['caseta_salida']}",
             'bitacora_salida':f"{self.mf['bitacora_salida']}",
@@ -280,7 +280,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         })
         # metadata['folio'] = self.create_poruction_lot_number()
         print('access_pass', access_pass)
-        pse = {
+        pase = {
                 f"{self.mf['nombre_visita']}": access_pass['nombre_visita'],
                 f"{self.mf['curp']}":access_pass['curp'],
                 f"{self.mf['nombre_perfil']}": access_pass['nombre_perfil'],
@@ -291,10 +291,11 @@ class Accesos(Employee, Location, base.LKF_Base):
                 f"{self.mf['status_visita']}":access_pass['status_visita'],
                 }
         answers = {
-            f"{self.mf['tipo_registro']}": self.get_tipo_registro(access_pass),
+            f"{self.mf['tipo_registro']}": 'entrada',
             f"{self.UBICACIONES_CAT_OBJ_ID}":{f"{self.f['location']}":location},
             f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}":{f"{self.f['area']}":area},
-            f"{self.PASE_ENTRADA_OBJ_ID}":pse,
+            f"{self.PASE_ENTRADA_OBJ_ID}":pase,
+            f"{self.mf['codigo_qr']}":access_pass['_id'],
             f"{self.mf['fecha_entrada']}":self.today_str(employee.get('timezone', 'America/Monterrey'), date_format='datetime'),
         }
         # print('answers', simplejson.dumps(answers, indent=4))
@@ -311,7 +312,8 @@ class Accesos(Employee, Location, base.LKF_Base):
         if not qr_code and not location and not area:
             return False
         access_pass = self.search_pass(qr_code)
-        val_location = self.validate_access_pass_location(access_pass, location)
+        if self.validate_access_pass_location(qr_code):
+            self.LKFException("En usuario ya se encuentra dentro de una ubicacion")
         val_certificados = self.validate_certificados(qr_code, location)
         pass_dates = self.validate_pass_dates(access_pass)
         res = self._do_access(access_pass,  location, area, vehiculo, equipo)
@@ -422,15 +424,18 @@ class Accesos(Employee, Location, base.LKF_Base):
             Realiza el cambio de estatus de la forma de bitacora, relacionada a la salida, como parametro
             es necesesario enviar el nombre del visitante que es el unico dato qu se encuentra en la forma
         '''
-        last_check_out = self.get_last_checkout_user(qr)
+        response = False
+        last_check_out = self.get_last_user_move(qr)
         if last_check_out.get('folio'):
             folio = last_check_out.get('folio',0)
-            answers = {
-                f"{self.mf['tipo_registro']}":self.get_tipo_registro(flag = False),
-            }
-            response_update = self.lkf_api.patch_multi_record( answers=answers, form_id=self.BITACORA_ACCESOS, folios=[folio], threading=True )
-            return response_update
-        return None;
+            if self.user_in_facility(status_visita=last_check_out.get('status_visita')):
+                answers = {
+                    f"{self.mf['tipo_registro']}":'salida',
+                }
+                response = self.lkf_api.patch_multi_record( answers=answers, form_id=self.BITACORA_ACCESOS, folios=[folio])
+        if not response:
+            self.LKFException("El usuario se encuentra fuera de la ubicacion.")
+        return response            
 
     def config_get_guards_positions(self):
         match_query = {
@@ -523,20 +528,28 @@ class Accesos(Employee, Location, base.LKF_Base):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_last_checkout_user(self, qr):
-
+    def get_last_user_move(self, qr):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ACCESOS,
-            f"answers.{self.bitacora_fields['codigo_user']}":qr,
+            f"answers.{self.bitacora_fields['codigo_qr']}":qr,
         }
         query = [
             {'$match': match_query },
-            {'$project': {'folio':'$folio'}},
+            {'$project': {
+                'updated_at':'$updated_at',
+                'folio':'$folio',
+                'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"
+                }},
             {'$sort':{'updated_at':-1}},
             {'$limit':1}
         ]
-        return self.format_cr_result(self.cr.aggregate(query), get_one=True)
+        res = self.cr.find(
+            match_query, 
+            {'folio':'$folio', 'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"}
+            ).sort('updated_at', -1).limit(1)
+        return self.format_cr_result(res, get_one=True)
+        # return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
     def get_user_last_checkin(self, user_id=False):
         if not user_id:
@@ -554,11 +567,15 @@ class Accesos(Employee, Location, base.LKF_Base):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_tipo_registro(self, access_pass = '', flag = True):
-        if flag:
-            return 'entrada'
+    def user_in_facility(self, status_visita):
+        """
+        Si envias un registro con entrada quiere regresa Verdadero, si 
+        """
+        print('status_visita=',status_visita)
+        if status_visita in ('entrada'):
+            return True
         else:
-            return 'salida'
+            return False
 
     def is_boot_available(self, location, area):
         self.last_check_in = self.get_last_checkin(location, area)
@@ -656,12 +673,13 @@ class Accesos(Employee, Location, base.LKF_Base):
 
         return complete_qr
 
-    def validate_access_pass_location(self, access_pass, location, ):
+    def validate_access_pass_location(self, qr_code):
         #TODO
-        if access_pass:
+        last_move = self.get_last_user_move(qr_code)
+        print('last_move', last_move)
+        if self.user_in_facility(last_move['status_visita']):
             return True
-        else:
-            return False
+        return False
 
     def validate_certificados(self, qr_code, location):
         return True
