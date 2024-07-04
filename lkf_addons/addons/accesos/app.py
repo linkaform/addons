@@ -98,15 +98,26 @@ class Accesos(Employee, Location, base.LKF_Base):
         ## Module Fields ##
         ''' self.mf : Estos son los campos que deseas mantener solo dentro de este modulo '''
         mf = {
+            'bitacora_salida':'662c51eb194f1cb7a91e5af0',
+            'bitacora_entrada':'662c51eb194f1cb7a91e5aef',
+            'catalog_caseta':'66566d60d4619218b880cf04',
+            'catalog_caseta_salida':'66566d60464fe63529d1c543',
+            'catalog_ubicacion':'664fc5d9860deae4c20954e2',
+            'catalog_visita':'664fc6f5d6078682a4dd0ab3',
+            'caseta':'663e5d44f5b8a7ce8211ed0f',
+            'caseta_salida':'663fb45992f2c5afcfe97ca8',
             'config_dia_de_acceso': "662c304fad7432d296d92584",
             'config_limitar_acceso': "6635380dc9b3e7db4d59eb49",
             'config_dias_acceso': "662c304fad7432d296d92585",
+            'codigo_user': "6685da34f065523d8d09052b",
             'curp': "5ea0897550b8dfe1f4d83a9f",
+            'documento': "663e5470424ad55e32832eec",
             'email_vsita': "5ea069562f8250acf7d83aca",
             'empresa':'64ecc95271803179d68ee081',
             'fecha_desde_visita': "662c304fad7432d296d92582",
             'fecha_hasta_visita': "662c304fad7432d296d92583",
             'foto':'5ea35de83ab7dad56c66e045',
+            'gafete':'663e530af52d352956832f72',
             'guard_group':'663fae53fa005c70de59eb95',
             'grupo_visitados': "663d4ba61b14fab90559ebb0",
             'identificacion':'65ce34985fa9df3dbf9dd2d0',
@@ -118,6 +129,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             'tipo_de_guardia': "6684484fa5fd62946c12e006",
             'tipo_registro': "66358a5e50e5c61267832f90",
             'tipo_visita_pase': "662c304fad7432d296d92581",
+            'ubicacion': "663e5c57f5b8a7ce8211ed0b",
             'fecha_entrada': "662c51eb194f1cb7a91e5aef",
 
 
@@ -158,7 +170,20 @@ class Accesos(Employee, Location, base.LKF_Base):
             'cat_area': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['area']}",
             'cat_employee_b': f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
         }
-
+        #- Para salida de bitacora y lista
+        self.bitacora_fields = {
+            'nombre_visita':f"{self.mf['catalog_visita']}.{self.mf['nombre_visita']}",
+            'perfil_visita':f"{self.mf['catalog_visita']}.{self.mf['nombre_perfil']}",
+            'status_visita':f"{self.mf['tipo_registro']}",
+            'ubicacion':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
+            'caseta_entrada':f"{self.mf['catalog_caseta']}.{self.mf['caseta']}",
+            'gafete':f"{self.mf['gafete']}",
+            'codigo_user':f"{self.mf['codigo_user']}",
+            'documento':f"{self.mf['documento']}",
+            'caseta_salida':f"{self.mf['catalog_caseta_salida']}.{self.mf['caseta_salida']}",
+            'bitacora_salida':f"{self.mf['bitacora_salida']}",
+            'bitacora_entrada':f"{self.mf['bitacora_entrada']}",
+        }
         self.pase_entrada_fields = {}
         self.pase_grupo_visitados:{
             'nombre_perfil':     f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
@@ -392,6 +417,21 @@ class Accesos(Employee, Location, base.LKF_Base):
             checkin.update({self.f['guard_group']:[]})
         return checkin
 
+    def do_out(self, qr):
+        '''
+            Realiza el cambio de estatus de la forma de bitacora, relacionada a la salida, como parametro
+            es necesesario enviar el nombre del visitante que es el unico dato qu se encuentra en la forma
+        '''
+        last_check_out = self.get_last_checkout_user(qr)
+        if last_check_out.get('folio'):
+            folio = last_check_out.get('folio',0)
+            answers = {
+                f"{self.mf['tipo_registro']}":self.get_tipo_registro(flag = False),
+            }
+            response_update = self.lkf_api.patch_multi_record( answers=answers, form_id=self.BITACORA_ACCESOS, folios=[folio], threading=True )
+            return response_update
+        return None;
+
     def config_get_guards_positions(self):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -424,6 +464,22 @@ class Accesos(Employee, Location, base.LKF_Base):
             {'$sort': {'tipo_de_guardia':1}}
             ]
         return self.format_cr_result(self.cr.aggregate(query))
+
+    def get_list_bitacora(self, location, area):
+        response = []
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.BITACORA_ACCESOS,
+            f"answers.{self.bitacora_fields['ubicacion']}":location,
+            f"answers.{self.bitacora_fields['caseta_entrada']}":area,
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': self.proyect_format(self.bitacora_fields)},
+            {'$sort':{'folio':-1}},
+        ]
+        response.append(self.format_cr_result(self.cr.aggregate(query), get_one=True))
+        return response
 
     def get_access_pass(self, qr_code):
         match_query = {
@@ -467,6 +523,21 @@ class Accesos(Employee, Location, base.LKF_Base):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
+    def get_last_checkout_user(self, qr):
+
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.BITACORA_ACCESOS,
+            f"answers.{self.bitacora_fields['codigo_user']}":qr,
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': {'folio':'$folio'}},
+            {'$sort':{'updated_at':-1}},
+            {'$limit':1}
+        ]
+        return self.format_cr_result(self.cr.aggregate(query), get_one=True)
+
     def get_user_last_checkin(self, user_id=False):
         if not user_id:
             user_id = self.user.get('user_id')
@@ -483,12 +554,14 @@ class Accesos(Employee, Location, base.LKF_Base):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_tipo_registro(self, access_pass):
-        return 'registrar_entrada'
+    def get_tipo_registro(self, access_pass = '', flag = True):
+        if flag:
+            return 'entrada'
+        else:
+            return 'salida'
 
     def is_boot_available(self, location, area):
         self.last_check_in = self.get_last_checkin(location, area)
-        print('last_check_in', self.last_check_in)
         last_status = self.last_check_in.get('checkin_type')
         if last_status == 'entrada':
             return False
