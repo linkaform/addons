@@ -102,6 +102,8 @@ class Accesos(Employee, Location, base.LKF_Base):
             'bitacora_entrada':'662c51eb194f1cb7a91e5aef',
             'catalog_caseta':'66566d60d4619218b880cf04',
             'catalog_caseta_salida':'66566d60464fe63529d1c543',
+            'catalog_guard':'664fc645276795e17ea76dc4',
+            'catalog_guard_close':'664fc64242c59486fadd0a27',
             'catalog_ubicacion':'664fc5d9860deae4c20954e2',
             'catalog_visita':'664fc6f5d6078682a4dd0ab3',
             'caseta':'663e5d44f5b8a7ce8211ed0f',
@@ -117,13 +119,17 @@ class Accesos(Employee, Location, base.LKF_Base):
             'fecha_desde_visita': "662c304fad7432d296d92582",
             'fecha_entrada': "662c51eb194f1cb7a91e5aef",
             'fecha_hasta_visita': "662c304fad7432d296d92583",
+            'field_note':'6647fadc96f80017ac388648',
             'foto':'5ea35de83ab7dad56c66e045',
             'gafete':'663e530af52d352956832f72',
             'guard_group':'663fae53fa005c70de59eb95',
             'grupo_visitados': "663d4ba61b14fab90559ebb0",
             'identificacion':'65ce34985fa9df3dbf9dd2d0',
+            'nota': "6647fadc96f80017ac388647",
+            'nombre_guardia': "62c5ff407febce07043024dd",
             'nombre_visita': "5ea0693a0c12d5a8e43d37df",
             'nombre_perfil': "661dc67e901906b7e9b73bac",
+            'nombre_guardia_apoyo': "663bd36eb19b7fb7d9e97ccb",
             'rfc':"64ecc95271803179d68ee081",
             'status_visita':'5ea1bd280ae8bad095055e61',
             'telefono':'661ea59c15baf5666f32360e',
@@ -145,14 +151,19 @@ class Accesos(Employee, Location, base.LKF_Base):
         Estos campos podras agregarlos asi directo a self.f , donde se agurpan todos los fields de los modulos heredados
 
         '''
-
+        #- Para creación , edición y lista de notas
         self.notes_fields = {
             'note_status':'6647f9eb6eefdb1840684dc1',
             'note_open_date':'6647fadc96f80017ac388646',
             'note_close_date':'6647fadc96f80017ac38864a',
+            'note_catalog_booth':f"{self.mf['catalog_caseta']}",
+            'note_booth':f"{self.mf['caseta']}",
+            'note_catalog_guard':f"{self.mf['catalog_guard']}",
+            'note_guard':f"{self.mf['nombre_guardia']}",
+            'note_catalog_guard_close':f"{self.mf['catalog_guard_close']}",
+            'note_guard_close':f"{self.mf['nombre_guardia_apoyo']}",
             'note':'6647fadc96f80017ac388647',
             'note_file':'6647fadc96f80017ac388648',
-            'note_pic':'6647fadc96f80017ac388649',
             'note_pic':'6647fadc96f80017ac388649',
             'note_comments_group':'6647fb1874c1a87eb02a9037',
             'note_comments':'6647fb38da07bf430e273ea2',
@@ -478,11 +489,45 @@ class Accesos(Employee, Location, base.LKF_Base):
             f"answers.{self.bitacora_fields['ubicacion']}":location,
             f"answers.{self.bitacora_fields['caseta_entrada']}":area,
         }
+
+
+
         query = [
             {'$match': match_query },
             {'$project': self.proyect_format(self.bitacora_fields)},
             {'$sort':{'folio':-1}},
         ]
+        response.append(self.format_cr_result(self.cr.aggregate(query), get_one=True))
+        return response
+
+    def get_list_notes(self, area):
+        '''
+        Función para crear nota, psandole los datos de area para filtrar las notas de la caseta
+
+        '''
+        response = []
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.ACCESOS_NOTAS,
+            f"answers.{self.notes_fields['note_catalog_booth']}.{self.notes_fields['note_booth']}":area,
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                "note_status": f"$answers.{self.notes_fields['note_status']}",
+                "note_open_date": f"$answers.{self.notes_fields['note_open_date']}",
+                "note_close_date": f"$answers.{self.notes_fields['note_close_date']}",
+                "note_booth": f"$answers.{self.notes_fields['note_catalog_booth']}.{self.notes_fields['note_booth']}",
+                "note_guard": f"$answers.{self.notes_fields['note_catalog_guard']}.{self.notes_fields['note_guard']}",
+                "note_guard_close": f"$answers.{self.notes_fields['note_catalog_guard_close']}.{self.notes_fields['note_guard_close']}",
+                "note": f"$answers.{self.notes_fields['note']}",
+                "note_file": f"$answers.{self.notes_fields['note_file']}",
+                "note_pic": f"$answers.{self.notes_fields['note_pic']}",
+                "note_comments_group": f"$answers.{self.notes_fields['note_comments_group']}",
+            }},
+            {'$sort':{'folio':-1}},
+        ]
+        #print('answers', simplejson.dumps(query, indent=4))
         response.append(self.format_cr_result(self.cr.aggregate(query), get_one=True))
         return response
 
@@ -493,6 +538,48 @@ class Accesos(Employee, Location, base.LKF_Base):
             }
         if _id:
             match_query.update({"_id":ObjectId(_id)})
+
+    def get_access_notes(self, location_name, area_name):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.ACCESOS_NOTAS,
+            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location_name,
+            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}":area_name
+            }
+        query = [
+            {'$match': match_query },
+            {'$project': self.proyect_format(self.notes_project_fields)},
+            {'$sort':{self.f['note_open_date']:1}}
+            ]
+        return self.format_cr_result(self.cr.aggregate(query))
+
+    def get_booth_status(self, booth_area, location):
+        last_chekin = self.get_last_checkin(location, booth_area)
+        booth_status = {
+            "status":'Disponible',
+            "guard_on_dutty":'',
+            "user_id":'',
+            "stated_at":'',
+            }
+        if last_chekin.get('checkin_type') == 'entrada':
+            #todo
+            #user_id 
+            booth_status['status'] = 'No Disponible'
+            booth_status['guard_on_dutty'] = last_chekin.get('employee') 
+            booth_status['stated_at'] = last_chekin.get('checkin_date')
+            booth_status['checkin_id'] = last_chekin['_id']
+
+        return booth_status
+
+    def get_booth_stats(self, booth_area, location):
+        res ={
+                "in_invitees":11,
+                "articulos_concesionados":12,
+                "incidentes_pendites": 13,
+                "vehiculos_estacionados": 14,
+                "gefetes_pendientes": 15,
+            }
+        return res
 
     def get_checkin_by_id(self, _id=None, folio=None):
         if not _id or not folio:
@@ -551,6 +638,15 @@ class Accesos(Employee, Location, base.LKF_Base):
         return self.format_cr_result(res, get_one=True)
         # return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
+    def get_user_booths_availability(self):
+        default_booth , user_booths = self.get_user_booth(search_default=False)
+        for booth in user_booths:
+            booth_area = booth.get('area')
+            location = booth.get('location')
+            booth_status = self.get_booth_status(booth_area, location)
+            booth['status'] = booth_status.get('status', 'Disponible')
+        return user_booths
+
     def get_user_last_checkin(self, user_id=False):
         if not user_id:
             user_id = self.user.get('user_id')
@@ -566,6 +662,12 @@ class Accesos(Employee, Location, base.LKF_Base):
             {'$limit':1}
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
+
+    def get_user_guards(self, location_employees):
+        for employee in location_employees:
+            if employee.get('user_id',0) == self.user.get('user_id'):
+                    return employee
+        self.LKFException(f"El usuario con id {self.user['user_id']}, no se ecuentra configurado como guardia")
 
     def user_in_facility(self, status_visita):
         """
@@ -597,6 +699,76 @@ class Accesos(Employee, Location, base.LKF_Base):
                     for guard in employee_list ]
         return checkin
 
+    def set_create_note(self, data_notes):
+        '''
+        '''
+        #---Define Metadata
+        metadata = self.lkf_api.get_metadata(form_id=self.ACCESOS_NOTAS)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Script",
+                    "Module": "Accesos",
+                    "Process": "Ingreso de Personal",
+                    "Action": "Do Access",
+                    "File": "accesos/app.py"
+                }
+            },
+        })
+        #---COmments
+        list_comments = []
+        for element in data_notes.get('list_comments',[]):
+            list_comments.append({f"{self.notes_fields['note_comments']}": element})
+        #---Define Answers
+        answers = {
+            f"{self.notes_fields['note_status']}": data_notes['note_status'],
+            f"{self.notes_fields['note_open_date']}":data_notes['note_open_date'],
+            #f"{self.notes_fields['note_close_date']}": data_notes['note_close_date'],
+            f"{self.notes_fields['note']}":data_notes['note'],
+            f"{self.notes_fields['note_catalog_booth']}":{ f"{self.notes_fields['note_booth']}":data_notes['note_booth']},
+            f"{self.notes_fields['note_catalog_guard']}":{ f"{self.notes_fields['note_guard']}":data_notes['note_guard']},
+            #f"{self.notes_fields['note_guard_close']}":data_notes['note_guard_close'],
+            f"{self.notes_fields['note_pic']}":data_notes['photos'],
+            f"{self.notes_fields['note_file']}":[],
+            f"{self.notes_fields['note_comments_group']}":list_comments,
+        }
+        metadata.update({'answers':answers})
+        print('answers', simplejson.dumps(metadata, indent=4))
+        return self.lkf_api.post_forms_answers(metadata)
+        print('response_create',response_create)
+
+    def set_delete_notes(self, folio):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.ACCESOS_NOTAS,
+            f"folio":folio,
+        }
+        res = self.cr.find(match_query, {'_id':0,}).limit(1)
+        response = self.format_cr_result(res, get_one=True)
+        if response.get('voucher_id'):
+            id_record = response.get('voucher_id')
+            return self.lkf_api.patch_record_list({
+                "deleted_objects": ["/api/infosync/form_answer/"+str(id_record)+"/"],
+            })
+        else:
+            self.LKFException('No se encontro el folio correspondiente')
+
+    def set_update_notes(self, data_notes, folio):
+        '''
+            Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
+        '''
+        answers = {}
+        for key, value in data_notes.items():
+            if key == 'list_comments':
+                answers.update({-1:{f"{self.notes_fields[key]}": value}})
+            else:
+                answers.update({f"{self.notes_fields[key]}":value})
+
+        if answers or folio:
+            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.ACCESOS_NOTAS, folios=[folio])
+        else:
+            self.LKFException('No se mandarón parametros para actualizar')
+        
     def search_pass(self, qr_code=None, location=None):
         if not qr_code and not location:
             msg = "Debes de proveer qr_code o location"
@@ -672,6 +844,56 @@ class Accesos(Employee, Location, base.LKF_Base):
 
 
         return complete_qr
+
+    def get_shift_data(self, search_default=True):
+        """
+        Obtiene informacion del turno del usuario logeado
+        """
+        load_shift_json = { }
+        username = self.user.get('username')
+        user_id = self.user.get('user_id')
+        default_booth , user_booths = self.get_user_booth(search_default=False)
+        location = default_booth.get('location')
+        if not default_booth:
+            return self.LKFException({"status_code":400, "msg":'No booth found or configure for user'})
+        booth_area = default_booth['area']
+        booth_location = default_booth['location']
+        booth_addres = self.get_area_address(booth_location, booth_area)
+        guards_positions = self.config_get_guards_positions()
+        location_employees = {}
+        for guard_type in guards_positions:
+            puesto = guard_type['tipo_de_guardia']
+            location_employees[puesto] = location_employees.get(puesto,
+                self.get_users_by_location_area(booth_location, booth_area, **{'position': guard_type['puestos']})
+                )
+            if guard_type['tipo_de_guardia'] == 'guardia_de_apoyo':
+                support_positions = guard_type['puestos']
+        guard = self.get_user_guards(location_employees['guardia'])
+        notes = self.get_access_notes(booth_location, booth_area)
+        load_shift_json["location"] = {
+            "name":  booth_location,
+            "area": booth_area,
+            "city": booth_addres.get('city'),
+            "state": booth_addres.get('state'),
+            "address": booth_addres.get('address'),
+            }
+        load_shift_json["booth_stats"] = self.get_booth_stats( booth_area, location)
+        load_shift_json["booth_status"] = self.get_booth_status(booth_area, location)
+        load_shift_json["support_guards"] = location_employees['guardia_de_apoyo']
+        load_shift_json["guard"] = self.update_guard_status(guard)
+        load_shift_json["notes"] = notes
+        load_shift_json["user_booths"] = user_booths
+        return load_shift_json
+
+    def update_guard_status(self, guard):
+        last_checkin = self.get_user_last_checkin(guard['user_id'])
+        status_turn = 'Turno Cerrado'
+        if last_checkin.get('checkin_type') == 'entrada':
+            status_turn = 'Turno Abierto'
+
+        guard['turn_start_datetime'] =  last_checkin.get('checkin_date','')
+        guard['status_turn'] =  status_turn
+        return guard
 
     def validate_access_pass_location(self, qr_code):
         #TODO
