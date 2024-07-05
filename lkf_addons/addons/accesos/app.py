@@ -55,6 +55,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
         self.BITACORA_ACCESOS = self.lkm.form_id('bitacora_de_entradas_y_salidas','id')
+        self.BITACORA_INCIDENCIAS = self.lkm.form_id('bitacora_de_incidencias','id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
 
         
@@ -98,27 +99,45 @@ class Accesos(Employee, Location, base.LKF_Base):
         ## Module Fields ##
         ''' self.mf : Estos son los campos que deseas mantener solo dentro de este modulo '''
         mf = {
+            'bitacora_salida':'662c51eb194f1cb7a91e5af0',
+            'bitacora_entrada':'662c51eb194f1cb7a91e5aef',
+            'catalog_caseta':'66566d60d4619218b880cf04',
+            'catalog_caseta_salida':'66566d60464fe63529d1c543',
+            'catalog_guard':'664fc645276795e17ea76dc4',
+            'catalog_guard_close':'664fc64242c59486fadd0a27',
+            'catalog_ubicacion':'664fc5d9860deae4c20954e2',
+            'catalog_visita':'664fc6f5d6078682a4dd0ab3',
+            'caseta':'663e5d44f5b8a7ce8211ed0f',
+            'caseta_salida':'663fb45992f2c5afcfe97ca8',
             'config_dia_de_acceso': "662c304fad7432d296d92584",
             'config_limitar_acceso': "6635380dc9b3e7db4d59eb49",
             'config_dias_acceso': "662c304fad7432d296d92585",
+            'codigo_qr':'6685da34f065523d8d09052b',
             'curp': "5ea0897550b8dfe1f4d83a9f",
+            'documento': "663e5470424ad55e32832eec",
             'email_vsita': "5ea069562f8250acf7d83aca",
             'empresa':'64ecc95271803179d68ee081',
             'fecha_desde_visita': "662c304fad7432d296d92582",
+            'fecha_entrada': "662c51eb194f1cb7a91e5aef",
             'fecha_hasta_visita': "662c304fad7432d296d92583",
+            'field_note':'6647fadc96f80017ac388648',
             'foto':'5ea35de83ab7dad56c66e045',
+            'gafete':'663e530af52d352956832f72',
             'guard_group':'663fae53fa005c70de59eb95',
             'grupo_visitados': "663d4ba61b14fab90559ebb0",
             'identificacion':'65ce34985fa9df3dbf9dd2d0',
+            'nota': "6647fadc96f80017ac388647",
+            'nombre_guardia': "62c5ff407febce07043024dd",
             'nombre_visita': "5ea0693a0c12d5a8e43d37df",
             'nombre_perfil': "661dc67e901906b7e9b73bac",
+            'nombre_guardia_apoyo': "663bd36eb19b7fb7d9e97ccb",
             'rfc':"64ecc95271803179d68ee081",
             'status_visita':'5ea1bd280ae8bad095055e61',
             'telefono':'661ea59c15baf5666f32360e',
             'tipo_de_guardia': "6684484fa5fd62946c12e006",
             'tipo_registro': "66358a5e50e5c61267832f90",
             'tipo_visita_pase': "662c304fad7432d296d92581",
-            'fecha_entrada': "662c51eb194f1cb7a91e5aef",
+            'ubicacion': "663e5c57f5b8a7ce8211ed0b",
 
 
         }
@@ -134,16 +153,20 @@ class Accesos(Employee, Location, base.LKF_Base):
 
         '''
 
-        self.notes_fields = {
-            'note_status':'6647f9eb6eefdb1840684dc1',
-            'note_open_date':'6647fadc96f80017ac388646',
-            'note_close_date':'6647fadc96f80017ac38864a',
-            'note':'6647fadc96f80017ac388647',
-            'note_file':'6647fadc96f80017ac388648',
-            'note_pic':'6647fadc96f80017ac388649',
-            'note_pic':'6647fadc96f80017ac388649',
-            'note_comments_group':'6647fb1874c1a87eb02a9037',
-            'note_comments':'6647fb38da07bf430e273ea2',
+       
+        #- Para salida de bitacora y lista
+        self.bitacora_fields = {
+            'nombre_visita':f"{self.mf['catalog_visita']}.{self.mf['nombre_visita']}",
+            'perfil_visita':f"{self.mf['catalog_visita']}.{self.mf['nombre_perfil']}",
+            'status_visita':f"{self.mf['tipo_registro']}",
+            'ubicacion':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
+            'caseta_entrada':f"{self.mf['catalog_caseta']}.{self.mf['caseta']}",
+            'gafete':f"{self.mf['gafete']}",
+            'codigo_qr':f"{self.mf['codigo_qr']}",
+            'documento':f"{self.mf['documento']}",
+            'caseta_salida':f"{self.mf['catalog_caseta_salida']}.{self.mf['caseta_salida']}",
+            'bitacora_salida':f"{self.mf['bitacora_salida']}",
+            'bitacora_entrada':f"{self.mf['bitacora_entrada']}",
         }
         self.checkin_fields = {
             'checkin_type': '663bffc28d00553254f274e0',
@@ -158,7 +181,37 @@ class Accesos(Employee, Location, base.LKF_Base):
             'cat_area': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['area']}",
             'cat_employee_b': f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
         }
-
+        #- Para creación , edición y lista de incidencias
+        self.incidence_fields = {
+            'date_incidence':'66396efeb37283c921e97cdf',
+            'catalog_incidence':'664fc6c7276795e17ea76dc9',
+            'incidence':'663973809fa65cafa759eb97',
+            'comments':'66397586aa8bbc0371e97c80',
+        }
+        #- Para creación , edición y lista de notas
+        self.notes_fields = {
+            'note_status':'6647f9eb6eefdb1840684dc1',
+            'note_open_date':'6647fadc96f80017ac388646',
+            'note_close_date':'6647fadc96f80017ac38864a',
+            'note_catalog_booth':f"{self.mf['catalog_caseta']}",
+            'note_booth':f"{self.mf['caseta']}",
+            'note_catalog_guard':f"{self.mf['catalog_guard']}",
+            'note_guard':f"{self.mf['nombre_guardia']}",
+            'note_catalog_guard_close':f"{self.mf['catalog_guard_close']}",
+            'note_guard_close':f"{self.mf['nombre_guardia_apoyo']}",
+            'note':'6647fadc96f80017ac388647',
+            'note_file':'6647fadc96f80017ac388648',
+            'note_pic':'6647fadc96f80017ac388649',
+            'note_comments_group':'6647fb1874c1a87eb02a9037',
+            'note_comments':'6647fb38da07bf430e273ea2',
+        }
+        self.notes_project_fields = {
+            'location': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+            'area': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
+            'created_by': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
+            'closed_by': f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
+            'support_guard':f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
+        }
         self.pase_entrada_fields = {}
         self.pase_grupo_visitados:{
             'nombre_perfil':     f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
@@ -198,20 +251,10 @@ class Accesos(Employee, Location, base.LKF_Base):
             'config_dia_de_acceso': self.mf['config_dia_de_acceso'],
             'config_limitar_acceso': self.mf['config_limitar_acceso'],
             'config_dias_acceso': self.mf['config_dias_acceso'],
-            })
-
-        self.notes_project_fields = {
-            'location': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
-            'area': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
-            'created_by': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
-            'closed_by': f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
-            'support_guard':f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
-        }
+        })
 
         self.notes_project_fields.update(self.notes_fields)
-        
         self.bitacora_acceos = {}
-        
         ## Fields ##
         '''
         self.f : En esta vairable "fields", se almacenan todos los campos de todos lo modulos heredados.
@@ -235,6 +278,94 @@ class Accesos(Employee, Location, base.LKF_Base):
         _single_leading_underscore: 
         weak “internal use” indicator. E.g. from M import * does not import objects whose names start with an underscore.
     '''
+    def create_incidence(self, data_incidences):
+        #---Define Metadata
+        metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_INCIDENCIAS)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Script",
+                    "Module": "Accesos",
+                    "Process": "Creación de incidencias",
+                    "Action": "create_incidence",
+                    "File": "accesos/app.py"
+                }
+            },
+        })
+        #---Define Answers
+        answers = {}
+        for key, value in data_incidences.items():
+            if  key == 'ubicacion_incidence':
+                dic_prev = answers.get(self.mf['catalog_caseta'],{})
+                dic_prev[self.mf['ubicacion']] = value 
+                answers[self.mf['catalog_caseta']] = dic_prev
+            elif  key == 'area_incidence':
+                dic_prev = answers.get(self.mf['catalog_caseta'],{})
+                dic_prev[self.mf['caseta']] = value 
+                answers[self.mf['catalog_caseta']] = dic_prev
+            elif  key == 'note_guard':
+                answers[self.mf['catalog_guard']] = {self.mf['nombre_guardia']:value}
+            elif  key == 'incidence':
+                answers[self.incidence_fields['catalog_incidence']] = {self.incidence_fields['incidence']:value}
+            else:
+                answers.update({f"{self.incidence_fields[key]}":value})
+        metadata.update({'answers':answers})
+        return self.lkf_api.post_forms_answers(metadata)
+
+    def create_note(self, data_notes):
+        '''
+        '''
+        #---Define Metadata
+        metadata = self.lkf_api.get_metadata(form_id=self.ACCESOS_NOTAS)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Script",
+                    "Module": "Accesos",
+                    "Process": "Creación de notas",
+                    "Action": "Create Note",
+                    "File": "accesos/app.py"
+                }
+            },
+        })
+        #---Define Answers
+        answers = {}
+        for key, value in data_notes.items():
+            if key == 'note_comments':
+                answers[self.notes_fields['note_comments_group']] = answers.get(self.notes_fields['note_comments_group'],[])
+                for comment in value:
+                    answers[self.notes_fields['note_comments_group']].append({self.notes_fields['note_comments']:comment})
+            elif  key == 'note_booth':
+                answers[self.notes_fields['note_catalog_booth']] = {self.notes_fields['note_booth']:value}
+            elif  key == 'note_guard':
+                answers[self.notes_fields['note_catalog_guard']] = {self.notes_fields['note_guard']:value}
+            else:
+                answers.update({f"{self.notes_fields[key]}":value})
+
+        metadata.update({'answers':answers})
+        #print('answers', simplejson.dumps(metadata, indent=4))
+        return self.lkf_api.post_forms_answers(metadata)
+        #print('response_create',response_create)
+
+    def delete_notes(self, folio):
+        response = self.get_record_by_folio(folio, self.ACCESOS_NOTAS, select_columns={'_id':1,})
+        if response.get('_id'):
+            return self.lkf_api.patch_record_list({
+                "deleted_objects": ["/api/infosync/form_answer/"+str(response['_id'])+"/"],
+            })
+        else:
+            self.LKFException('No se encontro el folio correspondiente')
+
+
+    def delete_incidence(self, folio):
+        response = self.get_record_by_folio(folio, self.BITACORA_INCIDENCIAS, select_columns={'_id':1,})
+        if response.get('_id'):
+            return self.lkf_api.patch_record_list({
+                "deleted_objects": ["/api/infosync/form_answer/"+str(response['_id'])+"/"],
+            })
+        else:
+            self.LKFException('No se encontro el folio correspondiente')
+
     def _do_access(self, access_pass, location, area, vehiculo, equipo):
         '''
         Registra el acceso del pase de entra a ubicacion
@@ -255,7 +386,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         })
         # metadata['folio'] = self.create_poruction_lot_number()
         print('access_pass', access_pass)
-        pse = {
+        pase = {
                 f"{self.mf['nombre_visita']}": access_pass['nombre_visita'],
                 f"{self.mf['curp']}":access_pass['curp'],
                 f"{self.mf['nombre_perfil']}": access_pass['nombre_perfil'],
@@ -266,10 +397,11 @@ class Accesos(Employee, Location, base.LKF_Base):
                 f"{self.mf['status_visita']}":access_pass['status_visita'],
                 }
         answers = {
-            f"{self.mf['tipo_registro']}": self.get_tipo_registro(access_pass),
+            f"{self.mf['tipo_registro']}": 'entrada',
             f"{self.UBICACIONES_CAT_OBJ_ID}":{f"{self.f['location']}":location},
             f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}":{f"{self.f['area']}":area},
-            f"{self.PASE_ENTRADA_OBJ_ID}":pse,
+            f"{self.PASE_ENTRADA_OBJ_ID}":pase,
+            f"{self.mf['codigo_qr']}":access_pass['_id'],
             f"{self.mf['fecha_entrada']}":self.today_str(employee.get('timezone', 'America/Monterrey'), date_format='datetime'),
         }
         # print('answers', simplejson.dumps(answers, indent=4))
@@ -286,7 +418,8 @@ class Accesos(Employee, Location, base.LKF_Base):
         if not qr_code and not location and not area:
             return False
         access_pass = self.search_pass(qr_code)
-        val_location = self.validate_access_pass_location(access_pass, location)
+        if self.validate_access_pass_location(qr_code):
+            self.LKFException("En usuario ya se encuentra dentro de una ubicacion")
         val_certificados = self.validate_certificados(qr_code, location)
         pass_dates = self.validate_pass_dates(access_pass)
         res = self._do_access(access_pass,  location, area, vehiculo, equipo)
@@ -312,7 +445,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         timezone = employee.get('cat_timezone')
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         checkin = self.checkin_data(employee, location, area, 'in', timezone)
-        checkin = self.set_checkout_employees(checkin=checkin, employee_list=employee_list, replace=True)
+        checkin = self.checkout_employees(checkin=checkin, employee_list=employee_list, replace=True)
         data.update({
                 'properties': {
                     "device_properties":{
@@ -348,7 +481,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         timezone = employee.get('cat_timezone')
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         checkin = self.checkin_data(employee, location, area, 'out', timezone)
-        checkin = self.set_checkout_employees(checkin=checkin, employee_list=guards, replace=False)
+        checkin = self.checkout_employees(checkin=checkin, employee_list=guards, replace=False)
         data.update({
                 'properties': {
                     "device_properties":{
@@ -392,6 +525,24 @@ class Accesos(Employee, Location, base.LKF_Base):
             checkin.update({self.f['guard_group']:[]})
         return checkin
 
+    def do_out(self, qr):
+        '''
+            Realiza el cambio de estatus de la forma de bitacora, relacionada a la salida, como parametro
+            es necesesario enviar el nombre del visitante que es el unico dato qu se encuentra en la forma
+        '''
+        response = False
+        last_check_out = self.get_last_user_move(qr)
+        if last_check_out.get('folio'):
+            folio = last_check_out.get('folio',0)
+            if self.user_in_facility(status_visita=last_check_out.get('status_visita')):
+                answers = {
+                    f"{self.mf['tipo_registro']}":'salida',
+                }
+                response = self.lkf_api.patch_multi_record( answers=answers, form_id=self.BITACORA_ACCESOS, folios=[folio])
+        if not response:
+            self.LKFException("El usuario se encuentra fuera de la ubicacion.")
+        return response            
+
     def config_get_guards_positions(self):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -433,6 +584,48 @@ class Accesos(Employee, Location, base.LKF_Base):
         if _id:
             match_query.update({"_id":ObjectId(_id)})
 
+    def get_access_notes(self, location_name, area_name):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.ACCESOS_NOTAS,
+            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location_name,
+            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}":area_name
+            }
+        query = [
+            {'$match': match_query },
+            {'$project': self.proyect_format(self.notes_project_fields)},
+            {'$sort':{self.f['note_open_date']:1}}
+            ]
+        return self.format_cr_result(self.cr.aggregate(query))
+
+    def get_booth_status(self, booth_area, location):
+        last_chekin = self.get_last_checkin(location, booth_area)
+        booth_status = {
+            "status":'Disponible',
+            "guard_on_dutty":'',
+            "user_id":'',
+            "stated_at":'',
+            }
+        if last_chekin.get('checkin_type') == 'entrada':
+            #todo
+            #user_id 
+            booth_status['status'] = 'No Disponible'
+            booth_status['guard_on_dutty'] = last_chekin.get('employee') 
+            booth_status['stated_at'] = last_chekin.get('checkin_date')
+            booth_status['checkin_id'] = last_chekin['_id']
+
+        return booth_status
+
+    def get_booth_stats(self, booth_area, location):
+        res ={
+                "in_invitees":11,
+                "articulos_concesionados":12,
+                "incidentes_pendites": 13,
+                "vehiculos_estacionados": 14,
+                "gefetes_pendientes": 15,
+            }
+        return res
+
     def get_checkin_by_id(self, _id=None, folio=None):
         if not _id or not folio:
             msg = "An _id or a folio is requierd to get the record"
@@ -467,6 +660,112 @@ class Accesos(Employee, Location, base.LKF_Base):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
+    def get_last_user_move(self, qr):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.BITACORA_ACCESOS,
+            f"answers.{self.bitacora_fields['codigo_qr']}":qr,
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                'updated_at':'$updated_at',
+                'folio':'$folio',
+                'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"
+                }},
+            {'$sort':{'updated_at':-1}},
+            {'$limit':1}
+        ]
+        res = self.cr.find(
+            match_query, 
+            {'folio':'$folio', 'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"}
+            ).sort('updated_at', -1).limit(1)
+        return self.format_cr_result(res, get_one=True)
+        # return self.format_cr_result(self.cr.aggregate(query), get_one=True)
+
+    def get_list_bitacora(self, location, area):
+        response = []
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.BITACORA_ACCESOS,
+            f"answers.{self.bitacora_fields['ubicacion']}":location,
+            f"answers.{self.bitacora_fields['caseta_entrada']}":area,
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': self.proyect_format(self.bitacora_fields)},
+            {'$sort':{'folio':-1}},
+        ]
+        response.append(self.format_cr_result(self.cr.aggregate(query), get_one=True))
+        return response
+
+    def get_list_incidences(self, location, area):
+        response = []
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.BITACORA_INCIDENCIAS,
+            f"answers.{self.mf['catalog_caseta']}.{self.mf['ubicacion']}":location,
+            f"answers.{self.mf['catalog_caseta']}.{self.mf['caseta']}":area,
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                "folio": "$folio",
+                "date_incidence": f"$answers.{self.incidence_fields['date_incidence']}",
+                "location": f"$answers.{self.mf['catalog_caseta']}.{self.mf['ubicacion']}",
+                "area": f"$answers.{self.mf['catalog_caseta']}.{self.mf['caseta']}",
+                "incidence": f"$answers.{self.incidence_fields['catalog_incidence']}.{self.incidence_fields['incidence']}",
+                "comments": f"$answers.{self.incidence_fields['comments']}",
+                "guard": f"$answers.{self.mf['catalog_guard']}.{self.mf['nombre_guardia']}",
+            }},
+            {'$sort':{'folio':-1}},
+        ]
+        #print('answers', simplejson.dumps(query, indent=4))
+        response.append(self.format_cr_result(self.cr.aggregate(query), get_one=True))
+        #print('Response',response)
+        return response
+
+    def get_list_notes(self, area):
+        '''
+        Función para crear nota, psandole los datos de area para filtrar las notas de la caseta
+
+        '''
+        response = []
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.ACCESOS_NOTAS,
+            f"answers.{self.notes_fields['note_catalog_booth']}.{self.notes_fields['note_booth']}":area,
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                "folio":"$folio",
+                "note_status": f"$answers.{self.notes_fields['note_status']}",
+                "note_open_date": f"$answers.{self.notes_fields['note_open_date']}",
+                "note_close_date": f"$answers.{self.notes_fields['note_close_date']}",
+                "note_booth": f"$answers.{self.notes_fields['note_catalog_booth']}.{self.notes_fields['note_booth']}",
+                "note_guard": f"$answers.{self.notes_fields['note_catalog_guard']}.{self.notes_fields['note_guard']}",
+                "note_guard_close": f"$answers.{self.notes_fields['note_catalog_guard_close']}.{self.notes_fields['note_guard_close']}",
+                "note": f"$answers.{self.notes_fields['note']}",
+                "note_file": f"$answers.{self.notes_fields['note_file']}",
+                "note_pic": f"$answers.{self.notes_fields['note_pic']}",
+                "note_comments_group": f"$answers.{self.notes_fields['note_comments_group']}",
+            }},
+            {'$sort':{'folio':-1}},
+        ]
+        #print('answers', simplejson.dumps(query, indent=4))
+        response.append(self.format_cr_result(self.cr.aggregate(query), get_one=True))
+        return response
+
+    def get_user_booths_availability(self):
+        default_booth , user_booths = self.get_user_booth(search_default=False)
+        for booth in user_booths:
+            booth_area = booth.get('area')
+            location = booth.get('location')
+            booth_status = self.get_booth_status(booth_area, location)
+            booth['status'] = booth_status.get('status', 'Disponible')
+        return user_booths
+
     def get_user_last_checkin(self, user_id=False):
         if not user_id:
             user_id = self.user.get('user_id')
@@ -483,19 +782,31 @@ class Accesos(Employee, Location, base.LKF_Base):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_tipo_registro(self, access_pass):
-        return 'registrar_entrada'
+    def get_user_guards(self, location_employees):
+        for employee in location_employees:
+            if employee.get('user_id',0) == self.user.get('user_id'):
+                    return employee
+        self.LKFException(f"El usuario con id {self.user['user_id']}, no se ecuentra configurado como guardia")
+
+    def user_in_facility(self, status_visita):
+        """
+        Si envias un registro con entrada quiere regresa Verdadero, si 
+        """
+        print('status_visita=',status_visita)
+        if status_visita in ('entrada'):
+            return True
+        else:
+            return False
 
     def is_boot_available(self, location, area):
         self.last_check_in = self.get_last_checkin(location, area)
-        print('last_check_in', self.last_check_in)
         last_status = self.last_check_in.get('checkin_type')
         if last_status == 'entrada':
             return False
         else:
             return True
 
-    def set_checkout_employees(self, checkin={}, employee_list=[], replace=True):
+    def checkout_employees(self, checkin={}, employee_list=[], replace=True):
         if not replace:
             checkin[self.f['guard_group']] = employee_list
         elif employee_list and replace:
@@ -507,6 +818,60 @@ class Accesos(Employee, Location, base.LKF_Base):
                     for guard in employee_list ]
         return checkin
 
+    def update_incidence(self, data_incidences, folio):
+        '''
+            Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
+        '''
+        answers = {}
+        for key, value in data_incidences.items():
+            if  key == 'ubicacion_incidence':
+                dic_prev = answers.get(self.mf['catalog_caseta'],{})
+                dic_prev[self.mf['ubicacion']] = value 
+                answers[self.mf['catalog_caseta']] = dic_prev
+            elif  key == 'area_incidence':
+                dic_prev = answers.get(self.mf['catalog_caseta'],{})
+                dic_prev[self.mf['caseta']] = value 
+                answers[self.mf['catalog_caseta']] = dic_prev
+            elif  key == 'note_guard':
+                answers[self.mf['catalog_guard']] = {self.mf['nombre_guardia']:value}
+            elif  key == 'incidence':
+                answers[self.incidence_fields['catalog_incidence']] = {self.incidence_fields['incidence']:value}
+            else:
+                answers.update({f"{self.incidence_fields[key]}":value})
+        if answers or folio:
+            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_INCIDENCIAS, folios=[folio])
+        else:
+            self.LKFException('No se mandarón parametros para actualizar')
+
+    def update_guard_status(self, guard):
+        last_checkin = self.get_user_last_checkin(guard['user_id'])
+        status_turn = 'Turno Cerrado'
+        if last_checkin.get('checkin_type') == 'entrada':
+            status_turn = 'Turno Abierto'
+
+        guard['turn_start_datetime'] =  last_checkin.get('checkin_date','')
+        guard['status_turn'] =  status_turn
+        return guard
+
+    def update_notes(self, data_notes, folio):
+        '''
+            Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
+        '''
+        answers = {}
+        for key, value in data_notes.items():
+            if key == 'list_comments':
+                answers.update({-1:{f"{self.notes_fields[key]}": value}})
+            elif  key == 'note_booth':
+                answers[self.notes_fields['note_catalog_booth']] = {self.notes_fields['note_booth']:value}
+            elif  key == 'note_guard':
+                answers[self.notes_fields['note_catalog_guard']] = {self.notes_fields['note_guard']:value}
+            else:
+                answers.update({f"{self.notes_fields[key]}":value})
+        if answers or folio:
+            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.ACCESOS_NOTAS, folios=[folio])
+        else:
+            self.LKFException('No se mandarón parametros para actualizar')
+        
     def search_pass(self, qr_code=None, location=None):
         if not qr_code and not location:
             msg = "Debes de proveer qr_code o location"
@@ -583,12 +948,53 @@ class Accesos(Employee, Location, base.LKF_Base):
 
         return complete_qr
 
-    def validate_access_pass_location(self, access_pass, location, ):
+    def get_shift_data(self, search_default=True):
+        """
+        Obtiene informacion del turno del usuario logeado
+        """
+        load_shift_json = { }
+        username = self.user.get('username')
+        user_id = self.user.get('user_id')
+        default_booth , user_booths = self.get_user_booth(search_default=False)
+        location = default_booth.get('location')
+        if not default_booth:
+            return self.LKFException({"status_code":400, "msg":'No booth found or configure for user'})
+        booth_area = default_booth['area']
+        booth_location = default_booth['location']
+        booth_addres = self.get_area_address(booth_location, booth_area)
+        guards_positions = self.config_get_guards_positions()
+        location_employees = {}
+        for guard_type in guards_positions:
+            puesto = guard_type['tipo_de_guardia']
+            location_employees[puesto] = location_employees.get(puesto,
+                self.get_users_by_location_area(booth_location, booth_area, **{'position': guard_type['puestos']})
+                )
+            if guard_type['tipo_de_guardia'] == 'guardia_de_apoyo':
+                support_positions = guard_type['puestos']
+        guard = self.get_user_guards(location_employees['guardia'])
+        notes = self.get_access_notes(booth_location, booth_area)
+        load_shift_json["location"] = {
+            "name":  booth_location,
+            "area": booth_area,
+            "city": booth_addres.get('city'),
+            "state": booth_addres.get('state'),
+            "address": booth_addres.get('address'),
+            }
+        load_shift_json["booth_stats"] = self.get_booth_stats( booth_area, location)
+        load_shift_json["booth_status"] = self.get_booth_status(booth_area, location)
+        load_shift_json["support_guards"] = location_employees['guardia_de_apoyo']
+        load_shift_json["guard"] = self.update_guard_status(guard)
+        load_shift_json["notes"] = notes
+        load_shift_json["user_booths"] = user_booths
+        return load_shift_json
+
+    def validate_access_pass_location(self, qr_code):
         #TODO
-        if access_pass:
+        last_move = self.get_last_user_move(qr_code)
+        print('last_move', last_move)
+        if self.user_in_facility(last_move['status_visita']):
             return True
-        else:
-            return False
+        return False
 
     def validate_certificados(self, qr_code, location):
         return True
