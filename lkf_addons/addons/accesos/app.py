@@ -350,7 +350,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         timezone = employee.get('cat_timezone')
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         checkin = self.checkin_data(employee, location, area, 'in', timezone)
-        checkin = self.set_checkout_employees(checkin=checkin, employee_list=employee_list, replace=True)
+        checkin = self.checkout_employees(checkin=checkin, employee_list=employee_list, replace=True)
         data.update({
                 'properties': {
                     "device_properties":{
@@ -386,7 +386,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         timezone = employee.get('cat_timezone')
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         checkin = self.checkin_data(employee, location, area, 'out', timezone)
-        checkin = self.set_checkout_employees(checkin=checkin, employee_list=guards, replace=False)
+        checkin = self.checkout_employees(checkin=checkin, employee_list=guards, replace=False)
         data.update({
                 'properties': {
                     "device_properties":{
@@ -687,7 +687,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         else:
             return True
 
-    def set_checkout_employees(self, checkin={}, employee_list=[], replace=True):
+    def checkout_employees(self, checkin={}, employee_list=[], replace=True):
         if not replace:
             checkin[self.f['guard_group']] = employee_list
         elif employee_list and replace:
@@ -699,7 +699,7 @@ class Accesos(Employee, Location, base.LKF_Base):
                     for guard in employee_list ]
         return checkin
 
-    def set_create_note(self, data_notes):
+    def create_note(self, data_notes):
         '''
         '''
         #---Define Metadata
@@ -709,51 +709,41 @@ class Accesos(Employee, Location, base.LKF_Base):
                 "device_properties":{
                     "System": "Script",
                     "Module": "Accesos",
-                    "Process": "Ingreso de Personal",
-                    "Action": "Do Access",
+                    "Process": "Creación de notas",
+                    "Action": "Create Note",
                     "File": "accesos/app.py"
                 }
             },
         })
-        #---COmments
-        list_comments = []
-        for element in data_notes.get('list_comments',[]):
-            list_comments.append({f"{self.notes_fields['note_comments']}": element})
         #---Define Answers
-        answers = {
-            f"{self.notes_fields['note_status']}": data_notes['note_status'],
-            f"{self.notes_fields['note_open_date']}":data_notes['note_open_date'],
-            #f"{self.notes_fields['note_close_date']}": data_notes['note_close_date'],
-            f"{self.notes_fields['note']}":data_notes['note'],
-            f"{self.notes_fields['note_catalog_booth']}":{ f"{self.notes_fields['note_booth']}":data_notes['note_booth']},
-            f"{self.notes_fields['note_catalog_guard']}":{ f"{self.notes_fields['note_guard']}":data_notes['note_guard']},
-            #f"{self.notes_fields['note_guard_close']}":data_notes['note_guard_close'],
-            f"{self.notes_fields['note_pic']}":data_notes['photos'],
-            f"{self.notes_fields['note_file']}":[],
-            f"{self.notes_fields['note_comments_group']}":list_comments,
-        }
+        answers = {}
+        for key, value in data_notes.items():
+            if key == 'note_comments':
+                answers[self.notes_fields['note_comments_group']] = answers.get(self.notes_fields['note_comments_group'],[])
+                for comment in value:
+                    answers[self.notes_fields['note_comments_group']].append({self.notes_fields['note_comments']:comment})
+            elif  key == 'note_booth':
+                answers[self.notes_fields['note_catalog_booth']] = {self.notes_fields['note_booth']:value}
+            elif  key == 'note_guard':
+                answers[self.notes_fields['note_catalog_guard']] = {self.notes_fields['note_guard']:value}
+            else:
+                answers.update({f"{self.notes_fields[key]}":value})
+
         metadata.update({'answers':answers})
         print('answers', simplejson.dumps(metadata, indent=4))
         return self.lkf_api.post_forms_answers(metadata)
         print('response_create',response_create)
 
-    def set_delete_notes(self, folio):
-        match_query = {
-            "deleted_at":{"$exists":False},
-            "form_id": self.ACCESOS_NOTAS,
-            f"folio":folio,
-        }
-        res = self.cr.find(match_query, {'_id':0,}).limit(1)
-        response = self.format_cr_result(res, get_one=True)
-        if response.get('voucher_id'):
-            id_record = response.get('voucher_id')
+    def delete_notes(self, folio):
+        response = self.get_record_by_folio(folio, self.ACCESOS_NOTAS, select_columns={'_id':1,})
+        if response.get('_id'):
             return self.lkf_api.patch_record_list({
-                "deleted_objects": ["/api/infosync/form_answer/"+str(id_record)+"/"],
+                "deleted_objects": ["/api/infosync/form_answer/"+str(response['_id'])+"/"],
             })
         else:
             self.LKFException('No se encontro el folio correspondiente')
 
-    def set_update_notes(self, data_notes, folio):
+    def update_notes(self, data_notes, folio):
         '''
             Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
         '''
