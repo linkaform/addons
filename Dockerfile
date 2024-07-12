@@ -84,6 +84,8 @@ RUN pip install linkaform_api-3.0.tar.gz
 COPY /lkf_addons /usr/local/lib/python3.10/site-packages/lkf_addons/
 COPY ./config /srv/scripts/addons/config
 
-USER nonroot
+RUN chown -R 33:33 /srv/scripts
+
+USER www-data
 
 #RUN pip install -r /tmp/requires.txt
