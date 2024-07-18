@@ -2223,7 +2223,10 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             res =  deepcopy(product)
         res[self.SKU_OBJ_ID ][self.f['reicpe_container']] = recipe['sku_package']
         res[self.SKU_OBJ_ID ][self.f['reicpe_per_container']] = recipe['sku_per_package']
-        res[self.SKU_OBJ_ID ][self.f['product_name']] = [recipe['product_name'],]
+        if type(recipe['product_name']) != list:
+            res[self.SKU_OBJ_ID ][self.f['product_name']] = [recipe['product_name'],]
+        else:
+            res[self.SKU_OBJ_ID ][self.f['product_name']] = recipe['product_name']
         return res
 
     def set_lot_ready_week(self, lot_ready_week, gradin_totals):

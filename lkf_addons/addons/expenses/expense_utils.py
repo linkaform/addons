@@ -18,7 +18,7 @@ def unlist(arg):
         return unlist(arg[0])
     return arg
 
-class Expenses(Base, Employee, base.LKF_Base):
+class Expenses(Employee, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
