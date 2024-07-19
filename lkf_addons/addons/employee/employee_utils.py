@@ -61,6 +61,8 @@ class Employee(Base, base.LKF_Base):
             'genero':'663bcbe2274189281359eb75',
             'status_en_empresa':'663bcbe2274189281359eb77',
             'cat_timezone':self.f['cat_timezone'],
+            'city':'6654187fc85ce22aaf8bb070',
+            'address':'663a7e0fe48382c5b1230902',
                 }
 
         self.f.update(self.employee_fields)
@@ -120,11 +122,13 @@ class Employee(Base, base.LKF_Base):
                     'area': f"$answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
                     'location': f"$answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                     'employee': f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_name']}",
-                    'marcada_como': f"$answers.{self.f['areas_group']}.{self.f['area_default']}"
+                    'marcada_como': f"$answers.{self.f['areas_group']}.{self.f['area_default']}",
+                    'city': f"$answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.employee_fields['city']}",
+                    'address': f"$answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.employee_fields['address']}",
                     }
             }
             ]
-        # print('query=', simplejson.dumps(query, indent=3))
+        print('query=', simplejson.dumps(query, indent=3))
         # print('area=', self.f['area'])
         res = self.format_cr(self.cr.aggregate(query))
         caseta = None

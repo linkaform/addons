@@ -23,6 +23,7 @@ app_utils.py, utils.py, xxx_utils.py
 
 import simplejson
 from bson import ObjectId
+from datetime import datetime
 
 from linkaform_api import base
 from lkf_addons.addons.employee.employee_utils import Employee
@@ -126,6 +127,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             'curp': "5ea0897550b8dfe1f4d83a9f",
             'documento': "663e5470424ad55e32832eec",
             'direccion': "663a7e0fe48382c5b1230902",
+            'duracion': "65cbe03c6c78b071a59f481e",
             'email_vsita': "5ea069562f8250acf7d83aca",
             'empresa':'64ecc95271803179d68ee081',
             'fecha_desde_visita': "662c304fad7432d296d92582",
@@ -158,8 +160,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             'tipo_vehiculo': "65f22098d1dc5e0b9529e89a",
             'tipo_visita_pase': "662c304fad7432d296d92581",
             'ubicacion': "663e5c57f5b8a7ce8211ed0b",
-
-
+            'status_area':"663e5e4bf5b8a7ce8211ed14",
         }
         self.mf = mf
         ## Form Fields ##
@@ -395,6 +396,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             else:
                 return {'status_code':'400'}
 
+
     def create_article_concessioned(self, data_articles):
         #---Define Metadata
         metadata = self.lkf_api.get_metadata(form_id=self.CONCESSIONED_ARTICULOS)
@@ -414,7 +416,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         for key, value in data_articles.items():
             if  key == 'ubicacion_concesion':
                 answers[self.mf['catalog_ubicacion']] = { self.mf['ubicacion'] : value}
-            elif  key == 'persona_nombre_concesion':
+            elif  key == 'nombre_concesion':
                 answers[self.consecionados_fields['persona_catalog_concesion']] = { self.consecionados_fields['persona_nombre_concesion'] : value}
             elif  key == 'caseta_concesion':
                 answers[self.mf['catalog_caseta_salida']] = { self.mf['caseta_salida']: value}
@@ -583,6 +585,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         })
         #---Define Answers
         answers = {}
+        #----Assign Values Keys
         for key, value in data_notes.items():
             if key == 'note_comments':
                 answers[self.notes_fields['note_comments_group']] = answers.get(self.notes_fields['note_comments_group'],[])
@@ -594,9 +597,13 @@ class Accesos(Employee, Location, base.LKF_Base):
                 answers[self.notes_fields['note_catalog_guard']] = {self.notes_fields['note_guard']:value}
             else:
                 answers.update({f"{self.notes_fields[key]}":value})
+        #----Assign Time
+        now = datetime.now()
+        fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        answers.update({f"{self.notes_fields['note_open_date']}":fecha_hora_str})
 
         metadata.update({'answers':answers})
-        #print('answers', simplejson.dumps(metadata, indent=4))
+        print('answers', simplejson.dumps(answers, indent=4))
         return self.lkf_api.post_forms_answers(metadata)
 
     def create_pase(self, data_pase):
@@ -679,7 +686,7 @@ class Accesos(Employee, Location, base.LKF_Base):
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
         #---Valor
         metadata.update({'answers':answers})
-        print('answers', simplejson.dumps(metadata, indent=4))
+        #print('answers', simplejson.dumps(metadata, indent=4))
         print('Respuesta',self.lkf_api.post_forms_answers(metadata))
 
     def delete_article_concessioned(self, folio):
@@ -840,7 +847,6 @@ class Accesos(Employee, Location, base.LKF_Base):
             msg += f"Because '{self.last_check_in.get('employee')}' is logged in."
             self.LKFException(msg)
         boot_config = self.get_users_by_location_area(location_name=location, area_name=area, user_id=self.user.get('user_id'))
-        print('boot_config', boot_config)
         if not boot_config:
             msg = f"User can not login to this area : {area} at location: {location} ."
             msg += f"Please check your configuration."
@@ -855,7 +861,9 @@ class Accesos(Employee, Location, base.LKF_Base):
         timezone = employee.get('cat_timezone')
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         checkin = self.checkin_data(employee, location, area, 'in', timezone)
+        print('checkin_data', simplejson.dumps(checkin, indent=4))
         checkin = self.checkout_employees(checkin=checkin, employee_list=employee_list, replace=True)
+        print('checkout_employees', simplejson.dumps(checkin, indent=4))
         data.update({
                 'properties': {
                     "device_properties":{
@@ -867,11 +875,13 @@ class Accesos(Employee, Location, base.LKF_Base):
                 },
                 'answers': checkin
             })
+        '''
         resp_create = self.lkf_api.post_forms_answers(data)
         #TODO agregar nombre del Guardia Quien hizo el checkin
         if resp_create.get('status_code') == 201:
             resp_create['json'].update({'boot_status':{'guard_on_duty':user_data['name']}})
         return resp_create
+        '''
 
     def do_checkout(self, checkin_id=None, location=None, area=None, guards=[]):
         print('--start checkout--')
@@ -1036,20 +1046,23 @@ class Accesos(Employee, Location, base.LKF_Base):
             }
         return res
 
-    def get_detail_user(self, curp):
+    def get_detail_user(self, qr_code):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.PASE_ENTRADA,
-            f"answers.{self.pase_entrada_fields['curp_catalog_pase']}":curp,
+            "_id":ObjectId(qr_code),
         }
+        print('match_query',match_query)
         query = [
             {'$match': match_query },
             {'$project': self.proyect_format(self.pase_entrada_fields)},
             {'$sort':{'folio':-1}},
         ]
-        result =  self.format_cr_result(self.cr.aggregate(query))
-        print('Result',result)
-        #return self.format_cr_result(self.cr.aggregate(query))
+        result = self.format_cr_result(self.cr.aggregate(query))
+        if len(result) == 1:
+            return result[0]
+        else:
+            return {} 
 
     def get_information_catalog(self, id_catalog):
         match_query = {
@@ -1106,7 +1119,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         }
         res = self.cr.find(
             match_query, 
-            {'folio':'$folio', 'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"}
+            {'folio':'$folio', 'status_visita': f"$answers.{self.bitacora_fields['status_visita']}",}
             ).sort('updated_at', -1).limit(1)
         return self.format_cr_result(res, get_one=True)
         # return self.format_cr_result(self.cr.aggregate(query), get_one=True)
@@ -1266,6 +1279,25 @@ class Accesos(Employee, Location, base.LKF_Base):
         print('answers', simplejson.dumps(query, indent=4))
         return self.format_cr_result(self.cr.aggregate(query))
 
+    def get_list_last_user_move(self, qr):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.BITACORA_ACCESOS,
+            f"answers.{self.bitacora_fields['codigo_qr']}":qr,
+        }
+        res = self.cr.find(
+            match_query, 
+            {
+                'status_visita': f"$answers.{self.bitacora_fields['status_visita']}",
+                'nombre_visita':f"$answers.{self.mf['catalog_visita']}.{self.mf['nombre_visita']}",
+                'location':f"$answers.{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
+                'fecha':f"$answers.{self.mf['bitacora_entrada']}",
+                'duration':f"$answers.{self.mf['duracion']}",
+            }
+            ).sort('updated_at', -1).limit(10000)
+
+        return self.format_cr_result(res)
+
     def get_user_booths_availability(self):
         default_booth , user_booths = self.get_user_booth(search_default=False)
         for booth in user_booths:
@@ -1297,6 +1329,32 @@ class Accesos(Employee, Location, base.LKF_Base):
                     return employee
         self.LKFException(f"El usuario con id {self.user['user_id']}, no se ecuentra configurado como guardia")
 
+    def get_guards_booths(self, location, area):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.CHECKIN_CASETAS,
+            f"answers.{self.mf['catalog_guard']}.{self.mf['ubicacion']}":location,
+            f"answers.{self.mf['catalog_guard']}.{self.mf['caseta']}":area,
+            f"answers.{self.checkin_fields['checkin_type']}":'entrada',
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                "_id": 1,
+                "folio": "$folio",
+                "name": f"$answers.{self.mf['guard_group']}.{self.mf['catalog_guard_close']}.{self.mf['nombre_guardia_apoyo']}",
+            }},
+            {'$sort':{'folio':-1}},
+            {'$limit':1},
+        ]
+        #return self.format_cr_result(self.format_cr_result(self.cr.aggregate(query)))
+        response = self.format_cr_result(self.format_cr_result(self.cr.aggregate(query)))
+        if len(response) == 1:
+            list_guards = response[0].get('name',[])
+            return list_guards
+        else:
+            return []
+
     def user_in_facility(self, status_visita):
         """
         Si envias un registro con entrada quiere regresa Verdadero, si 
@@ -1319,6 +1377,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         if not replace:
             checkin[self.f['guard_group']] = employee_list
         elif employee_list and replace:
+            print('employee_list',employee_list)
             checkin[self.f['guard_group']] += [
                 {self.f['employee_position']:'guardiad_de_apoyo',
                  self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID:
@@ -1332,7 +1391,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         for key, value in data_articles.items():
             if  key == 'ubicacion_concesion':
                 answers[self.mf['catalog_ubicacion']] = { self.mf['ubicacion'] : value}
-            elif  key == 'persona_nombre_concesion':
+            elif  key == 'nombre_concesion':
                 answers[self.consecionados_fields['persona_catalog_concesion']] = { self.consecionados_fields['persona_nombre_concesion'] : value}
             elif  key == 'caseta_concesion':
                 answers[self.mf['catalog_caseta_salida']] = { self.mf['caseta_salida']: value}
@@ -1433,11 +1492,20 @@ class Accesos(Employee, Location, base.LKF_Base):
         guard['status_turn'] =  status_turn
         return guard
 
+    def update_guards_booths(self, data_guard, folio):
+        response = []
+        for item in data_guard:
+            answers = {}
+            answers[self.mf['guard_group']] = {'-1':{ self.mf['catalog_guard_close']: {self.mf['nombre_guardia_apoyo']: item}}}
+            response.append(self.lkf_api.patch_multi_record( answers = answers, form_id=self.CHECKIN_CASETAS, folios=[folio]))
+        return response
+
     def update_notes(self, data_notes, folio):
         '''
             Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
         '''
         answers = {}
+        #----Assign Value
         for key, value in data_notes.items():
             if key == 'list_comments':
                 answers.update({-1:{f"{self.notes_fields[key]}": value}})
@@ -1447,7 +1515,13 @@ class Accesos(Employee, Location, base.LKF_Base):
                 answers[self.notes_fields['note_catalog_guard']] = {self.notes_fields['note_guard']:value}
             else:
                 answers.update({f"{self.notes_fields[key]}":value})
+        #----Assign Time
+        if data_notes.get('note_status','') == 'cerrado':
+            now = datetime.now()
+            fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
+            answers.update({f"{self.notes_fields['note_close_date']}":fecha_hora_str})
         if answers or folio:
+            print('answers', simplejson.dumps(answers, indent=4))
             return self.lkf_api.patch_multi_record( answers = answers, form_id=self.ACCESOS_NOTAS, folios=[folio])
         else:
             self.LKFException('No se mandarón parametros para actualizar')
@@ -1480,53 +1554,82 @@ class Accesos(Employee, Location, base.LKF_Base):
         Si NO entregas el qr_code, te regresa todos los qr de dicha area y ubicacion
         Si no entregas nada, te regrea un warning...
         """
+
+
+        print('Valor devuelto',self.validate_value_id(qr_code))
         print('-------------- search_access_pass')
-        complete_qr = {}
-        # location = 'Planta Monterrey'
-        # print('match_query', simplejson.dumps(query, indent=4))
-        complete_qr['pass'] = {
-            'tipo': 'Contratista Tipo XZ',
-            'status':'Vigente',
-            'fecha_expedicion':'2024-01-15',
-            'fecha_expiracion':'2026-01-15',
-        }
-        complete_qr['validaciones'] = {
-            'accion_ingreso':'Entrada',
-            'location': self.search_pass(qr_code=qr_code, location=location),
-            'errores':[{"tipo":'Certificado','comunicacion':'Vencido','fecha':'2024-05-25'}]
-        }
-        complete_qr['portador'] = self.search_pass(qr_code=qr_code)
-        complete_qr['comentarios'] = [{"msg":"Comentario 1"}, {"msg":"Comentario 2"}]
-        loction = 'Nombre de la ubicacion'
-        area = 'Nombre de la area'
-        complete_qr['accesos'] = [
-            {"nombre":"Cuarto de Maquinas", "location":location, "area":area, "status":"Permitido"},
-            {"nombre":"Piso 1", "location":location, "area":area, "status":"Permitido"},
-            {"nombre":"Piso 2", "location":location, "area":area, "status":"Permitido"},
-            {"nombre":"Piso 15-35", "location":location, "area":area, "status":"Permitido"},
-            ]
-        complete_qr['certificaiones'] = [
-            {"nombre":"Examen de Alturas","status":"Aprovado", "expiracion":"2024-09-15"}, 
-            {"nombre":"Licencia de Manejar","status":"Expirado", "expiracion":"2023-09-15"}, 
-            ]
-        complete_qr['ultimo_acceso'] = [
-            {"nombre_visita":"Juan Rulfo","location":location,"fecha":"2024-09-15T15:05", "duration": 5683}, 
-            {"nombre_visita":"Gabriel Garcia Marquez","location":location,"fecha":"2024-09-15T21:33", "duration": 600 }, 
-            ]
-        complete_qr['equipo'] = [
-            {"tipo":"Computadora", "marca":"Lenovo","modelo":"T42S", "serie": "u4568", "color":"Negra"}, 
-            {"tipo":"Herramienta", "marca":"Truper","modelo":"Pinza", "serie": "N/A", "color":"Naranja"}, 
-            ]
-        complete_qr['vehiculos'] = [
-            {"tipo":"Camion", "marca":"Volvo","modelo":"Modelo T", "placa": "TZ-58996-S", "color":"Azul"}, 
-            {"tipo":"Auto", "marca":"Ford","modelo":"Fiesta", "placa": "ZF-M4M0N", "color":"Blanco"}, 
-            ]
-
-        print('aqui voy tnego q buscar el q r code....')
-        print('si me das pura location y area', )
-
-
-        return complete_qr
+        if self.validate_value_id(qr_code):
+            complete_qr = {}
+            data_information = self.get_detail_user(qr_code);
+            complete_qr['pass'] = {
+                'tipo': data_information.get('perfil_pase',''),
+                'status':data_information.get('status_pase',''),
+                'fecha_expedicion':data_information.get('fecha_desde_pase',''),
+                'fecha_expiracion':data_information.get('fecha_hasta_pase',''),
+            }
+            complete_qr['validaciones'] = {
+                #---Se tiene que validar que movimiento se esta haciendo
+                'accion_ingreso':'Entrada',
+                'location': self.search_pass(qr_code=qr_code, location=location),
+                #---Se tiene que validar que errores pueden existir dentro de la data del pase
+                'errores':[
+                    #{"tipo":'Certificado','comunicacion':'Vencido','fecha':'2024-05-25'}
+                ]
+            }
+            complete_qr['portador'] = self.search_pass(qr_code=qr_code)
+            #---Comentarios
+            complete_qr['comentarios'] = []
+            if  data_information.get('instrucciones_group_pase'):
+                for item in data_information.get('instrucciones_group_pase'):
+                    complete_qr['comentarios'].append(item[self.pase_entrada_fields['comentario_pase']])
+            #---Accessos
+            complete_qr['accesos'] = []
+            if  data_information.get('areas_group_pase'):
+                for item in data_information.get('areas_group_pase'):
+                    area = item[self.mf['catalog_caseta']][self.mf['caseta']]
+                    status_area = item[self.mf['catalog_caseta']][self.mf['status_area']]
+                    if type(status_area) == list:
+                        status_area = status_area[0]
+                    complete_qr['accesos'].append({"area":area, "status":status_area})
+            #---Last Access
+            complete_qr['ultimo_acceso'] = []
+            response_last_move = self.get_list_last_user_move(qr_code);
+            for item in response_last_move:
+                complete_qr['ultimo_acceso'].append({
+                    'nombre_visita':item.get('nombre_visita',''),
+                    'location':item.get('location',''),
+                    'fecha':item.get('fecha',''),
+                    'duration':item.get('duration','0'),
+                })
+            #---List Equip
+            complete_qr['equipo'] = []
+            if  data_information.get('equipo_group_pase'):
+                for item in data_information.get('equipo_group_pase'):
+                    complete_qr['equipo'].append({
+                        'tipo': item[self.mf['tipo_equipo']],
+                        'marca': item[self.mf['nombre_articulo']],
+                        'modelo': item[self.mf['marca_articulo']],
+                        'serie': item[self.mf['numero_serie']],
+                        'color': item[self.mf['color_articulo']],
+                    })
+            #---List Equip
+            complete_qr['vehiculos'] = []
+            if  data_information.get('vehiculos_group_pase'):
+                for item in data_information.get('vehiculos_group_pase'):
+                    complete_qr['vehiculos'].append({
+                        'tipo':item[self.mf['catalog_vehiculo']][self.mf['tipo_vehiculo']],
+                        'marca':item[self.mf['catalog_vehiculo']][self.mf['marca_vehiculo']],
+                        'modelo':item[self.mf['catalog_vehiculo']][self.mf['modelo_vehiculo']],
+                        'placa':item[self.mf['placas_vehiculo']],
+                        'color':item[self.mf['color_vehiculo']],
+                    })
+            print('aqui voy tnego q buscar el q r code....')
+            print('si me das pura location y area', )
+            #print('complete_qr', simplejson.dumps(complete_qr, indent=4))
+            print('=====================================================')
+            return complete_qr
+        else:
+            return self.LKFException({"status_code":400, "msg":'El parametro para qr, no es valido'})
 
     def get_shift_data(self, search_default=True):
         """
@@ -1544,6 +1647,8 @@ class Accesos(Employee, Location, base.LKF_Base):
         booth_addres = self.get_area_address(booth_location, booth_area)
         guards_positions = self.config_get_guards_positions()
         location_employees = {}
+
+       
         for guard_type in guards_positions:
             puesto = guard_type['tipo_de_guardia']
             location_employees[puesto] = location_employees.get(puesto,
@@ -1560,12 +1665,14 @@ class Accesos(Employee, Location, base.LKF_Base):
             "state": booth_addres.get('state'),
             "address": booth_addres.get('address'),
             }
+        guards_online = self.get_guards_booths(booth_location, booth_area)
         load_shift_json["booth_stats"] = self.get_booth_stats( booth_area, location)
         load_shift_json["booth_status"] = self.get_booth_status(booth_area, location)
         load_shift_json["support_guards"] = location_employees['guardia_de_apoyo']
         load_shift_json["guard"] = self.update_guard_status(guard)
         load_shift_json["notes"] = notes
         load_shift_json["user_booths"] = user_booths
+        load_shift_json["guards_online"] = guards_online
         return load_shift_json
 
     def validate_access_pass_location(self, qr_code):
@@ -1581,3 +1688,10 @@ class Accesos(Employee, Location, base.LKF_Base):
 
     def validate_pass_dates(self, access_pass):
         return True
+
+    def validate_value_id(self, qr_code):
+        try:
+            ObjectId(qr_code)
+            return True
+        except:
+            return False
