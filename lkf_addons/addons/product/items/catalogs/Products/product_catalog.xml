@@ -7,8 +7,8 @@
         <button_message>Send</button_message>
     </confirmation>
     <description />
-    <_rev>6-3db0fd1d95e2d7e7915d25bbcd7d02c1</_rev>
-    <updated_at>2024-03-12T04:24:09.594184+00:00Z</updated_at>
+    <_rev>5-05f8c51f0ebbc4ad8105b2c9d703f43d</_rev>
+    <updated_at>2024-06-11T18:39:45.785258+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Product Catalog</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-03-12T04:24:09.594184+00:00Z</created_at>
+    <created_at>2024-06-11T18:39:45.785258+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,6 +25,10 @@
             <manual>False</manual>
         </folio>
     </advanced_options>
+    <catalog_id>119751</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>666899f1250c889ebae4a883</_id>
+    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -72,10 +76,6 @@
                 </item>
                 <item>
                     <field_type>images</field_type>
-                    <field_id>65dec8423199f9a040829245</field_id>
-                    <required>False</required>
-                    <fav>True</fav>
-                    <label>Imagen</label>
                     <properties>
                         <date_format>None</date_format>
                         <image_origin>
@@ -101,17 +101,40 @@
                         <location_decimals>None</location_decimals>
                         <metadata>[]</metadata>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>65dec8423199f9a040829245</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Imagen</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>text</field_type>
-                    <required>False</required>
-                    <field_id>010101010101010101010101</field_id>
                     <properties>
                         <send_email>False</send_email>
                         <custom>None</custom>
                         <size>complete</size>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>010101010101010101010101</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Codigo de Barras</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>select</field_type>
@@ -428,105 +451,139 @@
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
-                    <field_type>select</field_type>
-                    <properties>
-                        <selected>0</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
-                    <key>False</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>65dec8423199f9a040829246</field_id>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>669efbf447920d1b51663d28</item>
+                        <item>669efc6f47920d1b51663d29</item>
+                    </catalog_fields>
                     <required>False</required>
-                    <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
+                    <field_id>{{ catalog.unidad_de_medida.obj_id }}</field_id>
                     <label>Unidad de Medida</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>
-                        <item>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>unidades</value>
-                            <label>Unidades</label>
-                        </item>
-                        <item>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>gramos</value>
-                            <label>Gramos</label>
-                        </item>
-                        <item>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>metros</value>
-                            <label>Metros</label>
-                        </item>
-                        <item>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>area</value>
-                            <label>Area</label>
-                        </item>
-                    </options>
-                    <related_catalog>None</related_catalog>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>669efbf447920d1b51663d28</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.unidad_de_medida.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.unidad_de_medida.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
                 </item>
                 <item>
-                    <field_type>select</field_type>
-                    <properties>
-                        <selected>0</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
-                    <key>False</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>65dec8423199f9a040829247</field_id>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
                     <required>False</required>
-                    <fav>False</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Unidad de Medida de Compra</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>
-                        <item>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>unidades</value>
-                            <label>Unidades</label>
-                        </item>
-                        <item>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>gramos</value>
-                            <label>Gramos</label>
-                        </item>
-                        <item>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>metros</value>
-                            <label>Metros</label>
-                        </item>
-                        <item>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>area</value>
-                            <label>Area</label>
-                        </item>
-                    </options>
-                    <related_catalog>None</related_catalog>
+                    <field_id>669efbf447920d1b51663d28</field_id>
+                    <label>Categoria</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.unidad_de_medida.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>669efc6f47920d1b51663d29</field_id>
+                    <label>Unidad de Media</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.unidad_de_medida.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>669f00acbfb6752ba373ff38</item>
+                        <item>669f00acbfb6752ba373ff39</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.unidad_de_medida_destino.obj_id }}</field_id>
+                    <label>Unidad de Medida Destino</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.unidad_de_medida_destino.id }}</catalog_id>
+                        <view_fields>
+                            <item>669f00acbfb6752ba373ff38</item>
+                        </view_fields>
+                        <name>{{ catalog.unidad_de_medida_destino.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>669f00acbfb6752ba373ff38</field_id>
+                    <label>Categoria</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.unidad_de_medida_destino.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.unidad_de_medida_destino.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>669f00acbfb6752ba373ff39</field_id>
+                    <label>Unidad de Media</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.unidad_de_medida_destino.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.unidad_de_medida_destino.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
                 </item>
                 <item>
                     <field_type>checkbox</field_type>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>65dec8423199f9a040829248</field_id>
                     <required>False</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Puede ser</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>
                         <item>
                             <points>None</points>
@@ -547,19 +604,27 @@
                             <label>Puede ser Rentado</label>
                         </item>
                     </options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>select</field_type>
                     <properties>
                         <selected>0</selected>
                         <openChoice>False</openChoice>
                         <orientation>vertical</orientation>
                         <custom>None</custom>
                     </properties>
-                </item>
-                <item>
-                    <field_type>select</field_type>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>65dec8423199f9a040829249</field_id>
                     <required>False</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Status</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>
                         <item>
                             <points>None</points>
@@ -580,19 +645,27 @@
                             <label>Reserva</label>
                         </item>
                     </options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>checkbox</field_type>
                     <properties>
                         <selected>0</selected>
                         <openChoice>False</openChoice>
                         <orientation>vertical</orientation>
                         <custom>None</custom>
                     </properties>
-                </item>
-                <item>
-                    <field_type>checkbox</field_type>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>6205f73281bb36a6f157335a</field_id>
                     <required>False</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Origen</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>
                         <item>
                             <points>None</points>
@@ -613,26 +686,17 @@
                             <label>In Stock</label>
                         </item>
                         <item>
-                            <selected>False</selected>
-                            <label>Not Tracked</label>
-                            <value>not_tracked</value>
                             <points>None</points>
+                            <selected>False</selected>
+                            <value>not_tracked</value>
+                            <label>Not Tracked</label>
                         </item>
                     </options>
-                    <properties>
-                        <selected>0</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
+                    <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
             <page_description>None</page_description>
             <page_name>Product Info</page_name>
         </item>
     </catalog_pages>
-    <sync_last_update>None</sync_last_update>
-    <_id>65efd8e90577a332fcf2ea89</_id>
-    <public>False</public>
-    <catalog_id>116422</catalog_id>
 </lkf>
