@@ -256,13 +256,13 @@ _update(){
   case $Enviorment in
     prod)
     echo '--------------'
-      env -i ssh -i $HOME/.ssh/$Account_id _lkf_docker_remote@ansible.linkaform.com prod $IMAGE_NAME
+      env -i ssh -i $HOME/.ssh/keys/$Account_id _lkf_docker_remote@ansible.linkaform.com prod $IMAGE_NAME
     ;;
     preprod)
       echo 'Running Account_id...' $Account_id
       echo 'Running IMAGE_NAME...' $IMAGE_NAME
 
-      echo env -i ssh -i $HOME/.ssh/${Account_id} _lkf_docker_remote@ansible.linkaform.com preprod $IMAGE_NAME
+      echo env -i ssh -i $HOME/.ssh/keys/${Account_id} _lkf_docker_remote@ansible.linkaform.com preprod $IMAGE_NAME
      ;;
   esac
 }
