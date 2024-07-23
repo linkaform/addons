@@ -323,6 +323,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             'status_pase':'66353daa223b8a43d7f274b5',
             'qr_pase':'64ef5b5fff1bec97d2ca27b6',
             'comentario_pase':'65e0a69a322b61fbf9ed23af',
+            'catalog_area_pase':'664fc5f3bbbef12ae61b15e9',
         }
         self.pase_grupo_visitados:{
             'nombre_perfil':     f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
@@ -395,7 +396,6 @@ class Accesos(Employee, Location, base.LKF_Base):
                 return {'status_code':item[1]['status_code']}
             else:
                 return {'status_code':'400'}
-
 
     def create_article_concessioned(self, data_articles):
         #---Define Metadata
@@ -861,9 +861,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         timezone = employee.get('cat_timezone')
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         checkin = self.checkin_data(employee, location, area, 'in', timezone)
-        print('checkin_data', simplejson.dumps(checkin, indent=4))
         checkin = self.checkout_employees(checkin=checkin, employee_list=employee_list, replace=True)
-        print('checkout_employees', simplejson.dumps(checkin, indent=4))
         data.update({
                 'properties': {
                     "device_properties":{
@@ -875,13 +873,11 @@ class Accesos(Employee, Location, base.LKF_Base):
                 },
                 'answers': checkin
             })
-        '''
         resp_create = self.lkf_api.post_forms_answers(data)
         #TODO agregar nombre del Guardia Quien hizo el checkin
         if resp_create.get('status_code') == 201:
             resp_create['json'].update({'boot_status':{'guard_on_duty':user_data['name']}})
         return resp_create
-        '''
 
     def do_checkout(self, checkin_id=None, location=None, area=None, guards=[]):
         print('--start checkout--')
@@ -1106,7 +1102,7 @@ class Accesos(Employee, Location, base.LKF_Base):
         query = [
             {'$match': match_query },
             {'$project': self.proyect_format(self.checkin_fields)},
-            {'$sort':{'updated_at':-1}},
+            {'$sort':{'folio':-1}},
             {'$limit':1}
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
@@ -1347,6 +1343,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             {'$sort':{'folio':-1}},
             {'$limit':1},
         ]
+        print('answers', simplejson.dumps(query, indent=4))
         #return self.format_cr_result(self.format_cr_result(self.cr.aggregate(query)))
         response = self.format_cr_result(self.format_cr_result(self.cr.aggregate(query)))
         if len(response) == 1:
@@ -1554,9 +1551,6 @@ class Accesos(Employee, Location, base.LKF_Base):
         Si NO entregas el qr_code, te regresa todos los qr de dicha area y ubicacion
         Si no entregas nada, te regrea un warning...
         """
-
-
-        print('Valor devuelto',self.validate_value_id(qr_code))
         print('-------------- search_access_pass')
         if self.validate_value_id(qr_code):
             complete_qr = {}
@@ -1586,8 +1580,12 @@ class Accesos(Employee, Location, base.LKF_Base):
             complete_qr['accesos'] = []
             if  data_information.get('areas_group_pase'):
                 for item in data_information.get('areas_group_pase'):
-                    area = item[self.mf['catalog_caseta']][self.mf['caseta']]
-                    status_area = item[self.mf['catalog_caseta']][self.mf['status_area']]
+                    area = ''
+                    status_area = ''
+                    if self.mf['catalog_caseta'] in item and self.mf['caseta'] in item[self.mf['catalog_caseta']]:
+                        area = item[self.mf['catalog_caseta']][self.mf['caseta']]
+                    if self.mf['catalog_caseta'] in item and self.mf['caseta'] in item[self.mf['catalog_caseta']]:
+                        status_area = item[self.mf['catalog_caseta']][self.mf['status_area']]
                     if type(status_area) == list:
                         status_area = status_area[0]
                     complete_qr['accesos'].append({"area":area, "status":status_area})
@@ -1623,10 +1621,10 @@ class Accesos(Employee, Location, base.LKF_Base):
                         'placa':item[self.mf['placas_vehiculo']],
                         'color':item[self.mf['color_vehiculo']],
                     })
-            print('aqui voy tnego q buscar el q r code....')
-            print('si me das pura location y area', )
+            #print('aqui voy tnego q buscar el q r code....')
+            #print('si me das pura location y area', )
             #print('complete_qr', simplejson.dumps(complete_qr, indent=4))
-            print('=====================================================')
+            #print('=====================================================')
             return complete_qr
         else:
             return self.LKFException({"status_code":400, "msg":'El parametro para qr, no es valido'})
