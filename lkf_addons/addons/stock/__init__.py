@@ -1,4 +1,4 @@
 # coding: utf-8
 
 #Producto dependencies
-depends = ['base', 'location', 'product']
+depends = ['base', 'location', 'product', 'employee']
