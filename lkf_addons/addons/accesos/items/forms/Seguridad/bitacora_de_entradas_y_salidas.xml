@@ -2348,7 +2348,7 @@
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_de_la_ubicacion_salidas.id }}</catalog_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicacion_salidas.id }}</catalog_id>
                         <field_type>None</field_type>
                         <filters>Filtro_casetas</filters>
                         <geofence>None</geofence>
@@ -2370,7 +2370,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>{{ catalog.areas_de_la_ubicacion_salidas.obj_id }}</field_id>
+                    <field_id>{{ catalog.areas_de_las_ubicacion_salidas.obj_id }}</field_id>
                     <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -2430,8 +2430,8 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.areas_de_la_ubicacion_salidas.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_de_la_ubicacion_salidas.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicacion_salidas.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicacion_salidas.id }}</catalog_id>
                         <field_type>text</field_type>
                         <filters>None</filters>
                         <geofence>None</geofence>
