@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.lista_de_materiales.id }}</form_id>
+    <id>66a041692bab6873c0b2291c</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>66a041692bab6873c0b22915</_id>
+                    <action_id>12</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <synched_catalogs>
+                            <item>
+                                <couch_id>{{ catalog.lista_de_materiales.obj_id }}</couch_id>
+                                <id>{{ catalog.lista_de_materiales.id }}</id>
+                                <name>Lista de Materiales</name>
+                            </item>
+                        </synched_catalogs>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>66a041692bab6873c0b22916</id>
+            <name>None</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-07-24T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-07-23T23:26:45.778Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

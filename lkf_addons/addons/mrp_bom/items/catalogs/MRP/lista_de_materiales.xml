@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <redirect_url>default</redirect_url>
+        <button_message>Mandar respuestas</button_message>
+    </confirmation>
+    <description />
+    <_rev>5-3fb540c37b2ae207ab2ac3eca7de64bc</_rev>
+    <updated_at>2024-07-23T23:46:28.984679+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Lista de Materiales</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-07-23T23:46:28.984679+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <config>False</config>
+            <required>False</required>
+            <manual>False</manual>
+        </folio>
+    </advanced_options>
+    <catalog_id>121356</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>66a040d42bab6873c0b22911</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>select</field_type>
+                    <field_id>66a0361f2bab6873c0b228f5</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Tipo de Lista</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>bom</value>
+                            <label>BoM</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>kit</value>
+                            <label>Kit</label>
+                        </item>
+                    </options>
+                    <key>False</key>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>True</fav>
+                    <required>False</required>
+                    <field_id>66a0361f2bab6873c0b228f4</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Nombre de Lista</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>True</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <field_id>66a036582bab6873c0b228f7</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Canitdad</label>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <size>small</size>
+                        <step>1</step>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>669efbf447920d1b51663d28</item>
+                        <item>669efc6f47920d1b51663d29</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.unidad_de_medida.obj_id }}</field_id>
+                    <label>Unidad de Medida</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>669efbf447920d1b51663d28</item>
+                            <item>669efc6f47920d1b51663d29</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.unidad_de_medida.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.unidad_de_medida.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>669efbf447920d1b51663d28</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Categoria</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.unidad_de_medida.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>669efc6f47920d1b51663d29</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Unidad de Media</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.unidad_de_medida.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+            </page_fields>
+            <page_name>Página 1</page_name>
+            <page_description>None</page_description>
+        </item>
+    </catalog_pages>
+</lkf>

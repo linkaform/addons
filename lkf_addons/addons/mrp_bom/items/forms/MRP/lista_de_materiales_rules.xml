@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.lista_de_materiales.id }}</form_id>
+    <id>66a03c2f2bab6873c0b22909</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>66a0361f2bab6873c0b228f5</field_id>
+                        <group_id>None</group_id>
+                        <id>66a0361f2bab6873c0b228f5</id>
+                        <label>Tipo de Lista</label>
+                        <type>select</type>
+                    </field>
+                    <value>kit</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66a03bff2bab6873c0b22908</field_id>
+                    <group_id>None</group_id>
+                    <id>66a03bff2bab6873c0b22908</id>
+                    <label>Codigo de Producto</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar Codigo de Producto</name>
+            <operator>and</operator>
+            <rule_id>11962320176f1c7b</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>66a0361f2bab6873c0b228f5</field_id>
+                        <group_id>None</group_id>
+                        <id>66a0361f2bab6873c0b228f5</id>
+                        <label>Tipo de Lista</label>
+                        <type>select</type>
+                    </field>
+                    <value>kit</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66a03bff2bab6873c0b22908</field_id>
+                    <group_id>None</group_id>
+                    <id>66a03bff2bab6873c0b22908</id>
+                    <label>Codigo de Producto</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requerir Codigo de Producto</name>
+            <operator>and</operator>
+            <rule_id>174e253d107d179c</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
