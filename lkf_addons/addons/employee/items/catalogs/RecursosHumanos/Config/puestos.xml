@@ -3,8 +3,8 @@
     <templates>[]</templates>
     <confirmation>{}</confirmation>
     <description />
-    <_rev>6-37785a326ce30444b99db06d59633c2e</_rev>
-    <updated_at>2024-05-23T17:44:48.490276+00:00Z</updated_at>
+    <_rev>6-0af774ab2228b25a7b8a341ac4ddecc6</_rev>
+    <updated_at>2024-05-23T22:41:37.703908+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -12,7 +12,7 @@
     <filters>{}</filters>
     <name>Puestos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T17:44:48.490276+00:00Z</created_at>
+    <created_at>2024-05-23T22:41:37.703908+00:00Z</created_at>
     <advanced_options>{}</advanced_options>
     <catalog_pages>
         <item>
@@ -44,7 +44,7 @@
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>664f80903e59756b3c62ff50</_id>
+    <_id>664fc62142c59486fadd0a25</_id>
     <public>False</public>
-    <catalog_id>119132</catalog_id>
+    <catalog_id>119172</catalog_id>
 </lkf>

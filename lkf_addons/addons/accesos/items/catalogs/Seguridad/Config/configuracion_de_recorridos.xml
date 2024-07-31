@@ -7,8 +7,8 @@
         <button_message>Mandar respuestas</button_message>
     </confirmation>
     <description />
-    <_rev>5-28629eaf477a8b5e1dd25d9aacd95c0d</_rev>
-    <updated_at>2024-05-23T18:37:18.114310+00:00Z</updated_at>
+    <_rev>11-1bf2fcf16e49718afd144bb96987815a</_rev>
+    <updated_at>2024-05-23T22:44:41.054923+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Configuracion de Recorridos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T18:37:18.114310+00:00Z</created_at>
+    <created_at>2024-05-23T22:44:41.054923+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,9 +25,9 @@
             <manual>False</manual>
         </folio>
     </advanced_options>
-    <catalog_id>119167</catalog_id>
+    <catalog_id>119206</catalog_id>
     <sync_last_update>None</sync_last_update>
-    <_id>664f8cdeaa9907e44a490edb</_id>
+    <_id>664fc6d9299cf118df34b5af</_id>
     <public>False</public>
     <catalog_pages>
         <item>
@@ -132,13 +132,13 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
 </lkf>

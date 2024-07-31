@@ -1393,7 +1393,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1478,7 +1478,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -1554,7 +1554,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1630,7 +1630,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>checkbox</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1706,7 +1706,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>integer</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1782,7 +1782,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>select</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1858,7 +1858,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -3228,7 +3228,7 @@
                         <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>select</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -4844,5 +4844,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1721234833.0</updated_at>
+    <updated_at>1721845111.0</updated_at>
 </lkf>

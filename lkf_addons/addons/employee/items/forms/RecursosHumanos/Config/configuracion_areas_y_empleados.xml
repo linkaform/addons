@@ -14,7 +14,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1716487296.0</created_at>
+    <created_at>1716504158.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -213,7 +213,7 @@
                         <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.employee.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -441,7 +441,7 @@
                         <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.employee.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -517,7 +517,7 @@
                         <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.employee.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -593,7 +593,7 @@
                         <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.employee.id }}</catalog_id>
                         <field_type>email</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -677,7 +677,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>664f7fda3e59756b3c62ff34</item>
+                        <item>66566d60d4619218b880cf04</item>
                         <item>663e5c57f5b8a7ce8211ed0b</item>
                         <item>663e5d44f5b8a7ce8211ed0f</item>
                         <item>6653f2d49c6d89925dc04b27</item>
@@ -826,7 +826,7 @@
                         <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -905,7 +905,7 @@
                         <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1145,7 +1145,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/119143/</resource_uri>
+    <resource_uri>/api/infosync/form/119182/</resource_uri>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>
@@ -1165,5 +1165,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1716837146.0</updated_at>
+    <updated_at>1721838690.0</updated_at>
 </lkf>

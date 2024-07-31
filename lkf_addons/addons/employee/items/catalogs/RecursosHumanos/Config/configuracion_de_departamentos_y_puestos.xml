@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>6-b457132f7a38e05d61d5047349f62196</_rev>
-    <updated_at>2024-05-23T17:44:48.890538+00:00Z</updated_at>
+    <_rev>3-0e52181317773792007bc0bbc3a402b5</_rev>
+    <updated_at>2024-05-23T22:41:54.058321+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Configuracion de Departamentos y Puestos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T17:44:48.890538+00:00Z</created_at>
+    <created_at>2024-05-23T22:41:54.058321+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,6 +25,10 @@
             <config>False</config>
         </folio>
     </advanced_options>
+    <catalog_id>119174</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>664fc6328d4dfb34de095582</_id>
+    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -111,8 +115,4 @@
             <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
-    <sync_last_update>None</sync_last_update>
-    <_id>664f80903e59756b3c62ff54</_id>
-    <public>False</public>
-    <catalog_id>119134</catalog_id>
 </lkf>

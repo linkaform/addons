@@ -95,7 +95,7 @@ class Location(Base, base.LKF_Base):
                     }
             }
             ]
-        # import simplejson
+        import simplejson
         # print('query=', simplejson.dumps(query, indent=4))
         res = self.cr.aggregate(query)
         area_address = {}

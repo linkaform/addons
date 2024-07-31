@@ -3,8 +3,8 @@
     <templates>[]</templates>
     <confirmation>{}</confirmation>
     <description />
-    <_rev>2-e71cb79eaf971c22f9394c908b097396</_rev>
-    <updated_at>2024-05-23T18:37:17.391266+00:00Z</updated_at>
+    <_rev>9-53aa9dd1a3941e12417603c83987490b</_rev>
+    <updated_at>2024-05-23T22:44:33.211290+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -12,8 +12,12 @@
     <filters>{}</filters>
     <name>Definicion de Examenes</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T18:37:17.391266+00:00Z</created_at>
+    <created_at>2024-05-23T22:44:33.211290+00:00Z</created_at>
     <advanced_options>{}</advanced_options>
+    <catalog_id>119204</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>664fc6d13c5b6fd17e5d521a</_id>
+    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -64,8 +68,4 @@
             <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
-    <sync_last_update>None</sync_last_update>
-    <_id>664f8cddaa9907e44a490ed7</_id>
-    <public>False</public>
-    <catalog_id>119165</catalog_id>
 </lkf>

@@ -3,8 +3,8 @@
     <templates>[]</templates>
     <confirmation>{}</confirmation>
     <description />
-    <_rev>2-b2f1bde995d01a07c2870ef9d556145e</_rev>
-    <updated_at>2024-05-23T18:37:15.774305+00:00Z</updated_at>
+    <_rev>8-dba7105eaa203a25cab85dfd3b3bf41b</_rev>
+    <updated_at>2024-05-23T22:44:10.522141+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -12,7 +12,7 @@
     <filters>{}</filters>
     <name>Gafetes</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T18:37:15.774305+00:00Z</created_at>
+    <created_at>2024-05-23T22:44:10.522141+00:00Z</created_at>
     <advanced_options>{}</advanced_options>
     <catalog_pages>
         <item>
@@ -134,7 +134,7 @@
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>664f8cdbaa9907e44a490ecf</_id>
+    <_id>664fc6ba860deae4c20954eb</_id>
     <public>False</public>
-    <catalog_id>119160</catalog_id>
+    <catalog_id>119199</catalog_id>
 </lkf>

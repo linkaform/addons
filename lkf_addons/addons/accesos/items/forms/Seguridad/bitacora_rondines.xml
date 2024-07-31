@@ -9,7 +9,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1716489476.0</created_at>
+    <created_at>1716504415.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -441,7 +441,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>664f8cdeaa9907e44a490edd</item>
+                        <item>664fc6e0aa68f4907234b5bd</item>
                         <item>663e5d44f5b8a7ce8211ed0f</item>
                         <item>66462b9d7124d1540f962087</item>
                         <item>66462b9d7124d1540f962088</item>
@@ -1205,7 +1205,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/119184/</resource_uri>
+    <resource_uri>/api/infosync/form/119223/</resource_uri>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>
@@ -1225,5 +1225,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1716516867.0</updated_at>
+    <updated_at>1721837459.0</updated_at>
 </lkf>

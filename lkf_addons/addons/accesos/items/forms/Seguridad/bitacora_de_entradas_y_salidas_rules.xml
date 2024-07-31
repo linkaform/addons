@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.bitacora_de_entradas_y_salidas.id }}</form_id>
-    <id>65cbe06cfb981b2d079f47e2</id>
+    <id>66563e4c8703971484cae3f3</id>
     <rules>
         <item>
             <conditions>
@@ -33,7 +33,7 @@
             <group_conditions>{}</group_conditions>
             <name>Oculta campo duración</name>
             <operator>and</operator>
-            <rule_id>1105233916192111</rule_id>
+            <rule_id>1245165225ee22af</rule_id>
             <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -57,22 +57,22 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>663ff887fb484baab9f27479</field_id>
+                    <field_id>662c51eb194f1cb7a91e5af0</field_id>
                     <group_id>None</group_id>
-                    <id>663ff887fb484baab9f27479</id>
-                    <label>NOTA:</label>
-                    <type>description</type>
+                    <id>662c51eb194f1cb7a91e5af0</id>
+                    <label>Fecha y hora de salida</label>
+                    <type>datetime</type>
                 </item>
                 <item>
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.areas_de_las_ubicaciones_salidas.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>663fb45992f2c5afcfe97ca7</id>
-                    <label>Caseta de salida</label>
+                    <id>664fc5f02b3279a37a0955bd</id>
+                    <label>Caseta de Salida</label>
                     <type>catalog</type>
                 </item>
                 <item>
-                    <catalog_id>None</catalog_id>
+                    <catalog_id>664fc5f02b3279a37a0955bd</catalog_id>
                     <field_id>663fb45992f2c5afcfe97ca8</field_id>
                     <group_id>None</group_id>
                     <id>663fb45992f2c5afcfe97ca8</id>
@@ -81,18 +81,100 @@
                 </item>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>662c51eb194f1cb7a91e5af0</field_id>
+                    <field_id>663ff887fb484baab9f27479</field_id>
                     <group_id>None</group_id>
-                    <id>662c51eb194f1cb7a91e5af0</id>
-                    <label>Fecha y hora de salida</label>
-                    <type>datetime</type>
+                    <id>663ff887fb484baab9f27479</id>
+                    <label>NOTA:</label>
+                    <type>description</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
             <name>Mostrar campos para salida</name>
             <operator>and</operator>
-            <rule_id>1b4a2520bcd476</rule_id>
+            <rule_id>246c1dd6102e1104</rule_id>
             <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>icontains=</condition>
+                    <field>
+                        <catalog_id>664fc6f5d6078682a4dd0ab3</catalog_id>
+                        <field_id>661dc67e901906b7e9b73bac</field_id>
+                        <group_id>None</group_id>
+                        <id>661dc67e901906b7e9b73bac</id>
+                        <label>Nombre del perfil</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value>Visita General</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662c5055921425ec3652a363</field_id>
+                    <group_id>None</group_id>
+                    <id>662c5055921425ec3652a363</id>
+                    <label>Documentación de evidencia</label>
+                    <type>group</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.configuracion_de_perfiles.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>664fc6e81d1a1fcda334b587</id>
+                    <label>Permisos</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662962bb203407ab90c886e4</field_id>
+                    <group_id>None</group_id>
+                    <id>662962bb203407ab90c886e4</id>
+                    <label>Nombre del permiso o certificación</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662c514c0c4dd326f152a632</field_id>
+                    <group_id>None</group_id>
+                    <id>662c514c0c4dd326f152a632</id>
+                    <label>Documento/Comprobante</label>
+                    <type>files</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662c514c0c4dd326f152a633</field_id>
+                    <group_id>None</group_id>
+                    <id>662c514c0c4dd326f152a633</id>
+                    <label>Imagen</label>
+                    <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662c514c0c4dd326f152a634</field_id>
+                    <group_id>None</group_id>
+                    <id>662c514c0c4dd326f152a634</id>
+                    <label>Vigencia</label>
+                    <type>date</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662c514c0c4dd326f152a635</field_id>
+                    <group_id>None</group_id>
+                    <id>662c514c0c4dd326f152a635</id>
+                    <label>Estatus del comprobante</label>
+                    <type>radio</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar GR sobre evidencias</name>
+            <operator>and</operator>
+            <rule_id>249f98364724cd</rule_id>
+            <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
     </rules>

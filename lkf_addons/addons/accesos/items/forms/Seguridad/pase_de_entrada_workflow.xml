@@ -109,7 +109,7 @@
                     <action_id>5</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
-                        <body>{% raw %}&lt;!doctype html&gt;
+                        <body>{% raw %} &lt;!doctype html&gt;
 &lt;html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -758,8 +758,7 @@
         &lt;/table&gt;
     &lt;/center&gt;
 &lt;/body&gt;
-&lt;/html&gt;
-{% endraw%}</body>
+&lt;/html&gt; {% endraw %}</body>
                         <email_fields>[]</email_fields>
                         <emails>
                             <item>EMAIL_FIELD_VALUE</item>
@@ -771,7 +770,7 @@
                         <send_attachments>False</send_attachments>
                         <send_pdf>False</send_pdf>
                         <sender>RECORD_USER</sender>
-                        <subject>Invitación de visita</subject>
+                        <subject>{% raw %} Invitación de visita {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
@@ -834,7 +833,7 @@
                     <action_id>5</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
-                        <body>{% raw %}&lt;!doctype html&gt;
+                        <body>{% raw %} &lt;!doctype html&gt;
 &lt;html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
@@ -1486,7 +1485,7 @@
         &lt;/table&gt;
     &lt;/center&gt;
 &lt;/body&gt;
-&lt;/html&gt;{% endraw %}</body>
+&lt;/html&gt; {% endraw %}</body>
                         <email_fields>
                             <item>
                                 <field_id>662c2937108836dec6d92581</field_id>
@@ -1502,7 +1501,7 @@
                         <send_attachments>False</send_attachments>
                         <send_pdf>True</send_pdf>
                         <sender>RECORD_USER</sender>
-                        <subject>{% raw %}Pase de entrada para {{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}}{% endraw %}</subject>
+                        <subject>{% raw %} Pase de entrada para {{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}} {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>

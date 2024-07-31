@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>2-a2378f79d91fc77ca37f8a496a15c4d7</_rev>
-    <updated_at>2024-05-23T18:37:17.651231+00:00Z</updated_at>
+    <_rev>9-dbfcb470d072169078d19bef87ba61d1</_rev>
+    <updated_at>2024-05-23T22:44:36.557532+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Definicion de Permisos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T18:37:17.651231+00:00Z</created_at>
+    <created_at>2024-05-23T22:44:36.557532+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,6 +25,10 @@
             <config>False</config>
         </folio>
     </advanced_options>
+    <catalog_id>119205</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>664fc6d4f81ae652b0095585</_id>
+    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -279,8 +283,4 @@
             <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
-    <sync_last_update>None</sync_last_update>
-    <_id>664f8cddaa9907e44a490ed9</_id>
-    <public>False</public>
-    <catalog_id>119166</catalog_id>
 </lkf>

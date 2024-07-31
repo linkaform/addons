@@ -3,12 +3,12 @@
     <templates>[]</templates>
     <confirmation>
         <message>¡Su información fue capturada!</message>
-        <redirect_url>default</redirect_url>
         <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>6-25929df957563dfe9a0ca67f387ec925</_rev>
-    <updated_at>2024-05-23T17:44:49.669287+00:00Z</updated_at>
+    <_rev>10-99d1f784c0f2968f72d421e457f2f70e</_rev>
+    <updated_at>2024-05-23T22:41:57.419864+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,13 +16,13 @@
     <filters>{}</filters>
     <name>Empleados Jefes Directos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T17:44:49.669287+00:00Z</created_at>
+    <created_at>2024-05-23T22:41:57.419864+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
-            <config>False</config>
-            <required>False</required>
             <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
         </folio>
     </advanced_options>
     <catalog_pages>
@@ -30,23 +30,23 @@
             <page_fields>
                 <item>
                     <field_type>text</field_type>
-                    <view_fields>[]</view_fields>
-                    <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
-                    <required>True</required>
-                    <field_id>663bd36eb19b7fb7d9e97ccb</field_id>
-                    <catalog>{}</catalog>
-                    <relation_type>None</relation_type>
-                    <label>Nombre completo</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
-                    <catalog_id>None</catalog_id>
-                    <key>None</key>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>663bd36eb19b7fb7d9e97ccb</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Nombre completo</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
@@ -55,21 +55,18 @@
                     <field_id>663bd4f719b0aab097e97cde</field_id>
                     <properties>
                         <date_format>None</date_format>
-                        <multi_selection>True</multi_selection>
-                        <file_name>None</file_name>
-                        <max_images_count>10</max_images_count>
-                        <data_format>[]</data_format>
-                        <location_decimals>None</location_decimals>
-                        <fieldId>[]</fieldId>
-                        <file_name_array>[]</file_name_array>
-                        <watermark_enable>False</watermark_enable>
-                        <metadata>[]</metadata>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
                             <text_data>None</text_data>
@@ -77,6 +74,9 @@
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
+                        <fieldId>[]</fieldId>
+                        <location_decimals>None</location_decimals>
+                        <metadata>[]</metadata>
                     </properties>
                     <label>Fotografía del empleado</label>
                 </item>
@@ -86,8 +86,8 @@
                     <field_id>663bd5c0b6e749213859eb6b</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>RFC</label>
                 </item>
@@ -97,8 +97,8 @@
                     <field_id>663bd5c0b6e749213859eb6c</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>CURP</label>
                 </item>
@@ -108,8 +108,8 @@
                     <field_id>663bd5c0b6e749213859eb6d</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>NSS</label>
                 </item>
@@ -118,8 +118,8 @@
                     <required>False</required>
                     <field_id>663bd5c0b6e749213859eb6e</field_id>
                     <properties>
-                        <custom>None</custom>
                         <format>vertical</format>
+                        <custom>None</custom>
                     </properties>
                     <label>Fecha de nacimiento</label>
                 </item>
@@ -239,12 +239,6 @@
                 </item>
                 <item>
                     <field_type>radio</field_type>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
                     <field_id>663bd5c0b6e749213859eb72</field_id>
                     <required>False</required>
                     <fav>True</fav>
@@ -263,6 +257,12 @@
                             <label>No disponible</label>
                         </item>
                     </options>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
                 </item>
             </page_fields>
             <page_description>None</page_description>
@@ -285,20 +285,21 @@
                     <label>Domicilio</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters>None</filters>
+                        <view_fields>
+                            <item>663a7e0fe48382c5b1230901</item>
+                        </view_fields>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.contacto.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <view_fields>
-                            <item>663a7e0fe48382c5b1230901</item>
-                        </view_fields>
+                        <filters>None</filters>
                         <name>{{ catalog.contacto.name }}</name>
                     </catalog>
                     <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
                     <field_id>663a7e0fe48382c5b1230901</field_id>
                     <required>False</required>
                     <fav>True</fav>
@@ -306,118 +307,117 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
-                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
                     <required>False</required>
                     <field_id>663a7f67e48382c5b1230908</field_id>
                     <label>Tipo de Contacto</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                         <field_type>select</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
-                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
                     <required>False</required>
                     <field_id>663a7ca6e48382c5b12308fa</field_id>
                     <label>Pais</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
-                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
                     <required>False</required>
                     <field_id>663a7dd6e48382c5b12308ff</field_id>
                     <label>Nombre Estado</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
-                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
                     <required>False</required>
                     <field_id>663a7e0fe48382c5b1230902</field_id>
                     <label>Direccion</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
-                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
                     <required>False</required>
                     <field_id>663a7f79e48382c5b123090a</field_id>
                     <label>Colonia</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
-                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
                     <required>False</required>
                     <field_id>663e5c8cf5b8a7ce8211ed0c</field_id>
                     <label>Geolocalizacion</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                         <field_type>geolocation</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
-                    <properties>{}</properties>
                 </item>
             </page_fields>
             <page_name_tab>page_name2</page_name_tab>
@@ -433,35 +433,35 @@
                     <label>Empresa</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters>None</filters>
+                        <view_fields>
+                            <item>663a8153e48382c5b1230918</item>
+                        </view_fields>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.compaia.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.compaia.id }}</catalog_id>
-                        <view_fields>
-                            <item>663a8153e48382c5b1230918</item>
-                        </view_fields>
+                        <filters>None</filters>
                         <name>{{ catalog.compaia.name }}</name>
                     </catalog>
                     <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
                     <required>False</required>
                     <field_id>663a8153e48382c5b1230918</field_id>
                     <label>Compañia</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.compaia.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.compaia.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
-                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>radio</field_type>
@@ -507,9 +507,9 @@
                     <field_id>663bd7f1d30e66d8d7cb972b</field_id>
                     <properties>
                         <number_of_decimals>2</number_of_decimals>
-                        <custom>None</custom>
-                        <step>1</step>
                         <size>small</size>
+                        <step>1</step>
+                        <custom>None</custom>
                     </properties>
                     <label>Número de empleado</label>
                 </item>
@@ -518,8 +518,8 @@
                     <required>False</required>
                     <field_id>663bd7f1d30e66d8d7cb972c</field_id>
                     <properties>
-                        <custom>None</custom>
                         <format>vertical</format>
+                        <custom>None</custom>
                     </properties>
                     <label>Fecha de ingreso</label>
                 </item>
@@ -528,8 +528,8 @@
                     <required>False</required>
                     <field_id>663bd7f1d30e66d8d7cb972d</field_id>
                     <properties>
-                        <custom>None</custom>
                         <format>vertical</format>
+                        <custom>None</custom>
                     </properties>
                     <label>Fecha de antigüedad</label>
                 </item>
@@ -576,8 +576,8 @@
                     <required>False</required>
                     <field_id>663bd7f1d30e66d8d7cb972f</field_id>
                     <properties>
-                        <custom>None</custom>
                         <format>vertical</format>
+                        <custom>None</custom>
                     </properties>
                     <label>Vencimiento de contrato</label>
                 </item>
@@ -587,8 +587,8 @@
                     <field_id>663bd7f1d30e66d8d7cb9730</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>Antigüedad</label>
                 </item>
@@ -598,9 +598,9 @@
                     <field_id>663bd7f1d30e66d8d7cb9731</field_id>
                     <properties>
                         <number_of_decimals>2</number_of_decimals>
-                        <custom>None</custom>
-                        <step>1</step>
                         <size>small</size>
+                        <step>1</step>
+                        <custom>None</custom>
                     </properties>
                     <label>Días pendientes de vacaciones</label>
                 </item>
@@ -609,8 +609,8 @@
                     <required>False</required>
                     <field_id>663bd7f1d30e66d8d7cb9732</field_id>
                     <properties>
-                        <custom>None</custom>
                         <format>vertical</format>
+                        <custom>None</custom>
                     </properties>
                     <label>Fecha de baja</label>
                 </item>
@@ -619,8 +619,8 @@
                     <required>False</required>
                     <field_id>663bd7f1d30e66d8d7cb9733</field_id>
                     <properties>
-                        <custom>None</custom>
                         <format>vertical</format>
+                        <custom>None</custom>
                     </properties>
                     <label>Fecha de baja ante el IMSS</label>
                 </item>
@@ -630,8 +630,8 @@
                     <field_id>663bd7f1d30e66d8d7cb9734</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>Motivo de baja</label>
                 </item>
@@ -723,22 +723,21 @@
                     <label>Puesto</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <view_fields>
-                            <item>663bc4ed8a6b120eab4d7f1e</item>
-                            <item>663bc4c79b8046ce89e97cf4</item>
-                        </view_fields>
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_departamentos_y_puestos.id }}</catalog_id>
-                        <filters>None</filters>
+                        <view_fields>
+                            <item>663bc4ed8a6b120eab4d7f1e</item>
+                            <item>663bc4c79b8046ce89e97cf4</item>
+                        </view_fields>
                         <name>{{ catalog.configuracion_de_departamentos_y_puestos.name }}</name>
                     </catalog>
                     <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
-                    <properties>{}</properties>
                     <field_id>663bc4ed8a6b120eab4d7f1e</field_id>
                     <required>False</required>
                     <fav>True</fav>
@@ -746,18 +745,18 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_departamentos_y_puestos.id }}</catalog_id>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                     </catalog>
                     <options>[]</options>
+                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
-                    <properties>{}</properties>
                     <field_id>663bc4c79b8046ce89e97cf4</field_id>
                     <required>False</required>
                     <fav>True</fav>
@@ -765,14 +764,15 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.configuracion_de_departamentos_y_puestos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_departamentos_y_puestos.id }}</catalog_id>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                     </catalog>
                     <options>[]</options>
+                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>radio</field_type>
@@ -916,8 +916,8 @@
                     <field_id>663bd91e75151ab4554d7f88</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>Sucursal</label>
                 </item>
@@ -927,8 +927,8 @@
                     <field_id>663bd91e75151ab4554d7f89</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>Cuenta bancaria</label>
                 </item>
@@ -938,8 +938,8 @@
                     <field_id>663bd91e75151ab4554d7f8a</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>Clabe interbancaria</label>
                 </item>
@@ -949,8 +949,8 @@
                     <field_id>663bd91e75151ab4554d7f8b</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>Número de tarjeta</label>
                 </item>
@@ -967,8 +967,8 @@
                     <properties>
                         <email_configuration>{}</email_configuration>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>Correo Personal</label>
                 </item>
@@ -979,8 +979,8 @@
                     <properties>
                         <email_configuration>{}</email_configuration>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>Correo empresarial</label>
                 </item>
@@ -990,8 +990,8 @@
                     <field_id>663bd91e75151ab4554d7f8f</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>Teléfono personal</label>
                 </item>
@@ -1001,8 +1001,8 @@
                     <field_id>663bd91e75151ab4554d7f8e</field_id>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <label>Teléfono empresarial</label>
                 </item>
@@ -1018,18 +1018,22 @@
                     <field_id>663bd466b19b7fb7d9e97cd4</field_id>
                     <properties>
                         <date_format>None</date_format>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
-                        <multi_selection>True</multi_selection>
-                        <file_name>None</file_name>
-                        <max_images_count>10</max_images_count>
-                        <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
-                        <file_name_array>[]</file_name_array>
-                        <watermark_enable>False</watermark_enable>
+                        <mime_types>[]</mime_types>
                         <watermark_config>
                             <color>None</color>
                             <text_data>None</text_data>
@@ -1037,10 +1041,6 @@
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
-                        <fieldId>[]</fieldId>
-                        <location_decimals>None</location_decimals>
-                        <mime_types>[]</mime_types>
-                        <metadata>[]</metadata>
                     </properties>
                     <label>CV</label>
                 </item>
@@ -1050,18 +1050,22 @@
                     <field_id>663bd466b19b7fb7d9e97cd5</field_id>
                     <properties>
                         <date_format>None</date_format>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
-                        <multi_selection>True</multi_selection>
-                        <file_name>None</file_name>
-                        <max_images_count>10</max_images_count>
-                        <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
-                        <file_name_array>[]</file_name_array>
-                        <watermark_enable>False</watermark_enable>
+                        <mime_types>[]</mime_types>
                         <watermark_config>
                             <color>None</color>
                             <text_data>None</text_data>
@@ -1069,10 +1073,6 @@
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
-                        <fieldId>[]</fieldId>
-                        <location_decimals>None</location_decimals>
-                        <mime_types>[]</mime_types>
-                        <metadata>[]</metadata>
                     </properties>
                     <label>ACTA DE NACIMIENTO</label>
                 </item>
@@ -1082,18 +1082,22 @@
                     <field_id>663bd466b19b7fb7d9e97cd6</field_id>
                     <properties>
                         <date_format>None</date_format>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
-                        <multi_selection>True</multi_selection>
-                        <file_name>None</file_name>
-                        <max_images_count>10</max_images_count>
-                        <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
-                        <file_name_array>[]</file_name_array>
-                        <watermark_enable>False</watermark_enable>
+                        <mime_types>[]</mime_types>
                         <watermark_config>
                             <color>None</color>
                             <text_data>None</text_data>
@@ -1101,10 +1105,6 @@
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
-                        <fieldId>[]</fieldId>
-                        <location_decimals>None</location_decimals>
-                        <mime_types>[]</mime_types>
-                        <metadata>[]</metadata>
                     </properties>
                     <label>CURP PDF</label>
                 </item>
@@ -1114,18 +1114,22 @@
                     <field_id>663bd466b19b7fb7d9e97cd7</field_id>
                     <properties>
                         <date_format>None</date_format>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
-                        <multi_selection>True</multi_selection>
-                        <file_name>None</file_name>
-                        <max_images_count>10</max_images_count>
-                        <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
-                        <file_name_array>[]</file_name_array>
-                        <watermark_enable>False</watermark_enable>
+                        <mime_types>[]</mime_types>
                         <watermark_config>
                             <color>None</color>
                             <text_data>None</text_data>
@@ -1133,10 +1137,6 @@
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
-                        <fieldId>[]</fieldId>
-                        <location_decimals>None</location_decimals>
-                        <mime_types>[]</mime_types>
-                        <metadata>[]</metadata>
                     </properties>
                     <label>RFC PDF</label>
                 </item>
@@ -1146,18 +1146,22 @@
                     <field_id>663bd466b19b7fb7d9e97cd8</field_id>
                     <properties>
                         <date_format>None</date_format>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
-                        <multi_selection>True</multi_selection>
-                        <file_name>None</file_name>
-                        <max_images_count>10</max_images_count>
-                        <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
-                        <file_name_array>[]</file_name_array>
-                        <watermark_enable>False</watermark_enable>
+                        <mime_types>[]</mime_types>
                         <watermark_config>
                             <color>None</color>
                             <text_data>None</text_data>
@@ -1165,10 +1169,6 @@
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
-                        <fieldId>[]</fieldId>
-                        <location_decimals>None</location_decimals>
-                        <mime_types>[]</mime_types>
-                        <metadata>[]</metadata>
                     </properties>
                     <label>CONSTANCIA DE SITUACIÓN FISCAL</label>
                 </item>
@@ -1178,18 +1178,22 @@
                     <field_id>663bd466b19b7fb7d9e97cd9</field_id>
                     <properties>
                         <date_format>None</date_format>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
-                        <multi_selection>True</multi_selection>
-                        <file_name>None</file_name>
-                        <max_images_count>10</max_images_count>
-                        <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
-                        <file_name_array>[]</file_name_array>
-                        <watermark_enable>False</watermark_enable>
+                        <mime_types>[]</mime_types>
                         <watermark_config>
                             <color>None</color>
                             <text_data>None</text_data>
@@ -1197,10 +1201,6 @@
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
-                        <fieldId>[]</fieldId>
-                        <location_decimals>None</location_decimals>
-                        <mime_types>[]</mime_types>
-                        <metadata>[]</metadata>
                     </properties>
                     <label>NSS PDF</label>
                 </item>
@@ -1210,18 +1210,22 @@
                     <field_id>663bd466b19b7fb7d9e97cda</field_id>
                     <properties>
                         <date_format>None</date_format>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
-                        <multi_selection>True</multi_selection>
-                        <file_name>None</file_name>
-                        <max_images_count>10</max_images_count>
-                        <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
-                        <file_name_array>[]</file_name_array>
-                        <watermark_enable>False</watermark_enable>
+                        <mime_types>[]</mime_types>
                         <watermark_config>
                             <color>None</color>
                             <text_data>None</text_data>
@@ -1229,10 +1233,6 @@
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
-                        <fieldId>[]</fieldId>
-                        <location_decimals>None</location_decimals>
-                        <mime_types>[]</mime_types>
-                        <metadata>[]</metadata>
                     </properties>
                     <label>INE</label>
                 </item>
@@ -1242,18 +1242,22 @@
                     <field_id>663bd466b19b7fb7d9e97cdb</field_id>
                     <properties>
                         <date_format>None</date_format>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
-                        <multi_selection>True</multi_selection>
-                        <file_name>None</file_name>
-                        <max_images_count>10</max_images_count>
-                        <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
-                        <file_name_array>[]</file_name_array>
-                        <watermark_enable>False</watermark_enable>
+                        <mime_types>[]</mime_types>
                         <watermark_config>
                             <color>None</color>
                             <text_data>None</text_data>
@@ -1261,10 +1265,6 @@
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
-                        <fieldId>[]</fieldId>
-                        <location_decimals>None</location_decimals>
-                        <mime_types>[]</mime_types>
-                        <metadata>[]</metadata>
                     </properties>
                     <label>COMPROBANTE DE DOMICILIO</label>
                 </item>
@@ -1275,15 +1275,17 @@
         <item>
             <page_fields>
                 <item>
-                    <field_type>text</field_type>
-                    <required>False</required>
+                    <field_type>integer</field_type>
                     <field_id>663bd466b19b7fb7d9e97cdc</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>User Id</label>
                     <properties>
-                        <send_email>False</send_email>
+                        <number_of_decimals>2</number_of_decimals>
+                        <size>small</size>
+                        <step>1</step>
                         <custom>None</custom>
-                        <size>complete</size>
                     </properties>
-                    <label>ID usuario</label>
                 </item>
             </page_fields>
             <page_name_tab>page_name8</page_name_tab>
@@ -1291,7 +1293,7 @@
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>664f80913e59756b3c62ff56</_id>
+    <_id>664fc6353c5b6fd17e5d5214</_id>
     <public>False</public>
-    <catalog_id>119135</catalog_id>
+    <catalog_id>119175</catalog_id>
 </lkf>

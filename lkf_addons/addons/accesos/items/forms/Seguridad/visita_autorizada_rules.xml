@@ -53,7 +53,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.contratistas.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>664f8cd6aa9907e44a490ebb</id>
+                    <id>664fc686c9f60bd52034b5ae</id>
                     <label>Contratista</label>
                     <type>catalog</type>
                 </item>

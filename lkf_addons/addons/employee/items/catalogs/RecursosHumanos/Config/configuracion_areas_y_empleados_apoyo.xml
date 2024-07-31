@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>5-60ab8ea147fa8230dd93b63a01e88f51</_rev>
-    <updated_at>2024-05-23T17:49:22.817537+00:00Z</updated_at>
+    <_rev>12-57e07d8561bfc58977ebd8627588a46d</_rev>
+    <updated_at>2024-05-23T22:42:10.117132+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Configuracion Areas y Empleados Apoyo</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T17:49:22.817537+00:00Z</created_at>
+    <created_at>2024-05-23T22:42:10.117132+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,10 +25,6 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>119137</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>664f81a23e59756b3c62ff5a</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -36,6 +32,7 @@
                     <field_type>catalog</field_type>
                     <catalog_fields>
                         <item>663bd36eb19b7fb7d9e97ccb</item>
+                        <item>663bd466b19b7fb7d9e97cdc</item>
                         <item>663bc4ed8a6b120eab4d7f1e</item>
                         <item>663bc4c79b8046ce89e97cf4</item>
                         <item>663bd5c0b6e749213859eb72</item>
@@ -75,6 +72,24 @@
                     </catalog>
                     <options>[]</options>
                     <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663bd466b19b7fb7d9e97cdc</field_id>
+                    <label>User Id</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>integer</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.empleados_jefes_directos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados_jefes_directos.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
                 </item>
                 <item>
                     <field_type>catalog-detail</field_type>
@@ -193,4 +208,8 @@
             <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>664fc64242c59486fadd0a27</_id>
+    <public>False</public>
+    <catalog_id>119177</catalog_id>
 </lkf>

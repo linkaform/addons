@@ -1,29 +1,19 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <templates>[]</templates>
-    <confirmation>
-        <message>¡Su información fue capturada!</message>
-        <button_message>Mandar respuestas</button_message>
-        <redirect_url>default</redirect_url>
-    </confirmation>
+    <confirmation>{}</confirmation>
     <description />
-    <_rev>2-90760238508e8c78e8d39ec3b30a7d29</_rev>
-    <updated_at>2024-05-23T18:37:16.268371+00:00Z</updated_at>
+    <_rev>6-c03931b1d0808c13a6e3b1e4c4e29aa3</_rev>
+    <updated_at>2024-05-23T22:41:46.388226+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
     </sync>
     <filters>{}</filters>
-    <name>Lista de fallas</name>
+    <name>Departamentos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T18:37:16.268371+00:00Z</created_at>
-    <advanced_options>
-        <folio>
-            <manual>False</manual>
-            <required>False</required>
-            <config>False</config>
-        </folio>
-    </advanced_options>
+    <created_at>2024-05-23T22:41:46.388226+00:00Z</created_at>
+    <advanced_options>{}</advanced_options>
     <catalog_pages>
         <item>
             <page_fields>
@@ -36,12 +26,12 @@
                     </properties>
                     <key>None</key>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>66397bae9e8b08289a59ec86</field_id>
+                    <field_id>663bc4ed8a6b120eab4d7f1e</field_id>
                     <required>False</required>
                     <fav>True</fav>
                     <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
-                    <label>Tipo de falla</label>
+                    <label>Nombre del departamento</label>
                     <catalog>{}</catalog>
                     <catalog_id>None</catalog_id>
                     <view_fields>[]</view_fields>
@@ -54,7 +44,7 @@
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>664f8cdcaa9907e44a490ed1</_id>
+    <_id>664fc62a299cf118df34b5a9</_id>
     <public>False</public>
-    <catalog_id>119162</catalog_id>
+    <catalog_id>119173</catalog_id>
 </lkf>

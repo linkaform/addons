@@ -39,11 +39,11 @@
                 </item>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>{{ catalog.configuracion_areas_y_empleados.obj_id}}</field_id>
+                    <field_id>6647fb38da07bf430e273ea2</field_id>
                     <group_id>None</group_id>
-                    <id>664f81a33e59756b3c62ff5c</id>
-                    <label>Guardia que  cierra la nota</label>
-                    <type>catalog</type>
+                    <id>6647fb38da07bf430e273ea2</id>
+                    <label>Comentario</label>
+                    <type>textarea</type>
                 </item>
                 <item>
                     <catalog_id>None</catalog_id>
@@ -52,14 +52,6 @@
                     <id>663bd36eb19b7fb7d9e97ccb</id>
                     <label>Nombre completo</label>
                     <type>catalog-select</type>
-                </item>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>6647fb38da07bf430e273ea2</field_id>
-                    <group_id>None</group_id>
-                    <id>6647fb38da07bf430e273ea2</id>
-                    <label>Comentario</label>
-                    <type>textarea</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>

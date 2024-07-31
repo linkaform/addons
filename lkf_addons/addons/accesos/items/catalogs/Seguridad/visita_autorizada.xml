@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>5-e1a5a0be742e1f69155c59b1af19120d</_rev>
-    <updated_at>2024-05-23T18:37:21.997010+00:00Z</updated_at>
+    <_rev>25-79bfbd88d7e9fd69c092abb8d5a8d98f</_rev>
+    <updated_at>2024-05-23T22:45:04.537221+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -35,7 +35,7 @@
     </filters>
     <name>Visita Autorizada</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T18:37:21.997010+00:00Z</created_at>
+    <created_at>2024-05-23T22:45:04.537221+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -44,9 +44,9 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>119172</catalog_id>
+    <catalog_id>119211</catalog_id>
     <sync_last_update>None</sync_last_update>
-    <_id>664f8ce1aa9907e44a490ee5</_id>
+    <_id>664fc6f0c9f60bd52034b5b1</_id>
     <public>False</public>
     <catalog_pages>
         <item>

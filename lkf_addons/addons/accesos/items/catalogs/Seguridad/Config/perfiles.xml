@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>38-b0da96e31d9a5f62fa6b38ed7130dee8</_rev>
-    <updated_at>2024-04-01T17:52:29.152270+00:00Z</updated_at>
+    <_rev>8-ad9d726210e98b205f486eef5a7b88e8</_rev>
+    <updated_at>2024-05-23T22:44:53.100178+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Perfiles</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-04-01T17:52:29.152270+00:00Z</created_at>
+    <created_at>2024-05-23T22:44:53.100178+00:00Z</created_at>
     <advanced_options>
         <folio>
             <manual>False</manual>
@@ -45,7 +45,7 @@
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>660af45d82d3c136badc3a4c</_id>
+    <_id>664fc6e53c5b6fd17e5d521c</_id>
     <public>False</public>
-    <catalog_id>117056</catalog_id>
+    <catalog_id>119208</catalog_id>
 </lkf>
