@@ -1803,7 +1803,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         folios = []
         # lots_in = {}
         data_from = {'warehouse':warehouse, 'warehouse_location':location}
-        print('data_from', data_from)
+        print('data_from', data_frodm)
         new_records_data = []
         skus = self.get_group_skus(move_lines)
         metadata = self.lkf_api.get_metadata(self.FORM_INVENTORY_ID)
@@ -1826,7 +1826,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                         'product_code':moves['product_code'],
                         'sku':moves['sku'],
                         'warehouse': warehouse_to,
-                        'warehouse_location': location_to
+                        'warehouse_location': location_to,
+                        'record_id':self.record_id
                         }
             if exists:
                 self.cache_set(cache_data)
@@ -1939,7 +1940,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                         'product_code':product_code,
                         'product_lot':lot_number,
                         'warehouse': warehouse,
-                        'warehouse_location': location
+                        'warehouse_location': location,
+                        'record_id':self.record_id
                         }
             if self.folio:
                 move_vals_from.update({'kwargs': {'nin_folio':self.folio }})
@@ -2038,7 +2040,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     'sku':sku,
                     'product_lot':stock['lot_number'],
                     'warehouse': stock['warehouse'],
-                    'warehouse_location': stock['warehouse_location']
+                    'warehouse_location': stock['warehouse_location'],
+                    'record_id':self.record_id
                     })
         print('fokios', folios)
         res = self.update_stock(answers={}, form_id=self.FORM_INVENTORY_ID, folios=folios)
