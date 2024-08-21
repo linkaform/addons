@@ -64,6 +64,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.CARGA_PERMISOS_VISITANTES = self.lkm.form_id('carga_de_permisos_de_visitantes','id')
         self.CHECKIN_CASETAS = self.lkm.form_id('checkin_checkout_casetas','id')
         self.CONCESSIONED_ARTICULOS = self.lkm.form_id('concesion_de_activos_unico','id')
+        self.CONF_PERFILES = self.lkm.form_id('configuracion_de_perfiles','id')
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
@@ -86,13 +87,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         en lkm estan todas las funcions generales de modulos).
 
         '''
-        self.DEFINICION_PERMISOS = self.lkm.catalog_id('definicion_de_permisos')
-        self.DEFINICION_PERMISOS_ID = self.DEFINICION_PERMISOS.get('id')
-        self.DEFINICION_PERMISOS_OBJ_ID = self.DEFINICION_PERMISOS.get('obj_id')
+
+        self.CONFIGURACION_GAFETES_LOCKERS = self.lkm.catalog_id('configuracion_de_gafetes_y_lockers')
+        self.CONFIGURACION_GAFETES_LOCKERS_ID = self.CONFIGURACION_GAFETES_LOCKERS.get('id')
+        self.CONFIGURACION_GAFETES_LOCKERS_OBJ_ID = self.CONFIGURACION_GAFETES_LOCKERS.get('obj_id')
 
         self.CONFIG_PERFILES = self.lkm.catalog_id('configuracion_de_perfiles')
         self.CONFIG_PERFILES_ID = self.CONFIG_PERFILES.get('id')
         self.CONFIG_PERFILES_OBJ_ID = self.CONFIG_PERFILES.get('obj_id')
+
+        self.DEFINICION_PERMISOS = self.lkm.catalog_id('definicion_de_permisos')
+        self.DEFINICION_PERMISOS_ID = self.DEFINICION_PERMISOS.get('id')
+        self.DEFINICION_PERMISOS_OBJ_ID = self.DEFINICION_PERMISOS.get('obj_id')
+
+        self.PERFILES = self.lkm.catalog_id('perfiles')
+        self.PERFILES_ID = self.PERFILES.get('id')
+        self.PERFILES_OBJ_ID = self.PERFILES.get('obj_id')
 
         self.PASE_ENTRADA_CAT = self.lkm.catalog_id('pase_de_entrada')
         self.PASE_ENTRADA_ID = self.PASE_ENTRADA_CAT.get('id')
@@ -128,8 +138,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'catalog_visita':'664fc6f5d6078682a4dd0ab3',
             ##### REVISAR Y BORRAR ######
 
-            'bitacora_salida':'662c51eb194f1cb7a91e5af0',
-            'bitacora_entrada':'662c51eb194f1cb7a91e5aef',
+            'fecha_salida':'662c51eb194f1cb7a91e5af0',
+            'fecha_entrada':'662c51eb194f1cb7a91e5aef',
             'comentario_pase':'65e0a69a322b61fbf9ed23af',
             'nombre_area':'663e5d44f5b8a7ce8211ed0f',
             'nombre_area_salida':'663fb45992f2c5afcfe97ca8',
@@ -160,7 +170,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
             'field_note':'6647fadc96f80017ac388648',
             'foto':'5ea35de83ab7dad56c66e045',
-            'gafete':'663e530af52d352956832f72',
+            'status_gafete':'663e530af52d352956832f72',
             'grupo_equipos':'663e446cadf967542759ebbb',
             'grupo_areas_acceso':'663fed6cb8262fd454326cb3',
             # 'grupo_commentario_area': '66af1a77d703592958dca5eb',
@@ -206,6 +216,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'user_id_empleado': '663bd32d7fb8869bbc4d7f7b',
             'vigencia_certificado':'662962bb203407ab90c886e6',
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
+            'walkin':'66c4261351cc14058b020d48'
 
         }
         self.mf = mf
@@ -236,20 +247,20 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         #- Para salida de bitacora y lista
         self.bitacora_fields = {
-            'bitacora_salida':f"{self.mf['bitacora_salida']}",
-            'bitacora_entrada':f"{self.mf['bitacora_entrada']}",
-            'caseta_entrada':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+            'fecha_salida':f"{self.mf['fecha_salida']}",
+            'fecha_entrada':f"{self.mf['fecha_entrada']}",
+            'caseta_entrada':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
             'codigo_qr':f"{self.mf['codigo_qr']}",
             'documento':f"{self.mf['documento']}",
             'comentario':"66ba83cc079d8a54634711c1",
-            'gafete':f"{self.mf['gafete']}",
+            'status_gafete':f"{self.mf['status_gafete']}",
             'grupo_comentario':"66ba83942fef3a4613a07e91",
             'nombre_visita':f"{self.mf['catalog_visita']}.{self.mf['nombre_visita']}",
             'nombre_area_salida':f"{self.mf['catalog_caseta_salida']}.{self.mf['nombre_area_salida']}",
             'perfil_visita':f"{self.mf['catalog_visita']}.{self.mf['nombre_perfil']}",
             'status_visita':f"{self.mf['tipo_registro']}",
             'tipo_comentario':"66ba83cc079d8a54634711c2",
-            'ubicacion':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
+            'ubicacion':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
         }
         self.checkin_fields = {
             'boot_checkin_date':'663bffc28d00553254f274e1',
@@ -316,6 +327,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'catalog_gafete':'664fc6ec8d4dfb34de095586',
             'id_gafete':'664803e6d79bc1dfd33885e1',
             'documento_gafete':'65e0b6f7a07a72e587124dc6',
+            'gafete_locker':'66480101786e8cdb66e70124',
         }
         #- Para creación , edición y lista de notas
         self.notes_fields = {
@@ -353,9 +365,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'foto_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}",
             'foto_pase_id':f"{self.mf['foto']}",
             'identificacion_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}",
+            'identificacion_pase_id':f"{self.mf['identificacion']}",
             'motivo':f"{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
             'nombre_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
             'nombre_tipo_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.66297e1579900d9018c886ad",
+            'nombre_perfil':     f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'perfil_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.661dc67e901906b7e9b73bac",
             'perfil_pase_id':f"661dc67e901906b7e9b73bac",
             'requerimientos_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e5",
@@ -371,10 +385,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'nombre_pase':'662c2937108836dec6d92580',
             'qr_pase':'64ef5b5fff1bec97d2ca27b6',
             'telefono_pase':'662c2937108836dec6d92582',
+            'tipo_visita':"662c262cace163ca3ed3bb3a",
             'vigencia_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.'662962bb203407ab90c886e6",
             'vigencia_expresa_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e7",
-            'nombre_perfil':     f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
+            'walkin_email':'662c2937108836dec6d92581',
+            'walkin_empresa':'66357d5e4f00f9018ce97ce9',
+            'walkin_fotografia':'66c4d5b6d1095c4ce8b2c42a',
+            'walkin_identificacion':'66c4d5b6d1095c4ce8b2c42b',
+            'walkin_nombre':'662c2937108836dec6d92580',
+            'walkin_telefono':'662c2937108836dec6d92582',
             'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",        
         }
         self.pase_grupo_visitados:{
@@ -438,6 +458,36 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         _single_leading_underscore: 
         weak “internal use” indicator. E.g. from M import * does not import objects whose names start with an underscore.
     '''
+    def assets_access_pass(self, location):
+        ### Areas
+        catalog_id = self.AREAS_DE_LAS_UBICACIONES_CAT_ID
+        form_id = self.PASE_ENTRADA
+        group_level = 2
+        options = {
+              "group_level": group_level,
+              "startkey": [
+                location
+              ],
+              "endkey": [
+                f"{location}\n",
+                {}
+              ]
+            }
+        areas = self.lkf_api.catalog_view(catalog_id, form_id, options) 
+        print('areas=',areas)
+        ### Aquien Visita
+        catalog_id = self.CONF_AREA_EMPLEADOS_CAT_ID
+        visita_a = self.lkf_api.catalog_view(catalog_id, form_id, options) 
+        # visita_a = [r.get('key')[group_level-1] for r in visita_a]
+        print('visita_a=',visita_a)
+        ### Pases de accesos
+        res = {
+            'Areas': areas,
+            'Visita_a': visita_a,
+            'Perfiles': self.get_pefiles_walkin(location),
+        }
+        # print('visita_a=',visita_a)
+        return res
 
     def _do_access(self, access_pass, location, area, data):
         '''
@@ -471,16 +521,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 # f"{self.pase_entrada_fields['status_pase']}":[access_pass['estatus'],],
                 f"{self.pase_entrada_fields['status_pase']}":['Activo',],
                 f"{self.pase_entrada_fields['foto_pase_id']}":[access_pass['foto'],],
+                f"{self.pase_entrada_fields['identificacion_pase_id']}":[access_pass['identificacion'],],
                 }
         answers = {
             f"{self.mf['tipo_registro']}": 'entrada',
-            f"{self.UBICACIONES_CAT_OBJ_ID}":{f"{self.f['location']}":location},
-            f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}":{f"{self.f['area']}":area},
+            f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}":{
+                f"{self.f['location']}":location,
+                f"{self.f['area']}":area
+                },
             f"{self.PASE_ENTRADA_OBJ_ID}":pase,
             f"{self.mf['codigo_qr']}": str(access_pass['_id']),
-            f"{self.mf['bitacora_entrada']}":self.today_str(employee.get('timezone', 'America/Monterrey'), date_format='datetime'),
+            f"{self.mf['fecha_entrada']}":self.today_str(employee.get('timezone', 'America/Monterrey'), date_format='datetime'),
         }
-        
         vehiculos = data.get('vehiculo',[])
         if vehiculos:
             list_vehiculos = []
@@ -497,7 +549,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         self.mf['marca_vehiculo']:marca,
                         self.mf['modelo_vehiculo']:modelo,
                     },
-                    self.mf['catalog_estado']:{
+                    self.ESTADO_OBJ_ID:{
                         self.mf['nombre_estado']:estado,
                     },
                     self.mf['placas_vehiculo']:placas,
@@ -510,7 +562,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if equipos:
             list_equipos = []
             for item in equipos:
-                tipo = item.get('tipo_equipo','')
+                tipo = item.get('tipo_equipo','').lower().replace(' ', '_')
                 nombre = item.get('nombre_articulo','')
                 marca = item.get('marca_articulo','')
                 modelo = item.get('modelo_articulo','')
@@ -527,17 +579,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.mf['grupo_equipos']] = list_equipos
         comment = data.get('comentario_acceso',[])
         if comment:
-            answers.update({
-                self.bitacora_fields['grupo_comentario']:
-                    [{
-                        self.bitacora_fields['comentario']:comment,
-                        self.bitacora_fields['tipo_comentario'] :'entrada'},]
-                })
+            comment_list = []
+            for c in comment:
+                comment_list.append(
+                    {
+                        self.bitacora_fields['comentario']:c.get('comentario_pase'),
+                        self.bitacora_fields['tipo_comentario'] :c.get('tipo_de_comentario').lower().replace(' ', '_')
+                    }
+                )
+            answers.update({self.bitacora_fields['grupo_comentario']:comment_list})
 
         print('answers=', simplejson.dumps(answers, indent=3))
         
         metadata.update({'answers':answers})
-
 
         response_create = self.lkf_api.post_forms_answers(metadata)
         print('response_create',response_create)
@@ -807,7 +861,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
                 answers = {
                     f"{self.mf['tipo_registro']}":'salida',
-                    f"{self.mf['bitacora_salida']}":fecha_hora_str,
+                    f"{self.mf['fecha_salida']}":fecha_hora_str,
                     f"{self.mf['duracion']}":duration,
                 }
                 response = self.lkf_api.patch_multi_record( answers=answers, form_id=self.BITACORA_ACCESOS, folios=[folio])
@@ -849,7 +903,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         form_id = form_id
         group_level = options.get('group_level',1)
         res = self.lkf_api.catalog_view(catalog_id, form_id, options)
-        res = [r.get('key')[group_level-1] for r in res]
         if detail:
             if res and len(res) > 0:
                 res = self._labels(res[0])
@@ -1162,7 +1215,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
-    def create_pase(self, data_pase):
+    def create_access_pass(self, location, access_pass):
         #---Define Metadata
         metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
         metadata.update({
@@ -1171,80 +1224,135 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "System": "Script",
                     "Module": "Accesos",
                     "Process": "Creación de pase",
-                    "Action": "create_pase",
+                    "Action": "create_access_pass",
                     "File": "accesos/app.py"
                 }
             },
         })
         #---Define Answers
+
         answers = {}
-        for key, value in data_pase.items():
-            if key == 'ubicacion_pase':
-                answers[self.mf['catalog_ubicacion']] = {self.mf['ubicacion']:value}
-            elif key == 'perfil_pase':
-                answers[self.CONFIG_PERFILES_OBJ_ID] = {self.mf['nombre_perfil']:value}
-            elif key == 'visita_a_pase':
-                list_visit = []
-                for item in value:
-                    nombre = item.get('nombre_completo','')
-                    list_visit.append({self.mf['catalog_guard']:{self.mf['nombre_empleado']:nombre}})
-                answers[self.mf['grupo_visitados']] = list_visit
-            elif key == 'authorized_pase':
-                answers[self.mf['catalog_guard_close']] = {self.mf['nombre_guardia_apoyo']:value}
-            elif key == 'areas_group_pase':
-                list_areas = []
-                for item in value:
-                    list_areas.append({self.UBICACIONES_CAT_OBJ_ID:{self.mf['nombre_area']:item}})
-                answers[self.pase_entrada_fields['areas_group_pase']] = list_areas
-            elif key == 'grupo_vehiculos':
-                list_vehiculos = []
-                for item in value:
-                    tipo = item.get('tipo','')
-                    marca = item.get('marca','')
-                    modelo = item.get('modelo','')
-                    estado = item.get('estado','')
-                    placas = item.get('placas','')
-                    color = item.get('color','')
-                    list_vehiculos.append({
-                        self.TIPO_DE_VEHICULO_OBJ_ID:{
-                            self.mf['tipo_vehiculo']:tipo,
-                            self.mf['marca_vehiculo']:marca,
-                            self.mf['modelo_vehiculo']:modelo,
-                        },
-                        self.mf['catalog_estado']:{
-                            self.mf['nombre_estado']:estado,
-                        },
-                        self.mf['placas_vehiculo']:placas,
-                        self.mf['color_vehiculo']:color,
-                    })
-                answers[self.mf['grupo_vehiculos']] = list_vehiculos  
-            elif key == 'grupo_equipos':
-                list_equipos = []
-                for item in value:
-                    nombre = item.get('nombre','')
-                    marca = item.get('marca','')
-                    color = item.get('color','')
-                    tipo = item.get('tipo','')
-                    serie = item.get('serie','')
-                    list_equipos.append({
-                        self.mf['tipo_equipo']:tipo,
-                        self.mf['nombre_articulo']:nombre,
-                        self.mf['marca_articulo']:marca,
-                        self.mf['numero_serie']:serie,
-                        self.mf['color_articulo']:color,
-                    })
-                answers[self.mf['grupo_equipos']] = list_equipos  
-            elif key == 'grupo_instrucciones_pase':
-                list_comments = []
-                for item in value:
-                    list_comments.append({self.pase_entrada_fields['comentario_pase']:item})
-                answers[self.pase_entrada_fields['grupo_instrucciones_pase']] = list_comments
-            else:
-                answers.update({f"{self.pase_entrada_fields[key]}":value})
+        perfil_pase = access_pass.get('perfil_pase')
+        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
+        timezone = user_data.get('timezone','America/Monterrey')
+        now_datetime =self.today_str(timezone, date_format='datetime')
+
+        answers[self.UBICACIONES_CAT_OBJ_ID] = {}
+        answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
+        answers[self.mf['fecha_desde_visita']] = now_datetime
+        answers[self.mf['tipo_visita_pase']] = 'fecha_fija'
+        answers[self.pase_entrada_fields['tipo_visita']] = 'alta_de_nuevo_visitante'
+        answers[self.pase_entrada_fields['walkin_nombre']] = access_pass.get('nombre')
+        answers[self.pase_entrada_fields['walkin_email']] = access_pass.get('email')
+        answers[self.pase_entrada_fields['walkin_empresa']] = access_pass.get('empresa')
+        answers[self.pase_entrada_fields['walkin_fotografia']] = access_pass.get('foto')
+        answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
+        answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono')
+        #Visita A
+        answers[self.mf['grupo_visitados']] = []
+        visita_a = access_pass.get('visita_a')
+        visita_set = {
+            self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
+                self.mf['nombre_empleado'] : visita_a,
+                }
+            }
+        options_vistia = {
+              "group_level": 3,
+              "startkey": [location, visita_a],
+              "endkey": [location, f"{visita_a}\n",{}],
+            }
+        cat_visita = self.catalogo_view(self.CONF_AREA_EMPLEADOS_CAT_ID, self.PASE_ENTRADA, options_vistia)
+        if len(cat_visita) > 0:
+            cat_visita = cat_visita[0]
+        print('cat_visita', cat_visita)
+        visita_set[self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID].update(cat_visita)
+        answers[self.mf['grupo_visitados']].append(visita_set)
+
+        # Perfil de Pase
+        answers[self.CONFIG_PERFILES_OBJ_ID] = {
+            self.mf['nombre_perfil'] : perfil_pase,
+        }
+        options = {
+              "group_level": 2,
+              "startkey": [perfil_pase],
+              "endkey": [f"{perfil_pase}\n",{}],
+            }
+        cat_perfil = self.catalogo_view(self.CONFIG_PERFILES_ID, self.PASE_ENTRADA, options)
+        print('perfil_pase', cat_perfil)
+        if len(cat_perfil) > 0:
+            cat_perfil = cat_perfil[0]
+        answers[self.CONFIG_PERFILES_OBJ_ID].update(cat_perfil)
+        if answers[self.CONFIG_PERFILES_OBJ_ID].get(self.mf['nombre_permiso']) and \
+           type(answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']]) == str:
+            answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']] = [answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']],]
+
+
+        # elif key == 'grupo_vehiculos':
+        #         list_vehiculos = []
+        #         for item in value:
+        #             tipo = item.get('tipo','')
+        #             marca = item.get('marca','')
+        #             modelo = item.get('modelo','')
+        #             estado = item.get('estado','')
+        #             placas = item.get('placas','')
+        #             color = item.get('color','')
+        #             list_vehiculos.append({
+        #                 self.TIPO_DE_VEHICULO_OBJ_ID:{
+        #                     self.mf['tipo_vehiculo']:tipo,
+        #                     self.mf['marca_vehiculo']:marca,
+        #                     self.mf['modelo_vehiculo']:modelo,
+        #                 },
+        #                 self.ESTADO_OBJ_ID:{
+        #                     self.mf['nombre_estado']:estado,
+        #                 },
+        #                 self.mf['placas_vehiculo']:placas,
+        #                 self.mf['color_vehiculo']:color,
+        #             })
+        #         answers[self.mf['grupo_vehiculos']] = list_vehiculos  
+        #     elif key == 'grupo_equipos':
+        #         list_equipos = []
+        #         for item in value:
+        #             nombre = item.get('nombre','')
+        #             marca = item.get('marca','')
+        #             color = item.get('color','')
+        #             tipo = item.get('tipo','')
+        #             serie = item.get('serie','')
+        #             list_equipos.append({
+        #                 self.mf['tipo_equipo']:tipo,
+        #                 self.mf['nombre_articulo']:nombre,
+        #                 self.mf['marca_articulo']:marca,
+        #                 self.mf['numero_serie']:serie,
+        #                 self.mf['color_articulo']:color,
+        #             })
+        #         answers[self.mf['grupo_equipos']] = list_equipos  
         #---Valor
+
         metadata.update({'answers':answers})
-        #print('answers', simplejson.dumps(metadata, indent=4))
-        print('Respuesta',self.lkf_api.post_forms_answers(metadata))
+        print('answers', simplejson.dumps(metadata, indent=4))
+        res = self.lkf_api.post_forms_answers(metadata)
+        return res
+
+    def format_comentarios(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['comentario'] = r.get(self.bitacora_fields['comentario'],'')
+            row['tipo_comentario'] = r.get(self.bitacora_fields['tipo_comentario'],'')
+            res.append(row)
+        return res
+
+    def format_equipos(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['modelo_articulo'] = r.get(self.mf['modelo_articulo'],'')
+            row['marca_articulo'] = r.get(self.mf['marca_articulo'],'')
+            row['numero_serie'] = r.get(self.mf['numero_serie'],'')
+            row['nombre_articulo'] = r.get(self.mf['nombre_articulo'],'')
+            row['tipo_equipo'] = r.get(self.mf['tipo_equipo'],'').title()
+            row['color_articulo'] = r.get(self.mf['color_articulo'],'').title()
+            res.append(row)
+        return res
 
     def format_perfil_pase(self, perfil_pase, id_user=None, empresa=None):
         certificaciones = []
@@ -1262,6 +1370,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 cert['status'] = z
             certificaciones.append(cert)
         return certificaciones
+
+    def format_vehiculos(self, data):
+        res = []
+        for v in data:
+            row = {}
+            row['color'] = v.get(self.mf['color_vehiculo'],'').title()
+            row['placas'] = v.get(self.mf['placas_vehiculo'],'')
+            row['tipo'] = v.get(self.TIPO_DE_VEHICULO_OBJ_ID,{}).get(self.mf['tipo_vehiculo'],'')
+            row['marca_vehiculo'] = v.get(self.TIPO_DE_VEHICULO_OBJ_ID,{}).get(self.mf['marca_vehiculo'],'')
+            row['modelo_vehiculo'] = v.get(self.TIPO_DE_VEHICULO_OBJ_ID,{}).get(self.mf['modelo_vehiculo'],'')
+            row['nombre_estado'] = v.get(self.ESTADO_OBJ_ID,{}).get(self.mf['nombre_estado'],'')
+            res.append(row)
+        return res
 
     def get_access_pass(self, qr_code):
         match_query = {
@@ -1398,17 +1519,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'nombre': {"$ifNull":[
                     f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
                     f"$answers.{self.mf['nombre_pase']}"]},
-                'estatus': {'$first':f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['status_visita']}"},
-                'empresa': {'$first':{"$ifNull":[
+                'estatus': f"$answers.{self.pase_entrada_fields}.{self.pase_entrada_fields['status_pase']}",
+                'empresa': {"$ifNull":[
                      f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['empresa']}",
-                     f"$answers.{self.mf['empresa_pase']}"]}},
-                'email':  {'$first':{"$ifNull":[
+                     f"$answers.{self.mf['empresa_pase']}"]},
+                'email':  {"$ifNull":[
                     f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['email_vista']}",
-                    f"$answers.{self.mf['email_pase']}"]}},
-                'telefono': {'$first':{"$ifNull":[
+                    f"$answers.{self.mf['email_pase']}"]},
+                'telefono': {"$ifNull":[
                     f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['telefono']}",
-                    f"$answers.{self.mf['telefono_pase']}"]}},
-                'curp': {'$first':f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['curp']}"},
+                    f"$answers.{self.mf['telefono_pase']}"]},
+                'curp': f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['curp']}",
                 'fecha_de_expedicion': f"$answers.{self.mf['fecha_desde_visita']}",
                 'fecha_de_caducidad':{'$ifNull':[
                     f"$answers.{self.mf['fecha_desde_hasta']}",
@@ -1419,7 +1540,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'limite_de_acceso': f"$answers.{self.mf['config_limitar_acceso']}",
                 'identificacion': f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['identificacion']}",
                 'limitado_a_dias':f"$answers.{self.mf['config_dias_acceso']}",
-                'motivo_visita':{'$first':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}"},
+                'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
                 'perfil_pase':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}",
                 'tipo_de_pase':f"$answers.{self.pase_entrada_fields['perfil_pase']}",
                 'tipo_de_comentario': f"$answers.{self.mf['tipo_de_comentario']}",
@@ -1453,6 +1574,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             p = x.pop('visita_a_puesto') if x.get('visita_a_puesto') else []
             e = x.pop('visita_a_user_id') if x.get('visita_a_user_id') else []
             u = x.pop('visita_a_email') if x.get('visita_a_email') else []
+            x['empresa'] = self.unlist(x.get('empresa',''))
+            x['email'] = self.unlist(x.get('email',''))
+            x['telefono'] = self.unlist(x.get('telefono',''))
+            x['curp'] = self.unlist(x.get('curp',''))
+            x['motivo_visita'] = self.unlist(x.get('motivo_visita',''))
             for idx, nombre in enumerate(v):
                 emp = {'nombre':nombre}
                 if len(d) >= (idx+1):
@@ -1641,16 +1767,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ACCESOS,
-            f"answers.{self.bitacora_fields['codigo_qr']}":qr,
-            f"answers.{self.bitacora_fields['codigo_qr']}":qr,
+            f"answers.{self.mf['codigo_qr']}":qr,
         }
         res = self.cr.find(
             match_query, 
             {
                 'folio':'$folio', 
                 'status_visita': f"$answers.{self.bitacora_fields['status_visita']}",
-                'checkin_date': f"$answers.{self.bitacora_fields['bitacora_entrada']}",
-                'checkout_date': f"$answers.{self.bitacora_fields['bitacora_salida']}",
+                'checkin_date': f"$answers.{self.bitacora_fields['fecha_entrada']}",
+                'checkout_date': f"$answers.{self.bitacora_fields['fecha_salida']}",
                 }
             ).sort('updated_at', -1).limit(1)
         return self.format_cr(res, get_one=True)
@@ -1725,12 +1850,61 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             f"answers.{self.bitacora_fields['ubicacion']}":location,
             f"answers.{self.bitacora_fields['caseta_entrada']}":area,
         }
+        proyect_fields ={
+            '_id': 1,
+            'folio': "$folio",
+            'created_at': "$created_at",
+            'updated_at': "$updated_at",
+            #general
+            'a_quien_visita':f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
+            'fecha_salida':f"$answers.{self.mf['fecha_salida']}",
+            'fecha_entrada':f"$answers.{self.mf['fecha_entrada']}",
+            'caseta_entrada':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+            'codigo_qr':f"$answers.{self.mf['codigo_qr']}",
+            'comentarios':f"$answers.{self.bitacora_fields['grupo_comentario']}",
+            'documento': f"$answers.{self.mf['documento']}",
+            'status_gafete':f"$answers.{self.mf['status_gafete']}",
+            'id_gafete': f"$answers.{self.CONFIGURACION_GAFETES_LOCKERS_OBJ_ID}.{self.gafetes_fields['id_gafete']}",
+            'gafete_locker': {'$arrayElemAt': [f"$answers.{self.CONFIGURACION_GAFETES_LOCKERS_OBJ_ID}.{self.gafetes_fields['gafete_locker']}",0]},
+            'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
+            'nombre_area_salida':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
+            'nombre_visitante':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
+            'foto': {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}"},
+            'identificacion':  {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}"},
+            #'perfil_visita':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",
+            'perfil_visita':{'$arrayElemAt': [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",0]},
+            'status_visita':f"$answers.{self.mf['tipo_registro']}",
+            'ubicacion':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+            #Vehiculos
+            'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
+            'equipos':f"$answers.{self.mf['grupo_equipos']}",
+            'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
+            }
+        lookup = {
+         'from': 'form_answer',
+         'localField': 'codigo_qr',
+         'foreignField': '_id',
+         'as': 'new_fields'
+        }
         query = [
             {'$match': match_query },
-            {'$project': self.proyect_format(self.bitacora_fields)},
+            {'$project': proyect_fields},
+            {'$lookup': lookup},
             {'$sort':{'folio':-1}},
         ]
-        return self.format_cr_result(self.cr.aggregate(query))
+        print('query=', simplejson.dumps(query, indent=4))
+        records = self.format_cr(self.cr.aggregate(query))
+        for r in records:
+            # print(r)
+            r['motivo_visita'] = self.unlist(r.get('motivo_visita',''))
+            r['status_visita'] = r.get('status_visita','').title().replace('_', ' ')
+            r['status_gafete'] = r.get('status_gafete','').title().replace('_', ' ')
+            r['documento'] = r.get('documento','').title().replace('_', ' ')
+            r['grupo_areas_acceso'] = self._labels_list(r.pop('grupo_areas_acceso',[]), self.mf)
+            r['comentarios'] = self.format_comentarios(r.get('comentarios',[]))
+            r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
+            r['equipos'] = self.format_equipos(r.get('equipos',[]))
+        return  records
 
     def get_list_fallas(self, location, area):
         match_query = {
@@ -1818,11 +1992,43 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # print('answers', simplejson.dumps(query, indent=4))
         return self.format_cr(self.cr.aggregate(query))
 
-    def get_list_last_user_move(self, qr, status=False):
+    def get_lista_pase(self, location, status='activo'):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.PASE_ENTRADA,
+            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location,
+            f"answers.{self.pase_entrada_fields['status_pase']}":status
+        }
+        proyect_fields = {'_id':1,
+            'folio': f"$folio",
+            'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+            'nombre': {"$ifNull":[
+                f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
+                f"$answers.{self.mf['nombre_pase']}"]},
+            'estatus': f"$answers.{self.pase_entrada_fields}.{self.pase_entrada_fields['status_pase']}",
+            'empresa': {"$ifNull":[
+                 f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['empresa']}",
+                 f"$answers.{self.mf['empresa_pase']}"
+                    ]
+                 },
+            'foto': f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['foto']}",
+            }
+        query = [
+            {'$match': match_query },
+            {'$project': proyect_fields},
+            {'$sort':{'folio':-1}},
+        ]
+        records = self.format_cr(self.cr.aggregate(query))
+        for rec in records:
+            rec['qr_code'] = rec['_id']
+            rec['empresa'] = self.unlist(rec.get('empresa',[]))
+        return  records
+
+    def get_list_last_user_move(self, qr, limit=100, status=False):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ACCESOS,
-            f"answers.{self.bitacora_fields['codigo_qr']}":qr,
+            f"answers.{self.mf['codigo_qr']}":qr,
         }
 
         if status == 'in':
@@ -1838,14 +2044,62 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = self.cr.find(
             match_query, 
             {
-                'status_visita': f"$answers.{self.bitacora_fields['status_visita']}",
-                'fecha':f"$answers.{self.mf['bitacora_entrada']}",
+                'comentarios': f"$answers.{self.bitacora_fields['grupo_comentario']}",
+                'checkin_date': f"$answers.{self.bitacora_fields['fecha_entrada']}",
+                'checkout_date': f"$answers.{self.bitacora_fields['fecha_salida']}",
                 'duration':f"$answers.{self.mf['duracion']}",
+                'folio':'$folio', 
+                'fecha':f"$answers.{self.mf['fecha_entrada']}",
+                'status_visita': f"$answers.{self.bitacora_fields['status_visita']}",
                 'visita_a':f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
-                
+                #Vehiculos
+                'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
+                'equipos':f"$answers.{self.mf['grupo_equipos']}",
             }
-            ).sort('updated_at', -1).limit(10000)
-        return self.format_cr(res)
+            ).sort('updated_at', -1).limit(limit)
+        result = self.format_cr(res)
+        for r in result:
+            r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
+            r['equipos'] = self.format_equipos(r.get('equipos',[]))
+            r['comentarios'] = self.format_comentarios(r.get('comentarios',[]))
+
+            # if r.get('comentario'):
+            #     coment=[]
+            #     for c in r['comentario']:
+            #         print('c=',c)
+            #         row = {
+            #             'comentario':c.get(self.bitacora_fields['comentario']),
+            #             'tipo_comentario':c.get(self.bitacora_fields['tipo_comentario'])
+            #         }
+            #     coment.append(row)
+            #     r['comentario'] = coment
+        return result
+
+    def get_pefiles_walkin(self, location):
+        query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.CONF_PERFILES,
+            f"answers.{self.PERFILES_OBJ_ID}.{self.mf['walkin']}":'Si'
+        }
+        format_filed = {
+            'perfil': f"$answers.{self.PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}",
+            'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}"
+            } 
+        res = []
+        for r in self.cr.find(query,format_filed):
+            if r.get('perfil'):
+                if location:
+                    if r.get('ubicacion'): 
+                        if r['ubicacion'] == location:
+                            if r['perfil'] not in res:
+                                res.append(r['perfil'])
+                    else:
+                        if r['perfil'] not in res:
+                            res.append(r['perfil'])
+                else:
+                    if r['perfil'] not in res:
+                        res.append(r['perfil'])
+        return res
 
     def get_user_booths_availability(self):
         '''
@@ -2037,16 +2291,27 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         Si NO entregas el qr_code, te regresa todos los qr de dicha area y ubicacion
         Si no entregas nada, te regrea un warning...
         """
+        last_move = {}
         if self.validate_value_id(qr_code):
-            last_move = self.get_last_user_move(qr_code, location)
-            if not last_move or last_move.get('salida'):
+            print('qr_code=',qr_code)
+            last_moves = self.get_list_last_user_move(qr_code, limit=10)
+            if len(last_moves) > 0:
+                last_move = last_moves[0]
+            # else:
+            #     self.LKFException({"msg":"No se econtro ninguan entrada con pase "+ qr_code})
+            # print('last_moves=',simplejson.dumps(last_moves, indent=3))
+            #last_move = self.get_last_user_move(qr_code, location)
+            if not last_move or last_move.get('status_visita') == 'salida':
                 tipo_movimiento = 'Entrada'
             else:
                 tipo_movimiento = 'Salida'
             access_pass = self.get_detail_access_pass(qr_code)
             #---Last Access
-            access_pass['ultimo_acceso'] = self.get_list_last_user_move(qr_code)
+            access_pass['ultimo_acceso'] = last_moves
             access_pass['tipo_movimiento'] = tipo_movimiento
+            print('last_move', last_move)
+            access_pass['grupo_vehiculos'] = last_move.get('vehiculos',[])
+            access_pass['grupo_equipos'] = last_move.get('equipos',[])
             if access_pass.get('grupo_areas_acceso'):
                 for area in access_pass['grupo_areas_acceso']:
                     area['status'] = self.get_area_status(access_pass['ubicacion'], area['nombre_area'])
