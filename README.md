@@ -67,6 +67,28 @@ config.update({
 
 ``` 
 
+
+### Enableing Bash History
+
+This will help you on you development stage, it will store all you bash hsiotry comands, so you can search on command hisotry with `Ctrl+R` , This will prompot you for you search query input en the bash cli. 
+
+To enable this option simply run:
+
+1. Ensure that there is no file with `~/.bash_lkf_history` or folder. If so, delete thoes first using:
+``` 
+rm -rf ~/.bash_lkf_history
+```
+
+> If it was a file, this will delete all the bash hisotry. This also can be done if you what to clean
+> your history for any given reason
+
+2. Create a file called `.bash_lkf_history` on your home directory. For that run:
+```
+touch ~/.bash_lkf_history 
+```
+
+
+
 # Requirments
 
 Docker and Git, I asume you have `git` install so let's install docker.
