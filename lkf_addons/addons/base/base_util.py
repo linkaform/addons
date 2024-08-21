@@ -10,7 +10,13 @@ class Base(base.LKF_Base):
         #use self.lkm.catalog_id() to get catalog id
         # forms
         self.CONTACTO = self.lkm.form_id('contacto', 'id')
+        self.CLIENTE = self.lkm.form_id('clientes', 'id')
         # catalgos
+
+        self.CLIENTE_CAT = self.lkm.catalog_id('clientes')
+        self.CLIENTE_CAT_ID = self.CLIENTE_CAT.get('id')
+        self.CLIENTE_CAT_OBJ_ID = self.CLIENTE_CAT.get('obj_id')
+
         self.COMPANY = self.lkm.catalog_id('compaia')
         self.COMPANY_ID = self.COMPANY.get('id')
         self.COMPANY_OBJ_ID = self.COMPANY.get('obj_id')
@@ -42,6 +48,12 @@ class Base(base.LKF_Base):
             'address2':'663a7f79e48382c5b123090a',
             'country':'663a7ca6e48382c5b12308fa',
             'city':'6654187fc85ce22aaf8bb070',
+            'nombre_comercial':'667468e3e577b8b98c852aaa',
+            'razon_social':'6687f2f37b2c023e187d6252',
+            'rfc_razon_social':'667468e3e577b8b98c852aab',
+            'email':'66bfd647cd15883ed163e9b5',
+            'telefono':'66bfd666cd15883ed163e9b6',
+            'pagina_web':'66bfd66ecd15883ed163e9b7',
             'state':'663a7dd6e48382c5b12308ff',
             'state_code':'663a7dd6e48382c5b1230900',
             'email':'663a7ee1e48382c5b1230907',

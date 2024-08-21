@@ -30,6 +30,10 @@ class Employee(Base, base.LKF_Base):
         self.PUESTOS_ID = self.PUESTOS.get('id')
         self.PUESTOS_OBJ_ID = self.PUESTOS.get('obj_id')
 
+        self.DEPARTAMENTOS = self.lkm.catalog_id('departamentos')
+        self.DEPARTAMENTOS_ID = self.DEPARTAMENTOS.get('id')
+        self.DEPARTAMENTOS_OBJ_ID = self.DEPARTAMENTOS.get('obj_id')
+
         self.CONF_AREA_EMPLEADOS_CAT = self.lkm.catalog_id('configuracion_areas_y_empleados')
         self.CONF_AREA_EMPLEADOS_CAT_ID = self.CONF_AREA_EMPLEADOS_CAT.get('id')
         self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID = self.CONF_AREA_EMPLEADOS_CAT.get('obj_id')
@@ -43,13 +47,12 @@ class Employee(Base, base.LKF_Base):
         self.EMPLEADOS_JEFES_DIRECTOS_OBJ_ID = self.EMPLEADOS_JEFES_DIRECTOS.get('obj_id')
 
         self.employee_fields = {
-            'worker_name':'62c5ff407febce07043024dd',
-            'worker_name_jefes':'663bd36eb19b7fb7d9e97ccb',
-            'worker_department':'663bc4ed8a6b120eab4d7f1e',
-            'worker_position':'663bc4c79b8046ce89e97cf4',
-            'worker_name_b':'663bd36eb19b7fb7d9e97ccb',
-            'team_name':'62c5ff0162a70c261328845d',
+            'city':'6654187fc85ce22aaf8bb070',
+            'address':'663a7e0fe48382c5b1230902',
             'areas_group':'663cf9d77500019d1359eb9f',
+            'estatus_dentro_empresa':'663bcbe2274189281359eb77',
+            'estatus_disponibilidad':'663bcbe2274189281359eb78',
+            'cat_timezone':self.f['cat_timezone'],
             'user_id':'663bd32d7fb8869bbc4d7f7b',
             'user_id_jefes':'663bd466b19b7fb7d9e97cdc',
             'user_id_b':'663bd466b19b7fb7d9e97cdc',
@@ -63,9 +66,13 @@ class Employee(Base, base.LKF_Base):
             'fecha_nacimiento':'663bcbe2274189281359eb74',
             'genero':'663bcbe2274189281359eb75',
             'status_en_empresa':'663bcbe2274189281359eb77',
-            'cat_timezone':self.f['cat_timezone'],
-            'city':'6654187fc85ce22aaf8bb070',
-            'address':'663a7e0fe48382c5b1230902',
+            'team_name':'62c5ff0162a70c261328845d',
+            'telefono1':'66c3c17ece46780a6953aa29',
+            'worker_name':'62c5ff407febce07043024dd',
+            'worker_name_jefes':'663bd36eb19b7fb7d9e97ccb',
+            'worker_department':'663bc4ed8a6b120eab4d7f1e',
+            'worker_position':'663bc4c79b8046ce89e97cf4',
+            'worker_name_b':'663bd36eb19b7fb7d9e97ccb',
                 }
 
         self.f.update(self.employee_fields)

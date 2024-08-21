@@ -88,19 +88,19 @@
                     <field_type>catalog</field_type>
                     <catalog_fields>[]</catalog_fields>
                     <required>False</required>
-                    <field_id>{{ catalog.lista_de_equipos.obj_id }}</field_id>
+                    <field_id>{{ catalog.tipo_de_equipos.obj_id }}</field_id>
                     <label>Tipo de equipo</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <filters />
                         <view_index>0</view_index>
-                        <couch_id>{{ catalog.lista_de_equipos.obj_id }}</couch_id>
+                        <couch_id>{{ catalog.tipo_de_equipos.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.lista_de_equipos.id }}</catalog_id>
+                        <catalog_id>{{ catalog.tipo_de_equipos.id }}</catalog_id>
                         <view_fields>
                             <item>6639a9d9d38959539f59eb9f</item>
                         </view_fields>
-                        <name>{{ catalog.lista_de_equipos.name }}</name>
+                        <name>{{ catalog.tipo_de_equipos.name }}</name>
                     </catalog>
                     <properties>{}</properties>
                 </item>
@@ -116,8 +116,8 @@
                         <filters />
                         <field_type>text</field_type>
                         <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.lista_de_equipos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.lista_de_equipos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.tipo_de_equipos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_equipos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <options>[]</options>

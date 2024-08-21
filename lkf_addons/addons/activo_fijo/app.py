@@ -62,13 +62,27 @@ class Vehiculo(base.LKF_Base):
         en lkm estan todas las funcions generales de modulos).
 
         '''
-        self.LISTA_DE_EQUIPOS = self.lkm.catalog_id('lista_de_equipos')
-        self.LISTA_DE_EQUIPOS_ID = self.LISTA_DE_EQUIPOS.get('id')
-        self.LISTA_DE_EQUIPOS_OBJ_ID = self.LISTA_DE_EQUIPOS.get('obj_id')
+
+
+        self.ACTIVOS_FIJOS_CAT = self.lkm.catalog_id('activos_fijos')
+        self.ACTIVOS_FIJOS_CAT_ID = self.ACTIVOS_FIJOS_CAT.get('id')
+        self.ACTIVOS_FIJOS_CAT_OBJ_ID = self.ACTIVOS_FIJOS_CAT.get('obj_id')
+
+        self.TIPO_DE_EQUIPO = self.lkm.catalog_id('tipo_de_equipos')
+        self.TIPO_DE_EQUIPO_ID = self.TIPO_DE_EQUIPO.get('id')
+        self.TIPO_DE_EQUIPO_OBJ_ID = self.TIPO_DE_EQUIPO.get('obj_id')
+
         self.TIPO_DE_VEHICULO = self.lkm.catalog_id('tipos_de_vehiculo')
         self.TIPO_DE_VEHICULO_ID = self.TIPO_DE_VEHICULO.get('id')
         self.TIPO_DE_VEHICULO_OBJ_ID = self.TIPO_DE_VEHICULO.get('obj_id')
 
+        self.MARCA = self.lkm.catalog_id('marca')
+        self.MARCA_ID = self.MARCA.get('id')
+        self.MARCA_OBJ_ID = self.MARCA.get('obj_id')
+
+        self.MODELO = self.lkm.catalog_id('modelo')
+        self.MODELO_ID = self.MODELO.get('id')
+        self.MODELO_OBJ_ID = self.MODELO.get('obj_id')
 
         ## Module Fields ##
         ''' self.mf : Estos son los campos que deseas mantener solo dentro de este modulo '''
@@ -88,7 +102,26 @@ class Vehiculo(base.LKF_Base):
                 el orden de heredacion sera, primero carga A>B>C>D.
         '''
         self.f.update({
-            'tipo_vehiculo':'65f22098d1dc5e0b9529e89a'
+            'categoria_marca':'66beb1b507981d4509575057',
+            'categoria':'66beb1b507981d4509575057',
+            'estatus':'6646393c3fa8b818265d0329',
+            'estado':'66c1940b89463aa27fc1818c',
+            'fecha_horometro':'66c176ac89463aa27fc18172',
+            'fecha_horometro_2':'66c176ac89463aa27fc18173',
+            'fecha_kilometraje':'66c189f689463aa27fc18189',
+            'fecha_kilometraje_2':'66c176dc89463aa27fc18175',
+            'marca':'66beb10007981d4509575054',
+            'modelo':'66beb11907981d4509575056',
+            'nombre_equipo':'66c192ef89463aa27fc1818b',
+            'numero_de_serie_chasis':'6646393c3fa8b818265d0325',
+            'numero_de_serie_motor1':'66c174ec89463aa27fc1816c',
+            'numero_de_serie_motor2':'66c174ec89463aa27fc1816d',
+            'tipo_vehiculo':'65f22098d1dc5e0b9529e89a',
+            'tipo_equipo':'6639a9d9d38959539f59eb9f',
+            'ultimo_horometro':'66c1758989463aa27fc1816e',
+            'ultimo_horometro_2':'66c1758989463aa27fc1816f',
+            'ultimo_kilometraje':'66c1758989463aa27fc18170',
+            'ultimo_kilometraje2':'66c1758989463aa27fc18171',
             }
             )
 
