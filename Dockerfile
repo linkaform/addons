@@ -33,6 +33,7 @@ RUN apt-get update && \
 
 COPY ./secrets/lkf_jwt_key.pub /etc/ssl/certs/lkf_jwt_key.pub
 
+WORKDIR /srv/scripts/addons/modules
 
 ####################################
 # Image for develop                #
@@ -62,8 +63,24 @@ RUN mkdir -p /srv/scripts/addons/config
 RUN chown -R 1000:1000 /srv/scripts
 WORKDIR /srv/scripts/addons/modules
 
+####
+# Oracle Integration
+###
+WORKDIR /opt/oracle
+ADD https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/6650c41a967ad190e6a76dd3/66b5974cae333f423347115c.zip  66b5974cae333f423347115c.zip
+RUN unzip 66b5974cae333f423347115c.zip
+RUN cd /opt/oracle/instantclient_12_2/
+ENV LD_LIBRARY_PATH=/opt/oracle/instantclient:$LD_LIBRARY_PATH
+
+RUN apt-get install libaio1
+RUN echo /opt/oracle/instantclient_12_2 > /etc/ld.so.conf.d/oracle-instantclient.conf
+RUN ldconfig
+
+### END ORACLE ###
 
 USER nonroot
+
+WORKDIR /srv/scripts/addons/modules
 
 ####################################
 # Image for prodcution             #

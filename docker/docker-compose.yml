@@ -29,7 +29,7 @@ services:
       - ../modules:/srv/scripts/addons/modules
       - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/ 
       - ../../lkf/infosync_scripts/:/srv/infosync_scripts
-      - ../../../.bash_history:/root/.bash_history
+      - ../../../.bash_lkf_history:/srv/scripts/.bash_history
     command: sleep infinity
     stdin_open: true
     tty: true
@@ -57,7 +57,7 @@ services:
       - ../modules:/srv/scripts/addons/modules
       - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/ 
       - ../../lkf/infosync_scripts/:/srv/infosync_scripts
-      - ../../../.bash_history:/root/.bash_history
+      - ../../../.bash_lkf_history:/srv/scripts/.bash_history
     command: sleep infinity
     stdin_open: true
     tty: true

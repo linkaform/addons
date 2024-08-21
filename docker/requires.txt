@@ -1,6 +1,8 @@
 b2==1.4.2
 CouchDB-Linkaform
 -e git+https://github.com/linkaform/backbalze_utils.git#egg=backblaze_utils
+
+cx-Oracle==8.3.0
 httplib2==0.12.1
 #facturapi
 Jinja2==3.1.2
