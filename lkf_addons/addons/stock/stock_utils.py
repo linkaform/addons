@@ -2005,9 +2005,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             sku = stock.get('sku')
             warehouse = stock.get('warehouse')
             location = stock.get('warehouse_location')
-            print('lot_number........',lot_number)
-            print('warehouse........',warehouse)
-            print('location........',location)
             moves[self.f['move_dest_folio']] = stock['folio']
             set_location = f"{stock['warehouse']}__{stock['warehouse_location']}__{lot_number}"
             if set_location in move_locations:
@@ -2023,7 +2020,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 }
                 self.LKFException(msg_error_app)
             move_locations.append(set_location)
-            print('stock_info........',stock)
             if not stock.get('folio'):
                 continue
             # Información que modifica el usuario
@@ -2279,6 +2275,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             }
+        match_query.update(self.stock_kwargs_query(**kwargs))
         query_forms = self.STOCK_ONE_MANY_ONE_FORMS
         if len(query_forms) > 1:
             form_query = {"form_id":{"$in":query_forms}}
@@ -2297,13 +2294,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         print('product_code', product_code)
         print('sku', sku)
         print('lot_number', lot_number)
-        inc_folio = kwargs.get("inc_folio")
-        nin_folio = kwargs.get("nin_folio")
-        if inc_folio:
-            match_query.update({"folio":inc_folio})
-        if nin_folio:
-            match_query.update({"folio": {"$ne":nin_folio }})
-
         if move_type =='in':
             if warehouse:
                 match_query.update({f"answers.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_dest']}":warehouse})
@@ -2393,10 +2383,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             "form_id": self.ADJUIST_FORM_ID,
             f"answers.{self.f['inv_adjust_status']}":{"$ne":"cancel"}
             }
-        # inc_folio = kwargs.get("kwargs",{}).get("inc_folio")
-        # exclude_folio = kwargs.get("kwargs",{}).get("exclude_folio")
-        inc_folio = None
-        exclude_folio = None
+        match_query.update(self.stock_kwargs_query(**kwargs))
+        inc_folio = kwargs.pop("inc_folio") if kwargs.get("inc_folio") else None
         if warehouse:
             match_query.update({f"answers.{self.WAREHOUSE_OBJ_ID}.{self.f['warehouse']}":warehouse})      
         if date_from or date_to:
@@ -2415,8 +2403,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if location:
             match_query_stage2.update({f"answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_lot_location']}":location})
         query= [{'$match': match_query }]
-        if exclude_folio:
-            query += [{'$match': get_folios_match(exclude_folio=exclude_folio) }]
         query += [
             {'$unwind': '$answers.{}'.format(self.f['grading_group'])},
             ]
@@ -2464,8 +2450,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             "form_id": self.ADJUIST_FORM_ID,
             f"answers.{self.f['inv_adjust_status']}":{"$ne":"cancel"}
             }
-        inc_folio = kwargs.get("inc_folio")
-        nin_folio = kwargs.get("nin_folio")
+        match_query.update(self.stock_kwargs_query(**kwargs))
+        inc_folio = kwargs.pop("inc_folio") if kwargs.get("inc_folio") else None
         if warehouse:
             match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})   
         if location:
@@ -2474,8 +2460,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
         match_query_stage2 = {}
         # match_query_stage2 = {f"answers.{self.f['grading_group']}.{self.f['inv_adjust_grp_status']}": "done"}
-        if nin_folio:
-            match_query.update({"folio": {"$ne":nin_folio }})
         if inc_folio:
             match_query_stage2 = {"$or": [
                 {f"answers.{self.f['grading_group']}.{self.f['inv_adjust_grp_status']}": "done"},
