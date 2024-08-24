@@ -2533,12 +2533,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             }
         unwind_query = {}
         unwind = {'$unwind': '$answers.{}'.format(self.f['move_group'])}
-        inc_folio = kwargs.get("inc_folio")
-        nin_folio = kwargs.get("nin_folio")
-        if inc_folio:
-            match_query.update({"folio":inc_folio})
-        if nin_folio:
-            match_query.update({"folio": {"$ne":nin_folio }})
+        match_query.update(self.stock_kwargs_query(**kwargs))
         if status:
             match_query.update({f"answers.{self.f['inv_adjust_status']}":status})
         if date_from or date_to:
@@ -2598,17 +2593,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             "form_id": self.STOCK_MOVE_FORM_ID  
             }
         unwind_query = {}
-        # print('move type.................', move_type)
-        # print('warehouse', warehouse)
-        # print('location', location)
-        # print('product_code', product_code)
-        # print('lot_number', lot_number)
-        inc_folio = kwargs.get("inc_folio")
-        nin_folio = kwargs.get("nin_folio")
-        if inc_folio:
-            match_query.update({"folio":inc_folio})
-        if nin_folio:
-            match_query.update({"folio": {"$ne":nin_folio }})
+        match_query.update(self.stock_kwargs_query(**kwargs))
         if product_code:
             match_query.update({f"answers.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})
         if sku:
@@ -2718,12 +2703,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             }
         unwind_query = {}
         unwind = {'$unwind': '$answers.{}'.format(self.f['move_group'])}
-        inc_folio = kwargs.get("inc_folio")
-        nin_folio = kwargs.get("nin_folio")
-        if inc_folio:
-            match_query.update({"folio":inc_folio})
-        if nin_folio:
-            match_query.update({"folio": {"$ne":nin_folio }})
+        match_query.update(self.stock_kwargs_query(**kwargs))
         if status:
             match_query.update({f"answers.{self.f['inv_adjust_status']}":status})
         if date_from or date_to:
@@ -2781,13 +2761,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             "form_id": self.STOCK_MANY_LOCATION_2_ONE,
             }
         unwind_query = {}
+        match_query.update(self.stock_kwargs_query(**kwargs))
         unwind = {'$unwind': '$answers.{}'.format(self.f['move_group'])}
-        inc_folio = kwargs.get("inc_folio")
-        nin_folio = kwargs.get("nin_folio")
-        if inc_folio:
-            match_query.update({"folio":inc_folio})
-        if nin_folio:
-            match_query.update({"folio": {"$ne":nin_folio }})
         if status:
             match_query.update({f"answers.{self.f['inv_adjust_status']}":status})
         if date_from or date_to:
@@ -2842,6 +2817,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             "deleted_at":{"$exists":False},
             "form_id": self.MOVE_NEW_PRODUCTION_ID,
             }
+        match_query.update(self.stock_kwargs_query(**kwargs))
         match_query_stage2 = {}
         if date_from or date_to:
             match_query_stage2.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=f"{self.f['set_production_date']}"))
@@ -2935,12 +2911,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             "deleted_at":{"$exists":False},
             "form_id": self.STOCK_MOVE_FORM_ID,
             }
-        inc_folio = kwargs.get("inc_folio")
-        nin_folio = kwargs.get("nin_folio")
-        if inc_folio:
-            match_query.update({"folio":inc_folio})
-        if nin_folio:
-            match_query.update({"folio": {"$ne":nin_folio }})
+        match_query.update(self.stock_kwargs_query(**kwargs))
         if product_code:
             match_query.update({f"answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})
 
@@ -2996,6 +2967,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             # "form_id": {"$in":[self.SCRAP_FORM_ID, self.GRADING_FORM_ID]}
             "form_id": self.SCRAP_FORM_ID
             }
+        match_query.update(self.stock_kwargs_query(**kwargs))
         if product_code:
             match_query.update({f"answers.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code})
         if lot_number:
