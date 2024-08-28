@@ -212,6 +212,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             'worker_name':'62c5ff407febce07043024dd',
             'worker_obj_id':'62c5ff243c63280985580087',
         })
+        
+        self.mf = {}
 
     def add_dicts(self, dict1, dict2):
         for key in dict1:
