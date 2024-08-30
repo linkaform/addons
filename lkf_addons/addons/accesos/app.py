@@ -1902,13 +1902,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print('mango query', simplejson.dumps(mango_query))
         return self.format_lockers(self.lkf_api.search_catalog( self.LOCKERS_CAT_ID, mango_query))
 
-    def get_list_bitacora(self, location, area):
+    def get_list_bitacora(self, location=None, area=None):
         match_query = {
             "deleted_at":{"$exists":False},
-            "form_id": self.BITACORA_ACCESOS,
-            f"answers.{self.bitacora_fields['ubicacion']}":location,
-            f"answers.{self.bitacora_fields['caseta_entrada']}":area,
+            "form_id": self.BITACORA_ACCESOS
         }
+        if location:
+            match_query.update({f"answers.{self.bitacora_fields['ubicacion']}":location})
+        if area:
+            match_query.update({f"answers.{self.bitacora_fields['caseta_entrada']}":area})
+
         proyect_fields ={
             '_id': 1,
             'folio': "$folio",
