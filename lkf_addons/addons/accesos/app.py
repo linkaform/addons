@@ -188,7 +188,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'grupo_visitados': '663d4ba61b14fab90559ebb0',
             'grupo_vehiculos': '663e446cadf967542759ebba',
             'identificacion':'65ce34985fa9df3dbf9dd2d0',
-            'id_locker':'66480101786e8cdb66e70124',
+            'locker_id':'66480101786e8cdb66e70124',
             'marca_vehiculo':'65f22098d1dc5e0b9529e89b',
             'marca_articulo':'663e4730724f688b3059eb3a',
             'modelo_articulo':'66b29872aa6b3e6c3c02baa6',
@@ -333,9 +333,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.gafetes_fields = {
             'caseta_gafete':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
             'documento_gafete':'65e0b6f7a07a72e587124dc6',
-            'id_gafete':'664803e6d79bc1dfd33885e1',
+            'gafete_id':'664803e6d79bc1dfd33885e1',
             'catalog_gafete':'664fc6ec8d4dfb34de095586',
-            'status_gafete':'663961d5390b9ec511e97ca5',
             'ubicacion_gafete':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             'visita_gafete':f"{self.mf['catalog_visita']}.{self.mf['nombre_visita']}",
         }
@@ -519,18 +518,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         })
         # metadata['folio'] = self.create_poruction_lot_number()
 
+        try:
+            pase = {
+                    f"{self.mf['nombre_visita']}": access_pass['nombre'],
+                    f"{self.mf['curp']}":access_pass['curp'],
+                    ### Campos Select
+                    f"{self.mf['empresa']}":[access_pass.get('empresa'),],
+                    f"{self.pase_entrada_fields['perfil_pase_id']}": [access_pass['tipo_de_pase'],],
+                    # f"{self.pase_entrada_fields['status_pase']}":[access_pass['estatus'],],
+                    f"{self.pase_entrada_fields['status_pase']}":['Activo',],
+                    f"{self.pase_entrada_fields['foto_pase_id']}":[access_pass['foto'],],
+                    f"{self.pase_entrada_fields['identificacion_pase_id']}":[access_pass['identificacion'],],
+                    }
+        except Exception as e:
+            self.LKFException({"msg":f"Error al crear registro ingreso, no se encontro: {e}"}) 
 
-        pase = {
-                f"{self.mf['nombre_visita']}": access_pass['nombre'],
-                f"{self.mf['curp']}":access_pass['curp'],
-                ### Campos Select
-                f"{self.mf['empresa']}":[access_pass.get('empresa'),],
-                f"{self.pase_entrada_fields['perfil_pase_id']}": [access_pass['tipo_de_pase'],],
-                # f"{self.pase_entrada_fields['status_pase']}":[access_pass['estatus'],],
-                f"{self.pase_entrada_fields['status_pase']}":['Activo',],
-                f"{self.pase_entrada_fields['foto_pase_id']}":[access_pass['foto'],],
-                f"{self.pase_entrada_fields['identificacion_pase_id']}":[access_pass['identificacion'],],
-                }
         answers = {
             f"{self.mf['tipo_registro']}": 'entrada',
             f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}":{
@@ -589,10 +591,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         gafete = data.get('gafete',{})
         if gafete:
             gafete_ans = {}
-            gafete_ans[self.GAFETES_CAT_OBJ_ID] = {self.gafetes_fields['id_gafete']:gafete.get('id_gafete')}
-            gafete_ans[self.LOCKERS_CAT_OBJ_ID] = {self.mf['id_locker']:gafete.get('id_locker')}
+            gafete_ans[self.GAFETES_CAT_OBJ_ID] = {self.gafetes_fields['gafete_id']:gafete.get('gafete_id')}
+            gafete_ans[self.LOCKERS_CAT_OBJ_ID] = {self.mf['locker_id']:gafete.get('locker_id')}
             gafete_ans[self.mf['documento']] = gafete.get('documento_garantia')
             answers.update(gafete_ans)
+            self.update_gafet_status(answers)
 
 
         comment = data.get('comentario_acceso',[])
@@ -609,7 +612,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         
         metadata.update({'answers':answers})
-
         response_create = self.lkf_api.post_forms_answers(metadata)
         return response_create
 
@@ -863,10 +865,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         response = False
         last_check_out = self.get_last_user_move(qr, location)
+        if last_check_out.get('gafete_id'):
+            self.LKFException(f"Se necesita liberar el gafete antes de regitrar la salida")
         if not location:
             self.LKFException(f"Se requiere especificar una ubicacion de donde se raelizara la salida.")
         if not area:
-            self.LKFException(f"Se requiere especificar el area de donde se raelizara la salida.")
+            self.LKFException(f"Se requiere especificar el area de donde se realizara la salida.")
         if last_check_out.get('folio'):
             folio = last_check_out.get('folio',0)
             checkin_date_str = last_check_out.get('checkin_date')
@@ -875,7 +879,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
             duration = time.strftime('%H:%M:%S', time.gmtime( self.date_2_epoch(fecha_hora_str) - self.date_2_epoch(checkin_date_str)))
             if self.user_in_facility(status_visita=last_check_out.get('status_visita')):
-
                 answers = {
                     f"{self.mf['tipo_registro']}":'salida',
                     f"{self.mf['fecha_salida']}":fecha_hora_str,
@@ -1106,8 +1109,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.UBICACIONES_CAT_OBJ_ID] = {self.mf['nombre_area']:value}
             elif  key == 'visita_gafete':
                 answers[self.mf['catalog_visita']] = {self.mf['nombre_visita']:value}
-            elif  key == 'id_gafete':
-                answers[self.GAFETES_CAT_OBJ_ID] = {self.gafetes_fields['id_gafete']:value}
+            elif  key == 'gafete_id':
+                answers[self.GAFETES_CAT_OBJ_ID] = {self.gafetes_fields['gafete_id']:value}
             else:
                 answers.update({f"{self.gafetes_fields[key]}":value})
 
@@ -1371,11 +1374,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res
 
     def format_gafete(self, data):
+        print("data=",data)
         res = []
         for r in data:
             row = {}
+            row['_id'] = r.get('_id')
             row['ubicacion'] = r.get(self.f['location'])
-            row['id_gafete'] = r.get(self.gafetes_fields['id_gafete'])
+            row['gafete_id'] = r.get(self.gafetes_fields['gafete_id'])
             row['status'] = r.get(self.mf['status_gafete'])
             row['area'] = r.get(self.f['area'])
             res.append(row)
@@ -1385,8 +1390,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for r in data:
             row = {}
+            row['_id'] = r.get('_id')
             row['ubicacion'] = r.get(self.f['location'])
-            row['id_locker'] = r.get(self.mf['id_locker'])
+            row['locker_id'] = r.get(self.mf['locker_id'])
             row['status'] = r.get(self.mf['status_locker'])
             row['tipo_locker'] = r.get(self.mf['tipo_locker'])
             row['area'] = r.get(self.f['area'])
@@ -1395,6 +1401,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def format_perfil_pase(self, perfil_pase, id_user=None, empresa=None):
         certificaciones = []
+        if not perfil_pase.get('nombre_permiso') :
+            return {}
         for idx, name in enumerate(perfil_pase.get('nombre_permiso',[])):
             cert = {}
             cert['nombre_certificacion'] = name
@@ -1408,9 +1416,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 z = self.get_valiaciones_certificado(name, id_user, empresa)
                 cert['status'] = z
             certificaciones.append(cert)
-
-        print('certs=', simplejson.dumps(certificaciones, indent=3))
-        print(s)
         return certificaciones
 
     def format_vehiculos(self, data):
@@ -1579,9 +1584,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"$answers.{self.mf['fecha_desde_visita']}",
                     ]
                     },
-                'foto': f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['foto']}",
+                'foto': {'$ifNull':[
+                    f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['foto']}",
+                    f"$answers.{self.pase_entrada_fields['walkin_fotografia']}"]},
                 'limite_de_acceso': f"$answers.{self.mf['config_limitar_acceso']}",
-                'identificacion': f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['identificacion']}",
+                'identificacion': {'$ifNull':[
+                    f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['identificacion']}",
+                    f"$answers.{self.pase_entrada_fields['walkin_identificacion']}"]},
                 'limitado_a_dias':f"$answers.{self.mf['config_dias_acceso']}",
                 'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
                 'perfil_pase':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}",
@@ -1819,6 +1828,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'status_visita': f"$answers.{self.bitacora_fields['status_visita']}",
                 'checkin_date': f"$answers.{self.bitacora_fields['fecha_entrada']}",
                 'checkout_date': f"$answers.{self.bitacora_fields['fecha_salida']}",
+                'gafete_id': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
+                'locker_id': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.mf['locker_id']}",
                 }
             ).sort('updated_at', -1).limit(1)
         return self.format_cr(res, get_one=True)
@@ -1828,8 +1839,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ARTICULOS_PERDIDOS,
-            f"answers.{self.perdidos_fields['ubicacion_perdido']}":location,
-            f"answers.{self.perdidos_fields['area_perdido']}":area,
+            # f"answers.{self.perdidos_fields['ubicacion_perdido']}":location,
+            # f"answers.{self.perdidos_fields['area_perdido']}":area,
         }
         query = [
             {'$match': match_query },
@@ -1843,7 +1854,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
-            f"answers.{self.consecionados_fields['ubicacion_concesion']}":location,
+            # f"answers.{self.consecionados_fields['ubicacion_concesion']}":location,
         }
         query = [
             {'$match': match_query },
@@ -1865,14 +1876,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         ]
         return self.format_cr_result(self.cr.aggregate(query))
 
-    def get_gafetes(self, status='Disponible', location=None, area=None, limit=1000, skip=0):
+    def get_gafetes(self, status='Disponible', location=None, area=None, gafete_id=None, limit=1000, skip=0):
         selector = {}
         if status:
-            selector.update({f"answers.{self.mf['status_locker']}":status})
+            selector.update({f"answers.{self.mf['status_gafete']}":status})
         if location:
             selector.update({f"answers.{self.f['location']}":location})
         if area:
             selector.update({f"answers.{self.f['area']}":area})
+        if gafete_id:
+            selector.update({f"answers.{self.gafetes_fields['gafete_id']}":gafete_id})
         if not selector:
             selector = {"_id":{"$gt":None}}
         mango_query = {
@@ -1880,9 +1893,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "limit":limit,
             "skip":skip
         }
+        print('mango query', simplejson.dumps(mango_query))
         return self.format_gafete(self.lkf_api.search_catalog( self.GAFETES_CAT_ID, mango_query))
 
-    def get_lockers(self, status='Disponible', tipo_locker='Locker', location=None, area=None, limit=1000, skip=0):
+    def get_lockers(self, status='Disponible', tipo_locker='Locker', location=None, locker_id=None,area=None, limit=1000, skip=0):
         selector = {}
         if status:
             selector.update({f"answers.{self.mf['status_locker']}":status})
@@ -1891,7 +1905,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if area:
             selector.update({f"answers.{self.f['area']}":area})
         if tipo_locker:
-            selector.update({f"answers.{self.f['tipo_locker']}":tipo_locker})
+            selector.update({f"answers.{self.mf['tipo_locker']}":tipo_locker})
+        if locker_id:
+            selector.update({f"answers.{self.mf['locker_id']}":locker_id})
         if not selector:
             selector = {"_id":{"$gt":None}}
         mango_query = {
@@ -1927,12 +1943,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'foto': {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}"},
             'equipos':f"$answers.{self.mf['grupo_equipos']}",
             'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
-            'id_gafet': f"$answers.{self.CONFIGURACION_GAFETES_LOCKERS_OBJ_ID}.{self.gafetes_fields['id_gafete']}",
+            'id_gafet': f"$answers.{self.CONFIGURACION_GAFETES_LOCKERS_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
             'identificacion':  {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}"},
             'pase_id':{"$toObjectId":f"$answers.{self.mf['codigo_qr']}"},
             'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
             'nombre_area_salida':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
             'nombre_visitante':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
+            'contratista':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['empresa']}",
             'perfil_visita':{'$arrayElemAt': [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",0]},
             'status_gafete':f"$answers.{self.mf['status_gafete']}",
             'status_visita':f"$answers.{self.mf['tipo_registro']}",
@@ -1975,13 +1992,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 r['grupo_areas_acceso'] = self._labels_list(pase.get('grupo_areas_acceso'), self.mf)
 
             r['status_visita'] = r.get('status_visita','').title().replace('_', ' ')
+            r['contratista'] = self.unlist(r.get('contratista',[]))
             r['status_gafete'] = r.get('status_gafete','').title().replace('_', ' ')
             r['documento'] = r.get('documento','').title().replace('_', ' ')
             r['grupo_areas_acceso'] = self._labels_list(r.pop('grupo_areas_acceso',[]), self.mf)
             r['comentarios'] = self.format_comentarios(r.get('comentarios',[]))
             r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
             r['equipos'] = self.format_equipos(r.get('equipos',[]))
-        print('records' , records)
+        # print('records' , records)
         return  records
 
     def get_list_fallas(self, location, area):
@@ -2525,6 +2543,30 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
+    def update_gafet_status(self, answers={}):
+        if not answers:
+            answers = self.answers
+        status = None
+        tipo_movimiento=None
+        tipo_movimiento = answers.get(self.mf['tipo_registro'])
+        res = {}
+        if tipo_movimiento == "entrada":
+            status = "En Uso"
+        elif tipo_movimiento == 'salida':
+            status = "Disponible"
+        if status :
+            gafete_id = answers[self.GAFETES_CAT_OBJ_ID][self.gafetes_fields['gafete_id']]
+            locker_id = answers[self.LOCKERS_CAT_OBJ_ID][self.mf['locker_id']]
+            location = answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID][self.f['location']]
+            area = answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID][self.f['area']]
+            gafete = self.get_gafetes(status=None, location=location, area=area, gafete_id=gafete_id)
+            if len(gafete) > 0 :
+                gafete = gafete[0]
+                res = self.lkf_api.update_catalog_multi_record({self.mf['status_gafete']: status}, self.GAFETES_CAT_ID, record_id=[gafete['_id']])
+
+            self.update_locker_status(tipo_movimiento, location, area, locker_id)
+        return res
+
     def update_guard_status(self, guard, this_user):
         # last_checkin = self.get_user_last_checkin(guard['user_id'])
         status_turn = 'Turno Cerrado'
@@ -2558,6 +2600,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.mf['guard_group']] = {'-1':employee}
             response.append(self.lkf_api.patch_multi_record( answers = answers, form_id=self.CHECKIN_CASETAS, record_id=[record_id]))
         return response
+
+    def update_locker_status(self, tipo_movimiento, location, area, locker_id):
+        res = {}
+        if tipo_movimiento == "entrada":
+            status = "En Uso"
+        elif tipo_movimiento == 'salida':
+            status = "Disponible"
+
+        locker = self.get_lockers(status=None, tipo_locker='Locker', location=location, area=area, locker_id=locker_id)
+        if len(locker) > 0 :
+            locker = locker[0]
+            res = self.lkf_api.update_catalog_multi_record({self.mf['status_locker']: status}, self.LOCKERS_CAT_ID, record_id=[locker['_id']])
+        return res
 
     def update_notes(self, data_notes, folio):
         '''
