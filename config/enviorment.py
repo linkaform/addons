@@ -1,7 +1,7 @@
 # coding: utf-8
 from settings import config
 
-#ENV = 'preprod' 
+# ENV = 'preprod' 
 #ENV = 'local' 
 ENV = 'prod' 
 # print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))

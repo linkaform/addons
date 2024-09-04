@@ -866,12 +866,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         response = False
         last_check_out = self.get_last_user_move(qr, location)
+        print("last_check_out=", last_check_out)
+        print("gafete_id",gafete_id)
         if last_check_out.get('gafete_id') and not gafete_id:
-            self.LKFException(f"Se necesita liberar el gafete antes de regitrar la salida")
+            self.LKFException({"status_code":400, "msg":f"Se necesita liberar el gafete antes de regitrar la salida"})
         if not location:
-            self.LKFException(f"Se requiere especificar una ubicacion de donde se raelizara la salida.")
+            self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se raelizara la salida."})
         if not area:
-            self.LKFException(f"Se requiere especificar el area de donde se realizara la salida.")
+            self.LKFException({"status_code":400, "msg":f"Se requiere especificar el area de donde se realizara la salida."})
         if last_check_out.get('folio'):
             folio = last_check_out.get('folio',0)
             checkin_date_str = last_check_out.get('checkin_date')
@@ -887,7 +889,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
                 response = self.lkf_api.patch_multi_record( answers=answers, form_id=self.BITACORA_ACCESOS, folios=[folio])
         if not response:
-            self.LKFException(f"El usuario no se encuentra dentro de la Ubicacion: {location}.")
+            self.LKFException({"status_code":400, "msg":f"El usuario no se encuentra dentro de la Ubicacion: {location}."})
         return response            
 
     def do_validacion_certificado(self, cert, detail=False):
@@ -2393,8 +2395,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if self.validate_value_id(qr_code):
             print('qr_code=',qr_code)
             last_moves = self.get_list_last_user_move(qr_code, limit=10)
-            print('last_moves=',last_moves)
-            print('last_moves=',last_movesd)
             if len(last_moves) > 0:
                 last_move = last_moves[0]
             # else:
@@ -2405,12 +2405,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 tipo_movimiento = 'Entrada'
             else:
                 tipo_movimiento = 'Salida'
+            print("last_moves",last_move)
             access_pass = self.get_detail_access_pass(qr_code)
             #---Last Access
             access_pass['ultimo_acceso'] = last_moves
             access_pass['tipo_movimiento'] = tipo_movimiento
             access_pass['grupo_vehiculos'] = access_pass.get('grupo_vehiculos',[])
             access_pass['grupo_equipos'] = last_move.get('equipos',[])
+            access_pass['gafete_id'] = last_move.get('gafete_id')
+            access_pass['locker_id'] = last_move.get("locker_id")
             if access_pass.get('grupo_areas_acceso'):
                 for area in access_pass['grupo_areas_acceso']:
                     area['status'] = self.get_area_status(access_pass['ubicacion'], area['nombre_area'])
