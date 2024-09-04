@@ -859,14 +859,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "msg":"El guardia NO tiene permisos sobre el formulario de cierre de casetas"})
         return response
 
-    def do_out(self, qr, location, area):
+    def do_out(self, qr, location, area, gafete_id=None):
         '''
             Realiza el cambio de estatus de la forma de bitacora, relacionada a la salida, como parametro
             es necesesario enviar el nombre del visitante que es el unico dato qu se encuentra en la forma
         '''
         response = False
         last_check_out = self.get_last_user_move(qr, location)
-        if last_check_out.get('gafete_id'):
+        if last_check_out.get('gafete_id') and not gafete_id:
             self.LKFException(f"Se necesita liberar el gafete antes de regitrar la salida")
         if not location:
             self.LKFException(f"Se requiere especificar una ubicacion de donde se raelizara la salida.")
@@ -1546,7 +1546,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query.update(
                 {f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['empresa']}":empresa}
             )
-        print('match_query', simplejson.dumps(match_query, indent=3))
         result  =self.format_cr(self.cr.find(match_query,{'answers':1}), get_one=True)
         result  = self._labels(result, self.mf)
         return result
@@ -1894,10 +1893,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "limit":limit,
             "skip":skip
         }
-        print('mango query', simplejson.dumps(mango_query))
         return self.format_gafete(self.lkf_api.search_catalog( self.GAFETES_CAT_ID, mango_query))
 
-    def get_lockers(self, status='Disponible', tipo_locker='Locker', location=None, locker_id=None,area=None, limit=1000, skip=0):
+    def get_lockers(self, status='Disponible', location=None, area=None, tipo_locker='Locker', locker_id=None, limit=1000, skip=0):
         selector = {}
         if status:
             selector.update({f"answers.{self.mf['status_locker']}":status})
@@ -2145,13 +2143,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'checkin_date': f"$answers.{self.bitacora_fields['fecha_entrada']}",
                 'checkout_date': f"$answers.{self.bitacora_fields['fecha_salida']}",
                 'duration':f"$answers.{self.mf['duracion']}",
+                'equipos':f"$answers.{self.mf['grupo_equipos']}",
+                'equipos':f"$answers.{self.mf['grupo_equipos']}",
                 'folio':'$folio', 
                 'fecha':f"$answers.{self.mf['fecha_entrada']}",
                 'status_visita': f"$answers.{self.bitacora_fields['status_visita']}",
+                'gafete_id': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
+                'locker_id': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.mf['locker_id']}",
                 'visita_a':f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
                 #Vehiculos
                 'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
-                'equipos':f"$answers.{self.mf['grupo_equipos']}",
             }
             ).sort('updated_at', -1).limit(limit)
         result = self.format_cr(res)
@@ -2392,6 +2393,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if self.validate_value_id(qr_code):
             print('qr_code=',qr_code)
             last_moves = self.get_list_last_user_move(qr_code, limit=10)
+            print('last_moves=',last_moves)
+            print('last_moves=',last_movesd)
             if len(last_moves) > 0:
                 last_move = last_moves[0]
             # else:
@@ -2406,8 +2409,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             #---Last Access
             access_pass['ultimo_acceso'] = last_moves
             access_pass['tipo_movimiento'] = tipo_movimiento
-            print('last_move', last_move)
-            access_pass['grupo_vehiculos'] = last_move.get('vehiculos',[])
+            access_pass['grupo_vehiculos'] = access_pass.get('grupo_vehiculos',[])
             access_pass['grupo_equipos'] = last_move.get('equipos',[])
             if access_pass.get('grupo_areas_acceso'):
                 for area in access_pass['grupo_areas_acceso']:
@@ -2564,8 +2566,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if len(gafete) > 0 :
                 gafete = gafete[0]
                 res = self.lkf_api.update_catalog_multi_record({self.mf['status_gafete']: status}, self.GAFETES_CAT_ID, record_id=[gafete['_id']])
-
-            self.update_locker_status(tipo_movimiento, location, area, locker_id)
+            print('locker_id',locker_id)
+            print('tipo_movimiento',tipo_movimiento)
+            self.update_locker_status(tipo_movimiento, location, area, tipo_locker='Identificaciones', locker_id=locker_id)
         return res
 
     def update_guard_status(self, guard, this_user):
@@ -2602,14 +2605,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             response.append(self.lkf_api.patch_multi_record( answers = answers, form_id=self.CHECKIN_CASETAS, record_id=[record_id]))
         return response
 
-    def update_locker_status(self, tipo_movimiento, location, area, locker_id):
+    def update_locker_status(self, tipo_movimiento, location, area, tipo_locker, locker_id):
         res = {}
         if tipo_movimiento == "entrada":
             status = "En Uso"
         elif tipo_movimiento == 'salida':
             status = "Disponible"
 
-        locker = self.get_lockers(status=None, tipo_locker='Locker', location=location, area=area, locker_id=locker_id)
+        print('locker_id',locker_id)
+        locker = self.get_lockers(status=None, location=location, area=area, tipo_locker=tipo_locker, locker_id=locker_id)
+        print('locker',locker)
         if len(locker) > 0 :
             locker = locker[0]
             res = self.lkf_api.update_catalog_multi_record({self.mf['status_locker']: status}, self.LOCKERS_CAT_ID, record_id=[locker['_id']])
