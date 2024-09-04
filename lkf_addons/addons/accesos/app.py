@@ -468,36 +468,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         _single_leading_underscore: 
         weak “internal use” indicator. E.g. from M import * does not import objects whose names start with an underscore.
     '''
-    def assets_access_pass(self, location):
-        ### Areas
-        catalog_id = self.AREAS_DE_LAS_UBICACIONES_CAT_ID
-        form_id = self.PASE_ENTRADA
-        group_level = 2
-        options = {
-              "group_level": group_level,
-              "startkey": [
-                location
-              ],
-              "endkey": [
-                f"{location}\n",
-                {}
-              ]
-            }
-        areas = self.lkf_api.catalog_view(catalog_id, form_id, options) 
-        print('areas=',areas)
-        ### Aquien Visita
-        catalog_id = self.CONF_AREA_EMPLEADOS_CAT_ID
-        visita_a = self.lkf_api.catalog_view(catalog_id, form_id, options) 
-        # visita_a = [r.get('key')[group_level-1] for r in visita_a]
-        print('visita_a=',visita_a)
-        ### Pases de accesos
-        res = {
-            'Areas': areas,
-            'Visita_a': visita_a,
-            'Perfiles': self.get_pefiles_walkin(location),
-        }
-        # print('visita_a=',visita_a)
-        return res
 
     def _do_access(self, access_pass, location, area, data):
         '''
@@ -612,6 +582,37 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         response_create = self.lkf_api.post_forms_answers(metadata)
         return response_create
+        
+    def assets_access_pass(self, location):
+        ### Areas
+        catalog_id = self.AREAS_DE_LAS_UBICACIONES_CAT_ID
+        form_id = self.PASE_ENTRADA
+        group_level = 2
+        options = {
+              "group_level": group_level,
+              "startkey": [
+                location
+              ],
+              "endkey": [
+                f"{location}\n",
+                {}
+              ]
+            }
+        areas = self.lkf_api.catalog_view(catalog_id, form_id, options) 
+        print('areas=',areas)
+        ### Aquien Visita
+        catalog_id = self.CONF_AREA_EMPLEADOS_CAT_ID
+        visita_a = self.lkf_api.catalog_view(catalog_id, form_id, options) 
+        # visita_a = [r.get('key')[group_level-1] for r in visita_a]
+        print('visita_a=',visita_a)
+        ### Pases de accesos
+        res = {
+            'Areas': areas,
+            'Visita_a': visita_a,
+            'Perfiles': self.get_pefiles_walkin(location),
+        }
+        # print('visita_a=',visita_a)
+        return res
 
     def delete_article_concessioned(self, folio):
         list_records = []
@@ -2178,7 +2179,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     if r['perfil'] not in res:
                         res.append(r['perfil'])
         return res
-
+        
     def get_user_booths_availability(self):
         '''
         Regresa las castas configurados por usuario y su stats
