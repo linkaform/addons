@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>9-dbfcb470d072169078d19bef87ba61d1</_rev>
-    <updated_at>2024-05-23T22:44:36.557532+00:00Z</updated_at>
+    <_rev>7-974c2bb9ba162c51132155a370fd595e</_rev>
+    <updated_at>2024-07-30T00:58:57.576488+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Definicion de Permisos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T22:44:36.557532+00:00Z</created_at>
+    <created_at>2024-07-30T00:58:57.576488+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,31 +25,53 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>119205</catalog_id>
+    <catalog_id>121726</catalog_id>
     <sync_last_update>None</sync_last_update>
-    <_id>664fc6d4f81ae652b0095585</_id>
+    <_id>66a83ad1b35d90ebc7998485</_id>
     <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
                 <item>
                     <field_type>text</field_type>
-                    <field_id>662962bb203407ab90c886e4</field_id>
-                    <required>True</required>
-                    <fav>True</fav>
-                    <label>Nombre del permiso o certificación</label>
                     <properties>
                         <send_email>False</send_email>
                         <size>complete</size>
                         <custom>None</custom>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>662962bb203407ab90c886e4</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Nombre del permiso o certificación</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>checkbox</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>662962bb203407ab90c886e5</field_id>
                     <required>True</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Requerimientos</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>
                         <item>
                             <points>None</points>
@@ -75,33 +97,96 @@
                             <value>comprobante_de_documento</value>
                             <label>Comprobante de Documento</label>
                         </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>inspeccion_visual</value>
+                            <label>Inspeccion Visual</label>
+                        </item>
                     </options>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>6639a9d9d38959539f59eb9f</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.lista_de_equipos.obj_id }}</field_id>
+                    <label>Equipo o Material</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>6639a9d9d38959539f59eb9f</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.lista_de_equipos.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_equipos.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.lista_de_equipos.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>6639a9d9d38959539f59eb9f</field_id>
+                    <label>Tipo de equipo</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.lista_de_equipos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_equipos.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
                 </item>
                 <item>
                     <field_type>integer</field_type>
-                    <field_id>662962bb203407ab90c886e6</field_id>
-                    <required>False</required>
-                    <fav>True</fav>
-                    <label>Vigencia</label>
                     <properties>
                         <number_of_decimals>2</number_of_decimals>
                         <custom>None</custom>
                         <step>1</step>
                         <size>small</size>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>662962bb203407ab90c886e6</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Vigencia</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>select</field_type>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>662962bb203407ab90c886e7</field_id>
                     <required>False</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Vigencia Expresada en:</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>
                         <item>
                             <points>None</points>
@@ -128,19 +213,10 @@
                             <label>Años</label>
                         </item>
                     </options>
-                    <properties>
-                        <selected>0</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>files</field_type>
-                    <field_id>662962bb203407ab90c886e8</field_id>
-                    <required>False</required>
-                    <fav>True</fav>
-                    <label>Ejemplo de documento del permiso/certificación</label>
                     <properties>
                         <date_format>None</date_format>
                         <multi_selection>True</multi_selection>
@@ -179,13 +255,22 @@
                             <position>None</position>
                         </watermark_config>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>662962bb203407ab90c886e8</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Ejemplo de documento del permiso/certificación</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>images</field_type>
-                    <field_id>662962bb203407ab90c886e9</field_id>
-                    <required>False</required>
-                    <fav>True</fav>
-                    <label>Ejemplo en imagen</label>
                     <properties>
                         <date_format>None</date_format>
                         <image_origin>
@@ -211,12 +296,30 @@
                         <location_decimals>None</location_decimals>
                         <metadata>[]</metadata>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>662962bb203407ab90c886e9</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Ejemplo en imagen</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog</field_type>
+                    <properties>{}</properties>
+                    <key>None</key>
                     <catalog_fields>[]</catalog_fields>
-                    <required>False</required>
                     <field_id>{{ catalog.definicion_de_examenes.obj_id }}</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Examen</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -230,14 +333,21 @@
                         <filters>None</filters>
                         <name>{{ catalog.definicion_de_examenes.name }}</name>
                     </catalog>
-                    <properties>{}</properties>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
                     <properties>{}</properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>66297e1579900d9018c886ad</field_id>
                     <required>False</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Nombre del examen</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -249,7 +359,22 @@
                         <catalog_id>{{ catalog.definicion_de_examenes.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>decimal</field_type>
+                    <required>False</required>
+                    <field_id>66cebc0e9a80d82bbb5593a8</field_id>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <size>small</size>
+                        <step>any</step>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Calificaion de Aprovacion</label>
                 </item>
                 <item>
                     <field_type>select</field_type>
@@ -259,10 +384,17 @@
                         <orientation>vertical</orientation>
                         <custom>None</custom>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>662962bb203407ab90c886eb</field_id>
                     <required>True</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Estado del permiso/certificación</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>
                         <item>
                             <points>None</points>
@@ -277,10 +409,11 @@
                             <label>Cancelado</label>
                         </item>
                     </options>
+                    <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_description>None</page_description>
             <page_name>Página 1</page_name>
+            <page_description>None</page_description>
         </item>
     </catalog_pages>
 </lkf>

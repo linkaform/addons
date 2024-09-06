@@ -1,10 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <templates>[]</templates>
-    <confirmation>{}</confirmation>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
     <description />
-    <_rev>9-53aa9dd1a3941e12417603c83987490b</_rev>
-    <updated_at>2024-05-23T22:44:33.211290+00:00Z</updated_at>
+    <_rev>4-1d7a929822316fdd7ddb18f00f1c3559</_rev>
+    <updated_at>2024-07-30T00:58:57.107452+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -12,55 +16,57 @@
     <filters>{}</filters>
     <name>Definicion de Examenes</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T22:44:33.211290+00:00Z</created_at>
-    <advanced_options>{}</advanced_options>
-    <catalog_id>119204</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>664fc6d13c5b6fd17e5d521a</_id>
-    <public>False</public>
+    <created_at>2024-07-30T00:58:57.107452+00:00Z</created_at>
+    <advanced_options>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
     <catalog_pages>
         <item>
             <page_fields>
                 <item>
                     <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <key>None</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>66297e1579900d9018c886ac</field_id>
-                    <required>True</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>True</required>
+                    <field_id>66297e1579900d9018c886ac</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>ID forma</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <key>None</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>66297e1579900d9018c886ad</field_id>
-                    <required>True</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>True</required>
+                    <field_id>66297e1579900d9018c886ad</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Nombre del examen</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
@@ -68,4 +74,8 @@
             <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>66a83ad140fcd63624998450</_id>
+    <public>False</public>
+    <catalog_id>121725</catalog_id>
 </lkf>

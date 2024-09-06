@@ -3,8 +3,8 @@
     <templates>[]</templates>
     <confirmation>{}</confirmation>
     <description />
-    <_rev>8-0cb4a3ba1d7ceeef089ccc8edb7da8f9</_rev>
-    <updated_at>2024-05-23T22:45:00.412634+00:00Z</updated_at>
+    <_rev>1-68dca1d415d74ca04d1d14f16205ac18</_rev>
+    <updated_at>2024-07-30T00:59:00.334887+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -12,22 +12,30 @@
     <filters>{}</filters>
     <name>Configuracion de Gafetes y Lockers</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T22:45:00.412634+00:00Z</created_at>
+    <created_at>2024-07-30T00:59:00.334887+00:00Z</created_at>
     <advanced_options>{}</advanced_options>
+    <catalog_id>121731</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>66a83ad4de752e12018fbc5c</_id>
+    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
                 <item>
                     <field_type>catalog</field_type>
-                    <view_fields>[]</view_fields>
+                    <properties>{}</properties>
+                    <key>None</key>
                     <catalog_fields>
                         <item>663e5c57f5b8a7ce8211ed0b</item>
                         <item>663e5d44f5b8a7ce8211ed0f</item>
                         <item>66480101786e8cdb66e70124</item>
                     </catalog_fields>
-                    <fav>None</fav>
-                    <required>False</required>
                     <field_id>{{ catalog.lockers.obj_id }}</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Locker</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <filters>None</filters>
@@ -47,20 +55,21 @@
                         </related_catalog>
                         <name>{{ catalog.lockers.name }}</name>
                     </catalog>
-                    <relation_type>None</relation_type>
-                    <label>Locker</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
                     <catalog_id>None</catalog_id>
-                    <key>None</key>
-                    <properties>{}</properties>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
                     <required>False</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Ubicación</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -72,14 +81,21 @@
                         <catalog_id>{{ catalog.lockers.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>[]</options>
-                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
                     <required>False</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Nombre de Area</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -91,14 +107,21 @@
                         <catalog_id>{{ catalog.lockers.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>[]</options>
-                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>66480101786e8cdb66e70124</field_id>
                     <required>False</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>ID locker</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -110,16 +133,23 @@
                         <catalog_id>{{ catalog.lockers.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>[]</options>
-                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog</field_type>
+                    <properties>{}</properties>
+                    <key>None</key>
                     <catalog_fields>
                         <item>664803e6d79bc1dfd33885e1</item>
                     </catalog_fields>
-                    <required>False</required>
                     <field_id>{{ catalog.gafetes.obj_id }}</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Gafete</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -139,13 +169,21 @@
                         </related_catalog>
                         <name>{{ catalog.gafetes.name }}</name>
                     </catalog>
-                    <properties>{}</properties>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>664803e6d79bc1dfd33885e1</field_id>
                     <required>True</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>ID de Gafet</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -157,15 +195,30 @@
                         <catalog_id>{{ catalog.gafetes.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>[]</options>
-                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>radio</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>664807294f62334c9d273ed2</field_id>
                     <required>True</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Estatus</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>
                         <item>
                             <points>None</points>
@@ -180,20 +233,11 @@
                             <label>No disponible</label>
                         </item>
                     </options>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
+                    <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
             <page_description>None</page_description>
             <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
-    <sync_last_update>None</sync_last_update>
-    <_id>664fc6ec8d4dfb34de095586</_id>
-    <public>False</public>
-    <catalog_id>119210</catalog_id>
 </lkf>

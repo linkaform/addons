@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>10-62d5dbd6ea86b1567e531abd320c7967</_rev>
-    <updated_at>2024-05-23T22:44:16.553376+00:00Z</updated_at>
+    <_rev>2-9fefc710a8ab8e8db0077911a8cc2e6f</_rev>
+    <updated_at>2024-07-30T00:58:55.598840+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Lista de fallas</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T22:44:16.553376+00:00Z</created_at>
+    <created_at>2024-07-30T00:58:55.598840+00:00Z</created_at>
     <advanced_options>
         <folio>
             <manual>False</manual>
@@ -49,12 +49,12 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_description>None</page_description>
             <page_name>Página 1</page_name>
+            <page_description>None</page_description>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>664fc6c08d4dfb34de095584</_id>
+    <_id>66a83acfee0b950748489ca7</_id>
     <public>False</public>
-    <catalog_id>119201</catalog_id>
+    <catalog_id>121722</catalog_id>
 </lkf>
