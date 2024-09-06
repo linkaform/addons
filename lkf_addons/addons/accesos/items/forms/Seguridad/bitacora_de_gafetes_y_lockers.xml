@@ -14,7 +14,7 @@
         <message>FORM_CAPTURED</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1716504398.0</created_at>
+    <created_at>1722301162.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -1099,13 +1099,13 @@
         <max_points>0</max_points>
     </grading>
     <has_voucher>False</has_voucher>
-    <name>Bitacora de Gafetes y Lockers</name>
+    <name>Bitacora de Gafetes y Lockers Borrar?</name>
     <notification>
         <active>False</active>
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/119222/</resource_uri>
+    <resource_uri>/api/infosync/form/121744/</resource_uri>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>
@@ -1125,5 +1125,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1721837457.0</updated_at>
+    <updated_at>1724736233.0</updated_at>
 </lkf>

@@ -6,27 +6,29 @@
         <item>
             <actions>
                 <item>
-                    <_id>66316f6c702539e166d3bc7d</_id>
+                    <_id>66abf410e1eb98b522534026</_id>
                     <action_id>7</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
-                        <arguments>{}</arguments>
+                        <arguments>
+                            <field_id>64ef5b5fff1bec97d2ca27b6</field_id>
+                        </arguments>
                         <integration>None</integration>
                         <script>
-                            <created_at>2024-03-04T22:55:10.341144</created_at>
+                            <created_at>2024-08-01T20:45:44.313574</created_at>
                             <deleted_at>None</deleted_at>
                             <end_date>None</end_date>
-                            <id>{{ script.test_generate_qr.id }}</id>
+                            <id>{{ script.create_qr.id }}</id>
                             <is_fileShared>False</is_fileShared>
                             <itype>script</itype>
-                            <name>{{ script.test_generate_qr.name }}</name>
-                            <start_date>2024-03-04T22:55:10.339407</start_date>
-                            <updated_at>2024-03-20T21:56:51.105629</updated_at>
+                            <name>{{ script.create_qr.name }}</name>
+                            <start_date>2024-08-01T20:45:44.311815</start_date>
+                            <updated_at>2024-08-01T20:45:44.597472</updated_at>
                         </script>
                         <scriptArguments>
                             <item>
-                                <label>None</label>
-                                <value>None</value>
+                                <label>field_id</label>
+                                <value>64ef5b5fff1bec97d2ca27b6</value>
                             </item>
                         </scriptArguments>
                         <scriptQuery>None</scriptQuery>
@@ -51,7 +53,7 @@
                             </item>
                         </userOptions>
                     </configuration>
-                    <name>Generar QR</name>
+                    <name>None</name>
                 </item>
             </actions>
             <id>66316f6c702539e166d3bc89</id>
@@ -79,748 +81,24 @@
                     <deleted>False</deleted>
                     <edited>True</edited>
                     <run_multiple_times>True</run_multiple_times>
-                    <runtime>after</runtime>
+                    <runtime>before</runtime>
                 </record>
                 <wf_fields>
                     <operator>all</operator>
                     <triggers>
                         <item>
-                            <condition>in=</condition>
+                            <condition>is__empty=</condition>
                             <form_id>None</form_id>
                             <other_value>None</other_value>
                             <prefix>answer</prefix>
                             <trigger_field>
                                 <catalog>{}</catalog>
-                                <field_id>662c262cace163ca3ed3bb3a</field_id>
+                                <field_id>64ef5b5fff1bec97d2ca27b6</field_id>
                                 <group>{}</group>
-                                <label>Selección de Visitante</label>
-                                <type>radio</type>
+                                <label>QR</label>
+                                <type>images</type>
                             </trigger_field>
-                            <value>buscar_visitantes_registrados</value>
-                        </item>
-                    </triggers>
-                </wf_fields>
-            </rules>
-        </item>
-        <item>
-            <actions>
-                <item>
-                    <_id>663fefeefc5835d05059eb4b</_id>
-                    <action_id>5</action_id>
-                    <action_settings>{}</action_settings>
-                    <configuration>
-                        <body>{% raw %} &lt;!doctype html&gt;
-&lt;html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"&gt;
-&lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
-    &lt;title&gt;Template correo&lt;/title&gt;
-    &lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" /&gt;
-    &lt;style type="text/css"&gt;
-		p{
-			margin:10px 0;
-			padding:0;
-		}
-		table{
-			border-collapse:collapse;
-            
-		}
-		h1,h2,h3,h4,h5,h6{
-			display:block;
-			margin:0;
-			padding:0;
-		}
-		img,a img{
-			border:0;
-			height:auto;
-			outline:none;
-			text-decoration:none;
-		}
-		body,#bodyTable,#bodyCell{
-			height:100%;
-			margin:0;
-			padding:0;
-			width:100%;
-		}
-		.mcnPreviewText{
-			display:none !important;
-		}
-		#outlook a{
-			padding:0;
-		}
-		img{
-			-ms-interpolation-mode:bicubic;
-		}
-		table{
-			mso-table-lspace:0pt;
-			mso-table-rspace:0pt;
-		}
-		.ReadMsgBody{
-			width:100%;
-		}
-		.ExternalClass{
-			width:100%;
-		}
-		p,a,li,td,blockquote{
-			mso-line-height-rule:exactly;
-		}
-		a[href^=tel],a[href^=sms]{
-			color:inherit;
-			cursor:default;
-			text-decoration:none;
-		}
-		p,a,li,td,body,table,blockquote{
-			-ms-text-size-adjust:100%;
-			-webkit-text-size-adjust:100%;
-		}
-		.ExternalClass,.ExternalClass p,.ExternalClass td,.ExternalClass div,.ExternalClass span,.ExternalClass font{
-			line-height:100%;
-		}
-		a[x-apple-data-detectors]{
-			color:inherit !important;
-			text-decoration:none !important;
-			font-size:inherit !important;
-			font-family:inherit !important;
-			font-weight:inherit !important;
-			line-height:inherit !important;
-		}
-		#bodyCell{
-			padding:10px;
-		}
-		.templateContainer{
-			max-width:600px !important;
-		}
-		a.mcnButton{
-			display:block;
-		}
-		.mcnImage,.mcnRetinaImage{
-			vertical-align:bottom;
-		}
-		.mcnTextContent{
-			word-break:break-word;
-		}
-		.mcnTextContent img{
-			height:auto !important;
-		}
-		.mcnDividerBlock{
-			table-layout:fixed !important;
-		}
-        /*
-        @tab Page
-        @section Background Style
-        @tip Set the background color and top border for your email. You may want to choose colors that match your company's branding.
-        */
-            body,#bodyTable{
-                /*@editable*/background-color:#FAFAFA;
-            }
-        /*
-        @tab Page
-        @section Background Style
-        @tip Set the background color and top border for your email. You may want to choose colors that match your company's branding.
-        */
-            #bodyCell{
-                /*@editable*/border-top:0;
-            }
-        /*
-        @tab Page
-        @section Email Border
-        @tip Set the border for your email.
-        */
-            .templateContainer{
-                /*@editable*/border:0;
-            }
-        /*
-        @tab Page
-        @section Heading 1
-        @tip Set the styling for all first-level headings in your emails. These should be the largest of your headings.
-        @style heading 1
-        */
-            h1{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:26px;
-                /*@editable*/font-style:normal;
-                /*@editable*/font-weight:bold;
-                /*@editable*/line-height:125%;
-                /*@editable*/letter-spacing:normal;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Page
-        @section Heading 2
-        @tip Set the styling for all second-level headings in your emails.
-        @style heading 2
-        */
-            h2{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:22px;
-                /*@editable*/font-style:normal;
-                /*@editable*/font-weight:bold;
-                /*@editable*/line-height:125%;
-                /*@editable*/letter-spacing:normal;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Page
-        @section Heading 3
-        @tip Set the styling for all third-level headings in your emails.
-        @style heading 3
-        */
-            h3{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:20px;
-                /*@editable*/font-style:normal;
-                /*@editable*/font-weight:bold;
-                /*@editable*/line-height:125%;
-                /*@editable*/letter-spacing:normal;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Page
-        @section Heading 4
-        @tip Set the styling for all fourth-level headings in your emails. These should be the smallest of your headings.
-        @style heading 4
-        */
-            h4{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:18px;
-                /*@editable*/font-style:normal;
-                /*@editable*/font-weight:bold;
-                /*@editable*/line-height:125%;
-                /*@editable*/letter-spacing:normal;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Preheader
-        @section Preheader Style
-        @tip Set the background color and borders for your email's preheader area.
-        */
-            #templatePreheader{
-                /*@editable*/background-color:#FAFAFA;
-                /*@editable*/background-image:none;
-                /*@editable*/background-repeat:no-repeat;
-                /*@editable*/background-position:center;
-                /*@editable*/background-size:cover;
-                /*@editable*/border-top:0;
-                /*@editable*/border-bottom:0;
-                /*@editable*/padding-top:9px;
-                /*@editable*/padding-bottom:9px;
-            }
-        /*
-        @tab Preheader
-        @section Preheader Text
-        @tip Set the styling for your email's preheader text. Choose a size and color that is easy to read.
-        */
-            #templatePreheader .mcnTextContent,#templatePreheader .mcnTextContent p{
-                /*@editable*/color:#656565;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:12px;
-                /*@editable*/line-height:150%;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Preheader
-        @section Preheader Link
-        @tip Set the styling for your email's preheader links. Choose a color that helps them stand out from your text.
-        */
-            #templatePreheader .mcnTextContent a,#templatePreheader .mcnTextContent p a{
-                /*@editable*/color:#656565;
-                /*@editable*/font-weight:normal;
-                /*@editable*/text-decoration:underline;
-            }
-        /*
-        @tab Header
-        @section Header Style
-        @tip Set the background color and borders for your email's header area.
-        */
-            #templateHeader{
-                /*@editable*/background-color:#FFFFFF;
-                /*@editable*/background-image:none;
-                /*@editable*/background-repeat:no-repeat;
-                /*@editable*/background-position:center;
-                /*@editable*/background-size:cover;
-                /*@editable*/border-top:0;
-                /*@editable*/border-bottom:0;
-                /*@editable*/padding-top:9px;
-                /*@editable*/padding-bottom:0;
-            }
-        /*
-        @tab Header
-        @section Header Text
-        @tip Set the styling for your email's header text. Choose a size and color that is easy to read.
-        */
-            #templateHeader .mcnTextContent,#templateHeader .mcnTextContent p{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:16px;
-                /*@editable*/line-height:150%;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Header
-        @section Header Link
-        @tip Set the styling for your email's header links. Choose a color that helps them stand out from your text.
-        */
-            #templateHeader .mcnTextContent a,#templateHeader .mcnTextContent p a{
-                /*@editable*/color:#007C89;
-                /*@editable*/font-weight:normal;
-                /*@editable*/text-decoration:underline;
-            }
-        /*
-        @tab Body
-        @section Body Style
-        @tip Set the background color and borders for your email's body area.
-        */
-            #templateBody{
-                /*@editable*/background-color:#FFFFFF;
-                /*@editable*/background-image:none;
-                /*@editable*/background-repeat:no-repeat;
-                /*@editable*/background-position:center;
-                /*@editable*/background-size:cover;
-                /*@editable*/border-top:0;
-                /*@editable*/border-bottom:2px solid #EAEAEA;
-                /*@editable*/padding-top:0;
-                /*@editable*/padding-bottom:9px;
-            }
-        /*
-        @tab Body
-        @section Body Text
-        @tip Set the styling for your email's body text. Choose a size and color that is easy to read.
-        */
-            #templateBody .mcnTextContent,#templateBody .mcnTextContent p{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:16px;
-                /*@editable*/line-height:150%;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Body
-        @section Body Link
-        @tip Set the styling for your email's body links. Choose a color that helps them stand out from your text.
-        */
-            #templateBody .mcnTextContent a,#templateBody .mcnTextContent p a{
-                /*@editable*/color:#007C89;
-                /*@editable*/font-weight:normal;
-                /*@editable*/text-decoration:underline;
-            }
-        /*
-        @tab Footer
-        @section Footer Style
-        @tip Set the background color and borders for your email's footer area.
-        */
-            #templateFooter{
-                /*@editable*/background-color:#FAFAFA;
-                /*@editable*/background-image:none;
-                /*@editable*/background-repeat:no-repeat;
-                /*@editable*/background-position:center;
-                /*@editable*/background-size:cover;
-                /*@editable*/border-top:0;
-                /*@editable*/border-bottom:0;
-                /*@editable*/padding-top:9px;
-                /*@editable*/padding-bottom:9px;
-            }
-        /*
-        @tab Footer
-        @section Footer Text
-        @tip Set the styling for your email's footer text. Choose a size and color that is easy to read.
-        */
-            #templateFooter .mcnTextContent,#templateFooter .mcnTextContent p{
-                /*@editable*/color:#656565;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:12px;
-                /*@editable*/line-height:150%;
-                /*@editable*/text-align:center;
-            }
-        /*
-        @tab Footer
-        @section Footer Link
-        @tip Set the styling for your email's footer links. Choose a color that helps them stand out from your text.
-        */
-            #templateFooter .mcnTextContent a,#templateFooter .mcnTextContent p a{
-                /*@editable*/color:#656565;
-                /*@editable*/font-weight:normal;
-                /*@editable*/text-decoration:underline;
-            }
-        @media only screen and (min-width:768px){
-            .templateContainer{
-                width:600px !important;
-            }
-
-        }	@media only screen and (max-width: 480px){
-                body,table,td,p,a,li,blockquote{
-                    -webkit-text-size-adjust:none !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                body{
-                    width:100% !important;
-                    min-width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnRetinaImage{
-                    max-width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImage{
-                    width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnCartContainer,.mcnCaptionTopContent,.mcnRecContentContainer,.mcnCaptionBottomContent,.mcnTextContentContainer,.mcnBoxedTextContentContainer,.mcnImageGroupContentContainer,.mcnCaptionLeftTextContentContainer,.mcnCaptionRightTextContentContainer,.mcnCaptionLeftImageContentContainer,.mcnCaptionRightImageContentContainer,.mcnImageCardLeftTextContentContainer,.mcnImageCardRightTextContentContainer,.mcnImageCardLeftImageContentContainer,.mcnImageCardRightImageContentContainer{
-                    max-width:100% !important;
-                    width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnBoxedTextContentContainer{
-                    min-width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageGroupContent{
-                    padding:9px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnCaptionLeftContentOuter .mcnTextContent,.mcnCaptionRightContentOuter .mcnTextContent{
-                    padding-top:9px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageCardTopImageContent,.mcnCaptionBottomContent:last-child .mcnCaptionBottomImageContent,.mcnCaptionBlockInner .mcnCaptionTopContent:last-child .mcnTextContent{
-                    padding-top:18px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageCardBottomImageContent{
-                    padding-bottom:9px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageGroupBlockInner{
-                    padding-top:0 !important;
-                    padding-bottom:0 !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageGroupBlockOuter{
-                    padding-top:9px !important;
-                    padding-bottom:9px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnTextContent,.mcnBoxedTextContentColumn{
-                    padding-right:18px !important;
-                    padding-left:18px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageCardLeftImageContent,.mcnImageCardRightImageContent{
-                    padding-right:18px !important;
-                    padding-bottom:0 !important;
-                    padding-left:18px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcpreview-image-uploader{
-                    display:none !important;
-                    width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Heading 1
-            @tip Make the first-level headings larger in size for better readability on small screens.
-            */
-                h1{
-                    /*@editable*/font-size:22px !important;
-                    /*@editable*/line-height:125% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Heading 2
-            @tip Make the second-level headings larger in size for better readability on small screens.
-            */
-                h2{
-                    /*@editable*/font-size:20px !important;
-                    /*@editable*/line-height:125% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Heading 3
-            @tip Make the third-level headings larger in size for better readability on small screens.
-            */
-                h3{
-                    /*@editable*/font-size:18px !important;
-                    /*@editable*/line-height:125% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Heading 4
-            @tip Make the fourth-level headings larger in size for better readability on small screens.
-            */
-                h4{
-                    /*@editable*/font-size:16px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Boxed Text
-            @tip Make the boxed text larger in size for better readability on small screens. We recommend a font size of at least 16px.
-            */
-                .mcnBoxedTextContentContainer .mcnTextContent,.mcnBoxedTextContentContainer .mcnTextContent p{
-                    /*@editable*/font-size:14px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Preheader Visibility
-            @tip Set the visibility of the email's preheader on small screens. You can hide it to save space.
-            */
-                #templatePreheader{
-                    /*@editable*/display:block !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Preheader Text
-            @tip Make the preheader text larger in size for better readability on small screens.
-            */
-                #templatePreheader .mcnTextContent,#templatePreheader .mcnTextContent p{
-                    /*@editable*/font-size:14px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Header Text
-            @tip Make the header text larger in size for better readability on small screens.
-            */
-                #templateHeader .mcnTextContent,#templateHeader .mcnTextContent p{
-                    /*@editable*/font-size:16px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Body Text
-            @tip Make the body text larger in size for better readability on small screens. We recommend a font size of at least 16px.
-            */
-                #templateBody .mcnTextContent,#templateBody .mcnTextContent p{
-                    /*@editable*/font-size:16px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Footer Text
-            @tip Make the footer content text larger in size for better readability on small screens.
-            */
-                #templateFooter .mcnTextContent,#templateFooter .mcnTextContent p{
-                    /*@editable*/font-size:14px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-        }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;!--*|IF:MC_PREVIEW_TEXT|*--&gt;
-    &lt;!--[if !gte mso 9]&gt;&lt;!----&gt;&lt;span class="mcnPreviewText" style="display:none; font-size:0px; line-height:0px; max-height:0px; max-width:0px; opacity:0; overflow:hidden; visibility:hidden; mso-hide:all;"&gt;*|MC_PREVIEW_TEXT|*&lt;/span&gt;&lt;!--&lt;![endif]--&gt;
-    &lt;!--*|END:IF|*--&gt;
-    &lt;center&gt;
-        &lt;table align="center" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable"&gt;
-            &lt;tr&gt;
-                &lt;td align="center" valign="top" id="bodyCell"&gt;
-                    &lt;!-- BEGIN TEMPLATE --&gt;
-                    &lt;table border="0" cellpadding="0" cellspacing="0" width="100%" class="templateContainer"&gt;
-                        &lt;tr&gt;
-                            &lt;td valign="top" id="templateHeader"&gt;
-                                &lt;table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnImageBlock" style="min-width:100%;"&gt;
-                                    &lt;tbody class="mcnImageBlockOuter"&gt;
-                                        &lt;tr&gt;
-                                            &lt;td valign="top" style="padding:9px" class="mcnImageBlockInner"&gt;
-                                                &lt;table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" class="mcnImageContentContainer" style="min-width:100%;"&gt;
-                                                    &lt;tbody&gt;
-                                                        &lt;tr&gt;
-                                                            &lt;td class="mcnImageContent" valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align:center;"&gt;
-                                                                &lt;img align="center" alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/66351c8849f5474abb4d7f68.png" width="564" style="max-width:2500px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage"&gt;
-                                                            &lt;/td&gt;
-                                                        &lt;/tr&gt;
-                                                    &lt;/tbody&gt;
-                                                &lt;/table&gt;
-                                            &lt;/td&gt;
-                                        &lt;/tr&gt;
-                                    &lt;/tbody&gt;
-                                &lt;/table&gt;
-                            &lt;/td&gt;
-                        &lt;/tr&gt;
-                            &lt;td valign="top" id="templateBody"&gt;
-                                &lt;table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width:100%;"&gt;
-                                    &lt;tbody class="mcnTextBlockOuter"&gt;
-                                        &lt;tr&gt;
-                                            &lt;td valign="top" class="mcnTextBlockInner" style="padding-top:9px;"&gt; 
-                                            &lt;!-- background-color: #bdc5d3; --&gt;
-                                                &lt;table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width:100%; min-width:100%;" width="100%" class="mcnTextContentContainer"&gt;
-                                                    &lt;tbody&gt;
-                                                        &lt;tr&gt;
-                                                            &lt;td valign="top" class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;"&gt;
-                                                                &lt;div style="text-align: justify;"&gt;
-                                                                    &lt;p&gt;Hola, {{record.answers.662c2937108836dec6d92580}}.&lt;/p&gt;
-                                                                    &lt;p&gt;Has sido invitado a visitar a {{record.answers.663bd36eb19b7fb7d9e97cca.663bd36eb19b7fb7d9e97ccb}}.&lt;/p&gt;
-                                                                    &lt;p&gt;&lt;strong&gt;Detalles de la visita:&lt;/strong&gt;&lt;/p&gt;
-                                                                    &lt;ul&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Lugar: &lt;/strong&gt;{{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}}&lt;/p&gt;&lt;/li&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.663e6e5ddb059967eecb96fa.663a7e0fe48382c5b1230902}}&lt;/p&gt;&lt;/li&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/p&gt;&lt;/li&gt;
-                                                                    &lt;/ul&gt;
-                                                                    &lt;p&gt;Se ha creado un pre-registro y ahora está pendiente de su asignación. Por favor, complete sus datos de registro en este &lt;a href="https://srv.linkaform.com/solucion_accesos/registro_ingreso.html?Folio={{record.folio}}"&gt;enlace&lt;/a&gt;.&lt;/p&gt;&lt;br&gt;
-                                                                    &lt;p&gt;Saludos cordiales, &lt;strong&gt;LinkaForm.&lt;/strong&gt;&lt;/p&gt;
-                                                                &lt;/div&gt;
-                                                            &lt;/td&gt;
-                                                        &lt;/tr&gt;
-                                                    &lt;/tbody&gt;
-                                                &lt;/table&gt;
-                                            &lt;/td&gt;
-                                        &lt;/tr&gt;
-                                    &lt;/tbody&gt;
-                                &lt;/table&gt;
-                                &lt;!-- FOOTER --&gt;
-                                &lt;table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnDividerBlock" style="min-width:100%;"&gt;
-                                    &lt;tbody class="mcnDividerBlockOuter"&gt;
-                                        &lt;tr&gt;
-                                            &lt;td class="mcnDividerBlockInner" style="min-width: 100%; padding: 18px;"&gt;
-                                                &lt;table class="mcnDividerContent" border="0" cellpadding="0" cellspacing="0" width="100%" style="min-width: 100%;border-top-width: 2px;border-top-style: inset;border-top-color: #EAEAEA;"&gt;
-                                                    &lt;tbody&gt;
-                                                        &lt;tr&gt;
-                                                            &lt;td&gt;
-                                                                &lt;span&gt;&lt;/span&gt;
-                                                            &lt;/td&gt;
-                                                        &lt;/tr&gt;
-                                                    &lt;/tbody&gt;
-                                                &lt;/table&gt;
-                                            &lt;/td&gt;
-                                        &lt;/tr&gt;
-                                    &lt;/tbody&gt;
-                                &lt;/table&gt;
-                                &lt;table class="mcnImageBlock" style="min-width:100%;" width="100%" cellspacing="0" cellpadding="0" border="0"&gt;
-                                    &lt;tbody class="mcnImageBlockOuter footer"&gt;
-                                        &lt;style&gt;
-                                            .footer {
-                                            background-color: #fff6d5;    
-                                            width: 100%;
-                                            color:#021d49;
-                                            height: 45px;
-                                            }
-                                        &lt;/style&gt;
-                                        &lt;tr&gt;
-                                            &lt;td style="padding:9px" class="mcnImageBlockInner" valign="top"&gt;
-                                                &lt;table class="mcnImageContentContainer" style="min-width:100%;" width="100%" cellspacing="0" cellpadding="0" border="0" align="left"&gt;
-                                                    &lt;tbody&gt;
-                                                        &lt;tr&gt;
-                                                            &lt;td class="mcnImageContent" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0;" valign="top"&gt;
-                                                                &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" style="max-width:400px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage" width="150" align="left"&gt;
-                                                            &lt;/td&gt;
-                                                        &lt;/tr&gt;
-                                                    &lt;/tbody&gt;
-                                                &lt;/table&gt;
-                                            &lt;/td&gt;
-                                        &lt;/tr&gt;
-                                    &lt;/tbody&gt;
-                                &lt;/table&gt;
-                            &lt;/td&gt;
-                        &lt;/tr&gt;
-                    &lt;/table&gt;
-                    &lt;!-- END TEMPLATE --&gt;
-                &lt;/td&gt;
-            &lt;/tr&gt;
-        &lt;/table&gt;
-    &lt;/center&gt;
-&lt;/body&gt;
-&lt;/html&gt; {% endraw %}</body>
-                        <email_fields>[]</email_fields>
-                        <emails>
-                            <item>EMAIL_FIELD_VALUE</item>
-                        </emails>
-                        <embed_company_picture>True</embed_company_picture>
-                        <fields_attached>[]</fields_attached>
-                        <pdf_template>{}</pdf_template>
-                        <resend>RESEND</resend>
-                        <send_attachments>False</send_attachments>
-                        <send_pdf>False</send_pdf>
-                        <sender>RECORD_USER</sender>
-                        <subject>{% raw %} Invitación de visita {% endraw %}</subject>
-                        <timer_config>
-                            <seconds_to_expire>None</seconds_to_expire>
-                        </timer_config>
-                    </configuration>
-                    <name>Invitación</name>
-                </item>
-            </actions>
-            <id>663fefeffc5835d05059eb4f</id>
-            <name>Invitación para NUEVO visitante</name>
-            <rules>
-                <metadata>
-                    <connection>[]</connection>
-                    <date>
-                        <period>
-                            <month>1</month>
-                            <selected>False</selected>
-                            <year>2014</year>
-                        </period>
-                        <range>
-                            <end>2024-05-12T06:00:00.000Z</end>
-                            <selected>False</selected>
-                            <start>2024-05-11T22:21:07.477Z</start>
-                        </range>
-                    </date>
-                    <grading>{}</grading>
-                    <user>[]</user>
-                </metadata>
-                <record>
-                    <created>True</created>
-                    <deleted>True</deleted>
-                    <edited>True</edited>
-                    <run_multiple_times>True</run_multiple_times>
-                    <runtime>after</runtime>
-                </record>
-                <wf_fields>
-                    <operator>all</operator>
-                    <triggers>
-                        <item>
-                            <condition>in=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>{}</catalog>
-                                <field_id>662c262cace163ca3ed3bb3a</field_id>
-                                <group>{}</group>
-                                <label>Selección de Visitante</label>
-                                <type>radio</type>
-                            </trigger_field>
-                            <value>alta_de_nuevo_visitante</value>
+                            <value> </value>
                         </item>
                     </triggers>
                 </wf_fields>
@@ -833,657 +111,105 @@
                     <action_id>5</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
-                        <body>{% raw %} &lt;!doctype html&gt;
-&lt;html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"&gt;
+                        <body>{% raw %} &lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
-    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
-    &lt;title&gt;Template correo&lt;/title&gt;
-    &lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" /&gt;
-    &lt;style type="text/css"&gt;
-		p{
-			margin:10px 0;
-			padding:0;
-		}
-		table{
-			border-collapse:collapse;
-            
-		}
-		h1,h2,h3,h4,h5,h6{
-			display:block;
-			margin:0;
-			padding:0;
-		}
-		img,a img{
-			border:0;
-			height:auto;
-			outline:none;
-			text-decoration:none;
-		}
-		body,#bodyTable,#bodyCell{
-			height:100%;
-			margin:0;
-			padding:0;
-			width:100%;
-		}
-		.mcnPreviewText{
-			display:none !important;
-		}
-		#outlook a{
-			padding:0;
-		}
-		img{
-			-ms-interpolation-mode:bicubic;
-		}
-		table{
-			mso-table-lspace:0pt;
-			mso-table-rspace:0pt;
-		}
-		.ReadMsgBody{
-			width:100%;
-		}
-		.ExternalClass{
-			width:100%;
-		}
-		p,a,li,td,blockquote{
-			mso-line-height-rule:exactly;
-		}
-		a[href^=tel],a[href^=sms]{
-			color:inherit;
-			cursor:default;
-			text-decoration:none;
-		}
-		p,a,li,td,body,table,blockquote{
-			-ms-text-size-adjust:100%;
-			-webkit-text-size-adjust:100%;
-		}
-		.ExternalClass,.ExternalClass p,.ExternalClass td,.ExternalClass div,.ExternalClass span,.ExternalClass font{
-			line-height:100%;
-		}
-		a[x-apple-data-detectors]{
-			color:inherit !important;
-			text-decoration:none !important;
-			font-size:inherit !important;
-			font-family:inherit !important;
-			font-weight:inherit !important;
-			line-height:inherit !important;
-		}
-		#bodyCell{
-			padding:10px;
-		}
-		.templateContainer{
-			max-width:600px !important;
-		}
-		a.mcnButton{
-			display:block;
-		}
-		.mcnImage,.mcnRetinaImage{
-			vertical-align:bottom;
-		}
-		.mcnTextContent{
-			word-break:break-word;
-		}
-		.mcnTextContent img{
-			height:auto !important;
-		}
-		.mcnDividerBlock{
-			table-layout:fixed !important;
-		}
-        /*
-        @tab Page
-        @section Background Style
-        @tip Set the background color and top border for your email. You may want to choose colors that match your company's branding.
-        */
-            body,#bodyTable{
-                /*@editable*/background-color:#FAFAFA;
-            }
-        /*
-        @tab Page
-        @section Background Style
-        @tip Set the background color and top border for your email. You may want to choose colors that match your company's branding.
-        */
-            #bodyCell{
-                /*@editable*/border-top:0;
-            }
-        /*
-        @tab Page
-        @section Email Border
-        @tip Set the border for your email.
-        */
-            .templateContainer{
-                /*@editable*/border:0;
-            }
-        /*
-        @tab Page
-        @section Heading 1
-        @tip Set the styling for all first-level headings in your emails. These should be the largest of your headings.
-        @style heading 1
-        */
-            h1{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:26px;
-                /*@editable*/font-style:normal;
-                /*@editable*/font-weight:bold;
-                /*@editable*/line-height:125%;
-                /*@editable*/letter-spacing:normal;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Page
-        @section Heading 2
-        @tip Set the styling for all second-level headings in your emails.
-        @style heading 2
-        */
-            h2{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:22px;
-                /*@editable*/font-style:normal;
-                /*@editable*/font-weight:bold;
-                /*@editable*/line-height:125%;
-                /*@editable*/letter-spacing:normal;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Page
-        @section Heading 3
-        @tip Set the styling for all third-level headings in your emails.
-        @style heading 3
-        */
-            h3{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:20px;
-                /*@editable*/font-style:normal;
-                /*@editable*/font-weight:bold;
-                /*@editable*/line-height:125%;
-                /*@editable*/letter-spacing:normal;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Page
-        @section Heading 4
-        @tip Set the styling for all fourth-level headings in your emails. These should be the smallest of your headings.
-        @style heading 4
-        */
-            h4{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:18px;
-                /*@editable*/font-style:normal;
-                /*@editable*/font-weight:bold;
-                /*@editable*/line-height:125%;
-                /*@editable*/letter-spacing:normal;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Preheader
-        @section Preheader Style
-        @tip Set the background color and borders for your email's preheader area.
-        */
-            #templatePreheader{
-                /*@editable*/background-color:#FAFAFA;
-                /*@editable*/background-image:none;
-                /*@editable*/background-repeat:no-repeat;
-                /*@editable*/background-position:center;
-                /*@editable*/background-size:cover;
-                /*@editable*/border-top:0;
-                /*@editable*/border-bottom:0;
-                /*@editable*/padding-top:9px;
-                /*@editable*/padding-bottom:9px;
-            }
-        /*
-        @tab Preheader
-        @section Preheader Text
-        @tip Set the styling for your email's preheader text. Choose a size and color that is easy to read.
-        */
-            #templatePreheader .mcnTextContent,#templatePreheader .mcnTextContent p{
-                /*@editable*/color:#656565;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:12px;
-                /*@editable*/line-height:150%;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Preheader
-        @section Preheader Link
-        @tip Set the styling for your email's preheader links. Choose a color that helps them stand out from your text.
-        */
-            #templatePreheader .mcnTextContent a,#templatePreheader .mcnTextContent p a{
-                /*@editable*/color:#656565;
-                /*@editable*/font-weight:normal;
-                /*@editable*/text-decoration:underline;
-            }
-        /*
-        @tab Header
-        @section Header Style
-        @tip Set the background color and borders for your email's header area.
-        */
-            #templateHeader{
-                /*@editable*/background-color:#FFFFFF;
-                /*@editable*/background-image:none;
-                /*@editable*/background-repeat:no-repeat;
-                /*@editable*/background-position:center;
-                /*@editable*/background-size:cover;
-                /*@editable*/border-top:0;
-                /*@editable*/border-bottom:0;
-                /*@editable*/padding-top:9px;
-                /*@editable*/padding-bottom:0;
-            }
-        /*
-        @tab Header
-        @section Header Text
-        @tip Set the styling for your email's header text. Choose a size and color that is easy to read.
-        */
-            #templateHeader .mcnTextContent,#templateHeader .mcnTextContent p{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:16px;
-                /*@editable*/line-height:150%;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Header
-        @section Header Link
-        @tip Set the styling for your email's header links. Choose a color that helps them stand out from your text.
-        */
-            #templateHeader .mcnTextContent a,#templateHeader .mcnTextContent p a{
-                /*@editable*/color:#007C89;
-                /*@editable*/font-weight:normal;
-                /*@editable*/text-decoration:underline;
-            }
-        /*
-        @tab Body
-        @section Body Style
-        @tip Set the background color and borders for your email's body area.
-        */
-            #templateBody{
-                /*@editable*/background-color:#FFFFFF;
-                /*@editable*/background-image:none;
-                /*@editable*/background-repeat:no-repeat;
-                /*@editable*/background-position:center;
-                /*@editable*/background-size:cover;
-                /*@editable*/border-top:0;
-                /*@editable*/border-bottom:2px solid #EAEAEA;
-                /*@editable*/padding-top:0;
-                /*@editable*/padding-bottom:9px;
-            }
-        /*
-        @tab Body
-        @section Body Text
-        @tip Set the styling for your email's body text. Choose a size and color that is easy to read.
-        */
-            #templateBody .mcnTextContent,#templateBody .mcnTextContent p{
-                /*@editable*/color:#202020;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:16px;
-                /*@editable*/line-height:150%;
-                /*@editable*/text-align:left;
-            }
-        /*
-        @tab Body
-        @section Body Link
-        @tip Set the styling for your email's body links. Choose a color that helps them stand out from your text.
-        */
-            #templateBody .mcnTextContent a,#templateBody .mcnTextContent p a{
-                /*@editable*/color:#007C89;
-                /*@editable*/font-weight:normal;
-                /*@editable*/text-decoration:underline;
-            }
-        /*
-        @tab Footer
-        @section Footer Style
-        @tip Set the background color and borders for your email's footer area.
-        */
-            #templateFooter{
-                /*@editable*/background-color:#FAFAFA;
-                /*@editable*/background-image:none;
-                /*@editable*/background-repeat:no-repeat;
-                /*@editable*/background-position:center;
-                /*@editable*/background-size:cover;
-                /*@editable*/border-top:0;
-                /*@editable*/border-bottom:0;
-                /*@editable*/padding-top:9px;
-                /*@editable*/padding-bottom:9px;
-            }
-        /*
-        @tab Footer
-        @section Footer Text
-        @tip Set the styling for your email's footer text. Choose a size and color that is easy to read.
-        */
-            #templateFooter .mcnTextContent,#templateFooter .mcnTextContent p{
-                /*@editable*/color:#656565;
-                /*@editable*/font-family:Helvetica;
-                /*@editable*/font-size:12px;
-                /*@editable*/line-height:150%;
-                /*@editable*/text-align:center;
-            }
-        /*
-        @tab Footer
-        @section Footer Link
-        @tip Set the styling for your email's footer links. Choose a color that helps them stand out from your text.
-        */
-            #templateFooter .mcnTextContent a,#templateFooter .mcnTextContent p a{
-                /*@editable*/color:#656565;
-                /*@editable*/font-weight:normal;
-                /*@editable*/text-decoration:underline;
-            }
-        @media only screen and (min-width:768px){
-            .templateContainer{
-                width:600px !important;
-            }
-
-        }	@media only screen and (max-width: 480px){
-                body,table,td,p,a,li,blockquote{
-                    -webkit-text-size-adjust:none !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                body{
-                    width:100% !important;
-                    min-width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnRetinaImage{
-                    max-width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImage{
-                    width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnCartContainer,.mcnCaptionTopContent,.mcnRecContentContainer,.mcnCaptionBottomContent,.mcnTextContentContainer,.mcnBoxedTextContentContainer,.mcnImageGroupContentContainer,.mcnCaptionLeftTextContentContainer,.mcnCaptionRightTextContentContainer,.mcnCaptionLeftImageContentContainer,.mcnCaptionRightImageContentContainer,.mcnImageCardLeftTextContentContainer,.mcnImageCardRightTextContentContainer,.mcnImageCardLeftImageContentContainer,.mcnImageCardRightImageContentContainer{
-                    max-width:100% !important;
-                    width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnBoxedTextContentContainer{
-                    min-width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageGroupContent{
-                    padding:9px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnCaptionLeftContentOuter .mcnTextContent,.mcnCaptionRightContentOuter .mcnTextContent{
-                    padding-top:9px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageCardTopImageContent,.mcnCaptionBottomContent:last-child .mcnCaptionBottomImageContent,.mcnCaptionBlockInner .mcnCaptionTopContent:last-child .mcnTextContent{
-                    padding-top:18px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageCardBottomImageContent{
-                    padding-bottom:9px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageGroupBlockInner{
-                    padding-top:0 !important;
-                    padding-bottom:0 !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageGroupBlockOuter{
-                    padding-top:9px !important;
-                    padding-bottom:9px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnTextContent,.mcnBoxedTextContentColumn{
-                    padding-right:18px !important;
-                    padding-left:18px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcnImageCardLeftImageContent,.mcnImageCardRightImageContent{
-                    padding-right:18px !important;
-                    padding-bottom:0 !important;
-                    padding-left:18px !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-                .mcpreview-image-uploader{
-                    display:none !important;
-                    width:100% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Heading 1
-            @tip Make the first-level headings larger in size for better readability on small screens.
-            */
-                h1{
-                    /*@editable*/font-size:22px !important;
-                    /*@editable*/line-height:125% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Heading 2
-            @tip Make the second-level headings larger in size for better readability on small screens.
-            */
-                h2{
-                    /*@editable*/font-size:20px !important;
-                    /*@editable*/line-height:125% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Heading 3
-            @tip Make the third-level headings larger in size for better readability on small screens.
-            */
-                h3{
-                    /*@editable*/font-size:18px !important;
-                    /*@editable*/line-height:125% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Heading 4
-            @tip Make the fourth-level headings larger in size for better readability on small screens.
-            */
-                h4{
-                    /*@editable*/font-size:16px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Boxed Text
-            @tip Make the boxed text larger in size for better readability on small screens. We recommend a font size of at least 16px.
-            */
-                .mcnBoxedTextContentContainer .mcnTextContent,.mcnBoxedTextContentContainer .mcnTextContent p{
-                    /*@editable*/font-size:14px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Preheader Visibility
-            @tip Set the visibility of the email's preheader on small screens. You can hide it to save space.
-            */
-                #templatePreheader{
-                    /*@editable*/display:block !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Preheader Text
-            @tip Make the preheader text larger in size for better readability on small screens.
-            */
-                #templatePreheader .mcnTextContent,#templatePreheader .mcnTextContent p{
-                    /*@editable*/font-size:14px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Header Text
-            @tip Make the header text larger in size for better readability on small screens.
-            */
-                #templateHeader .mcnTextContent,#templateHeader .mcnTextContent p{
-                    /*@editable*/font-size:16px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Body Text
-            @tip Make the body text larger in size for better readability on small screens. We recommend a font size of at least 16px.
-            */
-                #templateBody .mcnTextContent,#templateBody .mcnTextContent p{
-                    /*@editable*/font-size:16px !important;
-                    /*@editable*/line-height:150% !important;
-                }
-
-        }	@media only screen and (max-width: 480px){
-            /*
-            @tab Mobile Styles
-            @section Footer Text
-            @tip Make the footer content text larger in size for better readability on small screens.
-            */
-                #templateFooter .mcnTextContent,#templateFooter .mcnTextContent p{
-                    /*@editable*/font-size:14px !important;
-                    /*@editable*/line-height:150% !important;
-                }
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Plantilla de Correo Electrónico&lt;/title&gt;
+    &lt;style&gt;
+        /* Estilos generales */
+        body, table, td, a {
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            color: #333333;
+            line-height: 1.6;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+        .header {
+            background-color: #021d49;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            text-align: justify;
+        }
+        .footer {
+            background-color: #F5F5F5;
+            color: #666666;
+            padding: 20px;
+            text-align: left;
+        }
+        .button {
+            background-color: #021d49;
+            color: #ffffff;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #005bb5;
         }
     &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
-    &lt;!--*|IF:MC_PREVIEW_TEXT|*--&gt;
-    &lt;!--[if !gte mso 9]&gt;&lt;!----&gt;&lt;span class="mcnPreviewText" style="display:none; font-size:0px; line-height:0px; max-height:0px; max-width:0px; opacity:0; overflow:hidden; visibility:hidden; mso-hide:all;"&gt;*|MC_PREVIEW_TEXT|*&lt;/span&gt;&lt;!--&lt;![endif]--&gt;
-    &lt;!--*|END:IF|*--&gt;
-    &lt;center&gt;
-        &lt;table align="center" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable"&gt;
-            &lt;tr&gt;
-                &lt;td align="center" valign="top" id="bodyCell"&gt;
-                    &lt;!-- BEGIN TEMPLATE --&gt;
-                    &lt;table border="0" cellpadding="0" cellspacing="0" width="100%" class="templateContainer"&gt;
-                        &lt;tr&gt;
-                            &lt;td valign="top" id="templateHeader"&gt;
-                                &lt;table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnImageBlock" style="min-width:100%;"&gt;
-                                    &lt;tbody class="mcnImageBlockOuter"&gt;
-                                        &lt;tr&gt;
-                                            &lt;td valign="top" style="padding:9px" class="mcnImageBlockInner"&gt;
-                                                &lt;table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" class="mcnImageContentContainer" style="min-width:100%;"&gt;
-                                                    &lt;tbody&gt;
-                                                        &lt;tr&gt;
-                                                            &lt;td class="mcnImageContent" valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align:center;"&gt;
-                                                                &lt;img align="center" alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/66351c8849f5474abb4d7f68.png" width="564" style="max-width:2500px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage"&gt;
-                                                            &lt;/td&gt;
-                                                        &lt;/tr&gt;
-                                                    &lt;/tbody&gt;
-                                                &lt;/table&gt;
-                                            &lt;/td&gt;
-                                        &lt;/tr&gt;
-                                    &lt;/tbody&gt;
-                                &lt;/table&gt;
-                            &lt;/td&gt;
-                        &lt;/tr&gt;
-                            &lt;td valign="top" id="templateBody"&gt;
-                                &lt;table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width:100%;"&gt;
-                                    &lt;tbody class="mcnTextBlockOuter"&gt;
-                                        &lt;tr&gt;
-                                            &lt;td valign="top" class="mcnTextBlockInner" style="padding-top:9px;"&gt; 
-                                            &lt;!-- background-color: #bdc5d3; --&gt;
-                                                &lt;table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width:100%; min-width:100%;" width="100%" class="mcnTextContentContainer"&gt;
-                                                    &lt;tbody&gt;
-                                                        &lt;tr&gt;
-                                                            &lt;td valign="top" class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;"&gt;
-                                                                &lt;div style="text-align: justify;"&gt;
-                                                                    &lt;p&gt;Hola, {{record.answers.65e6515a7cc2c9fe60dfd8b7.5ea0693a0c12d5a8e43d37df}}.&lt;/p&gt;
-                                                                    &lt;p&gt;Has sido invitado a visitar a {{record.answers.663bd36eb19b7fb7d9e97cca.663bd36eb19b7fb7d9e97ccb}}.&lt;/p&gt;
-                                                                    &lt;p&gt;&lt;strong&gt;Detalles de la visita:&lt;/strong&gt;&lt;/p&gt;
-                                                                    &lt;ul&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Lugar: &lt;/strong&gt;{{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}}&lt;/p&gt;&lt;/li&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.663e6e5ddb059967eecb96fa.663a7e0fe48382c5b1230902}}&lt;/p&gt;&lt;/li&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/p&gt;&lt;/li&gt;
-                                                                    &lt;/ul&gt;
-                                                                    &lt;p&gt;Usted tiene un &lt;strong&gt;tipo de pase&lt;/strong&gt;de {{record.answers.6622a77449da38df8a4686cf.661dc67e901906b7e9b73bac}}&lt;/p&gt;, favor de traer los siguientes documentos para su ingreso.&lt;/p&gt;
-                                                                    &lt;ul&gt;
-                                                                        &lt;li&gt;&lt;strong&gt;Documentos:&lt;/strong&gt;{{record.answers.6622a77449da38df8a4686cf.6622a5a362891857eef2eb59}}&lt;/p&gt;&lt;/li&gt;
-                                                                    &lt;/ul&gt;
-                                                                    &lt;p&gt;Saludos cordiales, &lt;strong&gt;LinkaForm.&lt;/strong&gt;&lt;/p&gt;
-                                                                &lt;/div&gt;
-                                                            &lt;/td&gt;
-                                                        &lt;/tr&gt;
-                                                    &lt;/tbody&gt;
-                                                &lt;/table&gt;
-                                            &lt;/td&gt;
-                                        &lt;/tr&gt;
-                                    &lt;/tbody&gt;
-                                &lt;/table&gt;
-                                &lt;!-- FOOTER --&gt;
-                                &lt;table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnDividerBlock" style="min-width:100%;"&gt;
-                                    &lt;tbody class="mcnDividerBlockOuter"&gt;
-                                        &lt;tr&gt;
-                                            &lt;td class="mcnDividerBlockInner" style="min-width: 100%; padding: 18px;"&gt;
-                                                &lt;table class="mcnDividerContent" border="0" cellpadding="0" cellspacing="0" width="100%" style="min-width: 100%;border-top-width: 2px;border-top-style: inset;border-top-color: #EAEAEA;"&gt;
-                                                    &lt;tbody&gt;
-                                                        &lt;tr&gt;
-                                                            &lt;td&gt;
-                                                                &lt;span&gt;&lt;/span&gt;
-                                                            &lt;/td&gt;
-                                                        &lt;/tr&gt;
-                                                    &lt;/tbody&gt;
-                                                &lt;/table&gt;
-                                            &lt;/td&gt;
-                                        &lt;/tr&gt;
-                                    &lt;/tbody&gt;
-                                &lt;/table&gt;
-                                &lt;table class="mcnImageBlock" style="min-width:100%;" width="100%" cellspacing="0" cellpadding="0" border="0"&gt;
-                                    &lt;tbody class="mcnImageBlockOuter footer"&gt;
-                                        &lt;style&gt;
-                                            .footer {
-                                            background-color: #fff6d5;    
-                                            width: 100%;
-                                            color:#021d49;
-                                            height: 45px;
-                                            }
-                                        &lt;/style&gt;
-                                        &lt;tr&gt;
-                                            &lt;td style="padding:9px" class="mcnImageBlockInner" valign="top"&gt;
-                                                &lt;table class="mcnImageContentContainer" style="min-width:100%;" width="100%" cellspacing="0" cellpadding="0" border="0" align="left"&gt;
-                                                    &lt;tbody&gt;
-                                                        &lt;tr&gt;
-                                                            &lt;td class="mcnImageContent" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0;" valign="top"&gt;
-                                                                &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" style="max-width:400px; padding-bottom: 0; display: inline !important; vertical-align: bottom;" class="mcnImage" width="150" align="left"&gt;
-                                                            &lt;/td&gt;
-                                                        &lt;/tr&gt;
-                                                    &lt;/tbody&gt;
-                                                &lt;/table&gt;
-                                            &lt;/td&gt;
-                                        &lt;/tr&gt;
-                                    &lt;/tbody&gt;
-                                &lt;/table&gt;
-                            &lt;/td&gt;
-                        &lt;/tr&gt;
-                    &lt;/table&gt;
-                    &lt;!-- END TEMPLATE --&gt;
-                &lt;/td&gt;
-            &lt;/tr&gt;
-        &lt;/table&gt;
-    &lt;/center&gt;
+    &lt;table class="container"&gt;
+        &lt;tr&gt;
+            &lt;td class="header"&gt;
+                &lt;img align="left" alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66b4093ed409d27d4ff620ea.png"&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td class="content"&gt;
+                &lt;h3&gt;Hola {{record.answers.66a83ad456d1e741159ce118.5ea0693a0c12d5a8e43d37df}},&lt;/h3&gt;
+                &lt;p&gt;Has sido invitado a visitar a: {{66a83ab5c3a77af505489ca2.663bd36eb19b7fb7d9e97ccb}} &lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Detalles de la ubicación:&lt;/strong&gt;&lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{record.answers.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}&lt;/p&gt;&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}&lt;/p&gt;&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/p&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;Usted tiene un pase de tipo &lt;strong&gt;{{record.answers.66a83ad3edd8174f986630ef.661dc67e901906b7e9b73bac}}&lt;/strong&gt;, favor de traer los documentos necesarios para su ingreso&lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;strong&gt;Documentos: &lt;/strong&gt;{{record.answers.66a83ad3edd8174f986630ef.662962bb203407ab90c886e4}}&lt;/p&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;Saludos,&lt;br&gt;Equipo de Administración.&lt;/p&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td class="footer"&gt;
+                &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
+                    &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png"&gt;
+                &lt;/a&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
 &lt;/body&gt;
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>
@@ -1493,15 +219,27 @@
                                 <label>Email</label>
                             </item>
                         </email_fields>
-                        <emails>[]</emails>
+                        <emails>
+                            <item>josepato@linkaform.com</item>
+                        </emails>
                         <embed_company_picture>True</embed_company_picture>
                         <fields_attached>[]</fields_attached>
-                        <pdf_template>{}</pdf_template>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Template para carnet de identidad para linkaform
+</description>
+                            <id>374</id>
+                            <name>Linkaform - Carnet Identidad</name>
+                            <owner>/api/infosync/user/8607/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/374/</resource_uri>
+                        </pdf_template>
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>True</send_pdf>
                         <sender>RECORD_USER</sender>
-                        <subject>{% raw %} Pase de entrada para {{record.answers.663e6e5ddb059967eecb96fa.663e5c57f5b8a7ce8211ed0b}} {% endraw %}</subject>
+                        <subject>{% raw %} ¡Pase de entrada para {{record.answers.66a83ad456d1e741159ce118.5ea0693a0c12d5a8e43d37df}}! {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
@@ -1605,6 +343,195 @@
                 <wf_fields>
                     <operator>all</operator>
                     <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>66bcf2bf8a06f8f584c4858b</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} &lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Plantilla de Correo Electrónico&lt;/title&gt;
+    &lt;style&gt;
+        /* Estilos generales */
+        body, table, td, a {
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            color: #333333;
+            line-height: 1.6;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+        /*.header {
+            background-color: #021d49;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }*/
+        .content {
+            padding: 20px;
+            text-align: justify;
+        }
+        .footer {
+            background-color: #F5F5F5;
+            color: #666666;
+            padding: 20px;
+            text-align: left;
+        }
+        .button {
+            background-color: #021d49;
+            color: #ffffff;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #005bb5;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;table class="container"&gt;
+        &lt;tr&gt;
+            &lt;td class="header"&gt;
+                &lt;img align="left" alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66cf3e294e2420113f105797.png"&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td class="content"&gt;
+                &lt;h3&gt;Hola {{record.answers.662c2937108836dec6d92580}},&lt;/h3&gt;
+                &lt;p&gt;Has sido invitado a visitar a: &lt;/p&gt;
+                {% if answers.663d4ba61b14fab90559ebb0 %}
+                    {% if answers.663d4ba61b14fab90559ebb0 | length &gt; 0 %}
+                        &lt;ul&gt;
+                            {% for item in answers.663d4ba61b14fab90559ebb0 %}
+                                {% if item.66a83ab5ca3453e21ea08d19 %}
+                                    &lt;li&gt;{{ item.66a83ab5ca3453e21ea08d19.62c5ff407febce07043024dd }}&lt;/li&gt;
+                                {% endif %}
+                            {% endfor %}
+                        &lt;/ul&gt;
+                    {% endif %}
+                {% endif %}            
+                &lt;p&gt;&lt;strong&gt;Detalles de la visita:&lt;/strong&gt;&lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{record.answers.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}&lt;/p&gt;&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}&lt;/p&gt;&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/p&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;Se ha creado un pre-registro y ahora está pendiente de su asignación. Por favor, complete sus datos de registro en este &lt;a href="https://srv.linkaform.com/solucion_accesos/ingreso.html?Folio={{record.folio}}" target="_blank"&gt;enlace&lt;/a&gt;.&lt;/p&gt;
+                &lt;p&gt;Saludos,&lt;br&gt;Equipo de Administración.&lt;/p&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td class="footer"&gt;
+                &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
+                    &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png"&gt;
+                &lt;/a&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>662c2937108836dec6d92581</field_id>
+                                <group_id>None</group_id>
+                                <label>Email</label>
+                            </item>
+                        </email_fields>
+                        <emails>
+                            <item>karina@linkaform.com</item>
+                        </emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} ¡Complete el proceso de registro! {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>Envío de correo nuevo usuario</name>
+                </item>
+            </actions>
+            <id>66bcf2bf8a06f8f584c48595</id>
+            <name>Invitación para NUEVO visitante</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-08-15T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-08-14T17:42:23.700Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>662c262cace163ca3ed3bb3a</field_id>
+                                <group>{}</group>
+                                <label>Selección de Visitante</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>alta_de_nuevo_visitante</value>
+                        </item>
+                    </triggers>
                 </wf_fields>
             </rules>
         </item>

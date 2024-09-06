@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.configuracion_de_perfiles.id }}</form_id>
+    <id>66bcde0dbad2aeca21ab5b94</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>66bcde0dbad2aeca21ab5b8d</_id>
+                    <action_id>12</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <synched_catalogs>
+                            <item>
+                                <couch_id>{{ catalog.configuracion_de_perfiles.obj_id }}</couch_id>
+                                <id>{{ catalog.configuracion_de_perfiles.id }}</id>
+                                <name>Configuracion de Perfiles</name>
+                            </item>
+                        </synched_catalogs>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>66bcde0dbad2aeca21ab5b8e</id>
+            <name>None</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-08-15T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-08-14T16:40:30.594Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

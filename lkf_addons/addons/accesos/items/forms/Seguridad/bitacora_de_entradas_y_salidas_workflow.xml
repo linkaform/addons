@@ -1,154 +1,63 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.bitacora_de_entradas_y_salidas.id }}</form_id>
-    <id>6643f7b529eca1662c961f2e</id>
+    <id>66d7611520cdaa6e6c53bb4c</id>
     <workflows>
         <item>
             <actions>
                 <item>
-                    <_id>6643f7b529eca1662c961f27</_id>
-                    <action_id>2</action_id>
+                    <_id>66d76124f5e362c454417e13</_id>
+                    <action_id>7</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
-                        <form>
+                        <arguments>
+                            <option>update_status</option>
+                        </arguments>
+                        <integration>None</integration>
+                        <script>
+                            <created_at>2024-07-30T00:58:50.583719</created_at>
                             <deleted_at>None</deleted_at>
-                            <id>{{ form.bitacora_de_gafetes_y_lockers.id }}</id>
-                            <name>{{ form.bitacora_de_gafetes_y_lockers.name }}</name>
-                        </form>
-                        <mapping>
+                            <end_date>None</end_date>
+                            <id>{{ script.gafetes_lockers.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.gafetes_lockers.name }}</name>
+                            <start_date>2024-07-30T00:58:50.580997</start_date>
+                            <updated_at>2024-08-30T19:59:48.396654</updated_at>
+                        </script>
+                        <scriptArguments>
                             <item>
-                                <etl>
-                                    <conditions>[]</conditions>
-                                </etl>
-                                <input>
-                                    <field_type>radio</field_type>
-                                    <id>663e530af52d352956832f72</id>
-                                    <type>field_to_field</type>
-                                    <value>None</value>
-                                </input>
-                                <output>
-                                    <id>663961d5390b9ec511e97ca5</id>
-                                </output>
+                                <label>option</label>
+                                <value>update_status</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
+                        <user>SCRIPT_OWNER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
                             </item>
                             <item>
-                                <etl>
-                                    <conditions>[]</conditions>
-                                </etl>
-                                <input>
-                                    <field_type>catalog-select</field_type>
-                                    <id>663e5c57f5b8a7ce8211ed0b</id>
-                                    <type>field_to_field</type>
-                                    <value>None</value>
-                                </input>
-                                <output>
-                                    <id>663e5c57f5b8a7ce8211ed0b</id>
-                                </output>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
                             </item>
                             <item>
-                                <etl>
-                                    <conditions>[]</conditions>
-                                </etl>
-                                <input>
-                                    <field_type>catalog-select</field_type>
-                                    <id>5ea0693a0c12d5a8e43d37df</id>
-                                    <type>field_to_field</type>
-                                    <value>None</value>
-                                </input>
-                                <output>
-                                    <id>5ea0693a0c12d5a8e43d37df</id>
-                                </output>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
                             </item>
                             <item>
-                                <etl>
-                                    <conditions>[]</conditions>
-                                </etl>
-                                <input>
-                                    <field_type>catalog-detail</field_type>
-                                    <id>66353daa223b8a43d7f274b5</id>
-                                    <type>field_to_field</type>
-                                    <value>None</value>
-                                </input>
-                                <output>
-                                    <id>66353daa223b8a43d7f274b5</id>
-                                </output>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
                             </item>
-                            <item>
-                                <etl>
-                                    <conditions>[]</conditions>
-                                </etl>
-                                <input>
-                                    <field_type>catalog-select</field_type>
-                                    <id>664803e6d79bc1dfd33885e1</id>
-                                    <type>field_to_field</type>
-                                    <value>None</value>
-                                </input>
-                                <output>
-                                    <id>664803e6d79bc1dfd33885e1</id>
-                                </output>
-                            </item>
-                            <item>
-                                <etl>
-                                    <conditions>[]</conditions>
-                                </etl>
-                                <input>
-                                    <field_type>catalog-detail</field_type>
-                                    <id>66480101786e8cdb66e70124</id>
-                                    <type>field_to_field</type>
-                                    <value>None</value>
-                                </input>
-                                <output>
-                                    <id>66480101786e8cdb66e70124</id>
-                                </output>
-                            </item>
-                            <item>
-                                <etl>
-                                    <conditions>[]</conditions>
-                                </etl>
-                                <input>
-                                    <field_type>catalog-detail</field_type>
-                                    <id>664807294f62334c9d273ed2</id>
-                                    <type>field_to_field</type>
-                                    <value>None</value>
-                                </input>
-                                <output>
-                                    <id>664807294f62334c9d273ed2</id>
-                                </output>
-                            </item>
-                            <item>
-                                <etl>
-                                    <conditions>[]</conditions>
-                                </etl>
-                                <input>
-                                    <field_type>catalog-select</field_type>
-                                    <id>663e5d44f5b8a7ce8211ed0f</id>
-                                    <type>field_to_field</type>
-                                    <value>None</value>
-                                </input>
-                                <output>
-                                    <id>663e5d44f5b8a7ce8211ed0f</id>
-                                </output>
-                            </item>
-                            <item>
-                                <etl>
-                                    <conditions>[]</conditions>
-                                </etl>
-                                <input>
-                                    <field_type>checkbox</field_type>
-                                    <id>663e5470424ad55e32832eec</id>
-                                    <type>field_to_field</type>
-                                    <value>None</value>
-                                </input>
-                                <output>
-                                    <id>65e0b6f7a07a72e587124dc6</id>
-                                </output>
-                            </item>
-                        </mapping>
+                        </userOptions>
                     </configuration>
-                    <name>Sincronizar bitacora de gafetes</name>
+                    <name>None</name>
                 </item>
             </actions>
-            <id>6643f7b529eca1662c961f28</id>
-            <name>Sincronizar a forma Bitácora de gafetes</name>
+            <id>66d76124f5e362c454417e14</id>
+            <name>None</name>
             <rules>
                 <metadata>
                     <connection>[]</connection>
@@ -159,9 +68,9 @@
                             <year>2014</year>
                         </period>
                         <range>
-                            <end>2024-05-15T06:00:00.000Z</end>
+                            <end>2024-09-04T06:00:00.000Z</end>
                             <selected>False</selected>
-                            <start>2024-05-14T23:39:48.856Z</start>
+                            <start>2024-09-03T19:14:43.613Z</start>
                         </range>
                     </date>
                     <grading>{}</grading>
@@ -169,14 +78,39 @@
                 </metadata>
                 <record>
                     <created>True</created>
-                    <deleted>True</deleted>
+                    <deleted>False</deleted>
                     <edited>True</edited>
                     <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
                     <operator>all</operator>
-                    <triggers>[]</triggers>
+                    <triggers>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.gafetes.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.gafetes.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters />
+                                    <geofence>None</geofence>
+                                    <last>False</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>664803e6d79bc1dfd33885e1</field_id>
+                                <group>{}</group>
+                                <label>ID de Gafet</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value> </value>
+                        </item>
+                    </triggers>
                 </wf_fields>
             </rules>
         </item>
