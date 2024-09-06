@@ -51,7 +51,7 @@ class CatalogResource(items.Items):
                 this_path = self.path
             catalog_model = self.load_module_template_file(this_path, catalog_name)
             self.this_path = this_path
-            res = self.lkf.install_catalog(self.module, catalog_name, catalog_model, local_path=detail.get('path'))
+            res = self.lkf.install_catalog(self.module, catalog_name, catalog_model, local_path=detail.get('path'), **kwargs)
             for file_type, files in detail.items():
                 if file_type == 'data' and self.load_data:
                     self.load_info(files, file_type, res )

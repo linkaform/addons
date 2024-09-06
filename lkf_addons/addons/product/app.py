@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from linkaform_api import base
-from lkf_addons.addons.base.base_util import Base
+from lkf_addons.addons.base.app import Base
 
 
 class Product(Base, base.LKF_Base):

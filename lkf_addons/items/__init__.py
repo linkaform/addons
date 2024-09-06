@@ -23,7 +23,7 @@ class LKFException(BaseException):
 
 class Items(LKFException):
 
-    def __init__(self, path, module, settings, load_data=False, load_demo=False):
+    def __init__(self, path, module, settings, load_data=False, load_demo=False, **kwargs):
         self.path = path
         self.module = module
         self.lkf_api = utils.Cache(settings)

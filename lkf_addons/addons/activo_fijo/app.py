@@ -86,7 +86,7 @@ class Vehiculo(base.LKF_Base):
 
         ## Module Fields ##
         ''' self.mf : Estos son los campos que deseas mantener solo dentro de este modulo '''
-        mf = {}
+        self.mf = {}
 
         ## Fields ##
         '''

@@ -10,7 +10,7 @@ from pytz import timezone
 from linkaform_api import base
 
 from lkf_addons.addons.employee.employee_utils import Employee
-from lkf_addons.addons.base.base_util import Base
+from lkf_addons.addons.base.app import Base
 
 
 def unlist(arg):

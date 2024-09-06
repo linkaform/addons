@@ -80,12 +80,15 @@ def get_module_dependencies(module, depend_modules):
 def do_load_modules(load_modules, **kwargs):
     response = []
     depend_modules = []
+    depends_on = []
+    for module in load_modules:
+        depends_on += get_module_dependencies(module, depends_on)
+    for module in load_modules:
+        if module not in depends_on:
+            depends_on.append(module)
+    kwargs.update({'depends_on': get_module_dependencies(module, depends_on)})
     if kwargs.get('dependencies'):
-        for module in load_modules:
-            depend_modules += get_module_dependencies(module, depend_modules)
-        for module in load_modules:
-            if module not in depend_modules:
-                depend_modules.append(module)
+        depend_modules = kwargs['depends_on']
         print('Installing Denpendencies: ', depend_modules)
     else:
         depend_modules = load_modules
@@ -103,7 +106,8 @@ def do_load_modules(load_modules, **kwargs):
                     module=module, 
                     settings=settings,
                     load_demo=load_demo, 
-                    load_data=load_data
+                    load_data=load_data, 
+                    **kwargs
                     )
                 try:
                     install_order = scripts.install_order
@@ -121,7 +125,8 @@ def do_load_modules(load_modules, **kwargs):
                     module=module, 
                     settings=settings, 
                     load_demo=load_demo, 
-                    load_data=load_data
+                    load_data=load_data, 
+                    **kwargs
                     )
                 try:
                     install_order = catalogs.install_order
@@ -139,7 +144,8 @@ def do_load_modules(load_modules, **kwargs):
                     module=module, 
                     settings=settings, 
                     load_demo=load_demo, 
-                    load_data=load_data
+                    load_data=load_data, 
+                    **kwargs
                     )
                 try:
                     install_order = forms.install_order
@@ -162,7 +168,8 @@ def do_load_modules(load_modules, **kwargs):
                         module=module, 
                         settings=settings,
                         load_demo=load_demo, 
-                        load_data=load_data
+                        load_data=load_data,
+                        **kwargs
                         )
                     install_order = reports.install_order
                 # except Exception as e:
