@@ -1618,16 +1618,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             },
             {'$sort':{'folio':-1}},
         ]
+        print('query', query)
         res = self.cr.aggregate(query)
         x = {}
         for x in res:
             visita_a =[]
             x['_id'] = str(x.pop('_id'))
-            v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
-            d = x.pop('visita_a_departamento') if x.get('visita_a_departamento') else []
-            p = x.pop('visita_a_puesto') if x.get('visita_a_puesto') else []
-            e = x.pop('visita_a_user_id') if x.get('visita_a_user_id') else []
-            u = x.pop('visita_a_email') if x.get('visita_a_email') else []
+            v = self.unlist(x.pop('visita_a_nombre') if x.get('visita_a_nombre') else [])
+            d = self.unlist(x.pop('visita_a_departamento') if x.get('visita_a_departamento') else [])
+            p = self.unlist(x.pop('visita_a_puesto') if x.get('visita_a_puesto') else [])
+            e = self.unlist(x.pop('visita_a_user_id') if x.get('visita_a_user_id') else [])
+            print('e',e)
+            u = self.unlist(x.pop('visita_a_email') if x.get('visita_a_email') else [])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['email'] = self.unlist(x.get('email',''))
             x['telefono'] = self.unlist(x.get('telefono',''))
@@ -1640,6 +1642,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 if len(p) >= (idx+1):
                     emp.update({'puesto':p[idx][0]})
                 if len(e) >= (idx+1):
+                    print('e', e[idx])
                     emp.update({'user_id':e[idx][0]})
                 if len(u) >= (idx+1):
                     emp.update({'email':u[idx][0]})

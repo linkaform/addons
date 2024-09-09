@@ -5,6 +5,7 @@ install_order = [
                     'gafetes',
                     'lista_de_fallas',
                     'lista_de_incidentes',
+                    'lista_de_equipos',
                     'lockers',
                     'definicion_de_examenes',
                     'definicion_de_permisos',
