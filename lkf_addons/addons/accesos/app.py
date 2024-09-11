@@ -243,18 +243,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         #- Para salida de bitacora  de articulos perdidos y lista
         self.perdidos_fields = {
-            'status_perdido':'6639ae65356a6efb4de97d28',
+            'estatus_perdido':'6639ae65356a6efb4de97d28',
             'date_hallazgo_perdido':'6639ae65356a6efb4de97d29',
             'ubicacion_perdido':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             'area_perdido':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+            'color_perdido':'66ce223e174f3f39c0020d65',
             'articulo_perdido':'6639aeeb97b12e6f4ccb9711',
-            'photo_perdido':'6639aeeb97b12e6f4ccb9712',
-            'comments_perdido':'6639affa5a9f58f5b5cb9706',
+            'tipo_articulo_perdido': '66ce2441d63bb7a3871adeae',
+            'foto_perdido':'6639aeeb97b12e6f4ccb9712',
+            'descripcion':'66ce2397c5c4d148311adf83',
+            'comentario_perdido':'6639affa5a9f58f5b5cb9706',
             'guard_perdido':f"{self.mf['catalog_guard']}.{self.mf['nombre_empleado']}",
+            'quien_entrega_interno':'66ce2646033c793281b2c414',
+            'quien_entrega_externo':'66ce2647033c793281b2c415',
             'recibe_perdido':'6639affa5a9f58f5b5cb9707',
-            'phone_recibe_perdido':'664415ce630b1fb22b07e159',
-            'identification_perdido':'664415ce630b1fb22b07e15a',
+            'telefono_recibe_perdido':'664415ce630b1fb22b07e159',
+            'identificacion_recibe_perdido':'664415ce630b1fb22b07e15a',
+            'foto_recibe_perdido':'66ce2675293aabefa3559486',
             'date_entrega_perdido':'6639affa5a9f58f5b5cb9708',
+            'locker_perdido':f"{self.LOCKERS_CAT_OBJ_ID}.{self.mf['locker_id']}"
         }
         #- Para salida de bitacora y lista
         self.bitacora_fields = {
@@ -1844,7 +1851,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ARTICULOS_PERDIDOS,
-            # f"answers.{self.perdidos_fields['ubicacion_perdido']}":location,
+            f"answers.{self.perdidos_fields['ubicacion_perdido']}":location,
             # f"answers.{self.perdidos_fields['area_perdido']}":area,
         }
         query = [
