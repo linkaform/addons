@@ -2395,7 +2395,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         """
         last_move = {}
         if self.validate_value_id(qr_code):
-            print('qr_code=',qr_code)
             last_moves = self.get_list_last_user_move(qr_code, limit=10)
             if len(last_moves) > 0:
                 last_move = last_moves[0]
@@ -2407,7 +2406,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 tipo_movimiento = 'Entrada'
             else:
                 tipo_movimiento = 'Salida'
-            print("last_moves",last_move)
             access_pass = self.get_detail_access_pass(qr_code)
             #---Last Access
             access_pass['ultimo_acceso'] = last_moves
