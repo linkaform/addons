@@ -1624,7 +1624,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for x in res:
             visita_a =[]
             x['_id'] = str(x.pop('_id'))
-            v = self.unlist(x.pop('visita_a_nombre') if x.get('visita_a_nombre') else [])
+            v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
             d = self.unlist(x.pop('visita_a_departamento') if x.get('visita_a_departamento') else [])
             p = self.unlist(x.pop('visita_a_puesto') if x.get('visita_a_puesto') else [])
             e = self.unlist(x.pop('visita_a_user_id') if x.get('visita_a_user_id') else [])
@@ -1637,15 +1637,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['motivo_visita'] = self.unlist(x.get('motivo_visita',''))
             for idx, nombre in enumerate(v):
                 emp = {'nombre':nombre}
-                if len(d) >= (idx+1):
-                    emp.update({'departamento':d[idx][0]})
-                if len(p) >= (idx+1):
-                    emp.update({'puesto':p[idx][0]})
-                if len(e) >= (idx+1):
-                    print('e', e[idx])
-                    emp.update({'user_id':e[idx][0]})
-                if len(u) >= (idx+1):
-                    emp.update({'email':u[idx][0]})
+                if d:
+                    emp.update({'departamento':d})
+                if p:
+                    emp.update({'puesto':p})
+                if e:
+                    emp.update({'user_id':e})
+                if u:
+                    emp.update({'email':u})
                 visita_a.append(emp)
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
