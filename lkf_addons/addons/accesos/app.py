@@ -57,7 +57,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         self.ACCESOS_NOTAS = self.lkm.form_id('notas','id')
         self.BITACORA_ACCESOS = self.lkm.form_id('bitacora_de_entradas_y_salidas','id')
-        self.BITACORA_ARTICULOS_PERDIDOS = self.lkm.form_id('bitacora_articulos_perdidos','id')
+        self.BITACORA_OBJETOS_PERDIDOS = self.lkm.form_id('bitacora_objetos_perdidos','id')
         self.BITACORA_FALLAS = self.lkm.form_id('bitacora_de_fallas','id')
         self.BITACORA_INCIDENCIAS = self.lkm.form_id('bitacora_de_incidencias','id')
         self.BITACORA_GAFETES_LOCKERS = self.lkm.form_id('bitacora_de_gafetes_y_lockers','id')
@@ -637,7 +637,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         list_records = []
         if len(folio) > 0:
             for element in folio:
-                response = self.get_record_by_folio(element, self.BITACORA_ARTICULOS_PERDIDOS, select_columns={'_id':1,})
+                response = self.get_record_by_folio(element, self.BITACORA_OBJETOS_PERDIDOS, select_columns={'_id':1,})
                 if response.get('_id'):
                     list_records.append("/api/infosync/form_answer/"+str(response['_id'])+"/")
                 else:
@@ -1059,7 +1059,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_article_lost(self, data_articles):
         #---Define Metadata
-        metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_ARTICULOS_PERDIDOS)
+        metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_OBJETOS_PERDIDOS)
         metadata.update({
             "properties": {
                 "device_properties":{
@@ -1842,7 +1842,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def get_list_article_lost(self, location, area):
         match_query = {
             "deleted_at":{"$exists":False},
-            "form_id": self.BITACORA_ARTICULOS_PERDIDOS,
+            "form_id": self.BITACORA_OBJETOS_PERDIDOS,
             # f"answers.{self.perdidos_fields['ubicacion_perdido']}":location,
             # f"answers.{self.perdidos_fields['area_perdido']}":area,
         }
@@ -2495,7 +2495,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers.update({f"{self.perdidos_fields[key]}":value})
 
         if answers or folio:
-            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_ARTICULOS_PERDIDOS, folios=[folio])
+            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_OBJETOS_PERDIDOS, folios=[folio])
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
