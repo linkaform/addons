@@ -61,6 +61,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.BITACORA_FALLAS = self.lkm.form_id('bitacora_de_fallas','id')
         self.BITACORA_INCIDENCIAS = self.lkm.form_id('bitacora_de_incidencias','id')
         self.BITACORA_GAFETES_LOCKERS = self.lkm.form_id('bitacora_de_gafetes_y_lockers','id')
+        #self.BITACORA_OBJETOS_PERDIDOS = self.lkm.form_id('bitacora_objetos_perdidos','id')
         self.CARGA_PERMISOS_VISITANTES = self.lkm.form_id('carga_de_permisos_de_visitantes','id')
         self.CHECKIN_CASETAS = self.lkm.form_id('checkin_checkout_casetas','id')
         self.CONCESSIONED_ARTICULOS = self.lkm.form_id('concesion_de_activos_unico','id')
@@ -116,6 +117,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.PASE_ENTRADA_ID = self.PASE_ENTRADA_CAT.get('id')
         self.PASE_ENTRADA_OBJ_ID = self.PASE_ENTRADA_CAT.get('obj_id')
 
+        self.TIPO_ARTICULOS_PERDIDOS_CAT = self.lkm.catalog_id('tipo_de_articulos_perdidos')
+        self.TIPO_ARTICULOS_PERDIDOS_CAT_ID = self.TIPO_ARTICULOS_PERDIDOS_CAT.get('id')
+        self.TIPO_ARTICULOS_PERDIDOS_CAT_OBJ_ID = self.TIPO_ARTICULOS_PERDIDOS_CAT.get('obj_id')
+        
         self.VISITA_AUTORIZADA_CAT = self.lkm.catalog_id('visita_autorizada')
         self.VISITA_AUTORIZADA_CAT_ID = self.VISITA_AUTORIZADA_CAT.get('id')
         self.VISITA_AUTORIZADA_CAT_OBJ_ID = self.VISITA_AUTORIZADA_CAT.get('obj_id')
@@ -134,6 +139,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         ## Module Fields ##
         ''' self.mf : Estos son los campos que deseas mantener solo dentro de este modulo '''
         mf = {
+            'articulo':'66ce2441d63bb7a3871adeaf',
             #LOS CATALOGOS NO SE CCLASIFICAN COMO CAMPOS            
             'catalog_area_pase':'664fc5f3bbbef12ae61b15e9',
             'catalog_caseta':'66566d60d4619218b880cf04',
@@ -216,6 +222,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'status_visita':'5ea1bd280ae8bad095055e61',
             'telefono_pase':'662c2937108836dec6d92582',
             'telefono':'661ea59c15baf5666f32360e',
+            'tipo_de_articulo_perdido':'66ce23efc5c4d148311adf86',
             'tipo_de_comentario':'66af1977ffb6fd75e769f457',
             'tipo_de_guardia': '6684484fa5fd62946c12e006',
             'tipo_equipo': '663e4730724f688b3059eb38',
@@ -245,17 +252,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.perdidos_fields = {
             'estatus_perdido':'6639ae65356a6efb4de97d28',
             'date_hallazgo_perdido':'6639ae65356a6efb4de97d29',
-            'ubicacion_perdido':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
-            'area_perdido':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+            'ubicacion_perdido':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['ubicacion']}",
+            'area_perdido':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
             'color_perdido':'66ce223e174f3f39c0020d65',
             'articulo_perdido':'6639aeeb97b12e6f4ccb9711',
-            'tipo_articulo_perdido': f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+            'tipo_articulo_perdido': f"{self.TIPO_ARTICULOS_PERDIDOS_CAT_OBJ_ID}.{self.mf['tipo_de_articulo_perdido']}",
+            'articulo_seleccion': f"{self.TIPO_ARTICULOS_PERDIDOS_CAT_OBJ_ID}.{self.mf['articulo']}",
             'foto_perdido':'6639aeeb97b12e6f4ccb9712',
             'descripcion':'66ce2397c5c4d148311adf83',
             'comentario_perdido':'6639affa5a9f58f5b5cb9706',
             'guard_perdido':f"{self.mf['catalog_guard']}.{self.mf['nombre_empleado']}",
             'quien_entrega':'66ce2646033c793281b2c414',
-            'quien_entrega_interno':f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name']}",
+            'quien_entrega_interno':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_empleado']}",
             'quien_entrega_externo':'66ce2647033c793281b2c415',
             'recibe_perdido':'6639affa5a9f58f5b5cb9707',
             'telefono_recibe_perdido':'664415ce630b1fb22b07e159',
@@ -923,6 +931,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res[nombre] = data
         return res
 
+    def catalogo_categoria(self, options={}):
+        catalog_id = self.ESTADO_ID
+        form_id = self.PASE_ENTRADA
+        group_level = options.get('group_level',1)
+        return self.catalogo_view(catalog_id, form_id)
+
     def catalogo_estados(self, options={}):
         catalog_id = self.ESTADO_ID
         form_id = self.PASE_ENTRADA
@@ -945,6 +959,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res = self._labels(res[0])
                 res = {k:v[0] for k,v in res.items() if len(v)>0}
         return res
+
+    def catalogo_tipo_articulo(self, options={}):
+        catalog_id = self.TIPO_ARTICULOS_PERDIDOS_CAT_ID
+        form_id = self.BITACORA_ARTICULOS_PERDIDOS
+        group_level = options.get('group_level',1)
+        print("catalog_id", catalog_id)
+        return self.catalogo_view(catalog_id, form_id)
 
     def check_status_code(self, data_response):
         for item in data_response:
@@ -1073,6 +1094,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_article_lost(self, data_articles):
         #---Define Metadata
+        print(data_article)
         metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_ARTICULOS_PERDIDOS)
         metadata.update({
             "properties": {
@@ -2773,6 +2795,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'group_level':2
         }
         return self.catalogo_vehiculos(options)
+
+    def tipo_articulo(self, tipo):
+        options = {
+            'startkey': [tipo],
+            'endkey': [f"{tipo}\n",{}],
+            'group_level':2
+        }
+        return self.catalogo_tipo_articulo(options)
 
     def vehiculo_modelo(self, tipo, marca):
         options = {
