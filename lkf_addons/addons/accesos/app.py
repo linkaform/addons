@@ -261,9 +261,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'foto_perdido':'6639aeeb97b12e6f4ccb9712',
             'descripcion':'66ce2397c5c4d148311adf83',
             'comentario_perdido':'6639affa5a9f58f5b5cb9706',
-            'guard_perdido':f"{self.mf['catalog_guard']}.{self.mf['nombre_empleado']}",
+            'guard_perdido':f"{self.mf['catalog_guard']}.{self.f['worker_name']}",
             'quien_entrega':'66ce2646033c793281b2c414',
-            'quien_entrega_interno':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_empleado']}",
+            'quien_entrega_interno':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'quien_entrega_externo':'66ce2647033c793281b2c415',
             'recibe_perdido':'6639affa5a9f58f5b5cb9707',
             'telefono_recibe_perdido':'664415ce630b1fb22b07e159',
@@ -960,12 +960,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res = {k:v[0] for k,v in res.items() if len(v)>0}
         return res
 
-    def catalogo_tipo_articulo(self, options={}):
+    def catalogo_tipo_articulo(self, tipo):
+        options = {
+            'startkey': [tipo],
+            'endkey': [f"{tipo}\n",{}],
+            'group_level':2
+        }
+
         catalog_id = self.TIPO_ARTICULOS_PERDIDOS_CAT_ID
-        form_id = self.BITACORA_ARTICULOS_PERDIDOS
+        form_id = self.BITACORA_OBJETOS_PERDIDOS
         group_level = options.get('group_level',1)
-        print("catalog_id", catalog_id)
-        return self.catalogo_view(catalog_id, form_id)
+        print("catalog_id", catalog_id, form_id)
+        return self.catalogo_view(catalog_id, form_id, options)
 
     def check_status_code(self, data_response):
         for item in data_response:
@@ -2796,14 +2802,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'group_level':2
         }
         return self.catalogo_vehiculos(options)
-
-    def tipo_articulo(self, tipo):
-        options = {
-            'startkey': [tipo],
-            'endkey': [f"{tipo}\n",{}],
-            'group_level':2
-        }
-        return self.catalogo_tipo_articulo(options)
 
     def vehiculo_modelo(self, tipo, marca):
         options = {
