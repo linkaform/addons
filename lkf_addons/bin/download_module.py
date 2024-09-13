@@ -33,7 +33,7 @@ from settings import *
 force_items = {
     "forms":{
         #61083:None,
-        #59308:None,
+        #122895:None,
 
         },
     "catalogs":{
@@ -76,8 +76,10 @@ def download_file(url, destination):
     os.makedirs(file_path, exist_ok=True)
     urllib.request.urlretrieve(url, destination)
 
-def download_modules(modules, options, items_ids={}, download_related=False):
+def download_modules(modules, options, items_ids={}, download_related=False, **kwargs):
     global lkf_api, lkf_modules, module_name, items
+    if kwargs.get('item_ids') and options:
+        force_items[options[0]] = {int(i_id):None for i_id in kwargs['item_ids']}
     if items_ids:
         items = items_ids
         modules = list(items.keys())
@@ -228,6 +230,7 @@ def get_item_name(item_type, item_id=None, element=None, attribute='name', item_
     item_id = int(float(item_id))
     item = items.get(item_type,{})
     item_name = None
+
     if item.get(item_id) and item[item_id]:
         return item[item_id]
     elif element:
@@ -336,7 +339,7 @@ def save_catalog_xml(xml_data, form_name):
                                 catalog_element.text = "{{ catalog." + catalog_name + ".name }}"
     #tree.write(f'{MODULES_PATH}/{module_name}/items/catalogs/downloads/{form_name}.xml', encoding="utf-8", xml_declaration=True)
     file_name = f'{form_name}.xml'
-    save_file(tree, module_name, 'catalog', file_name)
+    save_file(tree, module_name, 'catalogs', file_name)
     return True
 
 def save_file(tree, module_name, item_type, file_name):

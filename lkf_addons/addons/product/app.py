@@ -11,7 +11,7 @@ class Product(Base, base.LKF_Base):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
         self.name =  __class__.__name__
         self.settings = settings
-
+        
         self.PRODUCT = self.lkm.catalog_id('product_catalog')
         print('selef', self.PRODUCT)
         self.PRODUCT_ID = self.PRODUCT.get('id')

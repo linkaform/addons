@@ -15,4 +15,5 @@ install_order = [
                     'configuracion_de_perfiles',
                     'configuracion_de_gafetes_y_lockers',
                     'visita_autorizada',
+                    'categorias_artiuclos_peridos'
                     ]

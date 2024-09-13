@@ -208,17 +208,13 @@ class Items(LKFException):
                     search_element.insert(index, elem)
                     index += 1
                 elif position == 'replace':
-                    print('position', position)
-                    print('target_itemxxx', target_item)
                     index = list(search_element).index(target_item)
-                    print('in33dex', index)
                     position = 'after'
                     search_element.remove(target_item)
                     search_element.insert(index, elem)
                 else:
                     msg = f'Incorrect position: {position} , given.'
                     msg += ' Please check you inherit file and asure that position is set to before or after'
-                    print('msg', msg)
                     return self.LKFException(msg)
         return search_element
 
@@ -254,7 +250,7 @@ class Items(LKFException):
         if self.file_exists(modules_path, file_name, 'py'):
             search_file_path = '{}/{}.{}'.format(modules_path, file_name, 'py')
         elif self.file_exists(file_path, file_name, 'py'):
-            print('los scripts que estan en addons path no se instalan ya que viven como libreria dentro del contendedr')
+            # print('los scripts que estan en addons path no se instalan ya que viven como libreria dentro del contendedr')
             # search_file_path = '{}/{}.{}'.format(file_path, file_name, 'py')
             search_file_path = None
         else:

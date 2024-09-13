@@ -222,7 +222,7 @@ def get_modules_2_install(commands):
     return modules
 
 def get_items_2_load(commands):
-    global ask_4_items
+    global ask_4_items, download_related
     for idx, c in enumerate(commands):
         if c.strip() == '-r':
             download_related = True
@@ -321,6 +321,7 @@ if __name__ == '__main__':
             kwargs.update({'force':True})
         if '-id' in commands:
             item_ids = commands[(commands.index('-id') + 1 )].split(',')
+            kwargs.update({'item_ids':item_ids})
         if '-y' in commands:
             ask_form = False
             load_form = True
@@ -408,6 +409,7 @@ if __name__ == '__main__':
                             options.append('reports')
                 download_items = {}
                 if not load_modules:
+
                     if load_form:
                         form_id = set_value(input("Form id to download:"))
                         if item_ids and preload_item == 'form':
@@ -427,6 +429,6 @@ if __name__ == '__main__':
                     if load_reports:
                         script_id = set_value(input("Reports id to download:"))
                         download_items.update({'reports':{script_id:None}})
-                download_modules(load_modules, options, items_ids=download_items, download_related=download_related)
+                download_modules(load_modules, options, items_ids=download_items, download_related=download_related, **kwargs)
 
 

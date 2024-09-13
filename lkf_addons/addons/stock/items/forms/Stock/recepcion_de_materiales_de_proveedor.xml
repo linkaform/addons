@@ -1442,7 +1442,7 @@
                     </group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Adjust Status</label>
+                    <label>Move Status</label>
                     <number_type>None</number_type>
                     <options>
                         <item>

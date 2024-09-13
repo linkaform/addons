@@ -7,7 +7,7 @@ from bson import ObjectId
 
 from linkaform_api import base
 from lkf_addons.addons.employee.employee_utils import Employee
-from lkf_addons.addons.product.product_utils import Product, Warehouse
+from lkf_addons.addons.product.app import Product, Warehouse
 
 class Stock(Employee, Warehouse, Product, base.LKF_Base):
 

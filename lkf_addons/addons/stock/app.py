@@ -7,14 +7,16 @@ from copy import deepcopy
 
 from linkaform_api import base
 
-from lkf_addons.addons.employee.employee_utils import Employee
-from lkf_addons.addons.product.product_utils import Product, Warehouse
+from lkf_addons.addons.employee.app import Employee
+from lkf_addons.addons.product.app import Product, Warehouse
+from lkf_addons.addons.jit.app import JIT
 
 
-class Stock(Employee, Warehouse, Product, base.LKF_Base):
+class Stock(JIT, Employee, Warehouse, Product, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
+        self.mf = {}
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
         self.name =  __class__.__name__
         self.settings = settings
@@ -54,8 +56,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         self.FORM_CATALOG_DIR = {
             self.FORM_INVENTORY_ID: self.CATALOG_INVENTORY_ID, #Inventory Flow (greenHouse)
             }
-
-
 
         self.container_per_rack = {
                 'Baby Jar': 38,
@@ -176,7 +176,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             'production_year':'61f1da41b112fe4e7fe8582f',
             'production':'6271dc35e84e2577579eafeb',
             'recipe_type':'63483f8e2c8c769718b102b1',
-            'reicpe_container':'6209705080c17c97320e3382',
+            'sku_package':'6209705080c17c97320e3382',
+            'sku_container':'6209705080c17c97320e3382',
             'reicpe_end_week':'6209705080c17c97320e3381',
             'reicpe_growth_weeks':'6205f73281bb36a6f1573357',
             'reicpe_mult_rate':'6205f73281bb36a6f157334d',
@@ -213,7 +214,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             'worker_obj_id':'62c5ff243c63280985580087',
         })
         
-        self.mf = {}
 
     def add_dicts(self, dict1, dict2):
         for key in dict1:
@@ -782,7 +782,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 recipe[plant_code].update({
                     'S2_growth_weeks':this_recipe.get(self.f['reicpe_growth_weeks']),
                     'cut_productivity':this_recipe.get(self.f['reicpe_productiviy']),
-                    'media_tray':this_recipe.get(self.f['reicpe_container']),
+                    'media_tray':this_recipe.get(self.f['sku_container']),
                     'per_container':this_recipe.get(self.f['reicpe_per_container']),
                     'S2_mult_rate':this_recipe.get(self.f['reicpe_mult_rate']),
                     'S2_overage':this_recipe.get(self.f['reicpe_overage']),
@@ -804,7 +804,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 recipe[plant_code].update(
                     {'S3_growth_weeks':this_recipe.get(self.f['reicpe_growth_weeks']),
                     'cut_productivity':this_recipe.get(self.f['reicpe_productiviy']),
-                    'media_tray':this_recipe.get(self.f['reicpe_container']),
+                    'media_tray':this_recipe.get(self.f['sku_container']),
                     'per_container':this_recipe.get(self.f['reicpe_per_container']),
                     'plant_code':this_recipe.get(self.f['product_code']),
                     'S3_mult_rate':this_recipe.get(self.f['reicpe_mult_rate']),
@@ -827,7 +827,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     recipe[plant_code] = []
                 recipe[plant_code].append(
                     {'S4_growth_weeks':this_recipe.get(self.f['reicpe_growth_weeks']),
-                    'media_tray':this_recipe.get(self.f['reicpe_container']),
+                    'media_tray':this_recipe.get(self.f['sku_container']),
                     'cut_productivity':this_recipe.get(self.f['reicpe_productiviy']),
                     'per_container':this_recipe.get(self.f['reicpe_per_container']),
                     'S4_mult_rate':this_recipe.get(self.f['reicpe_mult_rate']),
@@ -848,7 +848,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if not recipe:
             return {}
         return recipe
-  
+
     def get_product_sku(self, all_codes):
         all_sku = []
         for sku, product_code in all_codes.items():
@@ -856,8 +856,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 all_sku.append(sku.upper())
         skus = {}
         mango_query = self.product_sku_query(all_sku)
-        print('SKU_ID =',self.SKU_ID)
-        print('mango_query =',mango_query)
         sku_finds = self.lkf_api.search_catalog(self.SKU_ID, mango_query)
         for this_sku in sku_finds:
                 product_code = this_sku.get(self.f['product_code'])
@@ -871,13 +869,13 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     'sku_color':this_sku.get(self.f['sku_color']),
                     'sku_image':this_sku.get(self.f['sku_image'],),
                     'sku_note':this_sku.get(self.f['sku_note'],),
-                    'sku_package':this_sku.get(self.f['reicpe_container'],),
+                    'sku_package':this_sku.get(self.f['sku_package'],),
                     'sku_per_package':this_sku.get(self.f['reicpe_per_container'],),
                     'sku_size' : this_sku.get(self.f['sku_size']),
                     'sku_source' : this_sku.get(self.f['sku_source']),
                     })
         return skus
-    
+  
     def get_plant_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main' ):
         return self.get_product_recipe(all_codes, stage=stage, recipe_type=recipe_type )
 
@@ -1235,7 +1233,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         res[self.f['plant_contamin_code']] = self.answers.get(self.f['plant_contamin_code'])
         production_recipe = self.answers.get(self.f['product_recipe'], {})
         res[self.f['plant_stage']] = int(production_recipe.get(self.f['reicpe_start_size'])[1])
-        res[self.f['plant_conteiner_type']] = self.unlist(production_recipe.get(self.f['reicpe_container'])).lower().replace(' ', '_')
+        res[self.f['plant_conteiner_type']] = self.unlist(production_recipe.get(self.f['sku_container'])).lower().replace(' ', '_')
         per_container = int(self.unlist(production_recipe.get(self.f['prod_qty_per_container'], [])))
         res[self.f['plant_per_container']] = per_container
 
@@ -2224,8 +2222,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             res[self.SKU_OBJ_ID ] = deepcopy(product)
         else:
             res =  deepcopy(product)
-        res[self.SKU_OBJ_ID ][self.f['reicpe_container']] = recipe['sku_package']
-        res[self.SKU_OBJ_ID ][self.f['reicpe_per_container']] = recipe['sku_per_package']
+        res[self.SKU_OBJ_ID ][self.f['sku_container']] = recipe['sku_package']
+        res[self.SKU_OBJ_ID ][self.f['per_container']] = recipe['sku_per_package']
         if type(recipe['product_name']) != list:
             res[self.SKU_OBJ_ID ][self.f['product_name']] = [recipe['product_name'],]
         else:
