@@ -251,25 +251,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.perdidos_fields = {
             'estatus_perdido':'6639ae65356a6efb4de97d28',
             'date_hallazgo_perdido':'6639ae65356a6efb4de97d29',
-            'ubicacion_perdido':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['ubicacion']}",
-            'area_perdido':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
+            'ubicacion_catalog':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
+            'ubicacion_perdido':f"{self.mf['ubicacion']}",
+            'area_catalog':f"{self.mf['catalog_caseta_salida']}",
+            'area_perdido':f"{self.mf['nombre_area_salida']}",
             'color_perdido':'66ce223e174f3f39c0020d65',
             'articulo_perdido':'6639aeeb97b12e6f4ccb9711',
-            'tipo_articulo_perdido': f"{self.TIPO_ARTICULOS_PERDIDOS_CAT_OBJ_ID}.{self.mf['tipo_de_articulo_perdido']}",
-            'articulo_seleccion': f"{self.TIPO_ARTICULOS_PERDIDOS_CAT_OBJ_ID}.{self.mf['articulo']}",
+            'tipo_articulo_catalog':f"{self.TIPO_ARTICULOS_PERDIDOS_CAT_OBJ_ID}",
+            'tipo_articulo_perdido':f"{self.mf['tipo_de_articulo_perdido']}",
+            'articulo_seleccion_catalog':f"{self.TIPO_ARTICULOS_PERDIDOS_CAT_OBJ_ID}",
+            'articulo_seleccion': f"{self.mf['articulo']}",
             'foto_perdido':'6639aeeb97b12e6f4ccb9712',
             'descripcion':'66ce2397c5c4d148311adf83',
             'comentario_perdido':'6639affa5a9f58f5b5cb9706',
-            'guard_perdido':f"{self.mf['catalog_guard']}.{self.f['worker_name']}",
+            'quien_entrega_catalog':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}",
+            'quien_entrega_interno':f"{self.f['worker_name']}",
             'quien_entrega':'66ce2646033c793281b2c414',
-            'quien_entrega_interno':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
+            #'quien_entrega_interno':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'quien_entrega_externo':'66ce2647033c793281b2c415',
             'recibe_perdido':'6639affa5a9f58f5b5cb9707',
             'telefono_recibe_perdido':'664415ce630b1fb22b07e159',
             'identificacion_recibe_perdido':'664415ce630b1fb22b07e15a',
             'foto_recibe_perdido':'66ce2675293aabefa3559486',
             'date_entrega_perdido':'6639affa5a9f58f5b5cb9708',
-            'locker_perdido':f"{self.LOCKERS_CAT_OBJ_ID}.{self.mf['locker_id']}"
+            'locker_catalog':f"{self.LOCKERS_CAT_OBJ_ID}",
+            'locker_perdido':f"{self.mf['locker_id']}"
         }
         #- Para salida de bitacora y lista
         self.bitacora_fields = {
@@ -959,17 +965,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res = {k:v[0] for k,v in res.items() if len(v)>0}
         return res
 
-    def catalogo_tipo_articulo(self, tipo):
-        options = {
-            'startkey': [tipo],
-            'endkey': [f"{tipo}\n",{}],
-            'group_level':2
-        }
+    def catalogo_config_area_empleado(self):
+        catalog_id = self.CONF_AREA_EMPLEADOS_CAT_ID
+        form_id= self.BITACORA_OBJETOS_PERDIDOS
+        return self.lkf_api.catalog_view(catalog_id, form_id) 
 
+    def catalogo_tipo_articulo(self, tipo=""):
+        options={}
+        if tipo:
+            options = {
+                'startkey': [tipo],
+                'endkey': [f"{tipo}\n",{}],
+                'group_level':2
+            }
         catalog_id = self.TIPO_ARTICULOS_PERDIDOS_CAT_ID
         form_id = self.BITACORA_OBJETOS_PERDIDOS
-        group_level = options.get('group_level',1)
-        print("catalog_id", catalog_id, form_id)
         return self.catalogo_view(catalog_id, form_id, options)
 
     def check_status_code(self, data_response):
@@ -1111,23 +1121,27 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
             },
         })
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         #---Define Answers
         answers = {}
         for key, value in data_articles.items():
-            if  key == 'ubicacion_perdido':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['ubicacion']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'area_perdido':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['nombre_area']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'guard_perdido':
-                answers[self.mf['catalog_guard']] = {self.mf['nombre_empleado']:value}
+            if key == 'tipo_articulo_perdido':
+                answers[self.perdidos_fields['tipo_articulo_catalog']] = {self.perdidos_fields['tipo_articulo_perdido']:value}
+            elif key == 'articulo_seleccion':
+                answers[self.perdidos_fields['articulo_seleccion_catalog']] = {self.perdidos_fields['articulo_seleccion']:value}
+            elif key == 'ubicacion_perdido':
+                answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:value}
+            elif key == 'area_perdido':
+                answers[self.perdidos_fields['area_catalog']] = {self.perdidos_fields['area_perdido']:value}
+            elif key == 'quien_entrega_interno':
+                answers[self.perdidos_fields['quien_entrega_catalog']] = {self.perdidos_fields['quien_entrega_interno']:value}
+            elif key == 'locker_perdido':
+                answers[self.perdidos_fields['locker_catalog']] = {self.perdidos_fields['locker_perdido']:value}
             else:
                 answers.update({f"{self.perdidos_fields[key]}":value})
         metadata.update({'answers':answers})
-        return self.lkf_api.post_forms_answers(metadata)
+        res=self.lkf_api.post_forms_answers(metadata)
+        return res
 
     def create_badge(self, data_badge):
         #---Define Metadata
@@ -1879,22 +1893,45 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.format_cr(res, get_one=True)
         # return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_list_article_lost(self, location, area):
+    def get_list_article_lost(self, location, area, status=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_OBJETOS_PERDIDOS,
             # f"answers.{self.perdidos_fields['ubicacion_perdido']}":location,
             # f"answers.{self.perdidos_fields['area_perdido']}":area,
         }
-        # if location:
-        #     match_query[f"answers.{self.perdidos_fields['ubicacion_perdido']}"] = location
-        # if area:
-        #     match_query[f"answers.{self.perdidos_fields['area_perdido']}"] = area
-
-        
+        if location:
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}"] = location
+        if area:
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['area_perdido']}"] = area
+        if status:
+             match_query[f"answers.{self.perdidos_fields['estatus_perdido']}"] = status
         query = [
             {'$match': match_query },
-            {'$project': self.proyect_format(self.perdidos_fields)},
+            #{'$project': self.proyect_format(self.perdidos_fields)},
+            {'$project': {
+                "folio":"$folio",
+                'estatus_perdido':f"$answers.{self.perdidos_fields['estatus_perdido']}",
+                'date_hallazgo_perdido':f"$answers.{self.perdidos_fields['date_hallazgo_perdido']}",
+                'ubicacion_perdido':f"$answers.{self.perdidos_fields['ubicacion_catalog']}.{self.perdidos_fields['ubicacion_perdido']}",
+                'area_perdido': f"$answers.{self.perdidos_fields['area_catalog']}.{self.perdidos_fields['area_perdido']}",
+                'color_perdido':f"$answers.{self.perdidos_fields['color_perdido']}",
+                'articulo_perdido':f"$answers.{self.perdidos_fields['articulo_perdido']}",
+                'tipo_articulo_perdido':f"$answers.{self.perdidos_fields['tipo_articulo_catalog']}.{self.perdidos_fields['tipo_articulo_perdido']}",
+                'articulo_seleccion':f"$answers.{self.perdidos_fields['articulo_seleccion_catalog']}.{self.perdidos_fields['articulo_seleccion']}",
+                'foto_perdido':f"$answers.{self.perdidos_fields['foto_perdido']}",
+                'descripcion':f"$answers.{self.perdidos_fields['descripcion']}",
+                'comentario_perdido':f"$answers.{self.perdidos_fields['comentario_perdido']}",
+                'quien_entrega_interno':f"$answers.{self.perdidos_fields['quien_entrega_catalog']}.{self.perdidos_fields['quien_entrega_interno']}",
+                'quien_entrega':f"$answers.{self.perdidos_fields['quien_entrega']}",
+                'quien_entrega_externo':f"$answers.{self.perdidos_fields['quien_entrega_externo']}",
+                'recibe_perdido':f"$answers.{self.perdidos_fields['recibe_perdido']}",
+                'telefono_recibe_perdido':f"$answers.{self.perdidos_fields['telefono_recibe_perdido']}",
+                'identificacion_recibe_perdido':f"$answers.{self.perdidos_fields['identificacion_recibe_perdido']}",
+                'foto_recibe_perdido':f"$answers.{self.perdidos_fields['foto_recibe_perdido']}",
+                'date_entrega_perdido':f"$answers.{self.perdidos_fields['date_entrega_perdido']}",
+                'locker_perdido':f"$answers.{self.perdidos_fields['locker_catalog']}.{self.perdidos_fields['locker_perdido']}" 
+            }},
             {'$sort':{'folio':-1}},
         ]
         pr= self.format_cr_result(self.cr.aggregate(query))
@@ -2527,22 +2564,36 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def update_article_lost(self, data_articles, folio):
         answers = {}
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        #---Define Answers
+        answers = {}
         for key, value in data_articles.items():
-            if  key == 'ubicacion_perdido':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['ubicacion']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'area_perdido':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['nombre_area']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'guard_perdido':
-                answers[self.mf['catalog_guard']] = {self.mf['nombre_empleado']:value}
+            if key == 'list_comments' or key == 'note_comments':
+                answers.update({self.notes_fields['note_comments_group']:{-1:{f"{self.notes_fields[key]}": value}}})
+            if key == 'tipo_articulo_perdido':
+                answers[self.perdidos_fields['tipo_articulo_catalog']] = {self.perdidos_fields['tipo_articulo_perdido']:value}
+            elif key == 'articulo_seleccion':
+                answers[self.perdidos_fields['articulo_seleccion_catalog']] = {self.perdidos_fields['articulo_seleccion']:value}
+            elif key == 'ubicacion_perdido':
+                answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:value}
+            elif key == 'area_perdido':
+                answers[self.perdidos_fields['area_catalog']] = {self.perdidos_fields['area_perdido']:value}
+            elif key == 'quien_entrega_interno':
+                answers[self.perdidos_fields['quien_entrega_catalog']] = {self.perdidos_fields['quien_entrega_interno']:value}
+            elif key == 'locker_perdido':
+                answers[self.perdidos_fields['locker_catalog']] = {self.perdidos_fields['locker_perdido']:value}
+            elif key == 'estatus_perdido' and (value == 'donado' or value == 'entregado'):
+                timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
+                date_entrega_perdido =self.today_str(timezone, date_format='datetime')
+                answers.update({
+                    f"{self.perdidos_fields['date_entrega_perdido']}":date_entrega_perdido})
             else:
                 answers.update({f"{self.perdidos_fields[key]}":value})
-
         if answers or folio:
-            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_OBJETOS_PERDIDOS, folios=[folio])
+            print('answers', simplejson.dumps(answers, indent=4))
+            res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_OBJETOS_PERDIDOS, folios=[folio])
+            if res.get('status_code') == 201:
+                res['json'].update({'date_entrega_perdido':{'date_entrega_perdido':date_entrega_perdido}})
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
