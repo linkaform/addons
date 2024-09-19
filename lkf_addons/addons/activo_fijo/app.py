@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
-### Linkaform Modules / Archivo de Modulo ###
+
+### Linkaform Modules / Archivo de Módulo ###
 '''
-    Archivo para utilizar las funcionalidades modulares de LinkaForm.
-    Con estas funcionalides podras utilizar la plafaorma de LinkaForm de 
-    manera modular, como un Backend as a Service o BaaS.
-    Este es un codigo es lincenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html)
-    El codigo es auto documentable y adaptable. Con la idea de que puedas reutilizar
-    gran parte del codigo en otros modulos, copiando y pegando en los nuevo modulos.
-    Al hacer esto, FAVOR de al copiar secciones de codigo, COPIAR CON TODO Y SU DOCUMENTACION.
-    Al hacer un documento nuevo o modulo nuevo, puedes copiarte de la carpeta _templates o de sus archivos,
-    pero cada que hagas un nuevo archivo, favor de copiar estas instrucciones y las generales que apliquen a 
-    cada archivo.
+Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
+podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
+
+Licencia
+Este código está licenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html).
+
+Propósito
+El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
+de gran parte del código en otros módulos simplemente copiando y pegando las secciones necesarias.
+
+Instrucciones
+1. Al copiar secciones de código, asegúrate de incluir la documentación correspondiente.
+2. Al crear un nuevo archivo o módulo, copia las instrucciones y las generales aplicables a cada archivo.
+3. Puedes basarte en la carpeta `_templates` o sus archivos para crear nuevos módulos.
 '''
 
 ### Archivo de Modulo ###
@@ -35,12 +40,24 @@ class Vehiculo(base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
-        #use self.lkm.catalog_id() to get catalog id
+        #--Variables 
+        ### Forms ###
+        '''
+        Use `self.FORM_NAME = self.lkm.form_id('form_name',id)` ---> Aquí deberás guardar los `ID` de los formularios. 
+        Para ello deberás llamar el método `lkm.form_id` del objeto `lkm` (linkaform modules, por sus siglas).
+        En `lkm` están todas las funciones generales de módulos.
+        '''
+        
+        #--Variables 
+        ### Catálogos ###
+        '''
+        Use `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos. 
+        Para ello deberás llamar el método `lkm.catalog_id` del objeto `lkm`(linkaform modules, por sus siglas).
+        En `lkm` están todas las funciones generales de módulos).
+        '''
 
 
-
-
- #--Variables 
+        #--Variables 
         # Module Globals#
         self.support_guard = 'guardia_de_apoyo'
         self.chife_guard = 'guardia_lider'
@@ -124,4 +141,5 @@ class Vehiculo(base.LKF_Base):
             'ultimo_kilometraje2':'66c1758989463aa27fc18171',
             }
             )
+
 

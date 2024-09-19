@@ -9,14 +9,12 @@ from linkaform_api import base
 
 from lkf_addons.addons.employee.app import Employee
 from lkf_addons.addons.product.app import Product, Warehouse
-from lkf_addons.addons.jit.app import JIT
 
 
-class Stock(JIT, Employee, Warehouse, Product, base.LKF_Base):
+class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
-        self.mf = {}
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
         self.name =  __class__.__name__
         self.settings = settings
@@ -214,7 +212,6 @@ class Stock(JIT, Employee, Warehouse, Product, base.LKF_Base):
             'worker_obj_id':'62c5ff243c63280985580087',
         })
         
-
     def add_dicts(self, dict1, dict2):
         for key in dict1:
             dict1[key] += dict2.get(key,0)
@@ -729,7 +726,6 @@ class Stock(JIT, Employee, Warehouse, Product, base.LKF_Base):
             f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}": warehouse,
             f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}": location,
         }
-        print('query', query_warehouse_inventory)
         if get_many:
             records = self.cr.find(query_warehouse_inventory, 
                 {'folio': 1, 'answers': 1, 'form_id': 1, 'user_id': 1,'created_at':1}).sort('created_at')
@@ -875,48 +871,15 @@ class Stock(JIT, Employee, Warehouse, Product, base.LKF_Base):
                     'sku_source' : this_sku.get(self.f['sku_source']),
                     })
         return skus
-  
-    def get_plant_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main' ):
-        return self.get_product_recipe(all_codes, stage=stage, recipe_type=recipe_type )
-
-    def get_product_map(self, values_dict, map_type='model_2_field_id'):
-        '''
-        values_dict: has the values of the stock model
-        fdict: has the fields:field_id realation of lkf forms
-
-        example:
-        values_dict = {'product_code':'LNAFP', 'stock_qty': 100, 'scrap':10, lot_num:'202305'} 
-        fdict = {'product_code':'ad0000000000000000cc0000', 
-                   'stock_qty': 'ad0000000000000000cc0111', '
-                   'scrap':'ad0000000000000000cc0222', 
-                   'lot_num':'ad0000000000000000cc333'} 
-        '''
-        fdict = deepcopy(self.f)
-        res = {}
-        if map_type == 'model_2_field_id':
-            for key, value in values_dict.items():
-                field_id = fdict.get(key)
-                if field_id:
-                    res['answers.{}'.format(field_id)] = value
-        elif map_type == 'field_id_2_model':
-            fdict =  { v:k for k,v in fdict.items()}
-            for key, value in values_dict.items():
-                if isinstance(value, dict):
-                    res.update(self.get_product_map(values_dict[key], map_type=map_type))
-                else:
-                    field_id = fdict.get(key)
-                    if field_id:
-                        res[field_id] = value
-        return res
 
     def get_product_stock(self, product_code, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
-        print(f'**33************Get Stock: {product_code}****************')
-        print('product_code', product_code)
-        print('sku', sku)
-        print('lot_number', lot_number)
-        print('warehouse', warehouse)
-        print('location', location)
+        # print(f'**33************Get Stock: {product_code}****************')
+        # print('product_code', product_code)
+        # print('sku', sku)
+        # print('lot_number', lot_number)
+        # print('warehouse', warehouse)
+        # print('location', location)
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         location = self.validate_value(location)
@@ -926,7 +889,6 @@ class Stock(JIT, Employee, Warehouse, Product, base.LKF_Base):
                 cache_stock = self.cache_get({'_id':f"{product_code}_{sku}_{lot_number}_{warehouse}_{location}","_one":True, },**kwargs)
             else:
                 cache_stock = self.cache_get({'_id':f"{product_code}_{sku}_{lot_number}_{warehouse}","_one":True, },**kwargs)
-        print('cache_stock =', cache_stock)
         kwargs.update(cache_stock.get('kwargs',{}))
         kwargs.update(cache_stock.get('cache',{}).get('kwargs',{}))
         if cache_stock.get('cache',{}).get('record_id'):
@@ -939,7 +901,6 @@ class Stock(JIT, Employee, Warehouse, Product, base.LKF_Base):
             warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
         # print('stock adjustments', stock['adjustments'])
         stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
-        print('stock move_in', stock['move_in'])
         stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         # print('stock move_out', stock)
         # if stock['adjustments']:
@@ -982,6 +943,39 @@ class Stock(JIT, Employee, Warehouse, Product, base.LKF_Base):
             stock['scrap_perc'] = round(stock.get('scrapped',0)/stock.get('stock_in',1),2)
         print('stock=', stock)
         return stock
+  
+    def get_plant_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main' ):
+        return self.get_product_recipe(all_codes, stage=stage, recipe_type=recipe_type )
+
+    def get_product_map(self, values_dict, map_type='model_2_field_id'):
+        '''
+        values_dict: has the values of the stock model
+        fdict: has the fields:field_id realation of lkf forms
+
+        example:
+        values_dict = {'product_code':'LNAFP', 'stock_qty': 100, 'scrap':10, lot_num:'202305'} 
+        fdict = {'product_code':'ad0000000000000000cc0000', 
+                   'stock_qty': 'ad0000000000000000cc0111', '
+                   'scrap':'ad0000000000000000cc0222', 
+                   'lot_num':'ad0000000000000000cc333'} 
+        '''
+        fdict = deepcopy(self.f)
+        res = {}
+        if map_type == 'model_2_field_id':
+            for key, value in values_dict.items():
+                field_id = fdict.get(key)
+                if field_id:
+                    res['answers.{}'.format(field_id)] = value
+        elif map_type == 'field_id_2_model':
+            fdict =  { v:k for k,v in fdict.items()}
+            for key, value in values_dict.items():
+                if isinstance(value, dict):
+                    res.update(self.get_product_map(values_dict[key], map_type=map_type))
+                else:
+                    field_id = fdict.get(key)
+                    if field_id:
+                        res[field_id] = value
+        return res
 
     def get_product_info(self, **kwargs):
         try:
@@ -2290,12 +2284,12 @@ class Stock(JIT, Employee, Warehouse, Product, base.LKF_Base):
         unwind = {'$unwind': '$answers.{}'.format(self.f['move_group'])}
         unwind_query = {}
         unwind_stage = []
-        print('move type.............', move_type)
-        print('warehouse', warehouse)
-        print('location', location)
-        print('product_code', product_code)
-        print('sku', sku)
-        print('lot_number', lot_number)
+        # print('move type.............', move_type)
+        # print('warehouse', warehouse)
+        # print('location', location)
+        # print('product_code', product_code)
+        # print('sku', sku)
+        # print('lot_number', lot_number)
         if move_type =='in':
             if warehouse:
                 match_query.update({f"answers.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_dest']}":warehouse})
@@ -2369,8 +2363,6 @@ class Stock(JIT, Employee, Warehouse, Product, base.LKF_Base):
             ]
         res = self.cr.aggregate(query)
         result = {}
-        if move_type == 'in':
-            print('query=', simplejson.dumps(query, indent=3))
         for r in res:
             pcode = r.get('product_code')
             result[pcode] = result.get(pcode, 0)        

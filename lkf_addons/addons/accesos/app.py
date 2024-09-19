@@ -1,24 +1,30 @@
 # -*- coding: utf-8 -*-
-### Linkaform Modules / Archivo de Modulo ###
+### Linkaform Modules / Archivo de Módulo ###
 '''
-Archivo para utilizar las funcionalidades modulares de LinkaForm.
-Con estas funcionalides podras utilizar la plafaorma de LinkaForm de 
-manera modular, como un Backend as a Service o BaaS.
-Este es un codigo es lincenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html)
-El codigo es auto documentable y adaptable. Con la idea de que puedas reutilizar
-gran parte del codigo en otros modulos, copiando y pegando en los nuevo modulos.
-Al hacer esto, FAVOR de al copiar secciones de codigo, COPIAR CON TODO Y SU DOCUMENTACION.
-Al hacer un documento nuevo o modulo nuevo, puedes copiarte de la carpeta _templates o de sus archivos,
-pero cada que hagas un nuevo archivo, favor de copiar estas instrucciones y las generales que apliquen a 
-cada archivo.
+Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
+podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
+
+Licencia
+Este código está licenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html).
+
+Propósito
+El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
+de gran parte del código en otros módulos simplemente copiando y pegando las secciones necesarias.
+
+Instrucciones
+1. Al copiar secciones de código, asegúrate de incluir la documentación correspondiente.
+2. Al crear un nuevo archivo o módulo, copia las instrucciones y las generales aplicables a cada archivo.
+3. Puedes basarte en la carpeta `_templates` o sus archivos para crear nuevos módulos.
 '''
 
 ### Archivo de Modulo ###
 '''
-En este archivo de define las funciones generales del modulo. Estos seran nombrados por conveniencia
-app.py, si llegaras a tener mas de una app, puedes crear un folder llamado app o sencillamente guardarlos
-a primer nivel. Tambien puedes hacer archvios llamados por conveniencia o estandar:
-app_utils.py, utils.py, xxx_utils.py       
+Este archivo define las funciones generales del módulo. Por conveniencia, se nombra `app.py`. 
+
+Si tienes más de una aplicación, puedes:
+    a. Crear una carpeta llamada `app`.
+    b. Guardar los archivos a nivel raíz.
+    c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
 '''
 
 import simplejson, time
@@ -31,29 +37,27 @@ from lkf_addons.addons.employee.app import Employee
 from lkf_addons.addons.activo_fijo.app import Vehiculo
 from lkf_addons.addons.location.app import Location
 
-### Objeto o Clase de Modulo ###
+### Objeto o Clase de Módulo ###
 '''
-Cada modulo puede tener N objetos, configurados en clases.
-Estos objetos deben de heredar de base.LKF_Base) y cualquier modulo dependiente.
-Al hacer el super() del __init__(), heredamos las variables de configuracion de clase.
+Cada módulo puede tener múltiples objetos, configurados en clases.
+Estos objetos deben heredar de `base.LKF_Base` y de cualquier módulo dependiente necesario.
+Al utilizar `super()` en el método `__init__()`, heredamos las variables de configuración de la clase.
 
-Se pueden heredar funciones de cualquier clase heredada con el metodo super(). 
+Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
 '''
-class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
+
+class Accesos(Employee, Location, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
         #--Variables 
         # Module Globals#
         self.support_guard = 'guardia_de_apoyo'
         self.chife_guard = 'guardia_lider'
         # Forms #
         '''
-        self.FORM_NAME = self.lkm.form_id('form_name',id)
-        aqui deberas guardar el los ID de los formularios. 
-        Para ello ocupas llamar el metodo lkm.form_id del objeto lkm(linkaform modules, por sus siglas, 
-        en lkm estan todas las funcions generales de modulos).
-
+        Use `self.FORM_NAME = self.lkm.form_id('form_name',id)` ---> Aquí deberás guardar los `ID` de los formularios. 
+        Para ello deberás llamar el método `lkm.form_id` del objeto `lkm` (linkaform modules, por sus siglas).
+        En `lkm` están todas las funciones generales de módulos.
         '''
         self.ACCESOS_NOTAS = self.lkm.form_id('notas','id')
         self.BITACORA_ACCESOS = self.lkm.form_id('bitacora_de_entradas_y_salidas','id')
@@ -70,23 +74,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
 
-        
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
         # self.FORM_ALTA_EQUIPOS = self.lkm.form_id('alta_de_equipos','id')
         # self.FORM_ALTA_VEHICULOS = self.lkm.form_id('alta_de_vehiculos','id')
-        # #self.FORM_BITACORA = self.lkm.form_id('bitacora','id')
+        # self.FORM_BITACORA = self.lkm.form_id('bitacora','id')
         # self.FORM_LOCKER = self.lkm.form_id('locker','id')
-        #self.FORM_PASE_DE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
-        #self.FORM_REGISTRO_PERMISOS = self.lkm.form_id('registro_de_permisos','id')
+        # self.FORM_PASE_DE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
+        # self.FORM_REGISTRO_PERMISOS = self.lkm.form_id('registro_de_permisos','id')
 
-        # catalogos
+        #--Variables 
+        ### Catálogos ###
         '''
-        self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)
-        aqui deberas guardar el los ID de los catalogos. 
-        Para ello ocupas llamar el metodo lkm.catalog_id del objeto lkm(linkaform modules, por sus siglas, 
-        en lkm estan todas las funcions generales de modulos).
-
+        Use `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos. 
+        Para ello deberás llamar el método `lkm.catalog_id` del objeto `lkm`(linkaform modules, por sus siglas).
+        En `lkm` están todas las funciones generales de módulos).
         '''
 
         self.CONFIGURACION_GAFETES_LOCKERS = self.lkm.catalog_id('configuracion_de_gafetes_y_lockers')
@@ -137,7 +139,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #----Dic Fields Forms
 
         ## Module Fields ##
-        ''' self.mf : Estos son los campos que deseas mantener solo dentro de este modulo '''
+        ''' 
+        self.mf : Estos son los campos que deseas mantener solo dentro de este modulo.
+        Asegúrese de utilizar `llave` y el `id` del campo ej.
+        'nombre_campo': "1f2h3j4j5d6f7h8j9j1a",
+        '''
         mf = {
             'articulo':'66ce2441d63bb7a3871adeaf',
             #LOS CATALOGOS NO SE CCLASIFICAN COMO CAMPOS            
@@ -240,13 +246,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.mf = mf
         ## Form Fields ##
         '''
-        self.form_name : En esta seccion podras agrupar todos los campos ya sea por forma o como dease
-        enviarls hacia tus servicios, en el caso de las busquedas de mongo, pudes hacer las busquedas de
-        Manera Anidada Por lo cual podras agrupar separadas por punto, ej.663d4ba61b14fab90559ebb0.665f482cc9a2f8acf685c20b
-        y asi podras hacer la busquedas directo en la base de datos.
+        `self.form_name`: En esta sección podrás agrupar todos los campos ya sea por forma o como desees enviarlos hacia tus servicios. 
+        En el caso de las búsquedas de Mongo, puedes hacer las búsquedas de manera anidada. Por lo cual podrás agrupar separadas por punto,
+        ej. 663d4ba61b14fab90559ebb0.665f482cc9a2f8acf685c20b y así podrás hacer las búsquedas directo en la base de datos.
 
-        Estos campos podras agregarlos asi directo a self.f , donde se agurpan todos los fields de los modulos heredados
-
+        Estos campos podrás agregarlos directamente a `self.f`, donde se agrupan todos los `fields` de los módulos heredados.
         '''
         #- Para salida de bitacora  de articulos perdidos y lista
         self.perdidos_fields = {
@@ -462,23 +466,26 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.bitacora_acceos = {}
         ## Fields ##
         '''
-        self.f : En esta vairable "fields", se almacenan todos los campos de todos lo modulos heredados.
-        El orden de remplazo de ve afectado por el orden en que se hereda cada modulo. El orden que se otroga, es considerando
-        que la vaiable se iguala en la base, y se va armando en tren de dependencias ej.
+        `self.f`: En esta variable "fields", se almacenan todos los campos de todos los módulos heredados.
+        El orden de reemplazo se ve afectado por el orden en que se hereda cada módulo. El orden que se otorga, es considerando
+        que la variable se iguala en la base, y se va armando en tren de dependencias ej.
+
             Class A:
             Class B(A):
             Class C(B):
             Class D(C):
 
             x_obj = D()
-            el orden de heredacion sera, primero carga A>B>C>D.
+            el orden de herencia será, primero carga A > B > C > D.
         '''
+
         self.f.update(self.notes_fields)
         self.f.update(self.checkin_fields)
 
     '''
-    _funciones internas: son funciones que solo se pueden mandar llamar dentro de este archivo. Si se hereda la clase
-    esta funcion no puede ser invocada.
+    funciones internas: son funciones que solo se pueden mandar llamar dentro de este archivo. Si se hereda la clase
+    esta función no puede ser invocada.
+
     pep-0008:
         _single_leading_underscore: 
         weak “internal use” indicator. E.g. from M import * does not import objects whose names start with an underscore.
@@ -486,8 +493,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def _do_access(self, access_pass, location, area, data):
         '''
-        Registra el acceso del pase de entra a ubicacion
-        solo puede ser ejecutado despues de revisar los accesos
+        Registra el acceso del pase de entrada a ubicación.
+        solo puede ser ejecutado después de revisar los accesos
         '''
         employee =  self.get_employee_data(email=self.user.get('email'), get_one=True)
         metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_ACCESOS)
@@ -731,6 +738,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         Valida pase de entrada y crea registro de entrada al pase
         '''
         print('me quede ahceidno la vaildacion y el registro de entrada')
+
         if not qr_code and not location and not area:
             return False
 
@@ -753,6 +761,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = self._do_access(access_pass, location, area, data)
 
     def do_checkin(self, location, area, employee_list=[]):
+        # Realiza el check-in en una ubicación y área específica.
+
         if not self.is_boot_available(location, area):
             msg = f"Can not login in to boot on location {location} at the area {area}."
             msg += f"Because '{self.last_check_in.get('employee')}' is logged in."
@@ -804,7 +814,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         data.update({
                 'properties': {
                     "device_properties":{
-                        "system": "Modulo Acceos",
+                        "system": "Modulo Accesos",
                         "process": 'Checkin-Checkout',
                         "action": 'do_checkin',
                         "archive": "accesos_utils.py"
@@ -1470,6 +1480,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res
 
     def get_access_pass(self, qr_code):
+        # Obtiene el pase de acceso con el código QR.
+
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CHECKIN_CASETAS,
@@ -1787,8 +1799,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res
 
     def get_checkin_by_id(self, _id=None, folio=None):
+        # Obtiene el registro de check-in por ID o folio.
+
         if not _id or not folio:
-            msg = "An _id or a folio is requierd to get the record"
+            msg = "An _id or a folio is required to get the record"
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CHECKIN_CASETAS,
@@ -1806,6 +1820,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
  
     def get_last_checkin(self, location, area):
+        # Obtiene el último registro de check-in por ubicación y área.
+
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CHECKIN_CASETAS,
@@ -2400,6 +2416,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             return False
 
     def is_boot_available(self, location, area):
+        # Verifica si el boot está disponible para check-in.
+
         self.last_check_in = self.get_last_checkin(location, area)
         last_status = self.last_check_in.get('checkin_type')
         if last_status in ['entrada','apertura']:
@@ -2407,7 +2425,23 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         else:
             return True
 
+    def set_checkout_employees(self, checkin={}, employee_list=[], replace=True):
+        # Establece los empleados para check-out.
+        
+        if not replace:
+            checkin[self.f['guard_group']] = employee_list
+        elif employee_list and replace:
+            checkin[self.f['guard_group']] += [
+                {self.f['employee_position']:'guardiad_de_apoyo',
+                 self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID:
+                   {self.f['worker_name_b']:guard.get('name'),
+                   }} 
+                    for guard in employee_list ]
+        return checkin
+
     def search_pass(self, qr_code=None, location=None):
+        # Busca el pase de acceso con el código QR o ubicación
+
         if not qr_code and not location:
             msg = "Debes de proveer qr_code o location"
             self.LKFException(msg)
@@ -2773,9 +2807,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return False
 
     def validate_certificados(self, qr_code, location):
+        # Valida los certificados del pase de acceso.
         return True
 
     def validate_pass_dates(self, access_pass):
+        # Valida las fechas del pase de acceso
         return True
 
     def validate_value_id(self, qr_code):

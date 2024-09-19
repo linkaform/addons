@@ -1,34 +1,42 @@
 # -*- coding: utf-8 -*-
-### Linkaform Modules / Archivo de Modulo ###
-    '''
-    Archivo para utilizar las funcionalidades modulares de LinkaForm.
-    Con estas funcionalides podras utilizar la plafaorma de LinkaForm de 
-    manera modular, como un Backend as a Service o BaaS.
-    Este es un codigo es lincenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html)
-    El codigo es auto documentable y adaptable. Con la idea de que puedas reutilizar
-    gran parte del codigo en otros modulos, copiando y pegando en los nuevo modulos.
-    Al hacer esto, FAVOR de al copiar secciones de codigo, COPIAR CON TODO Y SU DOCUMENTACION.
-    Al hacer un documento nuevo o modulo nuevo, puedes copiarte de la carpeta _templates o de sus archivos,
-    pero cada que hagas un nuevo archivo, favor de copiar estas instrucciones y las generales que apliquen a 
-    cada archivo.
-    '''
+### Linkaform Modules / Archivo de Módulo ###
+'''
+Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
+podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
+
+Licencia
+Este código está licenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html).
+
+Propósito
+El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
+de gran parte del código en otros módulos simplemente copiando y pegando las secciones necesarias.
+
+Instrucciones
+1. Al copiar secciones de código, asegúrate de incluir la documentación correspondiente.
+2. Al crear un nuevo archivo o módulo, copia las instrucciones y las generales aplicables a cada archivo.
+3. Puedes basarte en la carpeta `_templates` o sus archivos para crear nuevos módulos.
+'''
 
 ### Archivo de Modulo ###
-    '''
-    En este archivo de define las funciones generales del modulo. Estos seran nombrados por conveniencia
-    app.py, si llegaras a tener mas de una app, puedes crear un folder llamado app o sencillamente guardarlos
-    a primer nivel. Tambien puedes hacer archvios llamados por conveniencia o estandar:
-    app_utils.py, utils.py, xxx_utils.py       
-    '''
+'''
+Este archivo define las funciones generales del módulo. Por conveniencia, se nombra `app.py`. 
 
+Si tienes más de una aplicación, puedes:
+    a. Crear una carpeta llamada `app`.
+    b. Guardar los archivos a nivel raíz.
+    c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
+'''
+
+# Importaciones necesarias
 from linkaform_api.base import LKF_Base
 
-### Objecto de Modulo ###
-    '''
-    Cada modulo puede tener N objetos, configurados en clases.
-    Estos objetos deben de heredar de base.LKF_Base) y cualquier modulo dependiente
-    Al hacer el super() del __init__(), heredamos las variables de configuracion de clase.
+### Objeto o Clase de Módulo ###
+'''
+Cada módulo puede tener múltiples objetos, configurados en clases.
+Estos objetos deben heredar de `base.LKF_Base` y de cualquier módulo dependiente necesario.
+Al utilizar `super()` en el método `__init__()`, heredamos las variables de configuración de la clase.
 
-    Se pueden heredar funciones de cualquier clase heredada con el metodo super(). 
-    '''
+Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
+'''
+
 class Name_Your_Object(LKF_Base)

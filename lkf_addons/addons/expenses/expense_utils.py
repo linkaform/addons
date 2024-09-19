@@ -1,4 +1,33 @@
 # -*- coding: utf-8 -*-
+### Linkaform Modules / Archivo de Módulo ###
+'''
+Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
+podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
+
+Licencia
+Este código está licenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html).
+
+Propósito
+El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
+de gran parte del código en otros módulos simplemente copiando y pegando las secciones necesarias.
+
+Instrucciones
+1. Al copiar secciones de código, asegúrate de incluir la documentación correspondiente.
+2. Al crear un nuevo archivo o módulo, copia las instrucciones y las generales aplicables a cada archivo.
+3. Puedes basarte en la carpeta `_templates` o sus archivos para crear nuevos módulos.
+'''
+
+### Archivo de Modulo ###
+'''
+Este archivo define las funciones generales del módulo. Por conveniencia, se nombra `app.py`. 
+
+Si tienes más de una aplicación, puedes:
+    a. Crear una carpeta llamada `app`.
+    b. Guardar los archivos a nivel raíz.
+    c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
+'''
+
+# Importaciones necesarias
 import sys, simplejson
 from datetime import datetime, timedelta, date
 import time
@@ -17,6 +46,16 @@ def unlist(arg):
     if type(arg) == list and len(arg) > 0:
         return unlist(arg[0])
     return arg
+
+
+### Objeto o Clase de Módulo ###
+'''
+Cada módulo puede tener múltiples objetos, configurados en clases.
+Estos objetos deben heredar de `base.LKF_Base` y de cualquier módulo dependiente necesario.
+Al utilizar `super()` en el método `__init__()`, heredamos las variables de configuración de la clase.
+
+Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
+'''
 
 class Expenses(Employee, base.LKF_Base):
 
@@ -38,6 +77,14 @@ class Expenses(Employee, base.LKF_Base):
         self.settings = settings
         self.close_status = 'cerrada'
         self.status_id = '61041d15d9ee55ab14965bb6'
+
+        #--Variables 
+        ### Catálogos ###
+        '''
+        Use `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos. 
+        Para ello deberás llamar el método `lkm.catalog_id` del objeto `lkm`(linkaform modules, por sus siglas).
+        En `lkm` están todas las funciones generales de módulos).
+        '''
         self.CATALOG_SOL_VIAJE = self.lkm.catalog_id('solicitudes_de_gastos')
         self.CATALOG_SOL_VIAJE_ID = self.CATALOG_SOL_VIAJE.get('id')
         self.CATALOG_SOL_VIAJE_OBJ_ID = self.CATALOG_SOL_VIAJE.get('obj_id')
@@ -60,7 +107,14 @@ class Expenses(Employee, base.LKF_Base):
         # self.CATALOG_DESTINOS = self.lkm.catalog_id('estados')
         # self.CATALOG_DESTINOS_ID = self.CATALOG_DESTINOS.get('id')
         # self.CATALOG_DESTINOS_OBJ_ID = self.CATALOG_DESTINOS.get('obj_id')
-        
+
+        #--Variables 
+        ### Forms ###
+        '''
+        Use `self.FORM_NAME = self.lkm.form_id('form_name',id)` ---> Aquí deberás guardar los `ID` de los formularios. 
+        Para ello deberás llamar el método `lkm.form_id` del objeto `lkm` (linkaform modules, por sus siglas).
+        En `lkm` están todas las funciones generales de módulos.
+        '''
         self.FORM_ID_SOLICITUD = self.lkm.form_id('solicitud_de_viticos','id')
         self.FORM_ID_AUTORIZACIONES = self.lkm.form_id('autorizacin_de_viticos','id')
         self.FORM_BANK_TRANSACTIONS = self.lkm.form_id('entrega_de_efectivo_4','id')
@@ -76,6 +130,21 @@ class Expenses(Employee, base.LKF_Base):
         self.SOL_DATA = {}
         if folio_solicitud:
             self.SOL_DATA = self.set_solicitud_data(folio_solicitud)
+
+        ### Fields ###
+        '''
+        `self.f`: En esta variable "fields", se almacenan todos los campos de todos los módulos heredados.
+        El orden de reemplazo se ve afectado por el orden en que se hereda cada módulo. El orden que se otorga, es considerando
+        que la variable se iguala en la base, y se va armando en tren de dependencias ej.
+
+            Class A:
+            Class B(A):
+            Class C(B):
+            Class D(C):
+
+            x_obj = D()
+            el orden de herencia será, primero carga A > B > C > D.
+        '''
         self.f.update( {
             'allow_overdraft':'64dd637965b8662fabb5ac2d',
             'anticipo_efectivo':'649d02057880ff495300bcc0',
@@ -133,6 +202,15 @@ class Expenses(Employee, base.LKF_Base):
             'tipo_solicitud':'649b512cbf4cc1fab1133b7a',
             'total_gasto_moneda_sol':'544d5ad901a4de205f391111',
         })
+
+    '''
+    funciones internas: son funciones que solo se pueden mandar llamar dentro de este archivo. Si se hereda la clase
+    esta función no puede ser invocada.
+
+    pep-0008:
+        _single_leading_underscore: 
+        weak “internal use” indicator. E.g. from M import * does not import objects whose names start with an underscore.
+    '''
 
     def str_to_date(self, str_date):
         return datetime.strptime(str_date, '%Y-%m-%d')

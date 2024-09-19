@@ -29,7 +29,7 @@ cd addons
 git submodule update --init modules
 git fetch --recurse-submodules
 git pull --recurse-submodule
-git submodule foreach --recursive git checkout main
+git submodule foreach --recursive 'git checkout master'
 ```
 
 This will download Linkaform Modules and place you at the main branch where all the development is currently being made. Specific branches are available for you to serach try and use.
@@ -43,10 +43,21 @@ If you want to have a warranty upgrade compatibility without any merge conflicts
 cd ~/lkf
 git clone git@github.com:linkaform/linkaform_api.git
 cd linkaform_api
-git checkout 3.0
 ```
 
 > You should have docker installed on your computer
+
+
+### Crear Red de abiente
+
+Se crear una read llamada Linakaform dentro de la cual todos los contenedores se comunicaran. 
+
+Solo como dato cultural puedes craer varias redes y tomar la descicion de comunicarlas entre ellas en el docker-compose.yml file. Esto para poder tener unos servicio independientes de otros.
+
+```
+docker network create -d bridge --gateway 172.23.0.1 --subnet 172.23.0.0/16 linkaform
+
+```
 
 ### Configuring you Addons Settings
 
