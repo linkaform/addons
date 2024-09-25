@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.reglas_de_reorden.id }}</form_id>
+    <id>66eb1651c9aefada5b04b794</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>66dfc4d9a306e1ac7f6cd02c</catalog_id>
+                        <field_id>61ef32bcdf0ec2ba73dec33d</field_id>
+                        <group_id>None</group_id>
+                        <id>61ef32bcdf0ec2ba73dec33d</id>
+                        <label>Product Code</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.bom.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>66dfcccea4e5ddc4b5a1ca8e</id>
+                    <label>Lista de Materiales</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>66dfcccea4e5ddc4b5a1ca8e</catalog_id>
+                    <field_id>66da07d5b22bcdcc2f341efb</field_id>
+                    <group_id>None</group_id>
+                    <id>66da07d5b22bcdcc2f341efb</id>
+                    <label>Bom Name</label>
+                    <type>catalog-select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar Lista de Materiales</name>
+            <operator>and</operator>
+            <rule_id>dea1bb9102f10ce</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

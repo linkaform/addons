@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.demanda_ultimos_12_meses.id }}</form_id>
+    <id>66eca3ddc9aefada5b04b7bd</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>66dfc4d56c0d3d289e7b812e</catalog_id>
+                        <field_id>6442e4831198daf81456f274</field_id>
+                        <group_id>None</group_id>
+                        <id>6442e4831198daf81456f274</id>
+                        <label>Warehouse Name</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>66dfc4d56c0d3d289e7b812e</catalog_id>
+                        <field_id>6442e4831198daf81456f274</field_id>
+                        <group_id>None</group_id>
+                        <id>6442e4831198daf81456f274</id>
+                        <label>Warehouse Name</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ec770cc9aefada5b04b7a6</field_id>
+                    <group_id>None</group_id>
+                    <id>66ec770cc9aefada5b04b7a6</id>
+                    <label>Consumo Promedio Diario</label>
+                    <type>decimal</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar campos calculados</name>
+            <operator>or</operator>
+            <rule_id>18f6200726da1572</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
