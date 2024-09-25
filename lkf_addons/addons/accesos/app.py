@@ -46,7 +46,7 @@ Al utilizar `super()` en el método `__init__()`, heredamos las variables de con
 Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
 '''
 
-class Accesos(Employee, Location, base.LKF_Base):
+class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         #--Variables
@@ -1632,10 +1632,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             self.LKFException({"status_code":400, "msg":'No Existen puestos de guardias configurados.'})
         for guard_type in guards_positions:
             puesto = guard_type['tipo_de_guardia']
-            print('puwsto', puesto)
-            print('kwargs', kwargs)
             if kwargs.get('position') and kwargs['position'] != puesto:
-                print('continue')
                 continue
             res[puesto] = res.get(puesto,
                 self.get_users_by_location_area(location, area, **{'position': guard_type['puestos']})
