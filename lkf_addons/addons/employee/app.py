@@ -8,9 +8,9 @@ from lkf_addons.addons.base.app import Base
 
 class Employee(Base, base.LKF_Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         self.name =  __class__.__name__
         self.settings = settings
         # forms
@@ -99,7 +99,7 @@ class Employee(Base, base.LKF_Base):
             match_query.update(self._get_match_q(self.f['email'], email))            
         query = [
             {'$match': match_query },    
-            {'$project': self.proyect_format(self.employee_fields)},
+            {'$project': self.project_format(self.employee_fields)},
             {'$sort':{'worker_name':1}},
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
@@ -172,7 +172,7 @@ class Employee(Base, base.LKF_Base):
         users = self.format_cr_result(self.cr.aggregate(query))
         res = {}
         for usr in users:
-            res[usr['user_id']] = usr.get('pic_url',{})
+            res[usr['user_id']] = usr.get('pic_url',usr.get('file_url',{}))
         return res
 
     def get_users_by_location_area(self, location_name=None, area_name=None, user_id=None, **kwargs):
