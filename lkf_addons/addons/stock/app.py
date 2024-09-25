@@ -13,13 +13,17 @@ from lkf_addons.addons.product.app import Product, Warehouse
 
 class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
+        print('loaidng stok... app.py')
+        from lkf_addons.addons.jit.app import JIT
+        print('lYA LLAMO A JIT')
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        self.JIT = JIT( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        print('lYA LLAMO A JIT2222')
         self.name =  __class__.__name__
         self.settings = settings
 
-        print('lokf', self.lkm)
         self.STOCK_INVENTORY = self.lkm.catalog_id('stock_inventory')
         self.STOCK_INVENTORY_ID = self.STOCK_INVENTORY.get('id')
         self.STOCK_INVENTORY_OBJ_ID = self.STOCK_INVENTORY.get('obj_id')
@@ -874,12 +878,12 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def get_product_stock(self, product_code, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
-        # print(f'**33************Get Stock: {product_code}****************')
-        # print('product_code', product_code)
-        # print('sku', sku)
-        # print('lot_number', lot_number)
-        # print('warehouse', warehouse)
-        # print('location', location)
+        print(f'**33************Get Stock: {product_code}****************')
+        print('product_code', product_code)
+        print('sku', sku)
+        print('lot_number', lot_number)
+        print('warehouse', warehouse)
+        print('location', location)
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         location = self.validate_value(location)
@@ -902,7 +906,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         # print('stock adjustments', stock['adjustments'])
         stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
-        # print('stock move_out', stock)
+        print('stock move_in', stock['move_in'])
+        print('stock move_out', stock)
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -941,7 +946,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         stock['scrap_perc']  = 0
         if stock.get('stock_in') and stock.get('scrapped'):
             stock['scrap_perc'] = round(stock.get('scrapped',0)/stock.get('stock_in',1),2)
-        print('stock=', stock)
+        # print('stock=', stock)
         return stock
   
     def get_plant_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main' ):
@@ -2266,6 +2271,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def stock_one_many_one(self, move_type, product_code=None, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None, status='done', **kwargs):
         unwind =None
+        print(',modddpve type========', move_typde)
         if move_type not in ('in','out'):
             raise('Move type only accepts values "in" or "out" ')
         match_query = {
@@ -2362,6 +2368,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             {'$sort': {'product_code': 1}}
             ]
         res = self.cr.aggregate(query)
+        print('query=', simplejson.dumps(query, indent=3))
         result = {}
         for r in res:
             pcode = r.get('product_code')
@@ -2369,6 +2376,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             result[pcode] += r.get('total',0)
         if product_code:
             result = result.get(product_code,0)
+        print('result-', result)
         return result 
 
     def stock_adjustments(self, product_code=None, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None, **kwargs):
