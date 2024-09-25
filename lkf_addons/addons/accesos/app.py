@@ -48,9 +48,10 @@ Además, se pueden heredar funciones de cualquier clase antecesora usando el mé
 
 class Accesos(Employee, Location, base.LKF_Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
-        #--Variables 
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
+        #--Variables
         # Module Globals#
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         self.support_guard = 'guardia_de_apoyo'
         self.chife_guard = 'guardia_lider'
         # Forms #
@@ -126,6 +127,14 @@ class Accesos(Employee, Location, base.LKF_Base):
         self.VISITA_AUTORIZADA_CAT_ID = self.VISITA_AUTORIZADA_CAT.get('id')
         self.VISITA_AUTORIZADA_CAT_OBJ_ID = self.VISITA_AUTORIZADA_CAT.get('obj_id')
 
+        self.LISTA_INCIDENCIAS_CAT = self.lkm.catalog_id('lista_de_incidentes')
+        self.LISTA_INCIDENCIAS_CAT_ID = self.LISTA_INCIDENCIAS_CAT.get('id')
+        self.LISTA_INCIDENCIAS_CAT_OBJ_ID = self.LISTA_INCIDENCIAS_CAT.get('obj_id')
+
+        self.LISTA_INCIDENCIAS_CAT = self.lkm.catalog_id('lista_de_incidentes')
+        self.LISTA_INCIDENCIAS_CAT_ID = self.LISTA_INCIDENCIAS_CAT.get('id')
+        self.LISTA_INCIDENCIAS_CAT_OBJ_ID = self.LISTA_INCIDENCIAS_CAT.get('obj_id')
+
 
         # self.CONF_PERFIL = self.lkm.catalog_id('configuracion_de_perfiles','id')
         # self.CONF_PERFIL_ID = self.CONF_PERFIL.get('id')
@@ -155,6 +164,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             'catalog_tipo_pase':'664fc6e81d1a1fcda334b587',
             'catalog_ubicacion':'664fc5d9860deae4c20954e2',
             'catalog_visita':'664fc6f5d6078682a4dd0ab3',
+            'catalogo_persona_involucrada': '66ec6936fc1f0f3f111d818f',
             ##### REVISAR Y BORRAR ######
 
             'fecha_salida':'662c51eb194f1cb7a91e5af0',
@@ -257,7 +267,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             'date_hallazgo_perdido':'6639ae65356a6efb4de97d29',
             'ubicacion_catalog':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
             'ubicacion_perdido':f"{self.mf['ubicacion']}",
-            'area_catalog':f"{self.mf['catalog_caseta_salida']}",
+            'area_catalog':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
             'area_perdido':f"{self.mf['nombre_area_salida']}",
             'color_perdido':'66ce223e174f3f39c0020d65',
             'articulo_perdido':'6639aeeb97b12e6f4ccb9711',
@@ -349,10 +359,30 @@ class Accesos(Employee, Location, base.LKF_Base):
         }
         #- Para creación , edición y lista de incidencias
         self.incidence_fields = {
-            'date_incidence':'66396efeb37283c921e97cdf',
-            'catalog_incidence':'664fc6c7276795e17ea76dc9',
-            'incidence':'663973809fa65cafa759eb97',
-            'comments_incidence':'66397586aa8bbc0371e97c80',
+            'reporta_incidencia_catalog': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}", 
+            'reporta_incidencia': '62c5ff407febce07043024dd',
+            'fecha_hora_incidencia': '66396efeb37283c921e97cdf',
+            'ubicacion_incidencia_catalog': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
+            'ubicacion_incidencia': f"{self.mf['ubicacion']}",
+            'area_incidencia_catalog': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
+            'area_incidencia': '663e5d44f5b8a7ce8211ed0f',
+            'incidencia_catalog': f"{self.LISTA_INCIDENCIAS_CAT_OBJ_ID}",
+            'incidencia': '663973809fa65cafa759eb97',
+            'tipo_incidencia': '66ec667d7646541f2ea024de',
+            'comentario_incidencia': '66397586aa8bbc0371e97c80',
+            'tipo_dano_incidencia': '66ec6962ea3c921534b22c54',
+            'dano_incidencia':'66ec69144a27bb6151a0255a',
+            'personas_involucradas_incidencia':'66ec69144a27bb6151a0255b',
+            'acciones_tomadas_incidencia':'66ec6987f251a9c2cef0126f',
+            'evidencia_incidencia':'66ec6846028e5550cbf012e0',
+            'documento_incidencia':'66ec6846028e5550cbf012e1',
+            'prioridad_incidencia':'66ec69144a27bb6151a0255c',
+            'notificacion_incidencia':'66ec6ae6c17763d760218e5e',
+            'tipo_persona': '66ec6936fc1f0f3f111d818f',
+            'nombre_completo': '66ec69239938c882f8222036',
+            'responsable_accion':'66ec69a914bf1142b6a024e2',
+            'acciones_tomadas':'66ec69a914bf1142b6a024e3',
+            'area_incidencia_ver2':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}"
         }
         #- Para creación , edición y lista de gafetes y lockers
         self.gafetes_fields = {
@@ -958,6 +988,12 @@ class Accesos(Employee, Location, base.LKF_Base):
         group_level = options.get('group_level',1)
         return self.catalogo_view(catalog_id, form_id)
 
+    def catalogo_incidencias(self):
+        catalog_id = self.LISTA_INCIDENCIAS_CAT_ID
+        form_id = self.BITACORA_INCIDENCIAS
+        res=self.catalogo_view(catalog_id, form_id)
+        return res
+
     def catalogo_vehiculos(self, options={}):
         catalog_id = self.TIPO_DE_VEHICULO_ID
         form_id = self.PASE_ENTRADA
@@ -1136,13 +1172,22 @@ class Accesos(Employee, Location, base.LKF_Base):
         answers = {}
         for key, value in data_articles.items():
             if key == 'tipo_articulo_perdido':
+                print("value", value)
                 answers[self.perdidos_fields['tipo_articulo_catalog']] = {self.perdidos_fields['tipo_articulo_perdido']:value}
             elif key == 'articulo_seleccion':
                 answers[self.perdidos_fields['articulo_seleccion_catalog']] = {self.perdidos_fields['articulo_seleccion']:value}
-            elif key == 'ubicacion_perdido':
-                answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:value}
-            elif key == 'area_perdido':
-                answers[self.perdidos_fields['area_catalog']] = {self.perdidos_fields['area_perdido']:value}
+            if  key == 'ubicacion_perdido' or key == 'area_perdido':
+                if data_articles['ubicacion_perdido'] and not data_articles['area_perdido']:
+                    answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:data_articles['ubicacion_perdido']}
+                elif data_articles['area_perdido'] and not data_articles['ubicacion_perdido']:
+                    answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['area_perdido']:data_articles['area_perdido']}
+                elif data_articles['area_perdido'] and data_articles['ubicacion_perdido']: 
+                    answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:data_articles['ubicacion_perdido'],
+                    self.perdidos_fields['area_perdido']:data_articles['area_perdido']}
+            # elif key == 'ubicacion_perdido':
+            #     answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:value}
+            # elif key == 'area_perdido':
+            #     answers[self.perdidos_fields['area_catalog']] = {self.perdidos_fields['area_perdido']:value}
             elif key == 'quien_entrega_interno':
                 answers[self.perdidos_fields['quien_entrega_catalog']] = {self.perdidos_fields['quien_entrega_interno']:value}
             elif key == 'locker_perdido':
@@ -1238,20 +1283,47 @@ class Accesos(Employee, Location, base.LKF_Base):
         #---Define Answers
         answers = {}
         for key, value in data_incidences.items():
-            if  key == 'ubicacion_incidence':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['ubicacion']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'area_incidence':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['nombre_area']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'guard_incident':
-                answers[self.mf['catalog_guard']] = {self.mf['nombre_empleado']:value}
-            elif  key == 'incidence':
-                answers[self.incidence_fields['catalog_incidence']] = {self.incidence_fields['incidence']:value}
+            if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
+                if data_incidences['ubicacion_incidencia'] and not data_incidences['area_incidencia']:
+                    answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['ubicacion_incidencia']:data_incidences['ubicacion_incidencia']}
+                elif data_incidences['area_incidencia'] and not data_incidences['ubicacion_incidencia']:
+                    answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['area_incidencia']:data_incidences['area_incidencia']}
+                elif data_incidences['area_incidencia'] and data_incidences['ubicacion_incidencia']: 
+                    answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['ubicacion_incidencia']:data_incidences['ubicacion_incidencia'],
+                    self.incidence_fields['area_incidencia']:data_incidences['area_incidencia']}
+            elif  key == 'reporta_incidencia':
+                answers[self.incidence_fields['reporta_incidencia_catalog']] = {self.incidence_fields['reporta_incidencia']:value}
+            elif  key == 'incidencia':
+                answers[self.incidence_fields['incidencia_catalog']] = {self.incidence_fields['incidencia']:value}
+            elif key == 'personas_involucradas_incidencia':
+                personas = data_incidences.get('personas_involucradas_incidencia',[])
+                if personas:
+                    personas_list = []
+                    for c in personas:
+                        personas_list.append(
+                            {
+                                self.incidence_fields['nombre_completo']:c.get('nombre_completo'),
+                                self.incidence_fields['tipo_persona'] :c.get('tipo_persona')
+                            }
+                        )
+                    answers.update({self.incidence_fields['personas_involucradas_incidencia']:personas_list})
+            elif key == 'acciones_tomadas_incidencia':
+                acciones = data_incidences.get('acciones_tomadas_incidencia',[])
+                if acciones:
+                    acciones_list = []
+                    for c in acciones:
+                        acciones_list.append(
+                            {
+                                self.incidence_fields['responsable_accion']:c.get('responsable_accion'),
+                                self.incidence_fields['acciones_tomadas'] :c.get('acciones_tomadas').lower().replace(' ', '_')
+                            }
+                        )
+                    answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
+        
+        print("AREAAA",answers)
+        
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
@@ -1416,6 +1488,33 @@ class Accesos(Employee, Location, base.LKF_Base):
         metadata.update({'answers':answers})
         print('answers', simplejson.dumps(metadata, indent=4))
         res = self.lkf_api.post_forms_answers(metadata)
+        return res
+
+    def format_personas_involucradas(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['nombre_completo'] = r.get(self.incidence_fields['nombre_completo'],'')
+            row['tipo_persona'] = r.get(self.incidence_fields['tipo_persona'],'')
+            res.append(row)
+        return res
+
+    def format_datos_deposito(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['tipo_deposito'] = r.get(self.incidence_fields['tipo_deposito'],'')
+            row['cantidad'] = r.get(self.incidence_fields['cantidad'],'')
+            res.append(row)
+        return res
+
+    def format_acciones(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['responsable_accion'] = r.get(self.incidence_fields['responsable_accion'],'')
+            row['acciones_tomadas'] = r.get(self.incidence_fields['acciones_tomadas'],'')
+            res.append(row)
         return res
 
     def format_comentarios(self, data):
@@ -1849,7 +1948,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             }
         query = [
             {'$match': match_query },
-            {'$project': self.proyect_format(self.checkin_fields)},
+            {'$project': self.project_format(self.checkin_fields)},
             {'$sort':{'created_at':-1}},
             {'$limit':1}
             ]
@@ -2112,6 +2211,7 @@ class Accesos(Employee, Location, base.LKF_Base):
             f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}":location,
             f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area,
         }
+
         query = [
             {'$match': match_query },
             {'$project': {
@@ -2131,27 +2231,49 @@ class Accesos(Employee, Location, base.LKF_Base):
         # print('answers', simplejson.dumps(query, indent=4))
         return self.format_cr_result(self.cr.aggregate(query))
 
-    def get_list_incidences(self, location, area):
+    def get_list_incidences(self, location, area, prioridad=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_INCIDENCIAS,
-            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}":location,
-            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area,
         }
+        if location:
+             match_query[f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}"] = location
+        if area:
+             match_query[f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}"] = area
+        if prioridad:
+             match_query[f"answers.{self.incidence_fields['prioridad_incidencia']}"] = prioridad
+
+        print('location',match_query)
         query = [
             {'$match': match_query },
             {'$project': {
-                "folio": "$folio",
-                "date_incidence": f"$answers.{self.incidence_fields['date_incidence']}",
-                "ubicacion_incidence": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
-                "area_incidence": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
-                "incidence": f"$answers.{self.incidence_fields['catalog_incidence']}.{self.incidence_fields['incidence']}",
-                "comments_incidence": f"$answers.{self.incidence_fields['comments_incidence']}",
-                "guard_incident": f"$answers.{self.mf['catalog_guard']}.{self.mf['nombre_empleado']}",
+                'folio': '$folio',
+                'reporta_incidencia': f"$answers.{self.incidence_fields['reporta_incidencia_catalog']}.{self.incidence_fields['reporta_incidencia']}",
+                'fecha_hora_incidencia':f"$answers.{self.incidence_fields['fecha_hora_incidencia']}",
+                'ubicacion_incidencia': f"$answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}",
+                'area_incidencia': f"$answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}",
+                'incidencia': f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['incidencia']}",
+                'tipo_incidencia': f"$answers.{self.incidence_fields['tipo_incidencia']}",
+                'comentario_incidencia': f"$answers.{self.incidence_fields['comentario_incidencia']}",
+                'tipo_dano_incidencia': f"$answers.{self.incidence_fields['tipo_dano_incidencia']}",
+                'dano_incidencia':f"$answers.{self.incidence_fields['dano_incidencia']}",
+                'personas_involucradas_incidencia':f"$answers.{self.incidence_fields['personas_involucradas_incidencia']}",
+                'acciones_tomadas_incidencia':f"$answers.{self.incidence_fields['acciones_tomadas_incidencia']}",
+                'evidencia_incidencia':f"$answers.{self.incidence_fields['evidencia_incidencia']}",
+                'documento_incidencia':f"$answers.{self.incidence_fields['documento_incidencia']}",
+                'prioridad_incidencia':f"$answers.{self.incidence_fields['prioridad_incidencia']}",
+                'notificacion_incidencia':f"$answers.{self.incidence_fields['notificacion_incidencia']}"
             }},
             {'$sort':{'folio':-1}},
         ]
-        return self.format_cr_result(self.cr.aggregate(query))
+        result = self.format_cr_result(self.cr.aggregate(query))
+        result = self.format_cr(result)
+        for r in result:
+            r['personas_involucradas_incidencia'] = self.format_personas_involucradas(r.get('personas_involucradas_incidencia',[]))
+            r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
+        
+        print('result', simplejson.dumps(result, indent=4))
+        return result
 
     def get_list_notes(self, location, area, status=None):
         '''
@@ -2662,18 +2784,42 @@ class Accesos(Employee, Location, base.LKF_Base):
         '''
         answers = {}
         for key, value in data_incidences.items():
-            if  key == 'ubicacion_incidence':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['ubicacion']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'area_incidence':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['nombre_area']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'guard_incident':
-                answers[self.mf['catalog_guard']] = {self.mf['nombre_empleado']:value}
-            elif  key == 'incidence':
-                answers[self.incidence_fields['catalog_incidence']] = {self.incidence_fields['incidence']:value}
+            if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
+                if data_incidences['ubicacion_incidencia'] and not data_incidences['area_incidencia']:
+                    answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['ubicacion_incidencia']:data_incidences['ubicacion_incidencia']}
+                elif data_incidences['area_incidencia'] and not data_incidences['ubicacion_incidencia']:
+                    answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['area_incidencia']:data_incidences['area_incidencia']}
+                elif data_incidences['area_incidencia'] and data_incidences['ubicacion_incidencia']: 
+                    answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['ubicacion_incidencia']:data_incidences['ubicacion_incidencia'],
+                    self.incidence_fields['area_incidencia']:data_incidences['area_incidencia']}
+            elif  key == 'reporta_incidencia':
+                answers[self.incidence_fields['reporta_incidencia_catalog']] = {self.incidence_fields['reporta_incidencia']:value}
+            elif  key == 'incidencia':
+                answers[self.incidence_fields['incidencia_catalog']] = {self.incidence_fields['incidencia']:value}
+            elif key == 'personas_involucradas_incidencia':
+                personas = data_incidences.get('personas_involucradas_incidencia',[])
+                if personas:
+                    personas_list = []
+                    for c in personas:
+                        personas_list.append(
+                            {
+                                self.incidence_fields['nombre_completo']:c.get('nombre_completo'),
+                                self.incidence_fields['tipo_persona'] :c.get('tipo_persona')
+                            }
+                        )
+                    answers.update({self.incidence_fields['personas_involucradas_incidencia']:personas_list})
+            elif key == 'acciones_tomadas_incidencia':
+                acciones = data_incidences.get('acciones_tomadas_incidencia',[])
+                if acciones:
+                    acciones_list = []
+                    for c in acciones:
+                        acciones_list.append(
+                            {
+                                self.incidence_fields['responsable_accion']:c.get('responsable_accion'),
+                                self.incidence_fields['acciones_tomadas'] :c.get('acciones_tomadas').lower().replace(' ', '_')
+                            }
+                        )
+                    answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         if answers or folio:
@@ -2875,7 +3021,6 @@ class Accesos(Employee, Location, base.LKF_Base):
             ObjectId(qr_code)
             return True
         except Exception as e:
-            print(e)
             return False
 
     def vehiculo_tipo(self):
