@@ -273,7 +273,7 @@
                         <catalog_field_id>{{ catalog.product_catalog.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.product_catalog.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1160,6 +1160,7 @@
     <process_ids>[]</process_ids>
     <public>False</public>
     <resource_uri>/api/infosync/form/123149/</resource_uri>
+    <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>
@@ -1179,5 +1180,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1725944443.0</updated_at>
+    <updated_at>1725944589.0</updated_at>
 </lkf>

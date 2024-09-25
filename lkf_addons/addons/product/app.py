@@ -6,14 +6,13 @@ from lkf_addons.addons.base.app import Base
 
 class Product(Base, base.LKF_Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         self.name =  __class__.__name__
         self.settings = settings
         
         self.PRODUCT = self.lkm.catalog_id('product_catalog')
-        print('selef', self.PRODUCT)
         self.PRODUCT_ID = self.PRODUCT.get('id')
         self.PRODUCT_OBJ_ID = self.PRODUCT.get('obj_id')
 
@@ -84,9 +83,9 @@ class Product(Base, base.LKF_Base):
 class Warehouse(Base ,base.LKF_Base):
 
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api,**kwargs)
         self.name =  __class__.__name__
         self.settings = settings
 

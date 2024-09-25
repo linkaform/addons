@@ -36,8 +36,8 @@ from linkaform_api import base
 
 class Base(base.LKF_Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
        #--Variables 
         ### Forms ###
@@ -48,6 +48,7 @@ class Base(base.LKF_Base):
         '''
         self.CONTACTO = self.lkm.form_id('contacto', 'id')
         self.CLIENTE = self.lkm.form_id('clientes', 'id')
+        #self.CONFIGURACIONES = self.lkm.form_id('configuraciones', 'id')
         ### Catálogos ###
         '''
         `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos. 
@@ -82,6 +83,9 @@ class Base(base.LKF_Base):
         self.UOM_ID = self.UOM.get('id')
         self.UOM_OBJ_ID = self.UOM.get('obj_id')
 
+        ### Global Variables
+        self.GET_CONFIG = {}
+        
         self.f.update( {
             'address_name':'663a7e0fe48382c5b1230901',
             'address_image':'663a808be48382c5b123090d',
@@ -91,6 +95,7 @@ class Base(base.LKF_Base):
             'address':'663a7e0fe48382c5b1230902',
             'address2':'663a7f79e48382c5b123090a',
             'cat_timezone':f'{self.TIMEZONE_OBJ_ID}.665e4f90c4cf32cb52ebe15c',
+            'config_group':'66ed0baac9aefada5b04b817',
             'country':'663a7ca6e48382c5b12308fa',
             'city':'6654187fc85ce22aaf8bb070',
             'email':'663a7ee1e48382c5b1230907',
@@ -110,6 +115,41 @@ class Base(base.LKF_Base):
         }
         )
 
+        self.config_fields = {
+            'demora':f'{self.f.get("demora")}',
+            'lead_time':f'{self.f.get("lead_time")}',
+            'dias_laborales_consumo':f'{self.f.get("dias_laborales_consumo")}',
+            'factor_crecimiento_jit':f'{self.f.get("factor_crecimiento_jit")}',
+            'factor_seguridad_jit':f'{self.f.get("factor_seguridad_jit")}',
+            'uom':f'{self.UOM_OBJ_ID}.{self.f.get("uom")}',
+            'procurment_location':f'{self.f.get("config_group")}',
+            'warehouse_kind': '66ed0c88c9aefada5b04b818',
+        }
+
+
+    def _project_format(self, data):
+        return self.project_format(data)
+
+    def get_config(self, *args, **kwargs):
+        if not self.GET_CONFIG:
+            match_query ={ 
+                 'form_id': self.CONFIGURACIONES,  
+                 'deleted_at' : {'$exists':False},
+            } 
+            if kwargs.get('query'):
+                match_query.update(kwargs['query'])
+            project_ids = self._project_format(self.config_fields)
+            aggregate = [
+                {'$match': match_query},
+                {'$limit':kwargs.get('limit',1)},
+                {'$project': project_ids },
+                ]
+            self.GET_CONFIG =  self.format_cr(self.cr.aggregate(aggregate) )
+        result = {}
+        for res in self.GET_CONFIG:
+            result = {arg:res[arg] for arg in args if res.get(arg)}
+        return result if result else None
+        
 
 from linkaform_api import  upload_file
 
