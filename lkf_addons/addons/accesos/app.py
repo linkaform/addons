@@ -382,7 +382,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'nombre_completo': '66ec69239938c882f8222036',
             'responsable_accion':'66ec69a914bf1142b6a024e2',
             'acciones_tomadas':'66ec69a914bf1142b6a024e3',
-            'area_incidencia_ver2':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}"
+            'area_incidencia_ver2':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+            'total_deposito_incidencia':'66ec6821ea3c921534b22c30',
+            'datos_deposito_incidencia':'66ec6793eb386ff970218f1f',
+            'tipo_deposito': '66ec67dc608b1faed7b22c45',
+            'cantidad':'66ec67e42bcc75c3a458778e'
         }
         #- Para creación , edición y lista de gafetes y lockers
         self.gafetes_fields = {
@@ -1176,7 +1180,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.perdidos_fields['tipo_articulo_catalog']] = {self.perdidos_fields['tipo_articulo_perdido']:value}
             elif key == 'articulo_seleccion':
                 answers[self.perdidos_fields['articulo_seleccion_catalog']] = {self.perdidos_fields['articulo_seleccion']:value}
-            if  key == 'ubicacion_perdido' or key == 'area_perdido':
+            elif  key == 'ubicacion_perdido' or key == 'area_perdido':
                 if data_articles['ubicacion_perdido'] and not data_articles['area_perdido']:
                     answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:data_articles['ubicacion_perdido']}
                 elif data_articles['area_perdido'] and not data_articles['ubicacion_perdido']:
@@ -1319,10 +1323,23 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             }
                         )
                     answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
+            elif key == 'datos_deposito_incidencia':
+                acciones = data_incidences.get('datos_deposito_incidencia',[])
+                if acciones:
+                    acciones_list = []
+                    for c in acciones:
+                        acciones_list.append(
+                            {
+                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(' ', '_'),
+                                self.incidence_fields['cantidad'] :c.get('cantidad')
+                            }
+                        )
+                    answers.update({self.incidence_fields['datos_deposito_incidencia']:acciones_list})
+                    print("AREAAA",answers[self.incidence_fields['datos_deposito_incidencia']])
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         
-        print("AREAAA",answers)
+        
         
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
@@ -1616,7 +1633,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }
         query = [
             {'$match': match_query },
-            {'$project': self.proyect_format(self.notes_project_fields)},
+            {'$project': self.project_format(self.notes_project_fields)},
             {'$sort':{self.f['note_open_date']:1}}
             ]
         return self.format_cr_result(self.cr.aggregate(query))
@@ -1632,7 +1649,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException({"status_code":400, "msg":'No Existen puestos de guardias configurados.'})
         for guard_type in guards_positions:
             puesto = guard_type['tipo_de_guardia']
+            print('puwsto', puesto)
+            print('kwargs', kwargs)
             if kwargs.get('position') and kwargs['position'] != puesto:
+                print('continue')
                 continue
             res[puesto] = res.get(puesto,
                 self.get_users_by_location_area(location, area, **{'position': guard_type['puestos']})
@@ -2259,7 +2279,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'evidencia_incidencia':f"$answers.{self.incidence_fields['evidencia_incidencia']}",
                 'documento_incidencia':f"$answers.{self.incidence_fields['documento_incidencia']}",
                 'prioridad_incidencia':f"$answers.{self.incidence_fields['prioridad_incidencia']}",
-                'notificacion_incidencia':f"$answers.{self.incidence_fields['notificacion_incidencia']}"
+                'notificacion_incidencia':f"$answers.{self.incidence_fields['notificacion_incidencia']}",
+                'total_deposito_incidencia':f"$answers.{self.incidence_fields['total_deposito_incidencia']}",
+                'datos_deposito_incidencia':f"$answers.{self.incidence_fields['datos_deposito_incidencia']}",
             }},
             {'$sort':{'folio':-1}},
         ]
@@ -2268,6 +2290,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for r in result:
             r['personas_involucradas_incidencia'] = self.format_personas_involucradas(r.get('personas_involucradas_incidencia',[]))
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
+            r['datos_deposito_incidencia'] = self.format_datos_deposito(r.get('datos_deposito_incidencia',[]))
         
         print('result', simplejson.dumps(result, indent=4))
         return result
@@ -2719,6 +2742,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers = {}
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         #---Define Answers
+        date_entrega_perdido=""
         answers = {}
         for key, value in data_articles.items():
             if key == 'list_comments' or key == 'note_comments':
@@ -2727,10 +2751,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.perdidos_fields['tipo_articulo_catalog']] = {self.perdidos_fields['tipo_articulo_perdido']:value}
             elif key == 'articulo_seleccion':
                 answers[self.perdidos_fields['articulo_seleccion_catalog']] = {self.perdidos_fields['articulo_seleccion']:value}
-            elif key == 'ubicacion_perdido':
-                answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:value}
-            elif key == 'area_perdido':
-                answers[self.perdidos_fields['area_catalog']] = {self.perdidos_fields['area_perdido']:value}
+            elif  key == 'ubicacion_perdido' or key == 'area_perdido':
+                if data_articles['ubicacion_perdido'] and not data_articles['area_perdido']:
+                    answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:data_articles['ubicacion_perdido']}
+                elif data_articles['area_perdido'] and not data_articles['ubicacion_perdido']:
+                    answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['area_perdido']:data_articles['area_perdido']}
+                elif data_articles['area_perdido'] and data_articles['ubicacion_perdido']: 
+                    answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:data_articles['ubicacion_perdido'],
+                    self.perdidos_fields['area_perdido']:data_articles['area_perdido']}
             elif key == 'quien_entrega_interno':
                 answers[self.perdidos_fields['quien_entrega_catalog']] = {self.perdidos_fields['quien_entrega_interno']:value}
             elif key == 'locker_perdido':
@@ -2740,13 +2768,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 date_entrega_perdido =self.today_str(timezone, date_format='datetime')
                 answers.update({
                     f"{self.perdidos_fields['date_entrega_perdido']}":date_entrega_perdido})
+                answers.update({
+                    f"{self.perdidos_fields['estatus_perdido']}":date_entrega_perdido})
             else:
                 answers.update({f"{self.perdidos_fields[key]}":value})
         if answers or folio:
-            print('answers', simplejson.dumps(answers, indent=4))
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_OBJETOS_PERDIDOS, folios=[folio])
-            if res.get('status_code') == 201:
-                res['json'].update({'date_entrega_perdido':{'date_entrega_perdido':date_entrega_perdido}})
+            if res.get('status_code') == 201 or res.get('status_code') == 202:
+                print('answers', simplejson.dumps(res, indent=4))
+                res['json'].update({'date_entrega_perdido':date_entrega_perdido})
+                return res
+            else: 
+                return res
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
@@ -2813,13 +2846,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         acciones_list.append(
                             {
                                 self.incidence_fields['responsable_accion']:c.get('responsable_accion'),
-                                self.incidence_fields['acciones_tomadas'] :c.get('acciones_tomadas').lower().replace(' ', '_')
+                                self.incidence_fields['acciones_tomadas'] :c.get('acciones_tomadas')
                             }
                         )
                     answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         if answers or folio:
+            print('answers', answers)
             return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_INCIDENCIAS, folios=[folio])
         else:
             self.LKFException('No se mandarón parametros para actualizar')
