@@ -1111,7 +1111,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             res['record'] = record
             for key in kwargs['require']:
                 if not record:
-                    msg = "Something went wrong, we couldn't a record for:"
+                    msg = "******************** Something went wrong, we couldn't a record for: ***********************"
                     msg += f"Product Code {res['product_code']} / SKU: {res['sku']} /"
                     msg += f"Warehouse: {res['warehouse']} / Location: {res['warehouse_location']}"
                     self.LKFException(msg)
