@@ -73,11 +73,13 @@ class Items(LKFException):
         serach_inherit = f'{modules_path}/{file_name}_inherit*.{extension}'
         base_file_path = f'{search_file_path}/{file_name}.{extension}' 
         inherit_files = glob.glob(serach_inherit)
+        print('aqui estan los heredados', inherit_files)
         print('TODO AQUI HAY QUE BUSCAR EN LOS ARCHIVOS DE TODOS LOS MODULOS INSTALADOS....')
         for in_file in inherit_files:
             replace_childs = self.get_child_element_from_file(in_file, 'inherit')
             inherit_attr = self.get_inherit_attributes(in_file)
             base_file_path = self.add_new_item(base_file_path, replace_childs, inherit_attr, tmp_dir='_tmp')   
+        print('base_file_path', base_file_path)
         return base_file_path
 
     def file_exists(self, file_path, file_name, extension):
@@ -95,7 +97,6 @@ class Items(LKFException):
 
     def get_inherit_attributes(self, inherit_file_path):
         # Load the XML file
-        print('inherit_file_path',inherit_file_path)
         tree = ET.parse(inherit_file_path)
         root = tree.getroot()
         # Find the 'inherit' element
@@ -326,18 +327,20 @@ class Items(LKFException):
             # Return all children of the found element
             return list(parent_element)
 
-    def get_inherit_attributes(self, inherit_file_path):
-        # Load the XML file
-        tree = ET.parse(inherit_file_path)
-        root = tree.getroot()
-        # Find the 'inherit' element
-        inherit = root.find('.//inherit')
-        if inherit is None:
-            msg = "No 'inherit' element found"
-            return self.LKFException(msg)
-        # Extract all attributes of the 'inherit' element
-        attributes = inherit.attrib
-        return attributes
+    # def get_inherit_attributes(self, inherit_file_path):
+    #     # Load the XML file
+    #     print('es est...............')
+    #     tree = ET.parse(inherit_file_path)
+    #     print('inherit_file_path',inherit_file_path)
+    #     root = tree.getroot()
+    #     # Find the 'inherit' element
+    #     inherit = root.find('.//inherit')
+    #     if inherit is None:
+    #         msg = "No 'inherit' element found"
+    #         return self.LKFException(msg)
+    #     # Extract all attributes of the 'inherit' element
+    #     attributes = inherit.attrib
+    #     return attributes
 
     def load_module_template_file(self, file_path, file_name, file_data=None, inherit_attr={}):
         modules_path = file_path.replace(ADDONS_PATH, MODULES_PATH)
