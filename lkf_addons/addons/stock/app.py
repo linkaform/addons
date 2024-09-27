@@ -14,13 +14,10 @@ from lkf_addons.addons.product.app import Product, Warehouse
 class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
-        print('loaidng stok... app.py')
-        from lkf_addons.addons.jit.app import JIT
-        print('lYA LLAMO A JIT')
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        from lkf_addons.addons.jit.app import JIT
         self.JIT = JIT( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
-        print('lYA LLAMO A JIT2222')
         self.name =  __class__.__name__
         self.settings = settings
 

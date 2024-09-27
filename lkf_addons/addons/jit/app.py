@@ -43,7 +43,6 @@ class JIT(Product, base.LKF_Base):
 
 
     def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
-        print('loading jit....')
         # from lkf_addons.addons.stock.app import Stock
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
         self.mf = {}
@@ -84,8 +83,15 @@ class JIT(Product, base.LKF_Base):
                 'tipo_almacen': '66ed0c88c9aefada5b04b818'
             }
             )
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
+        from lkf_addons.addons.product.app import Product, Warehouse
 
+        self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
+        # from lkf_addons.addons.stock.app import Stock
+        # self.STOCK = Stock( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+
+        self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
         #Formas
         self.BOM_ID = self.lkm.form_id('bom','id')
         self.DEMANDA_UTIMOS_12_MES = self.lkm.form_id('demanda_ultimos_12_meses','id')
@@ -135,8 +141,10 @@ class JIT(Product, base.LKF_Base):
             sku = rule.get('sku')
             warehouse = rule.get('warehouse')
             product_by_warehouse[warehouse] = product_by_warehouse.get(warehouse,[])
+            print('rule', rule)
             location = rule.get('warehouse_location')
-            product_stock = self.get_product_stock(product_code, sku=sku,  warehouse=warehouse, location=location)
+            # product_stock = self.STOCK.get_product_stock(product_code, sku=sku,  warehouse=warehouse, location=location)
+            product_stock = {'actuals':0}
             order_qty = self.exec_reorder_rules(rule, product_stock)
             if order_qty:
                 ans = self.model_procurment(order_qty, product_code, sku, warehouse, location, procurment_method='buy')
@@ -144,20 +152,25 @@ class JIT(Product, base.LKF_Base):
         response = self.upsert_procurment(product_by_warehouse)
         return response
 
-    def calc_safety_stock(self, ave_daily_demand, lead_time, safty_factor=1):
+    def calc_safety_stock(self, ave_daily_demand, lead_time, demora, safty_factor=1):
         print('ave_daily_demand',ave_daily_demand)
         print('lead_time',lead_time)
         print('safty_factor',safty_factor)
-        return round(ave_daily_demand * lead_time * safty_factor,2)
+        #return round(ave_daily_demand * lead_time * safty_factor,2)
+        return round(ave_daily_demand * demora * safty_factor,2)
 
     def calc_max_stock(self, ave_daily_demand, lead_time, safety_stock):
         return self.calc_min_stock(ave_daily_demand, lead_time, safety_stock) * 2
 
     def calc_min_stock(self, ave_daily_demand, lead_time, safety_stock):
-        return round((ave_daily_demand * lead_time) + safety_stock,2)
+        #return round((ave_daily_demand * lead_time) + safety_stock,2)
+        return round((ave_daily_demand * lead_time) ,2)
 
-    def calc_reorder_point(self, ave_daily_demand, lead_time, min_stock):
-        return round((ave_daily_demand * lead_time) + min_stock,)
+    # def calc_reorder_point(self, ave_daily_demand, lead_time, safety_stock):
+    #     return round((ave_daily_demand * lead_time) + safety_stock)
+
+    def calc_reorder_point(self, min_stock, safety_stock):
+        return round(min_stock + safety_stock)
 
     def create_procurment(self,  answers, **kwargs):
         metadata = self.lkf_api.get_metadata(self.PROCURMENT)
@@ -181,6 +194,7 @@ class JIT(Product, base.LKF_Base):
 
         result = [dict(metadata, answers=answer) for answer in answers]
         response = self.lkf_api.post_forms_answers_list(result)
+        print('response', response)
         return response
 
     def create_reorder_rule(self, answers, **kwargs):
@@ -291,11 +305,11 @@ class JIT(Product, base.LKF_Base):
                 })
         if warehouse:
             match_query.update({
-                f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse
+                f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse']}":warehouse
                 })
         if location:
             match_query.update({
-                f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location
+                f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse_location']}":location
                 })
         query = [
             {'$match': match_query},
@@ -310,8 +324,8 @@ class JIT(Product, base.LKF_Base):
                     'sku':f'$answers.{self.SKU_OBJ_ID}.{self.f["sku"]}',
                     'status':f'$answers.{self.f["status"]}',
                     'uom':f'$answers.{self.UOM_OBJ_ID}.{self.f["uom"]}',
-                    'warehouse':f'$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse"]}',
-                    'warehouse_location':f'$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse_location"]}',
+                    'warehouse':f'$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse"]}',
+                    'warehouse_location':f'$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
             }},
             ]
         print('query=', simplejson.dumps(query, indent=3))
@@ -333,11 +347,11 @@ class JIT(Product, base.LKF_Base):
                 })
         if warehouse:
             match_query.update({
-                f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse
+                f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse']}":warehouse
                 })
         if location:
             match_query.update({
-                f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location
+                f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse_location']}":location
                 })
         query = [
             {'$match': match_query},
@@ -355,8 +369,8 @@ class JIT(Product, base.LKF_Base):
                     'status':f'$answers.{self.f["status"]}',
                     'trigger':f'$answers.{self.mf["trigger"]}',
                     'uom':f'$answers.{self.UOM_OBJ_ID}.{self.f["uom"]}',
-                    'warehouse':f'$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse"]}',
-                    'warehouse_location':f'$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse_location"]}',
+                    'warehouse':f'$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse"]}',
+                    'warehouse_location':f'$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
             }},
             ]
         return self.format_cr(self.cr.aggregate(query))
@@ -374,7 +388,7 @@ class JIT(Product, base.LKF_Base):
                     'folio':'$folio',
                     'sku':f'$answers.{self.SKU_OBJ_ID}.{self.f["product_sku"]}',
                     'product_code':f'$answers.{self.SKU_OBJ_ID}.{self.f["product_code"]}',
-                    'warehouse':f'$answers.{self.WAREHOUSE_OBJ_ID}.{self.f["warehouse"]}',
+                    'warehouse':f'$answers.{self.WH.WAREHOUSE_OBJ_ID}.{self.WH.f["warehouse"]}',
                     'demanda_12_meses':f'$answers.{self.mf["demanda_12_meses"]}',
                     'consumo_promedio_diario':f'$answers.{self.mf["consumo_promedio_diario"]}',
                     'fecha':f'$answers.{self.mf["fecha_demanda"]}',
@@ -405,7 +419,8 @@ class JIT(Product, base.LKF_Base):
 
     def model_procurment(self, qty, product_code, sku, warehouse, location, uom=None, schedule_date=None, \
         bom=None, status='programed', procurment_method='buy'):
-        
+        print('location', location)
+        print('location', locationds)
         answers = {}
         config = self.get_config(*['uom'])
 
@@ -421,9 +436,9 @@ class JIT(Product, base.LKF_Base):
         answers[self.SKU_OBJ_ID][self.f['sku']] = sku
         answers[self.UOM_OBJ_ID] = {}
         answers[self.UOM_OBJ_ID][self.f['uom']] = uom
-        answers[self.WAREHOUSE_LOCATION_OBJ_ID] = {}
-        answers[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse']] = warehouse
-        answers[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse_location']] = location
+        answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID] = {}
+        answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.WH.f['warehouse']] = warehouse
+        answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.WH.f['warehouse_location']] = location
         answers[self.mf['procurment_date']] = self.today_str()
         answers[self.mf['procurment_method']] = procurment_method
         answers[self.mf['procurment_qty']] = qty
@@ -446,15 +461,16 @@ class JIT(Product, base.LKF_Base):
             uom = config.get('uom')
         answers[self.UOM_OBJ_ID] = {}
         answers[self.UOM_OBJ_ID][self.f['uom']] = uom
-        answers[self.WAREHOUSE_LOCATION_OBJ_ID] = {}
-        answers[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse']] = warehouse
-        answers[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse_location']] = location
+        answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID] = {}
+        answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.WH.f['warehouse']] = warehouse
+        answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.WH.f['warehouse_location']] = location
         answers[self.f['lead_time']] = lead_time
         answers[self.f['demora']] = demora
-        answers[self.mf['safety_stock']] = self.calc_safety_stock(ave_daily_demand, lead_time, safety_factor )
+        answers[self.mf['safety_stock']] = self.calc_safety_stock(ave_daily_demand, lead_time, demora, safety_factor )
         answers[self.mf['min_stock']] = self.calc_min_stock(ave_daily_demand, lead_time, answers[self.mf['safety_stock']])
         answers[self.mf['max_stock']] = self.calc_max_stock(ave_daily_demand, lead_time, answers[self.mf['safety_stock']])
-        answers[self.mf['reorder_point']] = self.calc_reorder_point(ave_daily_demand, lead_time, answers[self.mf['min_stock']])
+        # answers[self.mf['reorder_point']] = self.calc_reorder_point(ave_daily_demand, lead_time, answers[self.mf['safety_stock']])
+        answers[self.mf['reorder_point']] = self.calc_reorder_point(answers[self.mf['min_stock']], answers[self.mf['safety_stock']])
         answers[self.mf['trigger']] = 'auto'
         answers[self.f['status']] = 'active'
         print('answers model_reorder_point', answers)
@@ -495,7 +511,7 @@ class JIT(Product, base.LKF_Base):
         config = self.get_config(*['uom'])
         for rec in records:
             demanda_12_meses = rec.get('demanda_12_meses')
-            consumo_promedio_diario = rec.get('consumo_promedio_diario')
+            consumo_promedio_diario = float(rec.get('consumo_promedio_diario'))
             product_code = rec.get('product_code')
             sku = rec.get('sku')
             warehouse = rec.get('warehouse')

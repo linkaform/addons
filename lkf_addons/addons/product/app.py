@@ -13,6 +13,7 @@ class Product(Base, base.LKF_Base):
         self.settings = settings
         
         self.PRODUCT = self.lkm.catalog_id('product_catalog')
+        
         self.PRODUCT_ID = self.PRODUCT.get('id')
         self.PRODUCT_OBJ_ID = self.PRODUCT.get('obj_id')
 
