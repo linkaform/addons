@@ -30,6 +30,7 @@ Si tienes más de una aplicación, puedes:
 # Importaciones necesarias
 import simplejson
 import re, os, zipfile, wget, random, shutil, datetime
+from datetime import timedelta
 
 from linkaform_api import base
 
@@ -37,6 +38,16 @@ from linkaform_api import base
 class Base(base.LKF_Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
+
+        self.mf = {
+            'form_name':'5d810a982628de5556500d55',
+            'form_id':'5d810a982628de5556500d56',
+            'form_type':'ccccc0000000000000000002',
+            }
+
+        print('Base mf' , self.mf)
+
+
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
        #--Variables 
@@ -55,6 +66,11 @@ class Base(base.LKF_Base):
         Para ello deberás llamar el método `lkm.catalog_id` del objeto `lkm`(linkaform modules, por sus siglas).
         En `lkm` están todas las funciones generales de módulos).
         '''
+
+        self.CATALOGO_FORMAS_CAT = self.lkm.catalog_id('catalogo_de_formas')
+        self.CATALOGO_FORMAS_CAT_ID = self.CATALOGO_FORMAS_CAT.get('id')
+        self.CATALOGO_FORMAS_CAT_OBJ_ID = self.CATALOGO_FORMAS_CAT.get('obj_id')
+
         self.CLIENTE_CAT = self.lkm.catalog_id('clientes')
         self.CLIENTE_CAT_ID = self.CLIENTE_CAT.get('id')
         self.CLIENTE_CAT_OBJ_ID = self.CLIENTE_CAT.get('obj_id')
@@ -79,9 +95,14 @@ class Base(base.LKF_Base):
         self.TIMEZONE_ID = self.TIMEZONE.get('id')
         self.TIMEZONE_OBJ_ID = self.TIMEZONE.get('obj_id')
 
+        self.USUARIOS = self.lkm.catalog_id('usuarios')
+        self.USUARIOS_ID = self.USUARIOS.get('id')
+        self.USUARIOS_OBJ_ID = self.USUARIOS.get('obj_id')
+
         self.UOM = self.lkm.catalog_id('unidad_de_medida')
         self.UOM_ID = self.UOM.get('id')
         self.UOM_OBJ_ID = self.UOM.get('obj_id')
+
 
         ### Global Variables
         self.GET_CONFIG = {}
@@ -155,16 +176,12 @@ from linkaform_api import  upload_file
 
 #fields_no_update = ['post_status', 'next_cut_week', 'cut_week', 'cycle_group', 'ready_year_week']
 
-class CargaUniversal(base.LKF_Base):
+class CargaUniversal(Base):
 
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
+
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
-
-        self.CATALOGO_FORMAS_CAT = self.lkm.catalog_id('catalogo_de_formas')
-        self.CATALOGO_FORMAS_CAT_ID = self.CATALOGO_FORMAS_CAT.get('id')
-        self.CATALOGO_FORMAS_CAT_OBJ_ID = self.CATALOGO_FORMAS_CAT.get('obj_id')
-
 
         self.f.update({
             'field_id_xls':'5e32fae308a46b2ea5fbde86', 
@@ -946,17 +963,22 @@ class CargaUniversal(base.LKF_Base):
         #     print("------------------- error:",e)
         #     return self.update_status_record(current_record, record_id, 'error', msg_comentarios='Ocurrió un error inesperado, favor de contactar a soporte')
 
-class Schedule(base.LKF_Base):
+
+class Schedule(Base):
 
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
-        self.mf = {
-            'dag_id':'abcde0001000000000000000'
-            }
+        
 
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
+        self.mf.update({
+            'dag_id':'abcde0001000000000000000',
+            'fecha_primer_evento':'abcde0001000000000010001',
+            }
+            )
 
+        print('shcedlue mf' , self.mf)
 
         self.PROGRAMAR_TAREAS = self.lkm.form_id('programar_tareas', 'id')
 
@@ -974,9 +996,9 @@ class Schedule(base.LKF_Base):
         '''
         time_offset = '1970-01-01 00:00:00'
         if timeframe and timeframe_unit:
-            time_offset = calc_date(time_offset , timeframe , timeframe_unit)
-        time_offset = calc_date(time_offset , tz_offset , 'minutes')
-        due_epoch = datetime.strptime(time_offset, '%Y-%m-%d %H:%M:%S')
+            time_offset = self.calc_date(time_offset , timeframe , timeframe_unit)
+        time_offset = self.calc_date(time_offset , tz_offset , 'minutes')
+        due_epoch = datetime.datetime.strptime(time_offset, '%Y-%m-%d %H:%M:%S')
         seconds = int(due_epoch.strftime('%s'))
         hours = int(seconds / 3600)
         first_date = '{% ' + ' $today + $hours + {}'.format(hours) + ' %}'
@@ -994,7 +1016,7 @@ class Schedule(base.LKF_Base):
             first_date = calc_funcint(first_date, return_hour=True)
         due_date = ''
         # first_date = '2024-01-01 00:00:00'
-        first_date_dt = datetime.strptime(first_date, '%Y-%m-%d %H:%M:%S')
+        first_date_dt = datetime.datetime.strptime(first_date, '%Y-%m-%d %H:%M:%S')
         if timeframe < 0 and operator == '+':
             operator = '-'
         elif timeframe < 0 and operator == '-':
@@ -1078,7 +1100,7 @@ class Schedule(base.LKF_Base):
                         "error":["No CronId found on folio {}!!".format(folio)]},
                 }
                 return msg_error_app
-        res = lkf_api.delete_cron(cron_id)
+        res = self.lkf_api.delete_cron(cron_id)
         res.update({'deleted': True})
         return res
 
@@ -1146,13 +1168,13 @@ class Schedule(base.LKF_Base):
         create_after = dag_info.get('next_dagrun_create_after')
         if next_run and create_after:
             res ={
-                'abcde000100000000000f000':lkf_date(next_run),
-                'abcde000100000000000f001':lkf_date(create_after),
+                'abcde000100000000000f000': self.lkf_date(next_run),
+                'abcde000100000000000f001': self.lkf_date(create_after),
             }
         return res    
 
     def get_form_fileshare(self, item_id):
-        shared_users = lkf_api.get_form_users(item_id)
+        shared_users = self.lkf_api.get_form_users(item_id)
         user_ids = [user['id'] for user in shared_users if user.get('id')]
         return user_ids
 
@@ -1171,8 +1193,8 @@ class Schedule(base.LKF_Base):
         print('is recurrent', is_recurrent)
         repeat_every = answers.get('abcde0001000000000010007')
         happens_every = answers.get('abcde0001000000000010009')
-        first_date = answers.get('abcde0001000000000010001')
-        f_date = datetime.strptime(first_date, '%Y-%m-%d %H:%M:%S')
+        first_date = answers.get(self.mf['fecha_primer_evento'])
+        f_date = datetime.datetime.strptime(first_date, '%Y-%m-%d %H:%M:%S')
 
         minute = answers.get('abcde0001000000000010010', f_date.minute)
         repeats_every_xminute = answers.get('abcde0001000000000010011')
@@ -1268,8 +1290,10 @@ class Schedule(base.LKF_Base):
 
     def lkf_date(self, date_str):
         global current_record
-        tz_offset = current_record.get('tz_offset', -300) 
-        lkf_date = datetime.strptime(date_str[:19], '%Y-%m-%dT%H:%M:%S') + timedelta(minutes=tz_offset)
+        tz_offset = self.current_record.get('tz_offset', -300) 
+        print('tz_offset', tz_offset)
+        lkf_date = datetime.datetime.strptime(date_str[:19], '%Y-%m-%dT%H:%M:%S') + timedelta(minutes=tz_offset)
+        print('lkf_date', lkf_date)
         lkf_date = lkf_date.strftime('%Y-%m-%d %H:%M:%S')
         return lkf_date
    
@@ -1317,44 +1341,40 @@ class Schedule(base.LKF_Base):
             if response.get('satus_code') == 200:
                 response['is_paused'] = False
 
-        first_date = answers.get('abcde0001000000000010001')
+
+        first_date = self.answers.get(self.mf['fecha_primer_evento'])
         #por default se corre en UTC+0
         start_date = first_date
-        anticipacion = answers.get('abcde0002000000000010001')
-        timeframe_ant = answers.get('abcde0002000000000010004')
-        timeframe_unit_ant = answers.get('abcde0002000000000010005','horas')
+        anticipacion = self.answers.get('abcde0002000000000010001')
+        timeframe_ant = self.answers.get('abcde0002000000000010004')
+        timeframe_unit_ant = self.answers.get('abcde0002000000000010005','horas')
         if anticipacion == 'si':
             if timeframe_ant:
-                print('first_date=',first_date)
-                print('timeframe_ant=',timeframe_ant)
-                print('timeframe_unit_ant=',timeframe_unit_ant)
-                print('tz_offset=',tz_offset)
                 start_date = self.calc_date(first_date, timeframe_ant, timeframe_unit_ant, operator='-')
-                print('start date 1111', start_date)
                 start_date = self.calc_date(start_date, tz_offset, 'minutes')
-        print('start date ', start_date)
         # print('start date ', start_datestop)
-        end_date = answers.get('abcde0001000000000010099')
-        timeframe = answers.get('abcde0001000000000010004')
-        timeframe_unit = answers.get('abcde0001000000000010005',1)
+
+        end_date = self.answers.get('abcde0001000000000010099')
+        timeframe = self.answers.get('abcde0001000000000010004')
+        timeframe_unit = self.answers.get('abcde0001000000000010005',1)
         #
-        due_date = calc_date_as_function(first_date, tz_offset, timeframe, timeframe_unit)
-        first_date = calc_date_as_function(first_date, tz_offset)
+        due_date = self.calc_date_as_function(first_date, tz_offset, timeframe, timeframe_unit)
+        first_date = self.calc_date_as_function(first_date, tz_offset)
 
 
-        task_name = answers.get('abcde0001000000000000001')
+        task_name = self.answers.get('abcde0001000000000000001')
 
-        task_st = answers.get('abcde0001000000000000006')
-        duration = answers.get('abcde0001000000000000016',1) * 3600
-        description = answers.get('abcde0001000000000000007')
-        status = answers.get('abcde0001000000000000020')
+        task_st = self.answers.get('abcde0001000000000000006')
+        duration = self.answers.get('abcde0001000000000000016',1) * 3600
+        description = self.answers.get('abcde0001000000000000007')
+        status = self.answers.get('abcde0001000000000000020')
 
         #cambia cada forma
-        field_map = {'abcded001000000000000001': answers.get('abcded001000000000000001')}
-        group_field_map = {'abcde0001000000000000008': answers.get('abcde0001000000000000008')}
+        field_map = {'abcded001000000000000001': self.answers.get('abcded001000000000000001')}
+        group_field_map = {'abcde0001000000000000008': self.answers.get('abcde0001000000000000008')}
 
-        asigne_to = answers.get('abcde0001000000000020001',[])
-        assigned_users = answers.get('abcde0001000000000020002')
+        asigne_to = self.answers.get('abcde0001000000000020001',[])
+        assigned_users = self.answers.get('abcde0001000000000020002')
         custom_cron = False
 
 
@@ -1363,13 +1383,14 @@ class Schedule(base.LKF_Base):
         #     if not custom_cron:
         #         error_msg = 'Si se indica una configuracion custom debe de poner un cron custom'
         # else:
-        schedule_config = get_schedule_config(answers)
+
+        schedule_config = self.get_schedule_config(self.
+            answers)
         if not schedule_config:
             error_msg = 'No se encontro configuracion'
         body = {}
-
-        item_id = answers.get('66b3e9a363db61a8c7f62096',{}).get('ccccc0000000000000000000')[0]
-        item_type = answers.get('66b3e9a363db61a8c7f62096',{}).get('ccccc0000000000000000002')
+        item_id = self.answers.get(self.CATALOGO_FORMAS_CAT_OBJ_ID,{}).get(self.mf['form_id'],[])[0]
+        item_type = self.answers.get(self.CATALOGO_FORMAS_CAT_OBJ_ID,{}).get(self.mf['form_type'],[])[0]
         if not item_type or not item_id:
             msg_error_app = {
                 "error":{"msg": ["Error al obtener el tipo de recurso (item)"], "label": "Cron Id", "error":["Error al obtener el tipo de recurso (item)"]},
@@ -1395,7 +1416,8 @@ class Schedule(base.LKF_Base):
             "email_on_failure" : True,
             "retry_delay" : "timedelta(seconds=30)"
         }
-        body['params'] = {'api_key':config['API_KEY']}
+
+        body['params'] = {'api_key':self.settings.config['APIKEY']}
         #TODO calcular el first date , para que arrance la recurrencia tomando en cuenta
         # el tiempo de anticipacion
         body['dag_params'] = {
@@ -1418,7 +1440,6 @@ class Schedule(base.LKF_Base):
             body['dag_params'].update({'schedule_config':schedule_config})
 
         if end_date:
-            print('hace el update????????? end date')
             body['dag_params'].update({
                 "end_date":"datetime({} ,{}, {}, {}, {})".format(
                 int(end_date[:4]),
@@ -1444,7 +1465,7 @@ class Schedule(base.LKF_Base):
                 "operator":"CreateAndAssignTask",
                 "params":{
                     "form_id":item_id,
-                    "answers":get_answers_map(task_st, description, first_date, due_date, status, field_map, group_field_map),
+                    "answers":self.get_answers_map(task_st, description, first_date, due_date, status, field_map, group_field_map),
                 }
             }
             #if 'todos_los_usuarios_que_tengan_el_formulario_ compartido' in asigne_to:
@@ -1454,10 +1475,8 @@ class Schedule(base.LKF_Base):
             all_user_ids = []
             if 'todos_los_usuarios_que_tengan_el_formulario_compartido' in  asigne_to:
                 fileshare_user_ids = get_form_fileshare(item_id)
-                print('fileshare_user_ids', fileshare_user_ids)
                 all_user_ids += convert_usr_id_to_dict(fileshare_user_ids)
             for gset in assigned_users:
-                print('gset', gset)
                 if gset.get('abcde0001000000000020003') == 'grupo':
                     udata = gset.get(GROUP_CATALOG_ID,{})
                     print('udata', udata)
@@ -1468,7 +1487,7 @@ class Schedule(base.LKF_Base):
                     # user_idsG = update_users(user_ids, guser_id)
                     all_user_ids += update_users(all_user_ids, group_users)
                 elif gset.get('abcde0001000000000020003') == 'usuario':
-                    udata = gset.get(USER_CATALOG_ID,{})
+                    udata = gset.get(self.USUARIOS_OBJ_ID,{})
                     data = {
                         "name":udata.get('638a9a7767c332f5d459fc81'),
                         "email":udata.get('638a9a7767c332f5d459fc82',[])[0],
@@ -1477,12 +1496,11 @@ class Schedule(base.LKF_Base):
                         "account_id":9804,
                         "resource_kind":"user"
                     }
-                    all_user_ids += update_users(all_user_ids, data)
+                    all_user_ids += self.update_users(all_user_ids, data)
             if all_user_ids:
                 body['assign'] = {'assign_users':[]}
 
             for assige_usr in all_user_ids:
-                print('a ver como va a qui', assige_usr)
                 # user_data = {
                 #     "resource_kind":"user",
                 #     "email":"user_email",
@@ -1504,7 +1522,7 @@ class Schedule(base.LKF_Base):
                 # print('th_body=',th_body)
             
             #print('body=', body['dag_params'])
-            response.update(subscribe_cron(body))
+            response.update(self.subscribe_cron(body))
             # print('si nos regresa el res....', response)
         elif task_type == 'LKFRunScript':
             task = {
@@ -1522,14 +1540,13 @@ class Schedule(base.LKF_Base):
             body['tasks'].append(task)
             downstream_task_id += 1
             body['tasks'][0]['downstream_task_id'].append(downstream_task_id)
-            response.update(subscribe_cron(body))
+            response.update(self.subscribe_cron(body))
         return response
 
     def subscribe_cron(self, body):
         # print('sub=',body)
         print('subscribe=',simplejson.dumps(body, indent=4))
-        subscribe = lkf_api.subscribe_cron(body)
-        print('subscribe=',subscribe)
+        subscribe = self.lkf_api.subscribe_cron(body)
         return subscribe
         #todo borrar regla
         #hacer coleccion para que el dag id sea el object id
