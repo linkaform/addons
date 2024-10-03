@@ -2264,7 +2264,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query[f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}"] = area
         if status:
             match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
-
+        print("match_query", status)
         query = [
             {'$match': match_query },
             {'$project': {
