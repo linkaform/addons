@@ -823,8 +823,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             result[epoch].append(r)
         return result
 
-   
-
     def get_folios_match(self, inc_folio=None, exclude_folio=None):
         if inc_folio and exclude_folio:
             query = {"$and":[
@@ -1389,9 +1387,9 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         for idx, plant in enumerate(plants):
             status = plant[self.f['inv_adjust_grp_status']]
             lot_number = plant[self.f['product_lot']]
-            adjust_qty = plant.get(self.f['inv_adjust_grp_qty'])
-            adjust_in = plant.get(self.f['inv_adjust_grp_in'], 0)
-            adjust_out = plant.get(self.f['inv_adjust_grp_out'], 0)
+            adjust_qty = self.not_none(plant.get(self.f['inv_adjust_grp_qty'],0))
+            adjust_in = self.not_none(plant.get(self.f['inv_adjust_grp_in'], 0))
+            adjust_out = self.not_none(plant.get(self.f['inv_adjust_grp_out'], 0))
             product_code = plant[self.CATALOG_PRODUCT_OBJ_ID][self.f['product_code']]
             verify = 0
             if adjust_qty or adjust_qty ==0:
@@ -1804,6 +1802,12 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     folios_2_update.append(record.get('folio'))
             return res
     
+    def not_none(self, data):
+        if not data or data == None or data == False:
+            return 0
+        else:
+            return data
+
     def plant_recipe_query(self, all_codes, start_size, reicpe_stage, recipe_type='Main'):
         if not recipe_type:
             recipe_type='Main'
