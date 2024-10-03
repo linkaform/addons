@@ -38,8 +38,52 @@ Se pueden heredar funciones de cualquier clase heredada con el metodo super().
 
 from lkf_addons.addons.product.app import Product, Warehouse
 
+class Base(Base):
 
-class JIT(Product, base.LKF_Base):
+
+    def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
+
+        self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
+
+        self.config_fields = {
+            'demora':f'{self.f.get("demora")}',
+            'lead_time':f'{self.f.get("lead_time")}',
+            'dias_laborales_consumo':f'{self.f.get("dias_laborales_consumo")}',
+            'factor_crecimiento_jit':f'{self.f.get("factor_crecimiento_jit")}',
+            'factor_seguridad_jit':f'{self.f.get("factor_seguridad_jit")}',
+            'uom':f'{self.UOM_OBJ_ID}.{self.f.get("uom")}',
+            'procurment_location':f'{self.f.get("config_group")}',
+            'warehouse_kind': '66ed0c88c9aefada5b04b818',
+        }
+
+
+    def get_config(self, *args, **kwargs):
+        if not self.GET_CONFIG:
+            match_query ={ 
+                 'form_id': self.CONFIGURACIONES,  
+                 'deleted_at' : {'$exists':False},
+            } 
+            if kwargs.get('query'):
+                match_query.update(kwargs['query'])
+            project_ids = self._project_format(self.config_fields)
+            aggregate = [
+                {'$match': match_query},
+                {'$limit':kwargs.get('limit',1)},
+                {'$project': project_ids },
+                ]
+            print('aggregate=', simplejson.dumps(aggregate, indent=4))
+            self.GET_CONFIG =  self.format_cr(self.cr.aggregate(aggregate) )
+            print('self.GET_CONFIG=', self.GET_CONFIG)
+        result = {}
+        for res in self.GET_CONFIG:
+            result = {arg:res[arg] for arg in args if res.get(arg)}
+        return result if result else None
+        
+
+
+class JIT(Product, Warehouse, base.LKF_Base):
 
 
     def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
@@ -90,6 +134,7 @@ class JIT(Product, base.LKF_Base):
         # from lkf_addons.addons.stock.app import Stock
         # self.STOCK = Stock( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
+        self.BASE = Base( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
         #Formas
@@ -141,7 +186,6 @@ class JIT(Product, base.LKF_Base):
             sku = rule.get('sku')
             warehouse = rule.get('warehouse')
             product_by_warehouse[warehouse] = product_by_warehouse.get(warehouse,[])
-            print('rule', rule)
             location = rule.get('warehouse_location')
             # product_stock = self.STOCK.get_product_stock(product_code, sku=sku,  warehouse=warehouse, location=location)
             product_stock = {'actuals':0}
@@ -328,7 +372,6 @@ class JIT(Product, base.LKF_Base):
                     'warehouse_location':f'$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
             }},
             ]
-        print('query=', simplejson.dumps(query, indent=3))
         return self.format_cr(self.cr.aggregate(query))
 
     def get_reorder_rules(self, warehouse=None, location=None, product_code=None, sku=None, status='active', group_by=False):
@@ -373,6 +416,7 @@ class JIT(Product, base.LKF_Base):
                     'warehouse_location':f'$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
             }},
             ]
+        print('query=', simplejson.dumps(query, indent=4))
         return self.format_cr(self.cr.aggregate(query))
 
     def get_product_average_demand_by_warehouse(self):
@@ -409,18 +453,21 @@ class JIT(Product, base.LKF_Base):
         return self.format_cr(self.cr.aggregate(query))
 
     def get_warehouse_config(self, key, value, get_key):
-        config = self.get_config(*['procurment_location'])
+        print('aqi va a pedir....', )
+        config = self.BASE.get_config(*['procurment_location'])
+        print('aqi va a pedir....',config )
         locations_config = config.get('procurment_location',[])
         res = None
+        print('locations_config', locations_config)
         for wh in locations_config:
+            wh['location'] = wh.get(self.f['warehouse_location'])
+            wh['warehouse'] = wh.get(self.f['warehouse'])
             if wh.get(key) and wh[key] == value:
                 res = wh.get(get_key)
         return res
 
     def model_procurment(self, qty, product_code, sku, warehouse, location, uom=None, schedule_date=None, \
         bom=None, status='programed', procurment_method='buy'):
-        print('location', location)
-        print('location', locationds)
         answers = {}
         config = self.get_config(*['uom'])
 
@@ -428,6 +475,7 @@ class JIT(Product, base.LKF_Base):
             schedule_date = self.today_str()
         if not location:
             location = self.get_warehouse_config('tipo_almacen', 'abastacimiento', 'warehouse_location')
+        print('location222', location)
         if not uom:
             uom = config.get('uom')
 
@@ -478,6 +526,7 @@ class JIT(Product, base.LKF_Base):
 
     def upsert_procurment(self, product_by_warehouse, **kwargs):
 
+        print('product by warehouse',product_by_warehouse)
         for wh, create_records in product_by_warehouse.items():
             print(f'----------------{wh}--------------------')
             existing_records = self.get_procurments(warehouse=wh)

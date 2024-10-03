@@ -124,6 +124,8 @@ class Base(base.LKF_Base):
             'uom':f'{self.UOM_OBJ_ID}.{self.f.get("uom")}',
             'procurment_location':f'{self.f.get("config_group")}',
             'warehouse_kind': '66ed0c88c9aefada5b04b818',
+            # 'warehouse':f'{self.WAREHOUSE_OBJ_ID}.{self.f.get("warehouse")}',
+            # 'location':f'{self.WAREHOUSE_OBJ_ID}.{self.f.get("location")}',
         }
 
 
@@ -336,7 +338,9 @@ class CargaUniversal(base.LKF_Base):
             #print('---------- field label = {} default_value = {}'.format(field['label'], field.get('default_value')))
             if not record[pos] and field.get('default_value'):
                 record[pos] = field['default_value']
-            if record[pos] or record[pos]==0:
+            print('pos=',pos)
+            print('record[pos]=',record[pos])
+            if record[pos] or record[pos] == 0:
                 if field['field_type'] in ('images','file'):
                     res_upload_docto = self.upload_docto(nueva_ruta, record[pos], id_forma_seleccionada, field['field_id'])
                     print("+++ res_upload_docto:",res_upload_docto)
@@ -360,7 +364,10 @@ class CargaUniversal(base.LKF_Base):
                         fields_to_find_catalog.update({catalog_field_id:[]})
                     fields_to_find_catalog[catalog_field_id].append({field['field_id']: {'$eq': record[pos]}})
                 else:
+                    print('dddddddddddddddda')
                     if field['field_type'] == "date":
+                        print('fechaaaaaaaaa=',record[pos])
+                        print('fechaaaaaaaaa=',record[posd])
                         try:
                             record[pos] = record[pos].strftime("%Y-%m-%d")
                         except:
@@ -614,6 +621,9 @@ class CargaUniversal(base.LKF_Base):
                 file_url = answer_file[0]['file_url'] if type(answer_file) == list else answer_file['file_url']
                 print('********************** file_url=',file_url)
                 header, records = self.upfile.read_file(file_url=file_url)
+
+            print('header', header)
+            print('records', records[0])
             """
             Obtengo la información de la forma seleccionada del catálogo
             """
@@ -623,6 +633,9 @@ class CargaUniversal(base.LKF_Base):
             else:
                 id_forma_seleccionada = form_id_to_load
             form_fields = self.lkf_api.get_form_id_fields(id_forma_seleccionada)
+            print('field_forma=',field_forma)
+            print('form_fields=',form_fields)
+            print('form_fields=',form_fieldds)
             if not form_fields:
                 return self.update_status_record(self.current_record, self.record_id, 'error', msg_comentarios='No se encontró la forma %s'%(str(id_forma_seleccionada)))
             else:
