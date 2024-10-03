@@ -135,6 +135,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.LISTA_INCIDENCIAS_CAT_ID = self.LISTA_INCIDENCIAS_CAT.get('id')
         self.LISTA_INCIDENCIAS_CAT_OBJ_ID = self.LISTA_INCIDENCIAS_CAT.get('obj_id')
 
+        self.LISTA_FALLAS_CAT = self.lkm.catalog_id('lista_de_fallas')
+        self.LISTA_FALLAS_CAT_ID = self.LISTA_FALLAS_CAT.get('id')
+        self.LISTA_FALLAS_CAT_OBJ_ID = self.LISTA_FALLAS_CAT.get('obj_id')
 
         # self.CONF_PERFIL = self.lkm.catalog_id('configuracion_de_perfiles','id')
         # self.CONF_PERFIL_ID = self.CONF_PERFIL.get('id')
@@ -345,17 +348,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         #- Para creación , edición y lista de fallas
         self.fallas_fields = {
-            'falla_status': '66397e2c59c2600b1df2742c',
-            'falla_fecha': '66397d0cfd99d7263f833032',
-            'falla_ubicacion':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
-            'falla_caseta':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
-            'falla_catalog':'664fc6c08d4dfb34de095584',
+            'falla_estatus': '66397e2c59c2600b1df2742c',
+            'falla_fecha_hora': '66397d0cfd99d7263f833032',
+            'falla_reporta_catalog':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}",
+            'falla_reporta_nombre': '62c5ff407febce07043024dd',
+            'falla_reporta_departamento': '663bc4ed8a6b120eab4d7f1e',
+            'falla_ubicacion_catalog':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
+            'falla_ubicacion': f"{self.mf['ubicacion']}",
+            'falla_caseta':f"{self.mf['nombre_area']}",
+            'falla_catalog': f"{self.LISTA_FALLAS_CAT_OBJ_ID}",
             'falla':'66397bae9e8b08289a59ec86',
-            'falla_comments':'66397d8cfd99d7263f83303a',
-            'falla_guard':f"{self.mf['catalog_guard']}.{self.mf['nombre_empleado']}",
-            'falla_guard_solution':f"{self.mf['catalog_guard_close']}.{self.mf['nombre_guardia_apoyo']}",
-            'falla_fecha_solucion':'663998f8df1f40254af27430',
-
+            'falla_objeto_afectado':'66ce2441d63bb7a3871adeaf',
+            'falla_comentarios':'66397d8cfd99d7263f83303a',
+            'falla_evidencia':'66f2df6b6917fe63f4233226',
+            'falla_documento':'66f2df6b6917fe63f4233227',
+            'falla_responsable_solucionar_catalog': f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}",
+            'falla_responsable_solucionar_nombre':'663bd36eb19b7fb7d9e97ccb',
+            'falla_responsable_solucionar_documento':'663bc4ed8a6b120eab4d7f1e',
+            'falla_comentario_solucion':'66f2dfb2c80d24e5e82332b3',
+            'falla_folio_accion_correctiva':'66f2dfb2c80d24e5e82332b4',
+            'falla_evidencia_solucion':'66f2dfb2c80d24e5e82332b5',
+            'falla_documento_solucion':'66f2dfb2c80d24e5e82332b6',
+            'falla_fecha_hora_solucion':'66fae1f1d4e5e97eb12170ef'
         }
         #- Para creación , edición y lista de incidencias
         self.incidence_fields = {
@@ -1020,6 +1034,23 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         form_id= self.BITACORA_OBJETOS_PERDIDOS
         return self.lkf_api.catalog_view(catalog_id, form_id) 
 
+    def catalogo_config_area_empleado_apoyo(self):
+        catalog_id = self.CONF_AREA_EMPLEADOS_AP_CAT_ID
+        form_id= self.BITACORA_FALLAS
+        return self.lkf_api.catalog_view(catalog_id, form_id) 
+
+    def catalogo_falla(self, tipo=""):
+        options={}
+        if tipo:
+            options = {
+                'startkey': [tipo],
+                'endkey': [f"{tipo}\n",{}],
+                'group_level':2
+            }
+        catalog_id = self.LISTA_FALLAS_CAT_ID
+        form_id = self.BITACORA_FALLAS
+        return self.catalogo_view(catalog_id, form_id, options)
+
     def catalogo_tipo_articulo(self, tipo=""):
         options={}
         if tipo:
@@ -1251,20 +1282,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #---Define Answers
         answers = {}
         for key, value in data_failures.items():
-            if  key == 'falla_ubicacion':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['ubicacion']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'falla_area':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['nombre_area']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'falla':
-                answers[self.fallas_fields['falla_catalog']] = {self.fallas_fields['falla']:value}
-            elif  key == 'falla_guard':
-                answers[self.mf['catalog_guard']] = {self.mf['nombre_empleado']:value}
-            elif  key == 'falla_guard_solution':
-                answers[self.mf['catalog_guard_close']] = {self.mf['nombre_guardia_apoyo']:value}
+            if key == 'falla_ubicacion' or key == 'falla_caseta':
+                if data_failures['falla_ubicacion'] and not data_failures['falla_caseta']:
+                    answers[self.fallas_fields['falla_ubicacion_catalog']] = {self.fallas_fields['falla_ubicacion']:data_failures['falla_ubicacion']}
+                elif data_failures['falla_caseta'] and not data_failures['falla_ubicacion']:
+                    answers[self.fallas_fields['falla_ubicacion_catalog']] = {self.fallas_fields['falla_caseta']:data_failures['falla_caseta']}
+                elif data_failures['falla_caseta'] and data_failures['falla_ubicacion']: 
+                    answers[self.fallas_fields['falla_ubicacion_catalog']] = {self.fallas_fields['falla_ubicacion']:data_failures['falla_ubicacion'],
+                    self.fallas_fields['falla_caseta']:data_failures['falla_caseta']}
+            elif key == 'falla' or key== 'falla_objeto_afectado':
+                answers[self.fallas_fields['falla_catalog']] = {self.fallas_fields['falla']:data_failures['falla'],
+                self.fallas_fields['falla_objeto_afectado']:data_failures['falla_objeto_afectado']}
+            elif key == 'falla_reporta_nombre':
+                answers[self.fallas_fields['falla_reporta_catalog']] = {self.fallas_fields['falla_reporta_nombre']:value}
+            elif key == 'falla_responsable_solucionar_nombre':
+                answers[self.fallas_fields['falla_responsable_solucionar_catalog']] = {self.fallas_fields['falla_responsable_solucionar_nombre']:value}
             else:
                 answers.update({f"{self.fallas_fields[key]}":value})
         metadata.update({'answers':answers})
@@ -2221,31 +2253,44 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # print('records' , records)
         return  records
 
-    def get_list_fallas(self, location, area):
+    def get_list_fallas(self, location=None, area=None,status=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_FALLAS,
-            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}":location,
-            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area,
         }
+        if location:
+            match_query[f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_ubicacion']}"] = location
+        if area:
+            match_query[f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}"] = area
+        if status:
+            match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
 
         query = [
             {'$match': match_query },
             {'$project': {
                 "folio": "$folio",
-                "falla_status": f"$answers.{self.fallas_fields['falla_status']}",
-                "falla_fecha": f"$answers.{self.fallas_fields['falla_fecha']}",
-                "falla_ubicacion": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
-                "falla_area": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
-                "falla": f"$answers.{self.fallas_fields['falla_catalog']}.{self.fallas_fields['falla']}",
-                "falla_comments": f"$answers.{self.fallas_fields['falla_comments']}",
-                "falla_guard": f"$answers.{self.mf['catalog_guard']}.{self.mf['nombre_empleado']}",
-                "falla_guard_solution": f"$answers.{self.mf['catalog_guard_close']}.{self.mf['nombre_guardia_apoyo']}",
-                "falla_fecha_solucion": f"$answers.{self.fallas_fields['falla_fecha_solucion']}",
+                'falla_estatus': f"$answers.{self.fallas_fields['falla_estatus']}",
+                'falla_fecha_hora': f"$answers.{self.fallas_fields['falla_fecha_hora']}",
+                'falla_reporta_nombre': f"$answers.{self.fallas_fields['falla_reporta_catalog']}.{self.fallas_fields['falla_reporta_nombre']}",
+                'falla_reporta_departamento': f"$answers.{self.fallas_fields['falla_reporta_catalog']}.{self.fallas_fields['falla_reporta_departamento']}",
+                'falla_ubicacion': f"$answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_ubicacion']}",
+                'falla_caseta':f"$answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}",
+                'falla':f"$answers.{self.fallas_fields['falla_catalog']}.{self.fallas_fields['falla']}",
+                'falla_objeto_afectado':f"$answers.{self.fallas_fields['falla_catalog']}.{self.fallas_fields['falla_objeto_afectado']}",
+                'falla_comentarios':f"$answers.{self.fallas_fields['falla_comentarios']}",
+                'falla_evidencia': f"$answers.{self.fallas_fields['falla_evidencia']}",
+                'falla_documento':f"$answers.{self.fallas_fields['falla_documento']}",
+                'falla_responsable_solucionar_nombre':f"$answers.{self.fallas_fields['falla_responsable_solucionar_catalog']}.{self.fallas_fields['falla_responsable_solucionar_nombre']}",
+                'falla_responsable_solucionar_documento':f"$answers.{self.fallas_fields['falla_responsable_solucionar_catalog']}.{self.fallas_fields['falla_responsable_solucionar_documento']}",
+                'falla_comentario_solucion':f"$answers.{self.fallas_fields['falla_comentario_solucion']}",
+                'falla_folio_accion_correctiva':f"$answers.{self.fallas_fields['falla_folio_accion_correctiva']}",
+                'falla_evidencia_solucion':f"$answers.{self.fallas_fields['falla_evidencia_solucion']}",
+                'falla_documento_solucion':f"$answers.{self.fallas_fields['falla_documento_solucion']}",
+                'falla_fecha_hora_solucion':f"$answers.{self.fallas_fields['falla_fecha_hora_solucion']}",
             }},
             {'$sort':{'folio':-1}},
         ]
-        # print('answers', simplejson.dumps(query, indent=4))
+        print('answers', simplejson.dumps(query, indent=4))
         return self.format_cr_result(self.cr.aggregate(query))
 
     def get_list_incidences(self, location, area, prioridad=None):
@@ -2769,7 +2814,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers.update({
                     f"{self.perdidos_fields['date_entrega_perdido']}":date_entrega_perdido})
                 answers.update({
-                    f"{self.perdidos_fields['estatus_perdido']}":date_entrega_perdido})
+                    f"{self.perdidos_fields['estatus_perdido']}":value})
             else:
                 answers.update({f"{self.perdidos_fields[key]}":value})
         if answers or folio:
@@ -2784,27 +2829,41 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException('No se mandarón parametros para actualizar')
 
     def update_failure(self, data_failures, folio):
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         answers = {}
+        falla_fecha_hora_solucion=""
         for key, value in data_failures.items():
-            if  key == 'falla_ubicacion':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['ubicacion']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'falla_area':
-                dic_prev = answers.get(self.UBICACIONES_CAT_OBJ_ID,{})
-                dic_prev[self.mf['nombre_area']] = value 
-                answers[self.UBICACIONES_CAT_OBJ_ID] = dic_prev
-            elif  key == 'falla':
-                answers[self.fallas_fields['falla_catalog']] = {self.fallas_fields['falla']:value}
-            elif  key == 'falla_guard':
-                answers[self.mf['catalog_guard']] = {self.mf['nombre_empleado']:value}
-            elif  key == 'falla_guard_solution':
-                answers[self.mf['catalog_guard_close']] = {self.mf['nombre_guardia_apoyo']:value}
+            if key == 'falla_ubicacion' or key == 'falla_caseta':
+                if data_failures['falla_ubicacion'] and not data_failures['falla_caseta']:
+                    answers[self.fallas_fields['falla_ubicacion_catalog']] = {self.fallas_fields['falla_ubicacion']:data_failures['falla_ubicacion']}
+                elif data_failures['falla_caseta'] and not data_failures['falla_ubicacion']:
+                    answers[self.fallas_fields['falla_ubicacion_catalog']] = {self.fallas_fields['falla_caseta']:data_failures['falla_caseta']}
+                elif data_failures['falla_caseta'] and data_failures['falla_ubicacion']: 
+                    answers[self.fallas_fields['falla_ubicacion_catalog']] = {self.fallas_fields['falla_ubicacion']:data_failures['falla_ubicacion'],
+                    self.fallas_fields['falla_caseta']:data_failures['falla_caseta']}
+            elif key == 'falla' or key== 'falla_objeto_afectado':
+                answers[self.fallas_fields['falla_catalog']] = {self.fallas_fields['falla']:data_failures['falla'],
+                self.fallas_fields['falla_objeto_afectado']:data_failures['falla_objeto_afectado']}
+            elif key == 'falla_reporta_nombre':
+                answers[self.fallas_fields['falla_reporta_catalog']] = {self.fallas_fields['falla_reporta_nombre']:value}
+            elif key == 'falla_responsable_solucionar_nombre':
+                answers[self.fallas_fields['falla_responsable_solucionar_catalog']] = {self.fallas_fields['falla_responsable_solucionar_nombre']:value}
+            elif key == 'falla_estatus' and  value == 'resuelto':
+                timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
+                falla_fecha_hora_solucion =self.today_str(timezone, date_format='datetime')
+                answers.update({
+                    f"{self.fallas_fields['falla_fecha_hora_solucion']}":falla_fecha_hora_solucion})
+                answers.update({
+                    f"{self.fallas_fields['falla_estatus']}":value})
             else:
                 answers.update({f"{self.fallas_fields[key]}":value})
-
         if answers or folio:
-            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_FALLAS, folios=[folio])
+            res = self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_FALLAS, folios=[folio])
+            if res.get('status_code') == 201 or res.get('status_code') == 202:
+                res['json'].update({'falla_fecha_hora_solucion':falla_fecha_hora_solucion})
+                return res
+            else:
+                return res
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
@@ -2812,6 +2871,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
             Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
         '''
+        print('DATA INCIDENCIAS', simplejson.dumps(data_incidences, indent=4))
         answers = {}
         for key, value in data_incidences.items():
             if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
@@ -2846,10 +2906,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         acciones_list.append(
                             {
                                 self.incidence_fields['responsable_accion']:c.get('responsable_accion'),
-                                self.incidence_fields['acciones_tomadas'] :c.get('acciones_tomadas')
+                                self.incidence_fields['acciones_tomadas'] :c.get('acciones_tomadas').lower().replace(' ', '_')
                             }
                         )
                     answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
+            elif key == 'datos_deposito_incidencia':
+                acciones = data_incidences.get('datos_deposito_incidencia',[])
+                if acciones:
+                    acciones_list = []
+                    for c in acciones:
+                        acciones_list.append(
+                            {
+                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(' ', '_'),
+                                self.incidence_fields['cantidad'] :c.get('cantidad')
+                            }
+                        )
+                    answers.update({self.incidence_fields['datos_deposito_incidencia']:acciones_list})
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         if answers or folio:
