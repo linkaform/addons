@@ -2924,10 +2924,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         if answers or folio:
-            print('answers', simplejson.dumps(answers, indent=4))
-            print('folio', folio)
-            print('self.BITACORA_INCIDENCIAS', self.BITACORA_INCIDENCIAS)
-            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_INCIDENCIAS, folios=[folio,])
+            metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_INCIDENCIAS)
+            metadata.update(self.get_record_by_folio(folio, self.BITACORA_INCIDENCIAS, select_columns={'_id':1}, limit=1))
+            metadata.update({
+                    'properties': {
+                        "device_properties":{
+                            "system": "Addons",
+                            "process":"Actualizacion de Incidencias", 
+                            "accion":'update_incidence', 
+                            "folio": folio, 
+                            "archive": "incidencias.py"
+                        }
+                    },
+                    'answers': answers
+                })
+            return self.net.patch_forms_answers(metadata)
+            # return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_INCIDENCIAS, folios=[folio,])
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
