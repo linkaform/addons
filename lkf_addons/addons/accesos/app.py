@@ -2871,7 +2871,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
             Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
         '''
-        print('DATA INCIDENCIAS', simplejson.dumps(data_incidences, indent=4))
         answers = {}
         for key, value in data_incidences.items():
             if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
@@ -2925,8 +2924,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         if answers or folio:
-            print('answers', answers)
-            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_INCIDENCIAS, folios=[folio])
+            print('answers', simplejson.dumps(answers, indent=4))
+            print('folio', folio)
+            print('self.BITACORA_INCIDENCIAS', self.BITACORA_INCIDENCIAS)
+            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_INCIDENCIAS, folios=[folio,])
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
