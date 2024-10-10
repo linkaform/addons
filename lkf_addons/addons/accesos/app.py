@@ -2240,7 +2240,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if len(pase) > 0 :
                 pase = pase[0]
                 r['motivo_visita'] = self.unlist(pase.get('motivo_visita',''))
-                r['grupo_areas_acceso'] = self._labels_list(pase.get('grupo_areas_acceso'), self.mf)
+                print('grupo_areas_acceso',pase.get('grupo_areas_acceso'))
+                print('self.mf',self.mf)
+                r['grupo_areas_acceso'] = self._labels_list(pase.get('grupo_areas_acceso',[]), self.mf)
 
             r['status_visita'] = r.get('status_visita','').title().replace('_', ' ')
             r['contratista'] = self.unlist(r.get('contratista',[]))
@@ -2707,18 +2709,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             #     self.LKFException({"msg":"No se econtro ninguan entrada con pase "+ qr_code})
             # print('last_moves=',simplejson.dumps(last_moves, indent=3))
             #last_move = self.get_last_user_move(qr_code, location)
+            gafete_info = {}
             if not last_move or last_move.get('status_visita') == 'salida':
                 tipo_movimiento = 'Entrada'
             else:
+                gafete_info['gafete_id'] = last_move.get('gafete_id')
+                gafete_info['locker_id'] = last_move.get('locker_id')
                 tipo_movimiento = 'Salida'
+
             access_pass = self.get_detail_access_pass(qr_code)
             #---Last Access
             access_pass['ultimo_acceso'] = last_moves
             access_pass['tipo_movimiento'] = tipo_movimiento
             access_pass['grupo_vehiculos'] = access_pass.get('grupo_vehiculos',[])
             access_pass['grupo_equipos'] = last_move.get('equipos',[])
-            access_pass['gafete_id'] = last_move.get('gafete_id')
-            access_pass['locker_id'] = last_move.get("locker_id")
+            access_pass['gafete_id'] = gafete_info.get('gafete_id')
+            access_pass['locker_id'] = gafete_info.get("locker_id")
             if access_pass.get('grupo_areas_acceso'):
                 for area in access_pass['grupo_areas_acceso']:
                     area['status'] = self.get_area_status(access_pass['ubicacion'], area['nombre_area'])

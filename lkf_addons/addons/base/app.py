@@ -338,8 +338,6 @@ class CargaUniversal(base.LKF_Base):
             #print('---------- field label = {} default_value = {}'.format(field['label'], field.get('default_value')))
             if not record[pos] and field.get('default_value'):
                 record[pos] = field['default_value']
-            print('pos=',pos)
-            print('record[pos]=',record[pos])
             if record[pos] or record[pos] == 0:
                 if field['field_type'] in ('images','file'):
                     res_upload_docto = self.upload_docto(nueva_ruta, record[pos], id_forma_seleccionada, field['field_id'])
@@ -364,10 +362,7 @@ class CargaUniversal(base.LKF_Base):
                         fields_to_find_catalog.update({catalog_field_id:[]})
                     fields_to_find_catalog[catalog_field_id].append({field['field_id']: {'$eq': record[pos]}})
                 else:
-                    print('dddddddddddddddda')
                     if field['field_type'] == "date":
-                        print('fechaaaaaaaaa=',record[pos])
-                        print('fechaaaaaaaaa=',record[posd])
                         try:
                             record[pos] = record[pos].strftime("%Y-%m-%d")
                         except:
@@ -627,15 +622,19 @@ class CargaUniversal(base.LKF_Base):
             """
             Obtengo la información de la forma seleccionada del catálogo
             """
+            print('self.answers', simplejson.dumps(self.answers, indent=3))
+            print('self.form_id_to_load', form_id_to_load)
+            print('self.form_id_to_load', form_id_to_load)
+            print('self.field_id_catalog_form', self.field_id_catalog_form)
+            print('self.field_id_catalog_form_detail', self.field_id_catalog_form_detail)
             if not form_id_to_load:
-                field_forma = self.current_record['answers'][self.field_id_catalog_form]
+                field_forma = self.answers[self.field_id_catalog_form]
                 id_forma_seleccionada = field_forma[self.field_id_catalog_form_detail][0]
             else:
                 id_forma_seleccionada = form_id_to_load
             form_fields = self.lkf_api.get_form_id_fields(id_forma_seleccionada)
             print('field_forma=',field_forma)
             print('form_fields=',form_fields)
-            print('form_fields=',form_fieldds)
             if not form_fields:
                 return self.update_status_record(self.current_record, self.record_id, 'error', msg_comentarios='No se encontró la forma %s'%(str(id_forma_seleccionada)))
             else:
