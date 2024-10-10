@@ -1351,28 +1351,27 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         acciones_list.append(
                             {
                                 self.incidence_fields['responsable_accion']:c.get('responsable_accion'),
-                                self.incidence_fields['acciones_tomadas'] :c.get('acciones_tomadas').lower().replace(' ', '_')
+                                self.incidence_fields['acciones_tomadas'] :c.get('acciones_tomadas')
                             }
                         )
                     answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
             elif key == 'datos_deposito_incidencia':
-                acciones = data_incidences.get('datos_deposito_incidencia',[])
-                if acciones:
-                    acciones_list = []
-                    for c in acciones:
-                        acciones_list.append(
+                depositos = data_incidences.get('datos_deposito_incidencia',[])
+                if depositos:
+                    depositos_list = []
+                    for c in depositos:
+                        depositos_list.append(
                             {
-                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(' ', '_'),
+                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(" ","_"),
                                 self.incidence_fields['cantidad'] :c.get('cantidad')
                             }
                         )
-                    answers.update({self.incidence_fields['datos_deposito_incidencia']:acciones_list})
-                    print("AREAAA",answers[self.incidence_fields['datos_deposito_incidencia']])
+                    answers.update({self.incidence_fields['datos_deposito_incidencia']:depositos_list})
+            elif key == 'prioridad_incidencia':
+                answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
-        
-        
-        
+        print('answers', simplejson.dumps(answers, indent=4))
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
@@ -1552,7 +1551,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for r in data:
             row = {}
-            row['tipo_deposito'] = r.get(self.incidence_fields['tipo_deposito'],'')
+            row['tipo_deposito'] = r.get(self.incidence_fields['tipo_deposito'],'').title().replace('_', ' ')
             row['cantidad'] = r.get(self.incidence_fields['cantidad'],'')
             res.append(row)
         return res
@@ -2338,6 +2337,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['personas_involucradas_incidencia'] = self.format_personas_involucradas(r.get('personas_involucradas_incidencia',[]))
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
             r['datos_deposito_incidencia'] = self.format_datos_deposito(r.get('datos_deposito_incidencia',[]))
+            r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
         
         print('result', simplejson.dumps(result, indent=4))
         return result
@@ -2911,7 +2911,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         acciones_list.append(
                             {
                                 self.incidence_fields['responsable_accion']:c.get('responsable_accion'),
-                                self.incidence_fields['acciones_tomadas'] :c.get('acciones_tomadas').lower().replace(' ', '_')
+                                self.incidence_fields['acciones_tomadas'] :c.get('acciones_tomadas')
                             }
                         )
                     answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
@@ -2922,11 +2922,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in acciones:
                         acciones_list.append(
                             {
-                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(' ', '_'),
+                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(" ","_"),
                                 self.incidence_fields['cantidad'] :c.get('cantidad')
                             }
                         )
                     answers.update({self.incidence_fields['datos_deposito_incidencia']:acciones_list})
+            elif key == 'prioridad_incidencia':
+                answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         if answers or folio:
