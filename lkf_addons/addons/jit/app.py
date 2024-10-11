@@ -89,8 +89,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
     def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
         # from lkf_addons.addons.stock.app import Stock
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
-        self.mf = {}
-        self.mf.update({
+        mf = {
             'bom_group_qty_in':'66d8e09cb22bcdcc2f341e85',
             'bom_group_qty_out':'66da962859bec54a05c73e00',
             'bom_group_qty_throughput':'66da962859bec54a05c73e01',
@@ -112,7 +111,13 @@ class JIT(Product, Warehouse, base.LKF_Base):
             'procurment_status':'66da0c19b22bcdcc2f341f07',
             'trigger':'66eb14ffc9aefada5b04b793',
             'reorder_point':'66ea62dac9aefada5b04b73b',
-            })
+            }
+
+        if hasattr(self, 'mf'):
+            self.mf.update(mf)
+        else:
+            self.mf = mf
+            
         kwargs = kwargs.get('f',
             {
                 'bom_name':'66d8e063b22bcdcc2f341e84',
@@ -158,6 +163,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
 
     def ave_daily_demand(self):
         print('average daly cons', self.form_id)
+        print('average daly mf=', self.mf)
         if self.form_id == self.DEMANDA_UTIMOS_12_MES:
             print('va por ultimos 12 meses>>>>>>')
             conf_data = self.get_config(*['dias_laborales_consumo', 'factor_crecimiento_jit'])
@@ -333,7 +339,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
             res.append(prod)
         return res
     
-    def get_procurments(self, warehouse=None, location=None, product_code=None, sku=None, status='programed', group_by=False):
+    def get_procurments(self, warehouse=None, location=None, product_code=None, sku=None, status='programmed', group_by=False):
         match_query ={ 
              'form_id': self.PROCURMENT,  
              'deleted_at' : {'$exists':False},
@@ -467,7 +473,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
         return res
 
     def model_procurment(self, qty, product_code, sku, warehouse, location, uom=None, schedule_date=None, \
-        bom=None, status='programed', procurment_method='buy'):
+        bom=None, status='programmed', procurment_method='buy'):
         answers = {}
         config = self.get_config(*['uom'])
 
@@ -612,4 +618,3 @@ class JIT(Product, Warehouse, base.LKF_Base):
 #     product_code = rec['product_code']
 #     if product_code not in products:
 #         products.append(product_code)
-

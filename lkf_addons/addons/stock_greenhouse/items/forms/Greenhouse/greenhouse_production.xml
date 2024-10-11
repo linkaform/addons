@@ -2646,7 +2646,7 @@
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>True</default>
-                    <default_value>programed</default_value>
+                    <default_value>programmed</default_value>
                     <descriptor>None</descriptor>
                     <fav>True</fav>
                     <field_id>62fbbf2587546d976e05dc7b</field_id>
@@ -2659,10 +2659,10 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Programed</label>
+                            <label>Programmed</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>programed</value>
+                            <value>programmed</value>
                         </item>
                         <item>
                             <label>In Progress</label>
