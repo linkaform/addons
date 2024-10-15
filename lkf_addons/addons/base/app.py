@@ -208,6 +208,147 @@ class CargaUniversal(Base):
         self.fields_no_update = self.f['fields_no_update']
         self.upfile = upload_file.LoadFile(settings)
 
+    def carga_doctos_records(self, records, pos_field_dict, files_dir, nueva_ruta, id_forma_seleccionada, dict_catalogs, group_records):
+            self.field_id_error_records = '5e32fbb498849f475cfbdca3'
+            metadata_form = self.lkf_api.get_metadata(form_id=id_forma_seleccionada )
+            # Necesito un diccionario que agrupe los registros que se crearán y los que están en un grupo repetitivo y pertenecen a uno principal
+            file_records = [i for i in pos_field_dict if pos_field_dict[i]['field_type'] in ('file','images')]
+            print("++++ file_records",file_records)
+            # Agrego información de la carga
+            metadata_form.update({'properties': {"device_properties":{"system": "SCRIPT","process":"Carga Universal", "accion":'CREA Y ACTUALIZA REGISTROS DE CUALQUIER FORMA', "folio carga":self.current_record['folio'], "archive":"carga_documentos_a_forma.py"}}})
+            metadata = None
+            print("***** Empezando con la carga de documentos *****")
+            resultado = {'creados':0,'error':0,'actualizados':0, 'no_update':0}
+            answers = {}
+            total_rows = len(records)
+            subgrupo_errors = []
+            dict_records_to_multi = {'create': [], 'update': []}
+            dict_records_copy = {'create': [], 'update': {}}
+            list_cols_for_upload = list( pos_field_dict.keys() )
+            for p, record in enumerate(records):
+                if p > 2:
+                    continue
+                print("=========================================== >> Procesando renglon:",p)
+                if p in subgrupo_errors:
+                    error_records.append(record+['',])
+                    continue
+                # Recorro la lista de campos de tipo documento para determinar si el contenido en esa posición está dentro del zip de carga
+                no_en_zip = [record[i] for i in file_records if record[i] and record[i] not in files_dir]
+                new_record = [record[i] for i in self.not_groups if record[i] and i in list_cols_for_upload]
+                if new_record and p != 0:
+                    if metadata.get('answers',{}):
+                        proceso = self.crea_actualiza_record(metadata, self.existing_records, error_records, records, sets_in_row, dict_records_to_multi, dict_records_copy, self.ids_fields_no_update)
+                        if proceso:
+                            resultado[proceso] += 1
+                    answers = {}
+                if new_record:
+                    sets_in_row = {p: group_records[p]}
+                if no_en_zip:
+                    docs_no_found = ''
+                    docs_no_found += ', '.join([str(a) for a in no_en_zip if a])
+                    error_records.append(record+['Los documentos %s no se encontraron en el Zip'%(docs_no_found),])
+                    resultado['error'] += 1
+                    if new_record:
+                        subgrupo_errors = group_records[p]
+                        metadata = metadata_form.copy()
+                        metadata.update({'answers': {}})
+                    continue
+
+                answers = self.procesa_row(pos_field_dict, record, files_dir, nueva_ruta, id_forma_seleccionada, answers, p, dict_catalogs)
+                print('answers', answers)
+                if new_record:
+                    if self.folio_manual and not record[0]:
+                        error_records.append(record+['La forma tiene configurado el folio manual por lo que el registro requiere un número de Folio'])
+                        resultado['error'] += 1
+                        subgrupo_errors = group_records[p]
+                        continue
+                    metadata = metadata_form.copy()
+                    metadata.update({'answers': answers})
+                    if self.folio_manual or (self.header_dict.get('folio') and self.header_dict['folio'] == 0):
+                        metadata.update({'folio':str(record[0])})
+                if p == total_rows-1:
+                    if metadata == None:
+                        metadata = metadata_form.copy()
+                        metadata.update({'answers': answers})
+                        sets_in_row = {
+                            0: list(group_records.keys())
+                        }
+                    proceso = self.crea_actualiza_record(metadata, self.existing_records, error_records, records, sets_in_row, dict_records_to_multi, dict_records_copy, self.ids_fields_no_update)
+                    if proceso:
+                        resultado[proceso] += 1
+            print('***************dict_records_to_multi update=',dict_records_to_multi['update'])
+            #print('***************dict_records_copy=',dict_records_copy)
+            #dict_sets_in_row = {}
+            if dict_records_to_multi['create']:
+                dict_sets_in_row = {x: list_create['sets_in_row'] for x, list_create in enumerate(dict_records_to_multi['create'])}
+                response_multi_post = self.lkf_api.post_forms_answers_list(dict_records_to_multi['create'])
+                print('===== response_multi_post:', response_multi_post)
+                for x, dict_res in enumerate(response_multi_post):
+                    sets_in_row = dict_sets_in_row[x]
+                    res_status = dict_res.get('status_code', 300)
+                    if res_status < 300:
+                        resultado['creados'] += 1
+                    else:
+                        resultado['error'] += 1
+                        msg_error_sistema = self.arregla_msg_error_sistema(dict_res)
+                        for g in sets_in_row:
+                            s = sets_in_row[g]
+                            error_records.append(dict_records_copy['create'][g]+[msg_error_sistema,])
+                            for dentro_grupo in s:
+                                error_records.append(dict_records_copy['create'][dentro_grupo]+['',])
+            if dict_records_to_multi['update']:
+                #dict_sets_in_row = {x: list_create['sets_in_row'] for x, list_create in enumerate(dict_records_to_multi['update'])}
+                response_bulk_patch = self.lkf_api.bulk_patch(dict_records_to_multi['update'], id_forma_seleccionada, threading=True)
+                print('===== response_bulk_patch=',response_bulk_patch)
+                for f in response_bulk_patch:
+                    dict_res = response_bulk_patch[ f ]
+                    sets_in_row = dict_records_copy['update'][f]
+                    res_status = dict_res.get('status_code', 300)
+                    if res_status < 300:
+                        resultado['actualizados'] += 1
+                    else:
+                        resultado['error'] += 1
+                        msg_error_sistema = self.arregla_msg_error_sistema(dict_res)
+                        for g in sets_in_row:
+                            s = sets_in_row[g]
+                            error_records.append(records[g]+[msg_error_sistema,])
+                            for dentro_grupo in s:
+                                error_records.append(records[dentro_grupo]+['',])
+            try:
+                if files_dir:
+                    # Elimino todos los archivos después de que ya los procesé
+                    for file_cargado in files_dir:
+                        os.remove(os.path.join(nueva_ruta, file_cargado))
+                    #os.remove(nueva_ruta+file)
+                    shutil.rmtree(nueva_ruta)
+            except Exception as e:
+                print("********************* exception borrado",e)
+                return False
+            if not resultado['error']:
+                if self.current_record['answers'].get(self.field_id_error_records):
+                    sin_file_error = self.current_record['answers'].pop(self.field_id_error_records)
+                if not resultado['creados'] and not resultado['actualizados']:
+                    return self.update_status_record('error', msg_comentarios='Registros Creados: %s, Actualizados: %s, No actualizados por información igual: %s'%(str(resultado['creados']), str(resultado['actualizados']), str(resultado['no_update'])))
+                else:
+                    return self.update_status_record('carga_terminada', msg_comentarios='Registros Creados: %s, Actualizados: %s, No actualizados por información igual: %s'%(str(resultado['creados']), str(resultado['actualizados']), str(resultado['no_update'])))
+            else:
+                if error_records:
+                    if self.record_id:
+                        self.current_record['answers'].update( self.lkf_api.make_excel_file(self.header + ['error',], error_records, self.current_record['form_id'], self.field_id_error_records) )
+                    else:
+                        error_file = self.lkf_api.make_excel_file(self.header + ['error',], error_records, None, self.field_id_error_records, is_tmp=True)
+                        dict_respuesta = {
+                            'error': 'Registros Creados: {}, Actualizados: {}, Erroneos: {}, No actualizados por información igual: {}'.format( resultado['creados'], resultado['actualizados'], resultado['error'], resultado['no_update'] )
+                        }
+                        dict_respuesta.update(error_file)
+                        return dict_respuesta
+                return self.update_status_record('error', msg_comentarios='Registros Creados: %s, Actualizados: %s, Erroneos: %s, No actualizados por información igual: %s'%(str(resultado['creados']), str(resultado['actualizados']), str(resultado['error']), str(resultado['no_update'])))
+            return True
+        # except Exception as e:
+        #     print("------------------- error:",e)
+        #     return self.update_status_record(current_record, record_id, 'error', msg_comentarios='Ocurrió un error inesperado, favor de contactar a soporte')
+
+
     def crea_directorio_temporal(self, nueva_ruta):
         try:
             if not os.path.exists(str(nueva_ruta)):
