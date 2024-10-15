@@ -187,14 +187,16 @@ class JIT(Product, Warehouse, base.LKF_Base):
 
         res = []
         product_by_warehouse = {}
+        from lkf_addons.addons.stock.app import Stock
+        self.STOCK = Stock( self.settings, sys_argv=self.sys_argv, use_api=self.use_api)
         for rule in product_rules:
             product_code = rule.get('product_code')
             sku = rule.get('sku')
             warehouse = rule.get('warehouse')
             product_by_warehouse[warehouse] = product_by_warehouse.get(warehouse,[])
             location = rule.get('warehouse_location')
-            # product_stock = self.STOCK.get_product_stock(product_code, sku=sku,  warehouse=warehouse, location=location)
-            product_stock = {'actuals':0}
+            product_stock = self.STOCK.get_product_stock(product_code, sku=sku,  warehouse=warehouse, location=location)
+            #product_stock = {'actuals':0}
             order_qty = self.exec_reorder_rules(rule, product_stock)
             if order_qty:
                 ans = self.model_procurment(order_qty, product_code, sku, warehouse, location, procurment_method='buy')
@@ -557,7 +559,6 @@ class JIT(Product, Warehouse, base.LKF_Base):
 
         return response
 
-
     def upsert_reorder_point(self):
         if self.current_record:
             print('record, product base')
@@ -565,8 +566,10 @@ class JIT(Product, Warehouse, base.LKF_Base):
         product_by_warehouse = {}
         config = self.get_config(*['uom'])
         for rec in records:
-            demanda_12_meses = rec.get('demanda_12_meses')
-            consumo_promedio_diario = float(rec.get('consumo_promedio_diario'))
+            demanda_12_meses = rec.get('demanda_12_meses',0)
+            if demanda_12_meses == 0:
+                continue
+            consumo_promedio_diario = float(rec.get('consumo_promedio_diario',0))
             product_code = rec.get('product_code')
             sku = rec.get('sku')
             warehouse = rec.get('warehouse')
