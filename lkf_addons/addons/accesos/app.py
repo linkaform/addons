@@ -2270,7 +2270,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'foto': {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}"},
             'equipos':f"$answers.{self.mf['grupo_equipos']}",
             'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
-            'id_gafet': f"$answers.{self.CONFIGURACION_GAFETES_LOCKERS_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
+            'id_gafet': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
             'identificacion':  {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}"},
             'pase_id':{"$toObjectId":f"$answers.{self.mf['codigo_qr']}"},
             'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
