@@ -1294,10 +1294,10 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Programed</label>
+                            <label>Programmed</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>programed</value>
+                            <value>programmed</value>
                         </item>
                         <item>
                             <label>Schedule</label>

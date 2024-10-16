@@ -2268,7 +2268,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def stock_one_many_one(self, move_type, product_code=None, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None, status='done', **kwargs):
         unwind =None
-        print(',modddpve type========', move_typde)
         if move_type not in ('in','out'):
             raise('Move type only accepts values "in" or "out" ')
         match_query = {

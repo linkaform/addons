@@ -89,8 +89,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
     def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
         # from lkf_addons.addons.stock.app import Stock
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
-        self.mf = {}
-        self.mf.update({
+        mf = {
             'bom_group_qty_in':'66d8e09cb22bcdcc2f341e85',
             'bom_group_qty_out':'66da962859bec54a05c73e00',
             'bom_group_qty_throughput':'66da962859bec54a05c73e01',
@@ -112,7 +111,13 @@ class JIT(Product, Warehouse, base.LKF_Base):
             'procurment_status':'66da0c19b22bcdcc2f341f07',
             'trigger':'66eb14ffc9aefada5b04b793',
             'reorder_point':'66ea62dac9aefada5b04b73b',
-            })
+            }
+
+        if hasattr(self, 'mf'):
+            self.mf.update(mf)
+        else:
+            self.mf = mf
+            
         kwargs = kwargs.get('f',
             {
                 'bom_name':'66d8e063b22bcdcc2f341e84',
@@ -158,6 +163,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
 
     def ave_daily_demand(self):
         print('average daly cons', self.form_id)
+        print('average daly mf=', self.mf)
         if self.form_id == self.DEMANDA_UTIMOS_12_MES:
             print('va por ultimos 12 meses>>>>>>')
             conf_data = self.get_config(*['dias_laborales_consumo', 'factor_crecimiento_jit'])
@@ -181,14 +187,16 @@ class JIT(Product, Warehouse, base.LKF_Base):
 
         res = []
         product_by_warehouse = {}
+        from lkf_addons.addons.stock.app import Stock
+        self.STOCK = Stock( self.settings, sys_argv=self.sys_argv, use_api=self.use_api)
         for rule in product_rules:
             product_code = rule.get('product_code')
             sku = rule.get('sku')
             warehouse = rule.get('warehouse')
             product_by_warehouse[warehouse] = product_by_warehouse.get(warehouse,[])
             location = rule.get('warehouse_location')
-            # product_stock = self.STOCK.get_product_stock(product_code, sku=sku,  warehouse=warehouse, location=location)
-            product_stock = {'actuals':0}
+            product_stock = self.STOCK.get_product_stock(product_code, sku=sku,  warehouse=warehouse, location=location)
+            #product_stock = {'actuals':0}
             order_qty = self.exec_reorder_rules(rule, product_stock)
             if order_qty:
                 ans = self.model_procurment(order_qty, product_code, sku, warehouse, location, procurment_method='buy')
@@ -333,7 +341,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
             res.append(prod)
         return res
     
-    def get_procurments(self, warehouse=None, location=None, product_code=None, sku=None, status='programed', group_by=False):
+    def get_procurments(self, warehouse=None, location=None, product_code=None, sku=None, status='programmed', group_by=False):
         match_query ={ 
              'form_id': self.PROCURMENT,  
              'deleted_at' : {'$exists':False},
@@ -467,7 +475,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
         return res
 
     def model_procurment(self, qty, product_code, sku, warehouse, location, uom=None, schedule_date=None, \
-        bom=None, status='programed', procurment_method='buy'):
+        bom=None, status='programmed', procurment_method='buy'):
         answers = {}
         config = self.get_config(*['uom'])
 
@@ -551,7 +559,6 @@ class JIT(Product, Warehouse, base.LKF_Base):
 
         return response
 
-
     def upsert_reorder_point(self):
         if self.current_record:
             print('record, product base')
@@ -559,8 +566,10 @@ class JIT(Product, Warehouse, base.LKF_Base):
         product_by_warehouse = {}
         config = self.get_config(*['uom'])
         for rec in records:
-            demanda_12_meses = rec.get('demanda_12_meses')
-            consumo_promedio_diario = float(rec.get('consumo_promedio_diario'))
+            demanda_12_meses = rec.get('demanda_12_meses',0)
+            if demanda_12_meses == 0:
+                continue
+            consumo_promedio_diario = float(rec.get('consumo_promedio_diario',0))
             product_code = rec.get('product_code')
             sku = rec.get('sku')
             warehouse = rec.get('warehouse')
@@ -612,4 +621,3 @@ class JIT(Product, Warehouse, base.LKF_Base):
 #     product_code = rec['product_code']
 #     if product_code not in products:
 #         products.append(product_code)
-

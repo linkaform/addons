@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
-    <form_id>{{ form.carga_universal.id }}</form_id>
+    <form_id>{{ form.carga_universal_module.id }}</form_id>
     <id>62283115391e409aa1af191d</id>
     <rules>
         <item>
