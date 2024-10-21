@@ -49,7 +49,6 @@ class Base(base.LKF_Base):
             self.mf = mf
 
 
-
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
        #--Variables 
@@ -111,21 +110,26 @@ class Base(base.LKF_Base):
         
         self.f.update( {
             'address_name':'663a7e0fe48382c5b1230901',
+            'address_code':'ccca7e0fe48382c5b1230901',
             'address_image':'663a808be48382c5b123090d',
             'address_geolocation':'663e5c8cf5b8a7ce8211ed0c',
-            'address_status':'6663a7f67e48382c5b1230909',
+            'address_status':'663a7f67e48382c5b1230909',
             'address_type':'663a7f67e48382c5b1230908',
             'address':'663a7e0fe48382c5b1230902',
             'address2':'663a7f79e48382c5b123090a',
             'cat_timezone':f'{self.TIMEZONE_OBJ_ID}.665e4f90c4cf32cb52ebe15c',
+            'client_code':'6711ea74b8514dc4fdfd917f',
             'config_group':'66ed0baac9aefada5b04b817',
             'country':'663a7ca6e48382c5b12308fa',
+            'country_code':'663a7ca6e48382c5b12308fb',
+            'country_ph_code':'663a7ca6e48382c5b12308fc',
             'city':'6654187fc85ce22aaf8bb070',
             'email':'663a7ee1e48382c5b1230907',
             'email_contacto':'66bfd647cd15883ed163e9b5',
             'nombre_comercial':'667468e3e577b8b98c852aaa',
             'pagina_web':'66bfd66ecd15883ed163e9b7',
             'phone':'663a7ee1e48382c5b1230906',
+            'phone2':'663a7ee1e48382c5b1232226',
             'razon_social':'6687f2f37b2c023e187d6252',
             'rfc_razon_social':'667468e3e577b8b98c852aab',
             'state':'663a7dd6e48382c5b12308ff',
