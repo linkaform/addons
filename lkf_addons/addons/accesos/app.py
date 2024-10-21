@@ -1024,6 +1024,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res[nombre] = data
         return res
 
+    def calcula_total_depositos(self):
+        depositos = self.answers.get(self.incidence_fields['datos_deposito_incidencia'],[])
+        return sum([x[self.incidence_fields['cantidad']] for x in depositos])
+
     def catalogo_categoria(self, options={}):
         catalog_id = self.ESTADO_ID
         form_id = self.PASE_ENTRADA
@@ -2221,6 +2225,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "limit":limit,
             "skip":skip
         }
+        print('mango_query', simplejson.dumps(mango_query, indent=4))
+        print('GAFETES_CAT_ID',self.GAFETES_CAT_ID)
         return self.format_gafete(self.lkf_api.search_catalog( self.GAFETES_CAT_ID, mango_query))
 
     def get_lockers(self, status='Disponible', location=None, area=None, tipo_locker='Locker', locker_id=None, limit=1000, skip=0):
