@@ -61,6 +61,7 @@ class Base(base.LKF_Base):
         self.CONTACTO = self.lkm.form_id('contacto', 'id')
         self.CLIENTE = self.lkm.form_id('clientes', 'id')
         self.CONFIGURACIONES = self.lkm.form_id('configuraciones', 'id')
+        self.ENVIO_DE_CORREOS = self.lkm.form_id('envio_de_correos', 'id')
         ### Catálogos ###
         '''
         `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos. 
@@ -142,6 +143,15 @@ class Base(base.LKF_Base):
         }
         )
 
+        self.envio_correo_fields = {
+            'email_from':"67169f72c736cc47794404f8",
+            'email_to':"670d2e32756833542954716c",
+            'enviado_desde':"6716a1067f394110d24404eb",
+            'msj':"670d2d9d0337e410e4353550",
+            "nombre": "670d2e32756833542954716b",
+            'titulo':"67169f72c736cc47794404f9",
+        }
+
         self.config_fields = {
             'demora':f'{self.f.get("demora")}',
             'lead_time':f'{self.f.get("lead_time")}',
@@ -178,7 +188,32 @@ class Base(base.LKF_Base):
         for res in self.GET_CONFIG:
             result = {arg:res[arg] for arg in args if res.get(arg)}
         return result if result else None
-        
+      
+    def send_email_by_form(self, data):
+        print("MSJ", data)
+        metadata = self.lkf_api.get_metadata(form_id=self.ENVIO_DE_CORREOS)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Addons",
+                    "Process": "Creación de envio de correo",
+                    "Action": "send_email_by_form",
+                }
+            },
+        })
+        #---Define Answers
+        answers = {}
+        answers.update({
+            f"{self.envio_correo_fields['email_from']}":data['email_from'],
+            f"{self.envio_correo_fields['titulo']}":data['titulo'],
+            f"{self.envio_correo_fields['nombre']}":data['nombre'],
+            f"{self.envio_correo_fields['email_to']}":data['email_to'],
+            f"{self.envio_correo_fields['msj']}":data['mensaje']
+            })
+        print('answers', answers)
+        metadata.update({'answers':answers})
+        return self.lkf_api.post_forms_answers(metadata)
+
 
 from linkaform_api import  upload_file
 

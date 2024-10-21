@@ -73,7 +73,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
-        # self.BITACORA_ENVIO_CORREOS = self.lkm.form_id('envio_de_correos','id')
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
         # self.FORM_ALTA_EQUIPOS = self.lkm.form_id('alta_de_equipos','id')
@@ -295,11 +294,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'locker_perdido':f"{self.mf['locker_id']}"
         }
 
-        self.envio_correo_fields = {
-            "nombre": "670d2e32756833542954716b",
-            'email':"670d2e32756833542954716c",
-            'msj':"670d2d9d0337e410e4353550",
-        }
+
 
         #- Para salida de bitacora y lista
         self.bitacora_fields = {
@@ -1300,26 +1295,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.lkf_api.post_forms_answers(metadata)
     
     def create_enviar_msj(self, data_msj):
-        print("MSJ", data_msj)
-        metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_ENVIO_CORREOS)
-        metadata.update({
-            "properties": {
-                "device_properties":{
-                    "System": "Script",
-                    "Module": "Accesos",
-                    "Process": "Creación de envio de correo",
-                    "Action": "create_enviar_msj",
-                    "File": "accesos/app.py"
-                }
-            },
-        })
-        #---Define Answers
-        answers = {}
-        for key, value in data_failures.items():
-                answers.update({f"{self.envio_correo_fields[key]}":value})
-        metadata.update({'answers':answers})
-        return self.lkf_api.post_forms_answers(metadata)
-    
+        data_msj['enviado_desde'] = 'Modulo de Acceos'
+        return self.send_email_by_form(data_msj)
+
     def create_failure(self, data_failures):
         #---Define Metadata
         metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_FALLAS)
