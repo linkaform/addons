@@ -1,7 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <advanced_options>
-        <active>False</active>
+        <active>True</active>
+        <folio>
+            <config>False</config>
+            <manual>False</manual>
+            <required>False</required>
+        </folio>
     </advanced_options>
     <allow_page_navigation>True</allow_page_navigation>
     <confirmation>
@@ -9,7 +14,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1716504415.0</created_at>
+    <created_at>1722301150.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -46,29 +51,29 @@
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>True</default>
-                    <default_value>realizado</default_value>
+                    <default_value>abierto</default_value>
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>6639b2744bb44059fc59eb62</field_id>
+                    <field_id>66397e2c59c2600b1df2742c</field_id>
                     <field_type>radio</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Estatus del recorrido</label>
+                    <label>Estatus de la falla</label>
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Realizado</label>
+                            <label>Abierto</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>realizado</value>
+                            <value>abierto</value>
                         </item>
                         <item>
-                            <label>Cancelado</label>
+                            <label>Resuelto</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>cancelado</value>
+                            <value>resuelto</value>
                         </item>
                     </options>
                     <properties>
@@ -113,10 +118,7 @@
                         <watermark_enable>False</watermark_enable>
                     </properties>
                     <required>True</required>
-                    <rules>
-                        <item>a851e2ecefa57</item>
-                        <item>25c21d1b1ba89b1</item>
-                    </rules>
+                    <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
                     <visible>True</visible>
@@ -131,13 +133,13 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>6639b2744bb44059fc59eb63</field_id>
+                    <field_id>66397d0cfd99d7263f833032</field_id>
                     <field_type>datetime</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Fecha y hora de inicio del recorrido</label>
+                    <label>Fecha y hora de la falla</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -192,39 +194,114 @@
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracion_de_recorridos.id }}</catalog_id>
+                        <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
                         <field_type>None</field_type>
                         <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>
-                            <childs>
-                                <item>6646272aeea716237ccafa56</item>
-                                <item>663cf8d3d9fec9d7c059eb56</item>
-                            </childs>
+                            <catalog_id>118591</catalog_id>
+                            <related_fields>
+                                <item>663e5c57f5b8a7ce8211ed0b</item>
+                            </related_fields>
                         </related_catalog>
                         <view_fields>
-                            <item>663e5c57f5b8a7ce8211ed0b</item>
-                            <item>6644fb97e14dcb705407e0ef</item>
+                            <item>62c5ff407febce07043024dd</item>
                         </view_fields>
                         <view_index>0</view_index>
                     </catalog>
                     <catalog_fields>
-                        <item>663e5c57f5b8a7ce8211ed0b</item>
-                        <item>6644fb97e14dcb705407e0ef</item>
+                        <item>663bc4ed8a6b120eab4d7f1e</item>
+                        <item>62c5ff407febce07043024dd</item>
                     </catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>{{ catalog.configuracion_de_recorridos.obj_id }}</field_id>
+                    <field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</field_id>
                     <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Recorrido</label>
+                    <label>Reporta</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>True</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
+                        <field_type>text</field_type>
+                        <filters>None</filters>
+                        <geofence>None</geofence>
+                        <last>True</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>[]</view_fields>
+                        <view_index>1</view_index>
+                    </catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>62c5ff407febce07043024dd</field_id>
+                    <field_type>catalog-select</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Nombre completo</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -278,8 +355,95 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.configuracion_de_recorridos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracion_de_recorridos.id }}</catalog_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <field_type>None</field_type>
+                        <filters>None</filters>
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>
+                            <childs>
+                                <item>663cf8d3d9fec9d7c059eb56</item>
+                                <item>663fb92aa3e9bfc6aecb96fd</item>
+                            </childs>
+                        </related_catalog>
+                        <view_fields>
+                            <item>663e5c57f5b8a7ce8211ed0b</item>
+                            <item>663e5d44f5b8a7ce8211ed0f</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                    </catalog>
+                    <catalog_fields>
+                        <item>663e5c57f5b8a7ce8211ed0b</item>
+                        <item>663e5d44f5b8a7ce8211ed0f</item>
+                    </catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</field_id>
+                    <field_type>catalog</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Lugar de la falla</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>text</field_type>
                         <filters>None</filters>
                         <geofence>None</geofence>
@@ -354,8 +518,8 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.configuracion_de_recorridos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracion_de_recorridos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>text</field_type>
                         <filters>None</filters>
                         <geofence>None</geofence>
@@ -370,249 +534,10 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>6644fb97e14dcb705407e0ef</field_id>
-                    <field_type>catalog-select</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>None</group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Nombre del recorrido</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>None</catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>66462aa5d4a4af2eea07e0d1</field_id>
-                    <field_type>group</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>None</group>
-                    <groups_fields>
-                        <item>664fc6e0aa68f4907234b5bd</item>
-                        <item>663e5d44f5b8a7ce8211ed0f</item>
-                        <item>66462b9d7124d1540f962087</item>
-                        <item>66462b9d7124d1540f962088</item>
-                        <item>66462b9d7124d1540f962089</item>
-                    </groups_fields>
-                    <help_text>None</help_text>
-                    <label>Areas del recorrido</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>0</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>0</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>True</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracion_de_recorridos_areas_de_inspeccion.id }}</catalog_id>
-                        <field_type>None</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>
-                            <catalog_id>118758</catalog_id>
-                            <related_fields>
-                                <item>663e5c57f5b8a7ce8211ed0b</item>
-                            </related_fields>
-                        </related_catalog>
-                        <view_fields>
-                            <item>663e5d44f5b8a7ce8211ed0f</item>
-                        </view_fields>
-                        <view_index>0</view_index>
-                    </catalog>
-                    <catalog_fields>
-                        <item>663e5d44f5b8a7ce8211ed0f</item>
-                    </catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>{{ catalog.configuracion_de_recorridos_areas_de_inspeccion.obj_id }}</field_id>
-                    <field_type>catalog</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>66462aa5d4a4af2eea07e0d1</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Area</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>True</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.configuracion_de_recorridos_areas_de_inspeccion.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracion_de_recorridos_areas_de_inspeccion.id }}</catalog_id>
-                        <field_type>text</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>1</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>True</fav>
                     <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
                     <field_type>catalog-select</field_type>
                     <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>66462aa5d4a4af2eea07e0d1</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
+                    <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
                     <label>Nombre de Area</label>
@@ -668,6 +593,240 @@
                 <item>
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_fallas.id }}</catalog_id>
+                        <field_type>None</field_type>
+                        <filters>None</filters>
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>
+                            <item>66397bae9e8b08289a59ec86</item>
+                            <item>66ce2441d63bb7a3871adeaf</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                    </catalog>
+                    <catalog_fields>
+                        <item>66397bae9e8b08289a59ec86</item>
+                        <item>66ce2441d63bb7a3871adeaf</item>
+                    </catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>{{ catalog.lista_de_fallas.obj_id }}</field_id>
+                    <field_type>catalog</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Falla</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>{{ catalog.lista_de_fallas.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_fallas.id }}</catalog_id>
+                        <field_type>text</field_type>
+                        <filters>None</filters>
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>[]</view_fields>
+                        <view_index>1</view_index>
+                    </catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>66397bae9e8b08289a59ec86</field_id>
+                    <field_type>catalog-select</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Falla</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>{{ catalog.lista_de_fallas.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_fallas.id }}</catalog_id>
+                        <field_type>text</field_type>
+                        <filters />
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>[]</view_fields>
+                        <view_index>2</view_index>
+                    </catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>66ce2441d63bb7a3871adeaf</field_id>
+                    <field_type>catalog-select</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Objeto Afectado</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
@@ -675,16 +834,95 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>66462b9d7124d1540f962087</field_id>
+                    <field_id>66397d8cfd99d7263f83303a</field_id>
+                    <field_type>textarea</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>Información relevante relacionado con la falla.</help_text>
+                    <label>Comentarios</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>
+                            <body>None</body>
+                            <email_fields>[]</email_fields>
+                            <emails>[]</emails>
+                            <embed_company_picture>False</embed_company_picture>
+                            <embed_fields>[]</embed_fields>
+                            <pdf_template>{}</pdf_template>
+                            <reply_to>None</reply_to>
+                            <resend>DONT_RESEND</resend>
+                            <send_attachments>False</send_attachments>
+                            <send_pdf>False</send_pdf>
+                            <sender>None</sender>
+                            <subject>None</subject>
+                            <template_html>None</template_html>
+                            <templates>[]</templates>
+                            <timer_config>None</timer_config>
+                        </email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>True</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>True</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>66f2df6b6917fe63f4233226</field_id>
                     <field_type>images</field_type>
                     <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>66462aa5d4a4af2eea07e0d1</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
+                    <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Fotografía de evidencia</label>
+                    <label>Evidencia</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -750,20 +988,17 @@
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
-                    <default>True</default>
+                    <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>66462b9d7124d1540f962088</field_id>
-                    <field_type>textarea</field_type>
+                    <fav>False</fav>
+                    <field_id>66f2df6b6917fe63f4233227</field_id>
+                    <field_type>files</field_type>
                     <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>66462aa5d4a4af2eea07e0d1</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
+                    <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>Cualquier información relevante que haya observado mientras recorría el punto asignado.</help_text>
-                    <label>Comentarios</label>
+                    <help_text>None</help_text>
+                    <label>Documento</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -777,7 +1012,101 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>True</help_text>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>
+                            <from_camera>True</from_camera>
+                            <from_draw>True</from_draw>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>10</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>True</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>
+                            <color>#FFFFFF</color>
+                            <font_size>22</font_size>
+                            <position>left-top</position>
+                            <text_data />
+                            <text_data_array>[]</text_data_array>
+                        </watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_areas_y_empleados_apoyo.id }}</catalog_id>
+                        <field_type>None</field_type>
+                        <filters>None</filters>
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>
+                            <catalog_id>118591</catalog_id>
+                            <related_fields>[]</related_fields>
+                        </related_catalog>
+                        <view_fields>
+                            <item>663bd36eb19b7fb7d9e97ccb</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                    </catalog>
+                    <catalog_fields>
+                        <item>663bc4ed8a6b120eab4d7f1e</item>
+                        <item>663bd36eb19b7fb7d9e97ccb</item>
+                    </catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>{{ catalog.configuracion_areas_y_empleados_apoyo.obj_id }}</field_id>
+                    <field_type>catalog</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Responsable asignado de solucionar</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -816,167 +1145,13 @@
                 <item>
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
-                    <catalog>None</catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>66462b9d7124d1540f962089</field_id>
-                    <field_type>datetime</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>66462aa5d4a4af2eea07e0d1</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Fecha y hora de la inspección</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>True</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
-                        <field_type>None</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>
-                            <catalog_id>118758</catalog_id>
-                            <related_fields>
-                                <item>663e5c57f5b8a7ce8211ed0b</item>
-                            </related_fields>
-                        </related_catalog>
-                        <view_fields>
-                            <item>62c5ff407febce07043024dd</item>
-                        </view_fields>
-                        <view_index>0</view_index>
-                    </catalog>
-                    <catalog_fields>
-                        <item>62c5ff407febce07043024dd</item>
-                    </catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</field_id>
-                    <field_type>catalog</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>None</group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Guardia responsable</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>True</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.configuracion_areas_y_empleados_apoyo.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_areas_y_empleados_apoyo.id }}</catalog_id>
                         <field_type>text</field_type>
                         <filters>None</filters>
                         <geofence>None</geofence>
-                        <last>False</last>
+                        <last>True</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>[]</view_fields>
                         <view_index>1</view_index>
@@ -987,7 +1162,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>62c5ff407febce07043024dd</field_id>
+                    <field_id>663bd36eb19b7fb7d9e97ccb</field_id>
                     <field_type>catalog-select</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -1044,29 +1219,32 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>a851e2ecefa57</rule_id>
-                            <rule_index>0</rule_index>
-                            <rule_type>invisible</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
-                    <catalog>None</catalog>
+                    <catalog>
+                        <catalog_field_id>{{ catalog.configuracion_areas_y_empleados_apoyo.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_areas_y_empleados_apoyo.id }}</catalog_id>
+                        <field_type>text</field_type>
+                        <filters />
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>[]</view_fields>
+                        <view_index>2</view_index>
+                    </catalog>
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>6639b47565d8e5c06fe97cf3</field_id>
-                    <field_type>text</field_type>
+                    <field_id>663bc4ed8a6b120eab4d7f1e</field_id>
+                    <field_type>catalog-detail</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Duración del recorrido</label>
+                    <label>Departamento</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -1117,14 +1295,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>25c21d1b1ba89b1</rule_id>
-                            <rule_index>1</rule_index>
-                            <rule_type>show</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -1132,14 +1303,14 @@
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>6639b6180bb793945af2742d</field_id>
-                    <field_type>textarea</field_type>
+                    <fav>False</fav>
+                    <field_id>66fae1f1d4e5e97eb12170ef</field_id>
+                    <field_type>datetime</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Motivo de la cancelación</label>
+                    <label>Fecha de resolucion</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -1190,22 +1361,315 @@
                     <visible>True</visible>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
+            <page_name>Datos</page_name>
+            <page_type>fields</page_type>
+        </item>
+        <item>
+            <page_description>None</page_description>
+            <page_fields>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>66f2dfb2c80d24e5e82332b3</field_id>
+                    <field_type>textarea</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Comentario de Solucion</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>66f2dfb2c80d24e5e82332b4</field_id>
+                    <field_type>text</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Folio de Reporte Accion Correctiva</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>66f2dfb2c80d24e5e82332b5</field_id>
+                    <field_type>images</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Evidencia Solucion de Falla</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>
+                            <from_camera>True</from_camera>
+                            <from_draw>True</from_draw>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>10</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>True</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>
+                            <color>#FFFFFF</color>
+                            <font_size>22</font_size>
+                            <position>left-top</position>
+                            <text_data />
+                            <text_data_array>[]</text_data_array>
+                        </watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>66f2dfb2c80d24e5e82332b6</field_id>
+                    <field_type>files</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Documento Solucion de Falla</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>
+                            <from_camera>True</from_camera>
+                            <from_draw>True</from_draw>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>10</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>True</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>
+                            <color>#FFFFFF</color>
+                            <font_size>22</font_size>
+                            <position>left-top</position>
+                            <text_data />
+                            <text_data_array>[]</text_data_array>
+                        </watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+            </page_fields>
+            <page_name>Seguimiento</page_name>
             <page_type>fields</page_type>
         </item>
     </form_pages>
     <grading>
         <active>False</active>
         <grade_type>points</grade_type>
+        <max_points>0</max_points>
     </grading>
     <has_voucher>False</has_voucher>
-    <name>Bitacora Rondines</name>
+    <name>Bitacora de Fallas</name>
     <notification>
         <active>False</active>
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/119223/</resource_uri>
+    <resource_uri>/api/infosync/form/121738/</resource_uri>
+    <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>
@@ -1225,5 +1689,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1721837459.0</updated_at>
+    <updated_at>1727724208.0</updated_at>
 </lkf>

@@ -105,10 +105,7 @@
                         <watermark_enable>False</watermark_enable>
                     </properties>
                     <required>True</required>
-                    <rules>
-                        <item>1496cbdfd0231f</item>
-                        <item>1496cbdfd0231f</item>
-                    </rules>
+                    <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
                     <visible>True</visible>
@@ -464,14 +461,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>1496cbdfd0231f</rule_id>
-                            <rule_index>0</rule_index>
-                            <rule_type>invisible</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
@@ -552,14 +542,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>1496cbdfd0231f</rule_id>
-                            <rule_index>0</rule_index>
-                            <rule_type>invisible</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>{{ catalog.contratistas.obj_id }}</catalog_field_id>
@@ -711,14 +694,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>1496cbdfd0231f</rule_id>
-                            <rule_index>0</rule_index>
-                            <rule_type>invisible</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -820,6 +796,7 @@
     <process_ids>[]</process_ids>
     <public>False</public>
     <resource_uri>/api/infosync/form/121750/</resource_uri>
+    <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>
@@ -839,5 +816,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1723653455.0</updated_at>
+    <updated_at>1728341839.0</updated_at>
 </lkf>

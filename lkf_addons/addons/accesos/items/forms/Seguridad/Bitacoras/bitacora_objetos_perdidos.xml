@@ -142,7 +142,7 @@
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Tipo Articulo</label>
+                    <label>Objeto</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -186,7 +186,7 @@
                         <watermark_config>None</watermark_config>
                         <watermark_enable>False</watermark_enable>
                     </properties>
-                    <required>True</required>
+                    <required>False</required>
                     <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -262,7 +262,7 @@
                         <watermark_config>None</watermark_config>
                         <watermark_enable>False</watermark_enable>
                     </properties>
-                    <required>True</required>
+                    <required>False</required>
                     <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -338,7 +338,7 @@
                         <watermark_config>None</watermark_config>
                         <watermark_enable>False</watermark_enable>
                     </properties>
-                    <required>True</required>
+                    <required>False</required>
                     <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -360,7 +360,7 @@
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>Nombre del artículo encontrado, por ejemplo: bolsa, celular, suéter, etc.</help_text>
-                    <label>Otro tipo de articulo</label>
+                    <label>Otro tipo de objeto</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -426,7 +426,7 @@
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>Breve descripcion del articulo</help_text>
-                    <label>Descripcion</label>
+                    <label>Descripción</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -943,7 +943,7 @@
                         </watermark_config>
                         <watermark_enable>False</watermark_enable>
                     </properties>
-                    <required>True</required>
+                    <required>False</required>
                     <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -2028,5 +2028,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1726099147.0</updated_at>
+    <updated_at>1726760095.0</updated_at>
 </lkf>

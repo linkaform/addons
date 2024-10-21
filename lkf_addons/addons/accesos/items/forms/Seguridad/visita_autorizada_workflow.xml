@@ -160,7 +160,9 @@
                                 <label>Email contratista</label>
                             </item>
                         </email_fields>
-                        <emails>[]</emails>
+                        <emails>
+                            <item>karina@linkaform.com</item>
+                        </emails>
                         <embed_company_picture>True</embed_company_picture>
                         <fields_attached>[]</fields_attached>
                         <pdf_template>{}</pdf_template>

@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.bitacora_de_incidencias.id }}</form_id>
+    <id>6716845b896195f903070e35</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>6716845b896195f903070e2e</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2024-10-21T16:40:45.194586</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.bitacora_incidencias.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.bitacora_incidencias.name }}</name>
+                            <start_date>2024-10-21T16:40:45.192356</start_date>
+                            <updated_at>2024-10-21T16:41:20.272337</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>6716845b896195f903070e2f</id>
+            <name>None</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-10-22T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-10-21T16:36:16.671Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>before</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

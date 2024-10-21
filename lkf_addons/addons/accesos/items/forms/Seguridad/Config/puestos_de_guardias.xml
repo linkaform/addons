@@ -370,6 +370,7 @@
     <process_ids>[]</process_ids>
     <public>False</public>
     <resource_uri>/api/infosync/form/121741/</resource_uri>
+    <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>

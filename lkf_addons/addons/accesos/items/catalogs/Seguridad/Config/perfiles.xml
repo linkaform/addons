@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>8-d79af93a4426f7f8e713a829fcf6dee3</_rev>
+    <_rev>13-127dcaa290a2f26e593e1a1adc1fac41</_rev>
     <updated_at>2024-07-30T00:58:59.310751+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -18,12 +18,17 @@
     <edit_public_records>False</edit_public_records>
     <created_at>2024-07-30T00:58:59.310751+00:00Z</created_at>
     <advanced_options>
+        <active>True</active>
         <folio>
             <manual>False</manual>
             <required>False</required>
             <config>False</config>
         </folio>
     </advanced_options>
+    <catalog_id>121729</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>66a83ad356d1e741159ce116</_id>
+    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -64,8 +69,8 @@
                         <item>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>autidotria</value>
-                            <label>Autidotria</label>
+                            <value>auditoria</value>
+                            <label>Auditoria</label>
                         </item>
                         <item>
                             <points>None</points>
@@ -76,14 +81,14 @@
                         <item>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>inspeccion</value>
-                            <label>Inspeccion</label>
+                            <value>inspección</value>
+                            <label>Inspección</label>
                         </item>
                         <item>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>reunion</value>
-                            <label>Reunion</label>
+                            <value>reunión</value>
+                            <label>Reunión</label>
                         </item>
                         <item>
                             <points>None</points>
@@ -125,8 +130,4 @@
             <page_description>None</page_description>
         </item>
     </catalog_pages>
-    <sync_last_update>None</sync_last_update>
-    <_id>66a83ad356d1e741159ce116</_id>
-    <public>False</public>
-    <catalog_id>121729</catalog_id>
 </lkf>
