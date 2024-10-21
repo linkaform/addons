@@ -846,6 +846,44 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             return {}
         return recipe
 
+    def ger_products_inventory(self, product_code, warehouse, status='active'):
+
+        match_query ={ 
+         'form_id': self.FORM_INVENTORY_ID,  
+         'deleted_at' : {'$exists':False},
+         } 
+
+        if product_code:
+            match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":{"$in":product_code}}) 
+        if warehouse:
+            match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse}) 
+        query = [
+            {'$match': match_query},
+            {'$project':{
+                '_id':0,
+                'product_code':f"$answers.{self.SKU_OBJ_ID}.{self.f['product_code']}",
+                'warehouse':f"$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
+                'actuals':f"$answers.{self.f['actual_eaches_on_hand']}",
+            }},
+            {'$group':{
+                '_id':{
+                    'product_code':'$product_code',
+                    'warehouse':'$warehouse'
+                },
+                'actuals':{'$sum':'$actuals'}
+            }},
+            {"$project":{
+                "_id":0,
+                "product_code":"$_id.product_code",
+                "warehouse":"$_id.warehouse",
+                "actuals": "$actuals"
+            }},
+        ]
+        
+        print('query=',simplejson.dumps(query, indent=5))
+        res = self.format_cr(self.cr.aggregate(query))
+        return res
+
     def get_product_sku(self, all_codes):
         all_sku = []
         for sku, product_code in all_codes.items():

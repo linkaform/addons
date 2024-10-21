@@ -100,7 +100,6 @@ class JIT(Product, Warehouse, base.LKF_Base):
             'input_goods_product_name':'71ef32bcdf0ec2ba73dec33e',
             'input_goods_sku':'75dec64a3199f9a040829243',
             'raw_material_group':'66d8dff5b22bcdcc2f341e83',
-            'safety_stock':'66ea62dac9aefada5b04b738',
             'min_stock':'66ea62dac9aefada5b04b739',
             'max_stock':'66ea62dac9aefada5b04b73a',
             'demanda_12_meses':'66ea6c61c9aefada5b04b76e',
@@ -109,6 +108,8 @@ class JIT(Product, Warehouse, base.LKF_Base):
             'procurment_schedule_date':'66da538cb22bcdcc2f341f47',
             'procurment_qty':'66da3bddb22bcdcc2f341f08',
             'procurment_status':'66da0c19b22bcdcc2f341f07',
+            'safety_stock':'66ea62dac9aefada5b04b738',
+            'status':'620ad6247a217dbcb888d175',
             'trigger':'66eb14ffc9aefada5b04b793',
             'reorder_point':'66ea62dac9aefada5b04b73b',
             }
@@ -118,30 +119,29 @@ class JIT(Product, Warehouse, base.LKF_Base):
         else:
             self.mf = mf
             
-        kwargs = kwargs.get('f',
-            {
-                'bom_name':'66d8e063b22bcdcc2f341e84',
-                'bom_type':'66d8dfbcb22bcdcc2f341e81',
-                'bom_status':'66e275891f6f133e363afb3f',
-                'demora':'66ea62dac9aefada5b04b737',
-                'lead_time':'66d8ee99b22bcdcc2f341e8a',
-                'dias_laborales_consumo':'66ececbcc9aefada5b04b800',
-                'factor_crecimiento_jit':'66ececbcc9aefada5b04b801',
-                'factor_seguridad_jit':'66ececbcc9aefada5b04b802',
-                'status':'620ad6247a217dbcb888d175',
-                'tipo_almacen': '66ed0c88c9aefada5b04b818'
-            }
-            )
+        # kwargs = kwargs.get('f',
+        #     {
+        #         'bom_name':'66d8e063b22bcdcc2f341e84',
+        #         'bom_type':'66d8dfbcb22bcdcc2f341e81',
+        #         'bom_status':'66e275891f6f133e363afb3f',
+        #         'demora':'66ea62dac9aefada5b04b737',
+        #         'lead_time':'66d8ee99b22bcdcc2f341e8a',
+        #         'dias_laborales_consumo':'66ececbcc9aefada5b04b800',
+        #         'factor_crecimiento_jit':'66ececbcc9aefada5b04b801',
+        #         'factor_seguridad_jit':'66ececbcc9aefada5b04b802',
+        #         'status':'620ad6247a217dbcb888d175',
+        #         'tipo_almacen': '66ed0c88c9aefada5b04b818'
+        #     }
+        #     )
         from lkf_addons.addons.product.app import Product, Warehouse
-
         self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         # from lkf_addons.addons.stock.app import Stock
         # self.STOCK = Stock( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
         self.BASE = Base( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #Formas
         self.BOM_ID = self.lkm.form_id('bom','id')
         self.DEMANDA_UTIMOS_12_MES = self.lkm.form_id('demanda_ultimos_12_meses','id')

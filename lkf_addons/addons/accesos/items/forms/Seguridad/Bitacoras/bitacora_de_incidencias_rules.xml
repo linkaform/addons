@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.bitacora_de_incidencias.id }}</form_id>
+    <id>66ec669daa9268bb58218f02</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>66a83ad07776b332fb75c147</catalog_id>
+                        <field_id>663973809fa65cafa759eb97</field_id>
+                        <group_id>None</group_id>
+                        <id>663973809fa65cafa759eb97</id>
+                        <label>Incidente</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value>Otro</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ec667d7646541f2ea024de</field_id>
+                    <group_id>None</group_id>
+                    <id>66ec667d7646541f2ea024de</id>
+                    <label>Incidente</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar Incicidente</name>
+            <operator>and</operator>
+            <rule_id>6382046735bee</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>66a83ad07776b332fb75c147</catalog_id>
+                        <field_id>663973809fa65cafa759eb97</field_id>
+                        <group_id>None</group_id>
+                        <id>663973809fa65cafa759eb97</id>
+                        <label>Incidente</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value>Otro</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ec667d7646541f2ea024de</field_id>
+                    <group_id>None</group_id>
+                    <id>66ec667d7646541f2ea024de</id>
+                    <label>Tipo Incidente</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requerir Tipo de Incidente</name>
+            <operator>and</operator>
+            <rule_id>1aa413e4209460f</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

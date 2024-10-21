@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>2-9fefc710a8ab8e8db0077911a8cc2e6f</_rev>
+    <_rev>12-65ef151dfdff9fb57cd85ef130b6a83a</_rev>
     <updated_at>2024-07-30T00:58:55.598840+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -18,6 +18,7 @@
     <edit_public_records>False</edit_public_records>
     <created_at>2024-07-30T00:58:55.598840+00:00Z</created_at>
     <advanced_options>
+        <active>True</active>
         <folio>
             <manual>False</manual>
             <required>False</required>
@@ -29,24 +30,86 @@
             <page_fields>
                 <item>
                     <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <key>None</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>66397bae9e8b08289a59ec86</field_id>
-                    <required>False</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>False</required>
+                    <field_id>66397bae9e8b08289a59ec86</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Tipo de falla</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
                     <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>66ce23efc5c4d148311adf86</item>
+                        <item>66ce2441d63bb7a3871adeaf</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</field_id>
+                    <label>Categoria</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>66ce23efc5c4d148311adf86</item>
+                            <item>66ce2441d63bb7a3871adeaf</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.tipo_de_articulos_perdidos.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>66ce23efc5c4d148311adf86</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Categoría del Objeto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>66ce2441d63bb7a3871adeaf</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Objeto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
                 </item>
             </page_fields>
             <page_name>Página 1</page_name>

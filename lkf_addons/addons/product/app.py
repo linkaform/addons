@@ -80,6 +80,20 @@ class Product(Base, base.LKF_Base):
         return product_field
 
 
+    def get_product_by_type(self, product_type):
+        product_field = None
+        mango_query = {
+            "selector": {
+                "answers": {
+                    self.f['product_type']: {"$eq": product_type},
+                    } ,
+                },
+            "limit": 10000,
+            "skip": 0
+                }
+        record = self._labels_list(self.lkf_api.search_catalog(self.PRODUCT_ID, mango_query), self.f)
+        return record
+
 
 class Warehouse(Base ,base.LKF_Base):
 
