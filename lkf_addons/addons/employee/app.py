@@ -50,6 +50,7 @@ class Employee(Base, base.LKF_Base):
             'city':'6654187fc85ce22aaf8bb070',
             'address':'663a7e0fe48382c5b1230902',
             'areas_group':'663cf9d77500019d1359eb9f',
+            'department_code':'670f571af57af9032464176e',
             'estatus_dentro_empresa':'663bcbe2274189281359eb77',
             'estatus_disponibilidad':'663bcbe2274189281359eb78',
             'cat_timezone':self.f['cat_timezone'],
@@ -72,7 +73,9 @@ class Employee(Base, base.LKF_Base):
             'worker_name_jefes':'663bd36eb19b7fb7d9e97ccb',
             'worker_department':'663bc4ed8a6b120eab4d7f1e',
             'worker_position':'663bc4c79b8046ce89e97cf4',
+            'worker_position_code':'670f57c281ad62446e641602',
             'worker_name_b':'663bd36eb19b7fb7d9e97ccb',
+            'worker_code':'670f585bf844ff7bc357b1dc',
                 }
 
         self.f.update(self.employee_fields)

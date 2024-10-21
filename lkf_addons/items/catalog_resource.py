@@ -45,13 +45,19 @@ class CatalogResource(items.Items):
         for catalog_name in install_order:
             print('Installing Catalog: ', catalog_name)
             detail = instalable_catalogs[catalog_name]
-            if detail.get('path'):
+            print('detail Catalog: ', detail)
+            if not detail:
+                continue
+            if detail and detail.get('path'):
                 this_path = '{}/{}'.format(self.path, detail['path'])
+                path = detail['path']
             else:
                 this_path = self.path
+                path = ''
+            print('this_path', this_path)
             catalog_model = self.load_module_template_file(this_path, catalog_name)
             self.this_path = this_path
-            res = self.lkf.install_catalog(self.module, catalog_name, catalog_model, local_path=detail.get('path'), **kwargs)
+            res = self.lkf.install_catalog(self.module, catalog_name, catalog_model, local_path=path, **kwargs)
             for file_type, files in detail.items():
                 if file_type == 'data' and self.load_data:
                     self.load_info(files, file_type, res )
