@@ -144,7 +144,7 @@ class Warehouse(Base ,base.LKF_Base):
             }
         if warehouse_type:
             mango_query['selector'] = {'answers':{self.f['warehouse_type']: warehouse_type}}
-        res = self.lkf_api.search_catalog( self.CATALOG_WAREHOUSE_ID, mango_query)
+        res = self.lkf_api.search_catalog( self.WAREHOUSE_ID, mango_query)
         warehouse = [r[self.f['warehouse']] for r in res]
         return warehouse
 

@@ -87,29 +87,28 @@ class JIT(Product, Warehouse, base.LKF_Base):
 
 
     def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
-        # from lkf_addons.addons.stock.app import Stock
-        #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
-        # f ={
-        #     'bom_name':'66d8e063b22bcdcc2f341e84',
-        #     'bom_type':'66d8dfbcb22bcdcc2f341e81',
-        #     'bom_status':'66e275891f6f133e363afb3f',
-        #     'demora':'66ea62dac9aefada5b04b737',
-        #     'lead_time':'66d8ee99b22bcdcc2f341e8a',
-        #     'dias_laborales_consumo':'66ececbcc9aefada5b04b800',
-        #     'factor_crecimiento_jit':'66ececbcc9aefada5b04b801',
-        #     'factor_seguridad_jit':'66ececbcc9aefada5b04b802',
-        #     'status':'620ad6247a217dbcb888d175',
-        #     'tipo_almacen': '66ed0c88c9aefada5b04b818'
-        #     }
+        from lkf_addons.addons.stock.app import Stock
+        base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
+        f ={
+            'bom_name':'66d8e063b22bcdcc2f341e84',
+            'bom_type':'66d8dfbcb22bcdcc2f341e81',
+            'bom_status':'66e275891f6f133e363afb3f',
+            'demora':'66ea62dac9aefada5b04b737',
+            'lead_time':'66d8ee99b22bcdcc2f341e8a',
+            'dias_laborales_consumo':'66ececbcc9aefada5b04b800',
+            'factor_crecimiento_jit':'66ececbcc9aefada5b04b801',
+            'factor_seguridad_jit':'66ececbcc9aefada5b04b802',
+            'status':'620ad6247a217dbcb888d175',
+            'tipo_almacen': '66ed0c88c9aefada5b04b818'
+            }
 
-        # if hasattr(self, 'f'):
-        #     self.f.update(f)
-        # else:
-        #     self.f = f
+        if hasattr(self, 'f'):
+            self.f.update(f)
+        else:
+            self.f = f
 
-        # mf = deepcopy(f)
-        # mf.update({
-        mf = {
+        mf = deepcopy(f)
+        mf.update({
                 'bom_group_qty_in':'66d8e09cb22bcdcc2f341e85',
                 'bom_group_qty_out':'66da962859bec54a05c73e00',
                 'bom_group_qty_throughput':'66da962859bec54a05c73e01',
@@ -135,7 +134,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
                 'trigger':'66eb14ffc9aefada5b04b793',
                 'reorder_point':'66ea62dac9aefada5b04b73b',
             }
-        # )
+        )
 
         if hasattr(self, 'mf'):
             self.mf.update(mf)
@@ -557,8 +556,8 @@ class JIT(Product, Warehouse, base.LKF_Base):
         answers = {}
         config = self.BASE.get_config(*['lead_time', 'demora', 'factor_seguridad_jit','factor_crecimiento_jit','uom'])
         print('33333',config )
-        lead_time = config.get('lead_time')
-        demora = config.get('demora')
+        lead_time = config.get('lead_time',47)
+        demora = config.get('demora',7)
         safety_factor = config.get('factor_seguridad_jit',1)
         factor_crecimiento_jit = config.get('factor_crecimiento_jit',1)
         answers[self.SKU_OBJ_ID] = {}
