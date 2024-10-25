@@ -57,13 +57,8 @@ class Base(Base):
             'uom':f'{self.UOM_OBJ_ID}.{self.f.get("uom")}',
             'procurment_location':f'{self.f.get("config_group")}',
             'warehouse_kind': '66ed0c88c9aefada5b04b818',
-<<<<<<< HEAD
             # 'warehouse': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse"]}',
             # 'location': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
-=======
-            'warehouse': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse"]}',
-            'location': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
->>>>>>> 3a06da2d9e1fb0af67c03a51052ecb4630022d92
         }
 
     def get_config(self, *args, **kwargs):
@@ -94,7 +89,6 @@ class JIT(Product, Warehouse, base.LKF_Base):
     def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
         # from lkf_addons.addons.stock.app import Stock
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
-<<<<<<< HEAD
         # f ={
         #     'bom_name':'66d8e063b22bcdcc2f341e84',
         #     'bom_type':'66d8dfbcb22bcdcc2f341e81',
@@ -142,54 +136,6 @@ class JIT(Product, Warehouse, base.LKF_Base):
                 'reorder_point':'66ea62dac9aefada5b04b73b',
             }
         # )
-=======
-        f ={
-            'bom_name':'66d8e063b22bcdcc2f341e84',
-            'bom_type':'66d8dfbcb22bcdcc2f341e81',
-            'bom_status':'66e275891f6f133e363afb3f',
-            'demora':'66ea62dac9aefada5b04b737',
-            'lead_time':'66d8ee99b22bcdcc2f341e8a',
-            'dias_laborales_consumo':'66ececbcc9aefada5b04b800',
-            'factor_crecimiento_jit':'66ececbcc9aefada5b04b801',
-            'factor_seguridad_jit':'66ececbcc9aefada5b04b802',
-            'status':'620ad6247a217dbcb888d175',
-            'tipo_almacen': '66ed0c88c9aefada5b04b818'
-            }
-
-        if hasattr(self, 'f'):
-            self.f.update(f)
-        else:
-            self.f = f
-
-        mf = deepcopy(f)
-        mf.update({
-            'bom_group_qty_in':'66d8e09cb22bcdcc2f341e85',
-            'bom_group_qty_out':'66da962859bec54a05c73e00',
-            'bom_group_qty_throughput':'66da962859bec54a05c73e01',
-            'bom_group_step':'66d8e7b0b22bcdcc2f341e88',
-            'consumo_promedio_diario':'66ec770cc9aefada5b04b7a6',
-            'fecha_demanda':'66ea6c28c9aefada5b04b76c',
-            'input_goods_product_code':'71ef32bcdf0ec2ba73dec33d',
-            'input_goods_product_name':'71ef32bcdf0ec2ba73dec33e',
-            'input_goods_sku':'75dec64a3199f9a040829243',
-            'raw_material_group':'66d8dff5b22bcdcc2f341e83',
-            'min_stock':'66ea62dac9aefada5b04b739',
-            'max_stock':'66ea62dac9aefada5b04b73a',
-            'demanda_12_meses':'66ea6c61c9aefada5b04b76e',
-            'procurment_date':'66da0c19b22bcdcc2f341f06',
-            'procurment_method':'66d92acdb22bcdcc2f341ebf',
-            'procurment_schedule_date':'66da538cb22bcdcc2f341f47',
-            'procurment_qty':'66da3bddb22bcdcc2f341f08',
-            'procurment_status':'66da0c19b22bcdcc2f341f07',
-            'rutas_group':'671b2266ecd538747985d0ac',
-            'safety_stock':'66ea62dac9aefada5b04b738',
-            'standar_pack':'671b22d738a541183685d077',
-            'status':'620ad6247a217dbcb888d175',
-            'trigger':'66eb14ffc9aefada5b04b793',
-            'reorder_point':'66ea62dac9aefada5b04b73b',
-            }
-        )
->>>>>>> 3a06da2d9e1fb0af67c03a51052ecb4630022d92
 
         if hasattr(self, 'mf'):
             self.mf.update(mf)
@@ -200,11 +146,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
 
 
 
-<<<<<<< HEAD
         # kwargs = kwargs.get('f',f)
-=======
-        kwargs = kwargs.get('f',f)
->>>>>>> 3a06da2d9e1fb0af67c03a51052ecb4630022d92
 
         from lkf_addons.addons.product.app import Product, Warehouse
         self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
