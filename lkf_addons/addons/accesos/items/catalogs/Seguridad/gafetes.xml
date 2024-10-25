@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>11-b2abce5861c80cabcade9a3a36aa91e6</_rev>
+    <_rev>19-31145697d9e6df32ebada9f8aee36b9a</_rev>
     <updated_at>2024-07-30T00:58:54.718607+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -74,7 +74,7 @@
                     <label>Ubicacion y Area</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -96,7 +96,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
@@ -115,7 +115,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>

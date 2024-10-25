@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>7-974c2bb9ba162c51132155a370fd595e</_rev>
+    <_rev>32-0a9b40a7388af79b2c07fff7aa162f35</_rev>
     <updated_at>2024-07-30T00:58:57.576488+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -25,10 +25,6 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>121726</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>66a83ad1b35d90ebc7998485</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -109,42 +105,63 @@
                 <item>
                     <field_type>catalog</field_type>
                     <catalog_fields>
-                        <item>6639a9d9d38959539f59eb9f</item>
+                        <item>66ce23efc5c4d148311adf86</item>
+                        <item>66ce2441d63bb7a3871adeaf</item>
                     </catalog_fields>
                     <required>False</required>
-                    <field_id>{{ catalog.lista_de_equipos.obj_id }}</field_id>
+                    <field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</field_id>
                     <label>Equipo o Material</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <view_fields>
-                            <item>6639a9d9d38959539f59eb9f</item>
-                        </view_fields>
-                        <view_index>0</view_index>
-                        <couch_id>{{ catalog.lista_de_equipos.obj_id }}</couch_id>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.lista_de_equipos.id }}</catalog_id>
                         <filters />
-                        <name>{{ catalog.lista_de_equipos.name }}</name>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <view_fields>
+                            <item>66ce23efc5c4d148311adf86</item>
+                            <item>66ce2441d63bb7a3871adeaf</item>
+                        </view_fields>
+                        <name>{{ catalog.tipo_de_articulos_perdidos.name }}</name>
                     </catalog>
                     <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
-                    <properties>{}</properties>
                     <required>False</required>
-                    <field_id>6639a9d9d38959539f59eb9f</field_id>
-                    <label>Tipo de equipo</label>
+                    <field_id>66ce23efc5c4d148311adf86</field_id>
+                    <label>Categoría del Objeto</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <view_fields>[]</view_fields>
+                        <filters />
                         <field_type>text</field_type>
                         <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.lista_de_equipos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.lista_de_equipos.id }}</catalog_id>
-                        <filters />
+                        <catalog_field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
                     </catalog>
                     <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>66ce2441d63bb7a3871adeaf</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Objeto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>integer</field_type>
@@ -374,7 +391,7 @@
                         <step>any</step>
                         <custom>None</custom>
                     </properties>
-                    <label>Calificaion de Aprovacion</label>
+                    <label>Calificación de Aprobación</label>
                 </item>
                 <item>
                     <field_type>select</field_type>
@@ -412,8 +429,12 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>66a83ad1b35d90ebc7998485</_id>
+    <public>False</public>
+    <catalog_id>121726</catalog_id>
 </lkf>

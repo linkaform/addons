@@ -5,7 +5,6 @@ install_order = [
                     'gafetes',
                     'lista_de_fallas',
                     'lista_de_incidentes',
-                    'lista_de_equipos',
                     'lockers',
                     'definicion_de_examenes',
                     'definicion_de_permisos',
@@ -15,5 +14,5 @@ install_order = [
                     'configuracion_de_perfiles',
                     'configuracion_de_gafetes_y_lockers',
                     'visita_autorizada',
-                    'categorias_artiuclos_peridos'
+                    'categorias_de_objetos'
                     ]

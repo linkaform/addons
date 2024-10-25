@@ -17,6 +17,9 @@ pyexcel-ods==0.6.0
 psycopg2==2.9.3
 pymongo==3.13
 pytz==2023.4
+pyexcel-ods3==0.6.1
+pyexcel-odsr==0.6.0
+pyexcel-ods==0.6.0
 simplejson==3.16.0
 #sha-py
 requests

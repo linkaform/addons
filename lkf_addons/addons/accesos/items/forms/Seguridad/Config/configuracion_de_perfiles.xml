@@ -371,13 +371,13 @@
                     <groups_fields>
                         <item>66a83ad1b35d90ebc7998485</item>
                         <item>662962bb203407ab90c886e4</item>
-                        <item>66cebc0e9a80d82bbb5593a8</item>
-                        <item>6639a9d9d38959539f59eb9f</item>
                         <item>662962bb203407ab90c886e5</item>
                         <item>662962bb203407ab90c886e6</item>
                         <item>662962bb203407ab90c886e7</item>
-                        <item>662962bb203407ab90c886e9</item>
                         <item>662962bb203407ab90c886e8</item>
+                        <item>662962bb203407ab90c886e9</item>
+                        <item>66ce2441d63bb7a3871adeaf</item>
+                        <item>66cebc0e9a80d82bbb5593a8</item>
                         <item>66297e1579900d9018c886ad</item>
                     </groups_fields>
                     <help_text>None</help_text>
@@ -448,13 +448,13 @@
                         <view_index>0</view_index>
                     </catalog>
                     <catalog_fields>
-                        <item>66cebc0e9a80d82bbb5593a8</item>
-                        <item>6639a9d9d38959539f59eb9f</item>
                         <item>662962bb203407ab90c886e5</item>
                         <item>662962bb203407ab90c886e6</item>
                         <item>662962bb203407ab90c886e7</item>
-                        <item>662962bb203407ab90c886e9</item>
                         <item>662962bb203407ab90c886e8</item>
+                        <item>662962bb203407ab90c886e9</item>
+                        <item>66ce2441d63bb7a3871adeaf</item>
+                        <item>66cebc0e9a80d82bbb5593a8</item>
                         <item>66297e1579900d9018c886ad</item>
                         <item>662962bb203407ab90c886e4</item>
                     </catalog_fields>
@@ -607,164 +607,6 @@
                     <catalog>
                         <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
-                        <field_type>decimal</field_type>
-                        <filters />
-                        <geofence>None</geofence>
-                        <last>True</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>2</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>66cebc0e9a80d82bbb5593a8</field_id>
-                    <field_type>catalog-detail</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>6622a883f795581dbd730290</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Calificaion de Aprovacion</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
-                        <field_type>text</field_type>
-                        <filters />
-                        <geofence>None</geofence>
-                        <last>True</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>2</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>6639a9d9d38959539f59eb9f</field_id>
-                    <field_type>catalog-detail</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>6622a883f795581dbd730290</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Tipo de equipo</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
                         <field_type>checkbox</field_type>
                         <filters>None</filters>
                         <geofence>None</geofence>
@@ -778,7 +620,7 @@
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
-                    <fav>False</fav>
+                    <fav>True</fav>
                     <field_id>662962bb203407ab90c886e5</field_id>
                     <field_type>catalog-detail</field_type>
                     <grading_criteria>{}</grading_criteria>
@@ -946,7 +788,86 @@
                     </group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Vigencia Expresada en:</label>
+                    <label>Vigencia Expresada en</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <field_type>files</field_type>
+                        <filters>None</filters>
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>[]</view_fields>
+                        <view_index>0</view_index>
+                    </catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>662962bb203407ab90c886e8</field_id>
+                    <field_type>catalog-detail</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>
+                        <group_id>6622a883f795581dbd730290</group_id>
+                        <group_set_id>0</group_set_id>
+                    </group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Ejemplo de documento del permiso/certificación</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -1081,13 +1002,13 @@
                     <catalog>
                         <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
-                        <field_type>files</field_type>
-                        <filters>None</filters>
+                        <field_type>text</field_type>
+                        <filters />
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>[]</view_fields>
-                        <view_index>0</view_index>
+                        <view_index>2</view_index>
                     </catalog>
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
@@ -1095,7 +1016,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>662962bb203407ab90c886e8</field_id>
+                    <field_id>66ce2441d63bb7a3871adeaf</field_id>
                     <field_type>catalog-detail</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>
@@ -1104,7 +1025,86 @@
                     </group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Ejemplo de documento del permiso/certificación</label>
+                    <label>Objeto</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <field_type>decimal</field_type>
+                        <filters />
+                        <geofence>None</geofence>
+                        <last>True</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>[]</view_fields>
+                        <view_index>2</view_index>
+                    </catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>66cebc0e9a80d82bbb5593a8</field_id>
+                    <field_type>catalog-detail</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>
+                        <group_id>6622a883f795581dbd730290</group_id>
+                        <group_set_id>0</group_set_id>
+                    </group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Calificación de Aprobación</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -1407,6 +1407,7 @@
     <process_ids>[]</process_ids>
     <public>False</public>
     <resource_uri>/api/infosync/form/121740/</resource_uri>
+    <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>
@@ -1426,5 +1427,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1724824701.0</updated_at>
+    <updated_at>1728332403.0</updated_at>
 </lkf>

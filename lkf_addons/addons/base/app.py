@@ -49,7 +49,6 @@ class Base(base.LKF_Base):
             self.mf = mf
 
 
-
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
        #--Variables 
@@ -62,6 +61,7 @@ class Base(base.LKF_Base):
         self.CONTACTO = self.lkm.form_id('contacto', 'id')
         self.CLIENTE = self.lkm.form_id('clientes', 'id')
         self.CONFIGURACIONES = self.lkm.form_id('configuraciones', 'id')
+        self.ENVIO_DE_CORREOS = self.lkm.form_id('envio_de_correos', 'id')
         ### Catálogos ###
         '''
         `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos. 
@@ -111,21 +111,26 @@ class Base(base.LKF_Base):
         
         self.f.update( {
             'address_name':'663a7e0fe48382c5b1230901',
+            'address_code':'ccca7e0fe48382c5b1230901',
             'address_image':'663a808be48382c5b123090d',
             'address_geolocation':'663e5c8cf5b8a7ce8211ed0c',
-            'address_status':'6663a7f67e48382c5b1230909',
+            'address_status':'663a7f67e48382c5b1230909',
             'address_type':'663a7f67e48382c5b1230908',
             'address':'663a7e0fe48382c5b1230902',
             'address2':'663a7f79e48382c5b123090a',
             'cat_timezone':f'{self.TIMEZONE_OBJ_ID}.665e4f90c4cf32cb52ebe15c',
+            'client_code':'6711ea74b8514dc4fdfd917f',
             'config_group':'66ed0baac9aefada5b04b817',
             'country':'663a7ca6e48382c5b12308fa',
+            'country_code':'663a7ca6e48382c5b12308fb',
+            'country_ph_code':'663a7ca6e48382c5b12308fc',
             'city':'6654187fc85ce22aaf8bb070',
             'email':'663a7ee1e48382c5b1230907',
             'email_contacto':'66bfd647cd15883ed163e9b5',
             'nombre_comercial':'667468e3e577b8b98c852aaa',
             'pagina_web':'66bfd66ecd15883ed163e9b7',
             'phone':'663a7ee1e48382c5b1230906',
+            'phone2':'663a7ee1e48382c5b1232226',
             'razon_social':'6687f2f37b2c023e187d6252',
             'rfc_razon_social':'667468e3e577b8b98c852aab',
             'state':'663a7dd6e48382c5b12308ff',
@@ -137,6 +142,15 @@ class Base(base.LKF_Base):
             'zip_code':'663a7ee1e48382c5b1230905',
         }
         )
+
+        self.envio_correo_fields = {
+            'email_from':"67169f72c736cc47794404f8",
+            'email_to':"670d2e32756833542954716c",
+            'enviado_desde':"6716a1067f394110d24404eb",
+            'msj':"670d2d9d0337e410e4353550",
+            "nombre": "670d2e32756833542954716b",
+            'titulo':"67169f72c736cc47794404f9",
+        }
 
         self.config_fields = {
             'demora':f'{self.f.get("demora")}',
@@ -174,7 +188,32 @@ class Base(base.LKF_Base):
         for res in self.GET_CONFIG:
             result = {arg:res[arg] for arg in args if res.get(arg)}
         return result if result else None
-        
+      
+    def send_email_by_form(self, data):
+        print("MSJ", data)
+        metadata = self.lkf_api.get_metadata(form_id=self.ENVIO_DE_CORREOS)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Addons",
+                    "Process": "Creación de envio de correo",
+                    "Action": "send_email_by_form",
+                }
+            },
+        })
+        #---Define Answers
+        answers = {}
+        answers.update({
+            f"{self.envio_correo_fields['email_from']}":data['email_from'],
+            f"{self.envio_correo_fields['titulo']}":data['titulo'],
+            f"{self.envio_correo_fields['nombre']}":data['nombre'],
+            f"{self.envio_correo_fields['email_to']}":data['email_to'],
+            f"{self.envio_correo_fields['msj']}":data['mensaje']
+            })
+        print('answers', answers)
+        metadata.update({'answers':answers})
+        return self.lkf_api.post_forms_answers(metadata)
+
 
 from linkaform_api import  upload_file
 

@@ -123,6 +123,7 @@ class Warehouse(Base ,base.LKF_Base):
 
 
         self.f.update( {
+            'config_wh_group':'66ed0baac9aefada5b04b817',
             'warehouse':'6442e4831198daf81456f274',
             'warehouse_dest':'65bdc71b3e183f49761a33b9',
             'warehouse_location':'65ac6fbc070b93e656bd7fbe',

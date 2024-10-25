@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>9-6166352098d24e0343a391fd0ec876ac</_rev>
+    <_rev>13-270a1dccaa48b9ad50104a2927bb32d5</_rev>
     <updated_at>2024-07-30T00:59:02.221348+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -222,7 +222,7 @@
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.visita_autorizada.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -313,7 +313,7 @@
                     <label>Empresa</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.contratistas.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
@@ -334,7 +334,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.contratistas.obj_id }}</catalog_field_id>
@@ -352,7 +352,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.contratistas.obj_id }}</catalog_field_id>
@@ -369,7 +369,7 @@
                     <label>Email contratista</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>email</field_type>
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.contratistas.obj_id }}</catalog_field_id>
@@ -885,10 +885,10 @@
                             <label>Activo</label>
                         </item>
                         <item>
-                            <selected>False</selected>
-                            <label>Vencido</label>
-                            <value>vencido</value>
                             <points>None</points>
+                            <selected>False</selected>
+                            <value>vencido</value>
+                            <label>Vencido</label>
                         </item>
                     </options>
                     <related_catalog>None</related_catalog>
@@ -946,8 +946,8 @@
                     <label>qr_code</label>
                 </item>
             </page_fields>
-            <page_description>None</page_description>
             <page_name>Página 1</page_name>
+            <page_description>None</page_description>
         </item>
     </catalog_pages>
 </lkf>
