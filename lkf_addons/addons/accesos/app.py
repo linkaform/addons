@@ -33,9 +33,10 @@ from datetime import datetime
 from copy import deepcopy
 
 from linkaform_api import base
-from lkf_addons.addons.employee.app import Employee
-from lkf_addons.addons.activo_fijo.app import Vehiculo
-from lkf_addons.addons.location.app import Location
+from lkf_addons.addons.base.app import Base
+# from lkf_addons.addons.employee.app import Employee
+# from lkf_addons.addons.activo_fijo.app import Vehiculo
+# from lkf_addons.addons.location.app import Location
 
 ### Objeto o Clase de Módulo ###
 '''
@@ -46,12 +47,20 @@ Al utilizar `super()` en el método `__init__()`, heredamos las variables de con
 Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
 '''
 
-class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
+# class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
+class Accesos(Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
+    def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
         #--Variables
         # Module Globals#
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+
+        self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])       
+        if self.__class__.__name__ not in kwargs:
+            self.kwargs['MODULES'].append(self.__class__.__name__)
+        self.load('Location', **self.kwargs)
+        # self.load('Product', **self.kwargs)
+
         self.support_guard = 'guardia_de_apoyo'
         self.chife_guard = 'guardia_lider'
         # Forms #
@@ -267,7 +276,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.perdidos_fields = {
             'estatus_perdido':'6639ae65356a6efb4de97d28',
             'date_hallazgo_perdido':'6639ae65356a6efb4de97d29',
-            'ubicacion_catalog':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
+            'ubicacion_catalog':f"{self.Location.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
             'ubicacion_perdido':f"{self.mf['ubicacion']}",
             'area_catalog':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
             'area_perdido':f"{self.mf['nombre_area_salida']}",

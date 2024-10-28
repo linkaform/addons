@@ -4,10 +4,18 @@ from linkaform_api import base
 from lkf_addons.addons.base.app import Base
 
 
-class Location(Base, base.LKF_Base):
+class Location(Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+
+        print('selfkwargs', self.kwargs)
+        print('kwargs', kwargs)
+        
+        self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])       
+        if self.__class__.__name__ not in kwargs:
+            self.kwargs['MODULES'].append(self.__class__.__name__)
+
         #use self.lkm.catalog_id() to get catalog id
         # forms
         self.AREAS_DE_LAS_UBICACIONES = self.lkm.form_id('areas_de_las_ubicaciones', 'id')
