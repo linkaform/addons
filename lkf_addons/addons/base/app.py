@@ -28,7 +28,7 @@ Si tienes más de una aplicación, puedes:
 '''
 
 # Importaciones necesarias
-import simplejson
+import simplejson, importlib
 import re, os, zipfile, wget, random, shutil, datetime
 from datetime import timedelta
 
@@ -48,8 +48,6 @@ class Base(base.LKF_Base):
         else:
             self.mf = mf
 
-
-
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
        #--Variables 
@@ -62,6 +60,7 @@ class Base(base.LKF_Base):
         self.CONTACTO = self.lkm.form_id('contacto', 'id')
         self.CLIENTE = self.lkm.form_id('clientes', 'id')
         self.CONFIGURACIONES = self.lkm.form_id('configuraciones', 'id')
+        self.ENVIO_DE_CORREOS = self.lkm.form_id('envio_de_correos', 'id')
         ### Catálogos ###
         '''
         `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos. 
@@ -107,25 +106,30 @@ class Base(base.LKF_Base):
 
 
         ### Global Variables
-        self.GET_CONFIG = {}
+        
         
         self.f.update( {
             'address_name':'663a7e0fe48382c5b1230901',
+            'address_code':'ccca7e0fe48382c5b1230901',
             'address_image':'663a808be48382c5b123090d',
             'address_geolocation':'663e5c8cf5b8a7ce8211ed0c',
-            'address_status':'6663a7f67e48382c5b1230909',
+            'address_status':'663a7f67e48382c5b1230909',
             'address_type':'663a7f67e48382c5b1230908',
             'address':'663a7e0fe48382c5b1230902',
             'address2':'663a7f79e48382c5b123090a',
             'cat_timezone':f'{self.TIMEZONE_OBJ_ID}.665e4f90c4cf32cb52ebe15c',
+            'client_code':'6711ea74b8514dc4fdfd917f',
             'config_group':'66ed0baac9aefada5b04b817',
             'country':'663a7ca6e48382c5b12308fa',
+            'country_code':'663a7ca6e48382c5b12308fb',
+            'country_ph_code':'663a7ca6e48382c5b12308fc',
             'city':'6654187fc85ce22aaf8bb070',
             'email':'663a7ee1e48382c5b1230907',
             'email_contacto':'66bfd647cd15883ed163e9b5',
             'nombre_comercial':'667468e3e577b8b98c852aaa',
             'pagina_web':'66bfd66ecd15883ed163e9b7',
             'phone':'663a7ee1e48382c5b1230906',
+            'phone2':'663a7ee1e48382c5b1232226',
             'razon_social':'6687f2f37b2c023e187d6252',
             'rfc_razon_social':'667468e3e577b8b98c852aab',
             'state':'663a7dd6e48382c5b12308ff',
@@ -137,6 +141,15 @@ class Base(base.LKF_Base):
             'zip_code':'663a7ee1e48382c5b1230905',
         }
         )
+
+        self.envio_correo_fields = {
+            'email_from':"67169f72c736cc47794404f8",
+            'email_to':"670d2e32756833542954716c",
+            'enviado_desde':"6716a1067f394110d24404eb",
+            'msj':"670d2d9d0337e410e4353550",
+            "nombre": "670d2e32756833542954716b",
+            'titulo':"67169f72c736cc47794404f9",
+        }
 
         self.config_fields = {
             'demora':f'{self.f.get("demora")}',
@@ -151,19 +164,22 @@ class Base(base.LKF_Base):
             # 'location':f'{self.WAREHOUSE_OBJ_ID}.{self.f.get("location")}',
         }
 
-
     def _project_format(self, data):
         return self.project_format(data)
 
     def get_config(self, *args, **kwargs):
+        print('args',args)
+        print('selfl config', self.config_fields)
         if not self.GET_CONFIG:
+            # print(dddd)
             match_query ={ 
                  'form_id': self.CONFIGURACIONES,  
                  'deleted_at' : {'$exists':False},
             } 
-            if kwargs.get('query'):
+            if 'query' in kwargs:
                 match_query.update(kwargs['query'])
             project_ids = self._project_format(self.config_fields)
+
             aggregate = [
                 {'$match': match_query},
                 {'$limit':kwargs.get('limit',1)},
@@ -172,9 +188,53 @@ class Base(base.LKF_Base):
             self.GET_CONFIG =  self.format_cr(self.cr.aggregate(aggregate) )
         result = {}
         for res in self.GET_CONFIG:
+            args = args or list(self.config_fields.keys())
             result = {arg:res[arg] for arg in args if res.get(arg)}
         return result if result else None
-        
+
+    def load(self, module , module_class=None, import_as=None, **kwargs):
+        print('loading module', module)
+        print('loading module_class', module_class)
+        if not module_class:
+            module_class = module
+        if not import_as:
+            import_as = module_class
+        print('loading module ..kwargs', kwargs.get('MODULES'))
+        if module not in kwargs.get('MODULES') or not hasattr(self, import_as):
+            # from lkf_addons.addons.stock.app import Stock
+            imp_module = importlib.import_module(f'lkf_addons.addons.{module.lower()}.app')
+            AddonsClass = getattr(imp_module, module_class)
+            # scripts = importlib.import_module('{}.items.scripts'.format(module))
+            print('import_as', import_as)
+            setattr(self, import_as, AddonsClass(self.settings, sys_argv=self.sys_argv, use_api=self.use_api, **self.kwargs))
+            if module not in self.kwargs['MODULES']:
+                self.kwargs['MODULES'].append(module)
+      
+    def send_email_by_form(self, data):
+        print("MSJ", data)
+        metadata = self.lkf_api.get_metadata(form_id=self.ENVIO_DE_CORREOS)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Addons",
+                    "Process": "Creación de envio de correo",
+                    "Action": "send_email_by_form",
+                }
+            },
+        })
+        #---Define Answers
+        answers = {}
+        answers.update({
+            f"{self.envio_correo_fields['email_from']}":data['email_from'],
+            f"{self.envio_correo_fields['titulo']}":data['titulo'],
+            f"{self.envio_correo_fields['nombre']}":data['nombre'],
+            f"{self.envio_correo_fields['email_to']}":data['email_to'],
+            f"{self.envio_correo_fields['msj']}":data['mensaje']
+            })
+        print('answers', answers)
+        metadata.update({'answers':answers})
+        return self.lkf_api.post_forms_answers(metadata)
+
 
 from linkaform_api import  upload_file
 
@@ -226,8 +286,6 @@ class CargaUniversal(Base):
             dict_records_copy = {'create': [], 'update': {}}
             list_cols_for_upload = list( pos_field_dict.keys() )
             for p, record in enumerate(records):
-                if p > 2:
-                    continue
                 print("=========================================== >> Procesando renglon:",p)
                 if p in subgrupo_errors:
                     error_records.append(record+['',])

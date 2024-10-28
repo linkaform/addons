@@ -73,13 +73,13 @@ class Items(LKFException):
         serach_inherit = f'{modules_path}/{file_name}_inherit*.{extension}'
         base_file_path = f'{search_file_path}/{file_name}.{extension}' 
         inherit_files = glob.glob(serach_inherit)
-        print('aqui estan los heredados', inherit_files)
-        print('TODO AQUI HAY QUE BUSCAR EN LOS ARCHIVOS DE TODOS LOS MODULOS INSTALADOS....')
+        if inherit_files:
+            print('aqui estan los heredados', inherit_files)
+            print('TODO AQUI HAY QUE BUSCAR EN LOS ARCHIVOS DE TODOS LOS MODULOS INSTALADOS....')
         for in_file in inherit_files:
             replace_childs = self.get_child_element_from_file(in_file, 'inherit')
             inherit_attr = self.get_inherit_attributes(in_file)
             base_file_path = self.add_new_item(base_file_path, replace_childs, inherit_attr, tmp_dir='_tmp')   
-        print('base_file_path', base_file_path)
         return base_file_path
 
     def file_exists(self, file_path, file_name, extension):

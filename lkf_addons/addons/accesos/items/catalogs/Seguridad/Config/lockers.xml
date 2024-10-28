@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>10-3b055c7cf074461f78dda2b9ff736ba5</_rev>
+    <_rev>14-9d490e57f764243ef46e67fb2ead76a1</_rev>
     <updated_at>2024-07-30T00:58:56.599380+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -30,111 +30,117 @@
             <page_fields>
                 <item>
                     <field_type>text</field_type>
-                    <view_fields>[]</view_fields>
-                    <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
-                    <required>True</required>
-                    <field_id>66480101786e8cdb66e70124</field_id>
-                    <catalog>{}</catalog>
-                    <relation_type>None</relation_type>
-                    <label>ID Activo</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
-                    <catalog_id>None</catalog_id>
-                    <key>None</key>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>66480101786e8cdb66e70124</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>ID Activo</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog</field_type>
-                    <view_fields>[]</view_fields>
+                    <properties>{}</properties>
+                    <key>None</key>
                     <catalog_fields>
                         <item>663e5c57f5b8a7ce8211ed0b</item>
                         <item>663e5d44f5b8a7ce8211ed0f</item>
                     </catalog_fields>
-                    <fav>None</fav>
-                    <required>False</required>
                     <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Caseta</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters>None</filters>
-                        <view_index>0</view_index>
-                        <couch_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</couch_id>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <view_fields>
                             <item>663e5c57f5b8a7ce8211ed0b</item>
                             <item>663e5d44f5b8a7ce8211ed0f</item>
                         </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <filters>None</filters>
                         <name>{{ catalog.areas_de_las_ubicaciones.name }}</name>
                     </catalog>
-                    <relation_type>None</relation_type>
-                    <label>Caseta</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
                     <catalog_id>None</catalog_id>
-                    <key>None</key>
-                    <properties>{}</properties>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
-                    <view_fields>[]</view_fields>
+                    <properties>{}</properties>
+                    <key>None</key>
                     <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
-                    <required>True</required>
                     <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Ubicación</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
-                    <relation_type>None</relation_type>
-                    <label>Ubicación</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
                     <catalog_id>None</catalog_id>
-                    <key>None</key>
-                    <properties>{}</properties>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
-                    <view_fields>[]</view_fields>
+                    <properties>{}</properties>
+                    <key>None</key>
                     <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
-                    <required>False</required>
                     <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Nombre de Area</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
-                    <relation_type>None</relation_type>
-                    <label>Nombre de Area</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
                     <catalog_id>None</catalog_id>
-                    <key>None</key>
-                    <properties>{}</properties>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>select</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
                     <field_id>66ccfec6acaa16b31e5593a3</field_id>
                     <required>False</required>
                     <fav>True</fav>
@@ -159,27 +165,15 @@
                             <label>Locker Visitas</label>
                         </item>
                         <item>
-                            <selected>False</selected>
-                            <label>Objetos Perdidos</label>
-                            <value>objetos_perdidos</value>
                             <points>None</points>
+                            <selected>False</selected>
+                            <value>objetos_perdidos</value>
+                            <label>Objetos Perdidos</label>
                         </item>
                     </options>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
                 </item>
                 <item>
                     <field_type>select</field_type>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
                     <field_id>663961d5390b9ec511e97ca5</field_id>
                     <required>False</required>
                     <fav>True</fav>
@@ -198,10 +192,16 @@
                             <label>En Uso</label>
                         </item>
                     </options>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>

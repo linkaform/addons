@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.definicion_de_permisos.id }}</form_id>
-    <id>662962fd31b03b987355c8f0</id>
+    <id>66ff30e342c1e19689227acb</id>
     <rules>
         <item>
             <conditions>
                 <item>
-                    <condition>in=</condition>
+                    <condition>iexact=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>662962bb203407ab90c886e5</field_id>
@@ -39,50 +39,16 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Regla 1</name>
+            <name>Mostrar sobre vigencia</name>
             <operator>and</operator>
-            <rule_id>dba26eb9c61eb9</rule_id>
+            <rule_id>18b9101cacb216d</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
         <item>
             <conditions>
                 <item>
-                    <condition>in=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>662962bb203407ab90c886e5</field_id>
-                        <group_id>None</group_id>
-                        <id>662962bb203407ab90c886e5</id>
-                        <label>Requerimientos</label>
-                        <type>checkbox</type>
-                    </field>
-                    <value>comprobante_foto</value>
-                </item>
-            </conditions>
-            <element_ids>[]</element_ids>
-            <empty>False</empty>
-            <fields_ruled>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>662962bb203407ab90c886e9</field_id>
-                    <group_id>None</group_id>
-                    <id>662962bb203407ab90c886e9</id>
-                    <label>Imagen</label>
-                    <type>images</type>
-                </item>
-            </fields_ruled>
-            <group_conditions>{}</group_conditions>
-            <name>Regla 2</name>
-            <operator>and</operator>
-            <rule_id>479122920ee1f24</rule_id>
-            <rule_type>show</rule_type>
-            <user_conditions>{}</user_conditions>
-        </item>
-        <item>
-            <conditions>
-                <item>
-                    <condition>in=</condition>
+                    <condition>iexact=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>662962bb203407ab90c886e5</field_id>
@@ -102,21 +68,55 @@
                     <field_id>662962bb203407ab90c886e8</field_id>
                     <group_id>None</group_id>
                     <id>662962bb203407ab90c886e8</id>
-                    <label>Documento del permiso/certificación</label>
+                    <label>Ejemplo de documento del permiso/certificación</label>
                     <type>files</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Regla 3</name>
+            <name>Mostrar sobre documentos</name>
             <operator>and</operator>
-            <rule_id>121a1e606cd253b</rule_id>
+            <rule_id>1eebda0f3812f2</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
         <item>
             <conditions>
                 <item>
-                    <condition>in=</condition>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>662962bb203407ab90c886e5</field_id>
+                        <group_id>None</group_id>
+                        <id>662962bb203407ab90c886e5</id>
+                        <label>Requerimientos</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>comprobante_foto</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662962bb203407ab90c886e9</field_id>
+                    <group_id>None</group_id>
+                    <id>662962bb203407ab90c886e9</id>
+                    <label>Ejemplo en imagen</label>
+                    <type>images</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar sobre imagenes</name>
+            <operator>and</operator>
+            <rule_id>17231ae21336252f</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>662962bb203407ab90c886e5</field_id>
@@ -135,23 +135,89 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.definicion_de_examenes.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>664fc6d13c5b6fd17e5d521a</id>
+                    <id>66a83ad140fcd63624998450</id>
                     <label>Examen</label>
                     <type>catalog</type>
                 </item>
                 <item>
-                    <catalog_id>66297e1579900d9018c886ab</catalog_id>
+                    <catalog_id>None</catalog_id>
                     <field_id>66297e1579900d9018c886ad</field_id>
                     <group_id>None</group_id>
                     <id>66297e1579900d9018c886ad</id>
-                    <label>Nombre de la forma</label>
+                    <label>Nombre del examen</label>
                     <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66cebbed11de2e011c2eed76</field_id>
+                    <group_id>None</group_id>
+                    <id>66cebbed11de2e011c2eed76</id>
+                    <label>Calificación de Aprobación</label>
+                    <type>decimal</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Regla 4</name>
+            <name>Mostrar sobre examen</name>
             <operator>and</operator>
-            <rule_id>9342274212023ef</rule_id>
+            <rule_id>69e25e51bd5f85</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>662962bb203407ab90c886e5</field_id>
+                        <group_id>None</group_id>
+                        <id>662962bb203407ab90c886e5</id>
+                        <label>Requerimientos</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>inspeccion_visual</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id}}</field_id>
+                    <group_id>66ce57845a054aa3491adec0</group_id>
+                    <id>66e35df3026f176693be09ca</id>
+                    <label>Equipos o Mateiral</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>66e35df3026f176693be09ca</catalog_id>
+                    <field_id>66ce2441d63bb7a3871adeaf</field_id>
+                    <group_id>66ce57845a054aa3491adec0</group_id>
+                    <id>66ce2441d63bb7a3871adeaf</id>
+                    <label>Objeto</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>66e35df3026f176693be09ca</catalog_id>
+                    <field_id>66ce23efc5c4d148311adf86</field_id>
+                    <group_id>66ce57845a054aa3491adec0</group_id>
+                    <id>66ce23efc5c4d148311adf86</id>
+                    <label>Categoría del Objeto</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ce57845a054aa3491adec0</field_id>
+                    <group_id>None</group_id>
+                    <id>66ce57845a054aa3491adec0</id>
+                    <label>Materiales / Equipo</label>
+                    <type>group</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar sobre inspección</name>
+            <operator>and</operator>
+            <rule_id>fee4641c2c2047</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>

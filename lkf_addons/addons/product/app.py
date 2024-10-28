@@ -11,7 +11,10 @@ class Product(Base, base.LKF_Base):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         self.name =  __class__.__name__
         self.settings = settings
-        
+        self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])       
+        if self.__class__.__name__ not in kwargs:
+            self.kwargs['MODULES'].append(self.__class__.__name__)
+            
         self.PRODUCT = self.lkm.catalog_id('product_catalog')
         
         self.PRODUCT_ID = self.PRODUCT.get('id')
@@ -152,6 +155,7 @@ class Warehouse(Base ,base.LKF_Base):
 
 
         self.f.update( {
+            'config_wh_group':'66ed0baac9aefada5b04b817',
             'warehouse':'6442e4831198daf81456f274',
             'warehouse_dest':'65bdc71b3e183f49761a33b9',
             'warehouse_location':'65ac6fbc070b93e656bd7fbe',
@@ -172,7 +176,7 @@ class Warehouse(Base ,base.LKF_Base):
             }
         if warehouse_type:
             mango_query['selector'] = {'answers':{self.f['warehouse_type']: warehouse_type}}
-        res = self.lkf_api.search_catalog( self.CATALOG_WAREHOUSE_ID, mango_query)
+        res = self.lkf_api.search_catalog( self.WAREHOUSE_ID, mango_query)
         warehouse = [r[self.f['warehouse']] for r in res]
         return warehouse
 

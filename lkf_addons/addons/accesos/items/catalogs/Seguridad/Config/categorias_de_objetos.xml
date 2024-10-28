@@ -7,27 +7,24 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>3-e8dd045578455e16ddd858b58a21a66b</_rev>
-    <updated_at>2024-07-30T00:58:36.639116+00:00Z</updated_at>
+    <_rev>12-93e175130c5b269710582a992086e762</_rev>
+    <updated_at>2024-09-12T21:32:31.835940+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
     </sync>
     <filters>{}</filters>
-    <name>Lista de Equipos</name>
+    <name>Categorias de Objetos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-07-30T00:58:36.639116+00:00Z</created_at>
+    <created_at>2024-09-12T21:32:31.835940+00:00Z</created_at>
     <advanced_options>
+        <active>True</active>
         <folio>
             <manual>False</manual>
             <required>False</required>
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>121696</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>66a83abc8bff808c618fbc34</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -36,19 +33,40 @@
                     <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
                     <fav>True</fav>
-                    <required>False</required>
-                    <field_id>6639a9d9d38959539f59eb9f</field_id>
+                    <required>True</required>
+                    <field_id>66ce23efc5c4d148311adf86</field_id>
                     <catalog>{}</catalog>
                     <relation_type>None</relation_type>
-                    <label>Tipo de equipo</label>
+                    <label>Categoría del Objeto</label>
                     <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
                     <catalog_id>None</catalog_id>
-                    <key>None</key>
+                    <key>True</key>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>textarea</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>True</fav>
+                    <required>False</required>
+                    <field_id>66ce23efc5c4d148311adf87</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Descripción Categoría</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>False</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
                     </properties>
                     <related_catalog>None</related_catalog>
                 </item>
@@ -57,4 +75,8 @@
             <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>66e35defcfe9c4be08b54bf4</_id>
+    <public>False</public>
+    <catalog_id>123272</catalog_id>
 </lkf>

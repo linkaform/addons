@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>2-460a52e2d5ed8ad49eead8cceeba801c</_rev>
+    <_rev>7-57019e86d057d8d20bd4baeb390696c8</_rev>
     <updated_at>2024-07-30T00:58:56.058724+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -24,37 +24,37 @@
             <config>False</config>
         </folio>
     </advanced_options>
+    <catalog_id>121723</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>66a83ad07776b332fb75c147</_id>
+    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
                 <item>
                     <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <key>None</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>663973809fa65cafa759eb97</field_id>
-                    <required>False</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>False</required>
+                    <field_id>663973809fa65cafa759eb97</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Tipo de incidente</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
-    <sync_last_update>None</sync_last_update>
-    <_id>66a83ad07776b332fb75c147</_id>
-    <public>False</public>
-    <catalog_id>121723</catalog_id>
 </lkf>

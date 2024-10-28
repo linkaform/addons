@@ -10,14 +10,28 @@ from linkaform_api import base
 from lkf_addons.addons.employee.app import Employee
 from lkf_addons.addons.product.app import Product, Warehouse
 
+# from lkf_addons.addons.jit.app import JIT
+from lkf_addons.addons.base.app import Base
 
-class Stock(Employee, Warehouse, Product, base.LKF_Base):
+
+class Stock(Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         #base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
-        from lkf_addons.addons.jit.app import JIT
-        self.JIT = JIT( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])
+        if self.__class__.__name__ not in kwargs:
+            self.kwargs['MODULES'].append(self.__class__.__name__)
+        # self.load('JIT', **self.kwargs)
+        self.load(module='Product', **self.kwargs)
+        self.load(module='Product', module_class='Warehouse', import_as='WH', **self.kwargs)
+        # if not  self.__dict__.get('STOCK'):
+        #     self.STOCK =True
+        #     print('ssssssssshasattr', hasattr(self, 'JIT'))
+        #     print('43242342342342343242342343242====',)
+        #     self.JIT =True
+        #     print('ssssssssssssssdir self', dir(self))
+        #     self.JIT = JIT( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         self.name =  __class__.__name__
         self.settings = settings
 
@@ -27,7 +41,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
         # self.STOCK_INVENTORY = self.lkm.catalog_id('stock_inventory')
         # self.STOCK_INVENTORY_ID = self.STOCK_INVENTORY.get('id')
-        # self.STOCK_INVENTORY_OBJ_ID = self.STOCK_INVENTORY.get('obj_id')
         ###### depricated ######
         self.CATALOG_INVENTORY = self.lkm.catalog_id('stock_inventory')
         self.CATALOG_INVENTORY_ID = self.CATALOG_INVENTORY.get('id')
@@ -36,6 +49,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
         self.FORM_INVENTORY_ID = self.lkm.form_id('stock_inventory','id')
         self.ADJUIST_FORM_ID = self.lkm.form_id('stock_inventory_adjustment','id')
+        self.STOCK_INVENTORY_ADJUSTMENT_ID = self.lkm.form_id('stock_inventory_adjustment','id')
         # self.STOCK_MOVE_FORM_ID = self.lkm.form_id('stock_inventory_move','id')
         # self.STOCK_MANY_LOCATION_OUT = self.lkm.form_id('stock_move_many_out','id')
         # self.MOVE_NEW_PRODUCTION_ID = self.lkm.form_id('stock_move_new_production','id')
@@ -212,6 +226,10 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             'worker_name':'62c5ff407febce07043024dd',
             'worker_obj_id':'62c5ff243c63280985580087',
         })
+       
+        self.f.update(self.Product.f)
+
+        self.f.update(self.WH.f)
         
     def add_dicts(self, dict1, dict2):
         for key in dict1:
@@ -691,10 +709,10 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         for product in products:
             product_code =  product.get('product_code')
             if not product_code:
-                product_code = product[self.SKU_OBJ_ID][self.f['product_code']]
+                product_code = product[self.Product.SKU_OBJ_ID][self.f['product_code']]
             sku =  self.unlist(product.get('sku'))
             if not sku:
-                sku = self.unlist(product[self.SKU_OBJ_ID][self.f['sku']])
+                sku = self.unlist(product[self.Product.SKU_OBJ_ID][self.f['sku']])
             search_codes[product_code] = search_codes.get(product_code, [])
             search_codes[product_code].append(sku)
             if sku not in search_codes[product_code]:
@@ -721,11 +739,11 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         query_warehouse_inventory = {
             'form_id': form_id,
             'deleted_at': {'$exists': False},
-            f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}": product_code,
-            f"answers.{self.SKU_OBJ_ID}.{self.f['sku']}": sku,
+            f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code,
+            f"answers.{self.Product.SKU_OBJ_ID}.{self.f['sku']}": sku,
             f"answers.{self.f['product_lot']}": lot_number,
-            f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}": warehouse,
-            f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}": location,
+            f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}": warehouse,
+            f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}": location,
         }
         if get_many:
             records = self.cr.find(query_warehouse_inventory, 
@@ -738,11 +756,11 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
     def get_product_lot_location(self, answers=None):
         if not answers:
             answers = self.answers
-        product_code = answers.get(self.SKU_OBJ_ID,{}).get(self.f['product_code'])
-        sku = answers.get(self.SKU_OBJ_ID,{}).get(self.f['sku'])
+        product_code = answers.get(self.Product.SKU_OBJ_ID,{}).get(self.f['product_code'])
+        sku = answers.get(self.Product.SKU_OBJ_ID,{}).get(self.f['sku'])
         lot_number = answers.get(self.f['product_lot'])
-        warehouse = answers.get(self.WAREHOUSE_LOCATION_OBJ_ID,{}).get(self.f['warehouse'])
-        location = answers.get(self.WAREHOUSE_LOCATION_OBJ_ID,{}).get(self.f['warehouse_location'])
+        warehouse = answers.get(self.WH.WAREHOUSE_LOCATION_OBJ_ID,{}).get(self.f['warehouse'])
+        location = answers.get(self.WH.WAREHOUSE_LOCATION_OBJ_ID,{}).get(self.f['warehouse_location'])
         return product_code, sku, lot_number, warehouse, location
 
     def get_product_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main'):
@@ -854,27 +872,29 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
          } 
 
         if product_code:
+
             if type(product_code) == list:
-                match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":{"$in":product_code}})
+                match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":{"$in":product_code}})
             else:
-                match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+                match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
                 
         if warehouse:
             if type(warehouse) == list:                
-                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":{"$in":warehouse}})
+                match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":{"$in":warehouse}})
             else:
-                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})
+                match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})
         if location:
             if type(location) == list:                
-                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":{"$in":location}})
+                match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":{"$in":location}})
             else:
-                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})
+                match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})
+
         query = [
             {'$match': match_query},
             {'$project':{
                 '_id':0,
-                'product_code':f"$answers.{self.SKU_OBJ_ID}.{self.f['product_code']}",
-                'warehouse':f"$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
+                'product_code':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
+                'warehouse':f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
                 'actuals':f"$answers.{self.f['actual_eaches_on_hand']}",
             }},
             {'$group':{
@@ -903,7 +923,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 all_sku.append(sku.upper())
         skus = {}
         mango_query = self.product_sku_query(all_sku)
-        sku_finds = self.lkf_api.search_catalog(self.SKU_ID, mango_query)
+        sku_finds = self.lkf_api.search_catalog(self.Product.SKU_ID, mango_query)
         for this_sku in sku_finds:
                 product_code = this_sku.get(self.f['product_code'])
                 skus[product_code] = skus.get(product_code, {})
@@ -925,12 +945,12 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def get_product_stock(self, product_code, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
-        print(f'**33************Get Stock: {product_code}****************')
-        print('product_code', product_code)
-        print('sku', sku)
-        print('lot_number', lot_number)
-        print('warehouse', warehouse)
-        print('location', location)
+        # print(f'**************Get Stock: {product_code}****************')
+        # print('product_code', product_code)
+        # print('sku', sku)
+        # print('lot_number', lot_number)
+        # print('warehouse', warehouse)
+        # print('location', location)
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         location = self.validate_value(location)
@@ -953,8 +973,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         # print('stock adjustments', stock['adjustments'])
         stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
-        print('stock move_in', stock['move_in'])
-        print('stock move_out', stock)
+        # print('stock move_in', stock['move_in'])
+        # print('stock move_out', stock)
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -1095,9 +1115,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
     def get_stock_info_form_answer(self, answers={}, data={}):
         if not answers:
             answers = self.answers
-        product_info = answers.get(self.STOCK_INVENTORY_OBJ_ID, answers.get(self.SKU_OBJ_ID,{}))
+        product_info = answers.get(self.STOCK_INVENTORY_OBJ_ID, answers.get(self.Product.SKU_OBJ_ID,{}))
         data['product_code'] = data.get(self.f['product_code'],self.unlist(product_info.get(self.f['product_code'])))
-        print('data====',data)
         data['sku'] = data.get(self.f['sku'],self.unlist(product_info.get(self.f['sku'])))
         wh_info =  self.get_stock_info_from_catalog_wl(answers, data=data)
         whd_info = self.get_stock_info_from_catalog_wld(answers, data=data)
@@ -1175,7 +1194,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if not answers:
             answers = self.answers
         res = {}
-        wh_info = answers.get(self.WAREHOUSE_LOCATION_OBJ_ID, {})
+        wh_info = answers.get(self.WH.WAREHOUSE_LOCATION_OBJ_ID, {})
         if not wh_info:
             wh_info = self.get_stock_info_from_catalog_wl(answers=self.answers, data=data)
         res['warehouse'] = data.get('warehouse',wh_info.get(self.f['warehouse']))
@@ -1187,7 +1206,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             answers = self.answers
         res = {}
         print('answers', answers)
-        wh_info = answers.get(self.WAREHOUSE_LOCATION_DEST_OBJ_ID, {})
+        wh_info = answers.get(self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID, {})
         if not wh_info:
             wh_info = self.get_stock_info_from_catalog_wld(answers=self.answers, data=data)
         res['warehouse_dest'] = data.get('warehouse_dest',wh_info.get(self.f['warehouse_dest']))
@@ -1260,10 +1279,10 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
     def get_production_move(self, new_containers, weighted_mult_rate, production_date):
         res = {}
 
-        res[self.SKU_OBJ_ID ] = deepcopy(self.answers.get(self.SKU_OBJ_ID, {}))
-        res[self.SKU_OBJ_ID ]['6205f73281bb36a6f1573357'] = 8
-        soil_type = self.unlist(self.answers.get(self.SKU_OBJ_ID,{}).get(self.f['reicpe_soil_type'],""))
-        # res[self.SKU_OBJ_ID ][self.f['reicpe_soil_type']] = soil_type
+        res[self.Product.SKU_OBJ_ID ] = deepcopy(self.answers.get(self.Product.SKU_OBJ_ID, {}))
+        res[self.Product.SKU_OBJ_ID ]['6205f73281bb36a6f1573357'] = 8
+        soil_type = self.unlist(self.answers.get(self.Product.SKU_OBJ_ID,{}).get(self.f['reicpe_soil_type'],""))
+        # res[self.Product.SKU_OBJ_ID ][self.f['reicpe_soil_type']] = soil_type
         res[self.TEAM_OBJ_ID] = self.answers.get( self.TEAM_OBJ_ID,{})
         res[self.MEDIA_LOT_OBJ_ID] = self.answers.get(self.MEDIA_LOT_OBJ_ID,{})
 
@@ -1434,8 +1453,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def inventory_adjustment(self):
         products = self.answers.get(self.f['grading_group'])
-        warehouse = self.answers[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse']]
-        location_id = self.answers[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse_location']]
+        warehouse = self.answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse']]
+        location_id = self.answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse_location']]
         adjust_date = self.answers[self.f['grading_date']]
         comments = self.answers.get(self.f['inv_adjust_comments'],'') 
         patch_records = []
@@ -1458,7 +1477,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             },
         )
         # for plant in plants:
-        #     product_code = plant[self.PRODUCT_OBJ_ID][self.f['product_code']]
+        #     product_code = plant[self.Product.PRODUCT_OBJ_ID][self.f['product_code']]
         #     search_codes.append(product_code)
 
 
@@ -1470,8 +1489,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if answers_version:
             version_products = answers_version.get(self.f['grading_group'])
             for ver_product in version_products:
-                ver_product_code = ver_product[self.SKU_OBJ_ID][self.f['product_code']]
-                ver_sku = ver_product[self.SKU_OBJ_ID][self.f['sku']]
+                ver_product_code = ver_product[self.Product.SKU_OBJ_ID][self.f['product_code']]
+                ver_sku = ver_product[self.Product.SKU_OBJ_ID][self.f['sku']]
                 ver_lot_number = ver_product.get(self.f['product_lot'])
                 if ver_lot_number:
                     last_verions_products[f'{ver_product_code}_{ver_sku}_{ver_lot_number}_{warehouse}_{location_id}'] = {
@@ -1484,16 +1503,16 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         skus = self.get_group_skus(products)
         not_found = []
         for idx, product in enumerate(products):
-            product_code =  product[self.SKU_OBJ_ID][self.f['product_code']]
-            sku =  product[self.SKU_OBJ_ID][self.f['sku']]
-            product_name =  self.unlist(product[self.SKU_OBJ_ID][self.f['product_name']])
+            product_code =  product[self.Product.SKU_OBJ_ID][self.f['product_code']]
+            sku =  product[self.Product.SKU_OBJ_ID][self.f['sku']]
+            product_name =  self.unlist(product[self.Product.SKU_OBJ_ID][self.f['product_name']])
             product[self.f['product_lot']] = product.get(self.f['product_lot'], 1) 
             lot_number = product[self.f['product_lot']]
             status = product[self.f['inv_adjust_grp_status']]
             adjust_qty = product.get(self.f['inv_adjust_grp_qty'])
             adjust_in = product.get(self.f['inv_adjust_grp_in'], 0)
             adjust_out = product.get(self.f['inv_adjust_grp_out'], 0)
-            product_code = product[self.SKU_OBJ_ID][self.f['product_code']]
+            product_code = product[self.Product.SKU_OBJ_ID][self.f['product_code']]
             verify = 0
             if adjust_qty or adjust_qty ==0:
                 verify +=1
@@ -1572,7 +1591,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     print('product', product)
                     answers = self.stock_inventory_model(product, skus[product_code])
                     answers.update({
-                        self.WAREHOUSE_LOCATION_OBJ_ID:{
+                        self.WH.WAREHOUSE_LOCATION_OBJ_ID:{
                             self.f['warehouse']:warehouse,
                             self.f['warehouse_location']:location_id}
                             },
@@ -1661,11 +1680,11 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     production = False
                 answers = deepcopy(self.answers)
                 answers.update(self.set_inventroy_format(answers, location, production=production ))
-                product_code = self.answers[self.SKU_OBJ_ID][self.f['product_code']]
-                sku = self.answers[self.SKU_OBJ_ID][self.f['sku']]
+                product_code = self.answers[self.Product.SKU_OBJ_ID][self.f['product_code']]
+                sku = self.answers[self.Product.SKU_OBJ_ID][self.f['sku']]
                 product_lot  = self.answers[self.f['product_lot']]
-                warehouse = location[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse']]
-                location_id = location[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse_location']]
+                warehouse = location[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse']]
+                location_id = location[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse_location']]
                 answers.update(self.set_up_containers_math(answers, record_qty, location, production=production ))
                 production_qty  = answers.get(self.f['production'],0)
                 
@@ -1761,7 +1780,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         dest_folio = []
         dest_folio_update = []
         for dest_set in dest_group:
-            to_wh_info = dest_set.get(self.WAREHOUSE_LOCATION_DEST_OBJ_ID,{})
+            to_wh_info = dest_set.get(self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID,{})
             qty_to_move = dest_set.get(self.f['move_group_qty'],0)
             to_warehouse = to_wh_info.get(self.f['warehouse_dest'])
             to_location = to_wh_info.get(self.f['warehouse_location_dest'])
@@ -1784,7 +1803,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 # stock = self.get_product_stock(product_code, warehouse=dest_warehouse, lot_number=product_lot, **{'keep_cache':True})
                 # update_values = self.get_product_map(stock)
                 new_inv_rec.update({
-                    f"{self.WAREHOUSE_LOCATION_OBJ_ID}": {
+                    f"{self.WH.WAREHOUSE_LOCATION_OBJ_ID}": {
                         self.f['warehouse']:to_warehouse,
                         self.f['warehouse_location']:to_location},
                     f"{self.f['product_lot_actuals']}": qty_to_move,
@@ -1893,7 +1912,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 print('moves', moves)
                 answers = self.stock_inventory_model(moves, skus[moves['product_code']], labels=True)
                 answers.update({
-                    self.WAREHOUSE_LOCATION_OBJ_ID:{
+                    self.WH.WAREHOUSE_LOCATION_OBJ_ID:{
                         self.f['warehouse']:warehouse_to,
                         self.f['warehouse_location']:location_to},
                     self.f['product_lot']:moves['product_lot']
@@ -1922,10 +1941,10 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def move_one_many_one(self):
         move_lines = self.answers[self.f['move_group']]
-        warehouse = self.answers[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse']]
-        location = self.answers[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse_location']]
-        warehouse_to = self.answers[self.WAREHOUSE_LOCATION_DEST_OBJ_ID][self.f['warehouse_dest']]
-        location_to = self.answers[self.WAREHOUSE_LOCATION_DEST_OBJ_ID][self.f['warehouse_location_dest']]
+        warehouse = self.answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse']]
+        location = self.answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse_location']]
+        warehouse_to = self.answers[self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID][self.f['warehouse_dest']]
+        location_to = self.answers[self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID][self.f['warehouse_location_dest']]
         # Información original del Inventory Flow
         status_code = 0
         move_locations = []
@@ -2010,7 +2029,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             print('setting cache form...', move_vals_from)
             self.cache_set(move_vals_from)
             new_lot = stock.get('record',{}).get('answers',{})
-            warehouse_ans = self.swap_location_dest(self.answers[self.WAREHOUSE_LOCATION_DEST_OBJ_ID])
+            warehouse_ans = self.swap_location_dest(self.answers[self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID])
             new_lot.update(warehouse_ans)
             new_records_data.append(self.create_inventory_flow(answers=new_lot))
         
@@ -2041,7 +2060,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         move_locations = []
         folios = []
         print('ans', self.answers)
-        product_code = self.answers.get(self.SKU_OBJ_ID,{}).get(self.f['product_code'])
+        product_code = self.answers.get(self.Product.SKU_OBJ_ID,{}).get(self.f['product_code'])
         print('product_code1', product_code)
         for moves in move_lines:
             print('move........', moves)
@@ -2138,13 +2157,13 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.FORM_INVENTORY_ID,
-            f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}": product_code,
-            f"answers.{self.SKU_OBJ_ID}.{self.f['sku']}": sku,
+            f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code,
+            f"answers.{self.Product.SKU_OBJ_ID}.{self.f['sku']}": sku,
             }
         if warehouse:
-            match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})      
+            match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})      
         if location:
-            match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})
+            match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})
         if lot_number:
             match_query.update({f"answers.{self.f['product_lot']}":lot_number})
         if status:
@@ -2265,15 +2284,15 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             product = self._lables_to_ids(product)
             print('>>>>product',product)
             res = {}
-            res[self.SKU_OBJ_ID ] = deepcopy(product)
+            res[self.Product.SKU_OBJ_ID ] = deepcopy(product)
         else:
             res =  deepcopy(product)
-        res[self.SKU_OBJ_ID ][self.f['sku_container']] = recipe['sku_package']
-        res[self.SKU_OBJ_ID ][self.f['per_container']] = recipe['sku_per_package']
+        res[self.Product.SKU_OBJ_ID ][self.f['sku_container']] = recipe['sku_package']
+        res[self.Product.SKU_OBJ_ID ][self.f['per_container']] = recipe['sku_per_package']
         if type(recipe['product_name']) != list:
-            res[self.SKU_OBJ_ID ][self.f['product_name']] = [recipe['product_name'],]
+            res[self.Product.SKU_OBJ_ID ][self.f['product_name']] = [recipe['product_name'],]
         else:
-            res[self.SKU_OBJ_ID ][self.f['product_name']] = recipe['product_name']
+            res[self.Product.SKU_OBJ_ID ][self.f['product_name']] = recipe['product_name']
         return res
 
     def set_lot_ready_week(self, lot_ready_week, gradin_totals):
@@ -2344,33 +2363,33 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         # print('lot_number', lot_number)
         if move_type =='in':
             if warehouse:
-                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_dest']}":warehouse})
+                match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_dest']}":warehouse})
             if location:
-                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_location_dest']}":location})        
+                match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_location_dest']}":location})        
         if move_type =='out':
             if warehouse:
-                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})
+                match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})
             if location:
-                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})
+                match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})
        
         if product_code:
             p_code_query = {"$or":[
                 {f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_code']}":product_code},
-                {f"answers.{self.f['move_group']}.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code}
+                {f"answers.{self.f['move_group']}.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code}
             ]
             }
             unwind_stage.append({'$match': p_code_query })
         if sku:
             sku_query = {"$or":[
                 {f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['sku']}":sku},
-                {f"answers.{self.f['move_group']}.{self.SKU_OBJ_ID}.{self.f['sku']}":sku}
+                {f"answers.{self.f['move_group']}.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku}
             ]
             }
             unwind_stage.append({'$match': sku_query })
         if lot_number:
             lot_number_query = {"$or":[
                 {f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['lot_number']}":lot_number},
-                {f"answers.{self.f['move_group']}.{self.SKU_OBJ_ID}.{self.f['lot_number']}":lot_number},
+                {f"answers.{self.f['move_group']}.{self.Product.SKU_OBJ_ID}.{self.f['lot_number']}":lot_number},
                 {f"answers.{self.f['move_group']}.{self.f['lot_number']}":lot_number}
             ]
             }
@@ -2385,7 +2404,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 {'_id': 1,
                     'product_code':{"$ifNull":[
                         f"$answers.{self.f['move_group']}.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_code']}",
-                        f"$answers.{self.f['move_group']}.{self.SKU_OBJ_ID}.{self.f['product_code']}",
+                        f"$answers.{self.f['move_group']}.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
                     ] } ,
                     'total': f"$answers.{self.f['move_group']}.{self.f['move_group_qty']}",
                     }
@@ -2414,7 +2433,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             {'$sort': {'product_code': 1}}
             ]
         res = self.cr.aggregate(query)
-        print('query=', simplejson.dumps(query, indent=3))
         result = {}
         for r in res:
             pcode = r.get('product_code')
@@ -2422,7 +2440,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             result[pcode] += r.get('total',0)
         if product_code:
             result = result.get(product_code,0)
-        print('result-', result)
         return result 
 
     def stock_adjustments(self, product_code=None, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None, **kwargs):
@@ -2501,9 +2518,9 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         match_query.update(self.stock_kwargs_query(**kwargs))
         inc_folio = kwargs.pop("inc_folio") if kwargs.get("inc_folio") else None
         if warehouse:
-            match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})   
+            match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})   
         if location:
-            match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})      
+            match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})      
         if date_from or date_to:
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
         match_query_stage2 = {}
@@ -2514,9 +2531,9 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 {"folio":inc_folio}
                 ]}
         if product_code:
-            match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+            match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
         if sku:
-            match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.SKU_OBJ_ID}.{self.f['sku']}":sku})
+            match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku})
         if lot_number:
             match_query_stage2.update({f"answers.{self.f['grading_group']}.{self.f['product_lot']}":lot_number})
         query= [{'$match': match_query },
@@ -2527,8 +2544,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         query += [
             {'$project':
                 {'_id': 1,
-                    'product_code': f"$answers.{self.f['grading_group']}.{self.PRODUCT_OBJ_ID}.{self.f['product_code']}",
-                    'sku': f"$answers.{self.f['grading_group']}.{self.PRODUCT_OBJ_ID}.{self.f['sku']}",
+                    'product_code': f"$answers.{self.f['grading_group']}.{self.Product.PRODUCT_OBJ_ID}.{self.f['product_code']}",
+                    'sku': f"$answers.{self.f['grading_group']}.{self.Product.PRODUCT_OBJ_ID}.{self.f['sku']}",
                     'adjust_in': f"$answers.{self.f['grading_group']}.{self.f['inv_adjust_grp_in']}",
                     'adjust_out': f"$answers.{self.f['grading_group']}.{self.f['inv_adjust_grp_out']}",
                     }
@@ -2585,16 +2602,16 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if date_from or date_to:
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
         if product_code:
-            match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+            match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
         if warehouse:
-            match_query.update({f"answers.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_dest']}":warehouse})      
+            match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_dest']}":warehouse})      
         if location:
-            match_query.update({f"answers.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_location_dest']}":location})
+            match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_location_dest']}":location})
         if lot_number:
             unwind_query.update({f"answers.{self.f['move_group']}.{self.STOCK_INVENTORY_OBJ_ID}.{self.f['product_lot']}":lot_number})
         project = {'$project':
                 {'_id': 1,
-                    'product_code': f"$answers.{self.SKU_OBJ_ID}.{self.f['product_code']}",
+                    'product_code': f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
                     'total': f"$answers.{self.f['move_group']}.{self.f['inv_move_qty']}",
                     }
             }
@@ -2661,9 +2678,9 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if move_type =='in':
             if warehouse:
                 # warehouse = warehouse.lower().replace(' ', '_')
-                unwind_query.update({f"answers.{self.f['move_group']}.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_dest']}":warehouse})    
+                unwind_query.update({f"answers.{self.f['move_group']}.{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_dest']}":warehouse})    
             if location:
-                unwind_query.update({f"answers.{self.f['move_group']}.{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_location_dest']}":location})   
+                unwind_query.update({f"answers.{self.f['move_group']}.{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f['warehouse_location_dest']}":location})   
        
         project = {'$project':
                 {'_id': 1,
@@ -2755,7 +2772,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if date_from or date_to:
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
         if product_code:
-            match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+            match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
         if lot_number:
             unwind_query.update({f"answers.{self.f['move_group']}.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_lot']}":lot_number})
         if warehouse:
@@ -2764,7 +2781,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             unwind_query.update({f"answers.{self.f['move_group']}.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['warehouse_location']}":location})
         project = {'$project':
                 {'_id': 1,
-                    'product_code': f"$answers.{self.SKU_OBJ_ID}.{self.f['product_code']}",
+                    'product_code': f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
                     'total': f"$answers.{self.f['move_group']}.{self.f['inv_move_qty']}",
                     }
             }
@@ -2814,7 +2831,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if date_from or date_to:
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
         if product_code:
-            match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+            match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
         if lot_number:
             unwind_query.update({f"answers.{self.f['move_group']}.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['product_lot']}":lot_number})
         if warehouse:
@@ -2823,7 +2840,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             unwind_query.update({f"answers.{self.f['move_group']}.{self.CATALOG_INVENTORY_OBJ_ID}.{self.f['warehouse_location']}":location})
         project = {'$project':
                 {'_id': 1,
-                    'product_code': f"$answers.{self.SKU_OBJ_ID}.{self.f['product_code']}",
+                    'product_code': f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
                     'total': f"$answers.{self.f['move_group']}.{self.f['inv_move_qty']}",
                     }
             }
@@ -2868,15 +2885,15 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if date_from or date_to:
             match_query_stage2.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=f"{self.f['set_production_date']}"))
         if product_code:
-            match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+            match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
         if status:
             match_query.update({f"answers.{self.f['move_status']}":status})
         if lot_number:
             match_query.update({f"answers.{self.f['product_lot']}":lot_number})  
         if warehouse:
-            match_query_stage2.update({f"answers.{self.f['new_location_group']}.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})    
+            match_query_stage2.update({f"answers.{self.f['new_location_group']}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})    
         if location:
-            match_query_stage2.update({f"answers.{self.f['new_location_group']}.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})    
+            match_query_stage2.update({f"answers.{self.f['new_location_group']}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})    
         query= [{'$match': match_query },
             {'$unwind': f"$answers.{self.f['new_location_group']}"},
             ]
@@ -2885,7 +2902,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         query += [
             {'$project':
                 {'_id': 1,
-                    'product_code': f"$answers.{self.SKU_OBJ_ID}.{self.f['product_code']}",
+                    'product_code': f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
                     'container_type' : f"$answers.{self.f['plant_conteiner_type']}",
                     'racks' : f"$answers.{self.f['new_location_group']}.{self.f['new_location_racks']}",
                     'containers': f"$answers.{self.f['new_location_group']}.{self.f['new_location_containers']}",
@@ -3087,15 +3104,15 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         self.process_record_to_catalog( record )
 
     def swap_location_dest(self, from_location):
-        res = {self.WAREHOUSE_LOCATION_OBJ_ID:{}}
-        res[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse']] = from_location[self.f['warehouse_dest']]
-        res[self.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse_location']] = from_location[self.f['warehouse_location_dest']]
+        res = {self.WH.WAREHOUSE_LOCATION_OBJ_ID:{}}
+        res[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse']] = from_location[self.f['warehouse_dest']]
+        res[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.f['warehouse_location']] = from_location[self.f['warehouse_location_dest']]
         return res
 
     def swap_location(self, from_location):
-        res = {self.WAREHOUSE_LOCATION_DEST_OBJ_ID:{}}
-        res[self.WAREHOUSE_LOCATION_DEST_OBJ_ID][self.f['warehouse_dest']] = from_location[self.f['warehouse']]
-        res[self.WAREHOUSE_LOCATION_DEST_OBJ_ID][self.f['warehouse_location_dest']] = from_location[self.f['warehouse_location']]
+        res = {self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID:{}}
+        res[self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID][self.f['warehouse_dest']] = from_location[self.f['warehouse']]
+        res[self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID][self.f['warehouse_location_dest']] = from_location[self.f['warehouse_location']]
         return res
 
     def update_calc_fields(self, product_code, lot_number, warehouse, location, folio=None, map_type='model_2_field_id', **kwargs):
@@ -3182,6 +3199,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             date_to=date_to, **{"nin_folio":self.folio})
 
         acctual_containers = inv.get('actuals')
+        print('acctual_containers',acctual_containers)
         if acctual_containers == 0:
             msg = f"This lot {lot_number} has 0 containers left, if this is NOT the case first do a inventory adjustment"
             msg_error_app = {
@@ -3217,7 +3235,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
     def validate_stock_move(self, from_wl, qty, dest_group):
         qty_to_move = 0
         for dest_set in dest_group:
-            to_wh_info = dest_set.get(self.WAREHOUSE_LOCATION_DEST_OBJ_ID,{})
+            to_wh_info = dest_set.get(self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID,{})
             qty_to_move += dest_set.get(self.f['move_group_qty'],0)
             to_warehouse = to_wh_info.get(self.f['warehouse_dest'])
             to_location = to_wh_info.get(self.f['warehouse_location_dest'])

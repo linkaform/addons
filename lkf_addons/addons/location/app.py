@@ -107,7 +107,17 @@ class Location(Base, base.LKF_Base):
             area_address = self.get_location_address(location_name)
         return area_address
 
-
+    def get_areas_by_location(self, location_name):
+        options={}
+        if location_name:
+            options = {
+                'startkey': [location_name],
+                'endkey': [f"{location_name}\n",{}],
+                'group_level':2
+            }
+        catalog_id = self.AREAS_DE_LAS_UBICACIONES_CAT_ID
+        form_id = self.PASE_ENTRADA
+        return self.catalogo_view(catalog_id, form_id, options)
 
     def get_area_status(self, location, area, state='activa'):
         match_query = {
