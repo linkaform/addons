@@ -1023,6 +1023,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         depositos = self.answers.get(self.incidence_fields['datos_deposito_incidencia'],[])
         return sum([x[self.incidence_fields['cantidad']] for x in depositos])
 
+    def catalago_area_location(self, location_name):
+        return self.get_areas_by_location(location_name)
+
     def catalogo_categoria(self, options={}):
         catalog_id = self.ESTADO_ID
         form_id = self.PASE_ENTRADA
@@ -2089,7 +2092,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$match': match_query },
             {'$unwind': f"$answers.{self.f['guard_group']}"},
             {'$match':unwind_query},
-            {'$project': self.proyect_format(self.checkin_fields)},
+            {'$project': self.project_format(self.checkin_fields)},
             {'$sort':{'created_at':-1}},
             {'$limit':1}
             ]
