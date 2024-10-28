@@ -425,10 +425,14 @@ class JIT(Base):
              'deleted_at' : {'$exists':False},
              f'answers.{self.mf["procurment_status"]}': status,
          }
-        if product_code:
+        if type(product_code) == list:
             match_query.update({
-                f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code
+                 f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": {"$in": product_code}
                 })
+        else:
+            match_query.update({
+                f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code
+                 })
         if sku:
             match_query.update({
                 f"answers.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku
