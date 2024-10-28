@@ -846,7 +846,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             return {}
         return recipe
 
-    def ger_products_inventory(self, product_code, warehouse, status='active'):
+    def get_products_inventory(self, product_code, warehouse, location=None, status='active'):
 
         match_query ={ 
          'form_id': self.FORM_INVENTORY_ID,  
@@ -854,9 +854,21 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
          } 
 
         if product_code:
-            match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":{"$in":product_code}}) 
+            if type(product_code) == list:
+                match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":{"$in":product_code}})
+            else:
+                match_query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+                
         if warehouse:
-            match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse}) 
+            if type(warehouse) == list:                
+                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":{"$in":warehouse}})
+            else:
+                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})
+        if location:
+            if type(location) == list:                
+                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":{"$in":location}})
+            else:
+                match_query.update({f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})
         query = [
             {'$match': match_query},
             {'$project':{
@@ -876,11 +888,11 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 "_id":0,
                 "product_code":"$_id.product_code",
                 "warehouse":"$_id.warehouse",
-                "actuals": "$actuals"
+                "actuals": "$actuals",
             }},
         ]
         
-        print('query=',simplejson.dumps(query, indent=5))
+        #print('query=',simplejson.dumps(query, indent=5))
         res = self.format_cr(self.cr.aggregate(query))
         return res
 
