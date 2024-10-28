@@ -48,7 +48,6 @@ class Base(base.LKF_Base):
         else:
             self.mf = mf
 
-
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
        #--Variables 

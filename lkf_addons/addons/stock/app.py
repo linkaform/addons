@@ -913,12 +913,12 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def get_product_stock(self, product_code, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
-        print(f'**33************Get Stock: {product_code}****************')
-        print('product_code', product_code)
-        print('sku', sku)
-        print('lot_number', lot_number)
-        print('warehouse', warehouse)
-        print('location', location)
+        # print(f'**************Get Stock: {product_code}****************')
+        # print('product_code', product_code)
+        # print('sku', sku)
+        # print('lot_number', lot_number)
+        # print('warehouse', warehouse)
+        # print('location', location)
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         location = self.validate_value(location)
@@ -941,8 +941,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         # print('stock adjustments', stock['adjustments'])
         stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
-        print('stock move_in', stock['move_in'])
-        print('stock move_out', stock)
+        # print('stock move_in', stock['move_in'])
+        # print('stock move_out', stock)
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -2402,7 +2402,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             {'$sort': {'product_code': 1}}
             ]
         res = self.cr.aggregate(query)
-        print('query=', simplejson.dumps(query, indent=3))
         result = {}
         for r in res:
             pcode = r.get('product_code')
@@ -2410,7 +2409,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             result[pcode] += r.get('total',0)
         if product_code:
             result = result.get(product_code,0)
-        print('result-', result)
         return result 
 
     def stock_adjustments(self, product_code=None, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None, **kwargs):
@@ -3170,6 +3168,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             date_to=date_to, **{"nin_folio":self.folio})
 
         acctual_containers = inv.get('actuals')
+        print('acctual_containers',acctual_containers)
         if acctual_containers == 0:
             msg = f"This lot {lot_number} has 0 containers left, if this is NOT the case first do a inventory adjustment"
             msg_error_app = {
