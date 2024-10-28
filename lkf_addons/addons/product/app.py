@@ -11,7 +11,10 @@ class Product(Base, base.LKF_Base):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         self.name =  __class__.__name__
         self.settings = settings
-        
+        self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])       
+        if self.__class__.__name__ not in kwargs:
+            self.kwargs['MODULES'].append(self.__class__.__name__)
+            
         self.PRODUCT = self.lkm.catalog_id('product_catalog')
         
         self.PRODUCT_ID = self.PRODUCT.get('id')
