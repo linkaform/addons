@@ -61,35 +61,52 @@ class Base(Base):
             # 'location': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
         }
 
-    def get_config(self, *args, **kwargs):
-        if not self.GET_CONFIG:
-            match_query ={ 
-                 'form_id': self.CONFIGURACIONES,  
-                 'deleted_at' : {'$exists':False},
-            } 
-            if kwargs.get('query'):
-                match_query.update(kwargs['query'])
-            project_ids = self._project_format(self.config_fields)
-            aggregate = [
-                {'$match': match_query},
-                {'$limit':kwargs.get('limit',1)},
-                {'$project': project_ids },
-                ]
-            self.GET_CONFIG =  self.format_cr(self.cr.aggregate(aggregate) )
-        result = {}
-        for res in self.GET_CONFIG:
-            result = {arg:res[arg] for arg in args if res.get(arg)}
-        return result if result else None
+    # def get_config(self, *args, **kwargs):
+    #     print('esta', esta)
+    #     print('esta', estad)
+    #     if not self.GET_CONFIG:
+    #         match_query ={ 
+    #              'form_id': self.CONFIGURACIONES,  
+    #              'deleted_at' : {'$exists':False},
+    #         } 
+    #         if kwargs.get('query'):
+    #             match_query.update(kwargs['query'])
+    #         project_ids = self._project_format(self.config_fields)
+    #         aggregate = [
+    #             {'$match': match_query},
+    #             {'$limit':kwargs.get('limit',1)},
+    #             {'$project': project_ids },
+    #             ]
+    #         self.GET_CONFIG =  self.format_cr(self.cr.aggregate(aggregate) )
+    #     result = {}
+    #     for res in self.GET_CONFIG:
+    #         result = {arg:res[arg] for arg in args if res.get(arg)}
+    #     return result if result else None
         
 
 
-class JIT(Product, Warehouse, base.LKF_Base):
+# class JIT(Product, Warehouse, base.LKF_Base):
+# from lkf_addons.addons.stock.app import Stock
+
+class JIT(Base):
 
 
     def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
-        from lkf_addons.addons.stock.app import Stock
-        base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
+
+        # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv, use_api=use_api)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])       
+        if self.__class__.__name__ not in kwargs:
+            self.kwargs['MODULES'].append(self.__class__.__name__)
+        self.load('Stock', **self.kwargs)
+        self.load('Product', **self.kwargs)
+        # if not hasattr(self, 'STOCK'):
+        #     print('hasattr', hasattr(self, 'STOCK'))
+        #     self.JIT =True
+        #     print('dir self', dir(self))
+        #    self.STOCK = Stock( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         f ={
+            'borrar_historial':'671fbd248e46aab662455b40',
             'bom_name':'66d8e063b22bcdcc2f341e84',
             'bom_type':'66d8dfbcb22bcdcc2f341e81',
             'bom_status':'66e275891f6f133e363afb3f',
@@ -99,12 +116,13 @@ class JIT(Product, Warehouse, base.LKF_Base):
             'factor_crecimiento_jit':'66ececbcc9aefada5b04b801',
             'factor_seguridad_jit':'66ececbcc9aefada5b04b802',
             'status':'620ad6247a217dbcb888d175',
-            'tipo_almacen': '66ed0c88c9aefada5b04b818'
+            'tipo_almacen': '66ed0c88c9aefada5b04b818',
             }
 
         if hasattr(self, 'f'):
             self.f.update(f)
         else:
+            print('vaa  A IGUALSAR')
             self.f = f
 
         mf = deepcopy(f)
@@ -141,21 +159,30 @@ class JIT(Product, Warehouse, base.LKF_Base):
         else:
             self.mf = mf
         
-
-
-
+        self.config_fields = {
+            'demora':f'{self.f.get("demora")}',
+            'lead_time':f'{self.f.get("lead_time")}',
+            'dias_laborales_consumo':f'{self.f.get("dias_laborales_consumo")}',
+            'factor_crecimiento_jit':f'{self.f.get("factor_crecimiento_jit")}',
+            'factor_seguridad_jit':f'{self.f.get("factor_seguridad_jit")}',
+            'uom':f'{self.UOM_OBJ_ID}.{self.f.get("uom")}',
+            'procurment_location':f'{self.f.get("config_group")}',
+            'warehouse_kind': '66ed0c88c9aefada5b04b818',
+            # 'warehouse': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse"]}',
+            # 'location': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
+        }
 
         # kwargs = kwargs.get('f',f)
 
         from lkf_addons.addons.product.app import Product, Warehouse
         self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        #super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         # from lkf_addons.addons.stock.app import Stock
         # self.STOCK = Stock( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
         self.BASE = Base( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        #super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #Formas
         self.BOM_ID = self.lkm.form_id('bom','id')
         self.DEMANDA_UTIMOS_12_MES = self.lkm.form_id('demanda_ultimos_12_meses','id')
@@ -175,12 +202,40 @@ class JIT(Product, Warehouse, base.LKF_Base):
         self.INPUT_GOODS_SKU_ID = self.INPUT_GOODS_SKU.get('id')
         self.INPUT_GOODS_SKU_OBJ_ID = self.INPUT_GOODS_SKU.get('obj_id')
 
+        print('44444444444444444444444444444444444444444444444444444444444',self.config_fields)
+
+    # def get_config(self, *args, **kwargs):
+    #     print('self config', self.GET_CONFIG)
+    #     print('self config_fields', self.config_fields)
+    #     if not self.GET_CONFIG:
+    #         match_query ={ 
+    #              'form_id': self.BASE.CONFIGURACIONES,  
+    #              'deleted_at' : {'$exists':False},
+    #         } 
+    #         if kwargs.get('query'):
+    #             match_query.update(kwargs['query'])
+    #         print('self match_query', match_query)
+    #         print('self elf.config_fields', self.config_fields)
+    #         project_ids = self.project_format(self.config_fields)
+    #         aggregate = [
+    #             {'$match': match_query},
+    #             {'$limit':kwargs.get('limit',1)},
+    #             {'$project': project_ids },
+    #             ]
+    #         print('self aggregate', aggregate)
+    #         print('self elf.config_fields', self.configd_fields)
+    #         self.GET_CONFIG =  self.format_cr(self.cr.aggregate(aggregate) )
+    #     result = {}
+    #     for res in self.GET_CONFIG:
+    #         result = {arg:res[arg] for arg in args if res.get(arg)}
+    #     return result if result else None
+
     def ave_daily_demand(self):
         print('average daly cons', self.form_id)
         print('average daly mf=', self.mf)
         if self.form_id == self.DEMANDA_UTIMOS_12_MES:
             print('va por ultimos 12 meses>>>>>>')
-            conf_data = self.get_config(*['dias_laborales_consumo', 'factor_crecimiento_jit'])
+            conf_data = self.get_config()
             dias_laborales_consumo = conf_data.get('dias_laborales_consumo',360)
             factor_crecimiento_jit = conf_data.get('factor_crecimiento_jit')
             demanda_12_meses = self.answers.get(self.mf['demanda_12_meses'])
@@ -200,21 +255,18 @@ class JIT(Product, Warehouse, base.LKF_Base):
             status=status)
 
         res = []
-        product_rules= [{'demora': 7, 'product_code': '750200301040', 'lead_time': 47, 'min_stock': 217.61, 'max_stock': 435.22, 'reorder_point': 250.0, 'safety_stock': 32.41, 'sku': '750200301040', 'status': 'active', 'trigger': 'auto', 'uom': 'unit', 'warehouse': 'ALM MONTERREY', 'warehouse_location': None}, {'demora': 7, 'product_code': '750200301040', 'lead_time': 47, 'min_stock': 13.63, 'max_stock': 27.26, 'reorder_point': 16.0, 'safety_stock': 2.03, 'sku': '750200301040', 'status': 'active', 'trigger': 'auto', 'uom': 'unit', 'warehouse': 'ALM MERIDA', 'warehouse_location': None}, {'demora': 7, 'product_code': '750200301040', 'lead_time': 47, 'min_stock': 87.42, 'max_stock': 174.84, 'reorder_point': 100.0, 'safety_stock': 13.02, 'sku': '750200301040', 'status': 'active', 'trigger': 'auto', 'uom': 'unit', 'warehouse': 'ALM GUADALAJARA', 'warehouse_location': None}, ]
 
         product_by_warehouse = {}
-        from lkf_addons.addons.stock.app import Stock
-        self.STOCK = Stock( self.settings, sys_argv=self.sys_argv, use_api=self.use_api)
         product_codes = [r['product_code'] for r in  product_rules if r.get('product_code')]
         self.ROUTE_RULES = {x['product_code']:x for x in self.get_rutas_transpaso(product_codes) if x.get('product_code')}
-
+        print('produyct_rules',product_rules )
         for rule in product_rules:
             product_code = rule.get('product_code')
             sku = rule.get('sku')
             warehouse = rule.get('warehouse')
             product_by_warehouse[warehouse] = product_by_warehouse.get(warehouse,[])
             location = rule.get('warehouse_location')
-            product_stock = self.STOCK.get_product_stock(product_code, sku=sku,  warehouse=warehouse, location=location)
+            product_stock = self.Stock.get_product_stock(product_code, sku=sku,  warehouse=warehouse, location=location)
             #product_stock = {'actuals':0}
             order_qty = self.exec_reorder_rules(rule, product_stock)
             if order_qty:
@@ -333,8 +385,8 @@ class JIT(Product, Warehouse, base.LKF_Base):
         match_query ={ 
              'form_id': self.BOM_ID,  
              'deleted_at' : {'$exists':False},
-             f'answers.{self.SKU_OBJ_ID}.{self.f["product_code"]}': product_code,
-             f'answers.{self.SKU_OBJ_ID}.{self.f["product_sku"]}': product_sku,
+             f'answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}': product_code,
+             f'answers.{self.Product.SKU_OBJ_ID}.{self.f["product_sku"]}': product_sku,
              f'answers.{self.mf["bom_type"]}': bom_type,
              f'answers.{self.mf["bom_status"]}': 'active',
          } 
@@ -373,13 +425,17 @@ class JIT(Product, Warehouse, base.LKF_Base):
              'deleted_at' : {'$exists':False},
              f'answers.{self.mf["procurment_status"]}': status,
          }
-        if product_code:
+        if type(product_code) == list:
             match_query.update({
-                f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code
+                 f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": {"$in": product_code}
                 })
+        else:
+            match_query.update({
+                f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code
+                 })
         if sku:
             match_query.update({
-                f"answers.{self.SKU_OBJ_ID}.{self.f['sku']}":sku
+                f"answers.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku
                 })
         if warehouse:
             match_query.update({
@@ -398,8 +454,8 @@ class JIT(Product, Warehouse, base.LKF_Base):
                     'date_schedule':f'$answers.{self.mf["procurment_schedule_date"]}',
                     'procurment_method':f'$answers.{self.mf["procurment_method"]}',
                     'procurment_qty':f'$answers.{self.mf["procurment_qty"]}',
-                    'product_code':f'$answers.{self.SKU_OBJ_ID}.{self.f["product_code"]}',
-                    'sku':f'$answers.{self.SKU_OBJ_ID}.{self.f["sku"]}',
+                    'product_code':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}',
+                    'sku':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["sku"]}',
                     'status':f'$answers.{self.mf["status"]}',
                     'uom':f'$answers.{self.UOM_OBJ_ID}.{self.f["uom"]}',
                     'warehouse':f'$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse"]}',
@@ -416,11 +472,11 @@ class JIT(Product, Warehouse, base.LKF_Base):
          }
         if product_code:
             match_query.update({
-                f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code
+                f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code
                 })
         if sku:
             match_query.update({
-                f"answers.{self.SKU_OBJ_ID}.{self.f['sku']}":sku
+                f"answers.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku
                 })
         if warehouse:
             match_query.update({
@@ -436,13 +492,13 @@ class JIT(Product, Warehouse, base.LKF_Base):
                     '_id':0,
                     'bom_name':f'$answers.{self.BOM_CAT_OBJ_ID}.{self.mf["bom_name"]}',
                     'demora':f'$answers.{self.mf["demora"]}',
-                    'product_code':f'$answers.{self.SKU_OBJ_ID}.{self.f["product_code"]}',
+                    'product_code':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}',
                     'lead_time':f'$answers.{self.mf["lead_time"]}',
                     'min_stock':f'$answers.{self.mf["min_stock"]}',
                     'max_stock':f'$answers.{self.mf["max_stock"]}',
                     'reorder_point':f'$answers.{self.mf["reorder_point"]}',
                     'safety_stock':f'$answers.{self.mf["safety_stock"]}',
-                    'sku':f'$answers.{self.SKU_OBJ_ID}.{self.f["sku"]}',
+                    'sku':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["sku"]}',
                     'status':f'$answers.{self.mf["status"]}',
                     'trigger':f'$answers.{self.mf["trigger"]}',
                     'uom':f'$answers.{self.UOM_OBJ_ID}.{self.f["uom"]}',
@@ -458,7 +514,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
              # 'form_id': self.RUTAS_REORDEN,  
              'form_id': 125127,  
              'deleted_at' : {'$exists':False},
-             f'answers.{self.SKU_OBJ_ID}.{self.f["product_code"]}':{"$in": product_codes},
+             f'answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}':{"$in": product_codes},
          } 
         query = [
             {'$match': match_query},
@@ -467,13 +523,13 @@ class JIT(Product, Warehouse, base.LKF_Base):
             {'$unwind':f'$answers.{self.mf["rutas_group"]}'},
             {'$project':{
                     '_id':0,
-                    'product_code':f'$answers.{self.SKU_OBJ_ID}.{self.f["product_code"]}',
-                    'sku':f'$answers.{self.SKU_OBJ_ID}.{self.f["sku"]}',
+                    'product_code':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}',
+                    'sku':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["sku"]}',
                     'standar_pack':f'$answers.{self.mf["rutas_group"]}.{self.mf["standar_pack"]}',
-                    'warehouse':f'$answers.{self.mf["rutas_group"]}{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse"]}',
-                    'warehouse_location':f'$answers.{self.mf["rutas_group"]}{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse_location"]}',
-                    'warehouse_dest':f'$answers.{self.mf["rutas_group"]}{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f["warehouse_dest"]}',
-                    'warehouse_location_dest':f'$answers.{self.mf["rutas_group"]}{self.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f["warehouse_location_dest"]}',
+                    'warehouse':f'$answers.{self.mf["rutas_group"]}{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse"]}',
+                    'warehouse_location':f'$answers.{self.mf["rutas_group"]}{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse_location"]}',
+                    'warehouse_dest':f'$answers.{self.mf["rutas_group"]}{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f["warehouse_dest"]}',
+                    'warehouse_location_dest':f'$answers.{self.mf["rutas_group"]}{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f["warehouse_location_dest"]}',
             }},
             ]
         res =  self.format_cr(self.cr.aggregate(query))
@@ -490,8 +546,8 @@ class JIT(Product, Warehouse, base.LKF_Base):
             {'$project':{
                     '_id':1,
                     'folio':'$folio',
-                    'sku':f'$answers.{self.SKU_OBJ_ID}.{self.f["product_sku"]}',
-                    'product_code':f'$answers.{self.SKU_OBJ_ID}.{self.f["product_code"]}',
+                    'sku':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["product_sku"]}',
+                    'product_code':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}',
                     'warehouse':f'$answers.{self.WH.WAREHOUSE_OBJ_ID}.{self.WH.f["warehouse"]}',
                     'demanda_12_meses':f'$answers.{self.mf["demanda_12_meses"]}',
                     'consumo_promedio_diario':f'$answers.{self.mf["consumo_promedio_diario"]}',
@@ -514,7 +570,7 @@ class JIT(Product, Warehouse, base.LKF_Base):
 
     def get_warehouse_config(self, key, value, get_key):
         print('aqi va a pedir....', )
-        config = self.BASE.get_config(*['procurment_location'])
+        config = self.get_config(*['procurment_location'])
         locations_config = config.get('procurment_location',[])
         res = None
         for wh in locations_config:
@@ -536,9 +592,9 @@ class JIT(Product, Warehouse, base.LKF_Base):
         if not uom:
             uom = config.get('uom')
         standar_pack = self.ROUTE_RULES.get(product_code,{}).get('standar_pack',1)
-        answers[self.SKU_OBJ_ID] = {}
-        answers[self.SKU_OBJ_ID][self.f['product_code']] = product_code
-        answers[self.SKU_OBJ_ID][self.f['sku']] = sku
+        answers[self.Product.SKU_OBJ_ID] = {}
+        answers[self.Product.SKU_OBJ_ID][self.f['product_code']] = product_code
+        answers[self.Product.SKU_OBJ_ID][self.f['sku']] = sku
         answers[self.UOM_OBJ_ID] = {}
         answers[self.UOM_OBJ_ID][self.f['uom']] = uom
         answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID] = {}
@@ -554,15 +610,15 @@ class JIT(Product, Warehouse, base.LKF_Base):
 
     def model_reorder_point(self, product_code, sku, uom, warehouse, location, ave_daily_demand ):
         answers = {}
-        config = self.BASE.get_config(*['lead_time', 'demora', 'factor_seguridad_jit','factor_crecimiento_jit','uom'])
+        config = self.get_config( *['lead_time', 'demora', 'factor_seguridad_jit','factor_crecimiento_jit','uom'])
         print('33333',config )
-        lead_time = config.get('lead_time',47)
-        demora = config.get('demora',7)
+        lead_time = config.get('lead_time')
+        demora = config.get('demora')
         safety_factor = config.get('factor_seguridad_jit',1)
         factor_crecimiento_jit = config.get('factor_crecimiento_jit',1)
-        answers[self.SKU_OBJ_ID] = {}
-        answers[self.SKU_OBJ_ID][self.f['product_code']] = product_code
-        answers[self.SKU_OBJ_ID][self.f['sku']] = sku
+        answers[self.Product.SKU_OBJ_ID] = {}
+        answers[self.Product.SKU_OBJ_ID][self.f['product_code']] = product_code
+        answers[self.Product.SKU_OBJ_ID][self.f['sku']] = sku
         if not uom:
             uom = config.get('uom')
         answers[self.UOM_OBJ_ID] = {}
@@ -585,15 +641,16 @@ class JIT(Product, Warehouse, base.LKF_Base):
     def upsert_procurment(self, product_by_warehouse, **kwargs):
 
         print('product by warehouse',product_by_warehouse)
+        response = {}
         for wh, create_records in product_by_warehouse.items():
             print(f'----------------{wh}--------------------')
             existing_records = self.get_procurments(warehouse=wh)
             update_records = []
             # existing_skus = [prod['sku'] for prod in existing_procurments]
             for product in create_records[:]:
-                if self.SKU_OBJ_ID in product:
-                    product_code = product[self.SKU_OBJ_ID].get(self.f['product_code'])
-                    sku = product[self.SKU_OBJ_ID].get(self.f['sku'])
+                if self.Product.SKU_OBJ_ID in product:
+                    product_code = product[self.Product.SKU_OBJ_ID].get(self.f['product_code'])
+                    sku = product[self.Product.SKU_OBJ_ID].get(self.f['sku'])
                     for existing_record in existing_records:
                         if existing_record.get('product_code') == product_code and \
                             existing_record.get('sku') == sku:
@@ -646,9 +703,9 @@ class JIT(Product, Warehouse, base.LKF_Base):
             existing_skus = [prod['sku'] for prod in existing_products]
             #only_pr_skus = [prod['sku'] for prod in existing_products]
             for product in create_records[:]:
-                if self.SKU_OBJ_ID in product:
-                    product_code = product[self.SKU_OBJ_ID].get(self.f['product_code'])
-                    sku = product[self.SKU_OBJ_ID].get(self.f['sku'])
+                if self.Product.SKU_OBJ_ID in product:
+                    product_code = product[self.Product.SKU_OBJ_ID].get(self.f['product_code'])
+                    sku = product[self.Product.SKU_OBJ_ID].get(self.f['sku'])
                     for existing_product in existing_products:
                         if existing_product.get('product_code') == product_code and \
                             existing_product.get('sku') == sku:

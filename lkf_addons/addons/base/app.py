@@ -28,7 +28,7 @@ Si tienes más de una aplicación, puedes:
 '''
 
 # Importaciones necesarias
-import simplejson
+import simplejson, importlib
 import re, os, zipfile, wget, random, shutil, datetime
 from datetime import timedelta
 
@@ -106,7 +106,7 @@ class Base(base.LKF_Base):
 
 
         ### Global Variables
-        self.GET_CONFIG = {}
+        
         
         self.f.update( {
             'address_name':'663a7e0fe48382c5b1230901',
@@ -164,19 +164,22 @@ class Base(base.LKF_Base):
             # 'location':f'{self.WAREHOUSE_OBJ_ID}.{self.f.get("location")}',
         }
 
-
     def _project_format(self, data):
         return self.project_format(data)
 
     def get_config(self, *args, **kwargs):
+        print('args',args)
+        print('selfl config', self.config_fields)
         if not self.GET_CONFIG:
+            # print(dddd)
             match_query ={ 
                  'form_id': self.CONFIGURACIONES,  
                  'deleted_at' : {'$exists':False},
             } 
-            if kwargs.get('query'):
+            if 'query' in kwargs:
                 match_query.update(kwargs['query'])
             project_ids = self._project_format(self.config_fields)
+
             aggregate = [
                 {'$match': match_query},
                 {'$limit':kwargs.get('limit',1)},
@@ -185,8 +188,27 @@ class Base(base.LKF_Base):
             self.GET_CONFIG =  self.format_cr(self.cr.aggregate(aggregate) )
         result = {}
         for res in self.GET_CONFIG:
+            args = args or list(self.config_fields.keys())
             result = {arg:res[arg] for arg in args if res.get(arg)}
         return result if result else None
+
+    def load(self, module , module_class=None, import_as=None, **kwargs):
+        print('loading module', module)
+        print('loading module_class', module_class)
+        if not module_class:
+            module_class = module
+        if not import_as:
+            import_as = module_class
+        print('loading module ..kwargs', kwargs.get('MODULES'))
+        if module not in kwargs.get('MODULES') or not hasattr(self, import_as):
+            # from lkf_addons.addons.stock.app import Stock
+            imp_module = importlib.import_module(f'lkf_addons.addons.{module.lower()}.app')
+            AddonsClass = getattr(imp_module, module_class)
+            # scripts = importlib.import_module('{}.items.scripts'.format(module))
+            print('import_as', import_as)
+            setattr(self, import_as, AddonsClass(self.settings, sys_argv=self.sys_argv, use_api=self.use_api, **self.kwargs))
+            if module not in self.kwargs['MODULES']:
+                self.kwargs['MODULES'].append(module)
       
     def send_email_by_form(self, data):
         print("MSJ", data)
@@ -264,8 +286,6 @@ class CargaUniversal(Base):
             dict_records_copy = {'create': [], 'update': {}}
             list_cols_for_upload = list( pos_field_dict.keys() )
             for p, record in enumerate(records):
-                if p > 2:
-                    continue
                 print("=========================================== >> Procesando renglon:",p)
                 if p in subgrupo_errors:
                     error_records.append(record+['',])
