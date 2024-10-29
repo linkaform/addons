@@ -27,6 +27,7 @@ Instrucciones
 '''
 
 from linkaform_api import base
+from lkf_addons.addons.base.app import Base
 
 ### Objecto de Modulo ###
 '''
@@ -36,10 +37,17 @@ from linkaform_api import base
 
     Se pueden heredar funciones de cualquier clase heredada con el metodo super(). 
 '''
-class Vehiculo(base.LKF_Base):
+class Vehiculo(Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+
+        print('selfkwargs', self.kwargs)
+        print('kwargs', kwargs)
+        
+        self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])       
+        if self.__class__.__name__ not in kwargs:
+            self.kwargs['MODULES'].append(self.__class__.__name__)
         #--Variables 
         ### Forms ###
         '''

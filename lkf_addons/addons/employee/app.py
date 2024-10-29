@@ -2,15 +2,21 @@
 import sys, simplejson
 
 from linkaform_api import settings
-from linkaform_api import base
 from lkf_addons.addons.base.app import Base
 
 
-class Employee(Base, base.LKF_Base):
+class Employee(Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+        
+        self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])       
+        if self.__class__.__name__ not in kwargs:
+            self.kwargs['MODULES'].append(self.__class__.__name__)
+        
+        self.load('Location', **self.kwargs)
+
         self.name =  __class__.__name__
         self.settings = settings
         # forms
@@ -84,7 +90,15 @@ class Employee(Base, base.LKF_Base):
             'worker_code':'670f585bf844ff7bc357b1dc',
                 }
 
+        f = {}
+        if hasattr(self, 'f'):
+            self.f.update(f)
+        else:
+            print('vaa  A IGUALSAR')
+            self.f = f
+
         self.f.update(self.employee_fields)
+        self.f.update(self.Location.f)
 
     def _get_match_q(self, field_id, value):
         if type(value) == list:
@@ -136,8 +150,8 @@ class Employee(Base, base.LKF_Base):
                 {'_id': 1,
                     'folio': "$folio",
                     'created_at': "$created_at",
-                    'area': f"$answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
-                    'location': f"$answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                    'area': f"$answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
+                    'location': f"$answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                     'employee': f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_name']}",
                     'marcada_como': f"$answers.{self.f['areas_group']}.{self.f['area_default']}",
                     }
@@ -200,11 +214,11 @@ class Employee(Base, base.LKF_Base):
         unwind_query = {}
         if location_name:
             unwind_query.update({
-                f"answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": location_name
+                f"answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": location_name
                 })
         if area_name:
             unwind_query.update({
-                f"answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}": area_name
+                f"answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}": area_name
                 })
         if kwargs.get('position'):
             positions = kwargs.get('position')
@@ -221,8 +235,8 @@ class Employee(Base, base.LKF_Base):
                 {'_id': 1,
                     'folio': "$folio",
                     'created_at': "$created_at",
-                    'area': f"$answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
-                    'location': f"$answers.{self.f['areas_group']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                    'area': f"$answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
+                    'location': f"$answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                     'name': f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_name']}",
                     'user_id': {'$first':f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['user_id']}"},
                     'marcada_como': f"$answers.{self.f['areas_group']}.{self.f['area_default']}",

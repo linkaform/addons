@@ -6,7 +6,7 @@ from lkf_addons.addons.base.app import Base
 
 class Location(Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
 
         print('selfkwargs', self.kwargs)
