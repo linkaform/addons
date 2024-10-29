@@ -446,8 +446,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'support_guard':f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
         }
         self.pase_entrada_fields = {
+            'area':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
             'grupo_areas_acceso':'663fed6cb8262fd454326cb3',
             'comentario_pase':'65e0a69a322b61fbf9ed23af',
+            'commentario_area':"66af1a77d703592958dca5eb",
             'catalog_area_pase':'664fc5f3bbbef12ae61b15e9',
             'curp_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['curp']}",
             'nombre_permiso':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e4",
@@ -459,9 +461,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'identificacion_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}",
             'identificacion_pase_id':f"{self.mf['identificacion']}",
             'motivo':f"{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
+            'nombre_area':f"{self.mf['nombre_area']}",
             'nombre_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
             'nombre_tipo_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.66297e1579900d9018c886ad",
-            'nombre_perfil':     f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
+            'nombre_perfil':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'perfil_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.661dc67e901906b7e9b73bac",
             'perfil_pase_id':f"661dc67e901906b7e9b73bac",
             'requerimientos_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e5",
@@ -478,6 +481,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'qr_pase':'64ef5b5fff1bec97d2ca27b6',
             'telefono_pase':'662c2937108836dec6d92582',
             'tipo_visita':"662c262cace163ca3ed3bb3a",
+            'tipo_comentario':'66af1977ffb6fd75e769f457',
             'vigencia_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.'662962bb203407ab90c886e6",
             'vigencia_expresa_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e7",
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
@@ -520,6 +524,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'tipo_visita_pase': self.mf['tipo_visita_pase'],
             'grupo_visitados': self.mf['grupo_visitados'],
             'fecha_desde_visita': self.mf['fecha_desde_visita'],
+            'fecha_desde_hasta': self.mf['fecha_desde_hasta'],
             'config_dia_de_acceso': self.mf['config_dia_de_acceso'],
             'config_limitar_acceso': self.mf['config_limitar_acceso'],
             'config_dias_acceso': self.mf['config_dias_acceso'],
@@ -1482,8 +1487,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
         answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
-        answers[self.mf['fecha_desde_visita']] = now_datetime
-        answers[self.mf['tipo_visita_pase']] = 'fecha_fija'
+        if access_pass.get('custom') == True :
+            answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase',"")
+            answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',"")
+            answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',"")
+            answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
+            answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
+        else:
+            answers[self.mf['fecha_desde_visita']] = now_datetime
+            answers[self.mf['tipo_visita_pase']] = 'fecha_fija'
         answers[self.pase_entrada_fields['tipo_visita']] = 'alta_de_nuevo_visitante'
         answers[self.pase_entrada_fields['walkin_nombre']] = access_pass.get('nombre')
         answers[self.pase_entrada_fields['walkin_email']] = access_pass.get('email')
@@ -1491,6 +1503,32 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers[self.pase_entrada_fields['walkin_fotografia']] = access_pass.get('foto')
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono')
+        
+        if access_pass.get('comentarios'):
+            comm = access_pass.get('comentarios',[])
+            if comm:
+                comm_list = []
+                for c in comm:
+                    comm_list.append(
+                        {
+                            self.pase_entrada_fields['comentario_pase']:c.get('comentario_pase'),
+                            self.pase_entrada_fields['tipo_comentario'] :c.get('tipo_comentario').lower()
+                        }
+                    )
+                answers.update({self.pase_entrada_fields['grupo_instrucciones_pase']:comm_list})
+
+        if access_pass.get('areas'):
+            areas = access_pass.get('areas',[])
+            if areas:
+                areas_list = []
+                for c in areas:
+                    areas_list.append(
+                        {
+                            self.pase_entrada_fields['commentario_area']:c.get('commentario_area'),
+                            self.pase_entrada_fields['area'] :{self.pase_entrada_fields['nombre_area']: c.get('nombre_area')}
+                        }
+                    )
+                answers.update({self.pase_entrada_fields['grupo_areas_acceso']:areas_list})
         #Visita A
         answers[self.mf['grupo_visitados']] = []
         visita_a = access_pass.get('visita_a')
