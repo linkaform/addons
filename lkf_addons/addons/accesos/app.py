@@ -172,11 +172,9 @@ class Accesos(Base):
             self.f.update(f)
         else:
             print('vaa  A IGUALSAR')
-            self.f = f
-        
-        self.f.update(self.Employee.f)
-        self.f.update(self.Location.f)
         self.f.update(self.VH.f)
+        self.f.update(self.Location.f)
+        self.f.update(self.Employee.f)
 
         mf = {
             'articulo':'66ce2441d63bb7a3871adeaf',
@@ -470,7 +468,7 @@ class Accesos(Base):
             'support_guard':f"{self.Employee.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
         }
         self.pase_entrada_fields = {
-            'area':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
+            'area':f"{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
             'grupo_areas_acceso':'663fed6cb8262fd454326cb3',
             'comentario_pase':'65e0a69a322b61fbf9ed23af',
             'commentario_area':"66af1a77d703592958dca5eb",
@@ -588,7 +586,7 @@ class Accesos(Base):
         Registra el acceso del pase de entrada a ubicación.
         solo puede ser ejecutado después de revisar los accesos
         '''
-        employee =  self.get_employee_data(email=self.user.get('email'), get_one=True)
+        employee =  self.Employee.get_employee_data(email=self.user.get('email'), get_one=True)
         metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_ACCESOS)
         metadata.update({
             'properties': {
@@ -620,7 +618,7 @@ class Accesos(Base):
 
         answers = {
             f"{self.mf['tipo_registro']}": 'entrada',
-            f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}":{
+            f"{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}":{
                 f"{self.f['location']}":location,
                 f"{self.f['area']}":area
                 },
@@ -639,7 +637,7 @@ class Accesos(Base):
                 placas = item.get('placas_vehiculo','')
                 color = item.get('color_vehiculo','')
                 list_vehiculos.append({
-                    self.TIPO_DE_VEHICULO_OBJ_ID:{
+                    self.VH.TIPO_DE_VEHICULO_OBJ_ID:{
                         self.mf['tipo_vehiculo']:tipo,
                         self.mf['marca_vehiculo']:marca,
                         self.mf['modelo_vehiculo']:modelo,
@@ -1091,12 +1089,12 @@ class Accesos(Base):
         return res
 
     def catalogo_config_area_empleado(self):
-        catalog_id = self.CONF_AREA_EMPLEADOS_CAT_ID
+        catalog_id = self.Employee.CONF_AREA_EMPLEADOS_CAT_ID
         form_id= self.BITACORA_OBJETOS_PERDIDOS
         return self.lkf_api.catalog_view(catalog_id, form_id) 
 
     def catalogo_config_area_empleado_apoyo(self):
-        catalog_id = self.CONF_AREA_EMPLEADOS_AP_CAT_ID
+        catalog_id = self.Employee.CONF_AREA_EMPLEADOS_AP_CAT_ID
         form_id= self.BITACORA_FALLAS
         return self.lkf_api.catalog_view(catalog_id, form_id) 
 
@@ -1171,7 +1169,7 @@ class Accesos(Base):
         checkin = {
             self.f['checkin_type']: set_type,
             self.f['boot_checkin_date'] : now_datetime,
-            self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID : {
+            self.Employee.CONF_AREA_EMPLEADOS_CAT_OBJ_ID : {
                 self.f['location']: location,
                 self.f['area']: area, 
                 self.f['worker_name']: employee.get('worker_name'),
@@ -1312,9 +1310,9 @@ class Accesos(Base):
         answers = {}
         for key, value in data_badge.items():
             if  key == 'ubicacion_gafete':
-                answers[self.UBICACIONES_CAT_OBJ_ID] = {self.mf['ubicacion']:value}
+                answers[self.Location.UBICACIONES_CAT_OBJ_ID] = {self.mf['ubicacion']:value}
             elif  key == 'caseta_gafete':
-                answers[self.UBICACIONES_CAT_OBJ_ID] = {self.mf['nombre_area']:value}
+                answers[self.Location.UBICACIONES_CAT_OBJ_ID] = {self.mf['nombre_area']:value}
             elif  key == 'visita_gafete':
                 answers[self.mf['catalog_visita']] = {self.mf['nombre_visita']:value}
             elif  key == 'gafete_id':
@@ -1783,8 +1781,8 @@ class Accesos(Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.ACCESOS_NOTAS,
-            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location_name,
-            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}":area_name
+            f"answers.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location_name,
+            f"answers.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}":area_name
             }
         query = [
             {'$match': match_query },
@@ -1796,7 +1794,7 @@ class Accesos(Base):
     def get_booths_guards(self, location=None, area=None, solo_disponibles=False, **kwargs):
         res = {}
         if not area:
-            default_booth , user_booths = self.get_user_booth(search_default=False)
+            default_booth , user_booths = self.Employee.get_user_booth(search_default=False)
             location = default_booth.get('location')
             area = default_booth.get('area')
         guards_positions = self.config_get_guards_positions()
@@ -2142,11 +2140,11 @@ class Accesos(Base):
             else:
                 #hace busqueda en lista de opciones
                 match_query.update({
-                    f"answers.{self.f['guard_group']}.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['user_id_jefes']}":{'$in':user_ids}
+                    f"answers.{self.f['guard_group']}.{self.Employee.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['user_id_jefes']}":{'$in':user_ids}
                     })
         if user_ids and type(user_ids) == int:
             unwind_query.update({
-                f"answers.{self.f['guard_group']}.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['user_id_jefes']}":user_ids
+                f"answers.{self.f['guard_group']}.{self.Employee.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['user_id_jefes']}":user_ids
                 })
         if not unwind_query:
             return self.LKFException({"msg":f"Algo salio mal al intentar buscar el checkin del los ids: {user_id}"})
@@ -2801,7 +2799,7 @@ class Accesos(Base):
         elif employee_list and replace:
             checkin[self.f['guard_group']] += [
                 {self.f['employee_position']:'guardiad_de_apoyo',
-                 self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID:
+                 self.Employee.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID:
                    {self.f['worker_name_b']:guard.get('name'),
                    }} 
                     for guard in employee_list ]
@@ -2820,7 +2818,7 @@ class Accesos(Base):
         if qr_code:
             match_query.update({"_id":ObjectId(qr_code)})
         if location:
-            match_query.update({f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location})
+            match_query.update({f"answers.{self.Location.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location})
         query = [
             {'$match': match_query },
             {'$project': self.proyect_format(self.mf)},
@@ -2933,7 +2931,7 @@ class Accesos(Base):
 
     def update_article_lost(self, data_articles, folio):
         answers = {}
-        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        employee = self.Employee.get_employee_data(email=self.user.get('email'), get_one=True)
         #---Define Answers
         date_entrega_perdido=""
         answers = {}
@@ -2977,7 +2975,7 @@ class Accesos(Base):
             self.LKFException('No se mandarón parametros para actualizar')
 
     def update_failure(self, data_failures, folio):
-        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        employee = self.Employee.get_employee_data(email=self.user.get('email'), get_one=True)
         answers = {}
         falla_fecha_hora_solucion=""
         for key, value in data_failures.items():
@@ -3107,8 +3105,8 @@ class Accesos(Base):
         if status :
             gafete_id = answers[self.GAFETES_CAT_OBJ_ID][self.gafetes_fields['gafete_id']]
             locker_id = answers[self.LOCKERS_CAT_OBJ_ID][self.mf['locker_id']]
-            location = answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID][self.f['location']]
-            area = answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID][self.f['area']]
+            location = answers[self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID][self.f['location']]
+            area = answers[self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID][self.f['area']]
             gafete = self.get_gafetes(status=None, location=location, area=area, gafete_id=gafete_id)
             if len(gafete) > 0 :
                 gafete = gafete[0]
@@ -3186,13 +3184,14 @@ class Accesos(Base):
                 answers.update({f"{self.notes_fields[key]}":value})
         #----Assign Time
         if data_notes.get('note_status','') == 'cerrado':
-            employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+            employee = self.Employee.get_employee_data(email=self.user.get('email'), get_one=True)
+            # print(employee)
             timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
             fecha_hora_str =self.today_str(timezone, date_format='datetime')
             answers.update({
                 f"{self.notes_fields['note_close_date']}":fecha_hora_str,
-                self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID :{
-                    self.employee_fields['worker_name_b']:employee['worker_name'],
+                self.Employee.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID :{
+                    self.Employee.employee_fields['worker_name_b']:employee['worker_name'],
                     }
                 }
                 )
@@ -3239,7 +3238,7 @@ class Accesos(Base):
             placas = vehiculos.get('placas',vehiculos.get('placas_vehiculo',''))
             color = vehiculos.get('color',vehiculos.get('color_vehiculo',''))
             ans = {
-                    self.TIPO_DE_VEHICULO_OBJ_ID:{
+                    self.VH.TIPO_DE_VEHICULO_OBJ_ID:{
                         self.mf['tipo_vehiculo']:tipo,
                         self.mf['marca_vehiculo']:marca,
                         self.mf['modelo_vehiculo']:modelo,
