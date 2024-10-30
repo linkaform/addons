@@ -1116,11 +1116,11 @@ class Stock(Base):
         if not answers:
             answers = self.answers
         product_info = answers.get(self.STOCK_INVENTORY_OBJ_ID, answers.get(self.Product.SKU_OBJ_ID,{}))
+        print('product_info===',product_info)
         data['product_code'] = data.get(self.f['product_code'],self.unlist(product_info.get(self.f['product_code'])))
         data['sku'] = data.get(self.f['sku'],self.unlist(product_info.get(self.f['sku'])))
         wh_info =  self.get_stock_info_from_catalog_wl(answers, data=data)
         whd_info = self.get_stock_info_from_catalog_wld(answers, data=data)
-
         # searchs first on the given data, if not it searches on the warehouse location 
         # catalogs located at first level
         # if not it searches on the product info at first level
@@ -1162,8 +1162,6 @@ class Stock(Base):
         if not answers:
             answers = self.answers
         res = deepcopy(data)
-        print('data=',data)
-        print('answers=',answers)
         res.update(self.get_stock_info_form_answer(answers=answers, data=res))
         print('res=',res)
         if not res.get('folio'):
@@ -1190,25 +1188,29 @@ class Stock(Base):
                     res[key] = self.search_4_key(record, key)
         return res
 
-    def get_stock_info_from_catalog_wl(self, answers={}, data={}):
+    def get_stock_info_from_catalog_wl(self, answers={}, data={}, search_key=None):
+        print('-------------------------')
         if not answers:
             answers = self.answers
         res = {}
-        wh_info = answers.get(self.WH.WAREHOUSE_LOCATION_OBJ_ID, {})
+        if not search_key:
+            search_key = self.WH.WAREHOUSE_LOCATION_OBJ_ID
+        wh_info = answers.get(search_key, {})
         if not wh_info:
-            wh_info = self.get_stock_info_from_catalog_wl(answers=self.answers, data=data)
+            data = self.get_stock_info_from_catalog_wl(answers=self.answers, data=data, search_key=self.STOCK_INVENTORY_OBJ_ID)
         res['warehouse'] = data.get('warehouse',wh_info.get(self.f['warehouse']))
         res['warehouse_location'] = data.get('warehouse_location', wh_info.get(self.f['warehouse_location']))
         return res
 
-    def get_stock_info_from_catalog_wld(self, answers={}, data={}):
+    def get_stock_info_from_catalog_wld(self, answers={}, data={},  search_key=None):
         if not answers:
             answers = self.answers
         res = {}
-        print('answers', answers)
-        wh_info = answers.get(self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID, {})
+        if not search_key:
+            search_key = self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID
+        wh_info = answers.get(search_key, {})
         if not wh_info:
-            wh_info = self.get_stock_info_from_catalog_wld(answers=self.answers, data=data)
+            data = self.get_stock_info_from_catalog_wld(answers=self.answers, data=data, search_key=self.STOCK_INVENTORY_OBJ_ID)
         res['warehouse_dest'] = data.get('warehouse_dest',wh_info.get(self.f['warehouse_dest']))
         res['warehouse_location_dest'] = data.get('warehouse_location_dest',wh_info.get(self.f['warehouse_location_dest']))
         return res
