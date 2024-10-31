@@ -9,6 +9,8 @@ lkm = lkf_obj.lkm
 lkf_api = lkf_obj.lkf_api
 VARS = {}
 
+# stock_obj = Stock(settings, sys_argv=sys.argv)
+
 FORM_RECEPCION_MATERIALES = lkm.form_id('recepcion_de_materiales_de_proveedor','id')
 FORM_INVENTORY_ADJUSTMENT = lkm.form_id('stock_inventory_adjustment','id')
 FORM_MOVE_ONE_MANY_ONE = lkm.form_id('stock_move_one_many_one','id')
@@ -31,6 +33,7 @@ fecha = fecha.strftime('%Y-%m-%d')
 fecha_salida = fecha_salida.strftime('%Y-%m-%d')
 
 class TestStocks():
+
     def test_crea_recepcion_materiales(self):
         metadata = {
             "form_id": FORM_RECEPCION_MATERIALES,"geolocation": [],"start_timestamp": 1715787608.475,"end_timestamp": 1715788138.316,
