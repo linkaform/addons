@@ -3253,51 +3253,52 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         qr_code= folio
         _folio= pass_selected.get("folio")
         answers={}
-        for key, value in access_pass.items():
-            if key == 'grupo_vehiculos':
-                list_vehiculos ={}
-                for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
-                    index+=1
-                    tipo = item.get('tipo','')
-                    marca = item.get('marca','')
-                    modelo = item.get('modelo','')
-                    estado = item.get('estado','')
-                    placas = item.get('placas','')
-                    color = item.get('color','')
-                    obj={
-                        self.TIPO_DE_VEHICULO_OBJ_ID:{
-                            self.mf['tipo_vehiculo']:tipo,
-                            self.mf['marca_vehiculo']:marca,
-                            self.mf['modelo_vehiculo']:modelo,
-                        },
-                        self.ESTADO_OBJ_ID:{
-                            self.mf['nombre_estado']:estado,
-                        },
-                        self.mf['placas_vehiculo']:placas,
-                        self.mf['color_vehiculo']:color,
-                    }
-                    list_vehiculos[f"-{index}"] = obj
-                answers[self.mf['grupo_vehiculos']] = list_vehiculos  
-            elif key == 'grupo_equipos':
-                list_equipos = {}
-                for index, item in enumerate(access_pass.get('grupo_equipos',[])):
-                    index+=1
-                    nombre = item.get('nombre','')
-                    marca = item.get('marca','')
-                    color = item.get('color','')
-                    tipo = item.get('tipo','')
-                    serie = item.get('serie','')
-                    obj={
-                        self.mf['tipo_equipo']:tipo.lower(),
-                        self.mf['nombre_articulo']:nombre,
-                        self.mf['marca_articulo']:marca,
-                        self.mf['numero_serie']:serie,
-                        self.mf['color_articulo']:color,
-                    }
-                    list_equipos[f"-{index}"] = obj
-                answers[self.mf['grupo_equipos']] = list_equipos
-            else:
-                answers.update({f"{self.pase_entrada_fields[key]}":value})
+        if access_pass.get('grupo_vehiculos'):
+            list_vehiculos ={}
+            index=0
+            for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
+                index+=1
+                tipo = item.get('tipo','')
+                marca = item.get('marca','')
+                modelo = item.get('modelo','')
+                estado = item.get('estado','')
+                placas = item.get('placas','')
+                color = item.get('color','')
+                obj={
+                    self.TIPO_DE_VEHICULO_OBJ_ID:{
+                        self.mf['tipo_vehiculo']:tipo,
+                        self.mf['marca_vehiculo']:marca,
+                        self.mf['modelo_vehiculo']:modelo,
+                    },
+                    self.ESTADO_OBJ_ID:{
+                        self.mf['nombre_estado']:estado,
+                    },
+                    self.mf['placas_vehiculo']:placas,
+                    self.mf['color_vehiculo']:color,
+                }
+                list_vehiculos[f"-{index}"] = obj
+            answers[self.mf['grupo_vehiculos']] = list_vehiculos  
+        elif access_pass.get('grupo_equipos'):
+            list_equipos = {}
+            index=0
+            for index, item in enumerate(access_pass.get('grupo_equipos',[])):
+                index+=1
+                nombre = item.get('nombre','')
+                marca = item.get('marca','')
+                color = item.get('color','')
+                tipo = item.get('tipo','')
+                serie = item.get('serie','')
+                obj={
+                    self.mf['tipo_equipo']:tipo.lower(),
+                    self.mf['nombre_articulo']:nombre,
+                    self.mf['marca_articulo']:marca,
+                    self.mf['numero_serie']:serie,
+                    self.mf['color_articulo']:color,
+                }
+                list_equipos[f"-{index}"] = obj
+            answers[self.mf['grupo_equipos']] = list_equipos
+        else:
+            answers.update({f"{self.pase_entrada_fields[key]}":value})
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
