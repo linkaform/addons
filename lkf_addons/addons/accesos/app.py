@@ -442,6 +442,7 @@ class Accesos(Base):
             'catalog_gafete':'664fc6ec8d4dfb34de095586',
             'ubicacion_gafete':f"{self.Location.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             'visita_gafete':f"{self.mf['catalog_visita']}.{self.mf['nombre_visita']}",
+            'status_gafete': self.mf['status_gafete'],
         }
         #- Para creación , edición y lista de notas
         self.notes_fields = {
@@ -1315,7 +1316,7 @@ class Accesos(Base):
                 answers[self.Location.UBICACIONES_CAT_OBJ_ID] = {self.mf['nombre_area']:value}
             elif  key == 'visita_gafete':
                 answers[self.mf['catalog_visita']] = {self.mf['nombre_visita']:value}
-            elif  key == 'gafete_id':
+            elif  key == 'id_gafete':
                 answers[self.GAFETES_CAT_OBJ_ID] = {self.gafetes_fields['gafete_id']:value}
             else:
                 answers.update({f"{self.gafetes_fields[key]}":value})
