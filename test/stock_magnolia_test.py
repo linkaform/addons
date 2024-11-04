@@ -103,6 +103,7 @@ class TestStock():
             "properties":{ "device_properties":{"system":"Testing"} }
             ,"geolocation_method":{"method":"HTML5","accuracy":1742.3649855282526}
         }
+        print('FORM_LAB_INVENTORY_ADJUSTMENT',FORM_LAB_INVENTORY_ADJUSTMENT)
         res_create =  lkf_api.post_forms_answers(metadata)
         print('res_create',res_create)
         assert res_create['status_code'] == 201
