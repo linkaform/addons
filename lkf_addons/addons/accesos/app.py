@@ -2564,10 +2564,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
             }
             ).sort('updated_at', -1).limit(limit)
+
+        print("MATCH QUERY",res)
         result = self.format_cr(res)
         for r in result:
             r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
-            r['equipos'] = self.format_equipos(r.get('equipos',[]))
+            # r['equipos'] = self.format_equipos(r.get('equipos',[]))
             r['comentarios'] = self.format_comentarios(r.get('comentarios',[]))
             r['visita_a']= self.format_visita(r.get('visita_a',[]))
             # r['status_pase'] = r.get(self.pase_entrada_fields['status_pase'],'')
@@ -2581,7 +2583,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             #         }
             #     coment.append(row)
             #     r['comentario'] = coment
-
+            equipos = r.get('equipos', [])
+            if equipos:  # Verifica si la lista de equipos no está vacía
+                r['equipos'] = self.format_equipos(equipos)
+            else:
+                r['equipos'] = []  # O alguna otra lógica que desees aplicar si está vacía
+                match_query2 = {
+                    "deleted_at":{"$exists":False},
+                    "form_id": self.PASE_ENTRADA,
+                    f"answers.{self.mf['codigo_qr']}":qr,
+                }
+                res2= self.cr.find(
+                match_query2, 
+                {
+                    'equipos':f"$answers.{self.mf['grupo_equipos']}",
+                }).sort('updated_at', -1).limit(limit)
+                result2 = self.format_cr(res2)
+                print("result2", result2)
+                for r2 in result2:
+                    r['equipos'] = self.format_equipos(r2.get('equipos',[]))
         return result
 
     def get_pefiles_walkin(self, location):
@@ -3235,7 +3255,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.mf['grupo_vehiculos']]  = {-1: ans }
             elif action == 'edit':
                 answers[self.mf['grupo_vehiculos']]  = {data.get('set_number',0): ans }
-
         #TODO UPDATE GAFET
 
         if not record_id and not folio:
