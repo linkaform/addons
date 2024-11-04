@@ -1014,6 +1014,7 @@ class Accesos(Base):
             duration = time.strftime('%H:%M:%S', time.gmtime( self.date_2_epoch(fecha_hora_str) - self.date_2_epoch(checkin_date_str)))
             if self.user_in_facility(status_visita=last_check_out.get('status_visita')):
                 answers = {
+                    f"{self.mf['nombre_area_salida']}": area,
                     f"{self.mf['tipo_registro']}":'salida',
                     f"{self.mf['fecha_salida']}":fecha_hora_str,
                     f"{self.mf['duracion']}":duration,
