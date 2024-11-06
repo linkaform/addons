@@ -85,6 +85,7 @@ class Accesos(Base):
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
+        # self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
         # self.FORM_ALTA_EQUIPOS = self.lkm.form_id('alta_de_equipos','id')
@@ -505,6 +506,7 @@ class Accesos(Base):
             'telefono_pase':'662c2937108836dec6d92582',
             'tipo_visita':"662c262cace163ca3ed3bb3a",
             'tipo_comentario':'66af1977ffb6fd75e769f457',
+            'visita_a':'663d4ba61b14fab90559ebb0',
             'vigencia_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.'662962bb203407ab90c886e6",
             'vigencia_expresa_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e7",
             'worker_department': f"{self.Employee.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
@@ -1952,6 +1954,8 @@ class Accesos(Base):
                 'grupo_vehiculos': f"$answers.{self.mf['grupo_vehiculos']}",
                 'grupo_instrucciones_pase': f"$answers.{self.mf['grupo_instrucciones_pase']}",
                 'comentario': f"$answers.{self.mf['grupo_instrucciones_pase']}",
+                'codigo_qr': f"$answers.{self.mf['codigo_qr']}",
+                'qr_pase': f"$answers.{self.mf['qr_pase']}"
                 },
             },
             {'$sort':{'folio':-1}},
@@ -1967,6 +1971,7 @@ class Accesos(Base):
             p = x.get('visita_a_puesto',[])
             e =  x.get('visita_a_user_id',[])
             u =  x.get('visita_a_email',[])
+            print("ESTATUSSS", x.get('estatus',''))
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['email'] =self.unlist(x.get('email',''))
             x['telefono'] = self.unlist(x.get('telefono',''))
@@ -2583,10 +2588,12 @@ class Accesos(Base):
                 'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
             }
             ).sort('updated_at', -1).limit(limit)
+
+        print("MATCH QUERY",res)
         result = self.format_cr(res)
         for r in result:
             r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
-            r['equipos'] = self.format_equipos(r.get('equipos',[]))
+            # r['equipos'] = self.format_equipos(r.get('equipos',[]))
             r['comentarios'] = self.format_comentarios(r.get('comentarios',[]))
             r['visita_a']= self.format_visita(r.get('visita_a',[]))
             # r['status_pase'] = r.get(self.pase_entrada_fields['status_pase'],'')
@@ -2600,7 +2607,25 @@ class Accesos(Base):
             #         }
             #     coment.append(row)
             #     r['comentario'] = coment
-
+            equipos = r.get('equipos', [])
+            if equipos:  # Verifica si la lista de equipos no está vacía
+                r['equipos'] = self.format_equipos(equipos)
+            else:
+                r['equipos'] = []  # O alguna otra lógica que desees aplicar si está vacía
+                match_query2 = {
+                    "deleted_at":{"$exists":False},
+                    "form_id": self.PASE_ENTRADA,
+                    f"answers.{self.mf['codigo_qr']}":qr,
+                }
+                res2= self.cr.find(
+                match_query2, 
+                {
+                    'equipos':f"$answers.{self.mf['grupo_equipos']}",
+                }).sort('updated_at', -1).limit(limit)
+                result2 = self.format_cr(res2)
+                print("result2", result2)
+                for r2 in result2:
+                    r['equipos'] = self.format_equipos(r2.get('equipos',[]))
         return result
 
     def get_pefiles_walkin(self, location):
@@ -3255,7 +3280,6 @@ class Accesos(Base):
                 answers[self.mf['grupo_vehiculos']]  = {-1: ans }
             elif action == 'edit':
                 answers[self.mf['grupo_vehiculos']]  = {data.get('set_number',0): ans }
-
         #TODO UPDATE GAFET
 
         if not record_id and not folio:
@@ -3268,6 +3292,71 @@ class Accesos(Base):
             self.LKFException({'msg':'Faltan datos para acutalizar pase de entrada'})
         return res
         
+    def update_pass(self, access_pass,folio):
+        pass_selected= self.get_detail_access_pass(qr_code=folio)
+        qr_code= folio
+        _folio= pass_selected.get("folio")
+        answers={}
+        if access_pass.get('grupo_vehiculos'):
+            list_vehiculos ={}
+            index=0
+            for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
+                index+=1
+                tipo = item.get('tipo','')
+                marca = item.get('marca','')
+                modelo = item.get('modelo','')
+                estado = item.get('estado','')
+                placas = item.get('placas','')
+                color = item.get('color','')
+                obj={
+                    self.TIPO_DE_VEHICULO_OBJ_ID:{
+                        self.mf['tipo_vehiculo']:tipo,
+                        self.mf['marca_vehiculo']:marca,
+                        self.mf['modelo_vehiculo']:modelo,
+                    },
+                    self.ESTADO_OBJ_ID:{
+                        self.mf['nombre_estado']:estado,
+                    },
+                    self.mf['placas_vehiculo']:placas,
+                    self.mf['color_vehiculo']:color,
+                }
+                list_vehiculos[f"-{index}"] = obj
+            answers[self.mf['grupo_vehiculos']] = list_vehiculos  
+        elif access_pass.get('grupo_equipos'):
+            list_equipos = {}
+            index=0
+            for index, item in enumerate(access_pass.get('grupo_equipos',[])):
+                index+=1
+                nombre = item.get('nombre','')
+                marca = item.get('marca','')
+                color = item.get('color','')
+                tipo = item.get('tipo','')
+                serie = item.get('serie','')
+                obj={
+                    self.mf['tipo_equipo']:tipo.lower(),
+                    self.mf['nombre_articulo']:nombre,
+                    self.mf['marca_articulo']:marca,
+                    self.mf['numero_serie']:serie,
+                    self.mf['color_articulo']:color,
+                }
+                list_equipos[f"-{index}"] = obj
+            answers[self.mf['grupo_equipos']] = list_equipos
+        else:
+            answers.update({f"{self.pase_entrada_fields[key]}":value})
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        if answers:
+            res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
+            if res.get('status_code') == 201 or res.get('status_code') == 202:
+                res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
+                res['json'].update({'telefono':pass_selected.get("telefono")})
+                res['json'].update({'enviar_a':pass_selected.get("nombre")})
+                res['json'].update({'enviar_de':employee.get('worker_name')})
+                return res
+            else: 
+                return res
+        else:
+            self.LKFException('No se mandarón parametros para actualizar')
+
     def validate_access_pass_location(self, qr_code, location):
         #TODO
         last_move = self.get_last_user_move(qr_code, location)
