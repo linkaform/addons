@@ -27,7 +27,7 @@ import cx_Oracle
     app_utils.py, utils.py, xxx_utils.py       
 '''
 
-from linkaform_api import base
+from lkf_addons.addons.base.app import Base
 
 ### Objecto de Modulo ###
 '''
@@ -38,7 +38,7 @@ from linkaform_api import base
     Se pueden heredar funciones de cualquier clase heredada con el metodo super(). 
 '''
 
-class Oracle(base.LKF_Base):
+class Oracle(Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
