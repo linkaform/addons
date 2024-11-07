@@ -4,6 +4,7 @@
 import subprocess, simplejson, os, glob
 from pathlib import Path
 import xml.etree.ElementTree as ET
+from collections import defaultdict
 
 from linkaform_api import utils, lkf_models
 from linkaform_api.lkf_object import LKFBase 
@@ -385,34 +386,32 @@ class Items(LKFException):
         # else:
         #     raise LKFException('No file with name: {} found, at path: {}'.format(file_name, file_path))
 
-    def merge_addons_modules(self, list1, list2):
+
+
+    def merge_nested_lists(self, data):
         result = []
-        # Helper function to find if a dictionary exists in the result and returns its index
-        def find_dict_in_list(dict_item, list_of_items):
-            for index, item in enumerate(list_of_items):
-                if isinstance(item, dict) and item.keys() == dict_item.keys():
-                    return index
-            return -1
-        # Function to merge two dictionaries
-        def merge_dicts(dict1, dict2):
-            for key in dict2:
-                if key in dict1:
-                    # Assuming values in these dictionaries are lists
-                    dict1[key] = list(set(dict1[key] + dict2[key]))
-                else:
-                    dict1[key] = dict2[key]
-            return dict1
-        # Add items from both lists into result
-        for item in list1 + list2:
+        for item in data:
             if isinstance(item, dict):
-                idx = find_dict_in_list(item, result)
-                if idx >= 0:
-                    result[idx] = merge_dicts(result[idx], item)
-                else:
-                    result.append(item)
-            elif item not in result:
+                merged_item = {}
+                for key, value in item.items():
+                    if isinstance(value, list) and all(isinstance(subitem, dict) for subitem in value):
+                        # Fusionar diccionarios en la lista bajo el mismo nombre de llave
+                        combined_dict = defaultdict(list)
+                        for subitem in value:
+                            for subkey, sublist in subitem.items():
+                                combined_dict[subkey].extend(sublist)
+                        
+                        # Eliminar duplicados en cada lista bajo las mismas llaves
+                        merged_item[key] = [{k: list(set(v))} for k, v in combined_dict.items()]
+                    else:
+                        merged_item[key] = value
+                result.append(merged_item)
+            else:
                 result.append(item)
         return result
+
+    def merge_addons_modules(self, list1, list2):
+        return self.merge_nested_lists( list1+list2 )
 
     def get_anddons_and_modules_items(self, itype, sub_dir=None):
         res_addons = self.get_all_items_json(itype, sub_dir=sub_dir, path=ADDONS_PATH)
