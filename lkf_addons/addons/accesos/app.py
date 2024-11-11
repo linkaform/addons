@@ -519,10 +519,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'empresa': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['empresa']}",
             'status_visita': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['status_visita']}",
             'nombre_perfil': f"{self.CONFIG_PERFILES_OBJ_ID}.{mf['nombre_perfil']}",
-            'grupo_visitados': self.mf['grupo_visitados'],
             #'nombre_perfil': f"{self.mf['grupo_visitados']}{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'worker_department': f"{self.mf['grupo_visitados']}{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'worker_position': f"{self.mf['grupo_visitados']}{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
+            'catalago_autorizado_por': f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}",
+            'autorizado_por': self.mf['nombre_guardia_apoyo'],
             'tipo_visita_pase': self.mf['tipo_visita_pase'],
             'grupo_visitados': self.mf['grupo_visitados'],
             'fecha_desde_visita': self.mf['fecha_desde_visita'],
@@ -1304,9 +1305,27 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print('answers', simplejson.dumps(metadata, indent=4))
         return self.lkf_api.post_forms_answers(metadata)
     
-    def create_enviar_msj(self, data_msj):
-        data_msj['enviado_desde'] = 'Modulo de Acceos'
+    def create_enviar_msj(self, data_msj, data_cel_msj=None):
+        data_msj['enviado_desde'] = 'Modulo de Accesos'
         return self.send_email_by_form(data_msj)
+
+    def create_enviar_msj_pase(self, data_msj, data_cel_msj=None, folio=None):
+        # access_pass={status_pase:"Activo"}
+        # resUp= update_pass(self, access_pass, None)
+        data_msj['enviado_desde'] = 'Modulo de Accesos'
+        # pass_selected= self.get_detail_access_pass(qr_code=folio)
+
+        # print("PASE", pass_selected)
+
+        # empresa=pass_selected.get("empresa","Linkaform")
+        # visita= pass_selected.get('visita_a', "")
+        # fecha_expedicion=pass_selected.get("fecha_de_expedicion")
+        # data_msj['msj']= f"Hola, un nuevo pase de entrada se ha creado para ti, has sido invitado por {visita}./n Ubicacion: {empresa}./n Fecha y hora: {fecha_expedicion}. Saludos."
+        resEm= self.send_email_by_form(data_msj)
+        # resUp.get('status_code') == 201
+
+        return resEm
+     
 
     def create_failure(self, data_failures):
         #---Define Metadata
@@ -1495,6 +1514,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',"")
             answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
             answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
+            answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:access_pass.get('visita_a',"")}
+            answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
+
         else:
             answers[self.mf['fecha_desde_visita']] = now_datetime
             answers[self.mf['tipo_visita_pase']] = 'fecha_fija'
@@ -2373,7 +2395,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query[f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}"] = area
         if status:
             match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
+
         print("match_query", status)
+        ERRO
         query = [
             {'$match': match_query },
             {'$project': {
@@ -3267,65 +3291,71 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException({'msg':'Faltan datos para acutalizar pase de entrada'})
         return res
         
-    def update_pass(self, access_pass,folio):
+    def update_pass(self, access_pass,folio=None):
         pass_selected= self.get_detail_access_pass(qr_code=folio)
         qr_code= folio
         _folio= pass_selected.get("folio")
         answers={}
-        if access_pass.get('grupo_vehiculos'):
-            list_vehiculos ={}
-            index=0
-            for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
-                index+=1
-                tipo = item.get('tipo','')
-                marca = item.get('marca','')
-                modelo = item.get('modelo','')
-                estado = item.get('estado','')
-                placas = item.get('placas','')
-                color = item.get('color','')
-                obj={
-                    self.TIPO_DE_VEHICULO_OBJ_ID:{
-                        self.mf['tipo_vehiculo']:tipo,
-                        self.mf['marca_vehiculo']:marca,
-                        self.mf['modelo_vehiculo']:modelo,
-                    },
-                    self.ESTADO_OBJ_ID:{
-                        self.mf['nombre_estado']:estado,
-                    },
-                    self.mf['placas_vehiculo']:placas,
-                    self.mf['color_vehiculo']:color,
-                }
-                list_vehiculos[f"-{index}"] = obj
-            answers[self.mf['grupo_vehiculos']] = list_vehiculos  
-        elif access_pass.get('grupo_equipos'):
-            list_equipos = {}
-            index=0
-            for index, item in enumerate(access_pass.get('grupo_equipos',[])):
-                index+=1
-                nombre = item.get('nombre','')
-                marca = item.get('marca','')
-                color = item.get('color','')
-                tipo = item.get('tipo','')
-                serie = item.get('serie','')
-                obj={
-                    self.mf['tipo_equipo']:tipo.lower(),
-                    self.mf['nombre_articulo']:nombre,
-                    self.mf['marca_articulo']:marca,
-                    self.mf['numero_serie']:serie,
-                    self.mf['color_articulo']:color,
-                }
-                list_equipos[f"-{index}"] = obj
-            answers[self.mf['grupo_equipos']] = list_equipos
-        else:
-            answers.update({f"{self.pase_entrada_fields[key]}":value})
+        for key, value in access_pass.items():
+            if key == 'grupo_vehiculos':
+                list_vehiculos ={}
+                index=1
+                print("ENUM", enumerate(access_pass.get('grupo_vehiculos',[])))
+                    # index+=1
+                for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
+                    print("INDEX", index)
+                    tipo = item.get('tipo','')
+                    marca = item.get('marca','')
+                    modelo = item.get('modelo','')
+                    estado = item.get('estado','')
+                    placas = item.get('placas','')
+                    color = item.get('color','')
+                    obj={
+                        self.TIPO_DE_VEHICULO_OBJ_ID:{
+                            self.mf['tipo_vehiculo']:tipo,
+                            self.mf['marca_vehiculo']:marca,
+                            self.mf['modelo_vehiculo']:modelo,
+                        },
+                        self.ESTADO_OBJ_ID:{
+                            self.mf['nombre_estado']:estado,
+                        },
+                        self.mf['placas_vehiculo']:placas,
+                        self.mf['color_vehiculo']:color,
+                    }
+                    list_vehiculos[f"-{index}"] = obj
+                answers[self.mf['grupo_vehiculos']] = list_vehiculos  
+            elif key == 'grupo_equipos':
+                list_equipos = {}
+                index=1
+                    # index+=1
+                for index, item in enumerate(access_pass.get('grupo_equipos',[])):
+                    nombre = item.get('nombre','')
+                    marca = item.get('marca','')
+                    color = item.get('color','')
+                    tipo = item.get('tipo','')
+                    serie = item.get('serie','')
+                    obj={
+                        self.mf['tipo_equipo']:tipo.lower(),
+                        self.mf['nombre_articulo']:nombre,
+                        self.mf['marca_articulo']:marca,
+                        self.mf['numero_serie']:serie,
+                        self.mf['color_articulo']:color,
+                    }
+                    list_equipos[f"-{index}"] = obj
+                answers[self.mf['grupo_equipos']] = list_equipos
+            else:
+                answers.update({f"{self.pase_entrada_fields[key]}":value})
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
-            if res.get('status_code') == 201 or res.get('status_code') == 202:
+            if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
+                pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 447, name_pdf='Pase de Entrada', send_url=True)
+                print("PASE DE ENTRADA", pass_selected)
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
                 res['json'].update({'enviar_de':employee.get('worker_name')})
+                res['json'].update({'pdf': pdf})
                 return res
             else: 
                 return res
