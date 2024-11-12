@@ -26,7 +26,7 @@ requests
 haversine==2.5.1
 googlemaps==4.5.3
 typing==3.7.4.3
-twilio==9.3.6
+twilio
 qrcode==7.3.1
 wget
 #urllib2

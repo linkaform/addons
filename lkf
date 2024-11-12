@@ -209,6 +209,8 @@ _build(){
         docker compose -f docker-prod.yml build --no-cache
       else
         docker compose -f docker-prod.yml build
+      docker tag linkaform/addons:latest linkaform/addons:develop
+
       fi
       for CONTAINER_ID in $(docker ps | grep addons | awk '{print $1}') 
       do
@@ -349,5 +351,5 @@ case "$Acction" in
   ;;
   ?)
    _usage
-   ;;
+  ;;
 esac
