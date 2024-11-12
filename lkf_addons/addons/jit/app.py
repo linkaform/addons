@@ -100,6 +100,7 @@ class JIT(Base):
             self.kwargs['MODULES'].append(self.__class__.__name__)
         self.load('Stock', **self.kwargs)
         self.load('Product', **self.kwargs)
+        self.load(module='Product', module_class='Warehouse', import_as='WH', **self.kwargs)
         # if not hasattr(self, 'STOCK'):
         #     print('hasattr', hasattr(self, 'STOCK'))
         #     self.JIT =True
@@ -186,6 +187,7 @@ class JIT(Base):
         #Formas
         self.BOM_ID = self.lkm.form_id('bom','id')
         self.DEMANDA_UTIMOS_12_MES = self.lkm.form_id('demanda_ultimos_12_meses','id')
+        self.DEMANDA_PLAN = self.lkm.form_id('demand_plan','id')
         self.PROCURMENT = self.lkm.form_id('procurment_record','id')
         self.REGLAS_REORDEN = self.lkm.form_id('reglas_de_reorden','id')
 
@@ -259,7 +261,6 @@ class JIT(Base):
         product_by_warehouse = {}
         product_codes = [r['product_code'] for r in  product_rules if r.get('product_code')]
         self.ROUTE_RULES = {x['product_code']:x for x in self.get_rutas_transpaso(product_codes) if x.get('product_code')}
-        print('produyct_rules',product_rules )
         for rule in product_rules:
             product_code = rule.get('product_code')
             sku = rule.get('sku')
@@ -569,7 +570,6 @@ class JIT(Base):
         return self.format_cr(self.cr.aggregate(query))
 
     def get_warehouse_config(self, key, value, get_key):
-        print('aqi va a pedir....', )
         config = self.get_config(*['procurment_location'])
         locations_config = config.get('procurment_location',[])
         res = None
@@ -591,7 +591,7 @@ class JIT(Base):
             location = self.get_warehouse_config('tipo_almacen', 'abastacimiento', 'warehouse_location')
         if not uom:
             uom = config.get('uom')
-        standar_pack = self.ROUTE_RULES.get(product_code,{}).get('standar_pack',1)
+        standar_pack = self.ROUTE_RULES.get(str(product_code),{}).get('standar_pack',1)
         answers[self.Product.SKU_OBJ_ID] = {}
         answers[self.Product.SKU_OBJ_ID][self.f['product_code']] = product_code
         answers[self.Product.SKU_OBJ_ID][self.f['sku']] = sku
@@ -674,12 +674,12 @@ class JIT(Base):
         config = self.get_config(*['uom'])
         for rec in records:
             print('rec=',rec)
+            product_code = rec.get('product_code')
             demanda_12_meses = rec.get('demanda_12_meses',0)
-            if demanda_12_meses == 0:
+            sku = rec.get('sku')
+            if demanda_12_meses == 0 or not sku or not product_code:
                 continue
             consumo_promedio_diario = float(rec.get('consumo_promedio_diario',0))
-            product_code = rec.get('product_code')
-            sku = rec.get('sku')
             warehouse = rec.get('warehouse')
             product_by_warehouse[warehouse] = product_by_warehouse.get(warehouse,[])
             location = rec.get('location')

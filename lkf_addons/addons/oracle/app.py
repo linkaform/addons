@@ -52,10 +52,7 @@ class Oracle(base.LKF_Base):
         self.ORACLE_PASSWORD = self.settings.config['ORACLE_PASSWORD']
         self.oracle = self.connect_to_oracle()
 
-
-
     def connect_to_oracle(self):
-        print('----------------------------------')
         try:
             dsn_tns = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME) 
             self.orcale_connection = cx_Oracle.connect(user=self.ORACLE_USERNAME, password=self.ORACLE_PASSWORD,  dsn=dsn_tns)
@@ -68,6 +65,7 @@ class Oracle(base.LKF_Base):
 
     def query_view(self, view_name, query=False):
         result = []
+        columns = []
         try:
             cursor = self.orcale_connection.cursor()
             # Query to fetch data from the view

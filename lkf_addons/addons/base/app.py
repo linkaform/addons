@@ -47,7 +47,6 @@ class Base(base.LKF_Base):
             self.mf.update(mf)
         else:
             self.mf = mf
-
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
        #--Variables 
@@ -200,6 +199,7 @@ class Base(base.LKF_Base):
         if not import_as:
             import_as = module_class
         print('loading module ..kwargs', kwargs.get('MODULES'))
+        self.master = False
         if module not in kwargs.get('MODULES') or not hasattr(self, import_as):
             # from lkf_addons.addons.stock.app import Stock
             imp_module = importlib.import_module(f'lkf_addons.addons.{module.lower()}.app')
@@ -1745,7 +1745,7 @@ class Schedule(Base):
                 }
             }
             #TODO place the script parameters answers
-            task["params"].update(get_script_map())
+            task["params"].update(self.get_script_map())
             body['tasks'].append(task)
             downstream_task_id += 1
             body['tasks'][0]['downstream_task_id'].append(downstream_task_id)
