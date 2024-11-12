@@ -531,6 +531,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'config_dia_de_acceso': self.mf['config_dia_de_acceso'],
             'config_limitar_acceso': self.mf['config_limitar_acceso'],
             'config_dias_acceso': self.mf['config_dias_acceso'],
+            'area_catalog':  f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
+            'area': '663fb45992f2c5afcfe97ca8',
+            'tema_cita':'67329875978e6460083c5648',
+            'descripcion': '67329875978e6460083c5649',
+            'link':'6732aa1189fc6b0ae27e3824',
+            'enviar_correo':'6732a153496e3b26d18e7ee1'
         })
 
         self.notes_project_fields.update(self.notes_fields)
@@ -1034,6 +1040,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def catalago_area_location(self, location_name):
         return self.get_areas_by_location(location_name)
 
+    def catalago_area_location_salidas(self, location_name):
+        return self.get_areas_by_location_salidas(location_name)
+
     def catalogo_categoria(self, options={}):
         catalog_id = self.ESTADO_ID
         form_id = self.PASE_ENTRADA
@@ -1305,26 +1314,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print('answers', simplejson.dumps(metadata, indent=4))
         return self.lkf_api.post_forms_answers(metadata)
     
-    def create_enviar_msj(self, data_msj, data_cel_msj=None):
+    def create_enviar_msj(self, data_msj, data_cel_msj=None, folio=None):
         data_msj['enviado_desde'] = 'Modulo de Accesos'
         return self.send_email_by_form(data_msj)
 
     def create_enviar_msj_pase(self, data_msj, data_cel_msj=None, folio=None):
-        # access_pass={status_pase:"Activo"}
-        # resUp= update_pass(self, access_pass, None)
-        data_msj['enviado_desde'] = 'Modulo de Accesos'
-        # pass_selected= self.get_detail_access_pass(qr_code=folio)
-
-        # print("PASE", pass_selected)
-
-        # empresa=pass_selected.get("empresa","Linkaform")
-        # visita= pass_selected.get('visita_a', "")
-        # fecha_expedicion=pass_selected.get("fecha_de_expedicion")
-        # data_msj['msj']= f"Hola, un nuevo pase de entrada se ha creado para ti, has sido invitado por {visita}./n Ubicacion: {empresa}./n Fecha y hora: {fecha_expedicion}. Saludos."
-        resEm= self.send_email_by_form(data_msj)
-        # resUp.get('status_code') == 201
-
-        return resEm
+        if data_msj :
+            access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
+            resUp= self.update_pass(access_pass=access_pass, folio=folio)
+        if data_cel_msj :
+            print("AQUI MANDAR LLAMAR EL SERVICIO PARA ENVIO DE MSJ", data_cel_msj)
+        
+        resUp.get('status_code') == 201
+        return resUp
      
 
     def create_failure(self, data_failures):
@@ -3343,6 +3345,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     }
                     list_equipos[f"-{index}"] = obj
                 answers[self.mf['grupo_equipos']] = list_equipos
+            elif key == 'status_pase':
+                answers.update({f"{self.pase_entrada_fields[key]}":value.lower()})
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
@@ -3350,7 +3354,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
                 pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 447, name_pdf='Pase de Entrada', send_url=True)
-                print("PASE DE ENTRADA", pass_selected)
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})

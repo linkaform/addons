@@ -119,6 +119,13 @@ class Location(Base, base.LKF_Base):
         form_id = self.PASE_ENTRADA
         return self.catalogo_view(catalog_id, form_id, options)
 
+    def get_areas_by_location_salidas(self, location_name):
+        options={}
+        catalog_id = self.AREAS_DE_LAS_UBICACIONES_SALIDA_ID
+        form_id = self.PASE_ENTRADA
+        group_level = options.get('group_level',1)
+        return self.catalogo_view(catalog_id, form_id, options=options)
+
     def get_area_status(self, location, area, state='activa'):
         match_query = {
             "deleted_at":{"$exists":False},
