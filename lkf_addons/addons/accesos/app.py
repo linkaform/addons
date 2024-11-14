@@ -1346,17 +1346,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.send_email_by_form(data_msj)
 
     def create_enviar_msj_pase(self, data_msj, data_cel_msj=None, folio=None):
+        res_update = {}
         if data_msj :
             access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
-            resUp= self.update_pass(access_pass=access_pass, folio=folio)
+            res_update= self.update_pass(access_pass=access_pass, folio=folio)
         if data_cel_msj :
             mensaje = data_cel_msj.get('mensaje', '')
             phone_to = data_cel_msj.get('numero', '')
             res = self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
             print('Mensaje: ', res)
         
-        resUp.get('status_code') == 201
-        return resUp
+        res_update.get('status_code') == 201
+        return res_update
      
 
     def create_failure(self, data_failures):
