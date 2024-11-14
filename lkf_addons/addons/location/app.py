@@ -106,7 +106,7 @@ class Location(Base, base.LKF_Base):
         if not area_address:
             area_address = self.get_location_address(location_name)
         return area_address
-
+        
     def get_areas_by_location(self, location_name):
         options={}
         if location_name:

@@ -31,6 +31,7 @@ import simplejson, time
 from bson import ObjectId
 from datetime import datetime
 from copy import deepcopy
+import urllib.parse
 
 from linkaform_api import base
 from lkf_addons.addons.employee.app import Employee
@@ -157,6 +158,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         mf = {
             'articulo':'66ce2441d63bb7a3871adeaf',
+            'areas_grupo':'663cf9d77500019d1359eb9f',
             #LOS CATALOGOS NO SE CCLASIFICAN COMO CAMPOS            
             'catalog_area_pase':'664fc5f3bbbef12ae61b15e9',
             'catalog_caseta':'66566d60d4619218b880cf04',
@@ -508,6 +510,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         # self.pase_entrada_fields.update(self.pase_grupo_vehiculos)
         self.pase_entrada_fields.update({
+            'ubicacion_cat': f"{self.UBICACIONES_CAT_OBJ_ID}",
+            'ubicacion_nombre':self.mf['ubicacion'],
             'ubicacion': f"{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
             'nombre_visita': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['nombre_visita']}",
             'email_vista': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['email_vista']}",
@@ -531,12 +535,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'config_dia_de_acceso': self.mf['config_dia_de_acceso'],
             'config_limitar_acceso': self.mf['config_limitar_acceso'],
             'config_dias_acceso': self.mf['config_dias_acceso'],
+            'area_catalog_normal':  f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
             'area_catalog':  f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
             'area': '663fb45992f2c5afcfe97ca8',
             'tema_cita':'67329875978e6460083c5648',
             'descripcion': '67329875978e6460083c5649',
             'link':'6732aa1189fc6b0ae27e3824',
-            'enviar_correo':'6732a153496e3b26d18e7ee1'
+            'enviar_correo':'6732a153496e3b26d18e7ee1',
+            'enviar_correo_pre_registro':'6734c6d5254e9a61df8e7f51'
         })
 
         self.notes_project_fields.update(self.notes_fields)
@@ -1037,11 +1043,35 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         depositos = self.answers.get(self.incidence_fields['datos_deposito_incidencia'],[])
         return sum([x[self.incidence_fields['cantidad']] for x in depositos])
 
-    def catalago_area_location(self, location_name):
-        return self.get_areas_by_location(location_name)
+    def catalagos_pase(self, user_id, location_name):
+        res={
+            "areas_by_location" : self.get_areas_by_location(location_name)
+        }
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.CONF_AREA_EMPLEADOS,
+        }
+        if user_id:
+            match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}"] = user_id
 
-    def catalago_area_location_salidas(self, location_name):
-        return self.get_areas_by_location_salidas(location_name)
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                'area':f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+            }}
+        ]
+        response = self.format_cr_result(self.cr.aggregate(query))
+        ubicaciones = response.pop().get('area', [])
+        ubicaciones = list(set(ubicaciones))
+        res['ubicaciones_user'] = ubicaciones
+        return res
+
+    def catalagos_pase_no_jwt(self, qr_code):
+        cat_vehiculos= self.catalogo_vehiculos({})
+        cat_estados= self.catalogo_estados({})
+        pass_selected= self.get_pass_custom(qr_code)
+        res={"cat_vehiculos":cat_vehiculos, "cat_estados":cat_estados, "pass_selected":pass_selected}
+        return res
 
     def catalogo_categoria(self, options={}):
         catalog_id = self.ESTADO_ID
@@ -1052,7 +1082,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def catalogo_estados(self, options={}):
         catalog_id = self.ESTADO_ID
         form_id = self.PASE_ENTRADA
-        group_level = options.get('group_level',1)
         return self.catalogo_view(catalog_id, form_id)
 
     def catalogo_incidencias(self):
@@ -1064,13 +1093,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def catalogo_vehiculos(self, options={}):
         catalog_id = self.TIPO_DE_VEHICULO_ID
         form_id = self.PASE_ENTRADA
-        group_level = options.get('group_level',1)
         return self.catalogo_view(catalog_id, form_id, options=options)
 
     def catalogo_view(self, catalog_id, form_id, options={}, detail=False):
         catalog_id = catalog_id
         form_id = form_id
-        group_level = options.get('group_level',1)
         res = self.lkf_api.catalog_view(catalog_id, form_id, options)
         if detail:
             if res and len(res) > 0:
@@ -1319,14 +1346,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.send_email_by_form(data_msj)
 
     def create_enviar_msj_pase(self, data_msj, data_cel_msj=None, folio=None):
+        res_update = {}
         if data_msj :
             access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
-            resUp= self.update_pass(access_pass=access_pass, folio=folio)
+            res_update= self.update_pass(access_pass=access_pass, folio=folio)
         if data_cel_msj :
-            print("AQUI MANDAR LLAMAR EL SERVICIO PARA ENVIO DE MSJ", data_cel_msj)
+            mensaje = data_cel_msj.get('mensaje', '')
+            phone_to = data_cel_msj.get('numero', '')
+            res = self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
+            print('Mensaje: ', res)
         
-        resUp.get('status_code') == 201
-        return resUp
+        res_update.get('status_code') == 201
+        return res_update
      
 
     def create_failure(self, data_failures):
@@ -1488,6 +1519,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_access_pass(self, location, access_pass):
         #---Define Metadata
+        print("ACESSSSS_PASSSSSSS", simplejson.dumps(access_pass, indent=4))
         metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
         metadata.update({
             "properties": {
@@ -1518,6 +1550,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
             answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:access_pass.get('visita_a',"")}
             answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
+            answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
+            answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
+            answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',"") 
+            answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"") 
+            answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',"") 
 
         else:
             answers[self.mf['fecha_desde_visita']] = now_datetime
@@ -1551,9 +1588,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     areas_list.append(
                         {
                             self.pase_entrada_fields['commentario_area']:c.get('commentario_area'),
-                            self.pase_entrada_fields['area'] :{self.pase_entrada_fields['nombre_area']: c.get('nombre_area')}
+                            self.pase_entrada_fields['area_catalog_normal'] :{self.mf['nombre_area']: c.get('nombre_area')}
                         }
                     )
+                    print("AREASSS", areas_list)
                 answers.update({self.pase_entrada_fields['grupo_areas_acceso']:areas_list})
         #Visita A
         answers[self.mf['grupo_visitados']] = []
@@ -1632,10 +1670,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #             })
         #         answers[self.mf['grupo_equipos']] = list_equipos  
         #---Valor
-
         metadata.update({'answers':answers})
-        print('answers', simplejson.dumps(metadata, indent=4))
         res = self.lkf_api.post_forms_answers(metadata)
+        if res.get("status_code") ==200 or res.get("status_code")==201:
+            link_info=access_pass.get('link')
+            docs=""
+            for index, d in enumerate(link_info["docs"]): 
+                if(d == "agregarIdentificacion"):
+                    docs+="iden"
+                elif(d == "agregarFoto"):
+                    docs+="foto"
+                if index==0 :
+                    docs+="-"
+            link_pass= f"{link_info['link']}?id={res.get('json')['id']}&user={link_info['creado_por_id']}&docs={docs}"
+            access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])}
+            resUp= self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
         return res
 
     def format_personas_involucradas(self, data):
@@ -1736,7 +1785,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for v in data:
             row = {}
-            print("DATAAAA", v.get(self.TIPO_DE_VEHICULO_OBJ_ID,{}).get(self.mf['tipo_vehiculo'],''))
             row['color'] = v.get(self.mf['color_vehiculo'],'').title()
             row['placas'] = v.get(self.mf['placas_vehiculo'],'')
             row['tipo'] = v.get('tipo_vehiculo','')
@@ -1904,7 +1952,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$project': 
                 {'_id':1,
                 'folio': f"$folio",
-                'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
                 'nombre': {"$ifNull":[
                     f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
                     f"$answers.{self.mf['nombre_pase']}"]},
@@ -1971,7 +2019,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             p = x.get('visita_a_puesto',[])
             e =  x.get('visita_a_user_id',[])
             u =  x.get('visita_a_email',[])
-            print("ESTATUSSS", x.get('estatus',''))
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['email'] =self.unlist(x.get('email',''))
             x['telefono'] = self.unlist(x.get('telefono',''))
@@ -2398,8 +2445,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if status:
             match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
 
-        print("match_query", status)
-        ERRO
         query = [
             {'$match': match_query },
             {'$project': {
@@ -2655,7 +2700,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     if r['perfil'] not in res:
                         res.append(r['perfil'])
         return res
-        
+    
+    def get_pass_custom(self,qr_code):
+        pass_selected= self.get_detail_access_pass(qr_code=qr_code)
+        answers={}
+        for key, value in pass_selected.items():
+            if key == 'nombre' or key == 'email' or key == 'telefono' or key == 'visita_a' or key == 'ubicacion' or key == 'fecha_de_expedicion' or key == 'fecha_de_caducidad' or key == "qr_pase" or key =="_id":
+                answers[key] = value
+        answers['folio']= pass_selected.get("folio")
+        return answers
+    
+
     def get_user_booths_availability(self):
         '''
         Regresa las castas configurados por usuario y su stats
@@ -3358,6 +3413,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
                 res['json'].update({'enviar_de':employee.get('worker_name')})
+                res['json'].update({'ubicacion':pass_selected.get('ubicacion')})
+                res['json'].update({'fecha_desde':pass_selected.get('fecha_de_expedicion')})
+                res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
                 res['json'].update({'pdf': pdf})
                 return res
             else: 
