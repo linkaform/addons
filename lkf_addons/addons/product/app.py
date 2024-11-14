@@ -16,19 +16,17 @@ class Product(Base, base.LKF_Base):
             self.kwargs['MODULES'].append(self.__class__.__name__)
             
         self.PRODUCT = self.lkm.catalog_id('product_catalog')
-        
         self.PRODUCT_ID = self.PRODUCT.get('id')
         self.PRODUCT_OBJ_ID = self.PRODUCT.get('obj_id')
 
-        try:
-            self.SKU = self.lkm.catalog_id('sku_catalog')
-            self.SKU_ID = self.SKU.get('id')
-            self.SKU_OBJ_ID = self.SKU.get('obj_id')
-        except:
+        self.SKU = self.lkm.catalog_id('sku_catalog')
+        self.SKU_ID = self.SKU.get('id')
+        self.SKU_OBJ_ID = self.SKU.get('obj_id')
+        if not self.SKU:
             self.SKU = self.lkm.catalog_id('product_recipe')
             self.SKU_ID = self.SKU.get('id')
             self.SKU_OBJ_ID = self.SKU.get('obj_id')
-
+            
         ###### Depricated ######
         try:
             self.PRODUCT_RECIPE = self.lkm.catalog_id('product_recipe')

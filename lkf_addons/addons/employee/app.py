@@ -67,11 +67,13 @@ class Employee(Base, base.LKF_Base):
             'email':'6653f3709c6d89925dc04b2f',
             'area_default':'6653f2d49c6d89925dc04b27',
             'picture':'663bcbe2274189281359eb70',
+            'picture_jefes':'663bd4f719b0aab097e97cde',
             'rfc':'663bcbe2274189281359eb71',
             'curp':'663bcbe2274189281359eb72',
             'nss':'663bcbe2274189281359eb73',
             'fecha_nacimiento':'663bcbe2274189281359eb74',
             'genero':'663bcbe2274189281359eb75',
+            'genero_jefes':'663bd5c0b6e749213859eb6f',
             'status_en_empresa':'663bcbe2274189281359eb77',
             'team_name':'62c5ff0162a70c261328845d',
             'telefono1':'66c3c17ece46780a6953aa29',
@@ -81,7 +83,6 @@ class Employee(Base, base.LKF_Base):
             'worker_position':'663bc4c79b8046ce89e97cf4',
             'worker_position_code':'670f57c281ad62446e641602',
             'worker_name_b':'663bd36eb19b7fb7d9e97ccb',
-            'worker_code':'670f585bf844ff7bc357b1dc',
                 }
 
         self.f.update(self.employee_fields)

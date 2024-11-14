@@ -192,20 +192,19 @@ class Base(base.LKF_Base):
         return result if result else None
 
     def load(self, module , module_class=None, import_as=None, **kwargs):
-        print('loading module', module)
-        print('loading module_class', module_class)
         if not module_class:
             module_class = module
         if not import_as:
             import_as = module_class
-        print('loading module ..kwargs', kwargs.get('MODULES'))
         self.master = False
-        if module not in kwargs.get('MODULES') or not hasattr(self, import_as):
+        #if module not in kwargs.get('MODULES'):
+        if hasattr(self, import_as):
+            pass
+        else:
             # from lkf_addons.addons.stock.app import Stock
             imp_module = importlib.import_module(f'lkf_addons.addons.{module.lower()}.app')
             AddonsClass = getattr(imp_module, module_class)
             # scripts = importlib.import_module('{}.items.scripts'.format(module))
-            print('import_as', import_as)
             setattr(self, import_as, AddonsClass(self.settings, sys_argv=self.sys_argv, use_api=self.use_api, **self.kwargs))
             if module not in self.kwargs['MODULES']:
                 self.kwargs['MODULES'].append(module)
