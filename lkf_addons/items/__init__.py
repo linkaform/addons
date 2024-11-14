@@ -13,6 +13,7 @@ MODULES_PATH = '/srv/scripts/addons/modules'
 
 default_image = 'linkaform/python3_lkf:latest'
 
+from collections.abc import MutableMapping
 
 class LKFException(BaseException):
     def __init__(self, message, res=None):
@@ -385,39 +386,73 @@ class Items(LKFException):
         # else:
         #     raise LKFException('No file with name: {} found, at path: {}'.format(file_name, file_path))
 
+
+    def hacer_hashable(self, d):
+        if isinstance(d, MutableMapping):
+            return frozenset((k, self.hacer_hashable(v)) for k, v in d.items())
+        elif isinstance(d, list):
+            return tuple(self.hacer_hashable(item) for item in d)
+        return d
+
     def merge_addons_modules(self, list1, list2):
-        result = []
-        # Helper function to find if a dictionary exists in the result and returns its index
-        def find_dict_in_list(dict_item, list_of_items):
-            for index, item in enumerate(list_of_items):
-                if isinstance(item, dict) and item.keys() == dict_item.keys():
-                    return index
-            return -1
-        # Function to merge two dictionaries
-        def merge_dicts(dict1, dict2):
-            for key in dict2:
-                if key in dict1:
-                    # Assuming values in these dictionaries are lists
-                    dict1[key] = list(set(dict1[key] + dict2[key]))
+        merged = []
+
+        def merge_elements(element1, element2):
+            # If both are dictionaries, merge by keys
+            if isinstance(element1, dict) and isinstance(element2, dict):
+                merged_dict = {}
+                keys = set(element1.keys()).union(element2.keys())
+                for key in keys:
+                    if key in element1 and key in element2:
+                        merged_dict[key] = merge_elements(element1[key], element2[key])
+                    elif key in element1:
+                        merged_dict[key] = element1[key]
+                    else:
+                        merged_dict[key] = element2[key]
+                return merged_dict
+            
+            # If both are lists, merge them
+            elif isinstance(element1, list) and isinstance(element2, list):
+                return self.merge_addons_modules(element1, element2)
+            
+            # If they're the same element or different types, return without duplication
+            return element1 if element1 == element2 else [element1, element2]
+
+        # Helper to find a dictionary in a list by a given key
+        def find_dict_by_key(lst, key):
+            for item in lst:
+                if isinstance(item, dict) and key in item:
+                    return item
+            return None
+
+        for item1 in list1:
+            if isinstance(item1, dict):
+                key = next(iter(item1))  # Get the dictionary key
+                # Find matching dictionary in list2 by key
+                matching_item2 = find_dict_by_key(list2, key)
+                if matching_item2:
+                    merged.append({key: merge_elements(item1[key], matching_item2[key])})
                 else:
-                    dict1[key] = dict2[key]
-            return dict1
-        # Add items from both lists into result
-        for item in list1 + list2:
-            if isinstance(item, dict):
-                idx = find_dict_in_list(item, result)
-                if idx >= 0:
-                    result[idx] = merge_dicts(result[idx], item)
-                else:
-                    result.append(item)
-            elif item not in result:
-                result.append(item)
-        return result
+                    merged.append(item1)
+            else:
+                merged.append(item1)
+
+        # Add unique items from list2 that weren't merged already
+        for item2 in list2:
+            if isinstance(item2, dict):
+                key = next(iter(item2))
+                if not find_dict_by_key(merged, key):
+                    merged.append(item2)
+            elif item2 not in merged:
+                merged.append(item2)
+
+        return merged
 
     def get_anddons_and_modules_items(self, itype, sub_dir=None):
         res_addons = self.get_all_items_json(itype, sub_dir=sub_dir, path=ADDONS_PATH)
         res_modules = self.get_all_items_json(itype, sub_dir=sub_dir, path=MODULES_PATH)
         addons_modules = self.merge_addons_modules(res_addons,res_modules)
+        print('addons_modules', addons_modules)
         return addons_modules
 
     def get_all_items_json(self, itype, sub_dir=None, path=MODULES_PATH):
