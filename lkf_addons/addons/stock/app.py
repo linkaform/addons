@@ -7,8 +7,8 @@ from bson import ObjectId
 
 from linkaform_api import base
 
-from lkf_addons.addons.employee.app import Employee
-from lkf_addons.addons.product.app import Product, Warehouse
+# from lkf_addons.addons.employee.app import Employee
+# from lkf_addons.addons.product.app import Product, Warehouse
 
 # from lkf_addons.addons.jit.app import JIT
 from lkf_addons.addons.base.app import Base

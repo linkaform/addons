@@ -4,13 +4,14 @@ from datetime import timedelta, datetime
 import math, simplejson, time
 from copy import deepcopy
 
-from .stock_utils import Stock
+# from .stock_utils import Stock
+# from lkf_addons.addons.stock.app import Stock
 
 
 from linkaform_api import base
 
 
-class Reports(base.LKF_Report, Stock):
+class Reports(base.LKF_Report):
 
 
     def detail_adjustment_moves(self, warehouse=None, product_code=None, lot_number=None,  location=None, date_from=None, date_to=None, status='done', **kwargs):
