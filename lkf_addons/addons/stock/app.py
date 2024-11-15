@@ -7,8 +7,8 @@ from bson import ObjectId
 
 from linkaform_api import base
 
-from lkf_addons.addons.employee.app import Employee
-from lkf_addons.addons.product.app import Product, Warehouse
+# from lkf_addons.addons.employee.app import Employee
+# from lkf_addons.addons.product.app import Product, Warehouse
 
 # from lkf_addons.addons.jit.app import JIT
 from lkf_addons.addons.base.app import Base
@@ -35,7 +35,7 @@ class Stock(Base):
         self.name =  __class__.__name__
         self.settings = settings
 
-        self.STOCK_INVENTORY = self.lkm.catalog_id('stock_inventory')
+        self.STOCK_INVENTORY = self.lkm.catalog_id('stock_inventory',{} )
         self.STOCK_INVENTORY_ID = self.STOCK_INVENTORY.get('id')
         self.STOCK_INVENTORY_OBJ_ID = self.STOCK_INVENTORY.get('obj_id')
 
@@ -66,9 +66,10 @@ class Stock(Base):
             self.STOCK_IN_ONE_MANY_ONE
             ]
 
-        self.FORM_CATALOG_DIR = {
-            self.FORM_INVENTORY_ID: self.CATALOG_INVENTORY_ID, #Inventory Flow (greenHouse)
-            }
+        if self.FORM_INVENTORY_ID:
+            self.FORM_CATALOG_DIR = {
+                self.FORM_INVENTORY_ID: self.CATALOG_INVENTORY_ID, #Inventory Flow (greenHouse)
+                }
 
         self.container_per_rack = {
                 'Baby Jar': 38,
@@ -291,8 +292,6 @@ class Stock(Base):
     def calculates_production_warehouse(self):
         production_recipe = self.answers.get(self.f['product_recipe'], {})
         prod_status = self.answers.get(self.f['production_left_overs'],'')
-        print('self.TEAM_OBJ_ID', self.TEAM_OBJ_ID)
-        print('self.TEAM_OBJ_ID', self.answers.get(self.TEAM_OBJ_ID))
         team = self.answers.get(self.TEAM_OBJ_ID).get(self.f['team_name'])
         qty_per_container = production_recipe.get(self.f['reicpe_per_container'], [])
         if qty_per_container:
