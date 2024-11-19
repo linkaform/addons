@@ -26,7 +26,9 @@ Si tienes más de una aplicación, puedes:
     b. Guardar los archivos a nivel raíz.
     c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
 '''
-
+import tempfile
+import os
+import uuid
 import simplejson, time
 from bson import ObjectId
 from datetime import datetime
@@ -463,6 +465,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'foto_pase_id':f"{self.mf['foto']}",
             'identificacion_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}",
             'identificacion_pase_id':f"{self.mf['identificacion']}",
+            'archivo_invitacion': '673773741b2adb2d05d99d63',
             'motivo':f"{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
             'nombre_area':f"{self.mf['nombre_area']}",
             'nombre_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
@@ -1347,6 +1350,62 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print('answers', simplejson.dumps(metadata, indent=4))
         return self.lkf_api.post_forms_answers(metadata)
     
+    def upload_ics(self, id_forma_seleccionada, id_field, ics_content={}):
+        # Convertir fechas al formato solicitado para el invite.ics
+        start_date = ics_content.get('fecha', {}).get('desde')
+        fecha_objeto = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+        fecha_salida = fecha_objeto.strftime("%Y%m%dT%H%M%S")
+
+        end_date = ics_content.get('fecha', {}).get('hasta')
+        fecha_end_salida = ''
+        if end_date:
+            fecha_end_objeto = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
+            fecha_end_salida = fecha_end_objeto.strftime("%Y%m%dT%H%M%S")
+
+        ics_content['fecha']['desde'] = fecha_salida
+        ics_content['fecha']['hasta'] = fecha_end_salida
+
+        # Obtener los valores del objeto
+        organizer_name = ics_content.get('nombre_organizador')
+        organizer_email = ics_content.get('email_from')
+        start_date = ics_content.get('fecha', {}).get('desde')
+        summary = ics_content.get('asunto')
+        location = ics_content.get('ubicacion')
+
+        event = EventInvitation(organizer_name, organizer_email, start_date, summary, location)
+        event.add_attendee(ics_content.get("nombre"), ics_content.get("email_to"))
+        event.add_description(ics_content.get('descripcion'))
+        ics_content = event.generate_ics()
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.ics', mode='w', encoding='utf-8') as temp_file:
+            temp_file.write(ics_content)
+            temp_file_path = temp_file.name
+
+        file_link, file_name = os.path.split(temp_file_path)
+        rb_file = open(temp_file_path, 'rb')
+        dir_file = {'File': rb_file}
+        
+        try:
+            upload_data = {'form_id': id_forma_seleccionada, 'field_id': id_field}
+            upload_url = self.lkf_api.post_upload_file(data=upload_data, up_file=dir_file)
+            rb_file.close()
+        except Exception as e:
+            rb_file.close()
+            os.remove(temp_file_path)
+            print("Error al subir el archivo:", e)
+            return {"error": "Fallo al subir el archivo"}
+
+        try:
+            file_url = upload_url['data']['file']
+            update_file = {'file_name': file_name, 'file_url': file_url}
+        except KeyError:
+            print('No se pudo obtener la URL del archivo')
+            update_file = {"error": "Fallo al obtener la URL del archivo"}
+        finally:
+            os.remove(temp_file_path)
+        
+        return update_file
+
     def create_enviar_msj(self, data_msj, data_cel_msj=None, folio=None):
         data_msj['enviado_desde'] = 'Modulo de Accesos'
         return self.send_email_by_form(data_msj)
@@ -1359,8 +1418,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             return {'status_code':200}
 
     def create_enviar_correo(self, data_msj, folio=None):
-        access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
-        res_update= self.update_pass(access_pass=access_pass, folio=folio)
+        id_forma = 121736
+        id_campo = '673773741b2adb2d05d99d63'
+
+        respuesta_ics = self.upload_ics(id_forma, id_campo, data_msj)
+        file_name = respuesta_ics.get('file_name', '')
+        file_url = respuesta_ics.get('file_url', '')
+        access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"], "archivo_invitacion": [
+            {
+                "file_name": f"{file_name}",
+                "file_url": f"{file_url}"
+            }
+        ]}
+
+        res_update = self.update_pass(access_pass=access_pass, folio=folio)
+        
+        # Obtener informacion del pase
+        # info_pase = self.get_detail_access_pass(qr_code='673cca79384193875e882353')
+        # print('//////////////////////////////////////////////////////////', info_pase)
+        
+        # Lo que tenia
+        # access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
+        # res_update= self.update_pass(access_pass=access_pass, folio=folio)
         res_update.get('status_code') == 201
         return res_update
      
@@ -2028,7 +2107,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'grupo_instrucciones_pase': f"$answers.{self.mf['grupo_instrucciones_pase']}",
                 'comentario': f"$answers.{self.mf['grupo_instrucciones_pase']}",
                 'codigo_qr': f"$answers.{self.mf['codigo_qr']}",
-                'qr_pase': f"$answers.{self.mf['qr_pase']}"
+                'qr_pase': f"$answers.{self.mf['qr_pase']}",
+                'tema_cita': f"$answers.{self.pase_entrada_fields['tema_cita']}",
+                'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}"
                 },
             },
             {'$sort':{'folio':-1}},
@@ -3429,6 +3510,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.mf['grupo_equipos']] = list_equipos
             elif key == 'status_pase':
                 answers.update({f"{self.pase_entrada_fields[key]}":value.lower()})
+            elif key == 'archivo_invitacion':
+                answers.update({f"{self.pase_entrada_fields[key]}": value})    
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
@@ -3443,6 +3526,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res['json'].update({'ubicacion':pass_selected.get('ubicacion')})
                 res['json'].update({'fecha_desde':pass_selected.get('fecha_de_expedicion')})
                 res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
+                res['json'].update({'asunto':pass_selected.get('tema_cita')})
+                res['json'].update({'descripcion':pass_selected.get('descripcion')})
                 res['json'].update({'pdf': pdf})
                 return res
             else: 
@@ -3510,3 +3595,87 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'group_level':3
         }
         return self.catalogo_view(catalog_id, form_id, options, detail=True)
+    
+class EventInvitation:
+    def __init__(self, organizer_name, organizer_email, start_date, summary, location):
+        self.organizer_name = organizer_name
+        self.organizer_email = organizer_email
+        self.start_date = start_date
+        self.summary = summary
+        self.location = location
+        
+        self.attendees = []
+        self.end_date = None
+        self.description = ""
+        self.meeting_link = None
+        self.timezone = "America/Monterrey"
+        self.uid = str(uuid.uuid4())
+        self.dt_stamp = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+        self.created_date = self.dt_stamp
+        self.last_modified_date = self.dt_stamp
+
+    def add_attendee(self, name, email):
+        """Añadir un asistente individualmente"""
+        attendee = {'name': name, 'email': email}
+        self.attendees.append(attendee)
+
+    def add_end_date(self, end_date):
+        """Añadir fecha de fin"""
+        self.end_date = end_date
+
+    def add_description(self, description):
+        """Añadir descripción"""
+        self.description = description
+
+    def add_meeting_link(self, meeting_link):
+        """Añadir enlace de Google Meet"""
+        self.meeting_link = meeting_link
+
+    def generate_ics(self):
+        if not self.attendees:
+            raise ValueError("Debe agregar al menos un asistente para generar el archivo .ics, puedes utilizar add_attendee(name, email) para hacerlo...")
+
+        attendees_str = ""
+        for attendee in self.attendees:
+            attendees_str += f"ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN={attendee['name']}:mailto:{attendee['email']}\n"
+
+        ics_content = f"""BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:{self.timezone}
+X-LIC-LOCATION:{self.timezone}
+BEGIN:STANDARD
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0600
+TZNAME:CST
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID={self.timezone}:{self.start_date}
+DTSTAMP:{self.dt_stamp}
+ORGANIZER;CN={self.organizer_name}:mailto:{self.organizer_email}
+UID:{self.uid}
+{attendees_str}
+CREATED:{self.created_date}
+DESCRIPTION:{self.description}
+LAST-MODIFIED:{self.last_modified_date}
+LOCATION:{self.location}
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:{self.summary}
+TRANSP:OPAQUE
+"""
+        
+        if self.end_date:
+            ics_content += f"DTEND;TZID={self.timezone}:{self.end_date}\n"
+
+        if self.meeting_link:
+            ics_content += f"X-GOOGLE-CONFERENCE:{self.meeting_link}\n"
+
+        ics_content += "END:VEVENT\nEND:VCALENDAR"
+
+        return ics_content
