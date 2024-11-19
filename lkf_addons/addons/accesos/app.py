@@ -463,6 +463,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'foto_pase_id':f"{self.mf['foto']}",
             'identificacion_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}",
             'identificacion_pase_id':f"{self.mf['identificacion']}",
+            'archivo_invitacion': '673773741b2adb2d05d99d63',
             'motivo':f"{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
             'nombre_area':f"{self.mf['nombre_area']}",
             'nombre_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
@@ -2002,7 +2003,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'grupo_instrucciones_pase': f"$answers.{self.mf['grupo_instrucciones_pase']}",
                 'comentario': f"$answers.{self.mf['grupo_instrucciones_pase']}",
                 'codigo_qr': f"$answers.{self.mf['codigo_qr']}",
-                'qr_pase': f"$answers.{self.mf['qr_pase']}"
+                'qr_pase': f"$answers.{self.mf['qr_pase']}",
+                'tema_cita': f"$answers.{self.pase_entrada_fields['tema_cita']}",
+                'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}"
                 },
             },
             {'$sort':{'folio':-1}},
@@ -3401,6 +3404,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.mf['grupo_equipos']] = list_equipos
             elif key == 'status_pase':
                 answers.update({f"{self.pase_entrada_fields[key]}":value.lower()})
+            elif key == 'archivo_invitacion':
+                answers.update({f"{self.pase_entrada_fields[key]}": value})    
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
