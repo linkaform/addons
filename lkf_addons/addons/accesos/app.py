@@ -74,7 +74,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
-        # self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
+        self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
         # self.FORM_ALTA_EQUIPOS = self.lkm.form_id('alta_de_equipos','id')
@@ -543,6 +543,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'link':'6732aa1189fc6b0ae27e3824',
             'enviar_correo':'6732a153496e3b26d18e7ee1',
             'enviar_correo_pre_registro':'6734c6d5254e9a61df8e7f51'
+        })
+
+        self.conf_accesos_fields.update({
+            'usuario_cat':  f"{self.EMPLOYEE_OBJ_ID}",
+            'grupos':f"{self.GRUPOS_OBJ_ID}",
+            'menus':"6722472f162366c38ebe1c64",
         })
 
         self.notes_project_fields.update(self.notes_fields)
@@ -1939,6 +1945,26 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         result  = self._labels(result, self.mf)
         return result
 
+    def get_config_accesos(self, id_user):
+        print("objetener la configuracion de accesos")
+        response = []
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.CONFIG_ACCESOS,
+            "_id":ObjectId(id_user),
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                "usuario": f"$created_by_id",
+                "grupos": f"$created_by_email",
+                "menus": f"$answers.{self.notes_fields['note_status']}",
+            }},
+            {'$sort':{'folio':-1}},
+        ]
+        # print('answers', simplejson.dumps(query, indent=4))
+        return self.format_cr(self.cr.aggregate(query))
+
     def get_detail_access_pass(self, qr_code):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -2735,6 +2761,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         load_shift_json = { }
         username = self.user.get('username')
         user_id = self.user.get('user_id')
+        config_accesos_user= get_config_accesos(user_id)
         user_status = self.get_employee_checkin_status(user_id, as_shift=True,  available=False)
         this_user = user_status.get(user_id)
         if not this_user:
@@ -2791,6 +2818,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         load_shift_json["guard"] = self.update_guard_status(guard, this_user)
         load_shift_json["notes"] = notes
         load_shift_json["user_booths"] = user_booths
+        load_shift_json['config_accesos_user']=config_accesos_user
         # load_shift_json["guards_online"] = guards_online
         return load_shift_json
 
