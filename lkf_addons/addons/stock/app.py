@@ -2284,7 +2284,6 @@ class Stock(Base):
     def stock_inventory_model(self, product, recipe, labels=False):
         if labels:
             product = self._lables_to_ids(product)
-            print('>>>>product',product)
             res = {}
             res[self.Product.SKU_OBJ_ID ] = deepcopy(product)
         else:

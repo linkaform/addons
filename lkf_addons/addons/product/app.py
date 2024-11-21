@@ -107,7 +107,7 @@ class Product(Base, base.LKF_Base):
         list_response.sort()           
         return list_response
         
-    def get_catalog_product(self):
+    def get_product_catalog(self):
         match_query = { 
             'deleted_at':{"$exists":False},
         }
@@ -122,6 +122,24 @@ class Product(Base, base.LKF_Base):
         res = self.lkf_api.search_catalog( 123105, mango_query)
         res_format = self.format_catalog_product(res)
         return res_format   
+
+    def get_catalog_product(self, query={}):
+        return self.get_product_catalog(query)
+
+    def match_query(self, product_code=None, sku=None, group_id=None):
+        query = {}
+        print('product_code', product_code)
+        if group_id:
+            if product_code:
+                query.update({f"answers.{group_id}.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+            if sku:
+                query.update({f"answers.{group_id}.{self.SKU_OBJ_ID}.{self.f['sku']}":sku})
+        else:
+            if product_code:
+                query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+            if sku:
+                query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['sku']}":sku})
+        return query
 
 class Warehouse(Base ,base.LKF_Base):
 

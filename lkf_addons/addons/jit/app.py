@@ -105,7 +105,13 @@ class JIT(Base):
         #     self.JIT =True
         #     print('dir self', dir(self))
         #    self.STOCK = Stock( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
-        f ={
+        f = {
+            'alloctaion_group':'66da3bddb22bcdcc2f341f0b',
+            'allocation_source_document':'66da48a1b22bcdcc2f341f2a',
+            'allocation_source_document_type':'66da48a1b22bcdcc2f341f2b',
+            'allocation_qty':'66da3e14b22bcdcc2f341f11',
+            'allocation_proc_method':'673e20c55f1c35d02395a6d2',
+            'dias_laborales_consumo':'66ececbcc9aefada5b04b800',
             'borrar_historial':'671fbd248e46aab662455b40',
             'bom_name':'66d8e063b22bcdcc2f341e84',
             'bom_type':'66d8dfbcb22bcdcc2f341e81',
@@ -115,6 +121,26 @@ class JIT(Base):
             'dias_laborales_consumo':'66ececbcc9aefada5b04b800',
             'factor_crecimiento_jit':'66ececbcc9aefada5b04b801',
             'factor_seguridad_jit':'66ececbcc9aefada5b04b802',
+            'allocation_status':'673e20f75f1c35d02395a6d3',
+            'fecha_demanda':'66ea6c28c9aefada5b04b76c',
+            'input_goods_product_code':'71ef32bcdf0ec2ba73dec33d',
+            'input_goods_product_name':'71ef32bcdf0ec2ba73dec33e',
+            'input_goods_sku':'75dec64a3199f9a040829243',
+            'lead_time':'66d8ee99b22bcdcc2f341e8a',
+            'month': '6206b9ae8209a9677f9b8bd9',
+            'min_stock':'66ea62dac9aefada5b04b739',
+            'max_stock':'66ea62dac9aefada5b04b73a',
+            'procurment_method':'66d92acdb22bcdcc2f341ebf',
+            'procurment_status':'621cdeeec9c81e23bb6380fc',
+            'procurment_date':'66da0c19b22bcdcc2f341f06',
+            'procurment_schedule_date':'66da538cb22bcdcc2f341f47',
+            'procurment_qty':'66da3bddb22bcdcc2f341f08',
+            'qty': '6206b9ae8209a9677f9b8bdb',
+            'qty_allocated': '66da3bddb22bcdcc2f341f09',
+            'qty_available': '66da3bddb22bcdcc2f341f0a',
+            'status':'620ad6247a217dbcb888d175',
+            'safety_stock':'66ea62dac9aefada5b04b738',
+            'standar_pack':'671b22d738a541183685d077',
             'status':'620ad6247a217dbcb888d175',
             'tipo_almacen': '66ed0c88c9aefada5b04b818',
             }
@@ -385,8 +411,8 @@ class JIT(Base):
         match_query ={ 
              'form_id': self.BOM_ID,  
              'deleted_at' : {'$exists':False},
-             f'answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}': product_code,
-             f'answers.{self.Product.SKU_OBJ_ID}.{self.f["product_sku"]}': product_sku,
+             f'answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_code"]}': product_code,
+             f'answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_sku"]}': product_sku,
              f'answers.{self.mf["bom_type"]}': bom_type,
              f'answers.{self.mf["bom_status"]}': 'active',
          } 

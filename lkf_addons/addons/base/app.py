@@ -125,6 +125,7 @@ class Base(base.LKF_Base):
             'country_code':'663a7ca6e48382c5b12308fb',
             'country_ph_code':'663a7ca6e48382c5b12308fc',
             'city':'6654187fc85ce22aaf8bb070',
+            'client':'667468e3e577b8b98c852aaa',
             'email':'663a7ee1e48382c5b1230907',
             'email_contacto':'66bfd647cd15883ed163e9b5',
             'nombre_comercial':'667468e3e577b8b98c852aaa',
