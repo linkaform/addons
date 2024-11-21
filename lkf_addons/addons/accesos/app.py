@@ -26,11 +26,14 @@ Si tienes más de una aplicación, puedes:
     b. Guardar los archivos a nivel raíz.
     c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
 '''
-
+import tempfile
+import os
+import uuid
 import simplejson, time
 from bson import ObjectId
 from datetime import datetime
 from copy import deepcopy
+import urllib.parse
 
 from linkaform_api import base
 from lkf_addons.addons.base.app import Base
@@ -85,7 +88,7 @@ class Accesos(Base):
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
-        # self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
+        self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
         # self.FORM_ALTA_EQUIPOS = self.lkm.form_id('alta_de_equipos','id')
@@ -179,6 +182,7 @@ class Accesos(Base):
 
         mf = {
             'articulo':'66ce2441d63bb7a3871adeaf',
+            'areas_grupo':'663cf9d77500019d1359eb9f',
             #LOS CATALOGOS NO SE CCLASIFICAN COMO CAMPOS            
             'catalog_area_pase':'664fc5f3bbbef12ae61b15e9',
             'catalog_caseta':'66566d60d4619218b880cf04',
@@ -483,6 +487,7 @@ class Accesos(Base):
             'foto_pase_id':f"{self.mf['foto']}",
             'identificacion_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}",
             'identificacion_pase_id':f"{self.mf['identificacion']}",
+            'archivo_invitacion': '673773741b2adb2d05d99d63',
             'motivo':f"{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
             'nombre_area':f"{self.mf['nombre_area']}",
             'nombre_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
@@ -531,6 +536,8 @@ class Accesos(Base):
         # self.pase_entrada_fields.update(self.pase_grupo_vehiculos)
         self.pase_entrada_fields.update({
             'ubicacion': f"{self.Location.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+            'ubicacion_cat': f"{self.Location.UBICACIONES_CAT_OBJ_ID}",
+            'ubicacion_nombre':self.mf['ubicacion'],
             'nombre_visita': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['nombre_visita']}",
             'email_vista': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['email_vista']}",
             'curp': self.unlist(f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['curp']}"),
@@ -541,10 +548,11 @@ class Accesos(Base):
             'empresa': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['empresa']}",
             'status_visita': f"{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{mf['status_visita']}",
             'nombre_perfil': f"{self.CONFIG_PERFILES_OBJ_ID}.{mf['nombre_perfil']}",
-            'grupo_visitados': self.mf['grupo_visitados'],
             #'nombre_perfil': f"{self.mf['grupo_visitados']}{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'worker_department': f"{self.mf['grupo_visitados']}{self.Employee.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'worker_position': f"{self.mf['grupo_visitados']}{self.Employee.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
+            'catalago_autorizado_por': f"{self.Employee.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}",
+            'autorizado_por': self.mf['nombre_guardia_apoyo'],
             'tipo_visita_pase': self.mf['tipo_visita_pase'],
             'grupo_visitados': self.mf['grupo_visitados'],
             'fecha_desde_visita': self.mf['fecha_desde_visita'],
@@ -552,6 +560,20 @@ class Accesos(Base):
             'config_dia_de_acceso': self.mf['config_dia_de_acceso'],
             'config_limitar_acceso': self.mf['config_limitar_acceso'],
             'config_dias_acceso': self.mf['config_dias_acceso'],
+            'area_catalog_normal':  f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
+            'area_catalog':  f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
+            'area': '663fb45992f2c5afcfe97ca8',
+            'tema_cita':'67329875978e6460083c5648',
+            'descripcion': '67329875978e6460083c5649',
+            'link':'6732aa1189fc6b0ae27e3824',
+            'enviar_correo':'6732a153496e3b26d18e7ee1',
+            'enviar_correo_pre_registro':'6734c6d5254e9a61df8e7f51'
+        })
+
+        self.conf_accesos_fields.update({
+            'usuario_cat':  f"{self.EMPLOYEE_OBJ_ID}",
+            'grupos':f"{self.GRUPOS_OBJ_ID}",
+            'menus':"6722472f162366c38ebe1c64",
         })
 
         self.notes_project_fields.update(self.notes_fields)
@@ -1053,8 +1075,35 @@ class Accesos(Base):
         depositos = self.answers.get(self.incidence_fields['datos_deposito_incidencia'],[])
         return sum([x[self.incidence_fields['cantidad']] for x in depositos])
 
-    def catalago_area_location(self, location_name):
-        return self.get_areas_by_location(location_name)
+    def catalagos_pase(self, user_id, location_name):
+        res={
+            "areas_by_location" : self.get_areas_by_location(location_name)
+        }
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.CONF_AREA_EMPLEADOS,
+        }
+        if user_id:
+            match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}"] = user_id
+
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                'area':f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+            }}
+        ]
+        response = self.format_cr_result(self.cr.aggregate(query))
+        ubicaciones = response.pop().get('area', [])
+        ubicaciones = list(set(ubicaciones))
+        res['ubicaciones_user'] = ubicaciones
+        return res
+
+    def catalagos_pase_no_jwt(self, qr_code):
+        cat_vehiculos= self.catalogo_vehiculos({})
+        cat_estados= self.catalogo_estados({})
+        pass_selected= self.get_pass_custom(qr_code)
+        res={"cat_vehiculos":cat_vehiculos, "cat_estados":cat_estados, "pass_selected":pass_selected}
+        return res
 
     def catalogo_categoria(self, options={}):
         catalog_id = self.ESTADO_ID
@@ -1065,7 +1114,6 @@ class Accesos(Base):
     def catalogo_estados(self, options={}):
         catalog_id = self.ESTADO_ID
         form_id = self.PASE_ENTRADA
-        group_level = options.get('group_level',1)
         return self.catalogo_view(catalog_id, form_id)
 
     def catalogo_incidencias(self):
@@ -1077,13 +1125,11 @@ class Accesos(Base):
     def catalogo_vehiculos(self, options={}):
         catalog_id = self.VH.TIPO_DE_VEHICULO_ID
         form_id = self.PASE_ENTRADA
-        group_level = options.get('group_level',1)
         return self.catalogo_view(catalog_id, form_id, options=options)
 
     def catalogo_view(self, catalog_id, form_id, options={}, detail=False):
         catalog_id = catalog_id
         form_id = form_id
-        group_level = options.get('group_level',1)
         res = self.lkf_api.catalog_view(catalog_id, form_id, options)
         if detail:
             if res and len(res) > 0:
@@ -1327,9 +1373,99 @@ class Accesos(Base):
         print('answers', simplejson.dumps(metadata, indent=4))
         return self.lkf_api.post_forms_answers(metadata)
     
-    def create_enviar_msj(self, data_msj):
-        data_msj['enviado_desde'] = 'Modulo de Acceos'
+    def upload_ics(self, id_forma_seleccionada, id_field, ics_content={}):
+        # Convertir fechas al formato solicitado para el invite.ics
+        start_date = ics_content.get('fecha', {}).get('desde')
+        fecha_objeto = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+        fecha_salida = fecha_objeto.strftime("%Y%m%dT%H%M%S")
+
+        end_date = ics_content.get('fecha', {}).get('hasta')
+        fecha_end_salida = ''
+        if end_date:
+            fecha_end_objeto = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
+            fecha_end_salida = fecha_end_objeto.strftime("%Y%m%dT%H%M%S")
+
+        ics_content['fecha']['desde'] = fecha_salida
+        ics_content['fecha']['hasta'] = fecha_end_salida
+
+        # Obtener los valores del objeto
+        organizer_name = ics_content.get('nombre_organizador')
+        organizer_email = ics_content.get('email_from')
+        start_date = ics_content.get('fecha', {}).get('desde')
+        summary = ics_content.get('asunto')
+        location = ics_content.get('ubicacion')
+
+        event = EventInvitation(organizer_name, organizer_email, start_date, summary, location)
+        event.add_attendee(ics_content.get("nombre"), ics_content.get("email_to"))
+        event.add_description(ics_content.get('descripcion'))
+        ics_content = event.generate_ics()
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.ics', mode='w', encoding='utf-8') as temp_file:
+            temp_file.write(ics_content)
+            temp_file_path = temp_file.name
+
+        file_link, file_name = os.path.split(temp_file_path)
+        rb_file = open(temp_file_path, 'rb')
+        dir_file = {'File': rb_file}
+        
+        try:
+            upload_data = {'form_id': id_forma_seleccionada, 'field_id': id_field}
+            upload_url = self.lkf_api.post_upload_file(data=upload_data, up_file=dir_file)
+            rb_file.close()
+        except Exception as e:
+            rb_file.close()
+            os.remove(temp_file_path)
+            print("Error al subir el archivo:", e)
+            return {"error": "Fallo al subir el archivo"}
+
+        try:
+            file_url = upload_url['data']['file']
+            update_file = {'file_name': file_name, 'file_url': file_url}
+        except KeyError:
+            print('No se pudo obtener la URL del archivo')
+            update_file = {"error": "Fallo al obtener la URL del archivo"}
+        finally:
+            os.remove(temp_file_path)
+        
+        return update_file
+
+    def create_enviar_msj(self, data_msj, data_cel_msj=None, folio=None):
+        data_msj['enviado_desde'] = 'Modulo de Accesos'
         return self.send_email_by_form(data_msj)
+
+    def create_enviar_msj_pase(self, data_cel_msj=None, folio=None):
+        mensaje = data_cel_msj.get('mensaje', '')
+        phone_to = data_cel_msj.get('numero', '')
+        res =self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
+        if res:
+            return {'status_code':200}
+
+    def create_enviar_correo(self, data_msj, folio=None):
+        id_forma = 121736
+        id_campo = '673773741b2adb2d05d99d63'
+
+        respuesta_ics = self.upload_ics(id_forma, id_campo, data_msj)
+        file_name = respuesta_ics.get('file_name', '')
+        file_url = respuesta_ics.get('file_url', '')
+        access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"], "archivo_invitacion": [
+            {
+                "file_name": f"{file_name}",
+                "file_url": f"{file_url}"
+            }
+        ]}
+
+        res_update = self.update_pass(access_pass=access_pass, folio=folio)
+        
+        # Obtener informacion del pase
+        # info_pase = self.get_detail_access_pass(qr_code='673cca79384193875e882353')
+        # print('//////////////////////////////////////////////////////////', info_pase)
+        
+        # Lo que tenia
+        # access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
+        # res_update= self.update_pass(access_pass=access_pass, folio=folio)
+        res_update.get('status_code') == 201
+        return res_update
+     
 
     def create_failure(self, data_failures):
         #---Define Metadata
@@ -1490,6 +1626,7 @@ class Accesos(Base):
 
     def create_access_pass(self, location, access_pass):
         #---Define Metadata
+        print("ACESSSSS_PASSSSSSS", simplejson.dumps(access_pass, indent=4))
         metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
         metadata.update({
             "properties": {
@@ -1518,6 +1655,14 @@ class Accesos(Base):
             answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',"")
             answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
             answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
+            answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:access_pass.get('visita_a',"")}
+            answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
+            answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
+            answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
+            answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',"") 
+            answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"") 
+            answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',"") 
+
         else:
             answers[self.mf['fecha_desde_visita']] = now_datetime
             answers[self.mf['tipo_visita_pase']] = 'fecha_fija'
@@ -1550,9 +1695,10 @@ class Accesos(Base):
                     areas_list.append(
                         {
                             self.pase_entrada_fields['commentario_area']:c.get('commentario_area'),
-                            self.pase_entrada_fields['area'] :{self.pase_entrada_fields['nombre_area']: c.get('nombre_area')}
+                            self.pase_entrada_fields['area_catalog_normal'] :{self.mf['nombre_area']: c.get('nombre_area')}
                         }
                     )
+                    print("AREASSS", areas_list)
                 answers.update({self.pase_entrada_fields['grupo_areas_acceso']:areas_list})
         #Visita A
         answers[self.mf['grupo_visitados']] = []
@@ -1631,10 +1777,21 @@ class Accesos(Base):
         #             })
         #         answers[self.mf['grupo_equipos']] = list_equipos  
         #---Valor
-
         metadata.update({'answers':answers})
-        print('answers', simplejson.dumps(metadata, indent=4))
         res = self.lkf_api.post_forms_answers(metadata)
+        if res.get("status_code") ==200 or res.get("status_code")==201:
+            link_info=access_pass.get('link')
+            docs=""
+            for index, d in enumerate(link_info["docs"]): 
+                if(d == "agregarIdentificacion"):
+                    docs+="iden"
+                elif(d == "agregarFoto"):
+                    docs+="foto"
+                if index==0 :
+                    docs+="-"
+            link_pass= f"{link_info['link']}?id={res.get('json')['id']}&user={link_info['creado_por_id']}&docs={docs}"
+            access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])}
+            resUp= self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
         return res
 
     def format_personas_involucradas(self, data):
@@ -1735,7 +1892,6 @@ class Accesos(Base):
         res = []
         for v in data:
             row = {}
-            print("DATAAAA", v.get(self.VH.TIPO_DE_VEHICULO_OBJ_ID,{}).get(self.mf['tipo_vehiculo'],''))
             row['color'] = v.get(self.mf['color_vehiculo'],'').title()
             row['placas'] = v.get(self.mf['placas_vehiculo'],'')
             row['tipo'] = v.get('tipo_vehiculo','')
@@ -1891,6 +2047,26 @@ class Accesos(Base):
         result  = self._labels(result, self.mf)
         return result
 
+    def get_config_accesos(self, id_user):
+        print("objetener la configuracion de accesos")
+        response = []
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.CONFIG_ACCESOS,
+            "_id":ObjectId(id_user),
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                "usuario": f"$created_by_id",
+                "grupos": f"$created_by_email",
+                "menus": f"$answers.{self.notes_fields['note_status']}",
+            }},
+            {'$sort':{'folio':-1}},
+        ]
+        # print('answers', simplejson.dumps(query, indent=4))
+        return self.format_cr(self.cr.aggregate(query))
+
     def get_detail_access_pass(self, qr_code):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -1954,7 +2130,9 @@ class Accesos(Base):
                 'grupo_instrucciones_pase': f"$answers.{self.mf['grupo_instrucciones_pase']}",
                 'comentario': f"$answers.{self.mf['grupo_instrucciones_pase']}",
                 'codigo_qr': f"$answers.{self.mf['codigo_qr']}",
-                'qr_pase': f"$answers.{self.mf['qr_pase']}"
+                'qr_pase': f"$answers.{self.mf['qr_pase']}",
+                'tema_cita': f"$answers.{self.pase_entrada_fields['tema_cita']}",
+                'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}"
                 },
             },
             {'$sort':{'folio':-1}},
@@ -1970,7 +2148,6 @@ class Accesos(Base):
             p = x.get('visita_a_puesto',[])
             e =  x.get('visita_a_user_id',[])
             u =  x.get('visita_a_email',[])
-            print("ESTATUSSS", x.get('estatus',''))
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['email'] =self.unlist(x.get('email',''))
             x['telefono'] = self.unlist(x.get('telefono',''))
@@ -2396,7 +2573,7 @@ class Accesos(Base):
             match_query[f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}"] = area
         if status:
             match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
-        print("match_query", status)
+
         query = [
             {'$match': match_query },
             {'$project': {
@@ -2652,7 +2829,17 @@ class Accesos(Base):
                     if r['perfil'] not in res:
                         res.append(r['perfil'])
         return res
-        
+    
+    def get_pass_custom(self,qr_code):
+        pass_selected= self.get_detail_access_pass(qr_code=qr_code)
+        answers={}
+        for key, value in pass_selected.items():
+            if key == 'nombre' or key == 'email' or key == 'telefono' or key == 'visita_a' or key == 'ubicacion' or key == 'fecha_de_expedicion' or key == 'fecha_de_caducidad' or key == "qr_pase" or key =="_id":
+                answers[key] = value
+        answers['folio']= pass_selected.get("folio")
+        return answers
+    
+
     def get_user_booths_availability(self):
         '''
         Regresa las castas configurados por usuario y su stats
@@ -2678,6 +2865,7 @@ class Accesos(Base):
         load_shift_json = { }
         username = self.user.get('username')
         user_id = self.user.get('user_id')
+        config_accesos_user= get_config_accesos(user_id)
         user_status = self.get_employee_checkin_status(user_id, as_shift=True,  available=False)
         this_user = user_status.get(user_id)
         if not this_user:
@@ -2734,6 +2922,7 @@ class Accesos(Base):
         load_shift_json["guard"] = self.update_guard_status(guard, this_user)
         load_shift_json["notes"] = notes
         load_shift_json["user_booths"] = user_booths
+        load_shift_json['config_accesos_user']=config_accesos_user
         # load_shift_json["guards_online"] = guards_online
         return load_shift_json
 
@@ -3291,65 +3480,79 @@ class Accesos(Base):
             self.LKFException({'msg':'Faltan datos para acutalizar pase de entrada'})
         return res
         
-    def update_pass(self, access_pass,folio):
+    def update_pass(self, access_pass,folio=None):
         pass_selected= self.get_detail_access_pass(qr_code=folio)
         qr_code= folio
         _folio= pass_selected.get("folio")
         answers={}
-        if access_pass.get('grupo_vehiculos'):
-            list_vehiculos ={}
-            index=0
-            for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
-                index+=1
-                tipo = item.get('tipo','')
-                marca = item.get('marca','')
-                modelo = item.get('modelo','')
-                estado = item.get('estado','')
-                placas = item.get('placas','')
-                color = item.get('color','')
-                obj={
-                    self.TIPO_DE_VEHICULO_OBJ_ID:{
-                        self.mf['tipo_vehiculo']:tipo,
-                        self.mf['marca_vehiculo']:marca,
-                        self.mf['modelo_vehiculo']:modelo,
-                    },
-                    self.ESTADO_OBJ_ID:{
-                        self.mf['nombre_estado']:estado,
-                    },
-                    self.mf['placas_vehiculo']:placas,
-                    self.mf['color_vehiculo']:color,
-                }
-                list_vehiculos[f"-{index}"] = obj
-            answers[self.mf['grupo_vehiculos']] = list_vehiculos  
-        elif access_pass.get('grupo_equipos'):
-            list_equipos = {}
-            index=0
-            for index, item in enumerate(access_pass.get('grupo_equipos',[])):
-                index+=1
-                nombre = item.get('nombre','')
-                marca = item.get('marca','')
-                color = item.get('color','')
-                tipo = item.get('tipo','')
-                serie = item.get('serie','')
-                obj={
-                    self.mf['tipo_equipo']:tipo.lower(),
-                    self.mf['nombre_articulo']:nombre,
-                    self.mf['marca_articulo']:marca,
-                    self.mf['numero_serie']:serie,
-                    self.mf['color_articulo']:color,
-                }
-                list_equipos[f"-{index}"] = obj
-            answers[self.mf['grupo_equipos']] = list_equipos
-        else:
-            answers.update({f"{self.pase_entrada_fields[key]}":value})
+        for key, value in access_pass.items():
+            if key == 'grupo_vehiculos':
+                list_vehiculos ={}
+                index=1
+                print("ENUM", enumerate(access_pass.get('grupo_vehiculos',[])))
+                    # index+=1
+                for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
+                    print("INDEX", index)
+                    tipo = item.get('tipo','')
+                    marca = item.get('marca','')
+                    modelo = item.get('modelo','')
+                    estado = item.get('estado','')
+                    placas = item.get('placas','')
+                    color = item.get('color','')
+                    obj={
+                        self.TIPO_DE_VEHICULO_OBJ_ID:{
+                            self.mf['tipo_vehiculo']:tipo,
+                            self.mf['marca_vehiculo']:marca,
+                            self.mf['modelo_vehiculo']:modelo,
+                        },
+                        self.ESTADO_OBJ_ID:{
+                            self.mf['nombre_estado']:estado,
+                        },
+                        self.mf['placas_vehiculo']:placas,
+                        self.mf['color_vehiculo']:color,
+                    }
+                    list_vehiculos[f"-{index}"] = obj
+                answers[self.mf['grupo_vehiculos']] = list_vehiculos  
+            elif key == 'grupo_equipos':
+                list_equipos = {}
+                index=1
+                    # index+=1
+                for index, item in enumerate(access_pass.get('grupo_equipos',[])):
+                    nombre = item.get('nombre','')
+                    marca = item.get('marca','')
+                    color = item.get('color','')
+                    tipo = item.get('tipo','')
+                    serie = item.get('serie','')
+                    obj={
+                        self.mf['tipo_equipo']:tipo.lower(),
+                        self.mf['nombre_articulo']:nombre,
+                        self.mf['marca_articulo']:marca,
+                        self.mf['numero_serie']:serie,
+                        self.mf['color_articulo']:color,
+                    }
+                    list_equipos[f"-{index}"] = obj
+                answers[self.mf['grupo_equipos']] = list_equipos
+            elif key == 'status_pase':
+                answers.update({f"{self.pase_entrada_fields[key]}":value.lower()})
+            elif key == 'archivo_invitacion':
+                answers.update({f"{self.pase_entrada_fields[key]}": value})    
+            else:
+                answers.update({f"{self.pase_entrada_fields[key]}":value})
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
-            if res.get('status_code') == 201 or res.get('status_code') == 202:
+            if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
+                pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 447, name_pdf='Pase de Entrada', send_url=True)
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
                 res['json'].update({'enviar_de':employee.get('worker_name')})
+                res['json'].update({'ubicacion':pass_selected.get('ubicacion')})
+                res['json'].update({'fecha_desde':pass_selected.get('fecha_de_expedicion')})
+                res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
+                res['json'].update({'asunto':pass_selected.get('tema_cita')})
+                res['json'].update({'descripcion':pass_selected.get('descripcion')})
+                res['json'].update({'pdf': pdf})
                 return res
             else: 
                 return res
@@ -3416,3 +3619,87 @@ class Accesos(Base):
             'group_level':3
         }
         return self.catalogo_view(catalog_id, form_id, options, detail=True)
+    
+class EventInvitation:
+    def __init__(self, organizer_name, organizer_email, start_date, summary, location):
+        self.organizer_name = organizer_name
+        self.organizer_email = organizer_email
+        self.start_date = start_date
+        self.summary = summary
+        self.location = location
+        
+        self.attendees = []
+        self.end_date = None
+        self.description = ""
+        self.meeting_link = None
+        self.timezone = "America/Monterrey"
+        self.uid = str(uuid.uuid4())
+        self.dt_stamp = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+        self.created_date = self.dt_stamp
+        self.last_modified_date = self.dt_stamp
+
+    def add_attendee(self, name, email):
+        """Añadir un asistente individualmente"""
+        attendee = {'name': name, 'email': email}
+        self.attendees.append(attendee)
+
+    def add_end_date(self, end_date):
+        """Añadir fecha de fin"""
+        self.end_date = end_date
+
+    def add_description(self, description):
+        """Añadir descripción"""
+        self.description = description
+
+    def add_meeting_link(self, meeting_link):
+        """Añadir enlace de Google Meet"""
+        self.meeting_link = meeting_link
+
+    def generate_ics(self):
+        if not self.attendees:
+            raise ValueError("Debe agregar al menos un asistente para generar el archivo .ics, puedes utilizar add_attendee(name, email) para hacerlo...")
+
+        attendees_str = ""
+        for attendee in self.attendees:
+            attendees_str += f"ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN={attendee['name']}:mailto:{attendee['email']}\n"
+
+        ics_content = f"""BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:{self.timezone}
+X-LIC-LOCATION:{self.timezone}
+BEGIN:STANDARD
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0600
+TZNAME:CST
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID={self.timezone}:{self.start_date}
+DTSTAMP:{self.dt_stamp}
+ORGANIZER;CN={self.organizer_name}:mailto:{self.organizer_email}
+UID:{self.uid}
+{attendees_str}
+CREATED:{self.created_date}
+DESCRIPTION:{self.description}
+LAST-MODIFIED:{self.last_modified_date}
+LOCATION:{self.location}
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:{self.summary}
+TRANSP:OPAQUE
+"""
+        
+        if self.end_date:
+            ics_content += f"DTEND;TZID={self.timezone}:{self.end_date}\n"
+
+        if self.meeting_link:
+            ics_content += f"X-GOOGLE-CONFERENCE:{self.meeting_link}\n"
+
+        ics_content += "END:VEVENT\nEND:VCALENDAR"
+
+        return ics_content

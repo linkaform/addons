@@ -48,7 +48,6 @@ class Base(base.LKF_Base):
             self.mf.update(mf)
         else:
             self.mf = mf
-
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
        #--Variables 
@@ -220,19 +219,19 @@ class Base(base.LKF_Base):
         return result if result else None
 
     def load(self, module , module_class=None, import_as=None, **kwargs):
-        print('loading module', module)
-        print('loading module_class', module_class)
         if not module_class:
             module_class = module
         if not import_as:
             import_as = module_class
-        print('loading module ..kwargs', kwargs.get('MODULES'))
-        if module not in kwargs.get('MODULES') or not hasattr(self, import_as):
+        self.master = False
+        #if module not in kwargs.get('MODULES'):
+        if hasattr(self, import_as):
+            pass
+        else:
             # from lkf_addons.addons.stock.app import Stock
             imp_module = importlib.import_module(f'lkf_addons.addons.{module.lower()}.app')
             AddonsClass = getattr(imp_module, module_class)
             # scripts = importlib.import_module('{}.items.scripts'.format(module))
-            print('import_as', import_as)
             setattr(self, import_as, AddonsClass(self.settings, sys_argv=self.sys_argv, use_api=self.use_api, **self.kwargs))
             if module not in self.kwargs['MODULES']:
                 self.kwargs['MODULES'].append(module)
@@ -1777,7 +1776,7 @@ class Schedule(Base):
                 }
             }
             #TODO place the script parameters answers
-            task["params"].update(get_script_map())
+            task["params"].update(self.get_script_map())
             body['tasks'].append(task)
             downstream_task_id += 1
             body['tasks'][0]['downstream_task_id'].append(downstream_task_id)

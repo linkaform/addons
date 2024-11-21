@@ -114,7 +114,7 @@ class Location(Base):
         if not area_address:
             area_address = self.get_location_address(location_name)
         return area_address
-
+        
     def get_areas_by_location(self, location_name):
         options={}
         if location_name:
@@ -126,6 +126,13 @@ class Location(Base):
         catalog_id = self.AREAS_DE_LAS_UBICACIONES_CAT_ID
         form_id = self.PASE_ENTRADA
         return self.catalogo_view(catalog_id, form_id, options)
+
+    def get_areas_by_location_salidas(self, location_name):
+        options={}
+        catalog_id = self.AREAS_DE_LAS_UBICACIONES_SALIDA_ID
+        form_id = self.PASE_ENTRADA
+        group_level = options.get('group_level',1)
+        return self.catalogo_view(catalog_id, form_id, options=options)
 
     def get_area_status(self, location, area, state='activa'):
         match_query = {

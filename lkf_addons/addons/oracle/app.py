@@ -40,8 +40,8 @@ from lkf_addons.addons.base.app import Base
 
 class Oracle(Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
         self.name =  __class__.__name__
         self.settings = settings
@@ -52,10 +52,7 @@ class Oracle(Base):
         self.ORACLE_PASSWORD = self.settings.config['ORACLE_PASSWORD']
         self.oracle = self.connect_to_oracle()
 
-
-
     def connect_to_oracle(self):
-        print('----------------------------------')
         try:
             dsn_tns = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME) 
             self.orcale_connection = cx_Oracle.connect(user=self.ORACLE_USERNAME, password=self.ORACLE_PASSWORD,  dsn=dsn_tns)
@@ -68,6 +65,7 @@ class Oracle(Base):
 
     def query_view(self, view_name, query=False):
         result = []
+        columns = []
         try:
             cursor = self.orcale_connection.cursor()
             # Query to fetch data from the view

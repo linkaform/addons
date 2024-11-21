@@ -39,27 +39,24 @@ Se pueden heredar funciones de cualquier clase heredada con el metodo super().
 
 from lkf_addons.addons.product.app import Product, Warehouse
 
-class Base(Base):
+# class Base(Base):
 
 
-    def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
+#     def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
+#         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
 
-        self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, f=kwargs)
-
-        self.config_fields = {
-            'demora':f'{self.f.get("demora")}',
-            'lead_time':f'{self.f.get("lead_time")}',
-            'dias_laborales_consumo':f'{self.f.get("dias_laborales_consumo")}',
-            'factor_crecimiento_jit':f'{self.f.get("factor_crecimiento_jit")}',
-            'factor_seguridad_jit':f'{self.f.get("factor_seguridad_jit")}',
-            'uom':f'{self.UOM_OBJ_ID}.{self.f.get("uom")}',
-            'procurment_location':f'{self.f.get("config_group")}',
-            'warehouse_kind': '66ed0c88c9aefada5b04b818',
-            # 'warehouse': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse"]}',
-            # 'location': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
-        }
+#         self.config_fields = {
+#             'demora':f'{self.f.get("demora")}',
+#             'lead_time':f'{self.f.get("lead_time")}',
+#             'dias_laborales_consumo':f'{self.f.get("dias_laborales_consumo")}',
+#             'factor_crecimiento_jit':f'{self.f.get("factor_crecimiento_jit")}',
+#             'factor_seguridad_jit':f'{self.f.get("factor_seguridad_jit")}',
+#             'uom':f'{self.UOM_OBJ_ID}.{self.f.get("uom")}',
+#             'procurment_location':f'{self.f.get("config_group")}',
+#             'warehouse_kind': '66ed0c88c9aefada5b04b818',
+#             # 'warehouse': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse"]}',
+#             # 'location': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
+#         }
 
     # def get_config(self, *args, **kwargs):
     #     print('esta', esta)
@@ -100,6 +97,7 @@ class JIT(Base):
             self.kwargs['MODULES'].append(self.__class__.__name__)
         self.load('Stock', **self.kwargs)
         self.load('Product', **self.kwargs)
+        self.load(module='Product', module_class='Warehouse', import_as='WH', **self.kwargs)
         # if not hasattr(self, 'STOCK'):
         #     print('hasattr', hasattr(self, 'STOCK'))
         #     self.JIT =True
@@ -113,12 +111,18 @@ class JIT(Base):
             'allocation_proc_method':'673e20c55f1c35d02395a6d2',
             'dias_laborales_consumo':'66ececbcc9aefada5b04b800',
             'borrar_historial':'671fbd248e46aab662455b40',
+            'bom_group_qty_in':'66d8e09cb22bcdcc2f341e85',
+            'bom_group_qty_out':'66da962859bec54a05c73e00',
+            'bom_group_qty_throughput':'66da962859bec54a05c73e01',
+            'bom_group_step':'66d8e7b0b22bcdcc2f341e88',
             'bom_name':'66d8e063b22bcdcc2f341e84',
             'bom_type':'66d8dfbcb22bcdcc2f341e81',
             'bom_status':'66e275891f6f133e363afb3f',
+            'consumo_promedio_diario':'66ec770cc9aefada5b04b7a6',
+            'demanda_12_meses':'66ea6c61c9aefada5b04b76e',
             'demora':'66ea62dac9aefada5b04b737',
-            'lead_time':'66d8ee99b22bcdcc2f341e8a',
-            'dias_laborales_consumo':'66ececbcc9aefada5b04b800',
+            'demand_date': '66d92fe6b22bcdcc2f341ed8',
+            'demand_hour': '66d92fe6b22bcdcc2f341ed9',
             'factor_crecimiento_jit':'66ececbcc9aefada5b04b801',
             'factor_seguridad_jit':'66ececbcc9aefada5b04b802',
             'allocation_status':'673e20f75f1c35d02395a6d3',
@@ -130,20 +134,39 @@ class JIT(Base):
             'month': '6206b9ae8209a9677f9b8bd9',
             'min_stock':'66ea62dac9aefada5b04b739',
             'max_stock':'66ea62dac9aefada5b04b73a',
-            'procurment_method':'66d92acdb22bcdcc2f341ebf',
-            'procurment_status':'621cdeeec9c81e23bb6380fc',
-            'procurment_date':'66da0c19b22bcdcc2f341f06',
-            'procurment_schedule_date':'66da538cb22bcdcc2f341f47',
-            'procurment_qty':'66da3bddb22bcdcc2f341f08',
             'qty': '6206b9ae8209a9677f9b8bdb',
             'qty_allocated': '66da3bddb22bcdcc2f341f09',
             'qty_available': '66da3bddb22bcdcc2f341f0a',
+            'procurment_date':'66da0c19b22bcdcc2f341f06',
+            'procurment_method':'66d92acdb22bcdcc2f341ebf',
+            'procurment_schedule_date':'66da538cb22bcdcc2f341f47',
+            'procurment_status':'621cdeeec9c81e23bb6380fc',
+            'procurment_qty':'66da3bddb22bcdcc2f341f08',
+            'qty': '6206b9ae8209a9677f9b8bdb',
             'status':'620ad6247a217dbcb888d175',
             'safety_stock':'66ea62dac9aefada5b04b738',
             'standar_pack':'671b22d738a541183685d077',
             'status':'620ad6247a217dbcb888d175',
             'tipo_almacen': '66ed0c88c9aefada5b04b818',
+            'raw_material_group':'66d8dff5b22bcdcc2f341e83',
+            'reorder_point':'66ea62dac9aefada5b04b73b',
+            'rutas_group':'671b2266ecd538747985d0ac',
+            'trigger':'66eb14ffc9aefada5b04b793',
+            'year': '6206b9ae8209a9677f9b8bda',
             }
+
+        self.config_fields = {
+            'demora':f'{self.f.get("demora")}',
+            'lead_time':f'{self.f.get("lead_time")}',
+            'dias_laborales_consumo':f'{self.f.get("dias_laborales_consumo")}',
+            'factor_crecimiento_jit':f'{self.f.get("factor_crecimiento_jit")}',
+            'factor_seguridad_jit':f'{self.f.get("factor_seguridad_jit")}',
+            'uom':f'{self.UOM_OBJ_ID}.{self.f.get("uom")}',
+            'procurment_location':f'{self.f.get("config_group")}',
+            'warehouse_kind': '66ed0c88c9aefada5b04b818',
+            # 'warehouse': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse"]}',
+            # 'location': f'{self.WH.f["config_wh_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
+        }
 
         if hasattr(self, 'f'):
             self.f.update(f)
@@ -151,34 +174,7 @@ class JIT(Base):
             print('vaa  A IGUALSAR')
             self.f = f
 
-        mf = deepcopy(f)
-        mf.update({
-                'bom_group_qty_in':'66d8e09cb22bcdcc2f341e85',
-                'bom_group_qty_out':'66da962859bec54a05c73e00',
-                'bom_group_qty_throughput':'66da962859bec54a05c73e01',
-                'bom_group_step':'66d8e7b0b22bcdcc2f341e88',
-                'consumo_promedio_diario':'66ec770cc9aefada5b04b7a6',
-                'fecha_demanda':'66ea6c28c9aefada5b04b76c',
-                'input_goods_product_code':'71ef32bcdf0ec2ba73dec33d',
-                'input_goods_product_name':'71ef32bcdf0ec2ba73dec33e',
-                'input_goods_sku':'75dec64a3199f9a040829243',
-                'raw_material_group':'66d8dff5b22bcdcc2f341e83',
-                'min_stock':'66ea62dac9aefada5b04b739',
-                'max_stock':'66ea62dac9aefada5b04b73a',
-                'demanda_12_meses':'66ea6c61c9aefada5b04b76e',
-                'procurment_date':'66da0c19b22bcdcc2f341f06',
-                'procurment_method':'66d92acdb22bcdcc2f341ebf',
-                'procurment_schedule_date':'66da538cb22bcdcc2f341f47',
-                'procurment_qty':'66da3bddb22bcdcc2f341f08',
-                'procurment_status':'66da0c19b22bcdcc2f341f07',
-                'rutas_group':'671b2266ecd538747985d0ac',
-                'safety_stock':'66ea62dac9aefada5b04b738',
-                'standar_pack':'671b22d738a541183685d077',
-                'status':'620ad6247a217dbcb888d175',
-                'trigger':'66eb14ffc9aefada5b04b793',
-                'reorder_point':'66ea62dac9aefada5b04b73b',
-            }
-        )
+        mf = deepcopy(f) #Backguard compability
 
         if hasattr(self, 'mf'):
             self.mf.update(mf)
@@ -212,6 +208,7 @@ class JIT(Base):
         #Formas
         self.BOM_ID = self.lkm.form_id('bom','id')
         self.DEMANDA_UTIMOS_12_MES = self.lkm.form_id('demanda_ultimos_12_meses','id')
+        self.DEMANDA_PLAN = self.lkm.form_id('demand_plan','id')
         self.PROCURMENT = self.lkm.form_id('procurment_record','id')
         self.REGLAS_REORDEN = self.lkm.form_id('reglas_de_reorden','id')
 
@@ -285,7 +282,6 @@ class JIT(Base):
         product_by_warehouse = {}
         product_codes = [r['product_code'] for r in  product_rules if r.get('product_code')]
         self.ROUTE_RULES = {x['product_code']:x for x in self.get_rutas_transpaso(product_codes) if x.get('product_code')}
-        print('produyct_rules',product_rules )
         for rule in product_rules:
             product_code = rule.get('product_code')
             sku = rule.get('sku')
@@ -595,7 +591,6 @@ class JIT(Base):
         return self.format_cr(self.cr.aggregate(query))
 
     def get_warehouse_config(self, key, value, get_key):
-        print('aqi va a pedir....', )
         config = self.get_config(*['procurment_location'])
         locations_config = config.get('procurment_location',[])
         res = None
@@ -617,10 +612,12 @@ class JIT(Base):
             location = self.get_warehouse_config('tipo_almacen', 'abastacimiento', 'warehouse_location')
         if not uom:
             uom = config.get('uom')
-        standar_pack = self.ROUTE_RULES.get(product_code,{}).get('standar_pack',1)
+        standar_pack = self.ROUTE_RULES.get(str(product_code),{}).get('standar_pack',1)
         answers[self.Product.SKU_OBJ_ID] = {}
         answers[self.Product.SKU_OBJ_ID][self.f['product_code']] = product_code
         answers[self.Product.SKU_OBJ_ID][self.f['sku']] = sku
+        answers[self.Product.SKU_OBJ_ID][self.f['familia']] = self.all_prod[sku]['familia']
+        answers[self.Product.SKU_OBJ_ID][self.f['lninea']] = self.all_prod[sku]['lninea']
         answers[self.UOM_OBJ_ID] = {}
         answers[self.UOM_OBJ_ID][self.f['uom']] = uom
         answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID] = {}
@@ -700,12 +697,12 @@ class JIT(Base):
         config = self.get_config(*['uom'])
         for rec in records:
             print('rec=',rec)
+            product_code = rec.get('product_code')
             demanda_12_meses = rec.get('demanda_12_meses',0)
-            if demanda_12_meses == 0:
+            sku = rec.get('sku')
+            if demanda_12_meses == 0 or not sku or not product_code:
                 continue
             consumo_promedio_diario = float(rec.get('consumo_promedio_diario',0))
-            product_code = rec.get('product_code')
-            sku = rec.get('sku')
             warehouse = rec.get('warehouse')
             product_by_warehouse[warehouse] = product_by_warehouse.get(warehouse,[])
             location = rec.get('location')

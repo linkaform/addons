@@ -27,7 +27,6 @@ Instrucciones
 '''
 
 from linkaform_api import base
-from lkf_addons.addons.base.app import Base
 
 ### Objecto de Modulo ###
 '''

@@ -178,7 +178,7 @@ class Employee(Base):
             msg = f'No existe caseta configurada para usuario id: {user_id}'
             self.LKFException(msg)
         return caseta, user_booths
-
+    
     def get_employee_pic(self, user_id):
         match_query = {
             "deleted_at":{"$exists":False},

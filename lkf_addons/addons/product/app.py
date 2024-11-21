@@ -16,19 +16,17 @@ class Product(Base, base.LKF_Base):
             self.kwargs['MODULES'].append(self.__class__.__name__)
             
         self.PRODUCT = self.lkm.catalog_id('product_catalog')
-        
         self.PRODUCT_ID = self.PRODUCT.get('id')
         self.PRODUCT_OBJ_ID = self.PRODUCT.get('obj_id')
 
-        try:
-            self.SKU = self.lkm.catalog_id('sku_catalog')
-            self.SKU_ID = self.SKU.get('id')
-            self.SKU_OBJ_ID = self.SKU.get('obj_id')
-        except:
+        self.SKU = self.lkm.catalog_id('sku_catalog')
+        self.SKU_ID = self.SKU.get('id')
+        self.SKU_OBJ_ID = self.SKU.get('obj_id')
+        if not self.SKU:
             self.SKU = self.lkm.catalog_id('product_recipe')
             self.SKU_ID = self.SKU.get('id')
             self.SKU_OBJ_ID = self.SKU.get('obj_id')
-
+            
         ###### Depricated ######
         try:
             self.PRODUCT_RECIPE = self.lkm.catalog_id('product_recipe')
@@ -57,8 +55,31 @@ class Product(Base, base.LKF_Base):
             }
             )
 
+    def format_catalog_product(self, data_query):
+        list_response = []
+        for item in data_query:
+            wharehouse = item.get('61ef32bcdf0ec2ba73dec343','')
+            if wharehouse not in list_response and wharehouse !='':
+                list_response.append(wharehouse)
+
+        list_response.sort()           
+        return list_response
+    
     def una_funcion_product(self):
         return True
+
+    def get_product_catalog(self, query={}):
+        mango_query = {"selector":{
+                "_id": {"$gt": None}
+                },
+                "limit":10000,
+                "skip":0
+            }
+        match_query = query
+        if match_query:
+            mango_query["selector"]['answers'] = query
+        res = self.lkf_api.search_catalog( self.SKU_ID, mango_query)
+        return res   
 
     def get_product(self, product_code):
         return self.get_product_field(product_code, pfield='*')
@@ -81,7 +102,6 @@ class Product(Base, base.LKF_Base):
                 return rec
             product_field = rec.get(self.f[pfield])
         return product_field
-
 
     def get_product_by_type(self, product_type):
         product_field = None
@@ -123,22 +143,22 @@ class Product(Base, base.LKF_Base):
         res_format = self.format_catalog_product(res)
         return res_format   
 
+        
     def get_catalog_product(self, query={}):
         return self.get_product_catalog(query)
 
     def match_query(self, product_code=None, sku=None, group_id=None):
         query = {}
-        print('product_code', product_code)
         if group_id:
             if product_code:
-                query.update({f"answers.{group_id}.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+                query.update({f"answers.{group_id}.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
             if sku:
-                query.update({f"answers.{group_id}.{self.SKU_OBJ_ID}.{self.f['sku']}":sku})
+                query.update({f"answers.{group_id}.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku})
         else:
             if product_code:
-                query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+                query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
             if sku:
-                query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['sku']}":sku})
+                query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku})
         return query
 
 class Warehouse(Base ,base.LKF_Base):
@@ -197,6 +217,20 @@ class Warehouse(Base ,base.LKF_Base):
         res = self.lkf_api.search_catalog( self.WAREHOUSE_ID, mango_query)
         warehouse = [r[self.f['warehouse']] for r in res]
         return warehouse
+
+    def match_query(self, warehouse=None, location=None, group_id=None):
+        query = {}
+        if group_id:
+            if warehouse:
+                match_query.update({f"answers.{group_id}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})   
+            if location:
+                match_query.update({f"answers.{group_id}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})  
+        else:
+            if warehouse:
+                match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse})   
+            if location:
+                match_query.update({f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}":location})  
+        return query
 
     def warehouse_type(self, warehouse_name):
         answers = {f"{self.f['warehouse']}":warehouse_name}
