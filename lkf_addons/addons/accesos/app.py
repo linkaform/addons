@@ -1564,7 +1564,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.lkf_api.post_forms_answers(metadata)
 
 
-    def _get_ics_file(meetings):
+    def _get_ics_file(self, meetings=[]):
         _logger = logging.getLogger(__name__)
 
         """Returns iCalendar file for the event invitation.
@@ -1849,8 +1849,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "attendee_ids": [{"email": email, "nombre": nombre}, {"email": creado_por_email, "nombre": visita_a}],
                 }
             ]
-
-            respuesta_ics = self.upload_ics(id_forma, id_campo, meeting)
+            respuesta_ics = self.upload_ics(id_forma, id_campo, meetings=meeting)
             file_name = respuesta_ics.get('file_name', '')
             file_url = respuesta_ics.get('file_url', '')
 
