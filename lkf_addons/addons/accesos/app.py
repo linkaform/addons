@@ -498,7 +498,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'walkin_identificacion':'66c4d5b6d1095c4ce8b2c42b',
             'walkin_nombre':'662c2937108836dec6d92580',
             'walkin_telefono':'662c2937108836dec6d92582',
-            'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",        
+            'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",    
+            'favoritos':'674642e2d53ce9476994dd89'    
         }
         self.pase_grupo_visitados:{
         }
@@ -2807,6 +2808,30 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         res.append(r['perfil'])
         return res
     
+    def get_my_pases(self):
+        query = [ 
+            {"$match":{
+                'form_id':121736,
+                deleted_at:{'$exists':false}}
+                },
+            {'$group':{
+                '_id':{
+                    'nombre':'$answers.662c2937108836dec6d92580'
+                },
+                'phone':{'$last':'$answers.662c2937108836dec6d92582'},
+                'email':{'$last':'$answers.662c2937108836dec6d92581'}
+                }
+            },
+            {'$project':
+                {
+                _id:0,
+                'nombre':'$_id.nombre',
+                'phone':'$phone',
+                'email':'$email',
+                }
+            }
+        ]
+
     def get_pass_custom(self,qr_code):
         pass_selected= self.get_detail_access_pass(qr_code=qr_code)
         answers={}
@@ -3511,6 +3536,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             elif key == 'status_pase':
                 answers.update({f"{self.pase_entrada_fields[key]}":value.lower()})
             elif key == 'archivo_invitacion':
+                answers.update({f"{self.pase_entrada_fields[key]}": value})
+            elif key == 'favoritos':
                 answers.update({f"{self.pase_entrada_fields[key]}": value})    
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
