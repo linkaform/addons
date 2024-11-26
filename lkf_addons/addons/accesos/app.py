@@ -1573,12 +1573,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         """
         result = {}
 
-        def ics_datetime(idate, allday=False):
+        def ics_datetime(idate, allday=False, tz_name='UTC'):
             if idate:
+                tz = pytz.timezone(tz_name)
                 if allday:
                     return idate
                 else:
-                    return idate.replace(tzinfo=pytz.timezone('UTC'))
+                    return tz.localize(idate)
             return False
 
         try:
@@ -1598,8 +1599,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 raise ValueError("First you have to specify the date of the invitation.")
             
             event.add('created').value = ics_datetime(datetime.now())
-            event.add('dtstart').value = ics_datetime(meeting["start"], meeting.get("allday", False))
-            event.add('dtend').value = ics_datetime(meeting["stop"], meeting.get("allday", False))
+            event.add('dtstart').value = ics_datetime(meeting["start"], meeting.get("allday", False), tz_name='America/Mexico_City')
+            event.add('dtend').value = ics_datetime(meeting["stop"], meeting.get("allday", False), tz_name='America/Mexico_City')
             event.add('summary').value = meeting["name"]
             if meeting.get("description"):
                 event.add('description').value = meeting["description"]
