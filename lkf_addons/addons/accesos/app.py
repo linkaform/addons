@@ -26,12 +26,14 @@ Si tienes más de una aplicación, puedes:
     b. Guardar los archivos a nivel raíz.
     c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
 '''
+import pytz
+import logging
 import tempfile
 import os
 import uuid
 import simplejson, time
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, timedelta
 from copy import deepcopy
 import urllib.parse
 
@@ -1350,39 +1352,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print('answers', simplejson.dumps(metadata, indent=4))
         return self.lkf_api.post_forms_answers(metadata)
     
-    def upload_ics(self, id_forma_seleccionada, id_field, ics_content={}):
-        # Convertir fechas al formato solicitado para el invite.ics
-        start_date = ics_content.get('fecha', {}).get('desde')
-        fecha_objeto = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
-        fecha_salida = fecha_objeto.strftime("%Y%m%dT%H%M%S")
+    def upload_ics(self, id_forma_seleccionada, id_field, ics_content={}, meetings=[]):
+        temp_dir = tempfile.gettempdir()  # Obtener el directorio temporal
+        temp_file_path = os.path.join(temp_dir, "invite.ics")  # Crear la ruta para invite.ics
 
-        end_date = ics_content.get('fecha', {}).get('hasta')
-        fecha_end_salida = ''
-        if end_date:
-            fecha_end_objeto = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
-            fecha_end_salida = fecha_end_objeto.strftime("%Y%m%dT%H%M%S")
+        #Creacion del invite.ics
+        invite_content = self._get_ics_file(meetings=meetings)
+        ics_data = invite_content.get(1)
+        ics_content = ics_data.decode('utf-8')
 
-        ics_content['fecha']['desde'] = fecha_salida
-        ics_content['fecha']['hasta'] = fecha_end_salida
-
-        # Obtener los valores del objeto
-        organizer_name = ics_content.get('nombre_organizador')
-        organizer_email = ics_content.get('email_from')
-        start_date = ics_content.get('fecha', {}).get('desde')
-        summary = ics_content.get('asunto')
-        location = ics_content.get('ubicacion')
-
-        event = EventInvitation(organizer_name, organizer_email, start_date, summary, location)
-        event.add_attendee(ics_content.get("nombre"), ics_content.get("email_to"))
-        event.add_description(ics_content.get('descripcion'))
-        ics_content = event.generate_ics()
-
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.ics', mode='w', encoding='utf-8') as temp_file:
+        with open(temp_file_path, mode='w', encoding='utf-8') as temp_file:
             temp_file.write(ics_content)
-            temp_file_path = temp_file.name
 
-        file_link, file_name = os.path.split(temp_file_path)
-        rb_file = open(temp_file_path, 'rb')
+        rb_file = open(temp_file_path, 'rb')  # Abrir el archivo para subirlo
         dir_file = {'File': rb_file}
         
         try:
@@ -1397,13 +1379,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         try:
             file_url = upload_url['data']['file']
-            update_file = {'file_name': file_name, 'file_url': file_url}
+            update_file = {'file_name': "invite.ics", 'file_url': file_url}
         except KeyError:
             print('No se pudo obtener la URL del archivo')
             update_file = {"error": "Fallo al obtener la URL del archivo"}
         finally:
-            os.remove(temp_file_path)
-        
+            os.remove(temp_file_path)  # Borrar el archivo temporal
+
         return update_file
 
     def create_enviar_msj(self, data_msj, data_cel_msj=None, folio=None):
@@ -1418,28 +1400,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             return {'status_code':200}
 
     def create_enviar_correo(self, data_msj, folio=None):
-        id_forma = 121736
-        id_campo = '673773741b2adb2d05d99d63'
-
-        respuesta_ics = self.upload_ics(id_forma, id_campo, data_msj)
-        file_name = respuesta_ics.get('file_name', '')
-        file_url = respuesta_ics.get('file_url', '')
-        access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"], "archivo_invitacion": [
-            {
-                "file_name": f"{file_name}",
-                "file_url": f"{file_url}"
-            }
-        ]}
-
-        res_update = self.update_pass(access_pass=access_pass, folio=folio)
-        
-        # Obtener informacion del pase
-        # info_pase = self.get_detail_access_pass(qr_code='673cca79384193875e882353')
-        # print('//////////////////////////////////////////////////////////', info_pase)
-        
-        # Lo que tenia
-        # access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
-        # res_update= self.update_pass(access_pass=access_pass, folio=folio)
+        access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
+        res_update= self.update_pass(access_pass=access_pass, folio=folio)
         res_update.get('status_code') == 201
         return res_update
      
@@ -1600,6 +1562,89 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers.update({f"{self.notes_fields['note_open_date']}":fecha_hora_str})
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
+
+
+    def _get_ics_file(meetings):
+        _logger = logging.getLogger(__name__)
+
+        """Returns iCalendar file for the event invitation.
+        :param meetings: List of meetings (each meeting is a dictionary with the required fields).
+        :returns: A dict of .ics file content for each meeting.
+        """
+        result = {}
+
+        def ics_datetime(idate, allday=False):
+            if idate:
+                if allday:
+                    return idate
+                else:
+                    return idate.replace(tzinfo=pytz.timezone('UTC'))
+            return False
+
+        try:
+            import vobject
+        except ImportError:
+            _logger.warning("The `vobject` Python module is not installed, so iCal file generation is unavailable. Please install the `vobject` Python module")
+            return result
+
+        for meeting in meetings:
+            cal = vobject.iCalendar()
+
+            cal.add('method').value = 'REQUEST'
+            
+            event = cal.add('vevent')
+
+            if not meeting.get("start") or not meeting.get("stop"):
+                raise ValueError("First you have to specify the date of the invitation.")
+            
+            event.add('created').value = ics_datetime(datetime.now())
+            event.add('dtstart').value = ics_datetime(meeting["start"], meeting.get("allday", False))
+            event.add('dtend').value = ics_datetime(meeting["stop"], meeting.get("allday", False))
+            event.add('summary').value = meeting["name"]
+            if meeting.get("description"):
+                event.add('description').value = meeting["description"]
+            if meeting.get("location"):
+                event.add('location').value = meeting["location"]
+            if meeting.get("rrule"):
+                event.add('rrule').value = meeting["rrule"]
+
+            if meeting.get("alarm_ids"):
+                for alarm in meeting["alarm_ids"]:
+                    valarm = event.add('valarm')
+                    interval = alarm["interval"]
+                    duration = alarm["duration"]
+                    trigger = valarm.add('TRIGGER')
+                    trigger.params['related'] = ["START"]
+                    if interval == 'days':
+                        delta = timedelta(days=duration)
+                    elif interval == 'hours':
+                        delta = timedelta(hours=duration)
+                    elif interval == 'minutes':
+                        delta = timedelta(minutes=duration)
+                    trigger.value = delta
+                    valarm.add('DESCRIPTION').value = alarm.get("name", "Default Alarm")
+
+            # Agregar organizador
+            organizer = event.add('organizer')
+            organizer.params['CN'] = [meeting['organizer_name']]
+            organizer.value = f"MAILTO:{meeting['organizer_email']}"
+            
+            # Agregar los asistentes (attendees)
+            for attendee_data in meeting.get("attendee_ids", []):
+                attendee = event.add('attendee')
+                attendee.value = "mailto:" + attendee_data.get("email", "")
+                
+                # Configuración de los parámetros de los asistentes
+                attendee.params['CN'] = [attendee_data.get("name", "Unknown")]
+                attendee.params['RS'] = ["OPT-PARTICIPANT"]
+                attendee.params['CUTYPE'] = ["INDIVIDUAL"]
+                attendee.params['ROLE'] = ["REQ-PARTICIPANT"]
+                attendee.params['PARTSTAT'] = ["NEEDS-ACTION"]
+                attendee.params['RSVP'] = ["TRUE"]
+            
+            result[meeting["id"]] = cal.serialize().encode('utf-8')
+
+        return result
 
     def create_access_pass(self, location, access_pass):
         #---Define Metadata
@@ -1767,7 +1812,58 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 if index==0 :
                     docs+="-"
             link_pass= f"{link_info['link']}?id={res.get('json')['id']}&user={link_info['creado_por_id']}&docs={docs}"
-            access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])}
+
+            id_forma = 121736
+            id_campo = '673773741b2adb2d05d99d63'
+
+            tema_cita = access_pass.get("tema_cita")
+            descripcion = access_pass.get("descripcion")
+            fecha_desde_visita = access_pass.get("fecha_desde_visita")
+            fecha_desde_hasta = access_pass.get("fecha_desde_hasta")
+            creado_por_email = access_pass.get("link", {}).get("creado_por_email")
+            ubicacion = access_pass.get("ubicacion")
+            nombre = access_pass.get("nombre")
+            visita_a = access_pass.get("visita_a")
+            email = access_pass.get("email")
+
+            start_datetime = datetime.strptime(fecha_desde_visita, "%Y-%m-%d %H:%M:%S")
+
+            if not fecha_desde_hasta:
+                stop_datetime = start_datetime + timedelta(hours=1)
+            else:
+                stop_datetime = datetime.strptime(fecha_desde_hasta, "%Y-%m-%d %H:%M:%S")
+
+            meeting = [
+                {
+                    "id": 1,
+                    "start": start_datetime,
+                    "stop": stop_datetime,
+                    "name": tema_cita,
+                    "description": descripcion,
+                    "location": ubicacion,
+                    "allday": False,
+                    "rrule": None,
+                    "alarm_ids": [{"interval": "minutes", "duration": 10, "name": "Reminder"}],
+                    'organizer_name': visita_a,
+                    'organizer_email': creado_por_email,
+                    "attendee_ids": [{"email": email, "nombre": nombre}, {"email": creado_por_email, "nombre": visita_a}],
+                }
+            ]
+
+            respuesta_ics = self.upload_ics(id_forma, id_campo, meeting)
+            file_name = respuesta_ics.get('file_name', '')
+            file_url = respuesta_ics.get('file_url', '')
+
+            access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[]),
+            "archivo_invitacion": [
+                {
+                    "file_name": f"{file_name}",
+                    "file_url": f"{file_url}"
+                }
+            ]}
+
+            # access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])}
+
             resUp= self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
         return res
 
@@ -3596,86 +3692,3 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return self.catalogo_view(catalog_id, form_id, options, detail=True)
     
-class EventInvitation:
-    def __init__(self, organizer_name, organizer_email, start_date, summary, location):
-        self.organizer_name = organizer_name
-        self.organizer_email = organizer_email
-        self.start_date = start_date
-        self.summary = summary
-        self.location = location
-        
-        self.attendees = []
-        self.end_date = None
-        self.description = ""
-        self.meeting_link = None
-        self.timezone = "America/Monterrey"
-        self.uid = str(uuid.uuid4())
-        self.dt_stamp = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
-        self.created_date = self.dt_stamp
-        self.last_modified_date = self.dt_stamp
-
-    def add_attendee(self, name, email):
-        """Añadir un asistente individualmente"""
-        attendee = {'name': name, 'email': email}
-        self.attendees.append(attendee)
-
-    def add_end_date(self, end_date):
-        """Añadir fecha de fin"""
-        self.end_date = end_date
-
-    def add_description(self, description):
-        """Añadir descripción"""
-        self.description = description
-
-    def add_meeting_link(self, meeting_link):
-        """Añadir enlace de Google Meet"""
-        self.meeting_link = meeting_link
-
-    def generate_ics(self):
-        if not self.attendees:
-            raise ValueError("Debe agregar al menos un asistente para generar el archivo .ics, puedes utilizar add_attendee(name, email) para hacerlo...")
-
-        attendees_str = ""
-        for attendee in self.attendees:
-            attendees_str += f"ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN={attendee['name']}:mailto:{attendee['email']}\n"
-
-        ics_content = f"""BEGIN:VCALENDAR
-PRODID:-//Google Inc//Google Calendar 70.9054//EN
-VERSION:2.0
-CALSCALE:GREGORIAN
-METHOD:REQUEST
-BEGIN:VTIMEZONE
-TZID:{self.timezone}
-X-LIC-LOCATION:{self.timezone}
-BEGIN:STANDARD
-TZOFFSETFROM:-0600
-TZOFFSETTO:-0600
-TZNAME:CST
-DTSTART:19700101T000000
-END:STANDARD
-END:VTIMEZONE
-BEGIN:VEVENT
-DTSTART;TZID={self.timezone}:{self.start_date}
-DTSTAMP:{self.dt_stamp}
-ORGANIZER;CN={self.organizer_name}:mailto:{self.organizer_email}
-UID:{self.uid}
-{attendees_str}
-CREATED:{self.created_date}
-DESCRIPTION:{self.description}
-LAST-MODIFIED:{self.last_modified_date}
-LOCATION:{self.location}
-SEQUENCE:0
-STATUS:CONFIRMED
-SUMMARY:{self.summary}
-TRANSP:OPAQUE
-"""
-        
-        if self.end_date:
-            ics_content += f"DTEND;TZID={self.timezone}:{self.end_date}\n"
-
-        if self.meeting_link:
-            ics_content += f"X-GOOGLE-CONFERENCE:{self.meeting_link}\n"
-
-        ics_content += "END:VEVENT\nEND:VCALENDAR"
-
-        return ics_content
