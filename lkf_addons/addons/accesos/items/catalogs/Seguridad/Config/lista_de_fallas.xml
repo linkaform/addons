@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>12-65ef151dfdff9fb57cd85ef130b6a83a</_rev>
+    <_rev>19-ed01307a261062c3fb87385b6d1b7861</_rev>
     <updated_at>2024-07-30T00:58:55.598840+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -25,6 +25,10 @@
             <config>False</config>
         </folio>
     </advanced_options>
+    <catalog_id>121722</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>66a83acfee0b950748489ca7</_id>
+    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -56,8 +60,8 @@
                         <item>66ce2441d63bb7a3871adeaf</item>
                     </catalog_fields>
                     <required>False</required>
-                    <field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</field_id>
-                    <label>Categoria</label>
+                    <field_id>{{ catalog.lista_de_objetos.obj_id }}</field_id>
+                    <label>Categoria222</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <view_fields>
@@ -65,11 +69,11 @@
                             <item>66ce2441d63bb7a3871adeaf</item>
                         </view_fields>
                         <view_index>0</view_index>
-                        <couch_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</couch_id>
+                        <couch_id>{{ catalog.lista_de_objetos.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
-                        <filters />
-                        <name>{{ catalog.tipo_de_articulos_perdidos.name }}</name>
+                        <catalog_id>{{ catalog.lista_de_objetos.id }}</catalog_id>
+                        <filters>None</filters>
+                        <name>{{ catalog.lista_de_objetos.name }}</name>
                     </catalog>
                     <properties>{}</properties>
                 </item>
@@ -86,8 +90,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.lista_de_objetos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_objetos.id }}</catalog_id>
                         <filters />
                     </catalog>
                     <options>[]</options>
@@ -105,8 +109,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.lista_de_objetos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_objetos.id }}</catalog_id>
                         <filters />
                     </catalog>
                     <options>[]</options>
@@ -116,8 +120,4 @@
             <page_description>None</page_description>
         </item>
     </catalog_pages>
-    <sync_last_update>None</sync_last_update>
-    <_id>66a83acfee0b950748489ca7</_id>
-    <public>False</public>
-    <catalog_id>121722</catalog_id>
 </lkf>
