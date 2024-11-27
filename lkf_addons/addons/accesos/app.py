@@ -551,11 +551,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'enviar_correo_pre_registro':'6734c6d5254e9a61df8e7f51'
         })
 
-        self.conf_accesos_fields.update({
-            'usuario_cat':  f"{self.EMPLOYEE_OBJ_ID}",
-            'grupos':f"{self.GRUPOS_OBJ_ID}",
-            'menus':"6722472f162366c38ebe1c64",
-        })
+        # self.conf_accesos_fields.update({
+        #     'usuario_cat':  f"{self.EMPLOYEE_OBJ_ID}",
+        #     'grupos':f"{self.GRUPOS_OBJ_ID}",
+        #     'menus':"6722472f162366c38ebe1c64",
+        # })
 
         self.notes_project_fields.update(self.notes_fields)
         self.bitacora_acceos = {}
@@ -1650,7 +1650,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_access_pass(self, location, access_pass):
         #---Define Metadata
-        print("ACESSSSS_PASSSSSSS", simplejson.dumps(access_pass, indent=4))
         metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
         metadata.update({
             "properties": {
@@ -2904,29 +2903,41 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         res.append(r['perfil'])
         return res
     
-    def get_my_pases(self):
+    def get_my_pases(self, tab_status):
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         query = [ 
             {"$match":{
                 'form_id':121736,
-                deleted_at:{'$exists':false}}
-                },
+                'deleted_at':{'$exists':False},
+                f"answers.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.pase_entrada_fields['autorizado_por']}":employee.get('worker_name'),
+
+                }
+            },
             {'$group':{
-                '_id':{
-                    'nombre':'$answers.662c2937108836dec6d92580'
-                },
+                '_id':'$_id',
+                # '_id':{
+                #     '$first': 
+                #     # 'nombre':'$answers.662c2937108836dec6d92580'
+                # },
                 'phone':{'$last':'$answers.662c2937108836dec6d92582'},
-                'email':{'$last':'$answers.662c2937108836dec6d92581'}
+                'email':{'$last':'$answers.662c2937108836dec6d92581'},
+                'nombre':{'$last':'$answers.662c2937108836dec6d92580'},
+                'folio':{'$first': '$folio'},
                 }
             },
             {'$project':
                 {
-                _id:0,
-                'nombre':'$_id.nombre',
-                'phone':'$phone',
-                'email':'$email',
+                '_id':1,
+                'folio': 1,
+                'nombre':f'$nombre',
+                'phone':f'$phone',
+                'email':f'$email',
                 }
             }
         ]
+        records = self.format_cr(self.cr.aggregate(query))
+        print('answers', simplejson.dumps(records, indent=4))
+        return  records
 
     def get_pass_custom(self,qr_code):
         pass_selected= self.get_detail_access_pass(qr_code=qr_code)
@@ -2937,7 +2948,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers['folio']= pass_selected.get("folio")
         return answers
     
-
     def get_user_booths_availability(self):
         '''
         Regresa las castas configurados por usuario y su stats
@@ -2963,7 +2973,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         load_shift_json = { }
         username = self.user.get('username')
         user_id = self.user.get('user_id')
-        config_accesos_user= get_config_accesos(user_id)
+        config_accesos_user="" #get_config_accesos(user_id)
         user_status = self.get_employee_checkin_status(user_id, as_shift=True,  available=False)
         this_user = user_status.get(user_id)
         if not this_user:
