@@ -141,6 +141,7 @@ class JIT(Base):
             'procurment_method':'66d92acdb22bcdcc2f341ebf',
             'procurment_schedule_date':'66da538cb22bcdcc2f341f47',
             'procurment_status':'621cdeeec9c81e23bb6380fc',
+            'jit_procurment_status':'66da0c19b22bcdcc2f341f07',
             'procurment_qty':'66da3bddb22bcdcc2f341f08',
             'qty': '6206b9ae8209a9677f9b8bdb',
             'status':'620ad6247a217dbcb888d175',
@@ -197,7 +198,6 @@ class JIT(Base):
         # kwargs = kwargs.get('f',f)
 
         from lkf_addons.addons.product.app import Product, Warehouse
-        self.WH = Warehouse( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         # from lkf_addons.addons.stock.app import Stock
         # self.STOCK = Stock( settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
@@ -225,7 +225,6 @@ class JIT(Base):
         self.INPUT_GOODS_SKU_ID = self.INPUT_GOODS_SKU.get('id')
         self.INPUT_GOODS_SKU_OBJ_ID = self.INPUT_GOODS_SKU.get('obj_id')
 
-        print('44444444444444444444444444444444444444444444444444444444444',self.config_fields)
 
     # def get_config(self, *args, **kwargs):
     #     print('self config', self.GET_CONFIG)

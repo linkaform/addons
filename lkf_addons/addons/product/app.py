@@ -151,14 +151,14 @@ class Product(Base, base.LKF_Base):
         query = {}
         if group_id:
             if product_code:
-                query.update({f"answers.{group_id}.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+                query.update({f"answers.{group_id}.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
             if sku:
-                query.update({f"answers.{group_id}.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku})
+                query.update({f"answers.{group_id}.{self.SKU_OBJ_ID}.{self.f['sku']}":sku})
         else:
             if product_code:
-                query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+                query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
             if sku:
-                query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku})
+                query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['sku']}":sku})
         return query
 
 class Warehouse(Base ,base.LKF_Base):
