@@ -31,7 +31,6 @@ Si tienes más de una aplicación, puedes:
 import simplejson, importlib
 import re, os, zipfile, wget, random, shutil, datetime
 from datetime import timedelta
-from twilio.rest import Client
 
 from linkaform_api import base
 
@@ -124,7 +123,6 @@ class Base(base.LKF_Base):
             'country_code':'663a7ca6e48382c5b12308fb',
             'country_ph_code':'663a7ca6e48382c5b12308fc',
             'city':'6654187fc85ce22aaf8bb070',
-            'client':'667468e3e577b8b98c852aaa',
             'email':'663a7ee1e48382c5b1230907',
             'email_contacto':'66bfd647cd15883ed163e9b5',
             'nombre_comercial':'667468e3e577b8b98c852aaa',
@@ -167,31 +165,6 @@ class Base(base.LKF_Base):
 
     def _project_format(self, data):
         return self.project_format(data)
-
-    def enviar_sms(self, phone_to, message, media_url=None):
-        twillio = self.lkf_api.get_twillio_info()
-        account_sid = twillio['account_sid']
-        auth_token = twillio['auth_token']
-        phone_twilio = twillio['phone']
-        api_key_sid = twillio.get('api_key_sid')
-        api_key_secret = twillio.get('api_key_secret')
-
-        if api_key_sid and api_key_secret:
-            client = Client(api_key_sid, api_key_secret, account_sid)
-        else:
-            client = Client(account_sid, auth_token)
-
-        try:
-            response = client.messages.create(
-                from_=phone_twilio,
-                body=message,
-                to=phone_to,
-                media_url=media_url
-            )
-            print(f"Mensaje enviado: {response.sid}")
-            print(message)
-        except Exception as e:
-            print(f"Error al enviar el mensaje: {e}")
 
     def get_config(self, *args, **kwargs):
         print('args',args)
@@ -1314,7 +1287,7 @@ class Schedule(Base):
     def convert_usr_id_to_dict(self, user_ids):
         user_info = []
         for user_id in user_ids:
-            user_data = self.lkf_api.get_user_by_id(user_id)
+            user_data = lkf_api.get_user_by_id(user_id)
             if user_data:
                 user_info.append({
                     'account_id': user_data.get('parent_info',{}).get('id'), 
@@ -1402,8 +1375,6 @@ class Schedule(Base):
     def get_dag_dates(self, data):
         res = {}
         dag_info = data.get('dag_info',{})
-        if type(dag_info) == list and len(dag_info)>0:
-            dag_info = dag_info[0]
         next_run = dag_info.get('next_dagrun')
         create_after = dag_info.get('next_dagrun_create_after')
         if next_run and create_after:
@@ -1415,9 +1386,7 @@ class Schedule(Base):
 
     def get_form_fileshare(self, item_id):
         shared_users = self.lkf_api.get_form_users(item_id)
-        print('shared_users', shared_users)
         user_ids = [user['id'] for user in shared_users if user.get('id')]
-        print('user_ids', user_ids)
         return user_ids
 
     def get_record_from_db(self, item_id, folio):
@@ -1717,30 +1686,29 @@ class Schedule(Base):
             body['tasks'][0]['downstream_task_id'].append(downstream_task_id)
             all_user_ids = []
             if 'todos_los_usuarios_que_tengan_el_formulario_compartido' in  asigne_to:
-                fileshare_user_ids = self.get_form_fileshare(item_id)
-                all_user_ids += self.convert_usr_id_to_dict(fileshare_user_ids)
-            else:
-                for gset in assigned_users:
-                    if gset.get('abcde0001000000000020003') == 'grupo':
-                        udata = gset.get(GROUP_CATALOG_ID,{})
-                        print('udata', udata)
-                        group_id = udata.get('639b65dfaf316bacfc551ba2')[0]
-                        # grp_set = set.get(GROUP_CATALOG_ID)
-                        group_users = lkf_api.get_group_users(group_id)
-                        # guser_id = [user['id'] for user in group_users if user.get('id')]
-                        # user_idsG = update_users(user_ids, guser_id)
-                        all_user_ids += self.update_users(all_user_ids, group_users)
-                    elif gset.get('abcde0001000000000020003') == 'usuario':
-                        udata = gset.get(self.USUARIOS_OBJ_ID,{})
-                        data = {
-                            "name":udata.get('638a9a7767c332f5d459fc81'),
-                            "email":udata.get('638a9a7767c332f5d459fc82',[])[0],
-                            "username":udata.get('638a9a7767c332f5d459fc82',[])[0],
-                            "user_id":udata.get('638a9a99616398d2e392a9f5',[])[0],
-                            "account_id":9804,
-                            "resource_kind":"user"
-                        }
-                        all_user_ids += self.update_users(all_user_ids, data)
+                fileshare_user_ids = get_form_fileshare(item_id)
+                all_user_ids += convert_usr_id_to_dict(fileshare_user_ids)
+            for gset in assigned_users:
+                if gset.get('abcde0001000000000020003') == 'grupo':
+                    udata = gset.get(GROUP_CATALOG_ID,{})
+                    print('udata', udata)
+                    group_id = udata.get('639b65dfaf316bacfc551ba2')[0]
+                    # grp_set = set.get(GROUP_CATALOG_ID)
+                    group_users = lkf_api.get_group_users(group_id)
+                    # guser_id = [user['id'] for user in group_users if user.get('id')]
+                    # user_idsG = update_users(user_ids, guser_id)
+                    all_user_ids += update_users(all_user_ids, group_users)
+                elif gset.get('abcde0001000000000020003') == 'usuario':
+                    udata = gset.get(self.USUARIOS_OBJ_ID,{})
+                    data = {
+                        "name":udata.get('638a9a7767c332f5d459fc81'),
+                        "email":udata.get('638a9a7767c332f5d459fc82',[])[0],
+                        "username":udata.get('638a9a7767c332f5d459fc82',[])[0],
+                        "user_id":udata.get('638a9a99616398d2e392a9f5',[])[0],
+                        "account_id":9804,
+                        "resource_kind":"user"
+                    }
+                    all_user_ids += self.update_users(all_user_ids, data)
             if all_user_ids:
                 body['assign'] = {'assign_users':[]}
 
