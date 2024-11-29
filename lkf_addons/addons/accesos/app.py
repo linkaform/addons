@@ -2206,7 +2206,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'visita_a_email':
                     f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_empleado']}",
                 'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
-                'grupo_commentario_area': f"$answers.{self.mf['grupo_commentario_area']}",
+                # 'grupo_commentario_area': f"$answers.{self.mf['grupo_commentario_area']}",
                 'grupo_equipos': f"$answers.{self.mf['grupo_equipos']}",
                 'grupo_vehiculos': f"$answers.{self.mf['grupo_vehiculos']}",
                 'grupo_instrucciones_pase': f"$answers.{self.mf['grupo_instrucciones_pase']}",
