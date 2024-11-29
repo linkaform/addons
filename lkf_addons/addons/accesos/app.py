@@ -1396,6 +1396,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.send_email_by_form(data_msj)
 
     def create_enviar_msj_pase(self, data_cel_msj=None, folio=None):
+        if not data_cel_msj['mensaje'] and data_cel_msj['from'] == 'enviar_pre_sms':
+            get_pase = self.get_detail_access_pass(qr_code=folio)
+            data_cel_msj['mensaje'] = f"Se ha creado un pre-registro y ahora está pendiente de su asignación. Por favor, complete sus datos de registro en este link: {get_pase.get('link', '')}"
+            
         mensaje = data_cel_msj.get('mensaje', '')
         phone_to = data_cel_msj.get('numero', '')
         res =self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
@@ -2210,7 +2214,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'codigo_qr': f"$answers.{self.mf['codigo_qr']}",
                 'qr_pase': f"$answers.{self.mf['qr_pase']}",
                 'tema_cita': f"$answers.{self.pase_entrada_fields['tema_cita']}",
-                'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}"
+                'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}",
+                'link': f"$answers.{self.pase_entrada_fields['link']}"
                 },
             },
             {'$sort':{'folio':-1}},
