@@ -193,6 +193,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'documento': '663e5470424ad55e32832eec',
             'documento_certificado': '66427511e93cc23f04f27467',
             'direccion': '663a7e0fe48382c5b1230902',
+            'direccion_visita': '67466b79bd2dc53e9864ad62',
             'duracion': '65cbe03c6c78b071a59f481e',
             'email_empleado': '6653f3709c6d89925dc04b2f',
             'email_pase':'662c2937108836dec6d92581',
@@ -235,6 +236,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'numero_serie': '66426453f076652427832fd2',
             'nombre_visita': '5ea0693a0c12d5a8e43d37df',
             'nombre_pase':'662c2937108836dec6d92580',
+            'nss': '67466b79bd2dc53e9864ad63',
             'placas_vehiculo':'663e4691f54d395ed7f27464',
             'puesto_empleado': '663bc4c79b8046ce89e97cf4',
             'qr_pase':'64ef5b5fff1bec97d2ca27b6',
@@ -246,6 +248,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'status_visita':'5ea1bd280ae8bad095055e61',
             'telefono_pase':'662c2937108836dec6d92582',
             'telefono':'661ea59c15baf5666f32360e',
+            'telefono_visita': '663ec042713049de31e97c93',
             'tipo_de_articulo_perdido':'66ce23efc5c4d148311adf86',
             'tipo_de_comentario':'66af1977ffb6fd75e769f457',
             'tipo_de_guardia': '6684484fa5fd62946c12e006',
@@ -550,11 +553,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'enviar_correo_pre_registro':'6734c6d5254e9a61df8e7f51'
         })
 
-        self.conf_accesos_fields.update({
-            'usuario_cat':  f"{self.EMPLOYEE_OBJ_ID}",
-            'grupos':f"{self.GRUPOS_OBJ_ID}",
-            'menus':"6722472f162366c38ebe1c64",
-        })
+        # self.conf_accesos_fields.update({
+        #     'usuario_cat':  f"{self.EMPLOYEE_OBJ_ID}",
+        #     'grupos':f"{self.GRUPOS_OBJ_ID}",
+        #     'menus':"6722472f162366c38ebe1c64",
+        # })
 
         self.notes_project_fields.update(self.notes_fields)
         self.bitacora_acceos = {}
@@ -1393,6 +1396,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.send_email_by_form(data_msj)
 
     def create_enviar_msj_pase(self, data_cel_msj=None, folio=None):
+        if not data_cel_msj['mensaje'] and data_cel_msj['from'] == 'enviar_pre_sms':
+            get_pase = self.get_detail_access_pass(qr_code=folio)
+            data_cel_msj['mensaje'] = f"Se ha creado un pre-registro y ahora está pendiente de su asignación. Por favor, complete sus datos de registro en este link: {get_pase.get('link', '')}"
+            
         mensaje = data_cel_msj.get('mensaje', '')
         phone_to = data_cel_msj.get('numero', '')
         res =self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
@@ -1866,6 +1873,53 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
             resUp= self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
         return res
+    
+    def create_visita_autorizada(self, visita_autorizada_obj, pase_obj={}):
+        pase_info = pase_obj
+        print(pase_info)
+        #---Define Metadata
+        print("VISITA AUTORIZADA OBJJJJJJJJ", simplejson.dumps(visita_autorizada_obj, indent=4))
+        metadata = self.lkf_api.get_metadata(form_id=self.VISITA_AUTORIZADA)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Script",
+                    "Module": "Accesos",
+                    "Process": "Creación de visita autorizada",
+                    "Action": "create_visita_autorizada",
+                    "File": "accesos/app.py"
+                }
+            },
+        })
+
+        #---Define Answers
+        answers = {}
+        nombre_completo = visita_autorizada_obj.get('nombre_completo', '')
+        curp = visita_autorizada_obj.get('curp', '')
+        direccion = visita_autorizada_obj.get('direccion', '')
+        nss = visita_autorizada_obj.get('nss', '')
+
+        email = pase_info.get('email', '')
+        telefono = pase_info.get('telefono', '')
+        fotografia = pase_info.get('fotografia',[])
+        identificacion = pase_info.get('identificacion',[])
+        
+        answers[self.mf['nombre_visita']] = nombre_completo
+        answers[self.mf['curp']] = curp
+        answers[self.mf['email_vista']] = email
+        answers[self.mf['telefono_visita']] = telefono
+        answers[self.mf['foto']] = fotografia
+        answers[self.mf['identificacion']] = identificacion
+        answers[self.mf['direccion_visita']] = direccion
+        answers[self.mf['nss']] = nss
+
+        metadata.update({'answers':answers})
+        res = self.lkf_api.post_forms_answers(metadata)
+        if res.get("status_code") ==200 or res.get("status_code")==201:
+            print(res)
+        else:
+            print("Error al ejecutar el post_forms_answers en create_visita_autorizada")
+        return res
 
     def format_personas_involucradas(self, data):
         res = []
@@ -2205,12 +2259,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'codigo_qr': f"$answers.{self.mf['codigo_qr']}",
                 'qr_pase': f"$answers.{self.mf['qr_pase']}",
                 'tema_cita': f"$answers.{self.pase_entrada_fields['tema_cita']}",
-                'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}"
+                'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}",
+                'link': f"$answers.{self.pase_entrada_fields['link']}"
                 },
             },
             {'$sort':{'folio':-1}},
         ]
-        print('query', query)
+        # print('query', query)
         res = self.cr.aggregate(query)
         x = {}
         for x in res:
