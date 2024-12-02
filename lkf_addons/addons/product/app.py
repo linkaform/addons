@@ -127,23 +127,7 @@ class Product(Base, base.LKF_Base):
         list_response.sort()           
         return list_response
         
-    def get_product_catalog(self):
-        match_query = { 
-            'deleted_at':{"$exists":False},
-        }
-
-        mango_query = {"selector":
-            {"answers":
-                {"$and":[match_query]}
-            },
-            "limit":10000,
-            "skip":0
-        }
-        res = self.lkf_api.search_catalog( 123105, mango_query)
-        res_format = self.format_catalog_product(res)
-        return res_format   
-
-        
+    
     def get_catalog_product(self, query={}):
         return self.get_product_catalog(query)
 
