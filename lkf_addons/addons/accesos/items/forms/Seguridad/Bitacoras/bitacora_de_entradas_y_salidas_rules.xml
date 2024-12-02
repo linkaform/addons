@@ -67,7 +67,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.areas_de_las_ubicaciones_salidas.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>664fc5f02b3279a37a0955bd</id>
+                    <id>66a83a77ee0b950748489c9f</id>
                     <label>Caseta de Salida</label>
                     <type>catalog</type>
                 </item>
@@ -125,7 +125,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.configuracion_de_perfiles.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>664fc6e81d1a1fcda334b587</id>
+                    <id>66a83ad3edd8174f986630ef</id>
                     <label>Permisos</label>
                     <type>catalog</type>
                 </item>

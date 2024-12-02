@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>20-970cf784320b968d911c64a75db2786a</_rev>
+    <_rev>22-47b6fec24ccc30c60e7a93650f2dd947</_rev>
     <updated_at>2024-07-30T00:58:59.775561+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -318,7 +318,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
@@ -336,7 +336,7 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters />
+                        <filters>None</filters>
                         <field_type>decimal</field_type>
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>

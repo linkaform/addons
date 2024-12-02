@@ -234,6 +234,26 @@ class Base(base.LKF_Base):
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
+    def strip_special_characters(self, value, underscore = False, remove_spaces=True):
+        res = ''
+        try:
+            res = str(value)
+        except UnicodeEncodeError:
+            try:
+                res = str(value.decode('utf-8'))
+            except AttributeError:
+                res = str(value)
+        except:
+            res = value
+        if underscore:
+            res = res.replace(' ','_').lower()
+        if type(res) == str:
+            res = res.replace('\xa0', '')
+            res = res.replace('\xc2','')
+            res = res.replace('\t','')
+            if remove_spaces:
+                res = res.strip()
+        return res
 
 from linkaform_api import  upload_file
 
@@ -461,22 +481,6 @@ class CargaUniversal(Base):
                 'folio':self.strip_special_characters(folio)}
         select_columns = {'folio':1,'user_id':1,'form_id':1, 'answers':1,'_id':1,'connection_id':1}
         return query, select_columns
-
-    def strip_special_characters(self, value, underscore = False):
-        res = ''
-        try:
-            res = str(value)
-        except UnicodeEncodeError:
-            try:
-                res = str(value.decode('utf-8'))
-            except AttributeError:
-                res = str(value)
-        except:
-            res = value
-
-        if underscore:
-            res = res.replace(' ','_').lower()
-        return res
 
     def get_records_existentes(self, form_id, folios, extra_params={}):
         query, select_columns = self.query_busca_records(form_id, folios)

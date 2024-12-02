@@ -30,12 +30,14 @@ class Reports(JIT, base.LKF_Report):
         }
         if warehouse:
             match_query.update({ f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse']}":warehouse})
-        if product_code:
-            if product_code and type(product_code) == list:
-                match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": {"$in":product_code}})
-            elif product_code:
-                match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code})
-    
+        # if product_code:
+        #     if product_code and type(product_code) == list:
+        #         match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": {"$in":product_code}})
+        #     elif product_code:
+        #         match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code})
+        #Borrar
+        match_query.update({
+            f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": '750200301040'})
         query = [
             {"$match": match_query},
             {"$project": {

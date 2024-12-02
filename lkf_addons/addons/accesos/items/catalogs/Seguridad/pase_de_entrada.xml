@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>13-270a1dccaa48b9ad50104a2927bb32d5</_rev>
+    <_rev>15-5d920b33a6154687743c82eb40471606</_rev>
     <updated_at>2024-07-30T00:59:02.221348+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -946,8 +946,8 @@
                     <label>qr_code</label>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
 </lkf>

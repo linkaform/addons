@@ -302,7 +302,7 @@
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <catalog_id>{{ catalog.lista_de_objetos.id }}</catalog_id>
                         <field_type>None</field_type>
                         <filters>Equipos_para_permisos</filters>
                         <geofence>None</geofence>
@@ -323,7 +323,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</field_id>
+                    <field_id>{{ catalog.lista_de_objetos.obj_id }}</field_id>
                     <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>
@@ -393,10 +393,10 @@
                     </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.lista_de_objetos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_objetos.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -479,10 +479,10 @@
                     </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.tipo_de_articulos_perdidos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.lista_de_objetos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.lista_de_objetos.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1263,5 +1263,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1728081125.0</updated_at>
+    <updated_at>1729712422.0</updated_at>
 </lkf>

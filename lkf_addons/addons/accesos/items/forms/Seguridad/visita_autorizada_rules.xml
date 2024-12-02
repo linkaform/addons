@@ -2,5 +2,60 @@
 <lkf>
     <form_id>{{ form.visita_autorizada.id }}</form_id>
     <id>6704674f52dc6e5662811721</id>
-    <rules>[]</rules>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>5ea0693a0c12d5a8e43d37df</field_id>
+                        <group_id>None</group_id>
+                        <id>5ea0693a0c12d5a8e43d37df</id>
+                        <label>Nombre Completo</label>
+                        <type>text</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>5ea0693a0c12d5a8e43d37df</field_id>
+                        <group_id>None</group_id>
+                        <id>5ea0693a0c12d5a8e43d37df</id>
+                        <label>Nombre Completo</label>
+                        <type>text</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5ea1bd280ae8bad095055e61</field_id>
+                    <group_id>None</group_id>
+                    <id>5ea1bd280ae8bad095055e61</id>
+                    <label>Estatus</label>
+                    <type>select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>or</operator>
+            <rule_id>22b910d2264f206a</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>
+                <condition>exclude</condition>
+                <users>
+                    <item>
+                        <user_id>10</user_id>
+                        <user_name>Emiliano Zapata</user_name>
+                    </item>
+                </users>
+            </user_conditions>
+        </item>
+    </rules>
 </lkf>

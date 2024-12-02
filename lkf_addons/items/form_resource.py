@@ -70,6 +70,7 @@ class FormResource(items.Items):
             }
             item = self.lkf.serach_module_item(item_info)
             res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'))
+            print('res=', res)
             response.append(
                     {
                         'module':self.module,

@@ -82,7 +82,7 @@ class Product(Base, base.LKF_Base):
         return res   
 
     def get_product(self, product_code):
-        return self.get_product_field(self, product_code, pfield='*')
+        return self.get_product_field(product_code, pfield='*')
 
     def get_product_field(self, product_code, pfield='product_name'):
         product_field = None
@@ -98,7 +98,7 @@ class Product(Base, base.LKF_Base):
         record = self.lkf_api.search_catalog(self.PRODUCT_ID, mango_query)
         if record and len(record) > 0:
             rec = record[0]
-            if product_field == '*':
+            if pfield == '*':
                 return rec
             product_field = rec.get(self.f[pfield])
         return product_field
@@ -116,6 +116,32 @@ class Product(Base, base.LKF_Base):
                 }
         record = self._labels_list(self.lkf_api.search_catalog(self.PRODUCT_ID, mango_query), self.f)
         return record
+    
+    def format_catalog_product(self, data_query):
+        list_response = []
+        for item in data_query:
+            wharehouse = item.get('61ef32bcdf0ec2ba73dec343','')
+            if wharehouse not in list_response and wharehouse !='':
+                list_response.append(wharehouse)
+
+        list_response.sort()           
+        return list_response
+        
+    def get_product_catalog(self):
+        match_query = { 
+            'deleted_at':{"$exists":False},
+        }
+
+        mango_query = {"selector":
+            {"answers":
+                {"$and":[match_query]}
+            },
+            "limit":10000,
+            "skip":0
+        }
+        res = self.lkf_api.search_catalog( 123105, mango_query)
+        res_format = self.format_catalog_product(res)
+        return res_format   
 
         
     def get_catalog_product(self, query={}):
@@ -125,14 +151,14 @@ class Product(Base, base.LKF_Base):
         query = {}
         if group_id:
             if product_code:
-                query.update({f"answers.{group_id}.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+                query.update({f"answers.{group_id}.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
             if sku:
-                query.update({f"answers.{group_id}.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku})
+                query.update({f"answers.{group_id}.{self.SKU_OBJ_ID}.{self.f['sku']}":sku})
         else:
             if product_code:
-                query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
+                query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['product_code']}":product_code})
             if sku:
-                query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['sku']}":sku})
+                query.update({f"answers.{self.SKU_OBJ_ID}.{self.f['sku']}":sku})
         return query
 
 class Warehouse(Base ,base.LKF_Base):
@@ -143,6 +169,10 @@ class Warehouse(Base ,base.LKF_Base):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api,**kwargs)
         self.name =  __class__.__name__
         self.settings = settings
+
+        # ME TRAJE ESTAS DOS LINEAS DE stock_utils / PACO
+        self.CATALOG_WAREHOUSE = self.lkm.catalog_id('warehouse')
+        self.CATALOG_WAREHOUSE_ID = self.CATALOG_WAREHOUSE.get('id')
 
         self.WAREHOUSE = self.lkm.catalog_id('warehouse')
         self.WAREHOUSE_ID = self.WAREHOUSE.get('id')
