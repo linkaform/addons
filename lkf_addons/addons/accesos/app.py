@@ -2970,42 +2970,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         fecha_hoy = datetime.now(pytz.timezone(employee.get('timezone'))).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
         match_query = {
-            'form_id':121736,
+            'form_id':self.PASE_ENTRADA,
             'deleted_at':{'$exists':False},
             f"answers.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.pase_entrada_fields['autorizado_por']}":employee.get('worker_name'),
         }
+        print("tab_status=",tab_status)
         if tab_status == "Favoritos":
             match_query.update({f"answers.{self.pase_entrada_fields['favoritos']}":'si'})
         elif tab_status == "Activos":
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'activo'})
         elif tab_status == "Vencidos":
-            match_query.update({
-               "$or": [
-                    {
-                        "$and": [
-                            {f"answers.{self.pase_entrada_fields['fecha_desde_visita']}": {"$lt": fecha_hoy_formateada}}, # si tengo una fehca anterior a hoy
-                            {
-                                "$or": [
-                                    {f"answers.{self.pase_entrada_fields['fecha_desde_hasta']}": {"$eq": ""}}, 
-                                    {f"answers.{self.pase_entrada_fields['fecha_desde_hasta']}": {"$exists": False}}, 
-                                    {f"answers.{self.pase_entrada_fields['fecha_desde_hasta']}": {"$eq": None}} 
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "$and": [
-                            {f"answers.{self.pase_entrada_fields['fecha_desde_visita']}": {"$lte": fecha_hoy_formateada}},
-                            {
-                                "$or": [
-                                    {f"answers.{self.pase_entrada_fields['fecha_desde_hasta']}": {"$gte": f"answers.{self.pase_entrada_fields['fecha_desde_visita']}"}},  # si fecha desde hasta mayor o igual a fecha desde visita
-                                    {f"answers.{self.pase_entrada_fields['fecha_desde_hasta']}": {"$exists": False}} 
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            })
+            match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'vencido'})
 
         query = [ 
             {"$match":match_query},
@@ -3076,6 +3051,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$sort':{'_id':-1}},
             # {'$limit':10}
         ]
+        print("query=", simplejson.dumps(query, indent=4))
+        print(stop)
         records = self.format_cr(self.cr.aggregate(query))
         for x in records:
             visita_a =[]
@@ -3116,7 +3093,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
-        print('answers', simplejson.dumps(records, indent=4))
+        # print('answers', simplejson.dumps(records, indent=4))
         return  records
 
     def get_pdf(self, qr_code, template_id=447, name_pdf='Pase de Entrada'):
@@ -3377,6 +3354,86 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             return access_pass
         else:
             return self.LKFException({"status_code":400, "msg":'El parametro para QR, no es valido'})
+
+    def search_pass_by_status(self, status, query_update=None):
+        match_query = {
+            'form_id':self.PASE_ENTRADA,
+            'deleted_at':{'$exists':False},
+            f"answers.{self.pase_entrada_fields['status_pase']}":status,
+        }
+        if query_update:
+            match_query.update(query_update)
+
+        query = [ 
+            {"$match":match_query},
+            {'$project':
+                {
+                    '_id': 1,
+                    'folio': "$folio",
+                    'favoritos':f"$answers.{self.pase_entrada_fields['favoritos']}",
+                    'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+                    'nombre': {"$ifNull":[
+                        f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
+                        f"$answers.{self.mf['nombre_pase']}"]},
+                    'estatus': f"$answers.{self.pase_entrada_fields['status_pase']}",
+                    'empresa': {"$ifNull":[
+                         f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['empresa']}",
+                         f"$answers.{self.mf['empresa_pase']}"]},
+                    'email':  {"$ifNull":[
+                        f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['email_vista']}",
+                        f"$answers.{self.mf['email_pase']}"]},
+                    'telefono': {"$ifNull":[
+                        f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['telefono']}",
+                        f"$answers.{self.mf['telefono_pase']}"]},
+                    'fecha_desde_visita': f"$answers.{self.mf['fecha_desde_visita']}",
+                    'fecha_desde_hasta':{'$ifNull':[
+                        f"$answers.{self.mf['fecha_desde_hasta']}",
+                        f"$answers.{self.mf['fecha_desde_visita']}"]
+                        },
+                    'identificacion': {'$ifNull':[
+                        f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['identificacion']}",
+                        f"$answers.{self.pase_entrada_fields['walkin_identificacion']}"]},
+                    'foto': {'$ifNull':[
+                        f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['foto']}",
+                        f"$answers.{self.pase_entrada_fields['walkin_fotografia']}"]},
+                    'visita_a_nombre':
+                        f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
+                    'visita_a_puesto': 
+                        f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['puesto_empleado']}",
+                    'visita_a_departamento':
+                        f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['departamento_empleado']}",
+                    'visita_a_user_id':
+                        f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['user_id_empleado']}",
+                    'visita_a_email':
+                        f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_empleado']}",
+                    'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
+                    'tipo_de_pase':f"$answers.{self.pase_entrada_fields['perfil_pase']}",
+                    'tema_cita':f"$answers.{self.pase_entrada_fields['tema_cita']}",
+                    'descripcion':f"$answers.{self.pase_entrada_fields['descripcion']}",
+                    'tipo_visita': f"$answers.{self.pase_entrada_fields['tipo_visita']}",
+                    'limite_de_acceso': f"$answers.{self.mf['config_limitar_acceso']}",
+                    'config_dia_de_acceso': f"$answers.{self.mf['config_dia_de_acceso']}",
+                    'identificacion': {'$ifNull':[
+                        f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['identificacion']}",
+                        f"$answers.{self.pase_entrada_fields['walkin_identificacion']}"]},
+                    'limitado_a_dias':f"$answers.{self.mf['config_dias_acceso']}",
+                    'perfil_pase':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}",
+                    'tipo_de_comentario': f"$answers.{self.mf['tipo_de_comentario']}",
+                    'tipo_fechas_pase': f"$answers.{self.mf['tipo_visita_pase']}",
+                    'enviar_correo_pre_registro': f"$answers.{self.pase_entrada_fields['enviar_correo_pre_registro']}",
+                    'enviar_correo': f"$answers.{self.pase_entrada_fields['enviar_correo']}",
+                    'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
+                    'grupo_equipos': f"$answers.{self.mf['grupo_equipos']}",
+                    'grupo_vehiculos': f"$answers.{self.mf['grupo_vehiculos']}",
+                    'grupo_instrucciones_pase': f"$answers.{self.mf['grupo_instrucciones_pase']}",
+                    'comentario': f"$answers.{self.mf['grupo_instrucciones_pase']}",
+                    'comentario_area_pase':f"$answers.{self.mf['commentario_area']}",
+                }
+            },
+            {'$sort':{'_id':-1}},
+            # {'$limit':10}
+        ]
+        return self.format_cr(self.cr.aggregate(query))
 
     def set_boot_status(self, checkin_type):
         if checkin_type == 'in':
@@ -3847,6 +3904,40 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 return res
         else:
             self.LKFException('No se mandarón parametros para actualizar')
+
+    def update_pass_status(self):
+        query_update = {}
+        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
+        timezone = user_data.get('timezone','America/Monterrey')
+        today = self.today_str(tz_name=timezone, date_format="datetime")
+        print("today=",today)
+        query_update = {
+            "$and": [{
+                "$or":[{
+                    f"answers.{self.pase_entrada_fields['fecha_desde_visita']}":{
+                        "$lte":today
+                        }
+                    },
+                    {
+                        f"answers.{self.pase_entrada_fields['fecha_desde_hasta']}":{
+                            "$lte":today
+                        },
+                    }
+                ]
+                }]
+            }
+        records_ = self.search_pass_by_status('activo', query_update)
+        records = [ObjectId(req["_id"]) for req in records]
+        update_query= {f"answers.{self.pase_entrada_fields['status_pase']}":"vencido"}
+        self.cr.update_many({
+                'form_id':self.PASE_ENTRADA,
+                'deleted_at':{'$exists':False},
+                '_id':{
+                    "$in":records
+                }
+            }, {"$set": update_query})
+        # print("records=",stop)
+
 
     def validate_access_pass_location(self, qr_code, location):
         #TODO
