@@ -972,8 +972,6 @@ class Stock(Base):
         # print('stock adjustments', stock['adjustments'])
         stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
-        # print('stock move_in', stock['move_in'])
-        # print('stock move_out', stock)
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -993,7 +991,6 @@ class Stock(Base):
         # print('stock OUT....',stock['move_out'])
         scrapped, cuarentin = self.stock_scrap(product_code=product_code, sku=sku, lot_number=lot_number, \
             warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, status='done', **kwargs )  
-        # print('stock scrapped',scrapped)  
         stock['scrapped'] = scrapped
         stock['cuarentin'] = cuarentin
 
@@ -1162,7 +1159,6 @@ class Stock(Base):
             answers = self.answers
         res = deepcopy(data)
         res.update(self.get_stock_info_form_answer(answers=answers, data=res))
-        print('res=',res)
         if not res.get('folio'):
             kwargs['require'] = kwargs.get('require',[])
             kwargs['require'].append('folio')
@@ -1177,10 +1173,15 @@ class Stock(Base):
             res['record'] = record
             for key in kwargs['require']:
                 if not record:
-                    msg = "******************** Something went wrong, we couldn't a record for: ***********************"
-                    msg += f"Product Code {res['product_code']} / SKU: {res['sku']} /"
-                    msg += f"Warehouse: {res['warehouse']} / Location: {res['warehouse_location']}"
-                    self.LKFException(msg)
+                    msg = "******************** Something went wrong, we couldn't find a record for: *********************** \n"
+                    msg += f"Product Code {res['product_code']} / SKU: {res['sku']} \n"
+                    msg += f"Warehouse: {res['warehouse']} / Location: {res['warehouse_location']} \n"
+                    msg += f"Numero de Lote: {res['lot_number']} "
+                    error = {
+                        f"{self.CATALOG_INVENTORY_OBJ_ID}": {
+                        "msg": [msg], 
+                        "label": "Producto NO encontrado", "error": []}}
+                    self.LKFException( '', dict_error=error )
                 if record.get(key):
                     res[key] = record.get(key)
                 else:
@@ -1188,14 +1189,13 @@ class Stock(Base):
         return res
 
     def get_stock_info_from_catalog_wl(self, answers={}, data={}, search_key=None):
-        print('-------------------------')
         if not answers:
             answers = self.answers
         res = {}
         if not search_key:
             search_key = self.WH.WAREHOUSE_LOCATION_OBJ_ID
         wh_info = answers.get(search_key, {})
-        if not wh_info:
+        if not wh_info and search_key != self.STOCK_INVENTORY_OBJ_ID:
             data = self.get_stock_info_from_catalog_wl(answers=self.answers, data=data, search_key=self.STOCK_INVENTORY_OBJ_ID)
         res['warehouse'] = data.get('warehouse',wh_info.get(self.f['warehouse']))
         res['warehouse_location'] = data.get('warehouse_location', wh_info.get(self.f['warehouse_location']))
@@ -1208,7 +1208,7 @@ class Stock(Base):
         if not search_key:
             search_key = self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID
         wh_info = answers.get(search_key, {})
-        if not wh_info:
+        if not wh_info and search_key != self.STOCK_INVENTORY_OBJ_ID:
             data = self.get_stock_info_from_catalog_wld(answers=self.answers, data=data, search_key=self.STOCK_INVENTORY_OBJ_ID)
         res['warehouse_dest'] = data.get('warehouse_dest',wh_info.get(self.f['warehouse_dest']))
         res['warehouse_location_dest'] = data.get('warehouse_location_dest',wh_info.get(self.f['warehouse_location_dest']))
@@ -3194,7 +3194,7 @@ class Stock(Base):
             folios = [folios,]
         return self.lkf_api.patch_multi_record( answers=answers, form_id=form_id, folios=folios, threading=True )
 
-    def validate_move_qty(self, product_code, sku, lot_number, warehouse, location, move_qty, date_to=None):
+    def validate_move_qty(self, product_code, sku, lot_number, warehouse, location, move_qty, date_to=None, **kwargs):
         inv = self.get_product_stock(product_code, sku=sku,lot_number=lot_number, warehouse=warehouse, location=location,  
             date_to=date_to, **{"nin_folio":self.folio})
 
