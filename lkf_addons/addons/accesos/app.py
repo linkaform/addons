@@ -1401,7 +1401,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def create_enviar_msj_pase(self, data_cel_msj=None, folio=None):
         if not data_cel_msj['mensaje'] and data_cel_msj['from'] == 'enviar_pre_sms':
             get_pase = self.get_detail_access_pass(qr_code=folio)
-            data_cel_msj['mensaje'] = f"Se ha creado un pre-registro y ahora está pendiente de su asignación. Por favor, complete sus datos de registro en este link: {get_pase.get('link', '')}"
+            data_cel_msj['mensaje'] = f"Hola {get_pase.get('nombre', '')}👋, {get_pase.get('visita_a', [])[0].get('nombre', '')} te esta invitando a {get_pase.get('ubicacion', '')}🏭 y ha creado un pase para ti... por favor, complete sus datos de registro en este link: {get_pase.get('link', '')}"
             
         mensaje = data_cel_msj.get('mensaje', '')
         phone_to = data_cel_msj.get('numero', '')
