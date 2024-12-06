@@ -214,6 +214,7 @@ class Stock(Base):
             'set_total_hours':'61f1fcf8c66d2990c8fc7cc7',
             'set_total_produced':'61f1fcf8c66d2990c8fc7cc3',
             'status':'620ad6247a217dbcb888d175',
+            'stock_move_comments':'66b561232c91d2011147118c',
             'stock_status':'6442e4537775ce64ef72dd6a',
             'time_in':'61f1fcf8c66d2990c8fc7cc5',
             'time_out':'61f1fcf8c66d2990c8fc7cc6',
@@ -234,7 +235,8 @@ class Stock(Base):
         
     def add_dicts(self, dict1, dict2):
         for key in dict1:
-            dict1[key] += dict2.get(key,0)
+            if dict2.get(key):
+                dict1[key] += dict2.get(key,0)
         return dict1
 
     def add_racks_and_containers(self, container_type, racks, containers):
@@ -254,6 +256,7 @@ class Stock(Base):
         product_info = answers.get(self.STOCK_INVENTORY_OBJ_ID,{})
         folio_inventory = product_info.get(self.f['cat_stock_folio'])
         product_code = product_info.get(self.f['product_code'])
+        product_sku = product_info.get(self.f['product_sku'])
         warehouse = product_info.get(self.f['warehouse'])
         product_lot = product_info.get(self.f['product_lot'])
         stock_record = self.get_inventory_record_by_folio(folio_inventory, self.FORM_INVENTORY_ID)
@@ -281,7 +284,7 @@ class Stock(Base):
                     }
                 }
             raise Exception( simplejson.dumps( msg_error_app ) )  
-        return self.update_calc_fields(product_code, warehouse, product_lot, folio=folio_inventory)
+        return self.update_calc_fields(product_code, product_sku, warehouse, product_lot, folio=folio_inventory)
 
     def calc_actuals(self, stock):
         stock_in  = stock.get('production', 0 ) + stock.get('move_in')
@@ -556,18 +559,14 @@ class Stock(Base):
         #data es un json con answers y folio. Que puede ser el current record
         # answers_to_new_record['620ad6247a217dbcb888d176'] = 'todo' # Post Status
         product_code, sku, lot_number, warehouse, location = self.get_product_lot_location(answers)
-        print('product_code',product_code)
-        print('warehouse',warehouse)
-        print('location',location)
-        print('lot_number',lot_number)
-        print('sku',sku)
         product_exist = self.product_stock_exists(product_code, sku=sku,  lot_number=lot_number, warehouse=warehouse, location=location)
-        print('product_exist',product_exist)
+        res = self.update_calc_fields(product_code, sku,  lot_number, warehouse, location=location)
         if product_exist:
-            # res = self.update_calc_fields(product_code, lot_number, warehouse, location=location)
             res = self.update_stock(answers=product_exist.get('answers'), form_id=product_exist.get('form_id'), folios=product_exist.get('folio') )
             return res
         else:
+            values = {key.split('answers.')[-1]: value for key, value in res.items()}
+            answers.update(values)
             print('NO EXISTE==================================')
             metadata = self.lkf_api.get_metadata(self.FORM_INVENTORY_ID)
             metadata.update({
@@ -755,6 +754,10 @@ class Stock(Base):
     def get_product_lot_location(self, answers=None):
         if not answers:
             answers = self.answers
+        if not answers:
+            self.LKFException( dict_error= {
+                        "msg": ['NO answers found']} 
+                )
         product_code = answers.get(self.Product.SKU_OBJ_ID,{}).get(self.f['product_code'])
         sku = answers.get(self.Product.SKU_OBJ_ID,{}).get(self.f['sku'])
         lot_number = answers.get(self.f['product_lot'])
@@ -984,7 +987,6 @@ class Stock(Base):
         # stock['move_in'] = self.stock_moves('in', product_code=product_code, lot_number=lot_number, sku=sku, \
         #     warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
         # #GET PRODUCT EXITS
-        # print('stock IN....',stock['move_in'])
 
         # stock['move_out'] = self.stock_moves('out', product_code=product_code, sku=sku, lot_number=lot_number, \
         #     warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
@@ -1112,7 +1114,6 @@ class Stock(Base):
         if not answers:
             answers = self.answers
         product_info = answers.get(self.STOCK_INVENTORY_OBJ_ID, answers.get(self.Product.SKU_OBJ_ID,{}))
-        print('product_info===',product_info)
         data['product_code'] = data.get(self.f['product_code'],self.unlist(product_info.get(self.f['product_code'])))
         data['sku'] = data.get(self.f['sku'],self.unlist(product_info.get(self.f['sku'])))
         wh_info =  self.get_stock_info_from_catalog_wl(answers, data=data)
@@ -1289,7 +1290,6 @@ class Stock(Base):
 
         res[self.f['set_production_date']] = str(production_date.strftime('%Y-%m-%d'))
         # prod_date = self.date_from_str(production_date)
-        print('year', production_date.strftime('%Y'))
         res[self.f['plant_cut_year']] = int(production_date.strftime('%Y'))
         res[self.f['production_cut_week']] = int(production_date.strftime('%W'))
         res[self.f['production_cut_day']] = int(production_date.strftime('%j'))
@@ -1309,7 +1309,6 @@ class Stock(Base):
         res[self.f['production_multiplication_rate']] = weighted_mult_rate
         res[self.f['inventory_status']] = 'active' if res[self.f['plant_stage']] in (1,2,"1","2") else 'pull'
         res[self.f['move_status']] = 'to_do'
-        print('res',res)
         return res
 
     def get_record_greenhouse_inventory(self, ready_date, planting_house, plant_code):
@@ -1449,7 +1448,7 @@ class Stock(Base):
                         'warehouse': warehouse,
                         'record_id':self.record_id
                         })
-            self.update_calc_fields(product_code, warehouse, lot_number)
+            self.update_calc_fields(product_code, sku, lot_number, warehouse)
         return answers
 
     def inventory_adjustment(self):
@@ -1727,14 +1726,14 @@ class Stock(Base):
         product_code, sku, lot_number, warehouse, location = self.get_product_lot_location()
         res = self.get_invtory_record_by_product(form_id, product_code, sku,  lot_number, warehouse, location, **{'get_many':True})
         delete_records = []
+        keeping = []
         if len(res) >= 1:
-            res.pop(0)
+            keeping = res.pop(-1)
         for x in res:
             delete_records.append(x['_id'])
         if delete_records:
-            print('aqui va a borrar *********************************************')
             res = self.lkf_api.delete_form_records(delete_records)
-        return True
+        return keeping
 
     def move_location(self):
         product_info = self.answers.get(self.STOCK_INVENTORY_OBJ_ID,{})
@@ -1999,7 +1998,6 @@ class Stock(Base):
                 self.LKFException(msg_error_app)
             # Información que modifica el usuario
             move_qty = moves.get(self.f['move_group_qty'],0)
-            print('move_qty', move_qty)
             moves[self.f['inv_move_qty']] = move_qty
             self.validate_move_qty(product_code, sku, lot_number,  warehouse, location, move_qty)
             
@@ -2025,9 +2023,7 @@ class Stock(Base):
                 'move_qty':move_qty
             })
             # lots_in[set_location] = lots_in.get(set_location, move_vals_to) 
-            print('setting cache to...', move_vals_to)
             self.cache_set(move_vals_to)
-            print('setting cache form...', move_vals_from)
             self.cache_set(move_vals_from)
             new_lot = stock.get('record',{}).get('answers',{})
             warehouse_ans = self.swap_location_dest(self.answers[self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID])
@@ -2043,13 +2039,11 @@ class Stock(Base):
                 create_new_records.append(record['new_record'])
             else:
                 print('YA EXISTE... record ya se actualizco usando cache', record)
-        print('create_new_records=',create_new_records)
         print('TODO mover status a lineas de registro')
         res_create = self.lkf_api.post_forms_answers_list(create_new_records)
         #updates records from where stock was moved
         res = self.update_stock(answers={}, form_id=self.FORM_INVENTORY_ID, folios=folios)
         res ={}
-        print('res_create', res_create)
         #res = self.update_stock(answers={}, form_id=self.FORM_INVENTORY_ID, folios=folios)
         return True
 
@@ -3095,8 +3089,8 @@ class Stock(Base):
         answers = record.get('answers')
         if answers:
             res = self.get_product_map(answers, 'field_id_2_model')
-            self.update_calc_fields( product_code=res.get('product_code'), warehouse=res.get('warehouse'), \
-                lot_number=res.get('product_lot'), location=res.get('location'))
+            self.update_calc_fields( product_code=res.get('product_code'), sku=res.get('sku'), lot_number=res.get('product_lot'),  
+                warehouse=res.get('warehouse'), location=res.get('location'))
         return record
 
     def sync_catalog(self, folio):
@@ -3115,7 +3109,7 @@ class Stock(Base):
         res[self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID][self.f['warehouse_location_dest']] = from_location[self.f['warehouse_location']]
         return res
 
-    def update_calc_fields(self, product_code, lot_number, warehouse, location, folio=None, map_type='model_2_field_id', **kwargs):
+    def update_calc_fields(self, product_code, sku, lot_number, warehouse, location, folio=None, map_type='model_2_field_id', **kwargs):
         '''
         stock = {
             'production':'Production',
@@ -3134,13 +3128,8 @@ class Stock(Base):
             'product_lot':lot_number,
             'location':location,
         }
-        print('----------------------------------------------------')
-        print('product_code', product_code)
-        print('warehouse', warehouse)
-        print('lot_number', lot_number)
-        print('location', location)
-        stock = self.get_product_stock(product_code, warehouse=warehouse, lot_number=lot_number,location=location, **kwargs)
-        print('stock111', stock)
+        stock = self.get_product_stock(product_code, sku=sku, warehouse=warehouse, lot_number=lot_number,location=location, **kwargs)
+        stock['actual_eaches_on_hand'] = stock['actuals']
 
         #production = self.stock_production( product_code=product_code, lot_number=lot_number)
         #scrap , cuarentine = self.stock_scrap( product_code=product_code, lot_number=lot_number, status='done')
@@ -3156,7 +3145,7 @@ class Stock(Base):
             if inv:
                 folio = inv.get('folio')
         if not folio:
-            return None
+            return update_values
         query_dict = {'from_id':self.FORM_INVENTORY_ID, 'folio':folio}
         match_query = self.get_stock_query(query_dict)
        # get_match_query = get_product_map(, query_dict, map_type='model_2_field_id')
@@ -3185,7 +3174,6 @@ class Stock(Base):
         acctual_containers = product_stock['actuals']
 
     def update_stock(self, answers={}, form_id=None, folios="" ):
-        print('patch stock folio', folios)
         if not answers:
             answers={"udpate":True}
         if not form_id:
