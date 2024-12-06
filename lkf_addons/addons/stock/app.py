@@ -469,7 +469,7 @@ class Stock(Base):
                 self.f['product_lot_created_week']: int(plant_yearWeek),
                 self.f['product_recipe']: plant_info,
                 self.f['product_growth_week']: grow_weeks,
-                self.WAREHOUSE_OBJ_ID: {self.f['warehouse']:warehouse},
+                self.WH.WAREHOUSE_OBJ_ID: {self.f['warehouse']:warehouse},
                 self.f['inventory_status']: 'active',
                 self.f['product_grading_pending']: 'grading_pending'
             }
@@ -1049,7 +1049,7 @@ class Stock(Base):
 
     def get_product_info(self, **kwargs):
         try:
-            warehouse = self.answers[self.WAREHOUSE_OBJ_ID][self.f['warehouse']]
+            warehouse = self.answers[self.WH.WAREHOUSE_OBJ_ID][self.f['warehouse']]
             plant_code = self.answers.get(self.f['product_recipe'], {}).get(self.f['product_code'], '')
         except Exception as e:
             print('**********************************************')
@@ -1316,7 +1316,7 @@ class Stock(Base):
             'form_id': self.FORM_INVENTORY_ID,
             'deleted_at': {'$exists': False},
             f"answers.{self.f['product_lot']}": int(ready_date),
-            f"answers.{self.WAREHOUSE_OBJ_ID}.{self.f['warehouse']}": planting_house,
+            f"answers.{self.WH.WAREHOUSE_OBJ_ID}.{self.f['warehouse']}": planting_house,
             f"answers.{self.f['product_recipe']}.{self.f['product_code']}": plant_code,
             #f"answers.{self.f['inventory_status']}": 'active'
         }
@@ -2196,7 +2196,7 @@ class Stock(Base):
 
         dict_answers_to_catalog = {}
         for id_field in dict_idfield_typefield:
-            if id_field in (self.f['product_recipe'], self.WAREHOUSE_OBJ_ID):
+            if id_field in (self.f['product_recipe'], self.WH.WAREHOUSE_OBJ_ID):
                 continue
             val_in_record = self.answers.get( id_field, False )
             val_in_record_org = val_in_record
@@ -2445,7 +2445,7 @@ class Stock(Base):
         match_query.update(self.stock_kwargs_query(**kwargs))
         inc_folio = kwargs.pop("inc_folio") if kwargs.get("inc_folio") else None
         if warehouse:
-            match_query.update({f"answers.{self.WAREHOUSE_OBJ_ID}.{self.f['warehouse']}":warehouse})      
+            match_query.update({f"answers.{self.WH.WAREHOUSE_OBJ_ID}.{self.f['warehouse']}":warehouse})      
         if date_from or date_to:
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=self.f['grading_date']))
 
