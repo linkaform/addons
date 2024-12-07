@@ -1570,7 +1570,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
-
     def _get_ics_file(self, meetings=[]):
         _logger = logging.getLogger(__name__)
 
@@ -2994,16 +2993,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'grupo_equipos': f"$answers.{self.mf['grupo_equipos']}",
                     'grupo_vehiculos': f"$answers.{self.mf['grupo_vehiculos']}",
                     'grupo_instrucciones_pase': f"$answers.{self.mf['grupo_instrucciones_pase']}",
-                    'comentario': f"$answers.{self.mf['grupo_instrucciones_pase']}",
-                    'comentario_area_pase':f"$answers.{self.mf['commentario_area']}",
+                    'comentario_area_pase':f"$answers.{self.mf['grupo_areas_acceso']}.{self.pase_entrada_fields['commentario_area']}",
                 }
             },
             {'$sort':{'_id':-1}},
-            # {'$limit':10}
+            # {'$limit':1}
         ]
-        print("query=", simplejson.dumps(query, indent=4))
-        print(stop)
+        # print(stop)
         records = self.format_cr(self.cr.aggregate(query))
+        # print("records=", simplejson.dumps(records, indent=4))
         for x in records:
             visita_a =[]
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
@@ -3037,13 +3035,24 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 x['email']= x.get('email', [""])[0] if x.get('email') else ""
                 x['empresa']= x.get('empresa', [""])[0] if x.get('empresa') else ""
                 x['telefono']= x.get('telefono', [""])[0] if x.get('telefono') else ""
-                # x['pdf'] = self.lkf_api.get_pdf_record(x['_id'], template_id = 447, name_pdf='Pase de Entrada', send_url=True)
-            x['comentario_area_pase']=x.pop('comentario_area_pase',[])
+                # x['pdf'] = self.lkf_api.get_pdf_record(x[' # for idx, dic in enumerate(x['grupo_areas_acceso']):
+            #     print("QUE ES ",idx, dic)_id'], template_id = 447, name_pdf='Pase de Entrada', send_url=True)
+            # x['comentario_area_pase']=x.pop('comentario_area_pase',[])
+            # print("QUE HAYYY",x['grupo_areas_acceso'])
+           
+
+                # for key in list(item.keys()):
+                #     if key in id_to_name_mapping:
+                #         # Reemplaza el id hexadecimal por su nombre en el diccionario
+                #         item[self.pase_entrada_fields['commentario_area']] = item.pop(key)
+
+
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
-        # print('answers', simplejson.dumps(records, indent=4))
+            # x['comentario'] = self._labels_list(x.pop('comentario',[]), self.mf)
+        print('answers', simplejson.dumps(records, indent=4))
         return  records
 
     def get_pdf(self, qr_code, template_id=447, name_pdf='Pase de Entrada'):
@@ -3782,8 +3791,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         qr_code= folio
         _folio= pass_selected.get("folio")
         answers={}
-        
-        
         for key, value in access_pass.items():
             if key == 'grupo_vehiculos':
                 answers[self.mf['grupo_vehiculos']]={}
@@ -3855,12 +3862,183 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
+    def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
+        answers = {}
+        perfil_pase = access_pass.get('perfil_pase', 'Visita General')
+        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
+        timezone = user_data.get('timezone','America/Monterrey')
+        now_datetime =self.today_str(timezone, date_format='datetime')
+
+        for key, value in access_pass.items():
+            if key == 'grupo_vehiculoss':
+                answers[self.mf['grupo_vehiculos']]={}
+                index=1
+                for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
+                    tipo = item.get('tipo_vehiculo','')
+                    marca = item.get('marca_vehiculo','')
+                    modelo = item.get('modelo_vehiculo','')
+                    estado = item.get('state','')
+                    placas = item.get('placas_vehiculo','')
+                    color = item.get('color_vehiculo','')
+                    obj={
+                        self.TIPO_DE_VEHICULO_OBJ_ID:{
+                            self.mf['tipo_vehiculo']:tipo,
+                            self.mf['marca_vehiculo']:marca,
+                            self.mf['modelo_vehiculo']:modelo,
+                        },
+                        self.ESTADO_OBJ_ID:{
+                            self.mf['nombre_estado']:estado,
+                        },
+                        self.mf['placas_vehiculo']:placas,
+                        self.mf['color_vehiculo']:color,
+                    }
+                    # answers[self.mf['grupo_vehiculos']][-index]=obj
+                    answers[self.mf['grupo_vehiculos']][-index] = {}
+            elif key == 'grupo_equiposs':
+                answers[self.mf['grupo_equipos']]={}
+                index=1
+                for index, item in enumerate(access_pass.get('grupo_equipos',[])):
+                    nombre = item.get('nombre_articulo','')
+                    marca = item.get('marca_articulo','')
+                    color = item.get('color_articulo','')
+                    tipo = item.get('tipo_equipo','')
+                    serie = item.get('numero_serie','')
+                    obj={
+                        self.mf['tipo_equipo']:tipo.lower(),
+                        self.mf['nombre_articulo']:nombre,
+                        self.mf['marca_articulo']:marca,
+                        self.mf['numero_serie']:serie,
+                        self.mf['color_articulo']:color,
+                    }
+                    answers[self.mf['grupo_equipos']][-index]=obj
+            elif key == 'grupo_vehiculos':
+                vehiculos = access_pass.get('grupo_vehiculos',[])
+                if vehiculos:
+                    list_vehiculos = []
+                    for item in vehiculos:
+                        tipo = item.get('tipo_vehiculo','')
+                        marca = item.get('marca_vehiculo','')
+                        modelo = item.get('modelo_vehiculo','')
+                        estado = item.get('state','')
+                        placas = item.get('placas_vehiculo','')
+                        color = item.get('color_vehiculo','')
+                        list_vehiculos.append({
+                            self.TIPO_DE_VEHICULO_OBJ_ID:{
+                                self.mf['tipo_vehiculo']:tipo,
+                                self.mf['marca_vehiculo']:marca,
+                                self.mf['modelo_vehiculo']:modelo,
+                            },
+                            self.ESTADO_OBJ_ID:{
+                                self.mf['nombre_estado']:estado,
+                            },
+                            self.mf['placas_vehiculo']:placas,
+                            self.mf['color_vehiculo']:color,
+                        })
+                    answers[self.mf['grupo_vehiculos']] = list_vehiculos  
+            elif key == 'grupo_equipos':
+                equipos = access_pass.get('grupo_equipos',[])
+                if equipos:
+                    list_equipos = []
+                    for item in equipos:
+                        tipo = item.get('tipo_equipo','').lower().replace(' ', '_')
+                        nombre = item.get('nombre_articulo','')
+                        marca = item.get('marca_articulo','')
+                        modelo = item.get('modelo_articulo','')
+                        color = item.get('color_articulo','')
+                        serie = item.get('numero_serie','')
+                        list_equipos.append({
+                            self.mf['tipo_equipo']:tipo,
+                            self.mf['nombre_articulo']:nombre,
+                            self.mf['marca_articulo']:marca,
+                            self.mf['modelo_articulo']:modelo,
+                            self.mf['color_articulo']:color,
+                            self.mf['numero_serie']:serie,
+                        })
+                    answers[self.mf['grupo_equipos']] = list_equipos
+
+            elif key == 'status_pase':
+                answers.update({f"{self.pase_entrada_fields[key]}":value.lower()})
+            elif key == 'foto':
+                answers.update({f"{self.pase_entrada_fields['walkin_fotografia']}":value})
+            elif key == 'identificacion':
+                answers.update({f"{self.pase_entrada_fields['walkin_identificacion']}":value})
+            elif key == 'telefono':
+                answers.update({f"{self.pase_entrada_fields['telefono_pase']}":value})
+            elif key == 'tipo_de_pase':
+                answers.update({f"{self.pase_entrada_fields['tipo_visita_pase']}":value})
+            elif key == 'limite_de_acceso':
+                answers.update({f"{self.pase_entrada_fields['config_limitar_acceso']}":value})
+            elif key == 'limitado_a_dias':
+                answers.update({f"{self.pase_entrada_fields['config_dias_acceso']}":value})
+            elif key == 'tipo_fechas_pase':
+                answers.update({f"{self.pase_entrada_fields['tipo_visita_pase']}":value})
+            elif key == 'archivo_invitacion':
+                answers.update({f"{self.pase_entrada_fields[key]}": value}) 
+            elif key =='grupo_instrucciones_pase':
+                acciones = access_pass.get('grupo_instrucciones_pase',[])
+                if acciones:
+                    acciones_list = []
+                    for c in acciones:
+                        acciones_list.append(
+                            {
+                                self.pase_entrada_fields['tipo_comentario']:c.get('tipo_comentario'),
+                                self.pase_entrada_fields['comentario_pase'] :c.get('comentario_pase')
+                            }
+                        )
+                    answers.update({self.pase_entrada_fields['grupo_instrucciones_pase']:acciones_list})
+            elif key =='grupo_areas_acceso':
+                acciones = access_pass.get('grupo_areas_acceso',[])
+                if acciones:
+                    acciones_list = []
+                    for c in acciones:
+                        acciones_list.append(
+                            {
+                                self.pase_entrada_fields['nombre_area']:c.get('nombre_area'),
+                                self.pase_entrada_fields['commentario_area'] :c.get('commentario_area')
+                            }
+                        )
+                    answers.update({self.pase_entrada_fields['grupo_areas_acceso']:acciones_list})
+            elif key =='link':
+                answers.update({f"{self.pase_entrada_fields[key]}": value.get('link', '')}) 
+            elif key == 'ubicacion':
+                answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
+            else:
+                answers.update({f"{self.pase_entrada_fields[key]}":value})
+
+        answers[self.pase_entrada_fields['tipo_visita']] = 'Buscar visitantes registrados'
+        answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:access_pass.get('visita_a',"")}
+       
+        print("HOLAAA", simplejson.dumps(answers, indent=4))
+        
+        if answers or folio:
+            metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
+            metadata.update(self.get_record_by_folio(folio, self.PASE_ENTRADA, select_columns={'_id':1}, limit=1))
+            print("METADLAAAAA", metadata)
+            metadata.update({
+                    'properties': {
+                        "device_properties":{
+                            "system": "Addons",
+                            "process":"Actualizacion de Pase de Entrada", 
+                            "accion":'update_full_pass', 
+                            "folio": folio, 
+                            "archive": "pase_acceso.py"
+                        }
+                    },
+                    'answers': answers
+                })
+            res= self.net.patch_forms_answers(metadata)
+            print("res", res)
+            return res
+            # return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_INCIDENCIAS, folios=[folio,])
+        else:
+            self.LKFException('No se mandarón parametros para actualizar')
+
     def update_pass_status(self):
         query_update = {}
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         timezone = user_data.get('timezone','America/Monterrey')
         today = self.today_str(tz_name=timezone, date_format="datetime")
-        print("today=",today)
+        # print("today=",today)
         query_update = {
             "$and": [{
                 "$or":[{
@@ -3879,7 +4057,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         records_ = self.search_pass_by_status('activo', query_update)
         records = [ObjectId(req["_id"]) for req in records]
         update_query= {f"answers.{self.pase_entrada_fields['status_pase']}":"vencido"}
-        self.cr.update_many({
+        return self.cr.update_many({
                 'form_id':self.PASE_ENTRADA,
                 'deleted_at':{'$exists':False},
                 '_id':{
@@ -3887,7 +4065,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
             }, {"$set": update_query})
         # print("records=",stop)
-
 
     def validate_access_pass_location(self, qr_code, location):
         #TODO
