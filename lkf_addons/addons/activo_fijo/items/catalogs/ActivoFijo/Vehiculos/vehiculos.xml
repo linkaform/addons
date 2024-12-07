@@ -1,0 +1,224 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>{}</confirmation>
+    <description />
+    <_rev>20-81a5dce21a69d51fd3a3eadf2f5fe083</_rev>
+    <updated_at>2024-06-21T16:45:21.281842+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Vehiculos</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-06-21T16:45:21.281842+00:00Z</created_at>
+    <advanced_options>{}</advanced_options>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>None</fav>
+                    <required>True</required>
+                    <field_id>6675ae21a97a1aa2bf03e906</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Placas</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>66beb10007981d4509575054</item>
+                        <item>66beb11907981d4509575056</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.modelo.obj_id }}</field_id>
+                    <label>Marca -Modelo</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>66beb10007981d4509575054</item>
+                            <item>66beb11907981d4509575056</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.modelo.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.modelo.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.modelo.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>66beb10007981d4509575054</field_id>
+                    <label>Marca</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.modelo.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.modelo.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>66beb11907981d4509575056</field_id>
+                    <label>Modelo</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.modelo.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.modelo.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>None</fav>
+                    <required>False</required>
+                    <field_id>6675ae21a97a1aa2bf03e909</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Último kilometraje</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>date</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>None</fav>
+                    <required>False</required>
+                    <field_id>6675ae21a97a1aa2bf03e90a</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Fecha de último kilometraje</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <custom>None</custom>
+                        <format>vertical</format>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>62c5ff407febce07043024dd</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.empleados.obj_id }}</field_id>
+                    <label>Asignado a Empleado</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>62c5ff407febce07043024dd</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.empleados.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters />
+                        <name>{{ catalog.empleados.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>62c5ff407febce07043024dd</field_id>
+                    <label>Nombre completo</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>select</field_type>
+                    <required>False</required>
+                    <field_id>6737723b067a6a086e016826</field_id>
+                    <options>
+                        <item>
+                            <selected>False</selected>
+                            <label>Activo</label>
+                            <value>activo</value>
+                            <points>None</points>
+                        </item>
+                        <item>
+                            <selected>False</selected>
+                            <label>En mantenimiento</label>
+                            <value>en_mantenimiento</value>
+                            <points>None</points>
+                        </item>
+                        <item>
+                            <selected>False</selected>
+                            <label>Baja</label>
+                            <value>baja</value>
+                            <points>None</points>
+                        </item>
+                    </options>
+                    <label>Estatus</label>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_name>Página 1</page_name>
+            <page_description>None</page_description>
+        </item>
+    </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>6675ae21a97a1aa2bf03e905</_id>
+    <public>False</public>
+    <catalog_id>120376</catalog_id>
+</lkf>

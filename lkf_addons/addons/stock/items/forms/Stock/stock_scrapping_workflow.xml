@@ -1,11 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.stock_scrapping.id }}</form_id>
-    <id>{{ form.stock_scrapping.obj_id }}</id>
+    <id>66288cbf7fa777f62d33a834</id>
     <workflows>
         <item>
             <actions>
                 <item>
+                    <_id>66288cc0b9f436f887f8cb69</_id>
                     <action_id>7</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
@@ -25,6 +26,7 @@
                     <name>None</name>
                 </item>
             </actions>
+            <id>66288cc0b9f436f887f8cb6a</id>
             <name>None</name>
             <rules>
                 <metadata>

@@ -4,6 +4,7 @@
 import subprocess, simplejson, os, glob
 from pathlib import Path
 import xml.etree.ElementTree as ET
+from collections import defaultdict
 
 from linkaform_api import utils, lkf_models
 from linkaform_api.lkf_object import LKFBase 
@@ -387,6 +388,29 @@ class Items(LKFException):
         #     raise LKFException('No file with name: {} found, at path: {}'.format(file_name, file_path))
 
 
+
+    def merge_nested_lists(self, data):
+        result = []
+        for item in data:
+            if isinstance(item, dict):
+                merged_item = {}
+                for key, value in item.items():
+                    if isinstance(value, list) and all(isinstance(subitem, dict) for subitem in value):
+                        # Fusionar diccionarios en la lista bajo el mismo nombre de llave
+                        combined_dict = defaultdict(list)
+                        for subitem in value:
+                            for subkey, sublist in subitem.items():
+                                combined_dict[subkey].extend(sublist)
+                        
+                        # Eliminar duplicados en cada lista bajo las mismas llaves
+                        merged_item[key] = [{k: list(set(v))} for k, v in combined_dict.items()]
+                    else:
+                        merged_item[key] = value
+                result.append(merged_item)
+            else:
+                result.append(item)
+        return result
+
     def hacer_hashable(self, d):
         if isinstance(d, MutableMapping):
             return frozenset((k, self.hacer_hashable(v)) for k, v in d.items())
@@ -394,59 +418,62 @@ class Items(LKFException):
             return tuple(self.hacer_hashable(item) for item in d)
         return d
 
+    # def merge_addons_modules(self, list1, list2):
+    #     merged = []
+
+    #     def merge_elements(element1, element2):
+    #         # If both are dictionaries, merge by keys
+    #         if isinstance(element1, dict) and isinstance(element2, dict):
+    #             merged_dict = {}
+    #             keys = set(element1.keys()).union(element2.keys())
+    #             for key in keys:
+    #                 if key in element1 and key in element2:
+    #                     merged_dict[key] = merge_elements(element1[key], element2[key])
+    #                 elif key in element1:
+    #                     merged_dict[key] = element1[key]
+    #                 else:
+    #                     merged_dict[key] = element2[key]
+    #             return merged_dict
+            
+    #         # If both are lists, merge them
+    #         elif isinstance(element1, list) and isinstance(element2, list):
+    #             return self.merge_addons_modules(element1, element2)
+            
+    #         # If they're the same element or different types, return without duplication
+    #         return element1 if element1 == element2 else [element1, element2]
+
+    #     # Helper to find a dictionary in a list by a given key
+    #     def find_dict_by_key(lst, key):
+    #         for item in lst:
+    #             if isinstance(item, dict) and key in item:
+    #                 return item
+    #         return None
+
+    #     for item1 in list1:
+    #         if isinstance(item1, dict):
+    #             key = next(iter(item1))  # Get the dictionary key
+    #             # Find matching dictionary in list2 by key
+    #             matching_item2 = find_dict_by_key(list2, key)
+    #             if matching_item2:
+    #                 merged.append({key: merge_elements(item1[key], matching_item2[key])})
+    #             else:
+    #                 merged.append(item1)
+    #         else:
+    #             merged.append(item1)
+
+    #     # Add unique items from list2 that weren't merged already
+    #     for item2 in list2:
+    #         if isinstance(item2, dict):
+    #             key = next(iter(item2))
+    #             if not find_dict_by_key(merged, key):
+    #                 merged.append(item2)
+    #         elif item2 not in merged:
+    #             merged.append(item2)
+
+    #     return merged
+
     def merge_addons_modules(self, list1, list2):
-        merged = []
-
-        def merge_elements(element1, element2):
-            # If both are dictionaries, merge by keys
-            if isinstance(element1, dict) and isinstance(element2, dict):
-                merged_dict = {}
-                keys = set(element1.keys()).union(element2.keys())
-                for key in keys:
-                    if key in element1 and key in element2:
-                        merged_dict[key] = merge_elements(element1[key], element2[key])
-                    elif key in element1:
-                        merged_dict[key] = element1[key]
-                    else:
-                        merged_dict[key] = element2[key]
-                return merged_dict
-            
-            # If both are lists, merge them
-            elif isinstance(element1, list) and isinstance(element2, list):
-                return self.merge_addons_modules(element1, element2)
-            
-            # If they're the same element or different types, return without duplication
-            return element1 if element1 == element2 else [element1, element2]
-
-        # Helper to find a dictionary in a list by a given key
-        def find_dict_by_key(lst, key):
-            for item in lst:
-                if isinstance(item, dict) and key in item:
-                    return item
-            return None
-
-        for item1 in list1:
-            if isinstance(item1, dict):
-                key = next(iter(item1))  # Get the dictionary key
-                # Find matching dictionary in list2 by key
-                matching_item2 = find_dict_by_key(list2, key)
-                if matching_item2:
-                    merged.append({key: merge_elements(item1[key], matching_item2[key])})
-                else:
-                    merged.append(item1)
-            else:
-                merged.append(item1)
-
-        # Add unique items from list2 that weren't merged already
-        for item2 in list2:
-            if isinstance(item2, dict):
-                key = next(iter(item2))
-                if not find_dict_by_key(merged, key):
-                    merged.append(item2)
-            elif item2 not in merged:
-                merged.append(item2)
-
-        return merged
+        return self.merge_nested_lists( list1+list2 )
 
     def get_anddons_and_modules_items(self, itype, sub_dir=None):
         res_addons = self.get_all_items_json(itype, sub_dir=sub_dir, path=ADDONS_PATH)

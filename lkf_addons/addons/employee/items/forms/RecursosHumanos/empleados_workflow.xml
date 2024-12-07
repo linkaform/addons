@@ -812,8 +812,8 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>{{ catalog.employee.obj_id }}</couch_id>
-                                <id>{{ catalog.employee.id }}</id>
+                                <couch_id>{{ catalog.empleados.obj_id }}</couch_id>
+                                <id>{{ catalog.empleados.id }}</id>
                                 <name>Empleados</name>
                             </item>
                         </synched_catalogs>

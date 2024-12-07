@@ -96,7 +96,7 @@
                                     <catalog_field_id>{{ catalog.gafetes.obj_id }}</catalog_field_id>
                                     <catalog_id>{{ catalog.gafetes.id }}</catalog_id>
                                     <field_type>text</field_type>
-                                    <filters />
+                                    <filters>None</filters>
                                     <geofence>None</geofence>
                                     <last>False</last>
                                     <related_catalog>{}</related_catalog>
@@ -108,7 +108,7 @@
                                 <label>ID de Gafet</label>
                                 <type>catalog-select</type>
                             </trigger_field>
-                            <value> </value>
+                            <value>None</value>
                         </item>
                     </triggers>
                 </wf_fields>

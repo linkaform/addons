@@ -810,7 +810,6 @@
                         <item>6646393c3fa8b818265d0329</item>
                         <item>62c5ff407febce07043024dd</item>
                         <item>663e5d44f5b8a7ce8211ed0f</item>
-                        <item>6646373dda020fe797cafa20</item>
                     </catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
@@ -1740,5 +1739,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1722301145.0</updated_at>
+    <updated_at>1729531045.0</updated_at>
 </lkf>

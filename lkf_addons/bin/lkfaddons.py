@@ -63,7 +63,7 @@ download_related = False
 
 
 def get_module_dependencies(module, depend_modules):
-    print('dependecies', module)
+    print('Dependecies: ', module)
     res = []
     try:
         this_m = importlib.import_module(f'{module}')
@@ -74,7 +74,7 @@ def get_module_dependencies(module, depend_modules):
         else:
             res = []
     except:
-            res = []
+        res = []
     return res
 
 def do_load_modules(load_modules, **kwargs):
@@ -210,6 +210,7 @@ def get_modules_2_install(commands):
     lkf_base = LKFBase()
     addons = lkf_base.search_modules(path=ADDONS_PATH)
     modules = lkf_base.search_modules(path=MODULES_PATH)
+    modules.sort()
     all_modules = list(set(addons)|set(modules))
     all_modules.sort()
     for idx, c in enumerate(commands):

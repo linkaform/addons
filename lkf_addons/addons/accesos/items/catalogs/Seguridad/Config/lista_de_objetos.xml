@@ -3,11 +3,11 @@
     <templates>[]</templates>
     <confirmation>
         <message>¡Su información fue capturada!</message>
-        <button_message>Mandar respuestas</button_message>
         <redirect_url>default</redirect_url>
+        <button_message>Mandar respuestas</button_message>
     </confirmation>
     <description />
-    <_rev>25-bacc22290f432641e0cb0da7a67d35d5</_rev>
+    <_rev>29-062121ddad48b3ae187c081a02f3254d</_rev>
     <updated_at>2024-09-12T21:32:35.013577+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -30,9 +30,9 @@
     <advanced_options>
         <active>True</active>
         <folio>
-            <manual>False</manual>
-            <required>False</required>
             <config>False</config>
+            <required>False</required>
+            <manual>False</manual>
         </folio>
     </advanced_options>
     <catalog_id>123273</catalog_id>
@@ -44,37 +44,38 @@
             <page_fields>
                 <item>
                     <field_type>catalog</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>
                         <item>66ce23efc5c4d148311adf86</item>
                         <item>66ce23efc5c4d148311adf87</item>
                     </catalog_fields>
-                    <field_id>{{ catalog.categorias_de_objetos.obj_id }}</field_id>
-                    <required>False</required>
                     <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Categoría Objetos</label>
+                    <required>False</required>
+                    <field_id>{{ catalog.categorias_de_objetos.obj_id }}</field_id>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <view_fields>
-                            <item>66ce23efc5c4d148311adf86</item>
-                        </view_fields>
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.categorias_de_objetos.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.categorias_de_objetos.id }}</catalog_id>
-                        <filters>None</filters>
+                        <view_fields>
+                            <item>66ce23efc5c4d148311adf86</item>
+                        </view_fields>
                         <name>{{ catalog.categorias_de_objetos.name }}</name>
                     </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <relation_type>None</relation_type>
+                    <label>Categoría Objetos</label>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
                     <field_id>66ce23efc5c4d148311adf86</field_id>
                     <required>False</required>
                     <fav>True</fav>
@@ -82,58 +83,57 @@
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <filters />
+                        <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.categorias_de_objetos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.categorias_de_objetos.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
-                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
                     <required>False</required>
                     <field_id>66ce23efc5c4d148311adf87</field_id>
                     <label>Descripción Categoría</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                         <field_type>textarea</field_type>
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.categorias_de_objetos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.categorias_de_objetos.id }}</catalog_id>
-                        <filters />
+                        <view_fields>[]</view_fields>
                     </catalog>
                     <options>[]</options>
+                    <properties>{}</properties>
                 </item>
                 <item>
                     <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <custom>None</custom>
-                        <size>complete</size>
-                    </properties>
-                    <key>True</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>66ce2441d63bb7a3871adeaf</field_id>
-                    <required>True</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>True</required>
+                    <field_id>66ce2441d63bb7a3871adeaf</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Objeto</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>True</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
 </lkf>

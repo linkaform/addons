@@ -344,7 +344,6 @@ class Expenses(Employee, base.LKF_Base):
             })
             metadata['answers'] = answers
             res = self.lkf_api.post_forms_answers(metadata)
-            print('res=0',res)
 
 
     def create_expense_authorization(self, folio=None, autorizador={}):
