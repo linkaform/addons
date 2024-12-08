@@ -4,8 +4,17 @@
 Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
 podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
 
-Licencia
-Este código está licenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html).
+Licencia BSD
+Copyright (c) 2024 Infosync / LinkaForm.  
+Todos los derechos reservados.
+
+Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
+
+1. Se debe conservar el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en las redistribuciones del código fuente.
+2. Se debe reproducir el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en la documentación y/u otros materiales proporcionados con las distribuciones en formato binario.
+3. Ni el nombre del Infosync ni los nombres de sus colaboradores pueden ser utilizados para respaldar o promocionar productos derivados de este software sin permiso específico previo por escrito.
+
+ESTE SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A GARANTÍAS DE COMERCIABILIDAD O IDONEIDAD PARA UN PROPÓSITO PARTICULAR. EN NINGÚN CASO LOS AUTORES O TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES POR CUALQUIER RECLAMACIÓN, DAÑO U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN CONTRACTUAL, EXTRACONTRACTUAL O DE OTRO TIPO, DERIVADA DE, O EN CONEXIÓN CON EL SOFTWARE O SU USO U OTRO TIPO DE ACCIONES EN EL SOFTWARE.
 
 Propósito
 El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
@@ -39,4 +48,13 @@ Al utilizar `super()` en el método `__init__()`, heredamos las variables de con
 Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
 '''
 
-class Name_Your_Object(LKF_Base)
+
+
+from lkf_addons.addons.base.app import Base
+
+
+class Service(Base):
+
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
+        # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)

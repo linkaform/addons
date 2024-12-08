@@ -4,8 +4,15 @@
 Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
 podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
 
-Licencia
-Este código está licenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html).
+Licencia BSD
+Copyright (c) 2024 Infosync / LinkaForm.  
+Todos los derechos reservados.
+
+Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
+
+1. Se debe conservar el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en las redistribuciones del código fuente.
+2. Se debe reproducir el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en la documentación y/u otros materiales proporcionados con las distribuciones en formato binario.
+3. Ni el nombre del Infosync ni los nombres de sus colaboradores pueden ser utilizados para respaldar o promocionar productos derivados de este software sin permiso específico previo por escrito.
 
 Propósito
 El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
@@ -1415,7 +1422,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res_update.get('status_code') == 201
         return res_update
      
-
     def create_failure(self, data_failures):
         #---Define Metadata
         metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_FALLAS)
@@ -3918,7 +3924,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
-
+        print('access_pass-', access_pass)
         for key, value in access_pass.items():
             if key == 'grupo_vehiculoss':
                 answers[self.mf['grupo_vehiculos']]={}
@@ -4058,12 +4064,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers[self.pase_entrada_fields['tipo_visita']] = 'Buscar visitantes registrados'
         answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:access_pass.get('visita_a',"")}
        
-        print("HOLAAA", simplejson.dumps(answers, indent=4))
+        print("HOLAAA", answers)
         
         if answers or folio:
             metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
             metadata.update(self.get_record_by_folio(folio, self.PASE_ENTRADA, select_columns={'_id':1}, limit=1))
             print("METADLAAAAA", metadata)
+
+            ans = {"64ef5b5fff1bec97d2ca27b6":[{"file":"https://f001.backblazeb2.com/file/app-linkaform/public-client-10/121736/64ef5b5fff1bec97d2ca27b6/67511d7d5c128b31c4160369.png","file_name":"qr_67511d7c25d9202dceabee9f.png","file_url":"https://f001.backblazeb2.com/file/app-linkaform/public-client-10/121736/64ef5b5fff1bec97d2ca27b6/67511d7d5c128b31c4160369.png"}],"65e0a68a06799422eded24aa":[{"65e0a69a322b61fbf9ed23af":"priemr comntario","66af1977ffb6fd75e769f457":"pase"},{"65e0a69a322b61fbf9ed23af":"otoro comentario","66af1977ffb6fd75e769f457":"pase"}],"662c262cace163ca3ed3bb3a":"alta_de_nuevo_visitante","662c2937108836dec6d92580":"MARI FULL","662c2937108836dec6d92581":"maricruz@linkaform.com","662c2937108836dec6d92582":"+528120084370","662c304fad7432d296d92581":"rango_de_fechas","662c304fad7432d296d92582":"2024-12-05 00:00:00","662c304fad7432d296d92583":"2024-12-06 00:00:00","662c304fad7432d296d92584":"limitar_días_de_acceso","662c304fad7432d296d92585":["martes","viernes","domingo"],"6635380dc9b3e7db4d59eb49":5,"66353daa223b8a43d7f274b5":"activo","663d4ba61b14fab90559ebb0":[{"66a83ab5ca3453e21ea08d19":{"62c5ff407febce07043024dd":"Emiliano Zapata","663bc4c79b8046ce89e97cf4":[["Jefe de Seguridad"]],"663bc4ed8a6b120eab4d7f1e":[["Seguridad"]],"663bd32d7fb8869bbc4d7f7b":[[10]],"6653f3709c6d89925dc04b2f":[["seguridad@linkaform.com"]]}}],"663e446cadf967542759ebba":[],"663e446cadf967542759ebbb":[],"663fed6cb8262fd454326cb3":[{"66a83a77cfed7f342775c161":{"663e5d44f5b8a7ce8211ed0f":"Antenas"},"66af1a77d703592958dca5eb":" nm"}],"66a83a74de752e12018fbc3c":{"663a7e0fe48382c5b1230902":["Monterrey #4321"],"663e5c57f5b8a7ce8211ed0b":"Planta Monterrey"},"66a83ab5c3a77af505489ca2":{"663bd36eb19b7fb7d9e97ccb":"Emiliano Zapata"},"66a83ad3edd8174f986630ef":{"661dc67e901906b7e9b73bac":"Visita General","662962bb203407ab90c886e4":[""],"662962bb203407ab90c886e5":[""],"662962bb203407ab90c886e6":[""],"662962bb203407ab90c886e7":[""],"66297e1579900d9018c886ad":[""],"6639a9d9d38959539f59eb9f":[],"66ad58a3a5515ee3174f2bb5":["Reunión"]},"66a83ad456d1e741159ce118":{},"66c4d5b6d1095c4ce8b2c42a":[{"file_name":"foto.png","file_url":"https://f001.backblazeb2.com/file/app-linkaform/public-client-126/116852/660459dde2b2d414bce9cf8f/67519cf4b9a533fb284a1b2b.png"}],"66c4d5b6d1095c4ce8b2c42b":[{"file_name":"indentificacion.png","file_url":"https://f001.backblazeb2.com/file/app-linkaform/public-client-126/116852/660459dde2b2d414bce9cf8f/67519cff87e02c473a8283e1.png"}],"67329875978e6460083c5648":"mari","67329875978e6460083c5649":"mari","6732a153496e3b26d18e7ee1":["enviar_correo"],"6732aa1189fc6b0ae27e3824":"http://127.0.0.1:8011/solucion_accesos/pase.html?id=67511d7c25d9202dceabee9f&user=10&docs=foto-iden","6734c6d5254e9a61df8e7f51":["enviar_correo_pre_registro","enviar_sms_pre_registro"],"673773741b2adb2d05d99d63":[{"file_name":"invite.ics","file_url":"https://f001.backblazeb2.com/file/app-linkaform/public-client-10/121736/673773741b2adb2d05d99d63/67511d81db64d830750755ea.ics"}]}
+
+
+
+
+
             metadata.update({
                     'properties': {
                         "device_properties":{
@@ -4074,9 +4087,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             "archive": "pase_acceso.py"
                         }
                     },
-                    'answers': answers
+                    'answers': ans
+
                 })
-            res= self.net.patch_forms_answers(metadata)
+            res= self.lkf_api.patch_record(metadata, record_id=qr_code)
+            # res= self.lkf_api.patch_forms_answers(metadata)
             print("res", res)
             return res
             # return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_INCIDENCIAS, folios=[folio,])
