@@ -36,8 +36,6 @@ Si tienes más de una aplicación, puedes:
     c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
 '''
 
-# Importaciones necesarias
-from linkaform_api.base import LKF_Base
 
 ### Objeto o Clase de Módulo ###
 '''
@@ -47,7 +45,6 @@ Al utilizar `super()` en el método `__init__()`, heredamos las variables de con
 
 Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
 '''
-
 
 
 from lkf_addons.addons.base.app import Base
