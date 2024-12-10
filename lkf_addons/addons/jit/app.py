@@ -1,6 +1,17 @@
 # -*- coding: utf-8 -*-
 ### Linkaform Modules / Archivo de Modulo ###
 '''
+
+Licencia BSD
+Copyright (c) 2024 Infosync / LinkaForm.  
+Todos los derechos reservados.
+
+Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
+
+1. Se debe conservar el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en las redistribuciones del código fuente.
+2. Se debe reproducir el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en la documentación y/u otros materiales proporcionados con las distribuciones en formato binario.
+3. Ni el nombre del Infosync ni los nombres de sus colaboradores pueden ser utilizados para respaldar o promocionar productos derivados de este software sin permiso específico previo por escrito.
+
 Archivo para utilizar las funcionalidades modulares de LinkaForm.
 Con estas funcionalides podras utilizar la plafaorma de LinkaForm de 
 manera modular, como un Backend as a Service o BaaS.
@@ -118,6 +129,7 @@ class JIT(Base):
             'bom_name':'66d8e063b22bcdcc2f341e84',
             'bom_type':'66d8dfbcb22bcdcc2f341e81',
             'bom_status':'66e275891f6f133e363afb3f',
+            'comments':'673261f0f652eb86b4204906',
             'consumo_promedio_diario':'66ec770cc9aefada5b04b7a6',
             'demanda_12_meses':'66ea6c61c9aefada5b04b76e',
             'demora':'66ea62dac9aefada5b04b737',
@@ -277,7 +289,6 @@ class JIT(Base):
             status=status)
 
         res = []
-
         product_by_warehouse = {}
         product_codes = [r['product_code'] for r in  product_rules if r.get('product_code')]
         self.ROUTE_RULES = {x['product_code']:x for x in self.get_rutas_transpaso(product_codes) if x.get('product_code')}
@@ -298,9 +309,6 @@ class JIT(Base):
         return response
 
     def calc_safety_stock(self, ave_daily_demand, lead_time, demora, safty_factor=1):
-        print('ave_daily_demand',ave_daily_demand)
-        print('lead_time',lead_time)
-        print('safty_factor',safty_factor)
         #return round(ave_daily_demand * lead_time * safty_factor,2)
         return round(ave_daily_demand * demora * safty_factor,2)
 
@@ -701,6 +709,7 @@ class JIT(Base):
             sku = rec.get('sku')
             if demanda_12_meses == 0 or not sku or not product_code:
                 continue
+
             consumo_promedio_diario = float(rec.get('consumo_promedio_diario',0))
             warehouse = rec.get('warehouse')
             product_by_warehouse[warehouse] = product_by_warehouse.get(warehouse,[])

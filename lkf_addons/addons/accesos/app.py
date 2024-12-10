@@ -4,8 +4,15 @@
 Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
 podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
 
-Licencia
-Este código está licenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html).
+Licencia BSD
+Copyright (c) 2024 Infosync / LinkaForm.  
+Todos los derechos reservados.
+
+Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
+
+1. Se debe conservar el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en las redistribuciones del código fuente.
+2. Se debe reproducir el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en la documentación y/u otros materiales proporcionados con las distribuciones en formato binario.
+3. Ni el nombre del Infosync ni los nombres de sus colaboradores pueden ser utilizados para respaldar o promocionar productos derivados de este software sin permiso específico previo por escrito.
 
 Propósito
 El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
@@ -1426,7 +1433,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res_update.get('status_code') == 201
         return res_update
      
-
     def create_failure(self, data_failures):
         #---Define Metadata
         metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_FALLAS)
@@ -4121,6 +4127,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if answers or folio:
             metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
             metadata.update(self.get_record_by_folio(folio, self.PASE_ENTRADA, select_columns={'_id':1}, limit=1))
+
             metadata.update({
                     'properties': {
                         "device_properties":{
