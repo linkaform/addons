@@ -216,9 +216,19 @@ class Base(base.LKF_Base):
             setattr(self, import_as, AddonsClass(self.settings, sys_argv=self.sys_argv, use_api=self.use_api, **self.kwargs))
             if module not in self.kwargs['MODULES']:
                 self.kwargs['MODULES'].append(module)
-      
+    
+    def send_email_by_form_answers(self, data):
+        answers = {}
+        answers.update({
+            f"{self.envio_correo_fields['email_from']}":data['email_from'],
+            f"{self.envio_correo_fields['titulo']}":data['titulo'],
+            f"{self.envio_correo_fields['nombre']}":data['nombre'],
+            f"{self.envio_correo_fields['email_to']}":data['email_to'],
+            f"{self.envio_correo_fields['msj']}":data['mensaje']
+            })
+        return answers
+
     def send_email_by_form(self, data):
-        print("MSJ", data)
         metadata = self.lkf_api.get_metadata(form_id=self.ENVIO_DE_CORREOS)
         metadata.update({
             "properties": {
@@ -230,15 +240,7 @@ class Base(base.LKF_Base):
             },
         })
         #---Define Answers
-        answers = {}
-        answers.update({
-            f"{self.envio_correo_fields['email_from']}":data['email_from'],
-            f"{self.envio_correo_fields['titulo']}":data['titulo'],
-            f"{self.envio_correo_fields['nombre']}":data['nombre'],
-            f"{self.envio_correo_fields['email_to']}":data['email_to'],
-            f"{self.envio_correo_fields['msj']}":data['mensaje']
-            })
-        print('answers', answers)
+        answers = self.send_email_by_form_answers(data)
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
