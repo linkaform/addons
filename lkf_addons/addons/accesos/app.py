@@ -3111,14 +3111,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print('answers', simplejson.dumps(records, indent=4))
         return  records
 
-    def get_pdf(self, qr_code, template_id=447, name_pdf='Pase de Entrada'):
+    def get_pdf(self, qr_code, template_id=491, name_pdf='Pase de Entrada'):
         return self.lkf_api.get_pdf_record(qr_code, template_id = template_id, name_pdf =name_pdf, send_url=True)
 
     def get_pass_custom(self,qr_code):
         pass_selected= self.get_detail_access_pass(qr_code=qr_code)
         answers={}
         for key, value in pass_selected.items():
-            if key == 'nombre' or key == 'email' or key == 'telefono' or key == 'visita_a' or key == 'ubicacion' or key == 'fecha_de_expedicion' or key == 'fecha_de_caducidad' or key == "qr_pase" or key =="_id":
+            if key == 'nombre' or key == 'email' or key == 'telefono' or key == 'visita_a' or key == 'ubicacion' or key == 'fecha_de_expedicion' or key == 'fecha_de_caducidad' or key == "qr_pase" or key =="_id" or key == "estatus" or key == "foto" or key == "identificacion" or key == "grupo_equipos" or key == "grupo_vehiculos":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
         return answers
