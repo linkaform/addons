@@ -571,6 +571,12 @@
                             <selected>False</selected>
                             <value>notas</value>
                         </item>
+                        <item>
+                            <label>Pases</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>pases</value>
+                        </item>
                     </options>
                     <properties>
                         <body_payload>[]</body_payload>
@@ -657,5 +663,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1731710486.0</updated_at>
+    <updated_at>1733822022.0</updated_at>
 </lkf>

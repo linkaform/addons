@@ -2194,13 +2194,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         result  = self._labels(result, self.mf)
         return result
 
-    def get_config_accesos(self, id_user):
-        print("objetener la configuracion de accesos")
+    def get_config_accesos(self):
         response = []
         match_query = {
             "deleted_at":{"$exists":False},
-            "form_id": self.CONFIG_ACCESOS,
-            "_id":ObjectId(id_user),
+            "form_id": self.CONF_ACCESOS,
+            f"answers.{self.USUARIOS_OBJ_ID}.{self.mf['id_usuario']}":self.user['user_id'],
         }
         query = [
             {'$match': match_query },
@@ -2211,7 +2210,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }},
             {'$sort':{'folio':-1}},
         ]
-        # print('answers', simplejson.dumps(query, indent=4))
         return self.format_cr_result(self.cr.aggregate(query))
 
     def get_detail_access_pass(self, qr_code):
@@ -3165,10 +3163,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         user_status = self.get_employee_checkin_status(user_id, as_shift=True,  available=False)
         this_user = user_status.get(user_id)
         if not this_user:
+            print('email...',self.user.get('email'))
             this_user =  self.get_employee_data(email=self.user.get('email'), get_one=True)
+            print('this_user', this_user)
             this_user['name'] = this_user.get('worker_name','')
         user_booths = []
         guards_positions = self.config_get_guards_positions()
+        print('guards_positions', guards_positions)
         if not guards_positions:
             self.LKFException({"status_code":400, "msg":'No Existen puestos de guardias configurados.'})
         if this_user and this_user.get('status') == 'in':
