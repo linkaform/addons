@@ -3884,12 +3884,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     color = item.get('color','')
                     tipo = item.get('tipo','')
                     serie = item.get('serie','')
+                    modelo = item.get('modelo','')
                     obj={
                         self.mf['tipo_equipo']:tipo.lower(),
                         self.mf['nombre_articulo']:nombre,
                         self.mf['marca_articulo']:marca,
                         self.mf['numero_serie']:serie,
                         self.mf['color_articulo']:color,
+                        self.mf['modelo_articulo']:modelo,
                     }
                     answers[self.mf['grupo_equipos']][-index]=obj
             elif key == 'status_pase':
