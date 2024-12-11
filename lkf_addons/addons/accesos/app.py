@@ -2108,10 +2108,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException({"status_code":400, "msg":'No Existen puestos de guardias configurados.'})
         for guard_type in guards_positions:
             puesto = guard_type['tipo_de_guardia']
-            print('puwsto', puesto)
-            print('kwargs', kwargs)
             if kwargs.get('position') and kwargs['position'] != puesto:
-                print('continue')
                 continue
             res[puesto] = res.get(puesto,
                 self.get_users_by_location_area(location, area, **{'position': guard_type['puestos']})
@@ -2210,7 +2207,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }},
             {'$sort':{'folio':-1}},
         ]
-        return self.format_cr_result(self.cr.aggregate(query))
+        return self.format_cr_result(self.cr.aggregate(query),  get_one=True)
 
     def get_detail_access_pass(self, qr_code):
         match_query = {
@@ -3163,23 +3160,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         user_status = self.get_employee_checkin_status(user_id, as_shift=True,  available=False)
         this_user = user_status.get(user_id)
         if not this_user:
-            print('email...',self.user.get('email'))
             this_user =  self.get_employee_data(email=self.user.get('email'), get_one=True)
-            print('this_user', this_user)
             this_user['name'] = this_user.get('worker_name','')
         user_booths = []
         guards_positions = self.config_get_guards_positions()
-        print('guards_positions', guards_positions)
         if not guards_positions:
             self.LKFException({"status_code":400, "msg":'No Existen puestos de guardias configurados.'})
         if this_user and this_user.get('status') == 'in':
             location_employees = {self.chife_guard:{},self.support_guard:[]}
             booth_area = this_user['area']
             booth_location = this_user['location']
-            print('user_status', user_status)
             for u_id, each_user in user_status.items():
-                print('uid', u_id)
-                print('each_user', each_user)
                 if u_id == user_id:
                     location_employees[self.support_guard].append(each_user)
                     guard = each_user
@@ -3240,7 +3231,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
     def get_user_guards(self, location_employees):
-        print('location_employees', location_employees)
         for employee in location_employees:
             if employee.get('user_id',0) == self.user.get('user_id'):
                     return employee
