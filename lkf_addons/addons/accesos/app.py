@@ -3158,6 +3158,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         """
         Obtiene informacion del turno del usuario logeado
         """
+
         load_shift_json = { }
         username = self.user.get('username')
         user_id = self.user.get('user_id')
@@ -3175,10 +3176,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             location_employees = {self.chife_guard:{},self.support_guard:[]}
             booth_area = this_user['area']
             booth_location = this_user['location']
-            print('user_status', user_status)
             for u_id, each_user in user_status.items():
-                print('uid', u_id)
-                print('each_user', each_user)
                 if u_id == user_id:
                     location_employees[self.support_guard].append(each_user)
                     guard = each_user

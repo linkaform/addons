@@ -134,13 +134,14 @@ class Employee(Base):
         if username:
             match_query.update(self._get_match_q(self.f['username'], username))
         if email:
-            match_query.update(self._get_match_q(self.f['email'], email))            
+            match_query.update(self._get_match_q(self.f['email'], email)) 
         query = [
             {'$match': match_query },    
             {'$project': self.project_format(self.employee_fields)},
             {'$sort':{'worker_name':1}},
             ]
-        return self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
+        res = self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
+        return res 
 
     def get_user_booth(self, search_default=True, **kwargs):
         if kwargs.get('user_id'):
