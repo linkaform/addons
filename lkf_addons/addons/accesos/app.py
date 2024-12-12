@@ -2108,10 +2108,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException({"status_code":400, "msg":'No Existen puestos de guardias configurados.'})
         for guard_type in guards_positions:
             puesto = guard_type['tipo_de_guardia']
-            print('puwsto', puesto)
-            print('kwargs', kwargs)
             if kwargs.get('position') and kwargs['position'] != puesto:
-                print('continue')
                 continue
             res[puesto] = res.get(puesto,
                 self.get_users_by_location_area(location, area, **{'position': guard_type['puestos']})
@@ -2194,13 +2191,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         result  = self._labels(result, self.mf)
         return result
 
-    def get_config_accesos(self, id_user):
-        print("objetener la configuracion de accesos")
+    def get_config_accesos(self):
         response = []
         match_query = {
             "deleted_at":{"$exists":False},
-            "form_id": self.CONFIG_ACCESOS,
-            "_id":ObjectId(id_user),
+            "form_id": self.CONF_ACCESOS,
+            f"answers.{self.USUARIOS_OBJ_ID}.{self.mf['id_usuario']}":self.user['user_id'],
         }
         query = [
             {'$match': match_query },
@@ -2211,8 +2207,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }},
             {'$sort':{'folio':-1}},
         ]
-        # print('answers', simplejson.dumps(query, indent=4))
-        return self.format_cr_result(self.cr.aggregate(query))
+        return self.format_cr_result(self.cr.aggregate(query),  get_one=True)
 
     def get_detail_access_pass(self, qr_code):
         match_query = {
@@ -3237,7 +3232,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
     def get_user_guards(self, location_employees):
-        print('location_employees', location_employees)
         for employee in location_employees:
             if employee.get('user_id',0) == self.user.get('user_id'):
                     return employee
@@ -3891,12 +3885,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     color = item.get('color','')
                     tipo = item.get('tipo','')
                     serie = item.get('serie','')
+                    modelo = item.get('modelo','')
                     obj={
                         self.mf['tipo_equipo']:tipo.lower(),
                         self.mf['nombre_articulo']:nombre,
                         self.mf['marca_articulo']:marca,
                         self.mf['numero_serie']:serie,
                         self.mf['color_articulo']:color,
+                        self.mf['modelo_articulo']:modelo,
                     }
                     answers[self.mf['grupo_equipos']][-index]=obj
             elif key == 'status_pase':
@@ -3912,7 +3908,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
-                pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 447, name_pdf='Pase de Entrada', send_url=True)
+                pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})

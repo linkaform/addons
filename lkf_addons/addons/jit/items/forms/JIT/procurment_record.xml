@@ -285,7 +285,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.warehouse_locations.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -367,7 +367,7 @@
                         <catalog_field_id>{{ catalog.warehouse_locations.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.warehouse_locations.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -443,7 +443,7 @@
                         <catalog_field_id>{{ catalog.warehouse_locations.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.warehouse_locations.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -867,7 +867,7 @@
                     <descriptor>None</descriptor>
                     <fav>True</fav>
                     <field_id>66da3bddb22bcdcc2f341f08</field_id>
-                    <field_type>integer</field_type>
+                    <field_type>decimal</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
@@ -929,7 +929,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1009,7 +1009,7 @@
                         <catalog_field_id>{{ catalog.unidad_de_medida.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -2725,5 +2725,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1726853514.0</updated_at>
+    <updated_at>1733803583.0</updated_at>
 </lkf>

@@ -37,7 +37,7 @@ class Employee(Base):
         self.CONF_DEPARTAMENTOS_PUESTOS = self.lkm.form_id('configuracion_de_departamentos_y_puestos', 'id')
         self.EMPLEADOS = self.lkm.form_id('empleados','id')
         # catalgos
-        self.EMPLOYEE = self.lkm.catalog_id('employee')
+        self.EMPLOYEE = self.lkm.catalog_id('empleados')
         self.EMPLOYEE_ID = self.EMPLOYEE.get('id')
         self.EMPLOYEE_OBJ_ID = self.EMPLOYEE.get('obj_id')
 
@@ -173,8 +173,6 @@ class Employee(Base):
                     }
             }
             ]
-        # print('query=', simplejson.dumps(query, indent=3))
-        # print('area=', self.f['area'])
         res = self.format_cr(self.cr.aggregate(query))
         caseta = None
         user_booths = []
@@ -260,5 +258,4 @@ class Employee(Base):
                     }
                 }
             ]
-        # print('query=', simplejson.dumps(query, indent=3))
         return self.format_cr_result(self.cr.aggregate(query))
