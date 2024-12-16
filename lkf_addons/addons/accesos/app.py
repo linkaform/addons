@@ -3184,6 +3184,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {"$project":{
                 "nombre":"$_id.nombre",
                 "email":"$email",
+                "empresa":"$empresa",
+                "fotografia":"$fotografia",
+                "identificacion":"$identificacion",
+                "telefono":"$telefono",
             }},
             {'$sort':{'nombre':-1}},
             ]
