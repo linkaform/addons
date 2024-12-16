@@ -966,8 +966,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         employee =  self.get_employee_data(email=self.user.get('email'), get_one=True)
         timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
         now_datetime =self.today_str(timezone, date_format='datetime')
-        print('location', location)
-        print('area', area)
         last_chekin = {}
         if not checkin_id:
             if guards:
@@ -3157,6 +3155,35 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             booth_address.pop('folio')
             booth.update(booth_address)
         return user_booths
+
+    def get_user_contacts(self):
+        user_id = self.user['user_id']
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.PASE_ENTRADA,
+            "created_by_id": user_id
+            }
+
+        query = [
+            {'$match': match_query },
+            {'$group':{
+                '_id':{
+                    'nombre':f"$answers.{self.pase_entrada_fields['walkin_nombre']}"
+                    },
+                'email': {'$last':f"$answers.{self.pase_entrada_fields['walkin_email']}"},
+                'empresa': {'$last':f"$answers.{self.pase_entrada_fields['walkin_empresa']}"},
+                'fotografia': {'$last':f"$answers.{self.pase_entrada_fields['walkin_fotografia']}"},
+                'identificacion': {'$last':f"$answers.{self.pase_entrada_fields['walkin_identificacion']}"},
+                'telefono': {'$last':f"$answers.{self.pase_entrada_fields['walkin_telefono']}"},
+                }
+            },
+            {"$project":{
+                "nombre":"$_id.nombre",
+                "email":"$email",
+            }},
+            {'$sort':{'nombre':-1}},
+            ]
+        return self.format_cr(self.cr.aggregate(query))        
 
     def get_shift_data(self, booth_location=None, booth_area=None, search_default=True):
         """

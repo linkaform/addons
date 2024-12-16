@@ -21,9 +21,6 @@ class Location(Base):
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
 
-        print('selfkwargs', self.kwargs)
-        print('kwargs', kwargs)
-        
         self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])       
         if self.__class__.__name__ not in kwargs:
             self.kwargs['MODULES'].append(self.__class__.__name__)
