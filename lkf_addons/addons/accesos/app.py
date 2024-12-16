@@ -638,8 +638,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"{self.pase_entrada_fields['perfil_pase_id']}": [access_pass['tipo_de_pase'],],
                     # f"{self.pase_entrada_fields['status_pase']}":[access_pass['estatus'],],
                     f"{self.pase_entrada_fields['status_pase']}":['Activo',],
-                    f"{self.pase_entrada_fields['foto_pase_id']}":[access_pass['foto'],],
-                    f"{self.pase_entrada_fields['identificacion_pase_id']}":[access_pass['identificacion'],],
+                    f"{self.pase_entrada_fields['foto_pase_id']}": access_pass.get("foto",[])#[access_pass['foto'],], #.get('foto','')
+                    f"{self.pase_entrada_fields['identificacion_pase_id']}": access_pass.get("identificacion",[]) #[access_pass['identificacion'],], #.get('identificacion','')
                     }
         except Exception as e:
             self.LKFException({"msg":f"Error al crear registro ingreso, no se encontro: {e}"}) 
@@ -734,7 +734,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                        self.bitacora_fields['email_empleado'] :[c.get('email')]
                    }}
                 )
-            print("VISIITAAAA",visit_list2)
             answers.update({self.bitacora_fields['visita_a']:visit_list2})
 
         metadata.update({'answers':answers})
@@ -874,7 +873,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         if not qr_code and not location and not area:
             return False
-
+        if data.get('status_pase',[]) == 'vencido':
+            self.LKFException("El estatus del pase se encuantra vencido")
         # access_pass = self.search_pass(qr_code)
         if self.validate_access_pass_location(qr_code, location):
             self.LKFException("En usuario ya se encuentra dentro de una ubicacion")
@@ -1697,6 +1697,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
         answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
+
+        print("ACCES PASS", simplejson.dumps(access_pass, indent=4))
         if access_pass.get('custom') == True :
             answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase',"")
             answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',"")
@@ -1828,7 +1830,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #         answers[self.mf['grupo_equipos']] = list_equipos  
         #---Valor
         metadata.update({'answers':answers})
+        print("ANSWERS", simplejson.dumps(answers, indent=4))
         res = self.lkf_api.post_forms_answers(metadata)
+        print("RESPONSE", res)
         if res.get("status_code") ==200 or res.get("status_code")==201:
             link_info=access_pass.get('link')
             docs=""

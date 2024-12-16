@@ -16,7 +16,7 @@
     </confirmation>
     <created_at>1730299618.0</created_at>
     <description />
-    <edit_public_records>False</edit_public_records>
+    <edit_public_records>True</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
     <email_configuration>
@@ -530,16 +530,10 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Pase</label>
+                            <label>Bitacoras</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>pase</value>
-                        </item>
-                        <item>
-                            <label>Bitacora de Accesos</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>bitacora_de_accesos</value>
+                            <value>bitacoras</value>
                         </item>
                         <item>
                             <label>Accesos</label>
@@ -576,6 +570,12 @@
                             <points>None</points>
                             <selected>False</selected>
                             <value>pases</value>
+                        </item>
+                        <item>
+                            <label>Turnos</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>turnos</value>
                         </item>
                     </options>
                     <properties>
@@ -663,5 +663,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1733822022.0</updated_at>
+    <updated_at>1734049128.0</updated_at>
 </lkf>
