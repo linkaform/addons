@@ -18,7 +18,6 @@ class Reports(JIT, base.LKF_Report):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
 
-
     def test(self):
         print('test')
 
@@ -35,7 +34,6 @@ class Reports(JIT, base.LKF_Report):
         #         match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": {"$in":product_code}})
         #     elif product_code:
         #         match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code})
-
         query = [
             {"$match": match_query},
             {"$project": {

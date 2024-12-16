@@ -927,7 +927,6 @@ class Stock(Base):
             }},
         ]
         
-        #print('query=',simplejson.dumps(query, indent=5))
         res = self.format_cr(self.cr.aggregate(query))
         return res
 

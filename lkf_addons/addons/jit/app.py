@@ -302,7 +302,6 @@ class JIT(Base):
             #product_stock = {'actuals':0}
             order_qty = self.exec_reorder_rules(rule, product_stock)
             if order_qty:
-                print('order qty', order_qty)
                 ans = self.model_procurment(order_qty, product_code, sku, warehouse, location, procurment_method='buy')
                 product_by_warehouse[warehouse].append(ans)
         response = self.upsert_procurment(product_by_warehouse)
@@ -491,6 +490,7 @@ class JIT(Base):
                     'warehouse_location':f'$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
             }},
             ]
+
         return self.format_cr(self.cr.aggregate(query))
 
     def get_reorder_rules(self, warehouse=None, location=None, product_code=None, sku=None, status='active', group_by=False):

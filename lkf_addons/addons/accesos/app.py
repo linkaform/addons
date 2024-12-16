@@ -966,8 +966,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         employee =  self.get_employee_data(email=self.user.get('email'), get_one=True)
         timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
         now_datetime =self.today_str(timezone, date_format='datetime')
-        print('location', location)
-        print('area', area)
         last_chekin = {}
         if not checkin_id:
             if guards:
@@ -1078,10 +1076,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         depositos = self.answers.get(self.incidence_fields['datos_deposito_incidencia'],[])
         return sum([x[self.incidence_fields['cantidad']] for x in depositos])
 
-    def catalagos_pase(self, user_id, location_name):
+    def catalogos_pase_area(self, location_name):
+        user_id= self.user.get("user_id")
         res={
             "areas_by_location" : self.get_areas_by_location(location_name)
         }
+        return res
+
+    def catalogos_pase_location(self):
+        user_id= self.user.get("user_id")
+        res = {}
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
@@ -1419,7 +1423,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def create_enviar_msj_pase(self, data_cel_msj=None, folio=None):
         if not data_cel_msj['mensaje'] and data_cel_msj['from'] == 'enviar_pre_sms':
             get_pase = self.get_detail_access_pass(qr_code=folio)
-            data_cel_msj['mensaje'] = f"Hola {get_pase.get('nombre', '')}👋, {get_pase.get('visita_a', [])[0].get('nombre', '')} te esta invitando a {get_pase.get('ubicacion', '')}🏭 y ha creado un pase para ti... por favor, complete sus datos de registro en este link: {get_pase.get('link', '')}"
+            msg = f"Hola {get_pase.get('nombre', '')}👋, {get_pase.get('visita_a', [])[0].get('nombre', '')} "
+            msg += f"te esta invitando a {get_pase.get('ubicacion', '')}🏭 y ha creado un pase para ti... por favor,"
+            msg += f"complete sus datos de registro en este link: {get_pase.get('link', '')}"
+            data_cel_msj['mensaje'] = msg
             
         mensaje = data_cel_msj.get('mensaje', '')
         phone_to = data_cel_msj.get('numero', '')
@@ -3152,6 +3159,35 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             booth_address.pop('folio')
             booth.update(booth_address)
         return user_booths
+
+    def get_user_contacts(self):
+        user_id = self.user['user_id']
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.PASE_ENTRADA,
+            "created_by_id": user_id
+            }
+
+        query = [
+            {'$match': match_query },
+            {'$group':{
+                '_id':{
+                    'nombre':f"$answers.{self.pase_entrada_fields['walkin_nombre']}"
+                    },
+                'email': {'$last':f"$answers.{self.pase_entrada_fields['walkin_email']}"},
+                'empresa': {'$last':f"$answers.{self.pase_entrada_fields['walkin_empresa']}"},
+                'fotografia': {'$last':f"$answers.{self.pase_entrada_fields['walkin_fotografia']}"},
+                'identificacion': {'$last':f"$answers.{self.pase_entrada_fields['walkin_identificacion']}"},
+                'telefono': {'$last':f"$answers.{self.pase_entrada_fields['walkin_telefono']}"},
+                }
+            },
+            {"$project":{
+                "nombre":"$_id.nombre",
+                "email":"$email",
+            }},
+            {'$sort':{'nombre':-1}},
+            ]
+        return self.format_cr(self.cr.aggregate(query))        
 
     def get_shift_data(self, booth_location=None, booth_area=None, search_default=True):
         """
