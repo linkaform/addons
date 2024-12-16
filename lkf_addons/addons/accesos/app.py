@@ -638,7 +638,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"{self.pase_entrada_fields['perfil_pase_id']}": [access_pass['tipo_de_pase'],],
                     # f"{self.pase_entrada_fields['status_pase']}":[access_pass['estatus'],],
                     f"{self.pase_entrada_fields['status_pase']}":['Activo',],
-                    f"{self.pase_entrada_fields['foto_pase_id']}": access_pass.get("foto",[])#[access_pass['foto'],], #.get('foto','')
+                    f"{self.pase_entrada_fields['foto_pase_id']}": access_pass.get("foto",[]), #[access_pass['foto'],], #.get('foto','')
                     f"{self.pase_entrada_fields['identificacion_pase_id']}": access_pass.get("identificacion",[]) #[access_pass['identificacion'],], #.get('identificacion','')
                     }
         except Exception as e:
