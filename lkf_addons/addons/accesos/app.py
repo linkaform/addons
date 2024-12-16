@@ -1078,10 +1078,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         depositos = self.answers.get(self.incidence_fields['datos_deposito_incidencia'],[])
         return sum([x[self.incidence_fields['cantidad']] for x in depositos])
 
-    def catalagos_pase(self, user_id, location_name):
+    def catalogos_pase_area(self, location_name):
+        user_id= self.user.get("user_id")
         res={
             "areas_by_location" : self.get_areas_by_location(location_name)
         }
+        return res
+
+    def catalogos_pase_location(self):
+        user_id= self.user.get("user_id")
+        res = {}
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
