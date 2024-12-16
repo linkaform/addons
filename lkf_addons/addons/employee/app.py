@@ -1,4 +1,17 @@
 # -*- coding: utf-8 -*-
+'''
+Licencia BSD
+Copyright (c) 2024 Infosync / LinkaForm.  
+Todos los derechos reservados.
+
+Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
+
+1. Se debe conservar el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en las redistribuciones del código fuente.
+2. Se debe reproducir el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en la documentación y/u otros materiales proporcionados con las distribuciones en formato binario.
+3. Ni el nombre del Infosync ni los nombres de sus colaboradores pueden ser utilizados para respaldar o promocionar productos derivados de este software sin permiso específico previo por escrito.
+
+'''
+
 import sys, simplejson
 
 from linkaform_api import settings
@@ -24,7 +37,7 @@ class Employee(Base):
         self.CONF_DEPARTAMENTOS_PUESTOS = self.lkm.form_id('configuracion_de_departamentos_y_puestos', 'id')
         self.EMPLEADOS = self.lkm.form_id('empleados','id')
         # catalgos
-        self.EMPLOYEE = self.lkm.catalog_id('employee')
+        self.EMPLOYEE = self.lkm.catalog_id('empleados')
         self.EMPLOYEE_ID = self.EMPLOYEE.get('id')
         self.EMPLOYEE_OBJ_ID = self.EMPLOYEE.get('obj_id')
 
@@ -121,13 +134,14 @@ class Employee(Base):
         if username:
             match_query.update(self._get_match_q(self.f['username'], username))
         if email:
-            match_query.update(self._get_match_q(self.f['email'], email))            
+            match_query.update(self._get_match_q(self.f['email'], email)) 
         query = [
             {'$match': match_query },    
             {'$project': self.project_format(self.employee_fields)},
             {'$sort':{'worker_name':1}},
             ]
-        return self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
+        res = self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
+        return res 
 
     def get_user_booth(self, search_default=True, **kwargs):
         if kwargs.get('user_id'):
@@ -159,8 +173,6 @@ class Employee(Base):
                     }
             }
             ]
-        # print('query=', simplejson.dumps(query, indent=3))
-        # print('area=', self.f['area'])
         res = self.format_cr(self.cr.aggregate(query))
         caseta = None
         user_booths = []
@@ -246,5 +258,4 @@ class Employee(Base):
                     }
                 }
             ]
-        # print('query=', simplejson.dumps(query, indent=3))
         return self.format_cr_result(self.cr.aggregate(query))

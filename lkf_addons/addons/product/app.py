@@ -1,5 +1,19 @@
 # -*- coding: utf-8 -*-
 
+'''
+Licencia BSD
+Copyright (c) 2024 Infosync / LinkaForm.  
+Todos los derechos reservados.
+
+Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
+
+1. Se debe conservar el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en las redistribuciones del código fuente.
+2. Se debe reproducir el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en la documentación y/u otros materiales proporcionados con las distribuciones en formato binario.
+3. Ni el nombre del Infosync ni los nombres de sus colaboradores pueden ser utilizados para respaldar o promocionar productos derivados de este software sin permiso específico previo por escrito.
+
+'''
+
+
 from linkaform_api import base
 from lkf_addons.addons.base.app import Base
 
@@ -127,23 +141,7 @@ class Product(Base, base.LKF_Base):
         list_response.sort()           
         return list_response
         
-    def get_product_catalog(self):
-        match_query = { 
-            'deleted_at':{"$exists":False},
-        }
-
-        mango_query = {"selector":
-            {"answers":
-                {"$and":[match_query]}
-            },
-            "limit":10000,
-            "skip":0
-        }
-        res = self.lkf_api.search_catalog( 123105, mango_query)
-        res_format = self.format_catalog_product(res)
-        return res_format   
-
-        
+    
     def get_catalog_product(self, query={}):
         return self.get_product_catalog(query)
 

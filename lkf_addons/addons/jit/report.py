@@ -34,16 +34,14 @@ class Reports(JIT, base.LKF_Report):
         #         match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": {"$in":product_code}})
         #     elif product_code:
         #         match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code})
-        #Borrar
-        # match_query.update({
-        #     f"answers.{self.Product.SKU_OBJ_ID}.{self.Product.f['product_code']}": '750200301040'})
         query = [
             {"$match": match_query},
             {"$project": {
                 "_id":1,
                 "folio":"$folio",
-                "product_code": "$answers.66dfc4d9a306e1ac7f6cd02c.61ef32bcdf0ec2ba73dec33d",
-                "stock_maximum": "$answers.66ea62dac9aefada5b04b73a",
+                "product_code": f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
+                # "product_code": "$answers.66dfc4d9a306e1ac7f6cd02c.61ef32bcdf0ec2ba73dec33d",
+                "stock_maximum": f"$answers.{self.f['max_stock']}",
                 "warehouse": f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
                 "location":  f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}",
             }},

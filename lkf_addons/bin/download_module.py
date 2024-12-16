@@ -246,8 +246,9 @@ def get_item_name(item_type, item_id=None, element=None, attribute='name', item_
             try:
                 item_json = item_obj[0]
             except:
-                msg = f"******************* Something went wrong, plese check that the item_id: {item_id} *******************"
-                msg += "The most common thing here is that the id does not exists and someone is seraching for it"
+                msg = f"******************* Something went wrong, plese check that the item_id: {item_id} ******************* \n"
+                msg += f"Item Type: {item_type} \n"
+                msg += "The most common thing here is that the id does not exists and someone is seraching for it. \n"
                 msg += "See who is tring to search form it!!!"
                 print('msg',  msg)
                 raise BaseException(msg)

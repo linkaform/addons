@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>1-aa8a6d73ef41291eecfbcd69f03287e6</_rev>
-    <updated_at>2024-08-07T21:43:45.214586+00:00Z</updated_at>
+    <_rev>2-3303c9de547f209d69319b937dd9cc10</_rev>
+    <updated_at>2024-11-25T23:57:14.395884+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Usuarios</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-08-07T21:43:45.214586+00:00Z</created_at>
+    <created_at>2024-11-25T23:57:14.395884+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,10 +25,6 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>121932</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>66b3ea91656abce3d1a07e89</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -47,6 +43,27 @@
                     <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
                     <label>Nombre</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <key>False</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>6759e4a7a9a6e13c7b26da33</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>username</label>
                     <catalog>{}</catalog>
                     <catalog_id>None</catalog_id>
                     <view_fields>[]</view_fields>
@@ -140,8 +157,12 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_description>None</page_description>
             <page_name>Página 1</page_name>
+            <page_description>None</page_description>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>67450edafff8e4d36edce995</_id>
+    <public>False</public>
+    <catalog_id>126460</catalog_id>
 </lkf>

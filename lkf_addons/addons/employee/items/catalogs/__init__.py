@@ -6,5 +6,5 @@ install_order = ['teams',
                 'departamentos',
                 'configuracion_de_departamentos_y_puestos', 
                 'empleados_jefes_directos',
-                'employee'
+                'empleados'
                 ]

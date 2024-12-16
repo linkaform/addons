@@ -4,8 +4,16 @@
 Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
 podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
 
-Licencia
-Este código está licenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html).
+Licencia BSD
+Copyright (c) 2024 Infosync / LinkaForm.  
+Todos los derechos reservados.
+
+Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
+
+1. Se debe conservar el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en las redistribuciones del código fuente.
+2. Se debe reproducir el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en la documentación y/u otros materiales proporcionados con las distribuciones en formato binario.
+3. Ni el nombre del Infosync ni los nombres de sus colaboradores pueden ser utilizados para respaldar o promocionar productos derivados de este software sin permiso específico previo por escrito.
+
 
 Propósito
 El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
@@ -208,9 +216,19 @@ class Base(base.LKF_Base):
             setattr(self, import_as, AddonsClass(self.settings, sys_argv=self.sys_argv, use_api=self.use_api, **self.kwargs))
             if module not in self.kwargs['MODULES']:
                 self.kwargs['MODULES'].append(module)
-      
+    
+    def send_email_by_form_answers(self, data):
+        answers = {}
+        answers.update({
+            f"{self.envio_correo_fields['email_from']}":data['email_from'],
+            f"{self.envio_correo_fields['titulo']}":data['titulo'],
+            f"{self.envio_correo_fields['nombre']}":data['nombre'],
+            f"{self.envio_correo_fields['email_to']}":data['email_to'],
+            f"{self.envio_correo_fields['msj']}":data['mensaje']
+            })
+        return answers
+
     def send_email_by_form(self, data):
-        print("MSJ", data)
         metadata = self.lkf_api.get_metadata(form_id=self.ENVIO_DE_CORREOS)
         metadata.update({
             "properties": {
@@ -222,15 +240,7 @@ class Base(base.LKF_Base):
             },
         })
         #---Define Answers
-        answers = {}
-        answers.update({
-            f"{self.envio_correo_fields['email_from']}":data['email_from'],
-            f"{self.envio_correo_fields['titulo']}":data['titulo'],
-            f"{self.envio_correo_fields['nombre']}":data['nombre'],
-            f"{self.envio_correo_fields['email_to']}":data['email_to'],
-            f"{self.envio_correo_fields['msj']}":data['mensaje']
-            })
-        print('answers', answers)
+        answers = self.send_email_by_form_answers(data)
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
