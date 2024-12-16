@@ -38,6 +38,8 @@ class Employee(Base):
         self.EMPLEADOS = self.lkm.form_id('empleados','id')
         # catalgos
         self.EMPLOYEE = self.lkm.catalog_id('empleados')
+        if not self.EMPLOYEE:
+            self.EMPLOYEE = self.lkm.catalog_id('employee')
         self.EMPLOYEE_ID = self.EMPLOYEE.get('id')
         self.EMPLOYEE_OBJ_ID = self.EMPLOYEE.get('obj_id')
 
