@@ -3069,6 +3069,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'archivo_invitacion': f"$answers.{self.mf['archivo_invitacion']}",
                     'codigo_qr': f"$answers.{self.mf['codigo_qr']}",
                     'qr_pase': f"$answers.{self.mf['qr_pase']}",
+                    'link':f"$answers.{self.pase_entrada_fields['link']}",
                 }
             },
             {'$sort':{'_id':-1}},
