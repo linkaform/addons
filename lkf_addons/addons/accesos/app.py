@@ -4230,6 +4230,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "visita_a": pass_selected.get('visita_a')[0].get('nombre'),
             "walkin_fotografia": update_obj.get('foto', []),
             "walkin_identificacion": update_obj.get('identificacion', []),
+            "archivo_invitacion": [],
         }
 
         location = access_pass.get('ubicacion', '')
