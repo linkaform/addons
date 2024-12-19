@@ -599,6 +599,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         self.f.update(self.notes_fields)
         self.f.update(self.checkin_fields)
+        self.f.update({
+            'duracion_rondin':'6639b47565d8e5c06fe97cf3',
+            'duracion_traslado_area':'6760a9581e31b10a38a22f1f',
+            'fecha_inspeccion_area':'6760a908a43b1b0e41abad6b',
+            'fecha_inicio_rondin':'6760a8e68cef14ecd7f8b6fe',
+            'grupo_areas_visitadas':'66462aa5d4a4af2eea07e0d1',
+        })
 
     '''
     funciones internas: son funciones que solo se pueden mandar llamar dentro de este archivo. Si se hereda la clase
@@ -4196,7 +4203,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if pass_selected.get('grupo_areas_acceso') == []:
             config_limitar_acceso = None
         else:
-            config_limitar_acceso == pass_selected.get('grupo_areas_acceso')
+            config_limitar_acceso = pass_selected.get('grupo_areas_acceso')
 
         access_pass = {
             "autorizado_por": pass_selected.get('visita_a', '')[0].get('nombre'),
@@ -4213,7 +4220,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "grupo_instrucciones_pase": pass_selected.get('grupo_instrucciones_pase', []),
             "grupo_vehiculos": update_obj.get('grupo_vehiculos'),
             "link": {
-                "creado_por_email": pass_selected.get('visita_a', '')[0].get('email', '')[0],
+                "creado_por_email": update_obj.get('user_email', ''),
                 "docs": [],
                 "creado_por_id": pass_selected.get('visita_a', '')[0].get('creado_por_id', ''),
                 "link": pass_selected.get('link', ''),
