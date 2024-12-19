@@ -2216,7 +2216,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "grupos":f"$answers.{self.conf_accesos_fields['grupos']}",
                 "menus": f"$answers.{self.conf_accesos_fields['menus']}",
             }},
-            {'$sort':{'folio':-1}},
+            {'$limit':1},
         ]
         return self.format_cr_result(self.cr.aggregate(query),  get_one=True)
 
