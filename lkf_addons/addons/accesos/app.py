@@ -869,17 +869,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         Valida pase de entrada y crea registro de entrada al pase
         '''
-        print('me quede ahceidno la vaildacion y el registro de entrada')
+        # print('me quede ahceidno la vaildacion y el registro de entrada')
 
         if not qr_code and not location and not area:
             return False
-        if data.get('status_pase',[]) == 'vencido':
-            self.LKFException("El estatus del pase se encuantra vencido")
+
         # access_pass = self.search_pass(qr_code)
         if self.validate_access_pass_location(qr_code, location):
             self.LKFException("En usuario ya se encuentra dentro de una ubicacion")
         val_certificados = self.validate_certificados(qr_code, location)
         access_pass = self.get_detail_access_pass(qr_code)
+
+       
+        if access_pass.get('estatus',"") == 'vencido':
+            self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Error de Configuracion'})
+
         pass_dates = self.validate_pass_dates(access_pass)
         comentario_pase =  data.get('comentario_pase',[])
         if comentario_pase:
@@ -1132,7 +1136,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def catalogo_vehiculos(self, options={}):
         catalog_id = self.TIPO_DE_VEHICULO_ID
         form_id = self.PASE_ENTRADA
-        return self.catalogo_view(catalog_id, form_id, options=options)
+        res= self.catalogo_view(catalog_id, form_id, options=options)
+        print("REPOSNE", res)
+        return res
 
     def catalogo_view(self, catalog_id, form_id, options={}, detail=False):
         catalog_id = catalog_id
@@ -1437,7 +1443,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def create_enviar_correo(self, data_msj, folio=None):
         access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
         res_update= self.update_pass(access_pass=access_pass, folio=folio)
-        res_update.get('status_code') == 201
+        print("RES UPDATE", res_update)
+        # res_update.get('status_code') == 201
         return res_update
      
     def create_failure(self, data_failures):
@@ -1705,7 +1712,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
         answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
 
-        print("ACCES PASS", simplejson.dumps(access_pass, indent=4))
         if access_pass.get('custom') == True :
             answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase',"")
             answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',"")
@@ -1790,6 +1796,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             # CUSTOM == TRUE significa que el pase fue creado desde soter en la pantalla pase.html
             if access_pass.get('custom') == True :
                 cat_perfil[0][self.mf['motivo']]= [cat_perfil[0].get(self.mf['motivo'])]
+            else:
+                cat_perfil[0][self.mf['motivo']]= ["Reunión"]
             cat_perfil = cat_perfil[0]
         answers[self.CONFIG_PERFILES_OBJ_ID].update(cat_perfil)
         if answers[self.CONFIG_PERFILES_OBJ_ID].get(self.mf['nombre_permiso']) and \
@@ -1841,75 +1849,79 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = self.lkf_api.post_forms_answers(metadata)
         print("RESPONSE", res)
         if res.get("status_code") ==200 or res.get("status_code")==201:
-            link_info=access_pass.get('link')
+            link_info=access_pass.get('link', "")
             docs=""
-            for index, d in enumerate(link_info["docs"]): 
-                if(d == "agregarIdentificacion"):
-                    docs+="iden"
-                elif(d == "agregarFoto"):
-                    docs+="foto"
-                if index==0 :
-                    docs+="-"
-            link_pass= f"{link_info['link']}?id={res.get('json')['id']}&user={link_info['creado_por_id']}&docs={docs}"
+            
+            if link_info:
+                for index, d in enumerate(link_info["docs"]): 
+                    if(d == "agregarIdentificacion"):
+                        docs+="iden"
+                    elif(d == "agregarFoto"):
+                        docs+="foto"
+                    if index==0 :
+                        docs+="-"
+                link_pass= f"{link_info['link']}?id={res.get('json')['id']}&user={link_info['creado_por_id']}&docs={docs}"
+                id_forma = 121736
+                id_campo = '673773741b2adb2d05d99d63'
 
-            id_forma = 121736
-            id_campo = '673773741b2adb2d05d99d63'
+                tema_cita = access_pass.get("tema_cita")
+                descripcion = access_pass.get("descripcion")
+                fecha_desde_visita = access_pass.get("fecha_desde_visita")
+                fecha_desde_hasta = access_pass.get("fecha_desde_hasta")
+                creado_por_email = access_pass.get("link", {}).get("creado_por_email")
+                ubicacion = access_pass.get("ubicacion")
+                nombre = access_pass.get("nombre")
+                visita_a = access_pass.get("visita_a")
+                email = access_pass.get("email")
 
-            tema_cita = access_pass.get("tema_cita")
-            descripcion = access_pass.get("descripcion")
-            fecha_desde_visita = access_pass.get("fecha_desde_visita")
-            fecha_desde_hasta = access_pass.get("fecha_desde_hasta")
-            creado_por_email = access_pass.get("link", {}).get("creado_por_email")
-            ubicacion = access_pass.get("ubicacion")
-            nombre = access_pass.get("nombre")
-            visita_a = access_pass.get("visita_a")
-            email = access_pass.get("email")
+                start_datetime = datetime.strptime(fecha_desde_visita, "%Y-%m-%d %H:%M:%S")
 
-            start_datetime = datetime.strptime(fecha_desde_visita, "%Y-%m-%d %H:%M:%S")
+                if not fecha_desde_hasta:
+                    stop_datetime = start_datetime + timedelta(hours=1)
+                else:
+                    stop_datetime = datetime.strptime(fecha_desde_hasta, "%Y-%m-%d %H:%M:%S")
 
-            if not fecha_desde_hasta:
-                stop_datetime = start_datetime + timedelta(hours=1)
+                meeting = [
+                    {
+                        "id": 1,
+                        "start": start_datetime,
+                        "stop": stop_datetime,
+                        "name": tema_cita,
+                        "description": descripcion,
+                        "location": ubicacion,
+                        "allday": False,
+                        "rrule": None,
+                        "alarm_ids": [{"interval": "minutes", "duration": 10, "name": "Reminder"}],
+                        'organizer_name': visita_a,
+                        'organizer_email': creado_por_email,
+                        "attendee_ids": [{"email": email, "nombre": nombre}, {"email": creado_por_email, "nombre": visita_a}],
+                    }
+                ]
+                respuesta_ics = self.upload_ics(id_forma, id_campo, meetings=meeting)
+                file_name = respuesta_ics.get('file_name', '')
+                file_url = respuesta_ics.get('file_url', '')
+
+                access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[]),
+                "archivo_invitacion": [
+                    {
+                        "file_name": f"{file_name}",
+                        "file_url": f"{file_url}"
+                    }
+                ]}
+                resUp= self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
             else:
-                stop_datetime = datetime.strptime(fecha_desde_hasta, "%Y-%m-%d %H:%M:%S")
-
-            meeting = [
-                {
-                    "id": 1,
-                    "start": start_datetime,
-                    "stop": stop_datetime,
-                    "name": tema_cita,
-                    "description": descripcion,
-                    "location": ubicacion,
-                    "allday": False,
-                    "rrule": None,
-                    "alarm_ids": [{"interval": "minutes", "duration": 10, "name": "Reminder"}],
-                    'organizer_name': visita_a,
-                    'organizer_email': creado_por_email,
-                    "attendee_ids": [{"email": email, "nombre": nombre}, {"email": creado_por_email, "nombre": visita_a}],
-                }
-            ]
-            respuesta_ics = self.upload_ics(id_forma, id_campo, meetings=meeting)
-            file_name = respuesta_ics.get('file_name', '')
-            file_url = respuesta_ics.get('file_url', '')
-
-            access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[]),
-            "archivo_invitacion": [
-                {
-                    "file_name": f"{file_name}",
-                    "file_url": f"{file_url}"
-                }
-            ]}
+                link_pass=""
+            
 
             # access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])}
 
-            resUp= self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
+            
         return res
     
     def create_visita_autorizada(self, visita_autorizada_obj, pase_obj={}):
         pase_info = pase_obj
         print(pase_info)
         #---Define Metadata
-        print("VISITA AUTORIZADA OBJJJJJJJJ", simplejson.dumps(visita_autorizada_obj, indent=4))
         metadata = self.lkf_api.get_metadata(form_id=self.VISITA_AUTORIZADA)
         metadata.update({
             "properties": {
@@ -2873,7 +2885,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         query = [
             {'$match': match_query },
             {'$project': proyect_fields},
-            {'$sort':{'folio':-1}},
+            {'$sort':{'_id':-1}},
         ]
         records = self.format_cr(self.cr.aggregate(query))
         for rec in records:
@@ -2986,16 +2998,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     
     def get_my_pases(self, tab_status):
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        print("EMPLOYEE", self.get_employee_data(email=self.user.get('email'), get_one=True))
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         employee['timezone'] = user_data.get('timezone','America/Monterrey')
         fecha_hoy = datetime.now(pytz.timezone(employee.get('timezone'))).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
+        print("tab_status=",employee)
         match_query = {
             'form_id':self.PASE_ENTRADA,
             'deleted_at':{'$exists':False},
             f"answers.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.pase_entrada_fields['autorizado_por']}":employee.get('worker_name'),
         }
-        print("tab_status=",tab_status)
         if tab_status == "Favoritos":
             match_query.update({f"answers.{self.pase_entrada_fields['favoritos']}":'si'})
         elif tab_status == "Activos":
@@ -3044,7 +3057,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'visita_a_user_id':
                         f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['user_id_empleado']}",
                     'visita_a_email':
-                        f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_empleado']}",
+                        f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['email']}",
                     'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
                     'tipo_de_pase':f"$answers.{self.pase_entrada_fields['perfil_pase']}",
                     'tema_cita':f"$answers.{self.pase_entrada_fields['tema_cita']}",
@@ -3078,6 +3091,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # print(stop)
         records = self.format_cr(self.cr.aggregate(query))
         # print("records=", simplejson.dumps(records, indent=4))
+        # print("ELEMENTOS", u)
         for x in records:
             visita_a =[]
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
@@ -3085,6 +3099,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             p = x.get('visita_a_puesto',[])
             e =  x.get('visita_a_user_id',[])
             u =  x.get('visita_a_email',[])
+
             for idx, nombre in enumerate(v):
                 emp = {'nombre':nombre}
                 if d:
@@ -3129,6 +3144,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
             # x['comentario'] = self._labels_list(x.pop('comentario',[]), self.mf)
         print('answers', simplejson.dumps(records, indent=4))
+
         return  records
 
     def get_pdf(self, qr_code, template_id=491, name_pdf='Pase de Entrada'):
@@ -3945,7 +3961,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             elif key == 'archivo_invitacion':
                 answers.update({f"{self.pase_entrada_fields[key]}": value})
             elif key == 'favoritos':
-                print("VALOR DE FAVORITOS",value)
                 answers.update({f"{self.pase_entrada_fields[key]}": [value]})    
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
@@ -3958,6 +3973,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
                 res['json'].update({'enviar_de':employee.get('worker_name')})
+                res['json'].update({'enviar_de_correo':employee.get('email')})
                 res['json'].update({'ubicacion':pass_selected.get('ubicacion')})
                 res['json'].update({'fecha_desde':pass_selected.get('fecha_de_expedicion')})
                 res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
