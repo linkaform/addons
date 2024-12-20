@@ -4199,16 +4199,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         if not pass_selected.get('fecha_de_caducidad'):
             tipo_visita_pase = 'fecha_fija'
-
-        if pass_selected.get('grupo_areas_acceso') == []:
-            config_limitar_acceso = None
         else:
-            config_limitar_acceso = pass_selected.get('grupo_areas_acceso')
+            tipo_visita_pase = 'rango_de_fechas'
 
         access_pass = {
             "autorizado_por": pass_selected.get('visita_a', '')[0].get('nombre'),
             "config_dias_acceso": pass_selected.get('limitado_a_dias', []),
-            "config_limitar_acceso": config_limitar_acceso,
+            "config_limitar_acceso": pass_selected.get('limite_de_acceso', []),
             "descripcion": pass_selected.get('descripcion', ''),
             "email_pase": pass_selected.get('email', ''),
             "enviar_correo": [],
