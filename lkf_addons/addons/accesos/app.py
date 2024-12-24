@@ -86,6 +86,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
         self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
+        self.CONF_MODULO_SEGURIDAD = self.lkm.form_id('configuracion_modulo_seguridad','id')
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
         # self.FORM_ALTA_EQUIPOS = self.lkm.form_id('alta_de_equipos','id')
@@ -580,6 +581,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'menus':"6722472f162366c38ebe1c64",
         }
 
+        self.conf_modulo_seguridad = {
+            'ubicacion_cat':  f"{self.UBICACIONES_CAT_OBJ_ID}",
+            'ubicacion':"663e5c57f5b8a7ce8211ed0b",
+            'grupo_requisitos':"676975321df93a68a609f9ce",
+            'datos_requeridos':"6769756fc728a0b63b8431ea",
+        }
+
         self.notes_project_fields.update(self.notes_fields)
         self.bitacora_acceos = {}
         ## Fields ##
@@ -746,7 +754,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         metadata.update({'answers':answers})
         response_create = self.lkf_api.post_forms_answers(metadata)
         return response_create
-        
+     
     def assets_access_pass(self, location):
         ### Areas
         catalog_id = self.AREAS_DE_LAS_UBICACIONES_CAT_ID
@@ -2234,6 +2242,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "usuario":f"$answers.{self.conf_accesos_fields['usuario_cat']}",
                 "grupos":f"$answers.{self.conf_accesos_fields['grupos']}",
                 "menus": f"$answers.{self.conf_accesos_fields['menus']}",
+            }},
+            {'$limit':1},
+        ]
+        return self.format_cr_result(self.cr.aggregate(query),  get_one=True)
+
+    def get_config_modulo_seguridad(self, ubicacion):
+        response = []
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.CONF_MODULO_SEGURIDAD,
+            f"answers.{self.USUARIOS_OBJ_ID}.{self.mf['id_usuario']}":self.user['user_id'],
+            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": ubicacion,
+        }
+        query = [
+            {'$match': match_query},
+            {'$project': {
+                "ubicacion":f"$answers.{self.conf_modulo_seguridad['ubicacion_cat']}.{self.conf_modulo_seguridad['ubicacion']}",
+                "grupo_requisitos":f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
+                "datos_requeridos": f"$answers.{self.conf_modulo_seguridad['datos_requeridos']}",
             }},
             {'$limit':1},
         ]
