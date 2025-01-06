@@ -122,13 +122,20 @@ class JIT(Base):
             'allocation_proc_method':'673e20c55f1c35d02395a6d2',
             'dias_laborales_consumo':'66ececbcc9aefada5b04b800',
             'borrar_historial':'671fbd248e46aab662455b40',
+            'bom_qty_min':'66d9c26cb22bcdcc2f341eef',
+            'bom_qty_max':'66d9c26cb22bcdcc2f341ef0',
+            'bom_qty_setp':'66d9c26cb22bcdcc2f341ef1',
+            'bom_qty':'66d8dfd7b22bcdcc2f341e82',
+            'bom_qty_out':'66d8dfd7b22bcdcc2f341e83',
             'bom_group_qty_in':'66d8e09cb22bcdcc2f341e85',
             'bom_group_qty_out':'66da962859bec54a05c73e00',
             'bom_group_qty_throughput':'66da962859bec54a05c73e01',
             'bom_group_step':'66d8e7b0b22bcdcc2f341e88',
             'bom_name':'66d8e063b22bcdcc2f341e84',
             'bom_type':'66d8dfbcb22bcdcc2f341e81',
+            'bom_template_step':'66d8f293b22bcdcc2f341ea6',
             'bom_status':'66e275891f6f133e363afb3f',
+            'bom_step':'66da9a3b59bec54a05c73e0a',
             'comments':'673261f0f652eb86b4204906',
             'consumo_promedio_diario':'66ec770cc9aefada5b04b7a6',
             'demanda_12_meses':'66ea6c61c9aefada5b04b76e',
@@ -143,6 +150,7 @@ class JIT(Base):
             'input_goods_product_name':'71ef32bcdf0ec2ba73dec33e',
             'input_goods_sku':'75dec64a3199f9a040829243',
             'lead_time':'66d8ee99b22bcdcc2f341e8a',
+            'manufacture_lead_time':'66d8eed3b22bcdcc2f341e8b',
             'month': '6206b9ae8209a9677f9b8bd9',
             'min_stock':'66ea62dac9aefada5b04b739',
             'max_stock':'66ea62dac9aefada5b04b73a',
@@ -157,9 +165,12 @@ class JIT(Base):
             'procurment_qty':'66da3bddb22bcdcc2f341f08',
             'qty': '6206b9ae8209a9677f9b8bdb',
             'status':'620ad6247a217dbcb888d175',
+            'step_disposal':'66d8f324b22bcdcc2f341eaa',
+            'step_harvest':'66d8f324b22bcdcc2f341ea9',
+            'step_multiplication':'66d8f2f2b22bcdcc2f341ea7',
+            'step_weeks':'66d8f2f2b22bcdcc2f341ea8',
             'safety_stock':'66ea62dac9aefada5b04b738',
             'standar_pack':'671b22d738a541183685d077',
-            'status':'620ad6247a217dbcb888d175',
             'tipo_almacen': '66ed0c88c9aefada5b04b818',
             'raw_material_group':'66d8dff5b22bcdcc2f341e83',
             'reorder_point':'66ea62dac9aefada5b04b73b',
@@ -219,6 +230,7 @@ class JIT(Base):
         #super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #Formas
         self.BOM_ID = self.lkm.form_id('bom','id')
+        self.BOM_TEMPLATE_ID = self.lkm.form_id('production_bom_template','id')
         self.DEMANDA_UTIMOS_12_MES = self.lkm.form_id('demanda_ultimos_12_meses','id')
         self.DEMANDA_PLAN = self.lkm.form_id('demand_plan','id')
         self.PROCURMENT = self.lkm.form_id('procurment_record','id')
@@ -399,17 +411,86 @@ class JIT(Base):
             res += new_line
         return res
 
+    def get_bom(self, product_code, product_sku, qty=1, warehouse=None, location=None, bom_type='manufacture'):
+        match_query ={ 
+             'form_id': self.BOM_ID,  
+             'deleted_at' : {'$exists':False},
+             f'answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_code"]}': product_code,
+             f'answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_sku"]}': product_sku,
+             f'answers.{self.mf["bom_type"]}': bom_type,
+             f'answers.{self.mf["bom_status"]}': 'active',
+         } 
+        query = [
+            {'$match': match_query},
+            {'$sort': {'created_at': 1}},
+            {'$limit':1},
+            {'$unwind':f'$answers.{self.mf["raw_material_group"]}'},
+            {'$project':{
+                    '_id':0,
+                    'bom_name':f'$answers.{self.mf["bom_name"]}',
+                    'bom_type':f'$answers.{self.mf["bom_type"]}',
+                    'product_code':f'$answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_code"]}',
+                    'product_name':f'$answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_sku"]}',
+                    'sku':f'$answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_name"]}',
+                    'qty':f'$answers.{self.f["bom_qty"]}',
+                    'qty_out':f'$answers.{self.f["bom_qty_out"]}',
+                    'step':f'$answers.{self.f["bom_qty_setp"]}',
+                    'lead_time':f'$answers.{self.f["lead_time"]}',
+                    'manufacture_lead_time':f'$answers.{self.f["manufacture_lead_time"]}',
+            }},
+            ]
+        cr_res =  self.format_cr(self.cr.aggregate(query))
+        return cr_res
+  
+    def get_bom_template(self, product_code, product_sku, qty=1, warehouse=None, location=None):
+        match_query ={ 
+          'form_id': self.BOM_TEMPLATE_ID,  
+          'deleted_at' : {'$exists':False},
+          f'answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_code"]}': product_code,
+          f'answers.{self.mf["bom_status"]}': 'active',
+        } 
+        query = [
+         {'$match': match_query},
+         {'$sort': {'created_at': 1}},
+         {'$limit':1},
+         {'$unwind':f'$answers.{self.mf["bom_template_step"]}'},
+         {'$project':{
+                 '_id':0,
+                 'bom_name':f'$answers.{self.mf["bom_name"]}',
+                 'bom_type':f'$answers.{self.mf["bom_type"]}',
+                 'product_code':f'$answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_code"]}',
+                 'product_name':f'$answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_sku"]}',
+                 'sku':f'$answers.{self.Product.SKU_OBJ_ID}.{self.Product.f["product_name"]}',
+                 'starting_qty':f'$answers.{self.f["bom_qty"]}',
+                 'starting_qty_out':f'$answers.{self.f["bom_qty_out"]}',
+                 'starting_qty_max':f'$answers.{self.f["bom_qty_max"]}',
+                 'starting_qty_min':f'$answers.{self.f["bom_qty_min"]}',
+                 'step':f'$answers.{self.mf["bom_template_step"]}.{self.f["bom_qty_setp"]}',
+                 'step2':2,
+                 'step_lead_time_weeks':f'$answers.{self.mf["bom_template_step"]}.{self.f["step_weeks"]}',
+                 'step_harvest':f'$answers.{self.mf["bom_template_step"]}.{self.f["step_harvest"]}',
+                 'step_disposal':f'$answers.{self.mf["bom_template_step"]}.{self.f["step_disposal"]}',
+                 'step_multiplication':f'$answers.{self.mf["bom_template_step"]}.{self.f["step_multiplication"]}',
+                 'step_qty':f'$answers.{self.mf["bom_template_step"]}.{self.f["bom_qty_setp"]}',
+                 'lead_time':f'$answers.{self.f["lead_time"]}',
+                 'manufacture_lead_time':f'$answers.{self.f["manufacture_lead_time"]}',
+         }},
+         ]
+        cr_res =  self.format_cr(self.cr.aggregate(query))
+        return cr_res  
+
     def get_bom_products(self, bom_line, warehouse=None, location=None, bom_type='manufacture'):
         product_code = bom_line.get('product_code')
         sku = bom_line.get('sku')
         qty = bom_line.get('move_group_qty')
-        bom_res = self.get_product_boms(product_code, sku, qty, warehouse=warehouse, location=location, bom_type=bom_type)
+        bom_res = self.get_product_boms(product_code, sku, qty, warehouse=warehouse, location=location)
         if bom_res:
             return bom_res
         else:
             return [bom_line,]
 
     def get_product_boms(self, product_code, product_sku, qty=1, warehouse=None, location=None, bom_type='manufacture'):
+
         match_query ={ 
              'form_id': self.BOM_ID,  
              'deleted_at' : {'$exists':False},
