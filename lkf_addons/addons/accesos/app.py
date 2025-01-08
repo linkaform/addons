@@ -4818,15 +4818,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }]
             }
         records_ = self.search_pass_by_status('activo', query_update)
-        records = [ObjectId(req["_id"]) for req in records]
+        records = [ObjectId(req["_id"]) for req in records_]
         update_query= {f"answers.{self.pase_entrada_fields['status_pase']}":"vencido"}
-        return self.cr.update_many({
+        # return self.cr.update_many({
+        #         'form_id':self.PASE_ENTRADA,
+        #         'deleted_at':{'$exists':False},
+        #         '_id':{
+        #             "$in":records
+        #         }
+        #     }, {"$set": update_query})
+    
+        res = self.cr.update_many({
                 'form_id':self.PASE_ENTRADA,
                 'deleted_at':{'$exists':False},
                 '_id':{
                     "$in":records
                 }
             }, {"$set": update_query})
+        
+        return res.matched_count
         # print("records=",stop)
 
     def validate_access_pass_location(self, qr_code, location):
