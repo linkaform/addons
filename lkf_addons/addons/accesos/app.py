@@ -1443,20 +1443,62 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def create_enviar_msj(self, data_msj, data_cel_msj=None, folio=None):
         data_msj['enviado_desde'] = 'Modulo de Accesos'
         return self.send_email_by_form(data_msj)
+    
+    def send_msj_pase(self, data_cel_msj=None, pre_sms=False):
+        """
+        Envía un mensaje de texto a un número de celular con información personalizada sobre un pase de invitación.
 
-    def create_enviar_msj_pase(self, data_cel_msj=None, folio=None):
-        if not data_cel_msj['mensaje'] and data_cel_msj['from'] == 'enviar_pre_sms':
-            get_pase = self.get_detail_access_pass(qr_code=folio)
-            msg = f"Hola {get_pase.get('nombre', '')}👋, {get_pase.get('visita_a', [])[0].get('nombre', '')} "
-            msg += f"te esta invitando a {get_pase.get('ubicacion', '')}🏭 y ha creado un pase para ti... por favor,"
-            msg += f"complete sus datos de registro en este link: {get_pase.get('link', '')}"
-            data_cel_msj['mensaje'] = msg
-            
-        mensaje = data_cel_msj.get('mensaje', '')
+        Este método genera un mensaje en función de los datos proporcionados en `data_cel_msj`. 
+        Si `pre_sms` es `True`, indica que se enviara un mensaje pre-registro para completar el pase. 
+        En caso contrario, incluirá el mensaje de cuando se completa el pase.
+
+        Args:
+            data_cel_msj (dict): Un diccionario con los datos necesarios para personalizar el mensaje. 
+                Las claves esperadas son:
+                    - 'nombre' (str): Nombre de la persona invitada.
+                    - 'visita_a' (str): Nombre de la persona o entidad que invita.
+                    - 'ubicacion' (str): Ubicación del evento o visita.
+                    - 'link' (str): Enlace para completar el registro.
+                    - 'fecha_desde' (str): Fecha de inicio de la invitación.
+                    - 'fecha_hasta' (str): Fecha de finalización de la invitación.
+                    - 'numero' (str): Número de teléfono al que se enviará el mensaje.
+            pre_sms (bool): Si es `True`, se genera un mensaje con instrucciones de registro.
+                            Si es `False`, se genera un mensaje de pase completado.
+
+        Returns:
+            dict: Un diccionario con el código de estado del envío. Por ejemplo:
+                - {'status_code': 200} si el mensaje fue enviado exitosamente.
+        """
+        mensaje=''
+        if pre_sms:
+            msg = f"Hola {data_cel_msj.get('nombre', '')}👋, {data_cel_msj.get('visita_a', '')} "
+            msg += f"te esta invitando a {data_cel_msj.get('ubicacion', '')}🏭 y ha creado un pase para ti... por favor,"
+            msg += f"complete sus datos de registro en este link: {data_cel_msj.get('link', '')}"
+            mensaje = msg
+        else:
+            get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''))
+            get_pdf_url = get_pdf_url.get('data', '').get('download_url', '')
+            msg = f"Estimado {data_cel_msj.get('nombre', '')}😁, {data_cel_msj.get('visita_a', '')}"
+
+            if data_cel_msj.get('fecha_desde', '') and not data_cel_msj.get('fecha_hasta', ''):
+                msg += f", te esta invitando a {data_cel_msj.get('ubicacion', '')} el día {data_cel_msj.get('fecha_desde', '')}."
+            elif data_cel_msj.get('fecha_desde', '') and data_cel_msj.get('fecha_hasta', ''):
+                msg += f", te esta invitando a {data_cel_msj.get('ubicacion', '')} "
+                msg += f"a partir del {data_cel_msj.get('fecha_desde', '')} hasta el {data_cel_msj.get('fecha_hasta','')}."
+
+            msg += f" Descarga tu pase 💳 en: {get_pdf_url}"
+            mensaje = msg
+
         phone_to = data_cel_msj.get('numero', '')
         res =self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
         if res:
             return {'status_code':200}
+
+    def create_enviar_msj_pase(self, data_cel_msj=None, folio=None):
+        access_pass={"enviar_correo": ["enviar_sms"]}
+        res_update= self.update_pass(access_pass=access_pass, folio=folio)
+        print("RES UPDATE", res_update)
+        return res_update
 
     def create_enviar_correo(self, data_msj, folio=None):
         access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
