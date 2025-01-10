@@ -884,21 +884,34 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         Valida pase de entrada y crea registro de entrada al pase
         '''
-        # print('me quede ahceidno la vaildacion y el registro de entrada')
-
+        access_pass = self.get_detail_access_pass(qr_code)
         if not qr_code and not location and not area:
             return False
+        total_entradas = self.get_count_ingresos(qr_code)
+        
+        diasDisponibles = access_pass.get("limitado_a_dias", [])
+        dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+        hoy = datetime.now()
+        dia_semana = hoy.weekday()
+        nombre_dia = dias_semana[dia_semana]
 
-        # access_pass = self.search_pass(qr_code)
+        if access_pass.get('estatus',"") == 'vencido':
+            self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Revisa la Configuración'})
+
+        if nombre_dia not in diasDisponibles:
+            self.LKFException({'msg':"No se permite realizar ingresos este día.","title":'Revisa la Configuración'})
+            
+        if int(total_entradas['total_records'])>= int(access_pass.get('limite_de_acceso')) :
+            self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
+        
+        if access_pass.get("ubicacion") != location:
+            self.LKFException({'msg':"No se puede realizar un ingreso en una ubicación diferente.","title":'Revisa la Configuración'})
+        
         if self.validate_access_pass_location(qr_code, location):
             self.LKFException("En usuario ya se encuentra dentro de una ubicacion")
         val_certificados = self.validate_certificados(qr_code, location)
-        access_pass = self.get_detail_access_pass(qr_code)
 
-       
-        if access_pass.get('estatus',"") == 'vencido':
-            self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Error de Configuracion'})
-
+        
         pass_dates = self.validate_pass_dates(access_pass)
         comentario_pase =  data.get('comentario_pase',[])
         if comentario_pase:
@@ -1047,7 +1060,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if last_check_out.get('gafete_id') and not gafete_id:
             self.LKFException({"status_code":400, "msg":f"Se necesita liberar el gafete antes de regitrar la salida"})
         if not location:
-            self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se raelizara la salida."})
+            self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
         if not area:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar el area de donde se realizara la salida."})
         if last_check_out.get('folio'):
@@ -1108,6 +1121,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
+            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}":qr,
         }
         if user_id:
             match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}"] = user_id
@@ -2265,6 +2279,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$limit':1},
         ]
         return self.format_cr_result(self.cr.aggregate(query),  get_one=True)
+
+    def get_count_ingresos(self, qr_code):
+        total_entradas=""
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.BITACORA_ACCESOS,
+            f"answers.{self.mf['codigo_qr']}":qr_code
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                'folio':'$folio',
+                }
+            },
+            {'$count': 'total_records'}
+        ]
+        total_entradas = self.format_cr_result(self.cr.aggregate(query))
+        total_entradas= total_entradas.pop() 
+        return total_entradas
 
     def get_detail_access_pass(self, qr_code):
         match_query = {
