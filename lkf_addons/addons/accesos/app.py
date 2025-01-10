@@ -1494,7 +1494,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if res:
             return {'status_code':200}
 
-    def create_enviar_msj_pase(self, data_cel_msj=None, folio=None):
+    def create_enviar_msj_pase(self, folio=None):
         access_pass={"enviar_correo": ["enviar_sms"]}
         res_update= self.update_pass(access_pass=access_pass, folio=folio)
         print("RES UPDATE", res_update)
@@ -3042,7 +3042,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'comentarios':f"$answers.{self.bitacora_fields['grupo_comentario']}",
             'fecha_salida':f"$answers.{self.mf['fecha_salida']}",
             'fecha_entrada':f"$answers.{self.mf['fecha_entrada']}",
-            'foto': {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}"},
+            'foto_url': {"$arrayElemAt": [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}.file_url", 0]},
             'equipos':f"$answers.{self.mf['grupo_equipos']}",
             'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
             'id_gafet': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
