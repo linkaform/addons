@@ -3677,7 +3677,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # guards_online = self.get_guards_booths(booth_location, booth_area)
         load_shift_json["booth_stats"] = self.get_booth_stats( booth_area, booth_location)
         load_shift_json["booth_status"] = self.get_booth_status(booth_area, booth_location)
-        load_shift_json["support_guards"] = location_employees[self.support_guard]
+        # load_shift_json["support_guards"] = location_employees[self.support_guard]
+        load_shift_json["support_guards"] = location_employees.get(self.support_guard, "")
         load_shift_json["guard"] = self.update_guard_status(guard, this_user)
         load_shift_json["notes"] = notes
         load_shift_json["user_booths"] = user_booths
