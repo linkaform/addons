@@ -1124,7 +1124,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
-            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}":qr,
+            # f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}":qr,
         }
         if user_id:
             match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}"] = user_id
