@@ -177,6 +177,40 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
+                    <field_id>abcde0001000000000010009</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde0001000000000010009</id>
+                    <label>La Recurrencia Sucede Cada</label>
+                    <type>checkbox</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Recurrencia Customizable</name>
+            <operator>and</operator>
+            <rule_id>14809291d381137</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>abcde0001000000000010009</field_id>
+                        <group_id>None</group_id>
+                        <id>abcde0001000000000010009</id>
+                        <label>La Recurrencia Sucede Cada</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>minuto</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
                     <field_id>abcde0001000000000010010</field_id>
                     <group_id>None</group_id>
                     <id>abcde0001000000000010010</id>
@@ -191,6 +225,32 @@
                     <label>Cada cuantos minutos se repite?</label>
                     <type>integer</type>
                 </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Customizar Minutos</name>
+            <operator>and</operator>
+            <rule_id>11cc1e8725bbeea</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>abcde0001000000000010009</field_id>
+                        <group_id>None</group_id>
+                        <id>abcde0001000000000010009</id>
+                        <label>La Recurrencia Sucede Cada</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>hora</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
                     <field_id>abcde0001000000000010012</field_id>
@@ -199,11 +259,179 @@
                     <label>En que hora Sucede?</label>
                     <type>integer</type>
                 </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde0001000000000010013</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde0001000000000010013</id>
+                    <label>Cada Cuantas Horas se repite?</label>
+                    <type>integer</type>
+                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Recurrencia Customizable</name>
+            <name>Customizar Horas</name>
             <operator>and</operator>
-            <rule_id>e1d182716391186</rule_id>
+            <rule_id>213873df4d2459</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>abcde0001000000000010009</field_id>
+                        <group_id>None</group_id>
+                        <id>abcde0001000000000010009</id>
+                        <label>La Recurrencia Sucede Cada</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>dia_de_la_semana</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde0001000000000010014</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde0001000000000010014</id>
+                    <label>Que Dia(s) de la Semana?</label>
+                    <type>checkbox</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde0001000000000010015</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde0001000000000010015</id>
+                    <label>En que semana sucede</label>
+                    <type>radio</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Customizar Dia de la Semana</name>
+            <operator>and</operator>
+            <rule_id>256910f6227c17fd</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>abcde0001000000000010009</field_id>
+                        <group_id>None</group_id>
+                        <id>abcde0001000000000010009</id>
+                        <label>La Recurrencia Sucede Cada</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>dia_del_mes</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde0001000000000010016</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde0001000000000010016</id>
+                    <label>Que Día del Mes?</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde0001000000000010017</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde0001000000000010017</id>
+                    <label>Cada cuantos dias se repeite?</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Customizar Dia del Mes</name>
+            <operator>and</operator>
+            <rule_id>226c54312c5f1d</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>abcde0001000000000010009</field_id>
+                        <group_id>None</group_id>
+                        <id>abcde0001000000000010009</id>
+                        <label>La Recurrencia Sucede Cada</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>mes</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde0001000000000010018</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde0001000000000010018</id>
+                    <label>En Que Mes</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde0001000000000010019</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde0001000000000010019</id>
+                    <label>Cada cuantos meses se repite?</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Customnizar Mes</name>
+            <operator>and</operator>
+            <rule_id>20102643228a1129</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>64374e47a208e5c0ff95e9bd</field_id>
+                        <group_id>None</group_id>
+                        <id>64374e47a208e5c0ff95e9bd</id>
+                        <label>La recurrencia cuenta con una fecha final?</label>
+                        <type>radio</type>
+                    </field>
+                    <value>sí</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde0001000000000010099</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde0001000000000010099</id>
+                    <label>Fecha Final de Recurrencia</label>
+                    <type>datetime</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Fecha Final</name>
+            <operator>and</operator>
+            <rule_id>1698225b21ae187d</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>

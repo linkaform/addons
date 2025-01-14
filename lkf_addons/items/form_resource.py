@@ -59,7 +59,7 @@ class FormResource(items.Items):
                 this_path = '{}/{}'.format(self.path, detail['path'])
             else:
                 this_path = self.path
-            print('Installig Form: ' ,form_name)
+            print('Installing Form: ' ,form_name)
             form_model = self.load_module_template_file(this_path, form_name)
             item_info = {
                 # 'created_by' : user,
