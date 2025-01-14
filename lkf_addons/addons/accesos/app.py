@@ -890,21 +890,34 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         Valida pase de entrada y crea registro de entrada al pase
         '''
-        # print('me quede ahceidno la vaildacion y el registro de entrada')
-
+        access_pass = self.get_detail_access_pass(qr_code)
         if not qr_code and not location and not area:
             return False
+        total_entradas = self.get_count_ingresos(qr_code)
+        
+        diasDisponibles = access_pass.get("limitado_a_dias", [])
+        dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+        hoy = datetime.now()
+        dia_semana = hoy.weekday()
+        nombre_dia = dias_semana[dia_semana]
 
-        # access_pass = self.search_pass(qr_code)
+        if access_pass.get('estatus',"") == 'vencido':
+            self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Revisa la Configuración'})
+
+        if nombre_dia not in diasDisponibles:
+            self.LKFException({'msg':"No se permite realizar ingresos este día.","title":'Revisa la Configuración'})
+            
+        if int(total_entradas['total_records'])>= int(access_pass.get('limite_de_acceso')) :
+            self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
+        
+        if access_pass.get("ubicacion") != location:
+            self.LKFException({'msg':"No se puede realizar un ingreso en una ubicación diferente.","title":'Revisa la Configuración'})
+        
         if self.validate_access_pass_location(qr_code, location):
             self.LKFException("En usuario ya se encuentra dentro de una ubicacion")
         val_certificados = self.validate_certificados(qr_code, location)
-        access_pass = self.get_detail_access_pass(qr_code)
 
-       
-        if access_pass.get('estatus',"") == 'vencido':
-            self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Error de Configuracion'})
-
+        
         pass_dates = self.validate_pass_dates(access_pass)
         comentario_pase =  data.get('comentario_pase',[])
         if comentario_pase:
@@ -1050,7 +1063,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if last_check_out.get('gafete_id') and not gafete_id:
             self.LKFException({"status_code":400, "msg":f"Se necesita liberar el gafete antes de regitrar la salida"})
         if not location:
-            self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se raelizara la salida."})
+            self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
         if not area:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar el area de donde se realizara la salida."})
         if last_check_out.get('folio'):
@@ -1111,6 +1124,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
+            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}":qr,
         }
         if user_id:
             match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}"] = user_id
@@ -1440,20 +1454,62 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def create_enviar_msj(self, data_msj, data_cel_msj=None, folio=None):
         data_msj['enviado_desde'] = 'Modulo de Accesos'
         return self.send_email_by_form(data_msj)
+    
+    def send_msj_pase(self, data_cel_msj=None, pre_sms=False):
+        """
+        Envía un mensaje de texto a un número de celular con información personalizada sobre un pase de invitación.
 
-    def create_enviar_msj_pase(self, data_cel_msj=None, folio=None):
-        if not data_cel_msj['mensaje'] and data_cel_msj['from'] == 'enviar_pre_sms':
-            get_pase = self.get_detail_access_pass(qr_code=folio)
-            msg = f"Hola {get_pase.get('nombre', '')}👋, {get_pase.get('visita_a', [])[0].get('nombre', '')} "
-            msg += f"te esta invitando a {get_pase.get('ubicacion', '')}🏭 y ha creado un pase para ti... por favor,"
-            msg += f"complete sus datos de registro en este link: {get_pase.get('link', '')}"
-            data_cel_msj['mensaje'] = msg
-            
-        mensaje = data_cel_msj.get('mensaje', '')
+        Este método genera un mensaje en función de los datos proporcionados en `data_cel_msj`. 
+        Si `pre_sms` es `True`, indica que se enviara un mensaje pre-registro para completar el pase. 
+        En caso contrario, incluirá el mensaje de cuando se completa el pase.
+
+        Args:
+            data_cel_msj (dict): Un diccionario con los datos necesarios para personalizar el mensaje. 
+                Las claves esperadas son:
+                    - 'nombre' (str): Nombre de la persona invitada.
+                    - 'visita_a' (str): Nombre de la persona o entidad que invita.
+                    - 'ubicacion' (str): Ubicación del evento o visita.
+                    - 'link' (str): Enlace para completar el registro.
+                    - 'fecha_desde' (str): Fecha de inicio de la invitación.
+                    - 'fecha_hasta' (str): Fecha de finalización de la invitación.
+                    - 'numero' (str): Número de teléfono al que se enviará el mensaje.
+            pre_sms (bool): Si es `True`, se genera un mensaje con instrucciones de registro.
+                            Si es `False`, se genera un mensaje de pase completado.
+
+        Returns:
+            dict: Un diccionario con el código de estado del envío. Por ejemplo:
+                - {'status_code': 200} si el mensaje fue enviado exitosamente.
+        """
+        mensaje=''
+        if pre_sms:
+            msg = f"Hola {data_cel_msj.get('nombre', '')}👋, {data_cel_msj.get('visita_a', '')} "
+            msg += f"te esta invitando a {data_cel_msj.get('ubicacion', '')}🏭 y ha creado un pase para ti... por favor,"
+            msg += f"complete sus datos de registro en este link: {data_cel_msj.get('link', '')}"
+            mensaje = msg
+        else:
+            get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''))
+            get_pdf_url = get_pdf_url.get('data', '').get('download_url', '')
+            msg = f"Estimado {data_cel_msj.get('nombre', '')}😁, {data_cel_msj.get('visita_a', '')}"
+
+            if data_cel_msj.get('fecha_desde', '') and not data_cel_msj.get('fecha_hasta', ''):
+                msg += f", te esta invitando a {data_cel_msj.get('ubicacion', '')} el día {data_cel_msj.get('fecha_desde', '')}."
+            elif data_cel_msj.get('fecha_desde', '') and data_cel_msj.get('fecha_hasta', ''):
+                msg += f", te esta invitando a {data_cel_msj.get('ubicacion', '')} "
+                msg += f"a partir del {data_cel_msj.get('fecha_desde', '')} hasta el {data_cel_msj.get('fecha_hasta','')}."
+
+            msg += f" Descarga tu pase 💳 en: {get_pdf_url}"
+            mensaje = msg
+
         phone_to = data_cel_msj.get('numero', '')
         res =self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
         if res:
             return {'status_code':200}
+
+    def create_enviar_msj_pase(self, folio=None):
+        access_pass={"enviar_correo": ["enviar_sms"]}
+        res_update= self.update_pass(access_pass=access_pass, folio=folio)
+        print("RES UPDATE", res_update)
+        return res_update
 
     def create_enviar_correo(self, data_msj, folio=None):
         access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
@@ -2552,6 +2608,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         ]
         return self.format_cr_result(self.cr.aggregate(query),  get_one=True)
 
+    def get_count_ingresos(self, qr_code):
+        total_entradas=""
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.BITACORA_ACCESOS,
+            f"answers.{self.mf['codigo_qr']}":qr_code
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                'folio':'$folio',
+                }
+            },
+            {'$count': 'total_records'}
+        ]
+        total_entradas = self.format_cr_result(self.cr.aggregate(query))
+        total_entradas= total_entradas.pop() 
+        return total_entradas
+
     def get_detail_access_pass(self, qr_code):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -2980,7 +3055,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'comentarios':f"$answers.{self.bitacora_fields['grupo_comentario']}",
             'fecha_salida':f"$answers.{self.mf['fecha_salida']}",
             'fecha_entrada':f"$answers.{self.mf['fecha_entrada']}",
-            'foto': {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}"},
+            'foto_url': {"$arrayElemAt": [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}.file_url", 0]},
             'equipos':f"$answers.{self.mf['grupo_equipos']}",
             'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
             'id_gafet': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
@@ -3569,7 +3644,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # guards_online = self.get_guards_booths(booth_location, booth_area)
         load_shift_json["booth_stats"] = self.get_booth_stats( booth_area, booth_location)
         load_shift_json["booth_status"] = self.get_booth_status(booth_area, booth_location)
-        load_shift_json["support_guards"] = location_employees[self.support_guard]
+        # load_shift_json["support_guards"] = location_employees[self.support_guard]
+        load_shift_json["support_guards"] = location_employees.get(self.support_guard, "")
         load_shift_json["guard"] = self.update_guard_status(guard, this_user)
         load_shift_json["notes"] = notes
         load_shift_json["user_booths"] = user_booths
@@ -4769,15 +4845,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }]
             }
         records_ = self.search_pass_by_status('activo', query_update)
-        records = [ObjectId(req["_id"]) for req in records]
+        records = [ObjectId(req["_id"]) for req in records_]
         update_query= {f"answers.{self.pase_entrada_fields['status_pase']}":"vencido"}
-        return self.cr.update_many({
+        # return self.cr.update_many({
+        #         'form_id':self.PASE_ENTRADA,
+        #         'deleted_at':{'$exists':False},
+        #         '_id':{
+        #             "$in":records
+        #         }
+        #     }, {"$set": update_query})
+    
+        res = self.cr.update_many({
                 'form_id':self.PASE_ENTRADA,
                 'deleted_at':{'$exists':False},
                 '_id':{
                     "$in":records
                 }
             }, {"$set": update_query})
+        
+        return res.matched_count
         # print("records=",stop)
 
     def validate_access_pass_location(self, qr_code, location):

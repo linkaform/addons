@@ -51,6 +51,7 @@ class Location(Base):
             'area':'663e5d44f5b8a7ce8211ed0f',
             'area_state':'663e5e4bf5b8a7ce8211ed14',
             'area_status':'663e5e4bf5b8a7ce8211ed15',
+            'area_qr_code':'663e5e4bf5b8a7ce8211ed13',
         }
         )
 
