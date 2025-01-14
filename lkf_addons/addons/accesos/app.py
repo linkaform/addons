@@ -108,6 +108,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.CONFIGURACION_GAFETES_LOCKERS_ID = self.CONFIGURACION_GAFETES_LOCKERS.get('id')
         self.CONFIGURACION_GAFETES_LOCKERS_OBJ_ID = self.CONFIGURACION_GAFETES_LOCKERS.get('obj_id')
 
+        self.CONFIGURACION_RECORRIDOS = self.lkm.catalog_id('configuracion_de_recorridos')
+        self.CONFIGURACION_RECORRIDOS_ID = self.CONFIGURACION_RECORRIDOS.get('id')
+        self.CONFIGURACION_RECORRIDOS_OBJ_ID = self.CONFIGURACION_RECORRIDOS.get('obj_id')
+
         self.CONFIG_PERFILES = self.lkm.catalog_id('configuracion_de_perfiles')
         self.CONFIG_PERFILES_ID = self.CONFIG_PERFILES.get('id')
         self.CONFIG_PERFILES_OBJ_ID = self.CONFIG_PERFILES.get('obj_id')
@@ -155,6 +159,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.GRUPOS_CAT = self.lkm.catalog_id('grupos')
         self.GRUPOS_CAT_ID = self.GRUPOS_CAT.get('id')
         self.GRUPOS_CAT_OBJ_ID = self.GRUPOS_CAT.get('obj_id')
+
+        self.load(module='Employee', **self.kwargs)
 
         # self.CONF_PERFIL = self.lkm.catalog_id('configuracion_de_perfiles','id')
         # self.CONF_PERFIL_ID = self.CONF_PERFIL.get('id')
@@ -774,19 +780,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
               ]
             }
         areas = self.lkf_api.catalog_view(catalog_id, form_id, options) 
-        print('areas=',areas)
         ### Aquien Visita
         catalog_id = self.CONF_AREA_EMPLEADOS_CAT_ID
         visita_a = self.lkf_api.catalog_view(catalog_id, form_id, options) 
         # visita_a = [r.get('key')[group_level-1] for r in visita_a]
-        print('visita_a=',visita_a)
         ### Pases de accesos
         res = {
             'Areas': areas,
             'Visita_a': visita_a,
             'Perfiles': self.get_pefiles_walkin(location),
         }
-        # print('visita_a=',visita_a)
         return res
 
     def delete_article_concessioned(self, folio):
@@ -1031,7 +1034,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # response = self.lkf_api.patch_multi_record( answers=checkin, form_id=self.CHECKIN_CASETAS, folios=[folio,])
         data['answers'] = checkin_answers
         response = self.lkf_api.patch_record( data=data, record_id=checkin_id)
-        print('response', response)
         if response.get('status_code') == 401:
             return self.LKFException({
                 "title":"Error de Configuracion",
@@ -1045,8 +1047,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         response = False
         last_check_out = self.get_last_user_move(qr, location)
-        print("last_check_out=", last_check_out)
-        print("gafete_id",gafete_id)
         if last_check_out.get('gafete_id') and not gafete_id:
             self.LKFException({"status_code":400, "msg":f"Se necesita liberar el gafete antes de regitrar la salida"})
         if not location:
@@ -1155,7 +1155,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         catalog_id = self.TIPO_DE_VEHICULO_ID
         form_id = self.PASE_ENTRADA
         res= self.catalogo_view(catalog_id, form_id, options=options)
-        print("REPOSNE", res)
         return res
 
     def catalogo_view(self, catalog_id, form_id, options={}, detail=False):
@@ -1346,7 +1345,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers = {}
         for key, value in data_articles.items():
             if key == 'tipo_articulo_perdido':
-                print("value", value)
                 answers[self.perdidos_fields['tipo_articulo_catalog']] = {self.perdidos_fields['tipo_articulo_perdido']:value}
             elif key == 'articulo_seleccion':
                 answers[self.perdidos_fields['articulo_seleccion_catalog']] = {self.perdidos_fields['articulo_seleccion']:value}
@@ -1401,7 +1399,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers.update({f"{self.gafetes_fields[key]}":value})
 
         metadata.update({'answers':answers})
-        print('answers', simplejson.dumps(metadata, indent=4))
         return self.lkf_api.post_forms_answers(metadata)
     
     def upload_ics(self, id_forma_seleccionada, id_field, ics_content={}, meetings=[]):
@@ -1461,7 +1458,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def create_enviar_correo(self, data_msj, folio=None):
         access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
         res_update= self.update_pass(access_pass=access_pass, folio=folio)
-        print("RES UPDATE", res_update)
         # res_update.get('status_code') == 201
         return res_update
      
@@ -1571,7 +1567,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
-        print('answers', simplejson.dumps(answers, indent=4))
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
@@ -1863,9 +1858,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #         answers[self.mf['grupo_equipos']] = list_equipos  
         #---Valor
         metadata.update({'answers':answers})
-        print("ANSWERS", simplejson.dumps(answers, indent=4))
         res = self.lkf_api.post_forms_answers(metadata)
-        print("RESPONSE", res)
         if res.get("status_code") ==200 or res.get("status_code")==201:
             link_info=access_pass.get('link', "")
             docs=""
@@ -1938,7 +1931,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     
     def create_visita_autorizada(self, visita_autorizada_obj, pase_obj={}):
         pase_info = pase_obj
-        print(pase_info)
         #---Define Metadata
         metadata = self.lkf_api.get_metadata(form_id=self.VISITA_AUTORIZADA)
         metadata.update({
@@ -2032,7 +2024,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res
 
     def format_gafete(self, data):
-        print("data=",data)
         res = []
         for r in data:
             row = {}
@@ -2217,9 +2208,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res
     
     def get_page_stats(self, booth_area, location, page=''):
-        print('entra a get_page_stats en addons')
-        print('booth_area', booth_area)
-        print('location', location)
         today = datetime.today().strftime("%Y-%m-%d")
         res={}
 
@@ -2365,7 +2353,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_visitas))
-            # print('resultadooooooooooooooooo',resultado)
             total_vehiculos_dentro = resultado[0]['total_vehiculos_dentro'] if resultado else 0
             visitas_en_dia = resultado[0]['visitas_en_dia'] if resultado else 0
             detalle_visitas = resultado[0]['detalle_visitas'] if resultado else []
@@ -2514,7 +2501,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res
 
     def get_certificacion(self, certificacion, id_user, empresa=None):
-        print("CERTII",certificacion ,id_user,empresa)
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CARGA_PERMISOS_VISITANTES,
@@ -2534,7 +2520,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_ACCESOS,
-            f"answers.{self.USUARIOS_OBJ_ID}.{self.mf['id_usuario']}":self.user['user_id'],
+            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.Employee.f['user_id']}":self.user['user_id'],
         }
         query = [
             {'$match': match_query },
@@ -2552,7 +2538,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_MODULO_SEGURIDAD,
-            f"answers.{self.USUARIOS_OBJ_ID}.{self.mf['id_usuario']}":self.user['user_id'],
+            f"answers.{self.USUARIOS_OBJ_ID}.{self.Employee.f['user_id']}":self.user['user_id'],
             f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": ubicacion,
         }
         query = [
@@ -2572,7 +2558,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "form_id": self.PASE_ENTRADA,
             "_id":ObjectId(qr_code),
         }
-        # print('match_query',match_query)
         query = [
             {'$match': match_query },
             {'$project': 
@@ -2637,7 +2622,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             },
             {'$sort':{'folio':-1}},
         ]
-        # print('query', query)
         res = self.cr.aggregate(query)
         x = {}
         for x in res:
@@ -2903,7 +2887,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$sort':{'folio':-1}},
         ]
         pr= self.format_cr_result(self.cr.aggregate(query))
-        print('answers', simplejson.dumps(pr, indent=4))
         return self.format_cr_result(self.cr.aggregate(query))
 
     def get_list_article_concessioned(self, location):
@@ -2949,8 +2932,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "limit":limit,
             "skip":skip
         }
-        print('mango_query', simplejson.dumps(mango_query, indent=4))
-        print('GAFETES_CAT_ID',self.GAFETES_CAT_ID)
         return self.format_gafete(self.lkf_api.search_catalog( self.GAFETES_CAT_ID, mango_query))
 
     def get_lockers(self, status='Disponible', location=None, area=None, tipo_locker='Locker', locker_id=None, limit=1000, skip=0):
@@ -2972,7 +2953,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "limit":limit,
             "skip":skip
         }
-        print('mango query', simplejson.dumps(mango_query))
         return self.format_lockers(self.lkf_api.search_catalog( self.LOCKERS_CAT_ID, mango_query))
 
     def get_list_bitacora(self, location=None, area=None, prioridades=[]):
@@ -3099,7 +3079,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }},
             {'$sort':{'folio':-1}},
         ]
-        print('answers', simplejson.dumps(query, indent=4))
         return self.format_cr_result(self.cr.aggregate(query))
 
     def get_list_incidences(self, location, area, prioridades=[]):
@@ -3115,7 +3094,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query[f"answers.{self.incidence_fields['prioridad_incidencia']}"] = {"$in": prioridades}
 
 
-        print('location',match_query)
         query = [
             {'$match': match_query },
             {'$project': {
@@ -3148,7 +3126,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['datos_deposito_incidencia'] = self.format_datos_deposito(r.get('datos_deposito_incidencia',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
         
-        print('result', simplejson.dumps(result, indent=4))
         return result
 
     def get_list_notes(self, location, area, status=None):
@@ -3265,7 +3242,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }
             ).sort('updated_at', -1).limit(limit)
 
-        print("MATCH QUERY",res)
         result = self.format_cr(res)
         for r in result:
             r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
@@ -3299,7 +3275,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'equipos':f"$answers.{self.mf['grupo_equipos']}",
                 }).sort('updated_at', -1).limit(limit)
                 result2 = self.format_cr(res2)
-                print("result2", result2)
                 for r2 in result2:
                     r['equipos'] = self.format_equipos(r2.get('equipos',[]))
         return result
@@ -3332,12 +3307,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     
     def get_my_pases(self, tab_status):
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
-        print("EMPLOYEE", self.get_employee_data(email=self.user.get('email'), get_one=True))
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         employee['timezone'] = user_data.get('timezone','America/Monterrey')
         fecha_hoy = datetime.now(pytz.timezone(employee.get('timezone'))).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
-        print("tab_status=",employee)
         match_query = {
             'form_id':self.PASE_ENTRADA,
             'deleted_at':{'$exists':False},
@@ -3422,10 +3395,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$sort':{'_id':-1}},
             # {'$limit':1}
         ]
-        # print(stop)
         records = self.format_cr(self.cr.aggregate(query))
-        # print("records=", simplejson.dumps(records, indent=4))
-        # print("ELEMENTOS", u)
         for x in records:
             visita_a =[]
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
@@ -3461,9 +3431,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 x['empresa']= x.get('empresa', [""])[0] if x.get('empresa') else ""
                 x['telefono']= x.get('telefono', [""])[0] if x.get('telefono') else ""
                 # x['pdf'] = self.lkf_api.get_pdf_record(x[' # for idx, dic in enumerate(x['grupo_areas_acceso']):
-            #     print("QUE ES ",idx, dic)_id'], template_id = 447, name_pdf='Pase de Entrada', send_url=True)
             # x['comentario_area_pase']=x.pop('comentario_area_pase',[])
-            # print("QUE HAYYY",x['grupo_areas_acceso'])
            
 
                 # for key in list(item.keys()):
@@ -3477,7 +3445,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['grupo_equipos'] = self.format_equipos(x.pop('grupo_equipos',[]))
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
             # x['comentario'] = self._labels_list(x.pop('comentario',[]), self.mf)
-        print('answers', simplejson.dumps(records, indent=4))
 
         return  records
 
@@ -3650,7 +3617,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$sort':{'folio':-1}},
             {'$limit':1},
         ]
-        print('answers', simplejson.dumps(query, indent=4))
         #return self.format_cr_result(self.format_cr_result(self.cr.aggregate(query)))
         response = self.format_cr_result(self.format_cr_result(self.cr.aggregate(query)))
         if len(response) == 1:
@@ -3670,11 +3636,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         """
         Si envias un registro con entrada quiere regresa Verdadero, si 
         """
-        print('status_visita=',status_visita)
         if not status_visita:
             return False
         elif status_visita in ('entrada'):
-            print('true..')
             return True
         else:
             return False
@@ -3864,7 +3828,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 for y in x:
                     employee_ids.append(int(y['user_id']))
             else:
-                print('x=',x)
                 if x:
                     employee_ids.append(int(x['user_id']))
         pics = self.get_employee_pic(employee_ids)
@@ -3944,7 +3907,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if answers or folio:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_OBJETOS_PERDIDOS, folios=[folio])
             if res.get('status_code') == 201 or res.get('status_code') == 202:
-                print('answers', simplejson.dumps(res, indent=4))
                 res['json'].update({'date_entrega_perdido':date_entrega_perdido})
                 return res
             else: 
@@ -4089,15 +4051,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if len(gafete) > 0 :
                 gafete = gafete[0]
                 res = self.lkf_api.update_catalog_multi_record({self.mf['status_gafete']: status}, self.GAFETES_CAT_ID, record_id=[gafete['_id']])
-            print('locker_id',locker_id)
-            print('tipo_movimiento',tipo_movimiento)
             self.update_locker_status(tipo_movimiento, location, area, tipo_locker='Identificaciones', locker_id=locker_id)
         return res
 
     def update_guard_status(self, guard, this_user):
         # last_checkin = self.get_user_last_checkin(guard['user_id'])
         status_turn = 'Turno Cerrado'
-        print('this_user', this_user)
         if this_user.get('status') == 'in':
             status_turn = 'Turno Abierto'
 
@@ -4116,7 +4075,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for idx, employee in enumerate(checkin.get(self.mf['guard_group'],[])):
             user_id = employee[self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID].get(self.f['user_id_jefes'])
             validate_status = self.get_employee_checkin_status(user_id)
-            print('validate_status',validate_status)
             not_allowed = [uid for uid, u_data in validate_status.items() if u_data['status'] =='in']
             if not_allowed:
                 msg = f"El usuario(s) con ids {not_allowed}. Se encuentran actualmente logeado en otra caseta."
@@ -4135,9 +4093,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         elif tipo_movimiento == 'salida':
             status = "Disponible"
 
-        print('locker_id',locker_id)
         locker = self.get_lockers(status=None, location=location, area=area, tipo_locker=tipo_locker, locker_id=locker_id)
-        print('locker',locker)
         if len(locker) > 0 :
             locker = locker[0]
             res = self.lkf_api.update_catalog_multi_record({self.mf['status_locker']: status}, self.LOCKERS_CAT_ID, record_id=[locker['_id']])
@@ -4174,7 +4130,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 )
 
         if answers or folio:
-            print('answers', simplejson.dumps(answers, indent=4))
             return self.lkf_api.patch_multi_record( answers = answers, form_id=self.ACCESOS_NOTAS, folios=[folio])
         else:
             self.LKFException('No se mandarón parametros para actualizar')
@@ -4538,8 +4493,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def update_active_pass(self, folio=None, qr_code=None, update_obj={}):
         pass_selected= self.get_detail_access_pass(qr_code=qr_code)
-        print(pass_selected)
-
         if not pass_selected.get('fecha_de_caducidad'):
             tipo_visita_pase = 'fecha_fija'
         else:
@@ -4790,7 +4743,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'answers': answers,
                     '_id': qr_code
                 })
-            # print(stop)
             res= self.net.patch_forms_answers(metadata)
             return res
         else:
@@ -4801,7 +4753,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         timezone = user_data.get('timezone','America/Monterrey')
         today = self.today_str(tz_name=timezone, date_format="datetime")
-        # print("today=",today)
         query_update = {
             "$and": [{
                 "$or":[{
