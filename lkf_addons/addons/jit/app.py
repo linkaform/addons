@@ -790,7 +790,7 @@ class JIT(Base):
             sku = rec.get('sku')
             if demanda_12_meses == 0 or not sku or not product_code:
                 continue
-
+            
             consumo_promedio_diario = float(rec.get('consumo_promedio_diario',0))
             warehouse = rec.get('warehouse')
             product_by_warehouse[warehouse] = product_by_warehouse.get(warehouse,[])

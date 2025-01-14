@@ -55,3 +55,11 @@ class Service(Base):
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+
+
+
+
+        self.f = {
+            'first_date':'fffff0001000000000000001',
+            'due_date':'fffff0001000000000000002',
+            }

@@ -1,7 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <advanced_options>
-        <active>False</active>
+        <active>True</active>
+        <folio>
+            <config>False</config>
+            <manual>False</manual>
+            <required>False</required>
+        </folio>
     </advanced_options>
     <allow_page_navigation>True</allow_page_navigation>
     <confirmation>
@@ -361,6 +366,7 @@
     <grading>
         <active>False</active>
         <grade_type>points</grade_type>
+        <max_points>0</max_points>
     </grading>
     <has_voucher>False</has_voucher>
     <name>Configuracion Modulo Seguridad</name>
@@ -390,5 +396,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1734978192.0</updated_at>
+    <updated_at>1734991710.0</updated_at>
 </lkf>
