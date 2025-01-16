@@ -1511,8 +1511,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print("RES UPDATE", res_update)
         return res_update
 
-    def create_enviar_correo(self, data_msj, folio=None):
-        access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
+    def create_enviar_correo(self, data_msj, folio=None, envio=[]):
+        access_pass={"status_pase":"Activo", "enviar_correo": envio}
         res_update= self.update_pass(access_pass=access_pass, folio=folio)
         # res_update.get('status_code') == 201
         return res_update
@@ -1780,7 +1780,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
         answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
-
         if access_pass.get('custom') == True :
             answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase',"")
             answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',"")
@@ -1790,6 +1789,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:access_pass.get('visita_a',"")}
             answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
             answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
+            # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
             answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
             answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',"") 
             answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"") 
