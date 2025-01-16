@@ -1774,6 +1774,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         answers = {}
         perfil_pase = access_pass.get('perfil_pase')
+        location_name = access_pass.get('ubicacion')
+        address = self.get_location_address(location_name=location_name)
+        access_pass['direccion'] = [address.get('address', '')]
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
@@ -1789,8 +1792,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:access_pass.get('visita_a',"")}
             answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
             answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
-            # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
-            answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
+            answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
+            # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
             answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',"") 
             answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"") 
             answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',"") 
