@@ -2817,6 +2817,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # print('checkin query=', simplejson.dumps(query, indent=4))
         data = self.format_cr(self.cr.aggregate(query))
         res = {}
+        print("DATAAAA EN GET",data)
         for rec in data:
             status = 'in' if rec.get('checkin_status') in ['in','entrada'] else 'out'
             res[int(rec.get('user_id',0))] = {
@@ -3598,6 +3599,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         username = self.user.get('username')
         user_id = self.user.get('user_id')
         config_accesos_user="" #get_config_accesos(user_id)
+        print("USER_ID",user_id)
         user_status = self.get_employee_checkin_status(user_id, as_shift=True,  available=False)
         this_user = user_status.get(user_id)
         if not this_user:
