@@ -904,11 +904,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if access_pass.get('estatus',"") == 'vencido':
             self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Revisa la Configuración'})
 
-        if nombre_dia not in diasDisponibles:
-            self.LKFException({'msg':"No se permite realizar ingresos este día.","title":'Revisa la Configuración'})
-            
-        if int(total_entradas['total_records'])>= int(access_pass.get('limite_de_acceso')) :
-            self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
+        if diasDisponibles:
+            if nombre_dia not in diasDisponibles:
+                self.LKFException({'msg':"No se permite realizar ingresos este día.","title":'Revisa la Configuración'})
+        
+        limite_acceso = access_pass.get('limite_de_acceso')
+        if len(total_entradas) > 0 and limite_acceso and int(limite_acceso) > 0:
+            if total_entradas['total_records']>= int(limite_acceso) :
+                self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
         
         if access_pass.get("ubicacion") != location:
             self.LKFException({'msg':"No se puede realizar un ingreso en una ubicación diferente.","title":'Revisa la Configuración'})
@@ -2627,7 +2630,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$count': 'total_records'}
         ]
         total_entradas = self.format_cr_result(self.cr.aggregate(query))
-        total_entradas= total_entradas.pop() 
+        if total_entradas:
+            total_entradas = total_entradas.pop()
         return total_entradas
 
     def get_detail_access_pass(self, qr_code):
