@@ -904,11 +904,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if access_pass.get('estatus',"") == 'vencido':
             self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Revisa la Configuración'})
 
-        if nombre_dia not in diasDisponibles:
-            self.LKFException({'msg':"No se permite realizar ingresos este día.","title":'Revisa la Configuración'})
-            
-        if int(total_entradas['total_records'])>= int(access_pass.get('limite_de_acceso')) :
-            self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
+        if diasDisponibles:
+            if nombre_dia not in diasDisponibles:
+                self.LKFException({'msg':"No se permite realizar ingresos este día.","title":'Revisa la Configuración'})
+        
+        limite_acceso = access_pass.get('limite_de_acceso')
+        if len(total_entradas) > 0 and limite_acceso and int(limite_acceso) > 0:
+            if total_entradas['total_records']>= int(limite_acceso) :
+                self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
         
         if access_pass.get("ubicacion") != location:
             self.LKFException({'msg':"No se puede realizar un ingreso en una ubicación diferente.","title":'Revisa la Configuración'})
@@ -1124,7 +1127,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
-            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}":qr,
+            # f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}":qr,
         }
         if user_id:
             match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}"] = user_id
@@ -1511,8 +1514,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print("RES UPDATE", res_update)
         return res_update
 
-    def create_enviar_correo(self, data_msj, folio=None):
-        access_pass={"status_pase":"Activo", "enviar_correo": ["enviar_correo"]}
+    def create_enviar_correo(self, data_msj, folio=None, envio=[]):
+        access_pass={"status_pase":"Activo", "enviar_correo": envio}
         res_update= self.update_pass(access_pass=access_pass, folio=folio)
         # res_update.get('status_code') == 201
         return res_update
@@ -1774,13 +1777,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         answers = {}
         perfil_pase = access_pass.get('perfil_pase')
+        location_name = access_pass.get('ubicacion')
+        address = self.get_location_address(location_name=location_name)
+        access_pass['direccion'] = [address.get('address', '')]
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
 
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
         answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
-
         if access_pass.get('custom') == True :
             answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase',"")
             answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',"")
@@ -1790,7 +1795,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:access_pass.get('visita_a',"")}
             answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
             answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
-            answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
+            answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
+            # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
             answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',"") 
             answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"") 
             answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',"") 
@@ -2624,7 +2630,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$count': 'total_records'}
         ]
         total_entradas = self.format_cr_result(self.cr.aggregate(query))
-        total_entradas= total_entradas.pop() 
+        if total_entradas:
+            total_entradas = total_entradas.pop()
         return total_entradas
 
     def get_detail_access_pass(self, qr_code):
@@ -2814,6 +2821,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # print('checkin query=', simplejson.dumps(query, indent=4))
         data = self.format_cr(self.cr.aggregate(query))
         res = {}
+        print("DATAAAA EN GET",data)
         for rec in data:
             status = 'in' if rec.get('checkin_status') in ['in','entrada'] else 'out'
             res[int(rec.get('user_id',0))] = {
@@ -3595,6 +3603,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         username = self.user.get('username')
         user_id = self.user.get('user_id')
         config_accesos_user="" #get_config_accesos(user_id)
+        print("USER_ID",user_id)
         user_status = self.get_employee_checkin_status(user_id, as_shift=True,  available=False)
         this_user = user_status.get(user_id)
         if not this_user:
