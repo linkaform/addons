@@ -1127,7 +1127,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
-            # f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}":qr,
         }
         if user_id:
             match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}"] = user_id
@@ -1138,8 +1137,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'area':f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             }}
         ]
-        response = self.format_cr_result(self.cr.aggregate(query))
-        ubicaciones = response.pop().get('area', [])
+        response = self.format_cr_result(self.cr.aggregate(query), get_one=True )
+        ubicaciones = response.get('area', [])
         ubicaciones = list(set(ubicaciones))
         res['ubicaciones_user'] = ubicaciones
         return res

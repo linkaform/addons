@@ -99,7 +99,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.visita_autorizada.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>66a83ad456d1e741159ce118</id>
+                    <id>67801352c6e7405be537f066</id>
                     <label>Pase a Nombre de:</label>
                     <type>catalog</type>
                 </item>
@@ -333,7 +333,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.configuracion_areas_y_empleados_apoyo.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>66a83ab5c3a77af505489ca2</id>
+                    <id>677ffe8b6ce6b02516a89b07</id>
                     <label>Autorizado por:</label>
                     <type>catalog</type>
                 </item>

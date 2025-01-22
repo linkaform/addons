@@ -107,200 +107,6 @@
         <item>
             <actions>
                 <item>
-                    <_id>663ff4f13216e91c834d7f76</_id>
-                    <action_id>5</action_id>
-                    <action_settings>{}</action_settings>
-                    <configuration>
-                        <body>{% raw %} &lt;!DOCTYPE html&gt;
-&lt;html lang="es"&gt;
-&lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;Plantilla de Correo Electrónico&lt;/title&gt;
-    &lt;style&gt;
-        /* Estilos generales */
-        body, table, td, a {
-            font-family: 'Arial', sans-serif;
-            font-size: 16px;
-            color: #333333;
-            line-height: 1.6;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #ffffff;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        img {
-            border: 0;
-            height: auto;
-            line-height: 100%;
-            outline: none;
-            text-decoration: none;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 20px;
-        }
-        .header {
-            background-color: #021d49;
-            color: #ffffff;
-            padding: 20px;
-            text-align: center;
-        }
-        .content {
-            padding: 20px;
-            text-align: justify;
-        }
-        .footer {
-            background-color: #F5F5F5;
-            color: #666666;
-            padding: 20px;
-            text-align: left;
-        }
-        .button {
-            background-color: #021d49;
-            color: #ffffff;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-        .button:hover {
-            background-color: #005bb5;
-        }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;table class="container"&gt;
-        &lt;tr&gt;
-            &lt;td class="header"&gt;
-                &lt;img align="left" alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66b4093ed409d27d4ff620ea.png"&gt;
-            &lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-            &lt;td class="content"&gt;
-                &lt;h3&gt;Hola {{record.answers.66a83ad456d1e741159ce118.5ea0693a0c12d5a8e43d37df}},&lt;/h3&gt;
-                &lt;p&gt;Has sido invitado a visitar a: {{66a83ab5c3a77af505489ca2.663bd36eb19b7fb7d9e97ccb}} &lt;/p&gt;
-                &lt;p&gt;&lt;strong&gt;Detalles de la ubicación:&lt;/strong&gt;&lt;/p&gt;
-                &lt;ul&gt;
-                    &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{record.answers.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}&lt;/p&gt;&lt;/li&gt;
-                    &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}&lt;/p&gt;&lt;/li&gt;
-                    &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/p&gt;&lt;/li&gt;
-                &lt;/ul&gt;
-                &lt;p&gt;Usted tiene un pase de tipo &lt;strong&gt;{{record.answers.66a83ad3edd8174f986630ef.661dc67e901906b7e9b73bac}}&lt;/strong&gt;, favor de traer los documentos necesarios para su ingreso&lt;/p&gt;
-                &lt;ul&gt;
-                    &lt;li&gt;&lt;strong&gt;Documentos: &lt;/strong&gt;{{record.answers.66a83ad3edd8174f986630ef.662962bb203407ab90c886e4}}&lt;/p&gt;&lt;/li&gt;
-                &lt;/ul&gt;
-                &lt;p&gt;Saludos,&lt;br&gt;Equipo de Administración.&lt;/p&gt;
-            &lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-            &lt;td class="footer"&gt;
-                &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
-                    &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png"&gt;
-                &lt;/a&gt;
-            &lt;/td&gt;
-        &lt;/tr&gt;
-    &lt;/table&gt;
-&lt;/body&gt;
-&lt;/html&gt; {% endraw %}</body>
-                        <email_fields>
-                            <item>
-                                <field_id>662c2937108836dec6d92581</field_id>
-                                <group_id>None</group_id>
-                                <label>Email</label>
-                            </item>
-                        </email_fields>
-                        <emails>
-                            <item>karina@linkaform.com</item>
-                            <item>josepato@linkaform.com</item>
-                            <item>victor.mendoza@linkaform.com</item>
-                            <item>maricruz@linkaform.com</item>
-                        </emails>
-                        <embed_company_picture>True</embed_company_picture>
-                        <fields_attached>[]</fields_attached>
-                        <pdf_template>
-                            <_type>single_record</_type>
-                            <description>Template para carnet de identidad para linkaform
-</description>
-                            <id>374</id>
-                            <name>Linkaform - Carnet Identidad</name>
-                            <owner>/api/infosync/user/8607/</owner>
-                            <paginate>True</paginate>
-                            <properties>{}</properties>
-                            <resource_uri>/api/infosync/templates/374/</resource_uri>
-                        </pdf_template>
-                        <resend>RESEND</resend>
-                        <send_attachments>False</send_attachments>
-                        <send_pdf>True</send_pdf>
-                        <sender>RECORD_USER</sender>
-                        <subject>{% raw %} ¡Pase de entrada para {{record.answers.66a83ad456d1e741159ce118.5ea0693a0c12d5a8e43d37df}}! {% endraw %}</subject>
-                        <timer_config>
-                            <seconds_to_expire>None</seconds_to_expire>
-                        </timer_config>
-                    </configuration>
-                    <name>Enviar QR para ingresar</name>
-                </item>
-            </actions>
-            <id>663ff4f13216e91c834d7f7d</id>
-            <name>Invitación para usuario REGISTRADO</name>
-            <rules>
-                <metadata>
-                    <connection>[]</connection>
-                    <date>
-                        <period>
-                            <month>1</month>
-                            <selected>False</selected>
-                            <year>2014</year>
-                        </period>
-                        <range>
-                            <end>2024-05-12T06:00:00.000Z</end>
-                            <selected>False</selected>
-                            <start>2024-05-11T22:21:07.477Z</start>
-                        </range>
-                    </date>
-                    <grading>{}</grading>
-                    <user>[]</user>
-                </metadata>
-                <record>
-                    <created>True</created>
-                    <deleted>True</deleted>
-                    <edited>True</edited>
-                    <run_multiple_times>True</run_multiple_times>
-                    <runtime>after</runtime>
-                </record>
-                <wf_fields>
-                    <operator>all</operator>
-                    <triggers>
-                        <item>
-                            <condition>in=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>{}</catalog>
-                                <field_id>662c262cace163ca3ed3bb3a</field_id>
-                                <group>{}</group>
-                                <label>Selección de Visitante</label>
-                                <type>radio</type>
-                            </trigger_field>
-                            <value>buscar_visitantes_registrados</value>
-                        </item>
-                    </triggers>
-                </wf_fields>
-            </rules>
-        </item>
-        <item>
-            <actions>
-                <item>
                     <_id>66426b6c566b54a7d259ec10</_id>
                     <action_id>12</action_id>
                     <action_settings>{}</action_settings>
@@ -352,150 +158,143 @@
         <item>
             <actions>
                 <item>
-                    <_id>66bcf2bf8a06f8f584c4858b</_id>
+                    <_id>6780261f1009e90e929119d3</_id>
                     <action_id>5</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
                         <body>{% raw %} &lt;!DOCTYPE html&gt;
-&lt;html lang="es"&gt;
-    &lt;head&gt;
-        &lt;meta charset="UTF-8"&gt;
-        &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-        &lt;title&gt;Plantilla de Correo Electrónico&lt;/title&gt;
-        &lt;style&gt;
-            /* Estilos generales */
-            body, table, td, a {
-                font-family: 'Arial', sans-serif;
-                font-size: 16px;
-                color: #333333;
-                line-height: 1.6;
-            }
-            body {
-                margin: 0;
-                padding: 0;
-               
-            }
-            table {
-                border-collapse: collapse;
-                width: 100%;
-            }
-            img {
-                border: 0;
-                height: auto;
-                line-height: 100%;
-                outline: none;
-                text-decoration: none;
-            }
-            .container {
-                max-width: 600px;
-                margin: 0 auto;
-                background-color: #FFFFFF!important;
-                padding: 20px;
-            }
-            /*.header {
-                background-color: #021d49;
-                color: #ffffff;
-                padding: 20px;
-                text-align: center;
-            }*/
-            .content {
-                padding: 20px;
-                text-align: justify;
-            }
-            .footer {
-                background-color: #FFFFFF!important;
-                color: #666666;
-                padding: 20px;
-                text-align: left;
-            }
-            .button {
-                background-color: #021d49;
-                color: #ffffff;
-                padding: 10px 20px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                margin: 10px 0;
-                border-radius: 5px;
-            }
-            .button:hover {
-                background-color: #005bb5;
-            }
-            .button-link{
-            	background-color: #0d6efd;
-            	border-radius: 5px;
-            	padding: 10px 20px; 
-            	width: 30%; 
-            	color: white; 
-            	text-align: center; 
-            	border-radius: 5px; 
-            	cursor: pointer;
-            }
-        &lt;/style&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-        &lt;table class="container"&gt;
-            &lt;tr&gt;
-                &lt;td class="header"&gt;
-                    &lt;img align="left" alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66cf3e294e2420113f105797.png" width="180" &gt;
-                &lt;/td&gt;
-            &lt;/tr&gt;
-           &lt;tr&gt;
-                &lt;td class="content"&gt;
-                    &lt;h3&gt;Hola {{record.answers.662c2937108836dec6d92580}},&lt;/h3&gt;
-                    &lt;p&gt;Has sido invitado a visitar a: &lt;/p&gt;
-                
-                    {% if record.answers.663d4ba61b14fab90559ebb0|length &gt; 0 %}
-                       {% for item in record.answers.663d4ba61b14fab90559ebb0 %}
-                            {% if item.66a83ab5ca3453e21ea08d19 %}
-                                        &lt;li&gt;&lt;strong&gt;{{ item.66a83ab5ca3453e21ea08d19.62c5ff407febce07043024dd }}&lt;/strong&gt;&lt;/li&gt;
-                            {% endif %}
-                       {% endfor %}
-                    {% endif %}
-                    &lt;p&gt;&lt;strong&gt;Detalles de la visita:&lt;/strong&gt;&lt;/p&gt;
-                    &lt;ul&gt;
-                        &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt; {{ record.answers.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b }} &lt;/li&gt; 
-                        {% if record.answers.662c304fad7432d296d92581 == 'Fecha fija' %}
-                        	&lt;li&gt;&lt;strong&gt;Fecha de la visita: &lt;/strong&gt; {{ record.answers.662c304fad7432d296d92582 }} &lt;/li&gt; 
-                        {% endif %}
-                    &lt;/ul&gt;
-                    {% if record.answers.662c304fad7432d296d92581 == "Rango de fechas" %}
-                    	&lt;p&gt;&lt;strong&gt;Disponibilidad de fechas:&lt;/strong&gt;&lt;/p&gt;
-                    	&lt;ul&gt;
-                            &lt;li&gt;&lt;strong&gt;Desde:&lt;/strong&gt; {{ record.answers.662c304fad7432d296d92582 }} &lt;/li&gt;
-                            &lt;li&gt;&lt;strong&gt;Hasta: &lt;/strong&gt; {{ record.answers.662c304fad7432d296d92583 }} &lt;/li&gt; 
-                        &lt;/ul&gt;
-                        {% if record.answers.6635380dc9b3e7db4d59eb49 %}
-	                        &lt;p&gt;&lt;strong&gt;Limite de accesos:&lt;/strong&gt; {{ record.answers.6635380dc9b3e7db4d59eb49 }} &lt;/p&gt;
-                        {% endif %}
-                        {% if record.answers.662c304fad7432d296d92585|length &gt; 0 %}
-                        	&lt;p&gt;&lt;strong&gt;Dias de acceso disponibles:&lt;/strong&gt;&lt;/p&gt;
-                    		&lt;ul&gt;
-	                        	{% for item in record.answers.662c304fad7432d296d92585 %}
-		                        	&lt;li&gt;&lt;strong&gt; {{ item }} &lt;/strong&gt;&lt;/li&gt;
-		                        {% endfor %}
-	                    	&lt;/ul&gt;
-                        {% endif %}
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Notificación de Visita&lt;/title&gt;
+    &lt;style&gt;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #021d49;
+            color: #ffffff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .header img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .content {
+            padding: 20px;
+            color: #333333;
+        }
+        .content h3 {
+            color: #021d49;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #005bb5; 
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid #004a99;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .button:hover {
+            background-color: #004a99;
+            transform: scale(1.05);
+        }
+        .button:active {
+            background-color: #003d80;
+            transform: scale(0.95);
+        }
+        .footer {
+            background-color: #f4f4f4;
+            text-align: center;
+            color: #666666;
+            padding: 10px;
+            font-size: 12px;
+        }
+        .footer a {
+            color: #021d49;
+            text-decoration: none;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="email-container"&gt;
+        &lt;!-- Header --&gt;
+        &lt;div class="header"&gt;
+            &lt;img alt="logo" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66b4093ed409d27d4ff620ea.png"&gt;
+        &lt;/div&gt;
 
-                    {% endif %}
-                    &lt;p&gt;Se ha creado un pre-registro y ahora está pendiente de su asignación. Por favor, complete sus datos de registro en este link :&lt;/p&gt; &lt;br&gt; 
-                	&lt;a class="d-flex justify-content-center" href={{record.answers.6732aa1189fc6b0ae27e3824}}&gt;
-				    	&lt;div class="button-link" style=""&gt;
-				     		Completar Pase
-				    	&lt;/div&gt;
-				 	&lt;/a&gt;
-                    &lt;p class="mt-3"&gt; Saludos, &lt;br&gt; Equipo de Administración. &lt;/p&gt;          
-                &lt;/td&gt;
-            &lt;/tr&gt;
-            &lt;tr&gt;
-                &lt;td class="footer"&gt;
-                    &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
-                        &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png"&gt;
-                    &lt;/a&gt;
-                &lt;/td&gt;
-            &lt;/tr&gt;
-        &lt;/table&gt;
-    &lt;/body&gt;
+        &lt;!-- Content --&gt;
+        &lt;div class="content"&gt;
+
+            &lt;p&gt;Hola &lt;strong&gt;{{record.answers.662c2937108836dec6d92580}}&lt;/strong&gt;,&lt;/p&gt;
+
+            &lt;p&gt;&lt;strong&gt;{{record.answers.66a83ab5c3a77af505489ca2.663bd36eb19b7fb7d9e97ccb}}&lt;/strong&gt; te ha invitado a visitarlo. Se ha creado un pre-registro y ahora está pendiente de su asignación. Por favor, presione el botón a continuación para completar su registro: &lt;/p&gt;
+                
+            &lt;div class="button-container" style="text-align: center; margin-top: 20px;"&gt;
+                &lt;a href="{{record.answers.6732aa1189fc6b0ae27e3824}}" class="button" target="_blank"
+                    style="
+                    font-family: Arial, sans-serif;
+                    font-size: 16px;
+                    color: #ffffff;
+                    text-decoration: none;
+                    background-color: #021d49;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    display: inline-block;"&gt;
+                Completar Pase
+                &lt;/a&gt;
+            &lt;/div&gt;
+
+            &lt;p&gt;A continuación, te proporcionamos los detalles de tu visita:&lt;/p&gt;
+
+            &lt;ul&gt;
+                &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{record.answers.666718cb1bdffb6d8fc908d6.663e5c57f5b8a7ce8211ed0b}}&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.666718cb1bdffb6d8fc908d6.663a7e0fe48382c5b1230902}}&lt;/li&gt;
+
+                {% if record.answers.662c304fad7432d296d92581 == "Rango de fechas" %}
+                    &lt;p&gt;&lt;strong&gt;Disponibilidad de fechas:&lt;/strong&gt;&lt;/p&gt;
+                    &lt;li&gt;&lt;strong&gt;Desde: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Hasta: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92583}}&lt;/li&gt; 
+                {% else %}
+                    &lt;li&gt;&lt;strong&gt;Fecha: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/li&gt;
+                {% endif %}
+            &lt;/ul&gt;
+
+            &lt;p&gt;Si tienes alguna duda, no dudes en contactarnos.&lt;/p&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Footer --&gt;
+        &lt;div class="footer"&gt;
+            &lt;p&gt;&amp;copy; 2024 &lt;a href="https://soter-app.webflow.io/" target="_blank"&gt;Soter&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
+            &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
+                &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" width="150px"&gt;
+            &lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>
                             <item>
@@ -510,33 +309,31 @@
                                 <label>email</label>
                             </item>
                         </email_fields>
-                        <emails>
-                            <item>maricruz@linkaform.com</item>
-                        </emails>
+                        <emails>[]</emails>
                         <embed_company_picture>True</embed_company_picture>
                         <fields_attached>
                             <item>
                                 <field_id>673773741b2adb2d05d99d63</field_id>
                                 <field_type>files</field_type>
                                 <group>None</group>
-                                <label>Archivo a enviar prueba</label>
+                                <label>Archivo de invitacion</label>
                             </item>
                         </fields_attached>
                         <pdf_template>{}</pdf_template>
                         <resend>RESEND</resend>
                         <send_attachments>True</send_attachments>
                         <send_pdf>False</send_pdf>
-                        <sender>CREATED_BY_USER</sender>
+                        <sender>RECORD_USER</sender>
                         <subject>{% raw %} ¡Nuevo pase de entrada, complete el proceso de registro! {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
                     </configuration>
-                    <name>Envío de correo nuevo usuario</name>
+                    <name>None</name>
                 </item>
             </actions>
-            <id>66bcf2bf8a06f8f584c48595</id>
-            <name>Invitación para NUEVO visitante</name>
+            <id>6780261f1009e90e929119db</id>
+            <name>Envío de Correo Preregistro</name>
             <rules>
                 <metadata>
                     <connection>[]</connection>
@@ -547,19 +344,19 @@
                             <year>2014</year>
                         </period>
                         <range>
-                            <end>2024-08-15T06:00:00.000Z</end>
+                            <end>2025-01-10T06:00:00.000Z</end>
                             <selected>False</selected>
-                            <start>2024-08-14T17:42:23.700Z</start>
+                            <start>2025-01-09T19:28:54.426Z</start>
                         </range>
                     </date>
                     <grading>{}</grading>
                     <user>[]</user>
                 </metadata>
                 <record>
-                    <created>False</created>
+                    <created>True</created>
                     <deleted>False</deleted>
                     <edited>True</edited>
-                    <run_multiple_times>False</run_multiple_times>
+                    <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
@@ -580,7 +377,7 @@
                             <value>alta_de_nuevo_visitante</value>
                         </item>
                         <item>
-                            <condition>iexact=</condition>
+                            <condition>in=</condition>
                             <form_id>None</form_id>
                             <other_value>None</other_value>
                             <prefix>answer</prefix>
@@ -605,7 +402,7 @@
                                 <label>Link</label>
                                 <type>text</type>
                             </trigger_field>
-                            <value> </value>
+                            <value>null</value>
                         </item>
                     </triggers>
                 </wf_fields>
@@ -614,135 +411,147 @@
         <item>
             <actions>
                 <item>
-                    <_id>672d6463fa4b02c14761a225</_id>
+                    <_id>6780261f1009e90e929119d4</_id>
                     <action_id>5</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
                         <body>{% raw %} &lt;!DOCTYPE html&gt;
-&lt;html lang="es"&gt;
-    &lt;head&gt;
-        &lt;meta charset="UTF-8"&gt;
-        &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-        &lt;title&gt;Plantilla de Correo Electrónico&lt;/title&gt;
-        &lt;style&gt;
-            /* Estilos generales */
-            body, table, td, a {
-                font-family: 'Arial', sans-serif;
-                font-size: 16px;
-                color: #333333;
-                line-height: 1.6;
-            }
-            body {
-                margin: 0;
-                padding: 0;
-                background-color: #ffffff;
-            }
-            table {
-                border-collapse: collapse;
-                width: 100%;
-            }
-            img {
-                border: 0;
-                height: auto;
-                line-height: 100%;
-                outline: none;
-                text-decoration: none;
-            }
-            .container {
-                max-width: 600px;
-                margin: 0 auto;
-                background-color: #ffffff;
-                padding: 20px;
-            }
-            /*.header {
-                background-color: #021d49;
-                color: #ffffff;
-                padding: 20px;
-                text-align: center;
-            }*/
-            .content {
-                padding: 20px;
-                text-align: justify;
-            }
-            .footer {
-                background-color: #F5F5F5;
-                color: #666666;
-                padding: 20px;
-                text-align: left;
-            }
-            .button {
-                background-color: #021d49;
-                color: #ffffff;
-                padding: 10px 20px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                margin: 10px 0;
-                border-radius: 5px;
-            }
-            .button:hover {
-                background-color: #005bb5;
-            }
-        &lt;/style&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-        &lt;table class="container"&gt;
-            &lt;tr&gt;
-                &lt;td class="header"&gt;
-                    &lt;img align="left" alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66cf3e294e2420113f105797.png" width="180" &gt;
-                &lt;/td&gt;
-            &lt;/tr&gt;
-           &lt;tr&gt;
-                &lt;td class="content"&gt;
-                    &lt;h3&gt;Hola {{record.answers.662c2937108836dec6d92580}}, se ha generado correctamente tu pase de entrada.&lt;/h3&gt;
-                    &lt;p&gt;Has sido invitado a visitar a: &lt;/p&gt;
-                
-                    {% if record.answers.663d4ba61b14fab90559ebb0|length &gt; 0 %}
-                       {% for item in record.answers.663d4ba61b14fab90559ebb0 %}
-                            {% if item.66a83ab5ca3453e21ea08d19 %}
-                                        &lt;li&gt;&lt;strong&gt;{{ item.66a83ab5ca3453e21ea08d19.62c5ff407febce07043024dd }}&lt;/strong&gt;&lt;/li&gt;
-                            {% endif %}
-                       {% endfor %}
-                    {% endif %}
-                    &lt;p&gt;&lt;strong&gt;Detalles de la visita:&lt;/strong&gt;&lt;/p&gt;
-                    &lt;ul&gt;
-                        &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt; {{ record.answers.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b }} &lt;/li&gt; 
-                        {% if record.answers.662c304fad7432d296d92581 == 'Fecha fija' %}
-                        	&lt;li&gt;&lt;strong&gt;Fecha de la visita: &lt;/strong&gt; {{ record.answers.662c304fad7432d296d92582 }} &lt;/li&gt; 
-                        {% endif %}
-                    &lt;/ul&gt;
-                    {% if record.answers.662c304fad7432d296d92581 == "Rango de fechas" %}
-                    	&lt;p&gt;&lt;strong&gt;Diponibilidad de fechas:&lt;/strong&gt;&lt;/p&gt;
-                    	&lt;ul&gt;
-                            &lt;li&gt;&lt;strong&gt;Desde:&lt;/strong&gt; {{ record.answers.662c304fad7432d296d92582 }} &lt;/li&gt;
-                            &lt;li&gt;&lt;strong&gt;Hasta: &lt;/strong&gt; {{ record.answers.662c304fad7432d296d92583 }} &lt;/li&gt; 
-                        &lt;/ul&gt;
-                        {% if record.answers.6635380dc9b3e7db4d59eb49 %}
-	                        &lt;p&gt;&lt;strong&gt;Limite de accesos:&lt;/strong&gt; {{ record.answers.6635380dc9b3e7db4d59eb49 }} &lt;/p&gt;
-                        {% endif %}
-                        {% if record.answers.662c304fad7432d296d92585|length &gt; 0 %}
-                        	&lt;p&gt;&lt;strong&gt;Dias de acceso disponibles:&lt;/strong&gt;&lt;/p&gt;
-                    		&lt;ul&gt;
-	                        	{% for item in record.answers.662c304fad7432d296d92585 %}
-		                        	&lt;li&gt;&lt;strong&gt; {{ item }} &lt;/strong&gt;&lt;/li&gt;
-		                        {% endfor %}
-	                    	&lt;/ul&gt;
-                        {% endif %}
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Confirmación de Pase de Entrada&lt;/title&gt;
+    &lt;style&gt;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #021d49;
+            color: #ffffff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .header img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .content {
+            padding: 20px;
+            color: #333333;
+        }
+        .content h3 {
+            color: #021d49;
+        }
+        .table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table th {
+            background-color: #666666;
+            color: #ffffff;
+            text-align: left;
+            padding: 10px;
+        }
+        table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .footer {
+            background-color: #f4f4f4;
+            text-align: center;
+            color: #666666;
+            padding: 10px;
+            font-size: 12px;
+        }
+        .footer a {
+            color: #021d49;
+            text-decoration: none;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="email-container"&gt;
+        &lt;!-- Header --&gt;
+        &lt;div class="header"&gt;
+            &lt;img alt="logo" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66b4093ed409d27d4ff620ea.png"&gt;
+        &lt;/div&gt;
 
-                    {% endif %}
-                    &lt;p&gt; Te esperamos&lt;/p&gt;
-                    &lt;p&gt; Saludos, &lt;br&gt; Equipo de Administración. &lt;/p&gt;          
-                &lt;/td&gt;
-            &lt;/tr&gt;
-            &lt;tr&gt;
-                &lt;td class="footer"&gt;
-                    &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
-                        &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png"&gt;
-                    &lt;/a&gt;
-                &lt;/td&gt;
-            &lt;/tr&gt;
-        &lt;/table&gt;
-    &lt;/body&gt;
+        &lt;!-- Content --&gt;
+        &lt;div class="content"&gt;
+            {% if record.answers.662c262cace163ca3ed3bb3a == "Alta de Nuevo Visitante" %}
+                &lt;p&gt;Hola &lt;strong&gt;{{ record.answers.662c2937108836dec6d92580 }}&lt;/strong&gt;,&lt;/p&gt;
+                &lt;p&gt;¡Tu pase de entrada ha sido generado exitosamente! El proceso de registro está completo y ahora estás listo/a para tu visita. A continuación, te proporcionamos los detalles de tu visita:&lt;/p&gt;
+
+            {% elif record.answers.662c262cace163ca3ed3bb3a == "Buscar visitantes registrados" %}
+                &lt;p&gt;Hola &lt;strong&gt;{{ record.answers.66a83ad456d1e741159ce118.5ea0693a0c12d5a8e43d37df }}&lt;/strong&gt;,&lt;/p&gt;
+                &lt;p&gt;¡Tu pase de tipo &lt;strong&gt;{{ record.answers.66a83ad3edd8174f986630ef.661dc67e901906b7e9b73bac }}&lt;/strong&gt; ha sido generado exitosamente! Por favor, asegúrate de presentar este pase y los siguientes documentos al momento de tu llegada.&lt;/p&gt;
+                &lt;div class="table-container"&gt;
+                    &lt;table&gt;
+                        &lt;thead&gt;
+                            &lt;tr&gt;
+                                &lt;th&gt;Documentos Requeridos&lt;/th&gt;
+                            &lt;/tr&gt;
+                        &lt;/thead&gt;
+                        &lt;tbody&gt;
+                            {% if record.answers.66a83ad3edd8174f986630ef|length &gt; 0 %}
+                                &lt;tr&gt;
+                                    {{ record.answers.66a83ad3edd8174f986630ef.662962bb203407ab90c886e4 }}
+                                &lt;/tr&gt;
+                            {% else %}
+                                &lt;tr&gt;
+                                    &lt;td colspan="2" style="text-align: center; color: red;"&gt;
+                                        No hay documentos requeridos.
+                                    &lt;/td&gt;
+                                &lt;/tr&gt;
+                            {% endif %}
+                        &lt;/tbody&gt;
+                    &lt;/table&gt;
+                &lt;/div&gt;
+            {% else %}
+                &lt;p&gt;Hola &lt;strong&gt;Visitante&lt;/strong&gt;,&lt;/p&gt;
+            {% endif %}
+
+            &lt;ul&gt;
+                &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{ record.answers.666718cb1bdffb6d8fc908d6.663e5c57f5b8a7ce8211ed0b }}&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{ record.answers.666718cb1bdffb6d8fc908d6.663a7e0fe48382c5b1230902 }}&lt;/li&gt;
+                {% if record.answers.662c304fad7432d296d92581 == "Rango de fechas" %}
+                    &lt;p&gt;&lt;strong&gt;Disponibilidad de fechas:&lt;/strong&gt;&lt;/p&gt;
+                    &lt;li&gt;&lt;strong&gt;Desde: &lt;/strong&gt;{{ record.answers.662c304fad7432d296d92582 }}&lt;/li&gt;
+                    &lt;li&gt;&lt;strong&gt;Hasta: &lt;/strong&gt;{{ record.answers.662c304fad7432d296d92583 }}&lt;/li&gt; 
+                {% else %}
+                    &lt;li&gt;&lt;strong&gt;Fecha: &lt;/strong&gt;{{ record.answers.662c304fad7432d296d92582 }}&lt;/li&gt;
+                {% endif %}
+            &lt;/ul&gt;
+
+        &lt;/div&gt;
+
+        &lt;!-- Footer --&gt;
+        &lt;div class="footer"&gt;
+            &lt;p&gt;&amp;copy; 2024 &lt;a href="https://soter-app.webflow.io/" target="_blank"&gt;Soter&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
+            &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
+                &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" width="150px"&gt;
+            &lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>
                             <item>
@@ -762,29 +571,28 @@
                         <fields_attached>[]</fields_attached>
                         <pdf_template>
                             <_type>single_record</_type>
-                            <description>Template para carnet de identidad para linkaform
-</description>
-                            <id>374</id>
-                            <name>Linkaform - Carnet Identidad</name>
-                            <owner>/api/infosync/user/8607/</owner>
+                            <description>Plantilla para Gafete a Una Cara</description>
+                            <id>491</id>
+                            <name>Soter - Gafete a Una Cara</name>
+                            <owner>/api/infosync/user/10/</owner>
                             <paginate>True</paginate>
                             <properties>{}</properties>
-                            <resource_uri>/api/infosync/templates/374/</resource_uri>
+                            <resource_uri>/api/infosync/templates/491/</resource_uri>
                         </pdf_template>
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>True</send_pdf>
                         <sender>CREATED_BY_USER</sender>
-                        <subject>{% raw %} ¡Nuevo pase de entrada generado! {% endraw %}</subject>
+                        <subject>{% raw %} ¡Pase de entrada generado! {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
                     </configuration>
-                    <name>Enviar correo</name>
+                    <name>None</name>
                 </item>
             </actions>
-            <id>672d6464fa4b02c14761a232</id>
-            <name>Registro completato de NUEVO visitante</name>
+            <id>6780261f1009e90e929119de</id>
+            <name>Envío de Correo Confirmación</name>
             <rules>
                 <metadata>
                     <connection>[]</connection>
@@ -795,9 +603,9 @@
                             <year>2014</year>
                         </period>
                         <range>
-                            <end>2024-11-08T06:00:00.000Z</end>
+                            <end>2025-01-10T06:00:00.000Z</end>
                             <selected>False</selected>
-                            <start>2024-11-07T19:30:21.616Z</start>
+                            <start>2025-01-09T19:28:54.426Z</start>
                         </range>
                     </date>
                     <grading>{}</grading>
@@ -807,28 +615,14 @@
                     <created>False</created>
                     <deleted>False</deleted>
                     <edited>True</edited>
-                    <run_multiple_times>False</run_multiple_times>
+                    <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
                     <operator>all</operator>
                     <triggers>
                         <item>
-                            <condition>iexact=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>{}</catalog>
-                                <field_id>66353daa223b8a43d7f274b5</field_id>
-                                <group>{}</group>
-                                <label>Estatus del pase</label>
-                                <type>radio</type>
-                            </trigger_field>
-                            <value>activo</value>
-                        </item>
-                        <item>
-                            <condition>iexact=</condition>
+                            <condition>in=</condition>
                             <form_id>None</form_id>
                             <other_value>None</other_value>
                             <prefix>answer</prefix>
@@ -848,12 +642,252 @@
                             <prefix>answer</prefix>
                             <trigger_field>
                                 <catalog>{}</catalog>
+                                <field_id>66353daa223b8a43d7f274b5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del pase</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>activo</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
                                 <field_id>6732a153496e3b26d18e7ee1</field_id>
                                 <group>{}</group>
                                 <label>Enviar correo</label>
                                 <type>checkbox</type>
                             </trigger_field>
                             <value>enviar_correo</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters>None</filters>
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>661dc67e901906b7e9b73bac</field_id>
+                                <group>{}</group>
+                                <label>Nombre del perfil</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>Visita General</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>6780601df5070ee33a89d50c</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <arguments>
+                            <pre_sms>True</pre_sms>
+                        </arguments>
+                        <integration>None</integration>
+                        <script>
+                            <created_at>2025-01-09T22:01:48.894727</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.send_sms.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.send_sms.name }}</name>
+                            <start_date>2025-01-09T22:01:48.892854</start_date>
+                            <updated_at>2025-01-09T23:31:28.153561</updated_at>
+                        </script>
+                        <scriptArguments>
+                            <item>
+                                <label>pre_sms</label>
+                                <value>True</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
+                        <user>SCRIPT_OWNER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
+                            </item>
+                            <item>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
+                            </item>
+                            <item>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
+                            </item>
+                            <item>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
+                            </item>
+                        </userOptions>
+                    </configuration>
+                    <name>Enviar SMS al usuario</name>
+                </item>
+            </actions>
+            <id>67804816da45f4ad6ea89af7</id>
+            <name>Envio de SMS pre-registro</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-01-10T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-01-09T22:02:37.251Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6734c6d5254e9a61df8e7f51</field_id>
+                                <group>{}</group>
+                                <label>Enviar correo pre registro</label>
+                                <type>checkbox</type>
+                            </trigger_field>
+                            <value>enviar_sms_pre_registro</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>6780601df5070ee33a89d50d</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <arguments>
+                            <pre_sms>False</pre_sms>
+                        </arguments>
+                        <integration>None</integration>
+                        <script>
+                            <created_at>2025-01-09T22:01:48.894727</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.send_sms.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.send_sms.name }}</name>
+                            <start_date>2025-01-09T22:01:48.892854</start_date>
+                            <updated_at>2025-01-09T23:31:28.153561</updated_at>
+                        </script>
+                        <scriptArguments>
+                            <item>
+                                <label>pre_sms</label>
+                                <value>False</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
+                        <user>SCRIPT_OWNER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
+                            </item>
+                            <item>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
+                            </item>
+                            <item>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
+                            </item>
+                            <item>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
+                            </item>
+                        </userOptions>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>6780601df5070ee33a89d51d</id>
+            <name>Envio de SMS pase completado</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-01-10T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-01-09T23:37:52.216Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>False</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6732a153496e3b26d18e7ee1</field_id>
+                                <group>{}</group>
+                                <label>Enviar correo</label>
+                                <type>checkbox</type>
+                            </trigger_field>
+                            <value>enviar_sms</value>
                         </item>
                     </triggers>
                 </wf_fields>

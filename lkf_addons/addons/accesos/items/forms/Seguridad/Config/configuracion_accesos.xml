@@ -14,13 +14,13 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1730299618.0</created_at>
+    <created_at>1736446844.0</created_at>
     <description />
     <edit_public_records>True</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
     <email_configuration>
-        <body />
+        <body>None</body>
         <email_fields>[]</email_fields>
         <emails>[]</emails>
         <embed_company_picture>False</embed_company_picture>
@@ -31,7 +31,7 @@
         <send_attachments>False</send_attachments>
         <send_pdf>False</send_pdf>
         <sender>None</sender>
-        <subject />
+        <subject>None</subject>
         <template_html>None</template_html>
         <templates>[]</templates>
         <timer_config>None</timer_config>
@@ -49,27 +49,27 @@
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.usuarios.id }}</catalog_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <field_type>None</field_type>
                         <filters />
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>
-                            <item>638a9a7767c332f5d459fc81</item>
+                            <item>6653f3709c6d89925dc04b2e</item>
                         </view_fields>
                         <view_index>0</view_index>
                     </catalog>
                     <catalog_fields>
-                        <item>638a9a99616398d2e392a9f5</item>
-                        <item>638a9a7767c332f5d459fc81</item>
+                        <item>663bd32d7fb8869bbc4d7f7b</item>
+                        <item>6653f3709c6d89925dc04b2e</item>
                     </catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>{{ catalog.usuarios.obj_id }}</field_id>
+                    <field_id>{{ catalog.empleados.obj_id }}</field_id>
                     <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -129,8 +129,8 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.usuarios.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.usuarios.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <field_type>text</field_type>
                         <filters />
                         <geofence>None</geofence>
@@ -145,13 +145,13 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>638a9a7767c332f5d459fc81</field_id>
+                    <field_id>6653f3709c6d89925dc04b2e</field_id>
                     <field_type>catalog-select</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Nombre</label>
+                    <label>Username</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -205,29 +205,29 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.usuarios.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.usuarios.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <field_type>integer</field_type>
                         <filters />
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>[]</view_fields>
-                        <view_index>2</view_index>
+                        <view_index>1</view_index>
                     </catalog>
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>638a9a99616398d2e392a9f5</field_id>
+                    <fav>True</fav>
+                    <field_id>663bd32d7fb8869bbc4d7f7b</field_id>
                     <field_type>catalog-detail</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Id</label>
+                    <label>ID de Usaurio</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -284,7 +284,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.grupos.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -365,7 +365,7 @@
                         <catalog_field_id>{{ catalog.grupos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.grupos.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -441,7 +441,7 @@
                         <catalog_field_id>{{ catalog.grupos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.grupos.id }}</catalog_id>
                         <field_type>integer</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -642,7 +642,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>True</public>
-    <resource_uri>/api/infosync/form/125340/</resource_uri>
+    <resource_uri>/api/infosync/form/127962/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -663,5 +663,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1734049128.0</updated_at>
+    <updated_at>1736447094.0</updated_at>
 </lkf>
