@@ -1439,7 +1439,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 actuals = product_stock.get('actuals',0)
                 if adjust_qty == 0 and adjust_in == 0 and adjust_out ==0:
                     cache_adjustment = adjust_qty - actuals
-                elif adjust_qty:
+                elif adjust_qty or adjust_qty == 0:
                     if actuals < adjust_qty:
                         adjust_in = adjust_qty - actuals 
                         cache_adjustment = adjust_in
@@ -1458,7 +1458,10 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     cache_adjustment = adjust_out * -1
                     adjust_in = 0
                     adjust_qty = 0
-
+                if cache_adjustment < 0:
+                    adjust_in = abs(cache_adjustment)
+                if cache_adjustment > 0:
+                    adjust_out = cache_adjustment
                 self.cache_set({
                         '_id': f'{product_code}_{lot_number}_{warehouse}',
                         'adjustments': cache_adjustment,

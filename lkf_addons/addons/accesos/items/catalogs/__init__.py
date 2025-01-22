@@ -3,6 +3,7 @@ from lkf_addons.items.catalog_resource import CatalogResource
 
 install_order = [
                     'gafetes',
+                    'categorias_artiuclos_peridos',
                     'categorias_de_objetos',
                     'lista_de_objetos',
                     'lista_de_fallas',

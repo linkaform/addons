@@ -1228,6 +1228,8 @@ class Schedule(Base):
         due_epoch = datetime.datetime.strptime(time_offset, '%Y-%m-%d %H:%M:%S')
         seconds = int(due_epoch.strftime('%s'))
         hours = int(seconds / 3600)
+        #TODO que funcione en bloques de minutos, actualmente solo funciona 
+        # en horas debido al int(second/3600) por lo tanto no soporta un 1.5 o .5
         first_date = '{% ' + ' $today + $hours + {}'.format(hours) + ' %}'
         return first_date
 
