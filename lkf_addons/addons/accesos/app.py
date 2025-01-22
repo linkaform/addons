@@ -416,7 +416,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'falla_folio_accion_correctiva':'66f2dfb2c80d24e5e82332b4',
             'falla_evidencia_solucion':'66f2dfb2c80d24e5e82332b5',
             'falla_documento_solucion':'66f2dfb2c80d24e5e82332b6',
-            'falla_fecha_hora_solucion':'66fae1f1d4e5e97eb12170ef'
+            'falla_fecha_hora_solucion':'66fae1f1d4e5e97eb12170ef',
+            'falla_subconcepto': '679124a8483c5220455bcb99'
         }
         #- Para creación , edición y lista de incidencias
         self.incidence_fields = {
@@ -1546,7 +1547,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     self.fallas_fields['falla_caseta']:data_failures['falla_caseta']}
             elif key == 'falla' or key== 'falla_objeto_afectado':
                 answers[self.fallas_fields['falla_catalog']] = {self.fallas_fields['falla']:data_failures['falla'],
-                self.fallas_fields['falla_objeto_afectado']:data_failures['falla_objeto_afectado']}
+                self.fallas_fields['falla_subconcepto']:data_failures['falla_objeto_afectado']}
             elif key == 'falla_reporta_nombre':
                 answers[self.fallas_fields['falla_reporta_catalog']] = {self.fallas_fields['falla_reporta_nombre']:value}
             elif key == 'falla_responsable_solucionar_nombre':
