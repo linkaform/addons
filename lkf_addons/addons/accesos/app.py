@@ -2599,19 +2599,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_MODULO_SEGURIDAD,
-            f"answers.{self.USUARIOS_OBJ_ID}.{self.Employee.f['user_id']}":self.user['user_id'],
-            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": ubicacion,
+            # f"answers.{self.USUARIOS_OBJ_ID}.{self.Employee.f['user_id']}":self.user['user_id'],
+            # f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": ubicacion,
         }
         query = [
             {'$match': match_query},
             {'$project': {
-                "ubicacion":f"$answers.{self.conf_modulo_seguridad['ubicacion_cat']}.{self.conf_modulo_seguridad['ubicacion']}",
+                # "ubicacion":f"$answers.{self.conf_modulo_seguridad['ubicacion_cat']}.{self.conf_modulo_seguridad['ubicacion']}",
                 "grupo_requisitos":f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
-                "datos_requeridos": f"$answers.{self.conf_modulo_seguridad['datos_requeridos']}",
+                # "datos_requeridos": f"$answers.{self.conf_modulo_seguridad['datos_requeridos']}",
             }},
             {'$limit':1},
         ]
-        return self.format_cr_result(self.cr.aggregate(query),  get_one=True)
+
+        raw_result = self.format_cr_result(self.cr.aggregate(query),  get_one=True)
+        grupo_requisitos = raw_result.get("grupo_requisitos", [])
+        requerimientos = {}
+        
+        for requisito in grupo_requisitos:
+            if requisito.get("location", '') == ubicacion:
+                requerimientos = {
+                    "location": requisito["location"],
+                    "requerimientos": requisito.get(self.conf_modulo_seguridad['datos_requeridos'], [])
+                }
+                
+        return requerimientos
 
     def get_count_ingresos(self, qr_code):
         total_entradas=""
@@ -4503,8 +4515,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                    type(answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']]) == str:
                     answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']] = [answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']],]
             elif key == 'archivo_invitacion':
-                id_forma = 121736
-                id_campo = '673773741b2adb2d05d99d63'
+                # id_forma = 121736
+                id_forma = self.PASE_ENTRADA
+                # id_campo = '673773741b2adb2d05d99d63'
+                id_campo = self.pase_entrada_fields['archivo_invitacion']
                 tema_cita = access_pass.get("tema_cita")
                 descripcion = access_pass.get("descripcion")
                 fecha_desde_visita = access_pass.get("fecha_desde_visita")
@@ -4585,7 +4599,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         access_pass = {
             "autorizado_por": pass_selected.get('visita_a', '')[0].get('nombre'),
             "config_dias_acceso": pass_selected.get('limitado_a_dias', []),
-            "config_limitar_acceso": pass_selected.get('limite_de_acceso', []),
+            "config_limitar_acceso": pass_selected.get('limite_de_acceso'),
             "descripcion": pass_selected.get('descripcion', ''),
             "email_pase": pass_selected.get('email', ''),
             "enviar_correo": [],
@@ -4761,8 +4775,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                    type(answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']]) == str:
                     answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']] = [answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']],]
             elif key == 'archivo_invitacion':
-                id_forma = 121736
-                id_campo = '673773741b2adb2d05d99d63'
+                # id_forma = 121736
+                id_forma = self.PASE_ENTRADA
+                # id_campo = '673773741b2adb2d05d99d63'
+                id_campo = self.pase_entrada_fields['archivo_invitacion']
                 tema_cita = access_pass.get("tema_cita")
                 descripcion = access_pass.get("descripcion")
                 fecha_desde_visita = access_pass.get("fecha_desde_visita")
