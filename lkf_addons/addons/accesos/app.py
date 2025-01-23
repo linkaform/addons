@@ -1485,14 +1485,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         """
         mensaje=''
         if pre_sms:
-            msg = f"Hola {data_cel_msj.get('nombre', '')}👋, {data_cel_msj.get('visita_a', '')} "
-            msg += f"te esta invitando a {data_cel_msj.get('ubicacion', '')}🏭 y ha creado un pase para ti... por favor,"
-            msg += f"complete sus datos de registro en este link: {data_cel_msj.get('link', '')}"
+            msg = f"Hola {data_cel_msj.get('nombre', '')}, {data_cel_msj.get('visita_a', '')} "
+            msg += f"te esta invitando a {data_cel_msj.get('ubicacion', '')} y ha creado un pase para ti... por favor,"
+            msg += f" complete sus datos de registro en este link: {data_cel_msj.get('link', '')}"
             mensaje = msg
         else:
             get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''))
             get_pdf_url = get_pdf_url.get('data', '').get('download_url', '')
-            msg = f"Estimado {data_cel_msj.get('nombre', '')}😁, {data_cel_msj.get('visita_a', '')}"
+            msg = f"Estimado {data_cel_msj.get('nombre', '')}, {data_cel_msj.get('visita_a', '')}"
 
             if data_cel_msj.get('fecha_desde', '') and not data_cel_msj.get('fecha_hasta', ''):
                 msg += f", te esta invitando a {data_cel_msj.get('ubicacion', '')} el día {data_cel_msj.get('fecha_desde', '')}."
@@ -1500,7 +1500,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 msg += f", te esta invitando a {data_cel_msj.get('ubicacion', '')} "
                 msg += f"a partir del {data_cel_msj.get('fecha_desde', '')} hasta el {data_cel_msj.get('fecha_hasta','')}."
 
-            msg += f" Descarga tu pase 💳 en: {get_pdf_url}"
+            msg += f" Descarga tu pase en: {get_pdf_url}"
             mensaje = msg
 
         phone_to = data_cel_msj.get('numero', '')
