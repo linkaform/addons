@@ -191,6 +191,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'catalog_guard_close':'664fc64242c59486fadd0a27',
             'catalog_tipo_pase':'664fc6e81d1a1fcda334b587',
             'catalog_ubicacion':'664fc5d9860deae4c20954e2',
+            "catalogo_ubicaciones": "66a83a77cfed7f342775c161",
             'catalog_visita':'664fc6f5d6078682a4dd0ab3',
             'catalogo_persona_involucrada': '66ec6936fc1f0f3f111d818f',
             ##### REVISAR Y BORRAR ######
@@ -489,6 +490,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'comentario_pase':'65e0a69a322b61fbf9ed23af',
             'commentario_area':"66af1a77d703592958dca5eb",
             'catalog_area_pase':'664fc5f3bbbef12ae61b15e9',
+            'catalogo_visitante_registrado': '66a83ad456d1e741159ce118',
             'curp_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['curp']}",
             'nombre_permiso':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e4",
             'email_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['email_vista']}",
@@ -504,6 +506,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'nombre_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
             'nombre_tipo_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.66297e1579900d9018c886ad",
             'nombre_perfil':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
+            'nombre_visitante_registrado': '5ea0693a0c12d5a8e43d37df',
             'perfil_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.661dc67e901906b7e9b73bac",
             'perfil_pase_id':f"661dc67e901906b7e9b73bac",
             'requerimientos_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e5",
@@ -1951,36 +1954,37 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
                 if not fecha_desde_hasta:
                     stop_datetime = start_datetime + timedelta(hours=1)
+                    meeting = [
+                        {
+                            "id": 1,
+                            "start": start_datetime,
+                            "stop": stop_datetime,
+                            "name": tema_cita,
+                            "description": descripcion,
+                            "location": ubicacion,
+                            "allday": False,
+                            "rrule": None,
+                            "alarm_ids": [{"interval": "minutes", "duration": 10, "name": "Reminder"}],
+                            'organizer_name': visita_a,
+                            'organizer_email': creado_por_email,
+                            "attendee_ids": [{"email": email, "nombre": nombre}, {"email": creado_por_email, "nombre": visita_a}],
+                        }
+                    ]
+                    respuesta_ics = self.upload_ics(id_forma, id_campo, meetings=meeting)
+                    file_name = respuesta_ics.get('file_name', '')
+                    file_url = respuesta_ics.get('file_url', '')
+
+                    access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[]),
+                    "archivo_invitacion": [
+                        {
+                            "file_name": f"{file_name}",
+                            "file_url": f"{file_url}"
+                        }
+                    ]}
                 else:
-                    stop_datetime = datetime.strptime(fecha_desde_hasta, "%Y-%m-%d %H:%M:%S")
+                    # stop_datetime = datetime.strptime(fecha_desde_hasta, "%Y-%m-%d %H:%M:%S")
+                    access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])}
 
-                meeting = [
-                    {
-                        "id": 1,
-                        "start": start_datetime,
-                        "stop": stop_datetime,
-                        "name": tema_cita,
-                        "description": descripcion,
-                        "location": ubicacion,
-                        "allday": False,
-                        "rrule": None,
-                        "alarm_ids": [{"interval": "minutes", "duration": 10, "name": "Reminder"}],
-                        'organizer_name': visita_a,
-                        'organizer_email': creado_por_email,
-                        "attendee_ids": [{"email": email, "nombre": nombre}, {"email": creado_por_email, "nombre": visita_a}],
-                    }
-                ]
-                respuesta_ics = self.upload_ics(id_forma, id_campo, meetings=meeting)
-                file_name = respuesta_ics.get('file_name', '')
-                file_url = respuesta_ics.get('file_url', '')
-
-                access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[]),
-                "archivo_invitacion": [
-                    {
-                        "file_name": f"{file_name}",
-                        "file_url": f"{file_url}"
-                    }
-                ]}
                 resUp= self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
             else:
                 link_pass=""
