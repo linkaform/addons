@@ -194,6 +194,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "catalogo_ubicaciones": "66a83a77cfed7f342775c161",
             'catalog_visita':'664fc6f5d6078682a4dd0ab3',
             'catalogo_persona_involucrada': '66ec6936fc1f0f3f111d818f',
+            "catalogo_departamentos": "66a83a7fca3453e21ea08d16",
+            "catalogo_puestos": "66a83a7dee0b950748489ca1",
             ##### REVISAR Y BORRAR ######
 
             'fecha_salida':'662c51eb194f1cb7a91e5af0',
@@ -238,6 +240,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'guard_group':'663fae53fa005c70de59eb95',
             'grupo_visitados': '663d4ba61b14fab90559ebb0',
             'grupo_vehiculos': '663e446cadf967542759ebba',
+            "grupo_puestos": "663c015f3ac46d98e8f27495",
             'identificacion':'65ce34985fa9df3dbf9dd2d0',
             'id_grupo':'639b65dfaf316bacfc551ba2',
             'id_usuario':'638a9a99616398d2e392a9f5',
