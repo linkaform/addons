@@ -418,6 +418,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'falla_responsable_solucionar_documento':'663bc4ed8a6b120eab4d7f1e',
             'falla_comentario_solucion':'66f2dfb2c80d24e5e82332b3',
             'falla_folio_accion_correctiva':'66f2dfb2c80d24e5e82332b4',
+            'falla_grupo_seguimiento': '6799125d9f8d78842caa22af',
+            'falla_inicio_seguimiento': '679a485c66c5d089fa6b8ef9',
+            'falla_fin_seguimiento': '679a485c66c5d089fa6b8efa',
             'falla_evidencia_solucion':'66f2dfb2c80d24e5e82332b5',
             'falla_documento_solucion':'66f2dfb2c80d24e5e82332b6',
             'falla_fecha_hora_solucion':'66fae1f1d4e5e97eb12170ef',
@@ -3144,7 +3147,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['visita_a'] = self.format_visita(r.get('visita_a',[]))
         return  records
 
-    def get_list_fallas(self, location=None, area=None,status=None):
+    def get_list_fallas(self, location=None, area=None,status=None, folio=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_FALLAS,
@@ -3155,6 +3158,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query[f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}"] = area
         if status:
             match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
+        if folio:
+            match_query.update({"folio":folio})
 
         query = [
             {'$match': match_query },
@@ -3167,7 +3172,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'falla_ubicacion': f"$answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_ubicacion']}",
                 'falla_caseta':f"$answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}",
                 'falla':f"$answers.{self.fallas_fields['falla_catalog']}.{self.fallas_fields['falla']}",
-                'falla_objeto_afectado':f"$answers.{self.fallas_fields['falla_catalog']}.{self.fallas_fields['falla_subconcepto']}",
+                'falla_objeto_afectado':f"$answers.{self.fallas_fields['falla_catalog']}.{self.fallas_fields['falla_objeto_afectado']}",
                 'falla_comentarios':f"$answers.{self.fallas_fields['falla_comentarios']}",
                 'falla_evidencia': f"$answers.{self.fallas_fields['falla_evidencia']}",
                 'falla_documento':f"$answers.{self.fallas_fields['falla_documento']}",
@@ -3178,6 +3183,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'falla_evidencia_solucion':f"$answers.{self.fallas_fields['falla_evidencia_solucion']}",
                 'falla_documento_solucion':f"$answers.{self.fallas_fields['falla_documento_solucion']}",
                 'falla_fecha_hora_solucion':f"$answers.{self.fallas_fields['falla_fecha_hora_solucion']}",
+                'falla_grupo_seguimiento':f"$answers.{self.fallas_fields['falla_grupo_seguimiento']}",
             }},
             {'$sort':{'folio':-1}},
         ]
@@ -4049,6 +4055,117 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers.update({f"{self.fallas_fields[key]}":value})
         if answers or folio:
             res = self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_FALLAS, folios=[folio])
+            if res.get('status_code') == 201 or res.get('status_code') == 202:
+                res['json'].update({'falla_fecha_hora_solucion':falla_fecha_hora_solucion})
+                return res
+            else:
+                return res
+        else:
+            self.LKFException('No se mandarón parametros para actualizar')
+
+    def update_failure_seguimiento(self, location=None, area=None, status=None, folio=None, falla_grupo_seguimiento=None):
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        failure_selected = self.get_list_fallas(location, area, folio=folio)
+        failure_selected = failure_selected[0]
+        print('failure_selecteddddddddd', failure_selected)
+        qr_code = failure_selected.get('_id')
+        falla_nuevo_grupo = failure_selected.get('falla_grupo_seguimiento', [])
+
+        falla_seg = {
+            "falla_estatus": status,
+            "falla_fecha_hora": failure_selected.get('falla_fecha_hora', ''),
+            "falla_reporta_nombre": failure_selected.get('falla_reporta_nombre', ''),
+            "falla_ubicacion": failure_selected.get('falla_ubicacion', ''),
+            "falla_caseta": failure_selected.get('falla_caseta', ''),
+            "falla": failure_selected.get('falla', ''),
+            "falla_objeto_afectado": failure_selected.get('falla_objeto_afectado', ''),
+            "falla_comentarios": failure_selected.get('falla_comentarios', ''),
+            "falla_evidencia": failure_selected.get('falla_evidencia', []),
+            "falla_documento": failure_selected.get('falla_documento', []),
+            "falla_responsable_solucionar_nombre": failure_selected.get('falla_responsable_solucionar_nombre', ''),
+            "falla_grupo_seguimiento": falla_grupo_seguimiento,
+        }
+
+        answers = {}
+        falla_fecha_hora_solucion = ''
+
+        if status == 'resuelto':
+            timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
+            falla_fecha_hora_solucion =self.today_str(timezone, date_format='datetime')
+            answers.update({
+                f"{self.fallas_fields['falla_fecha_hora_solucion']}": falla_fecha_hora_solucion
+            })
+
+        for key, value in falla_seg.items():
+            if key == 'falla_reporta_nombre':
+                answers.update({
+                    self.fallas_fields['falla_reporta_catalog']: {
+                        self.fallas_fields['falla_reporta_nombre']: value
+                    }
+                })
+            elif key == 'falla_ubicacion':
+                answers.update({
+                    self.mf['catalogo_ubicaciones']: {
+                        self.fallas_fields['falla_ubicacion']: falla_seg.get('falla_ubicacion'),
+                        self.fallas_fields['falla_caseta']: falla_seg.get('falla_caseta')
+                    }
+                })
+            elif key == 'falla':
+                answers.update({
+                    self.fallas_fields['falla_catalog']: {
+                        self.fallas_fields['falla']: falla_seg.get('falla'),
+                        self.fallas_fields['falla_objeto_afectado']: falla_seg.get('falla_objeto_afectado')
+                    }
+                })
+            elif key == 'falla_responsable_solucionar_nombre':
+                answers.update({
+                    self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID: {
+                        self.fallas_fields['falla_responsable_solucionar_nombre']: value
+                    }
+                })
+            elif key == 'falla_grupo_seguimiento':
+                fallas_seguimiento = [falla_seg.get('falla_grupo_seguimiento',{})]
+                if fallas_seguimiento:
+                    list_fallas_seguimiento = []
+                    for item in fallas_seguimiento:
+                        falla_folio = item.get('falla_folio_accion_correctiva','')
+                        falla_comentario = item.get('falla_comentario_solucion','')
+                        falla_foto_evidencia = item.get('falla_evidencia_solucion','')
+                        falla_documento = item.get('falla_documento_solucion','')
+                        falla_inicio_incidencia = item.get('fechaInicioFallaCompleta','')
+                        falla_fin_incidencia = item.get('fechaFinFallaCompleta','')
+                        list_fallas_seguimiento.append({
+                            self.fallas_fields['falla_folio_accion_correctiva']:falla_folio,
+                            self.fallas_fields['falla_comentario_solucion']:falla_comentario,
+                            self.fallas_fields['falla_evidencia_solucion']:falla_foto_evidencia,
+                            self.fallas_fields['falla_documento_solucion']:falla_documento,
+                            self.fallas_fields['falla_inicio_seguimiento']:falla_inicio_incidencia,
+                            self.fallas_fields['falla_fin_seguimiento']:falla_fin_incidencia,
+                        })
+                    falla_nuevo_grupo.append(list_fallas_seguimiento[0])
+                    answers[self.fallas_fields['falla_grupo_seguimiento']] = falla_nuevo_grupo
+            else:
+                answers.update({f"{self.fallas_fields[key]}":value})
+
+        if answers or folio:
+            metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_FALLAS)
+            metadata.update(self.get_record_by_folio(folio, self.BITACORA_FALLAS, select_columns={'_id':1}, limit=1))
+
+            metadata.update({
+                    'properties': {
+                        "device_properties":{
+                            "system": "Addons",
+                            "process":"Actualizacion de Falla", 
+                            "accion":'update_failure_seguimiento', 
+                            "folio": folio, 
+                            "archive": "fallas.py"
+                        }
+                    },
+                    'answers': answers,
+                    '_id': qr_code
+                })
+            print(simplejson.dumps(metadata, indent=3))
+            res= self.net.patch_forms_answers(metadata)
             if res.get('status_code') == 201 or res.get('status_code') == 202:
                 res['json'].update({'falla_fecha_hora_solucion':falla_fecha_hora_solucion})
                 return res
