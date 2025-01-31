@@ -2047,7 +2047,7 @@ class Stock(Base):
 
         create_new_records = []
         for record in new_records_data:
-            if record.get('new_record'):
+            if self.unlist(record).get('new_record'):
                 create_new_records.append(record['new_record'])
             else:
                 print('YA EXISTE... record ya se actualizco usando cache', record)
