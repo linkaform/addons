@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>19-ed01307a261062c3fb87385b6d1b7861</_rev>
+    <_rev>23-356c974813ab0d4ff9ae536e6997d27f</_rev>
     <updated_at>2024-07-30T00:58:55.598840+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -92,7 +92,7 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.lista_de_objetos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.lista_de_objetos.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -111,13 +111,13 @@
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.lista_de_objetos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.lista_de_objetos.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
 </lkf>
