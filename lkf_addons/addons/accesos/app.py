@@ -2589,6 +2589,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def get_config_accesos(self):
         response = []
+        print("self.user['user_id']",self.user)
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_ACCESOS,
@@ -3498,10 +3499,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'codigo_qr': f"$answers.{self.mf['codigo_qr']}",
                     'qr_pase': f"$answers.{self.mf['qr_pase']}",
                     'link':f"$answers.{self.pase_entrada_fields['link']}",
+                    'perfil_pase': f"$answers.{self.mf['nombre_perfil']}",
                 }
             },
             {'$sort':{'_id':-1}},
-            # {'$limit':1}
+            # {'$limit':5}
         ]
         records = self.format_cr(self.cr.aggregate(query))
         for x in records:
@@ -3523,16 +3525,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 if u:
                     emp.update({'email': u[idx].pop(0) if u[idx] else ""})
                 visita_a.append(emp)
-            # if x['tipo_de_pase'] == 'Visita General' or x['tipo_de_pase'] == 'visita general'
-            x['visita_a'] = visita_a
-            if x['tipo_visita'] == 'alta_de_nuevo_visitante':
+            if x['tipo_de_pase'] == 'Visita General' or x['tipo_de_pase'] == 'visita general':
+                x['visita_a'] = visita_a
                 x['favoritos'] = x.get('favoritos', [""]) if x.get('favoritos') else ""
                 x['motivo_visita'] = x.get('motivo_visita', [""]) if x.get('motivo_visita') else ""
-                x['email']= x.get('email', [""]) if x.get('email') else ""
-                x['empresa']= x.get('empresa', [""]) if x.get('empresa') else ""
-                x['telefono']= x.get('telefono', [""]) if x.get('telefono') else ""
+                x['email'] = x.get('email', [""]) if x.get('email') else ""
+                x['empresa'] = x.get('empresa', [""]) if x.get('empresa') else ""
+                x['telefono'] = x.get('telefono', [""]) if x.get('telefono') else ""
                 # x['pdf'] = self.lkf_api.get_pdf_record(x['_id'], template_id = 447, name_pdf='Pase de Entrada', send_url=True)
             else:
+                x['visita_a'] = visita_a
                 x['favoritos'] = x.get('favoritos', [""])[0] if x.get('favoritos') else ""
                 x['motivo_visita'] = x.get('motivo_visita', [""])[0] if x.get('motivo_visita') else ""
                 x['email']= x.get('email', [""])[0] if x.get('email') else ""
@@ -3547,12 +3549,26 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 #         # Reemplaza el id hexadecimal por su nombre en el diccionario
                 #         item[self.pase_entrada_fields['commentario_area']] = item.pop(key)
 
+            for visita in x.get('visita_a', []):
+                visita['departamento'] = visita['departamento'][0] if isinstance(visita.get('departamento'), list) and visita.get('departamento') else visita.get('departamento', "")
+                visita['puesto'] = visita['puesto'][0] if isinstance(visita.get('puesto'), list) and visita.get('puesto') else visita.get('puesto', "")
+                visita['user_id'] = visita['user_id'][0] if isinstance(visita.get('user_id'), list) and visita.get('user_id') else visita.get('user_id', "")
+                visita['email'] = visita['email'][0] if isinstance(visita.get('email'), list) and visita.get('email') else visita.get('email', "")
 
+            x['visita_a'] = visita
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self.format_equipos(x.pop('grupo_equipos',[]))
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
             # x['comentario'] = self._labels_list(x.pop('comentario',[]), self.mf)
+
+            x.pop('visita_a_nombre', None)
+            x.pop('visita_a_departamento', None)
+            x.pop('visita_a_puesto', None)
+            x.pop('visita_a_user_id', None)
+            x.pop('visita_a_email', None)
+
+        # print("RECORDDD", simplejson.dumps(records, indent=4))
 
         return  records
 
@@ -3628,7 +3644,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         username = self.user.get('username')
         user_id = self.user.get('user_id')
         config_accesos_user="" #get_config_accesos(user_id)
-        print("USER_ID",user_id)
         user_status = self.get_employee_checkin_status(user_id, as_shift=True,  available=False)
         this_user = user_status.get(user_id)
         if not this_user:
