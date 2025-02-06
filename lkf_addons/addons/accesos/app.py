@@ -4441,6 +4441,82 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException({'msg':'Faltan datos para acutalizar pase de entrada'})
         return res
         
+    def update_bitacora_entrada_many(self, data, record_id=None, folio=None):
+        answers = {}
+        action = data.get('action', 'create')
+        equipos = data.get('equipos', data.get('equipo'))
+        if equipos:
+            for i, equipo in enumerate(equipos):  # Iterar sobre cada equipo
+                tipo = equipo.get('tipo_equipo', '').lower().replace(' ', '_')
+                nombre = equipo.get('nombre_articulo', '')
+                marca = equipo.get('marca_articulo', '')
+                modelo = equipo.get('modelo_articulo', '')
+                color = equipo.get('color_articulo', '')
+                serie = equipo.get('numero_serie', '')
+                ans = {
+                    self.mf['tipo_equipo']: tipo,
+                    self.mf['nombre_articulo']: nombre,
+                    self.mf['marca_articulo']: marca,
+                    self.mf['modelo_articulo']: modelo,
+                    self.mf['color_articulo']: color,
+                    self.mf['numero_serie']: serie,
+                }
+                
+                if action == 'create':
+                    # Usar -1 para nuevos registros en 'create'
+                    answers[self.mf['grupo_equipos']] = answers.get(self.mf['grupo_equipos'], {})
+                    answers[self.mf['grupo_equipos']][-1] = ans
+                elif action == 'edit':
+                    # Usar el número de conjunto especificado en 'edit'
+                    set_number = data.get('set_number', 0)
+                    answers[self.mf['grupo_equipos']] = answers.get(self.mf['grupo_equipos'], {})
+                    answers[self.mf['grupo_equipos']][set_number] = ans
+
+        # Procesar los vehículos
+        vehiculos = data.get('vehiculo', [])
+        if vehiculos:
+            for i, vehiculo in enumerate(vehiculos):  # Iterar sobre cada vehículo
+                tipo = vehiculo.get('tipo_vehiculo', vehiculo.get('tipo', ''))
+                marca = vehiculo.get('marca_vehiculo', '')
+                modelo = vehiculo.get('modelo_vehiculo', '')
+                estado = vehiculo.get('nombre_estado', '')
+                placas = vehiculo.get('placas', vehiculo.get('placas_vehiculo', ''))
+                color = vehiculo.get('color', vehiculo.get('color_vehiculo', ''))
+                
+                ans = {
+                    self.TIPO_DE_VEHICULO_OBJ_ID: {
+                        self.mf['tipo_vehiculo']: tipo,
+                        self.mf['marca_vehiculo']: marca,
+                        self.mf['modelo_vehiculo']: modelo,
+                    },
+                    self.ESTADO_OBJ_ID: {
+                        self.mf['nombre_estado']: estado,
+                    },
+                    self.mf['placas_vehiculo']: placas,
+                    self.mf['color_vehiculo']: color,
+                }
+
+                if action == 'create':
+                    # Usar -1 para nuevos registros en 'create'
+                    answers[self.mf['grupo_vehiculos']] = answers.get(self.mf['grupo_vehiculos'], {})
+                    answers[self.mf['grupo_vehiculos']][-1] = ans
+                elif action == 'edit':
+                    # Usar el número de conjunto especificado en 'edit'
+                    set_number = data.get('set_number', 0)
+                    answers[self.mf['grupo_vehiculos']] = answers.get(self.mf['grupo_vehiculos'], {})
+                    answers[self.mf['grupo_vehiculos']][set_number] = ans
+                #TODO UPDATE GAFET
+
+        if not record_id and not folio:
+            self.LKFException({'msg':'Se requiere el folio o el id del registro a editar'})
+        if record_id:
+            res =  self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_ACCESOS, record_id=[record_id,])
+        elif folio:
+             res = self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_ACCESOS, folios=[folio,])
+        else:
+            self.LKFException({'msg':'Faltan datos para acutalizar pase de entrada'})
+        return res
+
     def update_pass(self, access_pass,folio=None):
         pass_selected= self.get_detail_access_pass(qr_code=folio)
         qr_code= folio
