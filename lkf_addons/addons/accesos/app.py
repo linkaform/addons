@@ -3500,12 +3500,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'qr_pase': f"$answers.{self.mf['qr_pase']}",
                     'link':f"$answers.{self.pase_entrada_fields['link']}",
                     'perfil_pase': f"$answers.{self.mf['nombre_perfil']}",
+                    'status_pase': f"$answers.{self.pase_entrada_fields['status_pase']}",
                 }
             },
             {'$sort':{'_id':-1}},
-            # {'$limit':5}
+            {'$limit':15}
         ]
         records = self.format_cr(self.cr.aggregate(query))
+        print("PRIMER PROINT", simplejson.dumps(records, indent=4))
+
         for x in records:
             visita_a =[]
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
@@ -3555,7 +3558,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 visita['user_id'] = visita['user_id'][0] if isinstance(visita.get('user_id'), list) and visita.get('user_id') else visita.get('user_id', "")
                 visita['email'] = visita['email'][0] if isinstance(visita.get('email'), list) and visita.get('email') else visita.get('email', "")
 
-            x['visita_a'] = visita
+            x['visita_a'] = [visita]
+            print("ESTATUSS",x.get('estatus', ""))
+            x['status_pase'] = x.get('estatus', "")
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self.format_equipos(x.pop('grupo_equipos',[]))
@@ -3568,7 +3573,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
 
-        # print("RECORDDD", simplejson.dumps(records, indent=4))
+        print("RECORDDD", simplejson.dumps(records, indent=4))
 
         return  records
 
