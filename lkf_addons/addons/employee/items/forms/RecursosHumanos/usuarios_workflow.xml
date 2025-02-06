@@ -1,0 +1,247 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.usuarios.id }}</form_id>
+    <id>679d10d6be9a31b0af147cca</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>679d11b71aba8cea9a19588e</_id>
+                    <action_id>12</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <synched_catalogs>
+                            <item>
+                                <couch_id>{{ catalog.usuarios.obj_id }}</couch_id>
+                                <id>{{ catalog.usuarios.id }}</id>
+                                <name>Usuarios</name>
+                            </item>
+                        </synched_catalogs>
+                    </configuration>
+                    <name>Sincronizar</name>
+                </item>
+            </actions>
+            <id>679d11b71aba8cea9a19588f</id>
+            <name>Sincronizar con catalogo Usuarios</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-02-01T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-01-31T18:03:17.705Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>679d023876ad7f5ba642f4ed</field_id>
+                                <group>{}</group>
+                                <label>Estatus</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>activo</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>67a299671f34c0d4cf3eaf73</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} &lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Bienvenido a Soter&lt;/title&gt;
+    &lt;style&gt;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container-main-soter {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #dddddd7d;
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: #021d49;
+            border-radius: 10px 10px 0 0;
+        }
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .content p {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 12px 20px;
+            margin-top: 15px;
+            font-size: 16px;
+            color: #ffffff !important;
+            background: #4CAF50;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #021d49;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .contenedor-principal {
+            background: #F8F9F9;
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="contenedor-principal"&gt;
+        &lt;div class="container-main-soter"&gt;
+            &lt;!-- Encabezado --&gt;
+            &lt;div class="header"&gt;
+                &lt;h1&gt;¡Bienvenido a Soter! 🎉&lt;/h1&gt;
+            &lt;/div&gt;
+    
+            &lt;!-- Contenido --&gt;
+            &lt;div class="content"&gt;
+                &lt;p&gt;¡Nos alegra darte la bienvenida a Soter!, Tu cuenta ya está activa, y ahora puedes acceder al sistema a través del siguiente enlace:&lt;/p&gt;
+                &lt;a href="https://app.soter.mx/" target="_blank" class="cta-button"&gt;Acceder a Soter&lt;/a&gt;
+                &lt;p&gt;Tu &lt;b&gt;username&lt;/b&gt; es: &lt;b&gt;{{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/b&gt;&lt;/p&gt;
+                &lt;p&gt;Para ayudarte a familiarizarte con la plataforma, hemos preparado un manual de usuario. Puedes revisarlo &lt;a href="https://docs.linkaform.com/Usuario/Soter/index.html" target="_blank" style="color: #021d49; font-weight: bold; text-decoration: none"&gt;aquí&lt;/a&gt;.&lt;/p&gt;
+                &lt;p&gt;Si tienes alguna duda, nuestro equipo está listo para ayudarte.&lt;/p&gt;
+                &lt;p&gt;¡Nos vemos dentro! 🚀&lt;/p&gt;
+            &lt;/div&gt;
+    
+            &lt;!-- Pie de página --&gt;
+            &lt;div class="footer"&gt;
+                &lt;p&gt;&amp;copy; 2024 &lt;a href="https://www.soter.mx/" target="_blank"&gt;Soter&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>638a9a7767c332f5d459fc82</field_id>
+                                <group_id>None</group_id>
+                                <label>Email</label>
+                            </item>
+                        </email_fields>
+                        <emails>[]</emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>False</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} 📢 ¡Bienvenido! Empieza a usar Soter hoy mismo. {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>Se envia el correo al usuario</name>
+                </item>
+            </actions>
+            <id>67a299671f34c0d4cf3eaf77</id>
+            <name>Envio de correo</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-02-05T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-02-04T22:46:18.202Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>679d023876ad7f5ba642f4ed</field_id>
+                                <group>{}</group>
+                                <label>Estatus</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>activo</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

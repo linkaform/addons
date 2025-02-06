@@ -713,8 +713,8 @@
                                     <conditions>[]</conditions>
                                 </etl>
                                 <input>
-                                    <field_type>text</field_type>
-                                    <id>663bd32d7fb8869bbc4d7f7b</id>
+                                    <field_type>catalog-detail</field_type>
+                                    <id>638a9a99616398d2e392a9f5</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>

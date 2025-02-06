@@ -1253,7 +1253,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             for idx, guard in enumerate(employee_list):
                 empl_cat = {}
                 empl_cat[self.f['worker_name_b']] = guard.get('name')
-                empl_cat[self.f['user_id_b']] = [guard.get('user_id'),]
+                if isinstance(guard.get('usuario_id'), list):
+                    empl_cat[self.f['user_id_b']] = [(guard.get('usuario_id', [])[0]),]
+                else:
+                    empl_cat[self.f['user_id_b']] = [guard.get('user_id'),]
                 guard_data = {
                         self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID : empl_cat,
                         self.checkin_fields['checkin_position']:'guardiad_de_apoyo',
