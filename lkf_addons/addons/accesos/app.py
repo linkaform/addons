@@ -2292,7 +2292,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
                 f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                f"answers.{self.bitacora_fields['catalogo_pase_entrada']}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
             }
@@ -2300,7 +2300,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             proyect_fields_visitas = {
                 '_id': 1,
                 'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
-                'id_gafete': f"$answers.{self.bitacora_fields['gafete_catalog']}.{self.gafetes_fields['gafete_id']}",
+                'id_gafete': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
                 'status_gafete': f"$answers.{self.mf['status_gafete']}"
             }
 
@@ -2339,7 +2339,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_concesionados = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.CONCESSIONED_ARTICULOS,
-                f"answers.{self.consecionados_fields['catalogo_ubicacion_concesion']}.{self.mf['ubicacion']}": location,
+                f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
             }
 
             proyect_fields_concesionados = {
@@ -2366,8 +2366,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_incidentes = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_INCIDENCIAS,
-                f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}": booth_area,
-                f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}": location
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location
             }
 
             proyect_fields_incidentes = {
@@ -2396,7 +2396,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
                 # f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                f"answers.{self.bitacora_fields['catalogo_pase_entrada']}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
                 # f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
@@ -2405,7 +2405,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             proyect_fields_visitas = {
                 '_id': 1,
                 'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
-                'perfil': f"$answers.{self.bitacora_fields['catalogo_pase_entrada']}.{self.mf['nombre_perfil']}",
+                'perfil': f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",
                 'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"
             }
 
@@ -2443,9 +2443,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_incidentes = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_INCIDENCIAS,
-                f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}": booth_area,
-                f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}": booth_area,
-                f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}": location,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
                 # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
             }
 
@@ -2473,8 +2473,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_fallas = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_FALLAS,
-                f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}": booth_area,
-                f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_ubicacion']}": location,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
                 f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
                 # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
             }
@@ -2503,7 +2503,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_concesionados = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.CONCESSIONED_ARTICULOS,
-                f"answers.{self.consecionados_fields['catalogo_ubicacion_concesion']}.{self.mf['ubicacion']}": location,
+                f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
                 f"answers.{self.consecionados_fields['status_concesion']}": "abierto",
             }
 
