@@ -3176,7 +3176,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'falla_ubicacion': f"$answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_ubicacion']}",
                 'falla_caseta':f"$answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}",
                 'falla':f"$answers.{self.fallas_fields['falla_catalog']}.{self.fallas_fields['falla']}",
-                'falla_objeto_afectado':f"$answers.{self.fallas_fields['falla_catalog']}.{self.fallas_fields['falla_objeto_afectado']}",
+                'falla_objeto_afectado':f"$answers.{self.LISTA_FALLAS_CAT_OBJ_ID}.{self.fallas_fields['falla_subconcepto']}",
                 'falla_comentarios':f"$answers.{self.fallas_fields['falla_comentarios']}",
                 'falla_evidencia': f"$answers.{self.fallas_fields['falla_evidencia']}",
                 'falla_documento':f"$answers.{self.fallas_fields['falla_documento']}",
@@ -4128,16 +4128,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 })
             elif key == 'falla_ubicacion':
                 answers.update({
-                    self.mf['catalogo_ubicaciones']: {
+                    self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID: {
                         self.fallas_fields['falla_ubicacion']: falla_seg.get('falla_ubicacion'),
                         self.fallas_fields['falla_caseta']: falla_seg.get('falla_caseta')
                     }
                 })
             elif key == 'falla':
                 answers.update({
-                    self.fallas_fields['falla_catalog']: {
+                    self.LISTA_FALLAS_CAT_OBJ_ID: {
                         self.fallas_fields['falla']: falla_seg.get('falla'),
-                        self.fallas_fields['falla_objeto_afectado']: falla_seg.get('falla_objeto_afectado')
+                        self.fallas_fields['falla_subconcepto']: falla_seg.get('falla_objeto_afectado')
                     }
                 })
             elif key == 'falla_responsable_solucionar_nombre':
