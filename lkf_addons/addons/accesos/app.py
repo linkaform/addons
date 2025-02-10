@@ -1253,7 +1253,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             for idx, guard in enumerate(employee_list):
                 empl_cat = {}
                 empl_cat[self.f['worker_name_b']] = guard.get('name')
-                empl_cat[self.f['user_id_b']] = [guard.get('user_id'),]
+                if isinstance(guard.get('usuario_id'), list):
+                    empl_cat[self.f['user_id_b']] = [(guard.get('usuario_id', [])[0]),]
+                else:
+                    empl_cat[self.f['user_id_b']] = [guard.get('user_id'),]
                 guard_data = {
                         self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID : empl_cat,
                         self.checkin_fields['checkin_position']:'guardiad_de_apoyo',
@@ -2289,15 +2292,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
                 f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                f"answers.{self.bitacora_fields['catalogo_pase_entrada']}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
             }
 
             proyect_fields_visitas = {
                 '_id': 1,
                 'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
-                'id_gafete': f"$answers.{self.bitacora_fields['gafete_catalog']}.{self.gafetes_fields['gafete_id']}",
+                'id_gafete': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
                 'status_gafete': f"$answers.{self.mf['status_gafete']}"
             }
 
@@ -2336,7 +2340,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_concesionados = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.CONCESSIONED_ARTICULOS,
-                f"answers.{self.consecionados_fields['catalogo_ubicacion_concesion']}.{self.mf['ubicacion']}": location,
+                f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
             }
 
             proyect_fields_concesionados = {
@@ -2363,8 +2367,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_incidentes = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_INCIDENCIAS,
-                f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}": booth_area,
-                f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}": location
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location
             }
 
             proyect_fields_incidentes = {
@@ -2393,16 +2397,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
                 # f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                f"answers.{self.bitacora_fields['catalogo_pase_entrada']}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
-                # f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
             }
 
             proyect_fields_visitas = {
                 '_id': 1,
                 'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
-                'perfil': f"$answers.{self.bitacora_fields['catalogo_pase_entrada']}.{self.mf['nombre_perfil']}",
+                'perfil': f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",
                 'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"
             }
 
@@ -2440,10 +2444,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_incidentes = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_INCIDENCIAS,
-                f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}": booth_area,
-                f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}": booth_area,
-                f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}": location,
-                # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
+                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
             }
 
             proyect_fields_incidentes = {
@@ -2470,8 +2473,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_fallas = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_FALLAS,
-                f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}": booth_area,
-                f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_ubicacion']}": location,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
                 f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
                 # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
             }
@@ -2500,7 +2503,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_concesionados = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.CONCESSIONED_ARTICULOS,
-                f"answers.{self.consecionados_fields['catalogo_ubicacion_concesion']}.{self.mf['ubicacion']}": location,
+                f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
                 f"answers.{self.consecionados_fields['status_concesion']}": "abierto",
             }
 
@@ -2589,6 +2592,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def get_config_accesos(self):
         response = []
+        print("self.user['user_id']",self.user)
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_ACCESOS,
@@ -3172,7 +3176,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'falla_ubicacion': f"$answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_ubicacion']}",
                 'falla_caseta':f"$answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}",
                 'falla':f"$answers.{self.fallas_fields['falla_catalog']}.{self.fallas_fields['falla']}",
-                'falla_objeto_afectado':f"$answers.{self.fallas_fields['falla_catalog']}.{self.fallas_fields['falla_objeto_afectado']}",
+                'falla_objeto_afectado':f"$answers.{self.LISTA_FALLAS_CAT_OBJ_ID}.{self.fallas_fields['falla_subconcepto']}",
                 'falla_comentarios':f"$answers.{self.fallas_fields['falla_comentarios']}",
                 'falla_evidencia': f"$answers.{self.fallas_fields['falla_evidencia']}",
                 'falla_documento':f"$answers.{self.fallas_fields['falla_documento']}",
@@ -3498,12 +3502,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'codigo_qr': f"$answers.{self.mf['codigo_qr']}",
                     'qr_pase': f"$answers.{self.mf['qr_pase']}",
                     'link':f"$answers.{self.pase_entrada_fields['link']}",
+                    'perfil_pase': f"$answers.{self.mf['nombre_perfil']}",
+                    'status_pase': f"$answers.{self.pase_entrada_fields['status_pase']}",
                 }
             },
             {'$sort':{'_id':-1}},
-            # {'$limit':1}
+            {'$limit':15}
         ]
         records = self.format_cr(self.cr.aggregate(query))
+        print("PRIMER PROINT", simplejson.dumps(records, indent=4))
+
         for x in records:
             visita_a =[]
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
@@ -3523,16 +3531,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 if u:
                     emp.update({'email': u[idx].pop(0) if u[idx] else ""})
                 visita_a.append(emp)
-            # if x['tipo_de_pase'] == 'Visita General' or x['tipo_de_pase'] == 'visita general'
-            x['visita_a'] = visita_a
-            if x['tipo_visita'] == 'alta_de_nuevo_visitante':
+            if x['tipo_de_pase'] == 'Visita General' or x['tipo_de_pase'] == 'visita general':
+                x['visita_a'] = visita_a
                 x['favoritos'] = x.get('favoritos', [""]) if x.get('favoritos') else ""
                 x['motivo_visita'] = x.get('motivo_visita', [""]) if x.get('motivo_visita') else ""
-                x['email']= x.get('email', [""]) if x.get('email') else ""
-                x['empresa']= x.get('empresa', [""]) if x.get('empresa') else ""
-                x['telefono']= x.get('telefono', [""]) if x.get('telefono') else ""
+                x['email'] = x.get('email', [""]) if x.get('email') else ""
+                x['empresa'] = x.get('empresa', [""]) if x.get('empresa') else ""
+                x['telefono'] = x.get('telefono', [""]) if x.get('telefono') else ""
                 # x['pdf'] = self.lkf_api.get_pdf_record(x['_id'], template_id = 447, name_pdf='Pase de Entrada', send_url=True)
             else:
+                x['visita_a'] = visita_a
                 x['favoritos'] = x.get('favoritos', [""])[0] if x.get('favoritos') else ""
                 x['motivo_visita'] = x.get('motivo_visita', [""])[0] if x.get('motivo_visita') else ""
                 x['email']= x.get('email', [""])[0] if x.get('email') else ""
@@ -3547,12 +3555,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 #         # Reemplaza el id hexadecimal por su nombre en el diccionario
                 #         item[self.pase_entrada_fields['commentario_area']] = item.pop(key)
 
+            for visita in x.get('visita_a', []):
+                visita['departamento'] = visita['departamento'][0] if isinstance(visita.get('departamento'), list) and visita.get('departamento') else visita.get('departamento', "")
+                visita['puesto'] = visita['puesto'][0] if isinstance(visita.get('puesto'), list) and visita.get('puesto') else visita.get('puesto', "")
+                visita['user_id'] = visita['user_id'][0] if isinstance(visita.get('user_id'), list) and visita.get('user_id') else visita.get('user_id', "")
+                visita['email'] = visita['email'][0] if isinstance(visita.get('email'), list) and visita.get('email') else visita.get('email', "")
 
+            x['visita_a'] = [visita]
+            print("ESTATUSS",x.get('estatus', ""))
+            x['status_pase'] = x.get('estatus', "")
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self.format_equipos(x.pop('grupo_equipos',[]))
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
             # x['comentario'] = self._labels_list(x.pop('comentario',[]), self.mf)
+
+            x.pop('visita_a_nombre', None)
+            x.pop('visita_a_departamento', None)
+            x.pop('visita_a_puesto', None)
+            x.pop('visita_a_user_id', None)
+            x.pop('visita_a_email', None)
+
+        print("RECORDDD", simplejson.dumps(records, indent=4))
 
         return  records
 
@@ -3628,7 +3652,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         username = self.user.get('username')
         user_id = self.user.get('user_id')
         config_accesos_user="" #get_config_accesos(user_id)
-        print("USER_ID",user_id)
         user_status = self.get_employee_checkin_status(user_id, as_shift=True,  available=False)
         this_user = user_status.get(user_id)
         if not this_user:
@@ -4105,16 +4128,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 })
             elif key == 'falla_ubicacion':
                 answers.update({
-                    self.mf['catalogo_ubicaciones']: {
+                    self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID: {
                         self.fallas_fields['falla_ubicacion']: falla_seg.get('falla_ubicacion'),
                         self.fallas_fields['falla_caseta']: falla_seg.get('falla_caseta')
                     }
                 })
             elif key == 'falla':
                 answers.update({
-                    self.fallas_fields['falla_catalog']: {
+                    self.LISTA_FALLAS_CAT_OBJ_ID: {
                         self.fallas_fields['falla']: falla_seg.get('falla'),
-                        self.fallas_fields['falla_objeto_afectado']: falla_seg.get('falla_objeto_afectado')
+                        self.fallas_fields['falla_subconcepto']: falla_seg.get('falla_objeto_afectado')
                     }
                 })
             elif key == 'falla_responsable_solucionar_nombre':
@@ -4418,6 +4441,82 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException({'msg':'Faltan datos para acutalizar pase de entrada'})
         return res
         
+    def update_bitacora_entrada_many(self, data, record_id=None, folio=None):
+        answers = {}
+        action = data.get('action', 'create')
+        equipos = data.get('equipos', data.get('equipo'))
+        if equipos:
+            for i, equipo in enumerate(equipos):  # Iterar sobre cada equipo
+                tipo = equipo.get('tipo_equipo', '').lower().replace(' ', '_')
+                nombre = equipo.get('nombre_articulo', '')
+                marca = equipo.get('marca_articulo', '')
+                modelo = equipo.get('modelo_articulo', '')
+                color = equipo.get('color_articulo', '')
+                serie = equipo.get('numero_serie', '')
+                ans = {
+                    self.mf['tipo_equipo']: tipo,
+                    self.mf['nombre_articulo']: nombre,
+                    self.mf['marca_articulo']: marca,
+                    self.mf['modelo_articulo']: modelo,
+                    self.mf['color_articulo']: color,
+                    self.mf['numero_serie']: serie,
+                }
+                
+                if action == 'create':
+                    # Usar -1 para nuevos registros en 'create'
+                    answers[self.mf['grupo_equipos']] = answers.get(self.mf['grupo_equipos'], {})
+                    answers[self.mf['grupo_equipos']][-1] = ans
+                elif action == 'edit':
+                    # Usar el número de conjunto especificado en 'edit'
+                    set_number = data.get('set_number', 0)
+                    answers[self.mf['grupo_equipos']] = answers.get(self.mf['grupo_equipos'], {})
+                    answers[self.mf['grupo_equipos']][set_number] = ans
+
+        # Procesar los vehículos
+        vehiculos = data.get('vehiculo', [])
+        if vehiculos:
+            for i, vehiculo in enumerate(vehiculos):  # Iterar sobre cada vehículo
+                tipo = vehiculo.get('tipo_vehiculo', vehiculo.get('tipo', ''))
+                marca = vehiculo.get('marca_vehiculo', '')
+                modelo = vehiculo.get('modelo_vehiculo', '')
+                estado = vehiculo.get('nombre_estado', '')
+                placas = vehiculo.get('placas', vehiculo.get('placas_vehiculo', ''))
+                color = vehiculo.get('color', vehiculo.get('color_vehiculo', ''))
+                
+                ans = {
+                    self.TIPO_DE_VEHICULO_OBJ_ID: {
+                        self.mf['tipo_vehiculo']: tipo,
+                        self.mf['marca_vehiculo']: marca,
+                        self.mf['modelo_vehiculo']: modelo,
+                    },
+                    self.ESTADO_OBJ_ID: {
+                        self.mf['nombre_estado']: estado,
+                    },
+                    self.mf['placas_vehiculo']: placas,
+                    self.mf['color_vehiculo']: color,
+                }
+
+                if action == 'create':
+                    # Usar -1 para nuevos registros en 'create'
+                    answers[self.mf['grupo_vehiculos']] = answers.get(self.mf['grupo_vehiculos'], {})
+                    answers[self.mf['grupo_vehiculos']][-1] = ans
+                elif action == 'edit':
+                    # Usar el número de conjunto especificado en 'edit'
+                    set_number = data.get('set_number', 0)
+                    answers[self.mf['grupo_vehiculos']] = answers.get(self.mf['grupo_vehiculos'], {})
+                    answers[self.mf['grupo_vehiculos']][set_number] = ans
+                #TODO UPDATE GAFET
+
+        if not record_id and not folio:
+            self.LKFException({'msg':'Se requiere el folio o el id del registro a editar'})
+        if record_id:
+            res =  self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_ACCESOS, record_id=[record_id,])
+        elif folio:
+             res = self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_ACCESOS, folios=[folio,])
+        else:
+            self.LKFException({'msg':'Faltan datos para acutalizar pase de entrada'})
+        return res
+
     def update_pass(self, access_pass,folio=None):
         pass_selected= self.get_detail_access_pass(qr_code=folio)
         qr_code= folio

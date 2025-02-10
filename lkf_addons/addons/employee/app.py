@@ -84,6 +84,8 @@ class Employee(Base):
             'user_id':'663bd32d7fb8869bbc4d7f7b',
             'user_id_jefes':'663bd466b19b7fb7d9e97cdc',
             'user_id_b':'663bd466b19b7fb7d9e97cdc',
+            'usuario_email': f"{self.USUARIOS_OBJ_ID}.638a9a7767c332f5d459fc82",
+            'usuario_id': f"{self.USUARIOS_OBJ_ID}.638a9a99616398d2e392a9f5",
             'username': '6653f3709c6d89925dc04b2e',
             'email':'6653f3709c6d89925dc04b2f',
             'area_default':'6653f2d49c6d89925dc04b27',
@@ -136,7 +138,7 @@ class Employee(Base):
         if username:
             match_query.update(self._get_match_q(self.f['username'], username))
         if email:
-            match_query.update(self._get_match_q(self.f['email'], email)) 
+            match_query.update(self._get_match_q(self.employee_fields['usuario_email'], email)) 
         query = [
             {'$match': match_query },    
             {'$project': self.project_format(self.employee_fields)},
@@ -198,12 +200,12 @@ class Employee(Base):
             "deleted_at":{"$exists":False},
             "form_id": self.EMPLEADOS,
             }
-        match_query.update(self._get_match_q(self.f['user_id'], user_id))
+        match_query.update(self._get_match_q(self.employee_fields['usuario_id'], user_id))
         query = [
             {'$match': match_query },    
             {'$project':{ 
                         '_id':1,
-                        'user_id':f"$answers.{self.employee_fields['user_id']}",
+                        'user_id':f"$answers.{self.employee_fields['usuario_id']}",
                         'pic_url':{"$first":f"$answers.{self.employee_fields['picture']}"}
                         }
             }
@@ -211,6 +213,8 @@ class Employee(Base):
         users = self.format_cr_result(self.cr.aggregate(query))
         res = {}
         for usr in users:
+            if type(usr['user_id']) == list:
+                usr['user_id'] = usr['user_id'][0]
             res[usr['user_id']] = usr.get('pic_url',usr.get('file_url',{}))
         return res
 
