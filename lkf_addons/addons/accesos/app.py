@@ -802,6 +802,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return res
 
+    def assing_gafete(data_gafete, id_bitacora):
+        print("DATA_GAFETE", data_gafete, id_bitacora)
+        answers={}
+        for key, value in data_gafete.items():
+            if key == "gafete_id":
+                answers[self.GAFETES_CAT_OBJ_ID] = {self.gafetes_fields['gafete_id']:gafete.get('gafete_id')}
+            elif key == "locker_id":
+                gafete_ans[self.LOCKERS_CAT_OBJ_ID] = {self.mf['locker_id']:gafete.get('locker_id')}
+            elif key == "documento":
+                gafete_ans[self.mf['documento']] = gafete.get('documento')
+            else:
+                answers.update({f"{self.bitacora_fields[key]}":value})
+        if answers:
+            res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_ACCESOS, record_id=[id_bitacora])
+            return res
+        else:
+            self.LKFException('No se mandarón parametros para actualizar')
+
+
     def delete_article_concessioned(self, folio):
         list_records = []
         if len(folio) > 0:
@@ -1401,6 +1420,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_badge(self, data_badge):
         #---Define Metadata
+        print("DATA BADGE", data_badge)
         metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_GAFETES_LOCKERS)
         metadata.update({
             "properties": {
