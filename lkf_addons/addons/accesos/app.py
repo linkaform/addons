@@ -2295,6 +2295,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
             }
 
             proyect_fields_visitas = {
@@ -2399,7 +2400,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
-                # f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
             }
 
             proyect_fields_visitas = {
@@ -2444,9 +2445,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_INCIDENCIAS,
                 f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
-                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
                 f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
-                # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
             }
 
             proyect_fields_incidentes = {
