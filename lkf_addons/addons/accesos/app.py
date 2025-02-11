@@ -1515,11 +1515,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             dict: Un diccionario con el código de estado del envío. Por ejemplo:
                 - {'status_code': 200} si el mensaje fue enviado exitosamente.
         """
+
+        fecha_str_desde = data_cel_msj.get('fecha_desde', '')
+        fecha_str_hasta = data_cel_msj.get('fecha_hasta', '')
+
+        fecha_desde = datetime.strptime(fecha_str_desde, "%Y-%m-%d %H:%M:%S")
+        if fecha_str_hasta:
+            fecha_hasta = datetime.strptime(fecha_str_hasta, "%Y-%m-%d %H:%M:%S")
+
         mensaje=''
         if pre_sms:
             msg = f"Hola {data_cel_msj.get('nombre', '')}, {data_cel_msj.get('visita_a', '')} "
-            msg += f"te esta invitando a {data_cel_msj.get('ubicacion', '')} y ha creado un pase para ti... por favor,"
-            msg += f" complete sus datos de registro en este link: {data_cel_msj.get('link', '')}"
+            msg += f"te invita a {data_cel_msj.get('ubicacion', '')} y creo un pase para ti."
+            msg += f" Completa tus datos de registro aquí: {data_cel_msj.get('link', '')}"
             mensaje = msg
         else:
             get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''))
@@ -1527,14 +1535,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             msg = f"Estimado {data_cel_msj.get('nombre', '')}, {data_cel_msj.get('visita_a', '')}"
 
             if data_cel_msj.get('fecha_desde', '') and not data_cel_msj.get('fecha_hasta', ''):
-                msg += f", te esta invitando a {data_cel_msj.get('ubicacion', '')} el día {data_cel_msj.get('fecha_desde', '')}."
+                fecha_desde_format = fecha_desde.strftime("%d/%m/%Y a las %H:%M")
+                msg += f", te invita a {data_cel_msj.get('ubicacion', '')} el {fecha_desde_format}."
             elif data_cel_msj.get('fecha_desde', '') and data_cel_msj.get('fecha_hasta', ''):
-                msg += f", te esta invitando a {data_cel_msj.get('ubicacion', '')} "
-                msg += f"a partir del {data_cel_msj.get('fecha_desde', '')} hasta el {data_cel_msj.get('fecha_hasta','')}."
+                fecha_desde_format = fecha_desde.strftime("%d/%m/%Y")
+                fecha_hasta_format = fecha_hasta.strftime("%d/%m/%Y")
+                msg += f", te invita a {data_cel_msj.get('ubicacion', '')} "
+                msg += f"del {fecha_desde_format} al {fecha_hasta_format}."
 
-            msg += f" Descarga tu pase en: {get_pdf_url}"
+            msg += f" Descarga tu pase: {get_pdf_url}"
             mensaje = msg
-
         phone_to = data_cel_msj.get('numero', '')
         res =self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
         if res:
@@ -1838,11 +1848,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.mf['tipo_visita_pase']] = 'fecha_fija'
         answers[self.pase_entrada_fields['tipo_visita']] = 'alta_de_nuevo_visitante'
         answers[self.pase_entrada_fields['walkin_nombre']] = access_pass.get('nombre')
-        answers[self.pase_entrada_fields['walkin_email']] = access_pass.get('email')
+        answers[self.pase_entrada_fields['walkin_email']] = access_pass.get('email', '')
         answers[self.pase_entrada_fields['walkin_empresa']] = access_pass.get('empresa')
         answers[self.pase_entrada_fields['walkin_fotografia']] = access_pass.get('foto')
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
-        answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono')
+        answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
         
         if access_pass.get('comentarios'):
             comm = access_pass.get('comentarios',[])
