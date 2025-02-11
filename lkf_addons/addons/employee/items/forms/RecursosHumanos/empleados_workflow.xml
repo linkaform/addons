@@ -750,6 +750,62 @@
                                     <id>663e5c8cf5b8a7ce8211ed0c</id>
                                 </output>
                             </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>catalog-select</field_type>
+                                    <id>638a9a7767c332f5d459fc81</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>638a9a7767c332f5d459fc81</id>
+                                </output>
+                            </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>catalog-detail</field_type>
+                                    <id>638a9a99616398d2e392a9f5</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>638a9a99616398d2e392a9f5</id>
+                                </output>
+                            </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>catalog-detail</field_type>
+                                    <id>6759e4a7a9a6e13c7b26da33</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>6759e4a7a9a6e13c7b26da33</id>
+                                </output>
+                            </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>catalog-detail</field_type>
+                                    <id>638a9a7767c332f5d459fc82</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>638a9a7767c332f5d459fc82</id>
+                                </output>
+                            </item>
                         </mapping>
                     </configuration>
                     <name>Sincronizar forma empleados a catálogo empleados Jefes Directos</name>
@@ -777,7 +833,7 @@
                 </metadata>
                 <record>
                     <created>True</created>
-                    <deleted>True</deleted>
+                    <deleted>False</deleted>
                     <edited>True</edited>
                     <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
@@ -843,7 +899,7 @@
                 </metadata>
                 <record>
                     <created>True</created>
-                    <deleted>True</deleted>
+                    <deleted>False</deleted>
                     <edited>True</edited>
                     <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
