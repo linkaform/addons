@@ -932,6 +932,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         if access_pass.get('estatus',"") == 'vencido':
             self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Revisa la Configuración'})
+        elif access_pass.get('estatus', '') == 'proceso':
+            self.LKFException({'msg':"El pase no se ha sido completado aun, informa al usuario que debe completarlo primero.","title":'Requisitos faltantes'})
 
         if diasDisponibles:
             if nombre_dia not in diasDisponibles:
@@ -1825,6 +1827,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        nombre_visita_a = employee.get('worker_name')
 
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
         answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
@@ -1834,7 +1838,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',"")
             answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
             answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
-            answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:access_pass.get('visita_a',"")}
+            answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:nombre_visita_a}
             answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
             answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
             answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
@@ -1884,13 +1888,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         visita_a = access_pass.get('visita_a')
         visita_set = {
             self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
-                self.mf['nombre_empleado'] : visita_a,
+                self.mf['nombre_empleado'] : nombre_visita_a,
                 }
             }
         options_vistia = {
               "group_level": 3,
-              "startkey": [location, visita_a],
-              "endkey": [location, f"{visita_a}\n",{}],
+              "startkey": [location, nombre_visita_a],
+              "endkey": [location, f"{nombre_visita_a}\n",{}],
             }
         cat_visita = self.catalogo_view(self.CONF_AREA_EMPLEADOS_CAT_ID, self.PASE_ENTRADA, options_vistia)
         if len(cat_visita) > 0:
