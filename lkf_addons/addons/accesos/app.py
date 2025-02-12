@@ -1104,7 +1104,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             folio = last_check_out.get('folio',0)
             checkin_date_str = last_check_out.get('checkin_date')
             checkin_date = self.date_from_str(checkin_date_str)
-            now = datetime.now()
+            tz_mexico = pytz.timezone('America/Mexico_City')
+            now = datetime.now(tz_mexico)
             fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
             duration = time.strftime('%H:%M:%S', time.gmtime( self.date_2_epoch(fecha_hora_str) - self.date_2_epoch(checkin_date_str)))
             if self.user_in_facility(status_visita=last_check_out.get('status_visita')):
