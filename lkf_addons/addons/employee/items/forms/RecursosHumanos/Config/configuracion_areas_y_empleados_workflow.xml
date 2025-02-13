@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.configuracion_areas_y_empleados.id }}</form_id>
+    <id>675896881d1303cb41b7782f</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>67898e62087c9fd70237f062</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2025-01-16T16:16:14.762406</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.sync_conf_area_empleados.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.sync_conf_area_empleados.name }}</name>
+                            <start_date>2025-01-16T16:16:14.760147</start_date>
+                            <updated_at>2025-01-16T22:53:22.952291</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>Se ejecuta script para sync catalogo</name>
+                </item>
+            </actions>
+            <id>67898e62087c9fd70237f069</id>
+            <name>Sync Catalogo Areas y Empleados</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-01-17T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-01-16T22:54:04.684Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
