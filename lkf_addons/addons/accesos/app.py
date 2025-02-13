@@ -203,6 +203,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'comentario_pase':'65e0a69a322b61fbf9ed23af',
             'nombre_area':'663e5d44f5b8a7ce8211ed0f',
             'nombre_area_salida':'663fb45992f2c5afcfe97ca8',
+            'nombre_ubicacion_salida': '663e5c57f5b8a7ce8211ed0b',
             'color_vehiculo': '663e4691f54d395ed7f27465',
             'color_articulo': '663e4730724f688b3059eb3b',
             'config_dia_de_acceso': '662c304fad7432d296d92584',
@@ -1113,6 +1114,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"{self.mf['tipo_registro']}":'salida',
                     f"{self.mf['fecha_salida']}":fecha_hora_str,
                     f"{self.mf['duracion']}":duration,
+                    f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}": {
+                        f"{self.mf['nombre_area_salida']}": area,
+                    },
                 }
                 response = self.lkf_api.patch_multi_record( answers=answers, form_id=self.BITACORA_ACCESOS, folios=[folio])
         if not response:
@@ -1533,7 +1537,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             msg += f" Completa tus datos de registro aquí: {data_cel_msj.get('link', '')}"
             mensaje = msg
         else:
-            if(account == 'milenium'):
+            if account == 'milenium':
                 get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''), template_id=553)
                 get_pdf_url = get_pdf_url.get('data', '').get('download_url', '')
             else:
@@ -2452,7 +2456,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             group_by_visitas = {
                 '_id': None,
                 'visitas_en_dia': {'$sum': 1},
-                'total_vehiculos_dentro': {'$sum': {'$size': '$vehiculos'}},
+                'total_vehiculos_dentro': {
+                    '$sum': {
+                        '$cond': {
+                            'if': {'$eq': ['$status_visita', 'entrada']},
+                            'then': {'$size': '$vehiculos'},
+                            'else': 0
+                        }
+                    }
+                },
                 'detalle_visitas': {
                     '$push': {
                         'perfil': '$perfil',
@@ -4616,7 +4628,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
-                pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
+                if employee.get('usuario_id', [])[0] == 7742:
+                    pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 553, name_pdf='Pase de Entrada', send_url=True)
+                else:
+                    pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
