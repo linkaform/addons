@@ -1161,7 +1161,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "form_id": self.CONF_AREA_EMPLEADOS,
         }
         if user_id:
-            match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}"] = user_id
+            match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}"] = user_id
 
         query = [
             {'$match': match_query },
@@ -1493,7 +1493,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         data_msj['enviado_desde'] = 'Modulo de Accesos'
         return self.send_email_by_form(data_msj)
     
-    def send_msj_pase(self, data_cel_msj=None, pre_sms=False):
+    def send_msj_pase(self, data_cel_msj=None, pre_sms=False, account=''):
         """
         Envía un mensaje de texto a un número de celular con información personalizada sobre un pase de invitación.
 
@@ -1533,8 +1533,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             msg += f" Completa tus datos de registro aquí: {data_cel_msj.get('link', '')}"
             mensaje = msg
         else:
-            get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''))
-            get_pdf_url = get_pdf_url.get('data', '').get('download_url', '')
+            if(account == 'milenium'):
+                get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''), template_id=553)
+                get_pdf_url = get_pdf_url.get('data', '').get('download_url', '')
+            else:
+                get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''))
+                get_pdf_url = get_pdf_url.get('data', '').get('download_url', '')
             msg = f"Estimado {data_cel_msj.get('nombre', '')}, {data_cel_msj.get('visita_a', '')}"
 
             if data_cel_msj.get('fecha_desde', '') and not data_cel_msj.get('fecha_hasta', ''):
@@ -2631,7 +2635,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_ACCESOS,
-            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.Employee.f['user_id']}":self.user['user_id'],
+            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}":self.user['user_id'],
         }
         query = [
             {'$match': match_query },

@@ -86,6 +86,7 @@ class Employee(Base):
             'user_id_b':'663bd466b19b7fb7d9e97cdc',
             'usuario_email': f"{self.USUARIOS_OBJ_ID}.638a9a7767c332f5d459fc82",
             'usuario_id': f"{self.USUARIOS_OBJ_ID}.638a9a99616398d2e392a9f5",
+            'user_id_id': '638a9a99616398d2e392a9f5',
             'username': '6653f3709c6d89925dc04b2e',
             'email':'6653f3709c6d89925dc04b2f',
             'area_default':'6653f2d49c6d89925dc04b27',
@@ -134,7 +135,7 @@ class Employee(Base):
         if name:
             match_query.update(self._get_match_q(self.f['worker_name'], name))
         if user_id:
-            match_query.update(self._get_match_q(self.f['user_id'], user_id))
+            match_query.update(self._get_match_q(self.employee_fields['user_id_id'], user_id))
         if username:
             match_query.update(self._get_match_q(self.f['username'], username))
         if email:
@@ -155,7 +156,7 @@ class Employee(Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
-            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.f['user_id']}":user_id
+            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}":user_id
             }
 
         unwind = {'$unwind': f"$answers.{self.f['areas_group']}"}
@@ -224,7 +225,7 @@ class Employee(Base):
             "form_id": self.CONF_AREA_EMPLEADOS,
             }
         if user_id:
-            field_id = f"{self.EMPLOYEE_OBJ_ID}.{self.f['user_id']}"
+            field_id = f"{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}"
             match_query.update(self._get_match_q(field_id, user_id))
         unwind = {'$unwind': f"$answers.{self.f['areas_group']}"}
         query= [
@@ -258,7 +259,7 @@ class Employee(Base):
                     'area': f"$answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
                     'location': f"$answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                     'name': f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_name']}",
-                    'user_id': {'$first':f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['user_id']}"},
+                    'user_id': {'$first':f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}"},
                     'marcada_como': f"$answers.{self.f['areas_group']}.{self.f['area_default']}",
                     'position': {"$first":f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_position']}"},
                     }
