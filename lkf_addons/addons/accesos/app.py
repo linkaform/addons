@@ -2675,19 +2675,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "grupo_requisitos":f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
                 # "datos_requeridos": f"$answers.{self.conf_modulo_seguridad['datos_requeridos']}",
             }},
-            {'$limit':1},
         ]
 
-        raw_result = self.format_cr_result(self.cr.aggregate(query),  get_one=True)
-        grupo_requisitos = raw_result.get("grupo_requisitos", [])
         requerimientos = {}
-        
-        for requisito in grupo_requisitos:
-            if requisito.get("location", '') == ubicacion:
-                requerimientos = {
-                    "location": requisito["location"],
-                    "requerimientos": requisito.get(self.conf_modulo_seguridad['datos_requeridos'], [])
-                }
+        raw_result = self.format_cr_result(self.cr.aggregate(query))
+        for raw in raw_result:
+            for grupo in raw.get('grupo_requisitos', []):
+                if grupo.get("location", '') == ubicacion:
+                    requerimientos = {
+                        "location": grupo["location"],
+                        "requerimientos": grupo.get(self.conf_modulo_seguridad['datos_requeridos'], [])
+                    }
                 
         return requerimientos
 
@@ -3121,9 +3119,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "form_id": self.BITACORA_ACCESOS
         }
         if location:
-            match_query.update({f"answers.{self.bitacora_fields['ubicacion']}":location})
+            match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}":location})
         if area:
-            match_query.update({f"answers.{self.bitacora_fields['caseta_entrada']}":area})
+            match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area})
         if prioridades:
             match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
 
