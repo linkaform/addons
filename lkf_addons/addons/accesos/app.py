@@ -466,6 +466,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'ubicacion_gafete':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             'visita_gafete':f"{self.mf['catalog_visita']}.{self.mf['nombre_visita']}",
         }
+        self.lockers_fields = {
+            'locker_id':'66480101786e8cdb66e70124',
+            'tipo_locker':'66ccfec6acaa16b31e5593a3',
+            'status_locker':"663961d5390b9ec511e97ca5",
+        }
         #- Para creación , edición y lista de notas
         self.notes_fields = {
             'note_status':'6647f9eb6eefdb1840684dc1',
@@ -802,24 +807,47 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return res
 
-    def assing_gafete(data_gafete, id_bitacora):
-        print("DATA_GAFETE", data_gafete, id_bitacora)
+    def assing_gafete(self, data_gafete, id_bitacora, tipo_movimiento):
         answers={}
+        answers_return={}
         for key, value in data_gafete.items():
             if key == "gafete_id":
-                answers[self.GAFETES_CAT_OBJ_ID] = {self.gafetes_fields['gafete_id']:gafete.get('gafete_id')}
+                answers[self.GAFETES_CAT_OBJ_ID] = {self.gafetes_fields['gafete_id']:data_gafete.get('gafete_id')}
+                # answers_return[self.GAFETES_CAT_OBJ_ID] = {self.gafetes_fields['gafete_id']:""}
             elif key == "locker_id":
-                gafete_ans[self.LOCKERS_CAT_OBJ_ID] = {self.mf['locker_id']:gafete.get('locker_id')}
+                answers[self.LOCKERS_CAT_OBJ_ID] = {self.mf['locker_id']:data_gafete.get('locker_id')}
+                # answers_return[self.LOCKERS_CAT_OBJ_ID] = {self.mf['locker_id']:""}
+
+            if  key == 'ubicacion' or key == 'area':
+                if data_gafete['ubicacion'] and not data_gafete['area']:
+                    answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID]={self.f['location']:data_gafete.get('ubicacion')}
+                    # answers_return[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID]={self.f['location']:data_gafete.get('ubicacion')}
+                elif data_gafete['area'] and not data_gafete['ubicacion']:
+                    answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID]={self.f['area']:data_gafete.get('area', "")}
+                    # answers_return[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID]={self.f['area']:data_gafete.get('area', "")}
+                elif data_gafete['area'] and data_gafete['ubicacion']: 
+                    answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID] = {self.f['location']:data_gafete.get('ubicacion'),self.f['area']:data_gafete.get('area', "")}
+                    # answers_return[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID] = {self.f['location']:data_gafete.get('ubicacion'),self.f['area']:data_gafete.get('area', "")}
+            elif key == "status_gafete":
+                answers[self.mf['status_gafete']]=data_gafete.get('status_gafete')
+                # answers_return[self.mf['status_gafete']]=data_gafete.get('status_gafete')
             elif key == "documento":
-                gafete_ans[self.mf['documento']] = gafete.get('documento')
-            else:
-                answers.update({f"{self.bitacora_fields[key]}":value})
-        if answers:
+                answers[self.mf['documento']] = data_gafete.get('documento')
+                # answers_return[self.mf['documento']] = data_gafete.get('documento')
+        if answers or answers_return:
+            # ans={}
+            # if tipo_movimiento=="salida":
+            #     ans=answers_return
+            # else:
+            #     ans=answers
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_ACCESOS, record_id=[id_bitacora])
-            return res
+            if res.get('status_code') == 201 or res.get('status_code') == 202:
+                answers[self.mf['tipo_registro']] = tipo_movimiento.lower()
+                res_gaf = self.update_gafet_status(answers)
+                if res_gaf.get('status_code') == 201 or res_gaf.get('status_code') == 202:
+                    return res
         else:
             self.LKFException('No se mandarón parametros para actualizar')
-
 
     def delete_article_concessioned(self, folio):
         list_records = []
@@ -3096,7 +3124,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if prioridades:
             match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
 
-
         proyect_fields ={
             '_id': 1,
             'folio': "$folio",
@@ -3113,6 +3140,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'equipos':f"$answers.{self.mf['grupo_equipos']}",
             'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
             'id_gafet': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
+            'id_locker': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.lockers_fields['locker_id']}",
             'identificacion':  {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}"},
             'pase_id':{"$toObjectId":f"$answers.{self.mf['codigo_qr']}"},
             'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
@@ -3152,6 +3180,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$sort':{'folio':-1}},
         ]
         records = self.format_cr(self.cr.aggregate(query))
+        # print( simplejson.dumps(records, indent=4))
         for r in records:
             pase = r.pop('pase')
             r.pop('pase_id')
@@ -3163,7 +3192,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['status_visita'] = r.get('status_visita','').title().replace('_', ' ')
             r['contratista'] = self.unlist(r.get('contratista',[]))
             r['status_gafete'] = r.get('status_gafete','').title().replace('_', ' ')
-            r['documento'] = r.get('documento','').title().replace('_', ' ')
+            r['documento'] = r.get('documento','')
             r['grupo_areas_acceso'] = self._labels_list(r.pop('grupo_areas_acceso',[]), self.mf)
             r['comentarios'] = self.format_comentarios(r.get('comentarios',[]))
             r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
@@ -4298,10 +4327,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def update_gafet_status(self, answers={}):
         if not answers:
             answers = self.answers
+
         status = None
         tipo_movimiento=None
         tipo_movimiento = answers.get(self.mf['tipo_registro'])
         res = {}
+        location=""
+        area=""
         if tipo_movimiento == "entrada":
             status = "En Uso"
         elif tipo_movimiento == 'salida':
@@ -4309,13 +4341,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if status :
             gafete_id = answers[self.GAFETES_CAT_OBJ_ID][self.gafetes_fields['gafete_id']]
             locker_id = answers[self.LOCKERS_CAT_OBJ_ID][self.mf['locker_id']]
-            location = answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID][self.f['location']]
-            area = answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID][self.f['area']]
+            if self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID in answers:
+                if self.f['area'] in answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID]:
+                    area = answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID][self.f['area']]
+                if self.f['location'] in answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID]:
+                    location = answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID][self.f['location']]
+            
             gafete = self.get_gafetes(status=None, location=location, area=area, gafete_id=gafete_id)
+
+            print("heloooo", gafete, gafete_id, status,tipo_movimiento)
+
             if len(gafete) > 0 :
                 gafete = gafete[0]
                 res = self.lkf_api.update_catalog_multi_record({self.mf['status_gafete']: status}, self.GAFETES_CAT_ID, record_id=[gafete['_id']])
             self.update_locker_status(tipo_movimiento, location, area, tipo_locker='Identificaciones', locker_id=locker_id)
+
         return res
 
     def update_guard_status(self, guard, this_user):
