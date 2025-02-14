@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.pase_de_entrada.id }}</form_id>
-    <id>67056c7e40bb7619b481176b</id>
+    <id>67488640f10968e65294dce3</id>
     <rules>
         <item>
             <conditions>
                 <item>
-                    <condition>iexact=</condition>
+                    <condition>in=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>662c262cace163ca3ed3bb3a</field_id>
@@ -73,14 +73,64 @@
             <group_conditions>{}</group_conditions>
             <name>Mostrar campos para nuevo visitante</name>
             <operator>and</operator>
-            <rule_id>cc91d10c4010f5</rule_id>
+            <rule_id>145622855972300</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
         <item>
             <conditions>
                 <item>
-                    <condition>iexact=</condition>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>662c262cace163ca3ed3bb3a</field_id>
+                        <group_id>None</group_id>
+                        <id>662c262cace163ca3ed3bb3a</id>
+                        <label>Selección de Visitante</label>
+                        <type>radio</type>
+                    </field>
+                    <value>alta_de_nuevo_visitante</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662c2937108836dec6d92580</field_id>
+                    <group_id>None</group_id>
+                    <id>662c2937108836dec6d92580</id>
+                    <label>Nombre Completo</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662c2937108836dec6d92581</field_id>
+                    <group_id>None</group_id>
+                    <id>662c2937108836dec6d92581</id>
+                    <label>Email</label>
+                    <type>email</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662c2937108836dec6d92582</field_id>
+                    <group_id>None</group_id>
+                    <id>662c2937108836dec6d92582</id>
+                    <label>Teléfono</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requerir campos para nuevo visitante</name>
+            <operator>and</operator>
+            <rule_id>14591fc5b99112b</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>662c262cace163ca3ed3bb3a</field_id>
@@ -99,7 +149,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.visita_autorizada.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>67801352c6e7405be537f066</id>
+                    <id>66a83ad456d1e741159ce118</id>
                     <label>Pase a Nombre de:</label>
                     <type>catalog</type>
                 </item>
@@ -113,9 +163,85 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Mostrar campos para visitante registrado</name>
+            <name>Mostrar campos para buscar entre registrados</name>
             <operator>and</operator>
-            <rule_id>c681c1e7d8146f</rule_id>
+            <rule_id>1f5120a110b978c</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>662c262cace163ca3ed3bb3a</field_id>
+                        <group_id>None</group_id>
+                        <id>662c262cace163ca3ed3bb3a</id>
+                        <label>Selección de Visitante</label>
+                        <type>radio</type>
+                    </field>
+                    <value>buscar_visitantes_registrados</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5ea0693a0c12d5a8e43d37df</field_id>
+                    <group_id>None</group_id>
+                    <id>5ea0693a0c12d5a8e43d37df</id>
+                    <label>Nombre Completo</label>
+                    <type>catalog-select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requerir campos para buscar entre registrados</name>
+            <operator>and</operator>
+            <rule_id>c531824efb5e1</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>662c304fad7432d296d92584</field_id>
+                        <group_id>None</group_id>
+                        <id>662c304fad7432d296d92584</id>
+                        <label>Días de acceso</label>
+                        <type>radio</type>
+                    </field>
+                    <value>limitar_días_de_acceso</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6635380dc9b3e7db4d59eb49</field_id>
+                    <group_id>None</group_id>
+                    <id>6635380dc9b3e7db4d59eb49</id>
+                    <label>Limitar número de accesos a:</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>662c304fad7432d296d92585</field_id>
+                    <group_id>None</group_id>
+                    <id>662c304fad7432d296d92585</id>
+                    <label>Seleccione los días de acceso</label>
+                    <type>checkbox</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Limitar días</name>
+            <operator>and</operator>
+            <rule_id>7ec21f51aa8212a</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -155,51 +281,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Mostrar campos para rango de fechas</name>
+            <name>Rango de fechas según el limite</name>
             <operator>and</operator>
-            <rule_id>145c215017901736</rule_id>
-            <rule_type>show</rule_type>
-            <user_conditions>{}</user_conditions>
-        </item>
-        <item>
-            <conditions>
-                <item>
-                    <condition>in=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>662c304fad7432d296d92584</field_id>
-                        <group_id>None</group_id>
-                        <id>662c304fad7432d296d92584</id>
-                        <label>Días de acceso</label>
-                        <type>radio</type>
-                    </field>
-                    <value>limitar_días_de_acceso</value>
-                </item>
-            </conditions>
-            <element_ids>[]</element_ids>
-            <empty>False</empty>
-            <fields_ruled>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>6635380dc9b3e7db4d59eb49</field_id>
-                    <group_id>None</group_id>
-                    <id>6635380dc9b3e7db4d59eb49</id>
-                    <label>Limitar número de accesos a:</label>
-                    <type>integer</type>
-                </item>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>662c304fad7432d296d92585</field_id>
-                    <group_id>None</group_id>
-                    <id>662c304fad7432d296d92585</id>
-                    <label>Seleccione los días de acceso</label>
-                    <type>checkbox</type>
-                </item>
-            </fields_ruled>
-            <group_conditions>{}</group_conditions>
-            <name>Mostrar días de accesos</name>
-            <operator>and</operator>
-            <rule_id>f1a196a10ee1641</rule_id>
+            <rule_id>d3114e810ed144f</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -237,137 +321,45 @@
                     <label>QR Code</label>
                     <type>text</type>
                 </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6732a153496e3b26d18e7ee1</field_id>
+                    <group_id>None</group_id>
+                    <id>6732a153496e3b26d18e7ee1</id>
+                    <label>Enviar correo</label>
+                    <type>checkbox</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6734c6d5254e9a61df8e7f51</field_id>
+                    <group_id>None</group_id>
+                    <id>6734c6d5254e9a61df8e7f51</id>
+                    <label>Enviar correo pre registro</label>
+                    <type>checkbox</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>673773741b2adb2d05d99d63</field_id>
+                    <group_id>None</group_id>
+                    <id>673773741b2adb2d05d99d63</id>
+                    <label>Archivo de invitacion</label>
+                    <type>files</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6732aa1189fc6b0ae27e3824</field_id>
+                    <group_id>None</group_id>
+                    <id>6732aa1189fc6b0ae27e3824</id>
+                    <label>Link</label>
+                    <type>text</type>
+                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Ocultar QR</name>
+            <name>Ocultar otros campos</name>
             <operator>and</operator>
-            <rule_id>562121111c6107a</rule_id>
+            <rule_id>187962a163f15ab</rule_id>
             <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
-        </item>
-        <item>
-            <conditions>
-                <item>
-                    <condition>not__empty=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>66353daa223b8a43d7f274b5</field_id>
-                        <group_id>None</group_id>
-                        <id>66353daa223b8a43d7f274b5</id>
-                        <label>Estatus del pase</label>
-                        <type>radio</type>
-                    </field>
-                    <value> </value>
-                </item>
-                <item>
-                    <condition>is__empty=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>66353daa223b8a43d7f274b5</field_id>
-                        <group_id>None</group_id>
-                        <id>66353daa223b8a43d7f274b5</id>
-                        <label>Estatus del pase</label>
-                        <type>radio</type>
-                    </field>
-                    <value> </value>
-                </item>
-            </conditions>
-            <element_ids>[]</element_ids>
-            <empty>False</empty>
-            <fields_ruled>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>662c262cace163ca3ed3bb3a</field_id>
-                    <group_id>None</group_id>
-                    <id>662c262cace163ca3ed3bb3a</id>
-                    <label>Selección de Visitante</label>
-                    <type>radio</type>
-                </item>
-            </fields_ruled>
-            <group_conditions>{}</group_conditions>
-            <name>Deshabilitar Contratistas</name>
-            <operator>or</operator>
-            <rule_id>263aa95124e1c0e</rule_id>
-            <rule_type>disabled</rule_type>
-            <user_conditions>
-                <condition>exclude</condition>
-                <users>
-                    <item>
-                        <user_id>10</user_id>
-                        <user_name>Emiliano Zapata</user_name>
-                    </item>
-                </users>
-            </user_conditions>
-        </item>
-        <item>
-            <conditions>
-                <item>
-                    <condition>not__empty=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>662c304fad7432d296d92581</field_id>
-                        <group_id>None</group_id>
-                        <id>662c304fad7432d296d92581</id>
-                        <label>Visita de</label>
-                        <type>radio</type>
-                    </field>
-                    <value> </value>
-                </item>
-                <item>
-                    <condition>is__empty=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>662c304fad7432d296d92581</field_id>
-                        <group_id>None</group_id>
-                        <id>662c304fad7432d296d92581</id>
-                        <label>Visita de</label>
-                        <type>radio</type>
-                    </field>
-                    <value> </value>
-                </item>
-            </conditions>
-            <element_ids>[]</element_ids>
-            <empty>False</empty>
-            <fields_ruled>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>{{ catalog.configuracion_areas_y_empleados_apoyo.obj_id}}</field_id>
-                    <group_id>None</group_id>
-                    <id>677ffe8b6ce6b02516a89b07</id>
-                    <label>Autorizado por:</label>
-                    <type>catalog</type>
-                </item>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>663bd36eb19b7fb7d9e97ccb</field_id>
-                    <group_id>None</group_id>
-                    <id>663bd36eb19b7fb7d9e97ccb</id>
-                    <label>Nombre completo</label>
-                    <type>catalog-select</type>
-                </item>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>66353daa223b8a43d7f274b5</field_id>
-                    <group_id>None</group_id>
-                    <id>66353daa223b8a43d7f274b5</id>
-                    <label>Estatus del pase</label>
-                    <type>radio</type>
-                </item>
-            </fields_ruled>
-            <group_conditions>{}</group_conditions>
-            <name>Oculta Contratista</name>
-            <operator>or</operator>
-            <rule_id>1f4b21402178aef</rule_id>
-            <rule_type>invisible</rule_type>
-            <user_conditions>
-                <condition>exclude</condition>
-                <users>
-                    <item>
-                        <user_id>10</user_id>
-                        <user_name>Emiliano Zapata</user_name>
-                    </item>
-                </users>
-            </user_conditions>
         </item>
     </rules>
 </lkf>

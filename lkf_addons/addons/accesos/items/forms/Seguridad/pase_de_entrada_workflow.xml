@@ -271,8 +271,8 @@
             &lt;p&gt;A continuación, te proporcionamos los detalles de tu visita:&lt;/p&gt;
 
             &lt;ul&gt;
-                &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{record.answers.666718cb1bdffb6d8fc908d6.663e5c57f5b8a7ce8211ed0b}}&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.666718cb1bdffb6d8fc908d6.663a7e0fe48382c5b1230902}}&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{record.answers.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}&lt;/li&gt;
 
                 {% if record.answers.662c304fad7432d296d92581 == "Rango de fechas" %}
                     &lt;p&gt;&lt;strong&gt;Disponibilidad de fechas:&lt;/strong&gt;&lt;/p&gt;
@@ -298,15 +298,15 @@
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>
                             <item>
-                                <field_id>662c2937108836dec6d92581</field_id>
-                                <group_id>None</group_id>
-                                <label>Email</label>
-                            </item>
-                            <item>
                                 <catalog_field_id>66a83ab5ca3453e21ea08d19</catalog_field_id>
                                 <field_id>6653f3709c6d89925dc04b2f</field_id>
                                 <group_id>663d4ba61b14fab90559ebb0</group_id>
                                 <label>email</label>
+                            </item>
+                            <item>
+                                <field_id>662c2937108836dec6d92581</field_id>
+                                <group_id>None</group_id>
+                                <label>Email</label>
                             </item>
                         </email_fields>
                         <emails>[]</emails>
@@ -323,7 +323,7 @@
                         <resend>RESEND</resend>
                         <send_attachments>True</send_attachments>
                         <send_pdf>False</send_pdf>
-                        <sender>RECORD_USER</sender>
+                        <sender>OWNER_EMAIL</sender>
                         <subject>{% raw %} ¡Nuevo pase de entrada, complete el proceso de registro! {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
@@ -403,6 +403,30 @@
                                 <type>text</type>
                             </trigger_field>
                             <value>null</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters>None</filters>
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>661dc67e901906b7e9b73bac</field_id>
+                                <group>{}</group>
+                                <label>Nombre del perfil</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>Visita General</value>
                         </item>
                     </triggers>
                 </wf_fields>
@@ -530,8 +554,8 @@
             {% endif %}
 
             &lt;ul&gt;
-                &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{ record.answers.666718cb1bdffb6d8fc908d6.663e5c57f5b8a7ce8211ed0b }}&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{ record.answers.666718cb1bdffb6d8fc908d6.663a7e0fe48382c5b1230902 }}&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{ record.answers.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b }}&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{ record.answers.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902 }}&lt;/li&gt;
                 {% if record.answers.662c304fad7432d296d92581 == "Rango de fechas" %}
                     &lt;p&gt;&lt;strong&gt;Disponibilidad de fechas:&lt;/strong&gt;&lt;/p&gt;
                     &lt;li&gt;&lt;strong&gt;Desde: &lt;/strong&gt;{{ record.answers.662c304fad7432d296d92582 }}&lt;/li&gt;
@@ -582,7 +606,7 @@
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>True</send_pdf>
-                        <sender>CREATED_BY_USER</sender>
+                        <sender>OWNER_EMAIL</sender>
                         <subject>{% raw %} ¡Pase de entrada generado! {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
@@ -788,6 +812,20 @@
                             </trigger_field>
                             <value>enviar_sms_pre_registro</value>
                         </item>
+                        <item>
+                            <condition>iexact=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>662c262cace163ca3ed3bb3a</field_id>
+                                <group>{}</group>
+                                <label>Selección de Visitante</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>alta_de_nuevo_visitante</value>
+                        </item>
                     </triggers>
                 </wf_fields>
             </rules>
@@ -888,6 +926,121 @@
                                 <type>checkbox</type>
                             </trigger_field>
                             <value>enviar_sms</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>67927d555ea336548d0fc651</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <arguments>
+                            <pre_sms>true</pre_sms>
+                        </arguments>
+                        <integration>None</integration>
+                        <script>
+                            <created_at>2025-01-09T22:01:48.894727</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.send_sms.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.send_sms.name }}</name>
+                            <start_date>2025-01-09T22:01:48.892854</start_date>
+                            <updated_at>2025-01-23T00:15:36.264960</updated_at>
+                        </script>
+                        <scriptArguments>
+                            <item>
+                                <label>pre_sms</label>
+                                <value>true</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
+                        <user>SCRIPT_OWNER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
+                            </item>
+                            <item>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
+                            </item>
+                            <item>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
+                            </item>
+                            <item>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
+                            </item>
+                        </userOptions>
+                    </configuration>
+                    <name>Enviar SMS al visitante registrado</name>
+                </item>
+            </actions>
+            <id>67927d555ea336548d0fc664</id>
+            <name>Envio de SMS pre-registro Visitante Registrado</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-01-24T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-01-23T17:30:31.496Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>iexact=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>662c262cace163ca3ed3bb3a</field_id>
+                                <group>{}</group>
+                                <label>Selección de Visitante</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>buscar_visitantes_registrados</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6734c6d5254e9a61df8e7f51</field_id>
+                                <group>{}</group>
+                                <label>Enviar correo pre registro</label>
+                                <type>checkbox</type>
+                            </trigger_field>
+                            <value>enviar_sms_pre_registro</value>
                         </item>
                     </triggers>
                 </wf_fields>
