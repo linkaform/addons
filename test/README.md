@@ -5,8 +5,14 @@ Contenedro base para correr pruebas de LinkaFrom
 Para hacer build de la imagen correr
 
 '''
-docker-compose build --no-cache lkf-test
-docker-compose build lkf-test
+cd ~/lkf/addons/test/docker/
+
+# Para correr sin cache
+
+docker compose build --no-cache lkf-test
+
+# Para correr directo
+docker compose build lkf-test
 '''
 
 Para subir imagen
@@ -26,7 +32,7 @@ docker run  -i -t linkaform/lkf-test:develop bash
 docker run   -w /srv/scripts/ -v `pwd`:/srv/scripts -v /home/josepato/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/ --name lkf_test -d linkaform/lkf_test:develop sleep infinity
 
 
-docker exec -it lkf_test bash
+docker exec -it lkf-test bash
 
 '''
 
