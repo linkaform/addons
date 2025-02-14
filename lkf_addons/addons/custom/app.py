@@ -36,7 +36,7 @@ Si tienes más de una aplicación, puedes:
 '''
 
 # Importaciones necesarias
-from linkaform_api import base
+from lkf_addons.addons.base.app import Base
 
 ### Objeto o Clase de Módulo ###
 '''
@@ -47,9 +47,9 @@ Al utilizar `super()` en el método `__init__()`, heredamos las variables de con
 Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
 '''
 
-class Custom(base):
+class Custom(Base):
     
-    def __init__(self, settings, sys_argv=None, use_api=False):
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+    def __init__(self, settings, sys_argv=None, use_api=False, **kwargs):
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
     
     

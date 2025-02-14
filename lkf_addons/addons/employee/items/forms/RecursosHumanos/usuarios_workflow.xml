@@ -81,7 +81,6 @@
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
     &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;Bienvenido a Soter&lt;/title&gt;
     &lt;style&gt;
         body {
             font-family: Arial, sans-serif;
@@ -117,6 +116,11 @@
             font-size: 16px;
             line-height: 1.5;
         }
+        .content a{
+            color: #021d49;
+            text-decoration: none;
+            font-weight: bold;
+        }
         .cta-button {
             display: inline-block;
             padding: 12px 20px;
@@ -135,7 +139,7 @@
             font-size: 14px;
         }
         .footer a {
-            color: #021d49;
+            color: #777;
             text-decoration: none;
             font-weight: bold;
         }
@@ -153,17 +157,17 @@
             &lt;div class="header"&gt;
                 &lt;h1&gt;¡Bienvenido a Soter! 🎉&lt;/h1&gt;
             &lt;/div&gt;
-    
+
             &lt;!-- Contenido --&gt;
             &lt;div class="content"&gt;
-                &lt;p&gt;¡Nos alegra darte la bienvenida a Soter!, Tu cuenta ya está activa, y ahora puedes acceder al sistema a través del siguiente enlace:&lt;/p&gt;
+                &lt;p&gt;¡Nos alegra darte la bienvenida a &lt;a href="https://www.soter.mx/" target="_blank"&gt;Soter&lt;/a&gt;, tu sistema de seguridad patrimonial! Tu cuenta ya está activa y ahora puedes acceder al sistema a través del siguiente enlace:&lt;/p&gt;
                 &lt;a href="https://app.soter.mx/" target="_blank" class="cta-button"&gt;Acceder a Soter&lt;/a&gt;
-                &lt;p&gt;Tu &lt;b&gt;username&lt;/b&gt; es: &lt;b&gt;{{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/b&gt;&lt;/p&gt;
+                &lt;p&gt;Tu username es: &lt;b&gt;{{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/b&gt;&lt;/p&gt;
                 &lt;p&gt;Para ayudarte a familiarizarte con la plataforma, hemos preparado un manual de usuario. Puedes revisarlo &lt;a href="https://docs.linkaform.com/Usuario/Soter/index.html" target="_blank" style="color: #021d49; font-weight: bold; text-decoration: none"&gt;aquí&lt;/a&gt;.&lt;/p&gt;
                 &lt;p&gt;Si tienes alguna duda, nuestro equipo está listo para ayudarte.&lt;/p&gt;
                 &lt;p&gt;¡Nos vemos dentro! 🚀&lt;/p&gt;
             &lt;/div&gt;
-    
+
             &lt;!-- Pie de página --&gt;
             &lt;div class="footer"&gt;
                 &lt;p&gt;&amp;copy; 2024 &lt;a href="https://www.soter.mx/" target="_blank"&gt;Soter&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;

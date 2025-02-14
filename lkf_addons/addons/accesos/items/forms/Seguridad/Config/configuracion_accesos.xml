@@ -14,7 +14,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1736446844.0</created_at>
+    <created_at>1732584431.0</created_at>
     <description />
     <edit_public_records>True</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -51,18 +51,18 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>
-                            <item>6653f3709c6d89925dc04b2e</item>
+                            <item>6759e4a7a9a6e13c7b26da33</item>
                         </view_fields>
                         <view_index>0</view_index>
                     </catalog>
                     <catalog_fields>
-                        <item>663bd32d7fb8869bbc4d7f7b</item>
-                        <item>6653f3709c6d89925dc04b2e</item>
+                        <item>638a9a99616398d2e392a9f5</item>
+                        <item>6759e4a7a9a6e13c7b26da33</item>
                     </catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
@@ -114,6 +114,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -145,7 +146,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>6653f3709c6d89925dc04b2e</field_id>
+                    <field_id>6759e4a7a9a6e13c7b26da33</field_id>
                     <field_type>catalog-select</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -190,6 +191,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -213,7 +215,7 @@
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>[]</view_fields>
-                        <view_index>1</view_index>
+                        <view_index>2</view_index>
                     </catalog>
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
@@ -221,13 +223,13 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>663bd32d7fb8869bbc4d7f7b</field_id>
+                    <field_id>638a9a99616398d2e392a9f5</field_id>
                     <field_type>catalog-detail</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>ID de Usaurio</label>
+                    <label>Id de Usuario</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -266,6 +268,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -347,6 +350,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -423,6 +427,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -499,6 +504,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -614,6 +620,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -642,7 +649,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>True</public>
-    <resource_uri>/api/infosync/form/127962/</resource_uri>
+    <resource_uri>/api/infosync/form/126562/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -663,5 +670,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1736447094.0</updated_at>
+    <updated_at>1739383297.0</updated_at>
 </lkf>

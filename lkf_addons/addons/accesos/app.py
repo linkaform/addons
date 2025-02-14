@@ -203,6 +203,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'comentario_pase':'65e0a69a322b61fbf9ed23af',
             'nombre_area':'663e5d44f5b8a7ce8211ed0f',
             'nombre_area_salida':'663fb45992f2c5afcfe97ca8',
+            'nombre_ubicacion_salida': '663e5c57f5b8a7ce8211ed0b',
             'color_vehiculo': '663e4691f54d395ed7f27465',
             'color_articulo': '663e4730724f688b3059eb3b',
             'config_dia_de_acceso': '662c304fad7432d296d92584',
@@ -960,6 +961,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         if access_pass.get('estatus',"") == 'vencido':
             self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Revisa la Configuración'})
+        elif access_pass.get('estatus', '') == 'proceso':
+            self.LKFException({'msg':"El pase no se ha sido completado aun, informa al usuario que debe completarlo primero.","title":'Requisitos faltantes'})
 
         if diasDisponibles:
             if nombre_dia not in diasDisponibles:
@@ -1130,7 +1133,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             folio = last_check_out.get('folio',0)
             checkin_date_str = last_check_out.get('checkin_date')
             checkin_date = self.date_from_str(checkin_date_str)
-            now = datetime.now()
+            tz_mexico = pytz.timezone('America/Mexico_City')
+            now = datetime.now(tz_mexico)
             fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
             duration = time.strftime('%H:%M:%S', time.gmtime( self.date_2_epoch(fecha_hora_str) - self.date_2_epoch(checkin_date_str)))
             if self.user_in_facility(status_visita=last_check_out.get('status_visita')):
@@ -1138,6 +1142,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"{self.mf['tipo_registro']}":'salida',
                     f"{self.mf['fecha_salida']}":fecha_hora_str,
                     f"{self.mf['duracion']}":duration,
+                    f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}": {
+                        f"{self.mf['nombre_area_salida']}": area,
+                    },
                 }
                 response = self.lkf_api.patch_multi_record( answers=answers, form_id=self.BITACORA_ACCESOS, folios=[folio])
         if not response:
@@ -1186,7 +1193,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "form_id": self.CONF_AREA_EMPLEADOS,
         }
         if user_id:
-            match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['user_id_empleado']}"] = user_id
+            match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}"] = user_id
 
         query = [
             {'$match': match_query },
@@ -1518,7 +1525,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         data_msj['enviado_desde'] = 'Modulo de Accesos'
         return self.send_email_by_form(data_msj)
     
-    def send_msj_pase(self, data_cel_msj=None, pre_sms=False):
+    def send_msj_pase(self, data_cel_msj=None, pre_sms=False, account=''):
         """
         Envía un mensaje de texto a un número de celular con información personalizada sobre un pase de invitación.
 
@@ -1543,26 +1550,40 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             dict: Un diccionario con el código de estado del envío. Por ejemplo:
                 - {'status_code': 200} si el mensaje fue enviado exitosamente.
         """
+
+        fecha_str_desde = data_cel_msj.get('fecha_desde', '')
+        fecha_str_hasta = data_cel_msj.get('fecha_hasta', '')
+
+        fecha_desde = datetime.strptime(fecha_str_desde, "%Y-%m-%d %H:%M:%S")
+        if fecha_str_hasta:
+            fecha_hasta = datetime.strptime(fecha_str_hasta, "%Y-%m-%d %H:%M:%S")
+
         mensaje=''
         if pre_sms:
             msg = f"Hola {data_cel_msj.get('nombre', '')}, {data_cel_msj.get('visita_a', '')} "
-            msg += f"te esta invitando a {data_cel_msj.get('ubicacion', '')} y ha creado un pase para ti... por favor,"
-            msg += f" complete sus datos de registro en este link: {data_cel_msj.get('link', '')}"
+            msg += f"te invita a {data_cel_msj.get('ubicacion', '')} y creo un pase para ti."
+            msg += f" Completa tus datos de registro aquí: {data_cel_msj.get('link', '')}"
             mensaje = msg
         else:
-            get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''))
-            get_pdf_url = get_pdf_url.get('data', '').get('download_url', '')
+            if account == 'milenium':
+                get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''), template_id=553)
+                get_pdf_url = get_pdf_url.get('data', '').get('download_url', '')
+            else:
+                get_pdf_url = self.get_pdf(data_cel_msj.get('qr_code', ''))
+                get_pdf_url = get_pdf_url.get('data', '').get('download_url', '')
             msg = f"Estimado {data_cel_msj.get('nombre', '')}, {data_cel_msj.get('visita_a', '')}"
 
             if data_cel_msj.get('fecha_desde', '') and not data_cel_msj.get('fecha_hasta', ''):
-                msg += f", te esta invitando a {data_cel_msj.get('ubicacion', '')} el día {data_cel_msj.get('fecha_desde', '')}."
+                fecha_desde_format = fecha_desde.strftime("%d/%m/%Y a las %H:%M")
+                msg += f", te invita a {data_cel_msj.get('ubicacion', '')} el {fecha_desde_format}."
             elif data_cel_msj.get('fecha_desde', '') and data_cel_msj.get('fecha_hasta', ''):
-                msg += f", te esta invitando a {data_cel_msj.get('ubicacion', '')} "
-                msg += f"a partir del {data_cel_msj.get('fecha_desde', '')} hasta el {data_cel_msj.get('fecha_hasta','')}."
+                fecha_desde_format = fecha_desde.strftime("%d/%m/%Y")
+                fecha_hasta_format = fecha_hasta.strftime("%d/%m/%Y")
+                msg += f", te invita a {data_cel_msj.get('ubicacion', '')} "
+                msg += f"del {fecha_desde_format} al {fecha_hasta_format}."
 
-            msg += f" Descarga tu pase en: {get_pdf_url}"
+            msg += f" Descarga tu pase: {get_pdf_url}"
             mensaje = msg
-
         phone_to = data_cel_msj.get('numero', '')
         res =self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
         if res:
@@ -1843,6 +1864,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        nombre_visita_a = employee.get('worker_name')
 
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
         answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
@@ -1852,7 +1875,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',"")
             answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
             answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
-            answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:access_pass.get('visita_a',"")}
+            answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:nombre_visita_a}
             answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
             answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
             answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
@@ -1866,11 +1889,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.mf['tipo_visita_pase']] = 'fecha_fija'
         answers[self.pase_entrada_fields['tipo_visita']] = 'alta_de_nuevo_visitante'
         answers[self.pase_entrada_fields['walkin_nombre']] = access_pass.get('nombre')
-        answers[self.pase_entrada_fields['walkin_email']] = access_pass.get('email')
+        answers[self.pase_entrada_fields['walkin_email']] = access_pass.get('email', '')
         answers[self.pase_entrada_fields['walkin_empresa']] = access_pass.get('empresa')
         answers[self.pase_entrada_fields['walkin_fotografia']] = access_pass.get('foto')
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
-        answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono')
+        answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
         
         if access_pass.get('comentarios'):
             comm = access_pass.get('comentarios',[])
@@ -1902,13 +1925,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         visita_a = access_pass.get('visita_a')
         visita_set = {
             self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
-                self.mf['nombre_empleado'] : visita_a,
+                self.mf['nombre_empleado'] : nombre_visita_a,
                 }
             }
         options_vistia = {
               "group_level": 3,
-              "startkey": [location, visita_a],
-              "endkey": [location, f"{visita_a}\n",{}],
+              "startkey": [location, nombre_visita_a],
+              "endkey": [location, f"{nombre_visita_a}\n",{}],
             }
         cat_visita = self.catalogo_view(self.CONF_AREA_EMPLEADOS_CAT_ID, self.PASE_ENTRADA, options_vistia)
         if len(cat_visita) > 0:
@@ -2461,7 +2484,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             group_by_visitas = {
                 '_id': None,
                 'visitas_en_dia': {'$sum': 1},
-                'total_vehiculos_dentro': {'$sum': {'$size': '$vehiculos'}},
+                'total_vehiculos_dentro': {
+                    '$sum': {
+                        '$cond': {
+                            'if': {'$eq': ['$status_visita', 'entrada']},
+                            'then': {'$size': '$vehiculos'},
+                            'else': 0
+                        }
+                    }
+                },
                 'detalle_visitas': {
                     '$push': {
                         'perfil': '$perfil',
@@ -2644,7 +2675,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_ACCESOS,
-            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.Employee.f['user_id']}":self.user['user_id'],
+            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}":self.user['user_id'],
         }
         query = [
             {'$match': match_query },
@@ -2672,19 +2703,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "grupo_requisitos":f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
                 # "datos_requeridos": f"$answers.{self.conf_modulo_seguridad['datos_requeridos']}",
             }},
-            {'$limit':1},
         ]
 
-        raw_result = self.format_cr_result(self.cr.aggregate(query),  get_one=True)
-        grupo_requisitos = raw_result.get("grupo_requisitos", [])
         requerimientos = {}
-        
-        for requisito in grupo_requisitos:
-            if requisito.get("location", '') == ubicacion:
-                requerimientos = {
-                    "location": requisito["location"],
-                    "requerimientos": requisito.get(self.conf_modulo_seguridad['datos_requeridos'], [])
-                }
+        raw_result = self.format_cr_result(self.cr.aggregate(query))
+        for raw in raw_result:
+            for grupo in raw.get('grupo_requisitos', []):
+                if grupo.get("location", '') == ubicacion:
+                    requerimientos = {
+                        "location": grupo["location"],
+                        "requerimientos": grupo.get(self.conf_modulo_seguridad['datos_requeridos'], [])
+                    }
                 
         return requerimientos
 
@@ -3118,9 +3147,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "form_id": self.BITACORA_ACCESOS
         }
         if location:
-            match_query.update({f"answers.{self.bitacora_fields['ubicacion']}":location})
+            match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}":location})
         if area:
-            match_query.update({f"answers.{self.bitacora_fields['caseta_entrada']}":area})
+            match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area})
         if prioridades:
             match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
 
@@ -4637,7 +4666,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
-                pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
+                if employee.get('usuario_id', [])[0] == 7742:
+                    pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 553, name_pdf='Pase de Entrada', send_url=True)
+                else:
+                    pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
