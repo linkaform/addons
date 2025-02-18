@@ -201,12 +201,12 @@ class Employee(Base):
             "deleted_at":{"$exists":False},
             "form_id": self.EMPLEADOS,
             }
-        match_query.update(self._get_match_q(self.employee_fields['usuario_id'], user_id))
+        match_query.update(self._get_match_q(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
         query = [
             {'$match': match_query },    
             {'$project':{ 
                         '_id':1,
-                        'user_id':f"$answers.{self.employee_fields['usuario_id']}",
+                        'user_id':f"$answers.{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}",
                         'pic_url':{"$first":f"$answers.{self.employee_fields['picture']}"}
                         }
             }

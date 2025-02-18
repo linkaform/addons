@@ -4037,15 +4037,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for a, x in employees.items():
             if type(x) == list:
                 for y in x:
-                    employee_ids.append(int(y['user_id']))
+                    employee_ids.append(y['user_id'])
             else:
                 if x:
-                    employee_ids.append(int(x['user_id']))
+                    employee_ids.append(x['user_id'])
         pics = self.get_employee_pic(employee_ids)
         for a, x in employees.items():
             if type(x) == list:
                 for y in x:
-                    u_id = int(y['user_id'])
+                    u_id = y['user_id']
                     if pics.get(u_id):
                         y['picture'] = pics[u_id]
             else:
@@ -4053,7 +4053,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     u_id = int(x['user_id'])
                     if pics.get(u_id):
                         x['picture'] = pics[u_id]
-                    employee_ids.append(int(x['user_id']))
+                    employee_ids.append(x['user_id'])
         return employees
 
     def update_article_concessioned(self, data_articles, folio):
