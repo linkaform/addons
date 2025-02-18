@@ -1867,6 +1867,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         nombre_visita_a = employee.get('worker_name')
 
+        if(access_pass.get('site', '') == 'accesos'):
+            nombre_visita_a = access_pass.get('visita_a')
+
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
         answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
         if access_pass.get('custom') == True :
