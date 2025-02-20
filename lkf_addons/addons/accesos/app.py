@@ -2848,7 +2848,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
         if not x:
-            self.LKFException({'msg':'Pase de Entrda no econtrado'})
+            self.LKFException({'title':'Advertencia', 'msg':'Pase de Entrada Invalido'})
         return x
 
     def get_ids_labels(self, data):
