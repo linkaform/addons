@@ -40,7 +40,7 @@
                         <item>6653f3709c6d89925dc04b2f</item>
                     </catalog_fields>
                     <required>False</required>
-                    <field_id>{{ catalog.employee.obj_id }}</field_id>
+                    <field_id>{{ catalog.empleados.obj_id }}</field_id>
                     <label>Empleado</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -48,11 +48,11 @@
                             <item>62c5ff407febce07043024dd</item>
                         </view_fields>
                         <view_index>0</view_index>
-                        <couch_id>{{ catalog.employee.obj_id }}</couch_id>
+                        <couch_id>{{ catalog.empleados.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.employee.id }}</catalog_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <filters>None</filters>
-                        <name>{{ catalog.employee.name }}</name>
+                        <name>{{ catalog.empleados.name }}</name>
                     </catalog>
                     <properties>{}</properties>
                 </item>
@@ -69,8 +69,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.employee.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
                     <options>[]</options>
@@ -87,8 +87,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.employee.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
                     <options>[]</options>
@@ -105,8 +105,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.employee.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
                     <options>[]</options>
@@ -123,8 +123,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.employee.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
                     <options>[]</options>
@@ -141,8 +141,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>integer</field_type>
                         <view_index>3</view_index>
-                        <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.employee.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
                     <options>[]</options>
@@ -159,8 +159,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>4</view_index>
-                        <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.employee.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
                     <options>[]</options>
@@ -176,8 +176,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>email</field_type>
                         <view_index>0</view_index>
-                        <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.employee.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
                     <options>[]</options>
@@ -193,8 +193,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>radio</field_type>
                         <view_index>0</view_index>
-                        <catalog_field_id>{{ catalog.employee.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.employee.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
                     <options>[]</options>

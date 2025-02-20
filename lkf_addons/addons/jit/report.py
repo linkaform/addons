@@ -18,7 +18,6 @@ class Reports(JIT, base.LKF_Report):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
 
-
     def test(self):
         print('test')
 
@@ -30,19 +29,19 @@ class Reports(JIT, base.LKF_Report):
         }
         if warehouse:
             match_query.update({ f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse']}":warehouse})
-        if product_code:
-            if product_code and type(product_code) == list:
-                match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": {"$in":product_code}})
-            elif product_code:
-                match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code})
-    
+        # if product_code:
+        #     if product_code and type(product_code) == list:
+        #         match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": {"$in":product_code}})
+        #     elif product_code:
+        #         match_query.update({f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code})
         query = [
             {"$match": match_query},
             {"$project": {
                 "_id":1,
                 "folio":"$folio",
-                "product_code": "$answers.66dfc4d9a306e1ac7f6cd02c.61ef32bcdf0ec2ba73dec33d",
-                "stock_maximum": "$answers.66ea62dac9aefada5b04b73a",
+                "product_code": f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
+                # "product_code": "$answers.66dfc4d9a306e1ac7f6cd02c.61ef32bcdf0ec2ba73dec33d",
+                "stock_maximum": f"$answers.{self.f['max_stock']}",
                 "warehouse": f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
                 "location":  f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}",
             }},

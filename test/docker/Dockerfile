@@ -1,10 +1,10 @@
 ####################################
 # Image for develop                #
+# MAINTAINER Linkaform
 ####################################
 
-FROM python:3.7-bullseye as develop
+FROM python:3.10.14-bullseye as develop
 
-MAINTAINER Linkaform
 
 
 #mongo 5.0 tools
@@ -13,6 +13,7 @@ RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-5.0.gpg] http://rep
 
 RUN apt-get update && \
     apt-get -y install \
+    vim \
     python3-psycopg2 \
     poppler-utils \
     mongodb-org-shell \

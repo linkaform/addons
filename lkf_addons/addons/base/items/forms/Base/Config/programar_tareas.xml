@@ -14,7 +14,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1727416697.0</created_at>
+    <created_at>1736440565.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -124,7 +124,20 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>[]</affecting_rules>
+                    <affecting_rules>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>220ba511bf41f93</rule_id>
+                            <rule_index>8</rule_index>
+                            <rule_type>disabled</rule_type>
+                        </item>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>179a7e4263925a9</rule_id>
+                            <rule_index>9</rule_index>
+                            <rule_type>invisible</rule_type>
+                        </item>
+                    </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -190,7 +203,20 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>[]</affecting_rules>
+                    <affecting_rules>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>220ba511bf41f93</rule_id>
+                            <rule_index>8</rule_index>
+                            <rule_type>disabled</rule_type>
+                        </item>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>179a7e4263925a9</rule_id>
+                            <rule_index>9</rule_index>
+                            <rule_type>invisible</rule_type>
+                        </item>
+                    </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -270,7 +296,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Nombre Interno de la Tarea</help_text>
                     <label>Nombre de la Tarea</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -285,7 +311,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -344,6 +370,7 @@
                     </catalog>
                     <catalog_fields>
                         <item>5d810a982628de5556500d56</item>
+                        <item>ccccc0000000000000000002</item>
                         <item>5d810a982628de5556500d55</item>
                     </catalog_fields>
                     <catalog_relation>None</catalog_relation>
@@ -414,7 +441,7 @@
                         <catalog_field_id>{{ catalog.catalogo_de_formas.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.catalogo_de_formas.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -490,7 +517,7 @@
                         <catalog_field_id>{{ catalog.catalogo_de_formas.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.catalogo_de_formas.id }}</catalog_id>
                         <field_type>integer</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -504,82 +531,6 @@
                     <descriptor>None</descriptor>
                     <fav>False</fav>
                     <field_id>5d810a982628de5556500d56</field_id>
-                    <field_type>catalog-detail</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>None</group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>ID de la forma</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.catalogo_de_formas.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.catalogo_de_formas.id }}</catalog_id>
-                        <field_type>integer</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>True</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>2</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>ccccc0000000000000000000</field_id>
                     <field_type>catalog-detail</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -661,7 +612,7 @@
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Tipo de Recurso</label>
+                    <label>Tipo de Item</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -726,8 +677,8 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Actividad</label>
+                    <help_text>Este dato de este campo sera enviado con el mismo id campo al registro que sera creado. Se siugiere  ser utilizado como el nombre de la tarea o la actividad a realizar.</help_text>
+                    <label>Actividad / Tarea</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -741,7 +692,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -792,7 +743,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Este dato de este campo sera enviado con el mismo id campo al registro que sera creado. Campo Opcional, con una descripcion de la actividad a realizar.</help_text>
                     <label>Descripcion</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -807,7 +758,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -858,7 +809,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Este dato de este campo sera enviado con el mismo id campo al registro que sera creado. Se sugiere que sea un status inicial</help_text>
                     <label>Status Inicial</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -873,7 +824,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -924,7 +875,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>Tiempo que le llevara al colaborardo realizar la tarea</help_text>
+                    <help_text>Tiempo que le llevara al colaborardo realizar la tarea. Sin uso de momento</help_text>
                     <label>Duracion en Horas de la Tarea</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -2132,7 +2083,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Actualmente funciona en bloques de 1 hora</help_text>
                     <label>El tiempo para ejecutar la tarea es de:</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -2147,7 +2098,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -2480,7 +2431,7 @@
                         <item>156626991b6c637</item>
                         <item>156626991b6c637</item>
                         <item>156626991b6c637</item>
-                        <item>1a7016a615b618a4</item>
+                        <item>139e63021131e75</item>
                     </rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -2576,7 +2527,7 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>1a7016a615b618a4</rule_id>
+                            <rule_id>139e63021131e75</rule_id>
                             <rule_index>1</rule_index>
                             <rule_type>show</rule_type>
                         </item>
@@ -3837,13 +3788,13 @@
                     <group>None</group>
                     <groups_fields>
                         <item>abcde0001000000000020003</item>
-                        <item>66f649762b30d5f80e632688</item>
+                        <item>677ffaea04607ad6f85c8532</item>
                         <item>638a9a7767c332f5d459fc81</item>
                         <item>638a9a7767c332f5d459fc82</item>
                         <item>638a9a99616398d2e392a9f5</item>
                         <item>638a9a99616398d2e392a9f7</item>
                         <item>638a9a99616398d2e392a9f6</item>
-                        <item>66f649756a38bc05612bca8d</item>
+                        <item>677ffae44528f76a4789d54b</item>
                         <item>638a9ab3616398d2e392a9fa</item>
                         <item>639b65dfaf316bacfc551ba2</item>
                     </groups_fields>
@@ -3986,7 +3937,14 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>[]</affecting_rules>
+                    <affecting_rules>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>1aa31af61f14148d</rule_id>
+                            <rule_index>12</rule_index>
+                            <rule_type>show</rule_type>
+                        </item>
+                    </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
@@ -4481,7 +4439,14 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>[]</affecting_rules>
+                    <affecting_rules>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>7925de1aadec6</rule_id>
+                            <rule_index>11</rule_index>
+                            <rule_type>show</rule_type>
+                        </item>
+                    </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
@@ -4975,7 +4940,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/123695/</resource_uri>
+    <resource_uri>/api/infosync/form/127828/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -4996,5 +4961,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1727417440.0</updated_at>
+    <updated_at>1737471588.0</updated_at>
 </lkf>

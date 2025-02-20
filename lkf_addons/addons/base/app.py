@@ -4,8 +4,16 @@
 Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
 podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
 
-Licencia
-Este código está licenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html).
+Licencia BSD
+Copyright (c) 2024 Infosync / LinkaForm.  
+Todos los derechos reservados.
+
+Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
+
+1. Se debe conservar el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en las redistribuciones del código fuente.
+2. Se debe reproducir el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en la documentación y/u otros materiales proporcionados con las distribuciones en formato binario.
+3. Ni el nombre del Infosync ni los nombres de sus colaboradores pueden ser utilizados para respaldar o promocionar productos derivados de este software sin permiso específico previo por escrito.
+
 
 Propósito
 El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
@@ -47,7 +55,6 @@ class Base(base.LKF_Base):
             self.mf.update(mf)
         else:
             self.mf = mf
-
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
        #--Variables 
@@ -100,6 +107,10 @@ class Base(base.LKF_Base):
         self.USUARIOS_ID = self.USUARIOS.get('id')
         self.USUARIOS_OBJ_ID = self.USUARIOS.get('obj_id')
 
+        self.GROUP = self.lkm.catalog_id('grupos')
+        self.GROUP_ID = self.GROUP.get('id')
+        self.GROUP_OBJ_ID = self.GROUP.get('obj_id')
+
         self.UOM = self.lkm.catalog_id('unidad_de_medida')
         self.UOM_ID = self.UOM.get('id')
         self.UOM_OBJ_ID = self.UOM.get('obj_id')
@@ -117,6 +128,7 @@ class Base(base.LKF_Base):
             'address_type':'663a7f67e48382c5b1230908',
             'address':'663a7e0fe48382c5b1230902',
             'address2':'663a7f79e48382c5b123090a',
+            'asignar_a':'abcde0001000000000020003',
             'cat_timezone':f'{self.TIMEZONE_OBJ_ID}.665e4f90c4cf32cb52ebe15c',
             'client_code':'6711ea74b8514dc4fdfd917f',
             'config_group':'66ed0baac9aefada5b04b817',
@@ -126,6 +138,7 @@ class Base(base.LKF_Base):
             'city':'6654187fc85ce22aaf8bb070',
             'email':'663a7ee1e48382c5b1230907',
             'email_contacto':'66bfd647cd15883ed163e9b5',
+            'group_id':'639b65dfaf316bacfc551ba2',
             'nombre_comercial':'667468e3e577b8b98c852aaa',
             'pagina_web':'66bfd66ecd15883ed163e9b7',
             'phone':'663a7ee1e48382c5b1230906',
@@ -193,25 +206,35 @@ class Base(base.LKF_Base):
         return result if result else None
 
     def load(self, module , module_class=None, import_as=None, **kwargs):
-        print('loading module', module)
-        print('loading module_class', module_class)
         if not module_class:
             module_class = module
         if not import_as:
             import_as = module_class
-        print('loading module ..kwargs', kwargs.get('MODULES'))
-        if module not in kwargs.get('MODULES') or not hasattr(self, import_as):
+        self.master = False
+        #if module not in kwargs.get('MODULES'):
+        if hasattr(self, import_as):
+            pass
+        else:
             # from lkf_addons.addons.stock.app import Stock
             imp_module = importlib.import_module(f'lkf_addons.addons.{module.lower()}.app')
             AddonsClass = getattr(imp_module, module_class)
             # scripts = importlib.import_module('{}.items.scripts'.format(module))
-            print('import_as', import_as)
             setattr(self, import_as, AddonsClass(self.settings, sys_argv=self.sys_argv, use_api=self.use_api, **self.kwargs))
             if module not in self.kwargs['MODULES']:
                 self.kwargs['MODULES'].append(module)
-      
+    
+    def send_email_by_form_answers(self, data):
+        answers = {}
+        answers.update({
+            f"{self.envio_correo_fields['email_from']}":data['email_from'],
+            f"{self.envio_correo_fields['titulo']}":data['titulo'],
+            f"{self.envio_correo_fields['nombre']}":data['nombre'],
+            f"{self.envio_correo_fields['email_to']}":data['email_to'],
+            f"{self.envio_correo_fields['msj']}":data['mensaje']
+            })
+        return answers
+
     def send_email_by_form(self, data):
-        print("MSJ", data)
         metadata = self.lkf_api.get_metadata(form_id=self.ENVIO_DE_CORREOS)
         metadata.update({
             "properties": {
@@ -223,18 +246,30 @@ class Base(base.LKF_Base):
             },
         })
         #---Define Answers
-        answers = {}
-        answers.update({
-            f"{self.envio_correo_fields['email_from']}":data['email_from'],
-            f"{self.envio_correo_fields['titulo']}":data['titulo'],
-            f"{self.envio_correo_fields['nombre']}":data['nombre'],
-            f"{self.envio_correo_fields['email_to']}":data['email_to'],
-            f"{self.envio_correo_fields['msj']}":data['mensaje']
-            })
-        print('answers', answers)
+        answers = self.send_email_by_form_answers(data)
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
+    def strip_special_characters(self, value, underscore = False, remove_spaces=True):
+        res = ''
+        try:
+            res = str(value)
+        except UnicodeEncodeError:
+            try:
+                res = str(value.decode('utf-8'))
+            except AttributeError:
+                res = str(value)
+        except:
+            res = value
+        if underscore:
+            res = res.replace(' ','_').lower()
+        if type(res) == str:
+            res = res.replace('\xa0', '')
+            res = res.replace('\xc2','')
+            res = res.replace('\t','')
+            if remove_spaces:
+                res = res.strip()
+        return res
 
 from linkaform_api import  upload_file
 
@@ -462,22 +497,6 @@ class CargaUniversal(Base):
                 'folio':self.strip_special_characters(folio)}
         select_columns = {'folio':1,'user_id':1,'form_id':1, 'answers':1,'_id':1,'connection_id':1}
         return query, select_columns
-
-    def strip_special_characters(self, value, underscore = False):
-        res = ''
-        try:
-            res = str(value)
-        except UnicodeEncodeError:
-            try:
-                res = str(value.decode('utf-8'))
-            except AttributeError:
-                res = str(value)
-        except:
-            res = value
-
-        if underscore:
-            res = res.replace(' ','_').lower()
-        return res
 
     def get_records_existentes(self, form_id, folios, extra_params={}):
         query, select_columns = self.query_busca_records(form_id, folios)
@@ -1209,6 +1228,8 @@ class Schedule(Base):
         due_epoch = datetime.datetime.strptime(time_offset, '%Y-%m-%d %H:%M:%S')
         seconds = int(due_epoch.strftime('%s'))
         hours = int(seconds / 3600)
+        #TODO que funcione en bloques de minutos, actualmente solo funciona 
+        # en horas debido al int(second/3600) por lo tanto no soporta un 1.5 o .5
         first_date = '{% ' + ' $today + $hours + {}'.format(hours) + ' %}'
         return first_date
 
@@ -1371,7 +1392,7 @@ class Schedule(Base):
 
     def get_dag_dates(self, data):
         res = {}
-        dag_info = data.get('dag_info',{})
+        dag_info = self.unlist(data.get('dag_info',{}))
         next_run = dag_info.get('next_dagrun')
         create_after = dag_info.get('next_dagrun_create_after')
         if next_run and create_after:
@@ -1686,23 +1707,22 @@ class Schedule(Base):
                 fileshare_user_ids = get_form_fileshare(item_id)
                 all_user_ids += convert_usr_id_to_dict(fileshare_user_ids)
             for gset in assigned_users:
-                if gset.get('abcde0001000000000020003') == 'grupo':
-                    udata = gset.get(GROUP_CATALOG_ID,{})
-                    print('udata', udata)
-                    group_id = udata.get('639b65dfaf316bacfc551ba2')[0]
+                if gset.get(self.f['asignar_a']) == 'grupo':
+                    udata = gset.get(self.GROUP_OBJ_ID,{})
+                    group_id = self.unlist(udata.get(self.f['group_id']))
                     # grp_set = set.get(GROUP_CATALOG_ID)
-                    group_users = lkf_api.get_group_users(group_id)
+                    group_users = self.lkf_api.get_group_users(group_id)
                     # guser_id = [user['id'] for user in group_users if user.get('id')]
                     # user_idsG = update_users(user_ids, guser_id)
-                    all_user_ids += update_users(all_user_ids, group_users)
-                elif gset.get('abcde0001000000000020003') == 'usuario':
+                    all_user_ids += self.update_users(all_user_ids, group_users)
+                elif gset.get(self.f['asignar_a']) == 'usuario':
                     udata = gset.get(self.USUARIOS_OBJ_ID,{})
                     data = {
                         "name":udata.get('638a9a7767c332f5d459fc81'),
                         "email":udata.get('638a9a7767c332f5d459fc82',[])[0],
                         "username":udata.get('638a9a7767c332f5d459fc82',[])[0],
                         "user_id":udata.get('638a9a99616398d2e392a9f5',[])[0],
-                        "account_id":9804,
+                        "account_id":self.account_id,
                         "resource_kind":"user"
                     }
                     all_user_ids += self.update_users(all_user_ids, data)
@@ -1745,7 +1765,7 @@ class Schedule(Base):
                 }
             }
             #TODO place the script parameters answers
-            task["params"].update(get_script_map())
+            task["params"].update(self.get_script_map())
             body['tasks'].append(task)
             downstream_task_id += 1
             body['tasks'][0]['downstream_task_id'].append(downstream_task_id)

@@ -17,6 +17,17 @@ import cx_Oracle
     Al hacer un documento nuevo o modulo nuevo, puedes copiarte de la carpeta _templates o de sus archivos,
     pero cada que hagas un nuevo archivo, favor de copiar estas instrucciones y las generales que apliquen a 
     cada archivo.
+
+Licencia BSD
+Copyright (c) 2024 Infosync / LinkaForm.  
+Todos los derechos reservados.
+
+Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
+
+1. Se debe conservar el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en las redistribuciones del código fuente.
+2. Se debe reproducir el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en la documentación y/u otros materiales proporcionados con las distribuciones en formato binario.
+3. Ni el nombre del Infosync ni los nombres de sus colaboradores pueden ser utilizados para respaldar o promocionar productos derivados de este software sin permiso específico previo por escrito.
+
 '''
 
 ### Archivo de Modulo ###
@@ -27,7 +38,7 @@ import cx_Oracle
     app_utils.py, utils.py, xxx_utils.py       
 '''
 
-from linkaform_api import base
+from lkf_addons.addons.base.app import Base
 
 ### Objecto de Modulo ###
 '''
@@ -38,10 +49,10 @@ from linkaform_api import base
     Se pueden heredar funciones de cualquier clase heredada con el metodo super(). 
 '''
 
-class Oracle(base.LKF_Base):
+class Oracle(Base):
 
-    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
         self.name =  __class__.__name__
         self.settings = settings
@@ -52,10 +63,7 @@ class Oracle(base.LKF_Base):
         self.ORACLE_PASSWORD = self.settings.config['ORACLE_PASSWORD']
         self.oracle = self.connect_to_oracle()
 
-
-
     def connect_to_oracle(self):
-        print('----------------------------------')
         try:
             dsn_tns = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME) 
             self.orcale_connection = cx_Oracle.connect(user=self.ORACLE_USERNAME, password=self.ORACLE_PASSWORD,  dsn=dsn_tns)
@@ -68,6 +76,7 @@ class Oracle(base.LKF_Base):
 
     def query_view(self, view_name, query=False):
         result = []
+        columns = []
         try:
             cursor = self.orcale_connection.cursor()
             # Query to fetch data from the view

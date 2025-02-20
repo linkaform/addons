@@ -9,7 +9,7 @@
         <embedded>True</embedded>
     </report_properties>
     <properties>
-        <script_id>{{ report_script.abastecimientos.id }}</script_id>
+        <script_id>{{ report_script.reorder_rules.id }}</script_id>
         <arguments>
             <argument1>value22</argument1>
         </arguments>

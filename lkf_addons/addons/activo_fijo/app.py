@@ -5,8 +5,15 @@
 Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
 podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
 
-Licencia
-Este código está licenciado bajo la licencia GPL3 (https://www.gnu.org/licenses/gpl-3.0.html).
+Licencia BSD
+Copyright (c) 2024 Infosync / LinkaForm.  
+Todos los derechos reservados.
+
+Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
+
+1. Se debe conservar el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en las redistribuciones del código fuente.
+2. Se debe reproducir el aviso de copyright anterior, esta lista de condiciones y el siguiente descargo de responsabilidad en la documentación y/u otros materiales proporcionados con las distribuciones en formato binario.
+3. Ni el nombre del Infosync ni los nombres de sus colaboradores pueden ser utilizados para respaldar o promocionar productos derivados de este software sin permiso específico previo por escrito.
 
 Propósito
 El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
@@ -26,7 +33,6 @@ Instrucciones
     app_utils.py, utils.py, xxx_utils.py       
 '''
 
-from linkaform_api import base
 from lkf_addons.addons.base.app import Base
 
 ### Objecto de Modulo ###
@@ -41,13 +47,6 @@ class Vehiculo(Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
-
-        print('selfkwargs', self.kwargs)
-        print('kwargs', kwargs)
-        
-        self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])       
-        if self.__class__.__name__ not in kwargs:
-            self.kwargs['MODULES'].append(self.__class__.__name__)
         #--Variables 
         ### Forms ###
         '''
@@ -130,6 +129,7 @@ class Vehiculo(Base):
             'categoria_marca':'66beb1b507981d4509575057',
             'categoria':'66beb1b507981d4509575057',
             'estatus':'6646393c3fa8b818265d0329',
+            'estatus_vehiculo':'6737723b067a6a086e016826',
             'estado':'66c1940b89463aa27fc1818c',
             'fecha_horometro':'66c176ac89463aa27fc18172',
             'fecha_horometro_2':'66c176ac89463aa27fc18173',
@@ -143,6 +143,7 @@ class Vehiculo(Base):
             'numero_de_serie_chasis':'6646393c3fa8b818265d0325',
             'numero_de_serie_motor1':'66c174ec89463aa27fc1816c',
             'numero_de_serie_motor2':'66c174ec89463aa27fc1816d',
+            'placas':'6675ae21a97a1aa2bf03e906',
             'tipo_vehiculo':'65f22098d1dc5e0b9529e89a',
             'tipo_equipo':'6639a9d9d38959539f59eb9f',
             'ultimo_horometro':'66c1758989463aa27fc1816e',

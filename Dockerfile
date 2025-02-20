@@ -47,7 +47,7 @@ RUN chmod a+x /usr/local/bin/lkfaddons
 
 RUN pip install --upgrade pip
 RUN pip install -r /tmp/requires.txt
-
+RUN pip install twilio
 WORKDIR /tmp/
 ADD https://f001.backblazeb2.com/file/lkf-resources/backblaze_utils-0.1.tar.gz ./backblaze_utils-0.1.tar.gz 
 RUN pip install backblaze_utils-0.1.tar.gz
@@ -106,3 +106,4 @@ RUN chown -R 33:33 /srv/scripts
 USER www-data
 
 #RUN pip install -r /tmp/requires.txt
+WORKDIR /srv/scripts/addons/modules

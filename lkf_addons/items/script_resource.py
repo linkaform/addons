@@ -36,8 +36,10 @@ class ScriptResource(items.Items):
                 # print('this_path',this_pathd)
                 script_location =  self.file_path_to_load(script_name, detail)
                 # script_location = '{}/{}.{}'.format(this_path, script_name, detail.get('file_ext'))
-                res = self.lkf.install_script(self.module, script_location, image=image, script_properties=properites, local_path=detail.get('path'), **kwargs)
-
+                try:
+                    res = self.lkf.install_script(self.module, script_location, image=image, script_properties=properites, local_path=detail.get('path'), **kwargs)
+                except:
+                    continue
     def get_script_modules(self, all_items, parent_path=None):
         data_file = []
         form_file = {}

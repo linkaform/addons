@@ -1,5 +1,3 @@
-version: '3.4'
-
 
 services:
   lkf-test:
@@ -7,12 +5,12 @@ services:
     container_name: lkf-test
     image: linkaform/lkf_test:develop
     volumes:
+      - ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/
+      - ../../lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons/
+      - ../../modules:/usr/local/lib/python3.10/site-packages/lkf_modules/
       - ../:/srv/lkf_test/
-      - ../../config/:/srv/config
-      - ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/
-      - ../../config:/srv/scripts/addons/config
+      - ../../config/:/srv/scripts/addons/config/
       - ../:/srv/lkf_test/config/
-      - ../:/srv/addons
     build:
      context: ./
      dockerfile: Dockerfile

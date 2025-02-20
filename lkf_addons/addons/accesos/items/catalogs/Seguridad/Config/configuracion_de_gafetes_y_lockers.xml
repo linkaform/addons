@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>5-bc98222ea56686a95d742ba741ea928c</_rev>
+    <_rev>7-03dce95811cf45a872ba8c569515b02a</_rev>
     <updated_at>2024-07-30T00:59:00.334887+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -246,8 +246,8 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
 </lkf>

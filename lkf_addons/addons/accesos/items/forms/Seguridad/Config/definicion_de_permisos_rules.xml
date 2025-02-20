@@ -183,7 +183,7 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>{{ catalog.tipo_de_articulos_perdidos.obj_id}}</field_id>
+                    <field_id>{{ catalog.lista_de_objetos.obj_id}}</field_id>
                     <group_id>66ce57845a054aa3491adec0</group_id>
                     <id>66e35df3026f176693be09ca</id>
                     <label>Equipos o Mateiral</label>

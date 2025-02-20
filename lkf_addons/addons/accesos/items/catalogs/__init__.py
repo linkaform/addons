@@ -3,6 +3,9 @@ from lkf_addons.items.catalog_resource import CatalogResource
 
 install_order = [
                     'gafetes',
+                    'categorias_artiuclos_peridos',
+                    'categorias_de_objetos',
+                    'lista_de_objetos',
                     'lista_de_fallas',
                     'lista_de_incidentes',
                     'lockers',
@@ -14,5 +17,4 @@ install_order = [
                     'configuracion_de_perfiles',
                     'configuracion_de_gafetes_y_lockers',
                     'visita_autorizada',
-                    'categorias_de_objetos'
                     ]

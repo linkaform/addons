@@ -115,7 +115,7 @@
             <group_conditions>{}</group_conditions>
             <name>configurable</name>
             <operator>and</operator>
-            <rule_id>1a7016a615b618a4</rule_id>
+            <rule_id>139e63021131e75</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -401,6 +401,22 @@
                     <label>Cron_id</label>
                     <type>text</type>
                 </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde000100000000000f000</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde000100000000000f000</id>
+                    <label>Fecha Inicial de Programacion</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde000100000000000f001</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde000100000000000f001</id>
+                    <label>Fecha Proxima Ejecucion</label>
+                    <type>datetime</type>
+                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
             <name>deshabilitar Cron Metadata</name>
@@ -471,6 +487,22 @@
                     <label>Proximas Fechas</label>
                     <type>text</type>
                 </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde000100000000000f000</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde000100000000000f000</id>
+                    <label>Fecha Inicial de Programacion</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde000100000000000f001</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde000100000000000f001</id>
+                    <label>Fecha Proxima Ejecucion</label>
+                    <type>datetime</type>
+                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
             <name>Ocultar Campos</name>
@@ -535,7 +567,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.grupos.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>66f649756a38bc05612bca8d</id>
+                    <id>677ffae44528f76a4789d54b</id>
                     <label>Grupo</label>
                     <type>catalog</type>
                 </item>
@@ -577,7 +609,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.usuarios.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>66f649762b30d5f80e632688</id>
+                    <id>677ffaea04607ad6f85c8532</id>
                     <label>Usuario</label>
                     <type>catalog</type>
                 </item>
