@@ -290,8 +290,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'user_id_empleado': '663bd32d7fb8869bbc4d7f7b',
             'vigencia_certificado':'662962bb203407ab90c886e6',
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
-            'walkin':'66c4261351cc14058b020d48'
-
+            'walkin':'66c4261351cc14058b020d48',
+            'email_visita_a': '638a9a7767c332f5d459fc82'
         }
         self.mf = mf
         ## Form Fields ##
@@ -1588,6 +1588,65 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res =self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
         if res:
             return {'status_code':200}
+        
+    def check_out_all_users(self):
+        match_query_visitas = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.BITACORA_ACCESOS,
+            f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+            f"answers.{self.bitacora_fields['status_visita']}": "entrada",
+        }
+
+        proyect_fields_visitas = {
+            '_id': 1,
+            'folio': f"$folio",
+            'fecha_entrada': f"$answers.{self.mf['fecha_entrada']}",
+            'estatus': f"$answers.{self.bitacora_fields['status_visita']}",
+        }
+
+        query_visitas = [
+            {'$match': match_query_visitas},
+            {'$project': proyect_fields_visitas},
+        ]
+
+        data = self.format_cr(self.cr.aggregate(query_visitas))
+
+        lista_filtrada = []
+        zona_horaria = pytz.timezone('America/Mexico_City')
+        fecha_actual = datetime.now(zona_horaria)
+
+        for item in data:
+            fecha_entrada_sin_zona = datetime.strptime(item['fecha_entrada'], '%Y-%m-%d %H:%M:%S')
+            fecha_entrada = zona_horaria.localize(fecha_entrada_sin_zona)
+
+            diferencia = fecha_actual - fecha_entrada
+    
+            if diferencia.total_seconds() > 7200:
+                lista_filtrada.append(item)
+
+        if lista_filtrada:
+            res = self.set_checkout_all_users(lista_filtrada)
+        else:
+            res = 'No hay registros para hacer checkout...'
+        return res
+
+    def set_checkout_all_users(self, data):
+        folio_list = []
+        for item in data:
+            folio_list.append(item['folio'])
+
+        tz_mexico = pytz.timezone('America/Mexico_City')
+        now = datetime.now(tz_mexico)
+        fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        duration = '02:00:00'
+        answers = {
+            f"{self.bitacora_fields['status_visita']}":'salida',
+            f"{self.mf['fecha_salida']}":fecha_hora_str,
+            f"{self.mf['duracion']}":duration,
+        }
+
+        response = self.lkf_api.patch_multi_record( answers=answers, form_id=self.BITACORA_ACCESOS, folios=folio_list)
+        return response
 
     def create_enviar_msj_pase(self, folio=None):
         access_pass={"enviar_correo": ["enviar_sms"]}
@@ -2794,7 +2853,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'visita_a_user_id':
                     f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['user_id_empleado']}",
                 'visita_a_email':
-                    f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_empleado']}",
+                    f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_visita_a']}",
                 'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
                 # 'grupo_commentario_area': f"$answers.{self.mf['grupo_commentario_area']}",
                 'grupo_equipos': f"$answers.{self.mf['grupo_equipos']}",
