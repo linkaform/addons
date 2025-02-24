@@ -225,12 +225,15 @@ class Base(base.LKF_Base):
     
     def send_email_by_form_answers(self, data):
         answers = {}
+        if isinstance(data.get('email_to'), list):
+            data['email_to'] = data.get('email_to', [])[0]
         answers.update({
             f"{self.envio_correo_fields['email_from']}":data['email_from'],
             f"{self.envio_correo_fields['titulo']}":data['titulo'],
             f"{self.envio_correo_fields['nombre']}":data['nombre'],
             f"{self.envio_correo_fields['email_to']}":data['email_to'],
-            f"{self.envio_correo_fields['msj']}":data['mensaje']
+            f"{self.envio_correo_fields['msj']}":data['mensaje'],
+            f"{self.envio_correo_fields['enviado_desde']}":data['enviado_desde'],
             })
         return answers
 

@@ -1522,7 +1522,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return update_file
 
     def create_enviar_msj(self, data_msj, data_cel_msj=None, folio=None):
-        data_msj['enviado_desde'] = 'Modulo de Accesos'
+        if not data_msj.get('enviado_desde'):
+            data_msj['enviado_desde'] = 'Modulo de Accesos'
         return self.send_email_by_form(data_msj)
     
     def send_msj_pase(self, data_cel_msj=None, pre_sms=False, account=''):
