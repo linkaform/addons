@@ -2417,7 +2417,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res
     
     def get_page_stats(self, booth_area, location, page=''):
-        today = datetime.today().strftime("%Y-%m-%d")
+        timezone = pytz.timezone('America/Mexico_City')
+        today = datetime.now(timezone).strftime("%Y-%m-%d")        
         res={}
 
         if page == 'Turnos':
