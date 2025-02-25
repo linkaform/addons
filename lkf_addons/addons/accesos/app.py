@@ -1999,6 +1999,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         cat_visita = self.catalogo_view(self.CONF_AREA_EMPLEADOS_CAT_ID, self.PASE_ENTRADA, options_vistia)
         if len(cat_visita) > 0:
             cat_visita =  {key: [value,] for key, value in cat_visita[0].items() if value}
+        else:
+            selector = {}
+            selector.update({f"answers.{self.mf['nombre_empleado']}": nombre_visita_a})
+            fields = ["_id", f"answers.{self.mf['nombre_empleado']}", f"answers.{self.mf['email_visita_a']}", f"answers.{self.mf['id_usuario']}"]
+
+            mango_query = {
+                "selector": selector,
+                "fields": fields,
+                "limit": 1
+            }
+
+            row_catalog = self.lkf_api.search_catalog(self.CONF_AREA_EMPLEADOS_CAT_ID, mango_query)
+            if row_catalog:
+                visita_set[self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID].update({
+                    self.mf['nombre_empleado']: nombre_visita_a,
+                    self.mf['email_visita_a']: [row_catalog[0].get(self.mf['email_visita_a'], "")],
+                    self.mf['id_usuario']: [row_catalog[0].get(self.mf['id_usuario'], "")],
+                })
+
         visita_set[self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID].update(cat_visita)
         answers[self.mf['grupo_visitados']].append(visita_set)
 
