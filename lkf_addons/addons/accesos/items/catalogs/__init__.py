@@ -6,6 +6,7 @@ install_order = [
                     'categorias_artiuclos_peridos',
                     'categorias_de_objetos',
                     'lista_de_objetos',
+                    'subconceptos_fallas',
                     'lista_de_fallas',
                     'lista_de_incidentes',
                     'lockers',
