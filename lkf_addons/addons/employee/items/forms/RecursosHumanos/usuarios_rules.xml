@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.usuarios.id }}</form_id>
+    <id>67bf7552826d80eb3d7f2ab2</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>679d023876ad7f5ba642f4ed</field_id>
+                        <group_id>None</group_id>
+                        <id>679d023876ad7f5ba642f4ed</id>
+                        <label>Estatus</label>
+                        <type>select</type>
+                    </field>
+                    <value>creado</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>638a9a99616398d2e392a9f5</field_id>
+                    <group_id>None</group_id>
+                    <id>638a9a99616398d2e392a9f5</id>
+                    <label>Id de Usuario</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Usuario creado</name>
+            <operator>and</operator>
+            <rule_id>1f48caa1f078a2</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>679d023876ad7f5ba642f4ed</field_id>
+                        <group_id>None</group_id>
+                        <id>679d023876ad7f5ba642f4ed</id>
+                        <label>Estatus</label>
+                        <type>select</type>
+                    </field>
+                    <value>crear</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67be0b7896e72a692b4fa660</field_id>
+                    <group_id>None</group_id>
+                    <id>67be0b7896e72a692b4fa660</id>
+                    <label>Contraseña Temporal</label>
+                    <type>password</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67be0c43a31e5161c47f2bba</field_id>
+                    <group_id>None</group_id>
+                    <id>67be0c43a31e5161c47f2bba</id>
+                    <label>Telefono</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67be0c43a31e5161c47f2bbb</field_id>
+                    <group_id>None</group_id>
+                    <id>67be0c43a31e5161c47f2bbb</id>
+                    <label>Puesto</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Crear USuario</name>
+            <operator>and</operator>
+            <rule_id>144a18321f561c06</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
