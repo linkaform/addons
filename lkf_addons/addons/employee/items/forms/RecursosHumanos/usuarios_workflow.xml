@@ -63,7 +63,7 @@
                                 <label>Estatus</label>
                                 <type>select</type>
                             </trigger_field>
-                            <value>activo</value>
+                            <value>creado</value>
                         </item>
                     </triggers>
                 </wf_fields>
@@ -125,6 +125,7 @@
             display: inline-block;
             padding: 12px 20px;
             margin-top: 15px;
+            margin-bottom: 20px;
             font-size: 16px;
             color: #ffffff !important;
             background: #4CAF50;
@@ -160,10 +161,15 @@
 
             &lt;!-- Contenido --&gt;
             &lt;div class="content"&gt;
-                &lt;p&gt;¡Nos alegra darte la bienvenida a &lt;a href="https://www.soter.mx/" target="_blank"&gt;Soter&lt;/a&gt;, tu sistema de seguridad patrimonial! Tu cuenta ya está activa y ahora puedes acceder al sistema a través del siguiente enlace:&lt;/p&gt;
-                &lt;a href="https://app.soter.mx/" target="_blank" class="cta-button"&gt;Acceder a Soter&lt;/a&gt;
-                &lt;p&gt;Tu username es: &lt;b&gt;{{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/b&gt;&lt;/p&gt;
-                &lt;p&gt;Para ayudarte a familiarizarte con la plataforma, hemos preparado un manual de usuario. Puedes revisarlo &lt;a href="https://docs.linkaform.com/Usuario/Soter/index.html" target="_blank" style="color: #021d49; font-weight: bold; text-decoration: none"&gt;aquí&lt;/a&gt;.&lt;/p&gt;
+                &lt;p&gt;¡Nos alegra darte la bienvenida a &lt;a href="https://www.soter.mx/" target="_blank"&gt;Soter&lt;/a&gt;, tu sistema de seguridad patrimonial! Para activar tu cuenta, por favor cambia tu contraseña e inicia sesión en el siguiente enlace:&lt;/p&gt;
+                &lt;a href="https://app.soter.mx/update_pass.html?userUsername={{ record.answers.6759e4a7a9a6e13c7b26da33 }}" target="_blank" class="cta-button"&gt;Activar Cuenta&lt;/a&gt;
+                &lt;br&gt;
+                &lt;p style="text-align: left; margin: 0;"&gt;Tus credenciales de accesos son:&lt;/p&gt;
+                &lt;br&gt;
+                &lt;p style="text-align: left; margin: 0;"&gt;&lt;b&gt;Usuario:&lt;/b&gt; {{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/p&gt;
+                &lt;p style="text-align: left; margin: 0;"&gt;&lt;b&gt;Contraseña Temporal:&lt;/b&gt; {{ record.answers.67be0b7896e72a692b4fa660 }}&lt;/p&gt;
+                
+                &lt;p&gt;Para ayudarte a familiarizarte con la plataforma, hemos preparado un manual de usuario. Puedes revisarlo &lt;a href="https://docs.linkaform.com/Soter/App/index.html" target="_blank" style="color: #021d49; font-weight: bold; text-decoration: none"&gt;aquí&lt;/a&gt;.&lt;/p&gt;
                 &lt;p&gt;Si tienes alguna duda, nuestro equipo está listo para ayudarte.&lt;/p&gt;
                 &lt;p&gt;¡Nos vemos dentro! 🚀&lt;/p&gt;
             &lt;/div&gt;
@@ -220,10 +226,10 @@
                     <user>[]</user>
                 </metadata>
                 <record>
-                    <created>False</created>
+                    <created>True</created>
                     <deleted>False</deleted>
-                    <edited>False</edited>
-                    <run_multiple_times>False</run_multiple_times>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
@@ -241,7 +247,7 @@
                                 <label>Estatus</label>
                                 <type>select</type>
                             </trigger_field>
-                            <value>inactivo</value>
+                            <value>crear</value>
                         </item>
                     </triggers>
                 </wf_fields>
