@@ -3844,7 +3844,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if not default_booth:
                 return self.LKFException({"status_code":400, "msg":'No booth found or configure for user'})
             location_employees = self.get_booths_guards(booth_location, booth_area, solo_disponibles=True)
-            guard = self.get_user_guards(location_employees.get(self.chife_guard,[]))
+            guard = self.get_user_guards(location_employees=location_employees)
             if not guard:
                 return self.LKFException({
                     "status_code":400, 
@@ -3887,7 +3887,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_user_guards(self, location_employees):
+    def get_user_guards(self, location_employees=[]):
+        location_guards = []
+        for clave in ["guardia_de_apoyo", "guardia_lider"]:
+            for usuario in location_employees[clave]:
+                if usuario.get("user_id") == self.user.get('user_id'):
+                    location_guards = location_employees[clave]
+                
+        location_employees = location_guards
+
         for employee in location_employees:
             if employee.get('user_id',0) == self.user.get('user_id'):
                     return employee
