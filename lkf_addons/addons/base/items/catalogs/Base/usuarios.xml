@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>6-991a7c849117f6f96507ed45e360174f</_rev>
-    <updated_at>2024-10-17T00:09:17.010192+00:00Z</updated_at>
+    <_rev>2-8ddf279e2f562a7b6b0b8ede21fd3e9b</_rev>
+    <updated_at>2025-02-26T16:59:29.483000+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Usuarios</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-10-17T00:09:17.010192+00:00Z</created_at>
+    <created_at>2025-02-26T16:59:29.483000+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -28,27 +28,6 @@
     <catalog_pages>
         <item>
             <page_fields>
-                <item>
-                    <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <key>False</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>638a9a7767c332f5d459fc81</field_id>
-                    <required>False</required>
-                    <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Nombre</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
                 <item>
                     <field_type>integer</field_type>
                     <properties>
@@ -65,6 +44,27 @@
                     <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
                     <label>Id de Usuario</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <key>False</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>638a9a7767c332f5d459fc81</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Nombre</label>
                     <catalog>{}</catalog>
                     <catalog_id>None</catalog_id>
                     <view_fields>[]</view_fields>
@@ -114,40 +114,13 @@
                     <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
-                <item>
-                    <field_type>radio</field_type>
-                    <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
-                    <field_id>679d023876ad7f5ba642f4ed</field_id>
-                    <required>False</required>
-                    <fav>True</fav>
-                    <label>Estatus</label>
-                    <options>
-                        <item>
-                            <selected>False</selected>
-                            <label>Activo</label>
-                            <value>activo</value>
-                            <points>None</points>
-                        </item>
-                        <item>
-                            <selected>False</selected>
-                            <label>Inactivo</label>
-                            <value>inactivo</value>
-                            <points>None</points>
-                        </item>
-                    </options>
-                </item>
             </page_fields>
             <page_name>Página 1</page_name>
             <page_description>None</page_description>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>671055ade88548ac5cf1fe08</_id>
+    <_id>67bf487136d80392c04fa565</_id>
     <public>False</public>
-    <catalog_id>124773</catalog_id>
+    <catalog_id>129725</catalog_id>
 </lkf>

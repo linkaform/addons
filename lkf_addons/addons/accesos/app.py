@@ -290,8 +290,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'user_id_empleado': '663bd32d7fb8869bbc4d7f7b',
             'vigencia_certificado':'662962bb203407ab90c886e6',
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
-            'walkin':'66c4261351cc14058b020d48'
-
+            'walkin':'66c4261351cc14058b020d48',
+            'email_visita_a': '638a9a7767c332f5d459fc82'
         }
         self.mf = mf
         ## Form Fields ##
@@ -1522,7 +1522,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return update_file
 
     def create_enviar_msj(self, data_msj, data_cel_msj=None, folio=None):
-        data_msj['enviado_desde'] = 'Modulo de Accesos'
+        if not data_msj.get('enviado_desde'):
+            data_msj['enviado_desde'] = 'Modulo de Accesos'
         return self.send_email_by_form(data_msj)
     
     def send_msj_pase(self, data_cel_msj=None, pre_sms=False, account=''):
@@ -1588,6 +1589,65 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res =self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
         if res:
             return {'status_code':200}
+        
+    def check_out_all_users(self):
+        match_query_visitas = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.BITACORA_ACCESOS,
+            f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+            f"answers.{self.bitacora_fields['status_visita']}": "entrada",
+        }
+
+        proyect_fields_visitas = {
+            '_id': 1,
+            'folio': f"$folio",
+            'fecha_entrada': f"$answers.{self.mf['fecha_entrada']}",
+            'estatus': f"$answers.{self.bitacora_fields['status_visita']}",
+        }
+
+        query_visitas = [
+            {'$match': match_query_visitas},
+            {'$project': proyect_fields_visitas},
+        ]
+
+        data = self.format_cr(self.cr.aggregate(query_visitas))
+
+        lista_filtrada = []
+        zona_horaria = pytz.timezone('America/Mexico_City')
+        fecha_actual = datetime.now(zona_horaria)
+
+        for item in data:
+            fecha_entrada_sin_zona = datetime.strptime(item['fecha_entrada'], '%Y-%m-%d %H:%M:%S')
+            fecha_entrada = zona_horaria.localize(fecha_entrada_sin_zona)
+
+            diferencia = fecha_actual - fecha_entrada
+    
+            if diferencia.total_seconds() > 7200:
+                lista_filtrada.append(item)
+
+        if lista_filtrada:
+            res = self.set_checkout_all_users(lista_filtrada)
+        else:
+            res = 'No hay registros para hacer checkout...'
+        return res
+
+    def set_checkout_all_users(self, data):
+        folio_list = []
+        for item in data:
+            folio_list.append(item['folio'])
+
+        tz_mexico = pytz.timezone('America/Mexico_City')
+        now = datetime.now(tz_mexico)
+        fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        duration = '02:00:00'
+        answers = {
+            f"{self.bitacora_fields['status_visita']}":'salida',
+            f"{self.mf['fecha_salida']}":fecha_hora_str,
+            f"{self.mf['duracion']}":duration,
+        }
+
+        response = self.lkf_api.patch_multi_record( answers=answers, form_id=self.BITACORA_ACCESOS, folios=folio_list)
+        return response
 
     def create_enviar_msj_pase(self, folio=None):
         access_pass={"enviar_correo": ["enviar_sms"]}
@@ -1867,6 +1927,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         nombre_visita_a = employee.get('worker_name')
 
+        if(access_pass.get('site', '') == 'accesos'):
+            nombre_visita_a = access_pass.get('visita_a')
+
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
         answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
         if access_pass.get('custom') == True :
@@ -1936,6 +1999,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         cat_visita = self.catalogo_view(self.CONF_AREA_EMPLEADOS_CAT_ID, self.PASE_ENTRADA, options_vistia)
         if len(cat_visita) > 0:
             cat_visita =  {key: [value,] for key, value in cat_visita[0].items() if value}
+        else:
+            selector = {}
+            selector.update({f"answers.{self.mf['nombre_empleado']}": nombre_visita_a})
+            fields = ["_id", f"answers.{self.mf['nombre_empleado']}", f"answers.{self.mf['email_visita_a']}", f"answers.{self.mf['id_usuario']}"]
+
+            mango_query = {
+                "selector": selector,
+                "fields": fields,
+                "limit": 1
+            }
+
+            row_catalog = self.lkf_api.search_catalog(self.CONF_AREA_EMPLEADOS_CAT_ID, mango_query)
+            if row_catalog:
+                visita_set[self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID].update({
+                    self.mf['nombre_empleado']: nombre_visita_a,
+                    self.mf['email_visita_a']: [row_catalog[0].get(self.mf['email_visita_a'], "")],
+                    self.mf['id_usuario']: [row_catalog[0].get(self.mf['id_usuario'], "")],
+                })
+
         visita_set[self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID].update(cat_visita)
         answers[self.mf['grupo_visitados']].append(visita_set)
 
@@ -2354,7 +2436,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res
     
     def get_page_stats(self, booth_area, location, page=''):
-        today = datetime.today().strftime("%Y-%m-%d")
+        timezone = pytz.timezone('America/Mexico_City')
+        today = datetime.now(timezone).strftime("%Y-%m-%d")        
         res={}
 
         if page == 'Turnos':
@@ -2791,7 +2874,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'visita_a_user_id':
                     f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['user_id_empleado']}",
                 'visita_a_email':
-                    f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_empleado']}",
+                    f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_visita_a']}",
                 'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
                 # 'grupo_commentario_area': f"$answers.{self.mf['grupo_commentario_area']}",
                 'grupo_equipos': f"$answers.{self.mf['grupo_equipos']}",
@@ -2845,7 +2928,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
         if not x:
-            self.LKFException({'msg':'Pase de Entrda no econtrado'})
+            self.LKFException({'title':'Advertencia', 'msg':'Pase de Entrada Invalido'})
         return x
 
     def get_ids_labels(self, data):
@@ -3761,7 +3844,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if not default_booth:
                 return self.LKFException({"status_code":400, "msg":'No booth found or configure for user'})
             location_employees = self.get_booths_guards(booth_location, booth_area, solo_disponibles=True)
-            guard = self.get_user_guards(location_employees.get(self.chife_guard,[]))
+            guard = self.get_user_guards(location_employees=location_employees)
             if not guard:
                 return self.LKFException({
                     "status_code":400, 
@@ -3804,7 +3887,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_user_guards(self, location_employees):
+    def get_user_guards(self, location_employees=[]):
+        location_guards = []
+        for clave in ["guardia_de_apoyo", "guardia_lider"]:
+            for usuario in location_employees[clave]:
+                if usuario.get("user_id") == self.user.get('user_id'):
+                    location_guards = location_employees[clave]
+                
+        location_employees = location_guards
+
         for employee in location_employees:
             if employee.get('user_id',0) == self.user.get('user_id'):
                     return employee
@@ -4037,15 +4128,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for a, x in employees.items():
             if type(x) == list:
                 for y in x:
-                    employee_ids.append(int(y['user_id']))
+                    employee_ids.append(y['user_id'])
             else:
                 if x:
-                    employee_ids.append(int(x['user_id']))
+                    employee_ids.append(x['user_id'])
         pics = self.get_employee_pic(employee_ids)
         for a, x in employees.items():
             if type(x) == list:
                 for y in x:
-                    u_id = int(y['user_id'])
+                    u_id = y['user_id']
                     if pics.get(u_id):
                         y['picture'] = pics[u_id]
             else:
@@ -4053,7 +4144,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     u_id = int(x['user_id'])
                     if pics.get(u_id):
                         x['picture'] = pics[u_id]
-                    employee_ids.append(int(x['user_id']))
+                    employee_ids.append(x['user_id'])
         return employees
 
     def update_article_concessioned(self, data_articles, folio):

@@ -14,7 +14,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1716504140.0</created_at>
+    <created_at>1732579116.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -113,6 +113,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -189,6 +190,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -215,11 +217,11 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>664fc62142c59486fadd0a25</item>
+                        <item>67450f185b61ede29ea21286</item>
                         <item>663bc4c79b8046ce89e97cf4</item>
                     </groups_fields>
                     <help_text>None</help_text>
-                    <label>Puestos</label>
+                    <label>Puesto</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -258,6 +260,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -341,6 +344,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -420,6 +424,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -448,7 +453,8 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/119180/</resource_uri>
+    <resource_uri>/api/infosync/form/126496/</resource_uri>
+    <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
         <account_id>None</account_id>
@@ -468,5 +474,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1721837015.0</updated_at>
+    <updated_at>1737136746.0</updated_at>
 </lkf>

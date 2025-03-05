@@ -154,6 +154,14 @@ class Base(base.LKF_Base):
             'uom':'669efc6f47920d1b51663d29',
             'uom_category':'669efbf447920d1b51663d28',
             'zip_code':'663a7ee1e48382c5b1230905',
+            'new_user_complete_name': '638a9a7767c332f5d459fc81',
+            'new_user_email': '638a9a7767c332f5d459fc82',
+            'new_user_id': '638a9a99616398d2e392a9f5',
+            'new_user_phone': '67be0c43a31e5161c47f2bba',
+            'new_user_position': '67be0c43a31e5161c47f2bbb',
+            'new_user_status': '679d023876ad7f5ba642f4ed',
+            'new_user_temp_password': '67be0b7896e72a692b4fa660',
+            'new_user_username': '6759e4a7a9a6e13c7b26da33',
         }
         )
 
@@ -178,6 +186,34 @@ class Base(base.LKF_Base):
             # 'warehouse':f'{self.WAREHOUSE_OBJ_ID}.{self.f.get("warehouse")}',
             # 'location':f'{self.WAREHOUSE_OBJ_ID}.{self.f.get("location")}',
         }
+
+    def create_user_account(self, user_data):
+        # if user_data.get(self.f['new_user_status']) == 'Creado':
+        #     return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
+        
+        complete_name = user_data.get(self.f['new_user_complete_name'])
+        email = user_data.get(self.f['new_user_email'])
+        username = user_data.get(self.f['new_user_username'])
+        phone = user_data.get(self.f['new_user_phone'])
+        password = user_data.get(self.f['new_user_temp_password'])
+        position = user_data.get(self.f['new_user_position'], '')
+
+        body_request = {
+            "first_name": complete_name,
+            "email": email,
+            "username": username,
+            "password": password,
+            "password2": password,
+            "position": position,
+            "phone": phone,
+            "permissions": [],
+            "company": "",
+            "send_welcome": False
+        }
+        print(simplejson.dumps(body_request, indent=3))
+
+        response = self.lkf_api.create_user(body_request)
+        return response
 
     def _project_format(self, data):
         return self.project_format(data)
@@ -227,12 +263,15 @@ class Base(base.LKF_Base):
     
     def send_email_by_form_answers(self, data):
         answers = {}
+        if isinstance(data.get('email_to'), list):
+            data['email_to'] = data.get('email_to', [])[0]
         answers.update({
             f"{self.envio_correo_fields['email_from']}":data['email_from'],
             f"{self.envio_correo_fields['titulo']}":data['titulo'],
             f"{self.envio_correo_fields['nombre']}":data['nombre'],
             f"{self.envio_correo_fields['email_to']}":data['email_to'],
-            f"{self.envio_correo_fields['msj']}":data['mensaje']
+            f"{self.envio_correo_fields['msj']}":data['mensaje'],
+            f"{self.envio_correo_fields['enviado_desde']}":data['enviado_desde'],
             })
         return answers
 

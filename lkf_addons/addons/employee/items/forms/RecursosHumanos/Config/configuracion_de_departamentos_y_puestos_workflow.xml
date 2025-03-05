@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.configuracion_de_departamentos_y_puestos.id }}</form_id>
+    <id>67a545d7e2570cfb1831ce07</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>67a545d7e2570cfb1831ce00</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2025-01-30T22:49:19.401222</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.sync_conf_departamentos_puestos.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.sync_conf_departamentos_puestos.name }}</name>
+                            <start_date>2025-01-30T22:49:19.399677</start_date>
+                            <updated_at>2025-01-30T22:49:19.611389</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>Se ejecuta script sync_conf_departamentos_puestos</name>
+                </item>
+            </actions>
+            <id>67a545d7e2570cfb1831ce01</id>
+            <name>Ejecuta script para sincronizar catalogo Configuracion de Departamentos y Puestos</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-02-07T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-02-06T23:25:32.705Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
