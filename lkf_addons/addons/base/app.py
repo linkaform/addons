@@ -129,6 +129,7 @@ class Base(base.LKF_Base):
             'address':'663a7e0fe48382c5b1230902',
             'address2':'663a7f79e48382c5b123090a',
             'asignar_a':'abcde0001000000000020003',
+            'asignar_de_grupo':'67ad6e90067960b5f2ce1e15',
             'cat_timezone':f'{self.TIMEZONE_OBJ_ID}.665e4f90c4cf32cb52ebe15c',
             'client_code':'6711ea74b8514dc4fdfd917f',
             'config_group':'66ed0baac9aefada5b04b817',
@@ -138,6 +139,7 @@ class Base(base.LKF_Base):
             'city':'6654187fc85ce22aaf8bb070',
             'email':'663a7ee1e48382c5b1230907',
             'email_contacto':'66bfd647cd15883ed163e9b5',
+            'group_name':'638a9ab3616398d2e392a9fa',
             'group_id':'639b65dfaf316bacfc551ba2',
             'nombre_comercial':'667468e3e577b8b98c852aaa',
             'pagina_web':'66bfd66ecd15883ed163e9b7',
@@ -1222,15 +1224,22 @@ class Schedule(Base):
         se adelante al huzo horario, como en se va a correr con un {% today %} se tiene q agrear 5 horas
         '''
         time_offset = '1970-01-01 00:00:00'
+        if tz_offset >= 0:
+            operator = '+'
+        else:
+            operator = '-'
+        time_offset = self.calc_date(time_offset , tz_offset , 'minutes', operator)
         if timeframe and timeframe_unit:
             time_offset = self.calc_date(time_offset , timeframe , timeframe_unit)
-        time_offset = self.calc_date(time_offset , tz_offset , 'minutes')
         due_epoch = datetime.datetime.strptime(time_offset, '%Y-%m-%d %H:%M:%S')
         seconds = int(due_epoch.strftime('%s'))
         hours = int(seconds / 3600)
         #TODO que funcione en bloques de minutos, actualmente solo funciona 
         # en horas debido al int(second/3600) por lo tanto no soporta un 1.5 o .5
-        first_date = '{% ' + ' $today + $hours + {}'.format(hours) + ' %}'
+        if hours >= 0 :
+          first_date = '{% ' + ' $today + $hours + {}'.format(abs(hours)) + ' %}'
+        else:
+          first_date = '{% ' + ' $today + $hours - {}'.format(abs(hours)) + ' %}'
         return first_date
 
     def calc_date(self, first_date, timeframe, timeframe_unit, operator='+'):
@@ -1239,8 +1248,6 @@ class Schedule(Base):
         Regresa una fecha
 
         '''
-        print('------------------------------------------')
-        print('asi entra trime frame',timeframe )
         if first_date.find('$') >= 0:
             first_date = calc_funcint(first_date, return_hour=True)
         due_date = ''
@@ -1251,8 +1258,6 @@ class Schedule(Base):
         elif timeframe < 0 and operator == '-':
             operator = '+'
         if timeframe_unit in ('segundos', 'seconds', 'sec'):
-            print('asi esta el operador', operator)
-            print('timeframe', timeframe)
             if operator == '-':
                 due_date = first_date_dt - timedelta(seconds=timeframe)
             else:
@@ -1268,8 +1273,6 @@ class Schedule(Base):
             else:
                 due_date = first_date_dt + timedelta(hours=timeframe)    
         if timeframe_unit in ('dias', 'days', 'dy'):
-            print('diasssss', operator)
-            print('timeframe', timeframe)
             if operator == '-':
                 due_date = first_date_dt - timedelta(days=timeframe)
             else:
@@ -1345,20 +1348,14 @@ class Schedule(Base):
             answers.update({'fffff0001000000000000002':due_date})    
         if status:
             answers.update({'abcde0001000000000000020':status.lower().replace(' ', '_')})
-        print('status', status)
-        print('answers', answers)
-        print('group_field_map', group_field_map)
         group_answers = group_field_map.get('abcde0001000000000000008',[])
         group_field_ans_map = []
         field_ans_map = {}
         for ans in group_answers:
             question = ans.get('abcde0001000000000000009')
-            print('question', question)
             try:
                 is_field = ObjectId(question)
-                print('is_field', is_field)
                 field_type = ans.get('abcde0001000000000000010')
-                print('field_type', field_type)
                 if 'contestar_respuesta' in field_type:
                     print('es un Respuesta')
                     field_ans_map[question] = ans.get('abcde0001000000000000011')    
@@ -1385,9 +1382,7 @@ class Schedule(Base):
         if field_ans_map:
             answers.update(field_ans_map)
         if group_field_ans_map:
-            print('group_field_ans_map=',group_field_ans_map)
             answers.update({'abcde0001000000000000008':group_field_ans_map})
-        print('field_ans_map=',field_ans_map)
         return answers
 
     def get_dag_dates(self, data):
@@ -1420,7 +1415,6 @@ class Schedule(Base):
 
     def get_schedule_config(self, answers):
         is_recurrent = answers.get('abcde0001000000000010006')
-        print('is recurrent', is_recurrent)
         repeat_every = answers.get('abcde0001000000000010007')
         happens_every = answers.get('abcde0001000000000010009')
         first_date = answers.get(self.mf['fecha_primer_evento'])
@@ -1439,7 +1433,6 @@ class Schedule(Base):
         repeats_eveyr_xmonth = answers.get('abcde0001000000000010019')
 
         frecuency = {}
-        print('happens_every', happens_every)
         if is_recurrent == 'cuenta_con_una_recurrencia':
 
             if repeat_every == 'configurable':
@@ -1469,7 +1462,6 @@ class Schedule(Base):
                         frecuency['every_week_day'].append('friday')
                     if 'sabado' in week_day:
                         frecuency['every_week_day'].append('saturday')
-                    print('week--------------------', week)
                     if week:
                         if week == 'primer_semana_del_mes':
                             frecuency['week_number'] = 1
@@ -1481,7 +1473,6 @@ class Schedule(Base):
                             frecuency['week_number'] = 4
                         if week == 'quinta_semana_del_mes':
                             frecuency['week_number'] = 5
-                    print('frecuency', frecuency)
                     if not frecuency['every_week_day']:
                         frecuency.pop('every_week_day')
                 if 'dia_del_mes' in happens_every and day_of_month:
@@ -1512,7 +1503,6 @@ class Schedule(Base):
                     frecuency['at_beginning'] = True
         else:
             frecuency['once'] = True
-        print('frec', frecuency)
         return frecuency
 
     def get_script_map(self):
@@ -1539,7 +1529,6 @@ class Schedule(Base):
         tz_offset = self.current_record.get('tz_offset', -300) 
         dag_id = self.answers.get(self.mf['dag_id'])
         action = self.answers.get('abcde00010000000a0000001')
-        print(action )
         if not self.answers or  action in ('eliminar', 'delete'):
             if dag_id:
                 return self.delete_cron(cron_id = dag_id)
@@ -1547,7 +1536,6 @@ class Schedule(Base):
                 return self.delete_cron(self.current_record.get('item_id'), self.current_record.get('folio'))
         task_type = 'create_and_assign'
         if action in ('pausar', 'pause','pausa'):
-            print('pauaaaaaaaaaaaaaaaaaaaaaaaaaa')
             if not dag_id:
                 msg_error_app = {
                     "error":{"msg": ["Cron ID is needed, only existing Crons can be paused!"], "label": "Cron Id", "error":["Cron ID is needed, only existing Crons can be paused!!!"]},
@@ -1562,7 +1550,6 @@ class Schedule(Base):
                 response['is_paused'] = True
             return response
         elif action in ('corriendo', 'running','programar','program') and dag_id:
-            print('va por acaaaa................')
             body = {
                 'dag_id': dag_id,
                 'is_pause': False
@@ -1591,7 +1578,6 @@ class Schedule(Base):
         due_date = self.calc_date_as_function(first_date, tz_offset, timeframe, timeframe_unit)
         first_date = self.calc_date_as_function(first_date, tz_offset)
 
-
         task_name = self.answers.get('abcde0001000000000000001')
 
         task_st = self.answers.get('abcde0001000000000000006')
@@ -1619,6 +1605,8 @@ class Schedule(Base):
         if not schedule_config:
             error_msg = 'No se encontro configuracion'
         body = {}
+        print('self.CATALOGO_FORMAS_CAT_OBJ_ID',self.CATALOGO_FORMAS_CAT_OBJ_ID)
+        print('self.form_id',self.mf['form_id'])
         item_id = self.answers.get(self.CATALOGO_FORMAS_CAT_OBJ_ID,{}).get(self.mf['form_id'],[])[0]
         item_type = self.answers.get(self.CATALOGO_FORMAS_CAT_OBJ_ID,{}).get(self.mf['form_type'],[])[0]
         if not item_type or not item_id:
@@ -1703,6 +1691,7 @@ class Schedule(Base):
             downstream_task_id += 1
             body['tasks'][0]['downstream_task_id'].append(downstream_task_id)
             all_user_ids = []
+            assigne_2_group = []
             if 'todos_los_usuarios_que_tengan_el_formulario_compartido' in  asigne_to:
                 fileshare_user_ids = get_form_fileshare(item_id)
                 all_user_ids += convert_usr_id_to_dict(fileshare_user_ids)
@@ -1710,11 +1699,16 @@ class Schedule(Base):
                 if gset.get(self.f['asignar_a']) == 'grupo':
                     udata = gset.get(self.GROUP_OBJ_ID,{})
                     group_id = self.unlist(udata.get(self.f['group_id']))
+                    group_name = self.unlist(udata.get(self.f['group_name']))
                     # grp_set = set.get(GROUP_CATALOG_ID)
-                    group_users = self.lkf_api.get_group_users(group_id)
+                    assigne_type = gset.get(self.f['asignar_de_grupo'])
+                    if assigne_type == 'un_solo_registro':
+                        assigne_2_group.append({'group_id':group_id, 'group_name':group_name})
+                    else:
+                        group_users = self.lkf_api.get_group_users(group_id)
                     # guser_id = [user['id'] for user in group_users if user.get('id')]
                     # user_idsG = update_users(user_ids, guser_id)
-                    all_user_ids += self.update_users(all_user_ids, group_users)
+                        all_user_ids += self.update_users(all_user_ids, group_users)
                 elif gset.get(self.f['asignar_a']) == 'usuario':
                     udata = gset.get(self.USUARIOS_OBJ_ID,{})
                     data = {
@@ -1728,6 +1722,8 @@ class Schedule(Base):
                     all_user_ids += self.update_users(all_user_ids, data)
             if all_user_ids:
                 body['assign'] = {'assign_users':[]}
+            elif assigne_2_group:
+                body['assign'] = {'assign_group': assigne_2_group}
 
             for assige_usr in all_user_ids:
                 # user_data = {
