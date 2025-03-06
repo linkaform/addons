@@ -2202,6 +2202,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             print("Error al ejecutar el post_forms_answers en create_visita_autorizada")
         return res
 
+    def format_seguimiento_fallas(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['accion_correctiva'] = r.get(self.fallas_fields['falla_folio_accion_correctiva'],'')
+            row['comentario'] = r.get(self.fallas_fields['falla_comentario_solucion'],'')
+            row['evidencia'] = r.get(self.fallas_fields['falla_evidencia_solucion'],'')
+            row['documento'] = r.get(self.fallas_fields['falla_documento_solucion'],'')
+            row['fecha_inicio'] = r.get(self.fallas_fields['falla_inicio_seguimiento'],'')
+            row['fecha_fin'] = r.get(self.fallas_fields['falla_fin_seguimiento'],'')
+            res.append(row)
+        return res
+
     def format_personas_involucradas(self, data):
         res = []
         for r in data:
@@ -3352,7 +3365,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }},
             {'$sort':{'folio':-1}},
         ]
-        return self.format_cr_result(self.cr.aggregate(query))
+        result = self.format_cr_result(self.cr.aggregate(query))
+        for r in result:
+            r['falla_grupo_seguimiento_formated'] = self.format_seguimiento_fallas(r.get('falla_grupo_seguimiento',[]))
+        print(simplejson.dumps(result, indent=4))
+        return result
 
     def get_list_incidences(self, location, area, prioridades=[]):
         match_query = {
