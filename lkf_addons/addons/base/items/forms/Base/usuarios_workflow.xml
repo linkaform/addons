@@ -196,7 +196,7 @@
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>False</send_pdf>
-                        <sender>OWNER_EMAIL</sender>
+                        <sender>donotreply@soter.mx</sender>
                         <subject>{% raw %} 📢 ¡Bienvenido! Empieza a usar Soter hoy mismo. {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
@@ -231,6 +231,77 @@
                     <edited>True</edited>
                     <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>679d023876ad7f5ba642f4ed</field_id>
+                                <group>{}</group>
+                                <label>Estatus</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>crear</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>67c8c5f13b338ce52adcb3df</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2025-03-05T16:30:46.029020</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.create_user.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.create_user.name }}</name>
+                            <start_date>2025-03-05T16:30:46.027645</start_date>
+                            <updated_at>2025-03-05T17:46:36.447864</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>Se ejecuta script de creacion</name>
+                </item>
+            </actions>
+            <id>67c8c5f13b338ce52adcb3e6</id>
+            <name>Creacion de usuario</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-03-06T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-03-05T21:44:37.117Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>False</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>before</runtime>
                 </record>
                 <wf_fields>
                     <operator>all</operator>

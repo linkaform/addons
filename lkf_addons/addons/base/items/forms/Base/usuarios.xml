@@ -14,13 +14,13 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1740589244.0</created_at>
+    <created_at>1738775106.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
     <email_configuration>
-        <body>None</body>
+        <body>Has contestado el formulario Usuarios</body>
         <email_fields>[]</email_fields>
         <emails>[]</emails>
         <embed_company_picture>False</embed_company_picture>
@@ -30,11 +30,18 @@
         <resend>DONT_RESEND</resend>
         <send_attachments>False</send_attachments>
         <send_pdf>False</send_pdf>
-        <sender>None</sender>
-        <subject>None</subject>
+        <sender>donotreply@soter.mx</sender>
+        <subject>Una forma ha sido contestada</subject>
         <template_html>None</template_html>
         <templates>[]</templates>
-        <timer_config>None</timer_config>
+        <timer_config>
+            <active>False</active>
+            <clicks_to_expire>None</clicks_to_expire>
+            <goodbye_text>None</goodbye_text>
+            <minutes>None</minutes>
+            <seconds_to_expire>None</seconds_to_expire>
+            <welcome_text>None</welcome_text>
+        </timer_config>
     </email_configuration>
     <emails>[]</emails>
     <enable_geolocation>True</enable_geolocation>
@@ -120,8 +127,8 @@
                     </properties>
                     <required>False</required>
                     <rules>
-                        <item>1f48caa1f078a2</item>
-                        <item>144a18321f561c06</item>
+                        <item>18601882e72111c</item>
+                        <item>d956212371189a</item>
                     </rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -131,7 +138,7 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>1f48caa1f078a2</rule_id>
+                            <rule_id>18601882e72111c</rule_id>
                             <rule_index>0</rule_index>
                             <rule_type>show</rule_type>
                         </item>
@@ -422,9 +429,9 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>144a18321f561c06</rule_id>
+                            <rule_id>d956212371189a</rule_id>
                             <rule_index>1</rule_index>
-                            <rule_type>show</rule_type>
+                            <rule_type>invisible</rule_type>
                         </item>
                     </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
@@ -496,9 +503,9 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>144a18321f561c06</rule_id>
+                            <rule_id>d956212371189a</rule_id>
                             <rule_index>1</rule_index>
-                            <rule_type>show</rule_type>
+                            <rule_type>invisible</rule_type>
                         </item>
                     </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
@@ -570,9 +577,9 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>144a18321f561c06</rule_id>
+                            <rule_id>d956212371189a</rule_id>
                             <rule_index>1</rule_index>
-                            <rule_type>show</rule_type>
+                            <rule_type>invisible</rule_type>
                         </item>
                     </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
@@ -657,7 +664,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/129759/</resource_uri>
+    <resource_uri>/api/infosync/form/129150/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -678,5 +685,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1740693176.0</updated_at>
+    <updated_at>1741284040.0</updated_at>
 </lkf>
