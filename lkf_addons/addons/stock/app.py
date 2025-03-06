@@ -133,7 +133,7 @@ class Stock(Base):
             'inv_scrap_status':'644c1cb6dc502afa06c4423e',
             'inventory_status':'620ad6247a217dbcb888d175',
             'lot_number':'620a9ee0a449b98114f61d77',
-            'media_lot':'62e948f79928ba006783dc5c',
+            'media_lot':'65b538f49d2b7d901c1671eb',
             'media_name':'61ef43c226fd42cc223c98f7',
             'move_dest_folio':'ffff00000000000000000001',
             'move_group_qty':'6442e4cc45983bf1778ec17d',
@@ -779,6 +779,7 @@ class Stock(Base):
         return product_code, sku, lot_number, warehouse, location
 
     def get_product_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main'):
+        Print('===== STOCK APP: get_product_recipe =====')
         if type(all_codes) == str and all_codes:
             all_codes = [all_codes.upper(),]
         recipe = {}
@@ -1880,7 +1881,6 @@ class Stock(Base):
         folios = []
         # lots_in = {}
         data_from = {'warehouse':warehouse, 'warehouse_location':location}
-        print('data_from', data_frodm)
         new_records_data = []
         skus = self.get_group_skus(move_lines)
         metadata = self.lkf_api.get_metadata(self.FORM_INVENTORY_ID)
