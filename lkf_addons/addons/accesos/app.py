@@ -3367,7 +3367,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         ]
         result = self.format_cr_result(self.cr.aggregate(query))
         for r in result:
-            r['falla_grupo_seguimiento_formated'] = self.format_seguimiento_fallas(r.get('falla_grupo_seguimiento',[]))
+            if r:
+                r['falla_grupo_seguimiento_formated'] = self.format_seguimiento_fallas(r.get('falla_grupo_seguimiento',[]))
         print(simplejson.dumps(result, indent=4))
         return result
 
