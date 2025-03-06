@@ -111,7 +111,17 @@ class Employee(Base):
             'worker_code_jefes':'671a8fbae68fe659567224b0',
                 }
 
-        f = {}
+        f = {
+            'nombre_empleado': '62c5ff407febce07043024dd',
+            'ubicacion': '663e5c57f5b8a7ce8211ed0b',
+            'nombre_area':'663e5d44f5b8a7ce8211ed0f',
+            'nombre_guardia_apoyo': '663bd36eb19b7fb7d9e97ccb',
+            'nombre_area_salida':'663fb45992f2c5afcfe97ca8',
+            'areas_grupo':'663cf9d77500019d1359eb9f',
+            'departamento_empleado': '663bc4ed8a6b120eab4d7f1e',
+            "grupo_puestos": "663c015f3ac46d98e8f27495",
+            'puesto_empleado': '663bc4c79b8046ce89e97cf4',
+        }
         if hasattr(self, 'f'):
             self.f.update(f)
         else:
