@@ -188,8 +188,8 @@ class Base(base.LKF_Base):
         }
 
     def create_user_account(self, user_data):
-        # if user_data.get(self.f['new_user_status']) == 'Creado':
-        #     return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
+        if user_data.get(self.f['new_user_status']) == 'Creado':
+            return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
         
         complete_name = user_data.get(self.f['new_user_complete_name'])
         email = user_data.get(self.f['new_user_email'])
