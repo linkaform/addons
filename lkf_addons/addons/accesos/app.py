@@ -2805,9 +2805,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         raw_result = self.format_cr_result(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
-                if grupo.get("location", '') == ubicacion:
+                if grupo.get("ubicacion", '') == ubicacion:
                     requerimientos = {
-                        "location": grupo["location"],
+                        "ubicacion": grupo["ubicacion"],
                         "requerimientos": grupo.get(self.conf_modulo_seguridad['datos_requeridos'], [])
                     }
                 
