@@ -3369,7 +3369,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for r in result:
             if r:
                 r['falla_grupo_seguimiento_formated'] = self.format_seguimiento_fallas(r.get('falla_grupo_seguimiento',[]))
-                r.pop('falla_grupo_seguimiento')
+                try:
+                    r.pop('falla_grupo_seguimiento')
+                except KeyError:
+                    pass
         print(simplejson.dumps(result, indent=4))
         return result
 
