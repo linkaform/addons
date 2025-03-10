@@ -3912,9 +3912,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def get_user_guards(self, location_employees=[]):
         location_guards = []
         for clave in ["guardia_de_apoyo", "guardia_lider"]:
-            for usuario in location_employees[clave]:
-                if usuario.get("user_id") == self.user.get('user_id'):
-                    location_guards = location_employees[clave]
+            if location_employees.get(clave):
+                for usuario in location_employees[clave]:
+                    if usuario.get("user_id") == self.user.get('user_id'):
+                        location_guards = location_employees[clave]
                 
         location_employees = location_guards
 
