@@ -3775,12 +3775,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers['folio']= pass_selected.get("folio")
         return answers
     
-    def get_user_booths_availability(self):
+    def get_user_booths_availability(self, turn_areas=True):
         '''
         Regresa las castas configurados por usuario y su stats
         TODO, se puede mejorar la parte de la obtencion de la direccion para hacerlo en 1 sola peticion
         '''
-        default_booth , user_booths = self.get_user_booth(search_default=False)
+        default_booth , user_booths = self.get_user_booth(search_default=False, turn_areas=turn_areas)
         user_booths.insert(0, default_booth)
         for booth in user_booths:
             booth_area = booth.get('area')
