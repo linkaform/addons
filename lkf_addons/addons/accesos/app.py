@@ -3331,9 +3331,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "form_id": self.BITACORA_FALLAS,
         }
         if location:
-            match_query[f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_ubicacion']}"] = location
+            match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}"] = location
         if area:
-            match_query[f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}"] = area
+            match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}"] = area
         if status:
             match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
         if folio:
@@ -4281,10 +4281,24 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def update_failure_seguimiento(self, location=None, area=None, status=None, folio=None, falla_grupo_seguimiento=None):
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         failure_selected = self.get_list_fallas(location, area, folio=folio)
-        failure_selected = failure_selected[0]
+        if failure_selected:
+            failure_selected = failure_selected[0]
+        else:
+            self.LKFException('No hay una falla registrada.')
         print('failure_selecteddddddddd', failure_selected)
         qr_code = failure_selected.get('_id')
-        falla_nuevo_grupo = failure_selected.get('falla_grupo_seguimiento', [])
+        falla_nuevo_grupo = failure_selected.get('falla_grupo_seguimiento_formated', [])
+        falla_nuevo_grupo_con_ids = []
+        for falla in falla_nuevo_grupo:
+            falla = {
+                self.fallas_fields['falla_comentario_solucion']: falla.get('comentario'),
+                self.fallas_fields['falla_folio_accion_correctiva']: falla.get('accion_correctiva'),
+                self.fallas_fields['falla_evidencia_solucion']: falla.get('evidencia'),
+                self.fallas_fields['falla_documento_solucion']: falla.get('documento'),
+                self.fallas_fields['falla_inicio_seguimiento']: falla.get('fecha_inicio'),
+                self.fallas_fields['falla_fin_seguimiento']: falla.get('fecha_fin'),    
+            }
+            falla_nuevo_grupo_con_ids.append(falla)
 
         falla_seg = {
             "falla_estatus": status,
@@ -4357,8 +4371,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             self.fallas_fields['falla_inicio_seguimiento']:falla_inicio_incidencia,
                             self.fallas_fields['falla_fin_seguimiento']:falla_fin_incidencia,
                         })
-                    falla_nuevo_grupo.append(list_fallas_seguimiento[0])
-                    answers[self.fallas_fields['falla_grupo_seguimiento']] = falla_nuevo_grupo
+                    falla_nuevo_grupo_con_ids.append(list_fallas_seguimiento[0])
+                    answers[self.fallas_fields['falla_grupo_seguimiento']] = falla_nuevo_grupo_con_ids
             else:
                 answers.update({f"{self.fallas_fields[key]}":value})
 
