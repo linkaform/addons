@@ -1,0 +1,205 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>{}</confirmation>
+    <description />
+    <_rev>6-0397f9eb8845c6c85d454a85334f8910</_rev>
+    <updated_at>2025-03-05T23:27:39.591334+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Lista de Precios</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2025-03-05T23:27:39.591334+00:00Z</created_at>
+    <advanced_options>{}</advanced_options>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>catalog</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>
+                        <item>67c8ddc6810f3eafed183e1d</item>
+                    </catalog_fields>
+                    <fav>None</fav>
+                    <required>False</required>
+                    <field_id>{{ catalog.tipo_de_lista_de_precio.obj_id }}</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.tipo_de_lista_de_precio.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_lista_de_precio.id }}</catalog_id>
+                        <view_fields>
+                            <item>67c8ddc6810f3eafed183e1d</item>
+                        </view_fields>
+                        <name>{{ catalog.tipo_de_lista_de_precio.name }}</name>
+                    </catalog>
+                    <relation_type>None</relation_type>
+                    <label>Lista</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>67c8ddc6810f3eafed183e1d</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre Lista de Precios</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.tipo_de_lista_de_precio.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_lista_de_precio.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>61ef32bcdf0ec2ba73dec33e</item>
+                        <item>61ef32bcdf0ec2ba73dec33d</item>
+                        <item>669efc6f47920d1b51663d29</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.product_catalog.obj_id }}</field_id>
+                    <label>Producto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.product_catalog.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.product_catalog.id }}</catalog_id>
+                        <view_fields>
+                            <item>61ef32bcdf0ec2ba73dec33e</item>
+                            <item>61ef32bcdf0ec2ba73dec33d</item>
+                            <item>669efc6f47920d1b51663d29</item>
+                        </view_fields>
+                        <name>{{ catalog.product_catalog.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>61ef32bcdf0ec2ba73dec33e</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre de Producto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.product_catalog.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.product_catalog.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>61ef32bcdf0ec2ba73dec33d</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Codigo de Producto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.product_catalog.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.product_catalog.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>669efc6f47920d1b51663d29</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Unidad de Media</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>3</view_index>
+                        <catalog_field_id>{{ catalog.product_catalog.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.product_catalog.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>[]</catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.services.obj_id }}</field_id>
+                    <label>Servicio</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.services.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.services.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                        <name>{{ catalog.services.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <field_id>67c8de281eeb80b05b183ded</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Cantidad</label>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>decimal</field_type>
+                    <field_id>67c8df711eeb80b05b183dee</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Precio</label>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <size>small</size>
+                        <step>1</step>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_description>None</page_description>
+            <page_name>Página 1</page_name>
+        </item>
+    </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>67c8ddeb810f3eafed183e20</_id>
+    <public>False</public>
+    <catalog_id>130117</catalog_id>
+</lkf>
