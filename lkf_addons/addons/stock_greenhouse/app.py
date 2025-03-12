@@ -142,7 +142,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             'reicpe_per_container':'6205f73281bb36a6f157335b',
             'reicpe_productiviy':'6209705080c17c97320e337f',
             'reicpe_soil_type':'6209705080c17c97320e3383',
-            'reicpe_stage':'621fca56ee94313e8d8c5e2e',
+            'reicpe_stage':'6205f73281bb36a6f1573358',
             'reicpe_start_size':'6205f73281bb36a6f1573358',
             'reicpe_start_week':'6209705080c17c97320e3380',
             'sales':'6442e2fbc0dd855fe856f1da',
@@ -916,8 +916,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         if 3 in stage:
             mango_query = self.plant_recipe_query(all_codes, "S3", "S2", recipe_type)
             recipe_s3 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query)
-
         if 4 in stage:
+
             if 'Ln72' in stage:
                 mango_query = self.plant_recipe_query(all_codes, "Ln72", "S4", recipe_type)
             else:
@@ -1028,7 +1028,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         return res
 
     def get_product_stock(self, product_code, warehouse=None, location=None, lot_number=None, date_from=None, date_to=None,  **kwargs):
-        # GET INCOME PRODUCT
+        ##GET INCOME PRODUCT
         # print(f'**************Get Stock: {product_code}****************')
         # print('lot_number', lot_number)
         # print('warehouse', warehouse)
@@ -1045,7 +1045,9 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             else:
                 cache_id = f"{product_code}_{lot_number}_{warehouse}"
         cache_stock = self.cache_get({'_id':cache_id,"_one":True, },**kwargs)
-        print('cache_stock=', cache_stock)
+        # print('cache_stockcache_id=', cache_id)
+        # print('kwargs=', kwargs)
+        # print('cache_stock=', cache_stock)
         kwargs.update(cache_stock.get('kwargs',{}))
         kwargs.update(cache_stock.get('cache',{}).get('kwargs',{}))
         if cache_stock.get('cache',{}).get('record_id'):
@@ -1057,6 +1059,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             stock['actuals'] += initial_stock.get('actuals',0)
         stock['adjustments'] = self.stock_adjustments_moves( product_code=product_code, lot_number=lot_number, \
             warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
+        # print('adjustments=', stock['adjustments'])
         # print('adjustments',  stock['adjustments'])
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
@@ -1068,6 +1071,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         # print('stock production....',stock['production'])
         stock['move_in'] = self.stock_moves('in', product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, **kwargs)
+        # print('move_in=', stock['move_in'])
         #GET PRODUCT EXITS
         # print('stock IN....',stock['move_in'])
         stock['move_out'] = self.stock_moves('out', product_code=product_code, warehouse=warehouse, location=location, \
@@ -1408,6 +1412,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             verify = 0
             if adjust_qty or adjust_qty ==0:
                 verify +=1
+                adjust_in = 0
+                adjust_out = 0
             elif adjust_in:
                 if adjust_qty == 0  and last_verions_products:
                     pass
@@ -1430,7 +1436,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 plant[self.f['inv_adjust_grp_comments']] = msg
                 continue
 
-
             if last_verions_products.get(f'{product_code}_{warehouse}_{lot_number}'):
                 last_verions_products.pop(f'{product_code}_{warehouse}_{lot_number}')
             exist = self.product_stock_exists(product_code=product_code, warehouse=warehouse, lot_number=lot_number)
@@ -1442,10 +1447,10 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 elif adjust_qty or adjust_qty == 0:
                     if actuals < adjust_qty:
                         adjust_in = adjust_qty - actuals 
-                        cache_adjustment = adjust_in * -1
+                        cache_adjustment = adjust_in
                     elif actuals > adjust_qty:
                         adjust_out = adjust_qty - actuals
-                        cache_adjustment = adjust_out 
+                        cache_adjustment = adjust_out  
                     else:
                         cache_adjustment = adjust_qty - actuals
                         adjust_in  = 0
@@ -1458,10 +1463,12 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     cache_adjustment = adjust_out * -1
                     adjust_in = 0
                     adjust_qty = 0
-                if cache_adjustment < 0:
-                    adjust_in = abs(cache_adjustment)
                 if cache_adjustment > 0:
-                    adjust_out = cache_adjustment
+                    adjust_in = abs(cache_adjustment)
+                    adjust_out = 0 
+                else:
+                    adjust_out = abs(cache_adjustment) * -1
+                    adjust_in = 0 
                 self.cache_set({
                         '_id': f'{product_code}_{lot_number}_{warehouse}',
                         'adjustments': cache_adjustment,

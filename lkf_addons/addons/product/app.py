@@ -33,7 +33,7 @@ class Product(Base, base.LKF_Base):
         self.PRODUCT_ID = self.PRODUCT.get('id')
         self.PRODUCT_OBJ_ID = self.PRODUCT.get('obj_id')
 
-        self.SKU = self.lkm.catalog_id('sku_catalog')
+        self.SKU = self.lkm.catalog_id('sku_catalog',{})
         self.SKU_ID = self.SKU.get('id')
         self.SKU_OBJ_ID = self.SKU.get('obj_id')
         if not self.SKU:
