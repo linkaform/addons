@@ -188,8 +188,8 @@ class Base(base.LKF_Base):
         }
 
     def create_user_account(self, user_data):
-        # if user_data.get(self.f['new_user_status']) == 'Creado':
-        #     return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
+        if user_data.get(self.f['new_user_status']) == 'Creado':
+            return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
         
         complete_name = user_data.get(self.f['new_user_complete_name'])
         email = user_data.get(self.f['new_user_email'])
@@ -214,6 +214,40 @@ class Base(base.LKF_Base):
 
         response = self.lkf_api.create_user(body_request)
         return response
+    
+    def get_user_by_username(self, username):
+        #TODO Checar por que el form id de Usuarios no trae el id correcto
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": 129150,
+            f"answers.{self.f['new_user_username']}": username,
+        }
+
+        query_visitas = [
+            {'$match': match_query},
+            {'$limit': 1},
+        ]
+
+        resultado = self.format_cr(self.cr.aggregate(query_visitas))
+        if resultado:
+            return resultado[0]
+        else:
+            return self.LKFException({
+                "status_code": 400, 
+                "msg": f"El username: {username} no se encuentra registrado."
+            }) 
+
+    def update_user_register(self, username, userId):
+        actual_user = self.get_user_by_username(username=username)
+        folio = actual_user.get('folio')
+        answers = {
+            self.f['new_user_id']: userId,
+            self.f['new_user_status']: 'creado',
+        }
+        if answers:
+            #TODO Checar por que el form id de Usuarios no trae el id correcto
+            res = self.lkf_api.patch_multi_record(answers=answers, form_id=129150, folios=[folio])
+            return res
 
     def _project_format(self, data):
         return self.project_format(data)

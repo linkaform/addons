@@ -136,7 +136,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.PASE_ENTRADA_ID = self.PASE_ENTRADA_CAT.get('id')
         self.PASE_ENTRADA_OBJ_ID = self.PASE_ENTRADA_CAT.get('obj_id')
 
-        self.TIPO_ARTICULOS_PERDIDOS_CAT = self.lkm.catalog_id('tipo_de_articulos_perdidos')
+        self.TIPO_ARTICULOS_PERDIDOS_CAT = self.lkm.catalog_id('lista_de_objetos')
         self.TIPO_ARTICULOS_PERDIDOS_CAT_ID = self.TIPO_ARTICULOS_PERDIDOS_CAT.get('id')
         self.TIPO_ARTICULOS_PERDIDOS_CAT_OBJ_ID = self.TIPO_ARTICULOS_PERDIDOS_CAT.get('obj_id')
         
@@ -2202,6 +2202,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             print("Error al ejecutar el post_forms_answers en create_visita_autorizada")
         return res
 
+    def format_seguimiento_fallas(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['accion_correctiva'] = r.get(self.fallas_fields['falla_folio_accion_correctiva'],'')
+            row['comentario'] = r.get(self.fallas_fields['falla_comentario_solucion'],'')
+            row['evidencia'] = r.get(self.fallas_fields['falla_evidencia_solucion'],'')
+            row['documento'] = r.get(self.fallas_fields['falla_documento_solucion'],'')
+            row['fecha_inicio'] = r.get(self.fallas_fields['falla_inicio_seguimiento'],'')
+            row['fecha_fin'] = r.get(self.fallas_fields['falla_fin_seguimiento'],'')
+            res.append(row)
+        return res
+
     def format_personas_involucradas(self, data):
         res = []
         for r in data:
@@ -2792,9 +2805,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         raw_result = self.format_cr_result(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
-                if grupo.get("location", '') == ubicacion:
+                if grupo.get("ubicacion", '') == ubicacion:
                     requerimientos = {
-                        "location": grupo["location"],
+                        "ubicacion": grupo["ubicacion"],
                         "requerimientos": grupo.get(self.conf_modulo_seguridad['datos_requeridos'], [])
                     }
                 
@@ -3318,9 +3331,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "form_id": self.BITACORA_FALLAS,
         }
         if location:
-            match_query[f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_ubicacion']}"] = location
+            match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}"] = location
         if area:
-            match_query[f"answers.{self.fallas_fields['falla_ubicacion_catalog']}.{self.fallas_fields['falla_caseta']}"] = area
+            match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}"] = area
         if status:
             match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
         if folio:
@@ -3352,7 +3365,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }},
             {'$sort':{'folio':-1}},
         ]
-        return self.format_cr_result(self.cr.aggregate(query))
+        result = self.format_cr_result(self.cr.aggregate(query))
+        for r in result:
+            if r:
+                r['falla_grupo_seguimiento_formated'] = self.format_seguimiento_fallas(r.get('falla_grupo_seguimiento',[]))
+                try:
+                    r.pop('falla_grupo_seguimiento')
+                except KeyError:
+                    pass
+        print(simplejson.dumps(result, indent=4))
+        return result
 
     def get_list_incidences(self, location, area, prioridades=[]):
         match_query = {
@@ -3753,12 +3775,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers['folio']= pass_selected.get("folio")
         return answers
     
-    def get_user_booths_availability(self):
+    def get_user_booths_availability(self, turn_areas=True):
         '''
         Regresa las castas configurados por usuario y su stats
         TODO, se puede mejorar la parte de la obtencion de la direccion para hacerlo en 1 sola peticion
         '''
-        default_booth , user_booths = self.get_user_booth(search_default=False)
+        default_booth , user_booths = self.get_user_booth(search_default=False, turn_areas=turn_areas)
         user_booths.insert(0, default_booth)
         for booth in user_booths:
             booth_area = booth.get('area')
@@ -3890,9 +3912,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def get_user_guards(self, location_employees=[]):
         location_guards = []
         for clave in ["guardia_de_apoyo", "guardia_lider"]:
-            for usuario in location_employees[clave]:
-                if usuario.get("user_id") == self.user.get('user_id'):
-                    location_guards = location_employees[clave]
+            if location_employees.get(clave):
+                for usuario in location_employees[clave]:
+                    if usuario.get("user_id") == self.user.get('user_id'):
+                        location_guards = location_employees[clave]
                 
         location_employees = location_guards
 
@@ -4258,10 +4281,24 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def update_failure_seguimiento(self, location=None, area=None, status=None, folio=None, falla_grupo_seguimiento=None):
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         failure_selected = self.get_list_fallas(location, area, folio=folio)
-        failure_selected = failure_selected[0]
+        if failure_selected:
+            failure_selected = failure_selected[0]
+        else:
+            self.LKFException('No hay una falla registrada.')
         print('failure_selecteddddddddd', failure_selected)
         qr_code = failure_selected.get('_id')
-        falla_nuevo_grupo = failure_selected.get('falla_grupo_seguimiento', [])
+        falla_nuevo_grupo = failure_selected.get('falla_grupo_seguimiento_formated', [])
+        falla_nuevo_grupo_con_ids = []
+        for falla in falla_nuevo_grupo:
+            falla = {
+                self.fallas_fields['falla_comentario_solucion']: falla.get('comentario'),
+                self.fallas_fields['falla_folio_accion_correctiva']: falla.get('accion_correctiva'),
+                self.fallas_fields['falla_evidencia_solucion']: falla.get('evidencia'),
+                self.fallas_fields['falla_documento_solucion']: falla.get('documento'),
+                self.fallas_fields['falla_inicio_seguimiento']: falla.get('fecha_inicio'),
+                self.fallas_fields['falla_fin_seguimiento']: falla.get('fecha_fin'),    
+            }
+            falla_nuevo_grupo_con_ids.append(falla)
 
         falla_seg = {
             "falla_estatus": status,
@@ -4334,8 +4371,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             self.fallas_fields['falla_inicio_seguimiento']:falla_inicio_incidencia,
                             self.fallas_fields['falla_fin_seguimiento']:falla_fin_incidencia,
                         })
-                    falla_nuevo_grupo.append(list_fallas_seguimiento[0])
-                    answers[self.fallas_fields['falla_grupo_seguimiento']] = falla_nuevo_grupo
+                    falla_nuevo_grupo_con_ids.append(list_fallas_seguimiento[0])
+                    answers[self.fallas_fields['falla_grupo_seguimiento']] = falla_nuevo_grupo_con_ids
             else:
                 answers.update({f"{self.fallas_fields[key]}":value})
 

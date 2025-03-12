@@ -111,7 +111,17 @@ class Employee(Base):
             'worker_code_jefes':'671a8fbae68fe659567224b0',
                 }
 
-        f = {}
+        f = {
+            'nombre_empleado': '62c5ff407febce07043024dd',
+            'ubicacion': '663e5c57f5b8a7ce8211ed0b',
+            'nombre_area':'663e5d44f5b8a7ce8211ed0f',
+            'nombre_guardia_apoyo': '663bd36eb19b7fb7d9e97ccb',
+            'nombre_area_salida':'663fb45992f2c5afcfe97ca8',
+            'areas_grupo':'663cf9d77500019d1359eb9f',
+            'departamento_empleado': '663bc4ed8a6b120eab4d7f1e',
+            "grupo_puestos": "663c015f3ac46d98e8f27495",
+            'puesto_empleado': '663bc4c79b8046ce89e97cf4',
+        }
         if hasattr(self, 'f'):
             self.f.update(f)
         else:
@@ -148,7 +158,7 @@ class Employee(Base):
         res = self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
         return res 
 
-    def get_user_booth(self, search_default=True, **kwargs):
+    def get_user_booth(self, search_default=True, turn_areas=True, **kwargs):
         if kwargs.get('user_id'):
             user_id = kwargs['user_id']
         else:
@@ -182,6 +192,30 @@ class Employee(Base):
         caseta = None
         user_booths = []
         for x in res:
+            if not x.get('area') and not turn_areas:
+                selector = {}
+                selector.update({f"answers.{self.f['ubicacion']}": x.get('location')})
+
+                if not selector:
+                    selector = {"_id": {"$gt": None}}
+
+                fields = ["_id", f"answers.{self.f['nombre_area']}"]
+
+                mango_query = {
+                    "selector": selector,
+                    "fields": fields,
+                    "limit": 1000
+                }
+
+                row_catalog = self.lkf_api.search_catalog(self.Location.AREAS_DE_LAS_UBICACIONES_CAT_ID, mango_query)
+                if row_catalog:
+                    for r in row_catalog:
+                        res.append({
+                            'area': r.get(self.f['nombre_area']),
+                            'location': x.get('location'),
+                            'employee': x.get('employee'),
+                            'marcada_como': 'normal',
+                        })
             if x['marcada_como'] == 'default' and not caseta:
                 caseta = x
             else:

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.usuarios.id }}</form_id>
-    <id>67bf7552826d80eb3d7f2ab2</id>
+    <id>67c9e221e2075dd719a7ddb3</id>
     <rules>
         <item>
             <conditions>
@@ -31,9 +31,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Usuario creado</name>
+            <name>Regla 1</name>
             <operator>and</operator>
-            <rule_id>1f48caa1f078a2</rule_id>
+            <rule_id>18601882e72111c</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -49,7 +49,7 @@
                         <label>Estatus</label>
                         <type>select</type>
                     </field>
-                    <value>crear</value>
+                    <value>creado</value>
                 </item>
             </conditions>
             <element_ids>[]</element_ids>
@@ -81,10 +81,10 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Crear USuario</name>
+            <name>Regla 2</name>
             <operator>and</operator>
-            <rule_id>144a18321f561c06</rule_id>
-            <rule_type>show</rule_type>
+            <rule_id>d956212371189a</rule_id>
+            <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
     </rules>
