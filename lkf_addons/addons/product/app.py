@@ -41,6 +41,14 @@ class Product(Base, base.LKF_Base):
             self.SKU_ID = self.SKU.get('id')
             self.SKU_OBJ_ID = self.SKU.get('obj_id')
             
+        self.LISTA_DE_PRECIOS = self.lkm.catalog_id('lista_de_precios')
+        self.LISTA_DE_PRECIOS_ID = self.LISTA_DE_PRECIOS.get('id')
+        self.LISTA_DE_PRECIOS_OBJ_ID = self.LISTA_DE_PRECIOS.get('obj_id')
+
+        self.SERVICES = self.lkm.catalog_id('services')
+        self.SERVICES_ID = self.SERVICES.get('id')
+        self.SERVICES_OBJ_ID = self.SERVICES.get('obj_id')
+
         ###### Depricated ######
         try:
             self.PRODUCT_RECIPE = self.lkm.catalog_id('product_recipe')
@@ -66,6 +74,16 @@ class Product(Base, base.LKF_Base):
             'sku_percontainer':'6205f73281bb36a6f157335b',
             'sku_size':'6205f73281bb36a6f1573358',
             'sku_source':'6205f73281bb36a6f157335a',
+            'grupo_servicios': '67c8d79dae48ab7c10183e01',
+            'grupo_refacciones': '67c8d4e63bb53469c1183ded',
+            'costo_total_servicios': '67c8eb319008841d97183e46',
+            'costo_total_refacciones': '67c8eb319008841d97183e47',
+            'subtotal_servicio': '67c8e03bd552fe159e183e1b',
+            'servicio_precio': '67c8df711eeb80b05b183dee',
+            'servicio_cantidad': '67c8e0301eeb80b05b183df0',
+            'servicio_descuento': '67c8e048810f3eafed183e21',
+            'refaccion_cantidad': '67c8e1341eeb80b05b183df2',
+            'refaccion_costo_unitario': '67c8e1341eeb80b05b183df3',
             }
             )
 
