@@ -1,0 +1,251 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.orden_de_servicio.id }}</form_id>
+    <id>67d3280bdd0390e4c73ea525</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>67d3270d10704c590bbd3f3d</field_id>
+                        <group_id>None</group_id>
+                        <id>67d3270d10704c590bbd3f3d</id>
+                        <label>Requiere Refacciones</label>
+                        <type>radio</type>
+                    </field>
+                    <value>no</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.warehouse_locations.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>67c9e49e7a90772f1a98144d</id>
+                    <label>Alacen Refacciones</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>67c9e49e7a90772f1a98144d</catalog_id>
+                    <field_id>6442e4831198daf81456f274</field_id>
+                    <group_id>None</group_id>
+                    <id>6442e4831198daf81456f274</id>
+                    <label>Nombre Almacen</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>67c9e49e7a90772f1a98144d</catalog_id>
+                    <field_id>65ac6fbc070b93e656bd7fbe</field_id>
+                    <group_id>None</group_id>
+                    <id>65ac6fbc070b93e656bd7fbe</id>
+                    <label>Ubicacion</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.activos_fijos.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>67d21521a163d9de897a2546</id>
+                    <label>Equipo</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>67d21521a163d9de897a2546</catalog_id>
+                    <field_id>6646393c3fa8b818265d0325</field_id>
+                    <group_id>None</group_id>
+                    <id>6646393c3fa8b818265d0325</id>
+                    <label>Número de serie - Chasis</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67c8d4e63bb53469c1183ded</field_id>
+                    <group_id>None</group_id>
+                    <id>67c8d4e63bb53469c1183ded</id>
+                    <label>Refacciones</label>
+                    <type>group</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.stock_inventory.obj_id}}</field_id>
+                    <group_id>67c8d4e63bb53469c1183ded</group_id>
+                    <id>67d216afdf78c6fb39dcb3f9</id>
+                    <label>Refaccion</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>67d216afdf78c6fb39dcb3f9</catalog_id>
+                    <field_id>65dec64a3199f9a040829243</field_id>
+                    <group_id>67c8d4e63bb53469c1183ded</group_id>
+                    <id>65dec64a3199f9a040829243</id>
+                    <label>SKU de Producto</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>67d216afdf78c6fb39dcb3f9</catalog_id>
+                    <field_id>620a9ee0a449b98114f61d77</field_id>
+                    <group_id>67c8d4e63bb53469c1183ded</group_id>
+                    <id>620a9ee0a449b98114f61d77</id>
+                    <label>Serie</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67c8e1341eeb80b05b183df3</field_id>
+                    <group_id>67c8d4e63bb53469c1183ded</group_id>
+                    <id>67c8e1341eeb80b05b183df3</id>
+                    <label>Costo Unitario</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67c8e1341eeb80b05b183df2</field_id>
+                    <group_id>67c8d4e63bb53469c1183ded</group_id>
+                    <id>67c8e1341eeb80b05b183df2</id>
+                    <label>Cantidad</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67c8eb319008841d97183e47</field_id>
+                    <group_id>None</group_id>
+                    <id>67c8eb319008841d97183e47</id>
+                    <label>Costo Total Refacciones</label>
+                    <type>decimal</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>and</operator>
+            <rule_id>1402a844e323fb</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>67d3270d10704c590bbd3f3d</field_id>
+                        <group_id>None</group_id>
+                        <id>67d3270d10704c590bbd3f3d</id>
+                        <label>Requiere Refacciones</label>
+                        <type>radio</type>
+                    </field>
+                    <value>sí</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.warehouse_locations.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>67c9e49e7a90772f1a98144d</id>
+                    <label>Alacen Refacciones</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6442e4831198daf81456f274</field_id>
+                    <group_id>None</group_id>
+                    <id>6442e4831198daf81456f274</id>
+                    <label>Nombre Almacen</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>65ac6fbc070b93e656bd7fbe</field_id>
+                    <group_id>None</group_id>
+                    <id>65ac6fbc070b93e656bd7fbe</id>
+                    <label>Ubicacion</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.activos_fijos.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>67d21521a163d9de897a2546</id>
+                    <label>Equipo</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6646393c3fa8b818265d0325</field_id>
+                    <group_id>None</group_id>
+                    <id>6646393c3fa8b818265d0325</id>
+                    <label>Número de serie - Chasis</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67c8d4e63bb53469c1183ded</field_id>
+                    <group_id>None</group_id>
+                    <id>67c8d4e63bb53469c1183ded</id>
+                    <label>Refacciones</label>
+                    <type>group</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.stock_inventory.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>67d216afdf78c6fb39dcb3f9</id>
+                    <label>Refaccion</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>65dec64a3199f9a040829243</field_id>
+                    <group_id>None</group_id>
+                    <id>65dec64a3199f9a040829243</id>
+                    <label>SKU de Producto</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>620a9ee0a449b98114f61d77</field_id>
+                    <group_id>None</group_id>
+                    <id>620a9ee0a449b98114f61d77</id>
+                    <label>Serie</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67c8e1341eeb80b05b183df2</field_id>
+                    <group_id>None</group_id>
+                    <id>67c8e1341eeb80b05b183df2</id>
+                    <label>Cantidad</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67c8e1341eeb80b05b183df3</field_id>
+                    <group_id>None</group_id>
+                    <id>67c8e1341eeb80b05b183df3</id>
+                    <label>Costo Unitario</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67c8eb319008841d97183e47</field_id>
+                    <group_id>None</group_id>
+                    <id>67c8eb319008841d97183e47</id>
+                    <label>Costo Total Refacciones</label>
+                    <type>decimal</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>and</operator>
+            <rule_id>c811a4f258990a</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
