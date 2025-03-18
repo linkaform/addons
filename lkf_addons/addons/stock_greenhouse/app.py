@@ -170,7 +170,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             'cycle_count_adjust_quantity': '67d32f752aa3844751c1de85',
             'cycle_count_total': '67d32f752aa3844751c1de86',
             'cycle_count_comment': '67d32f752aa3844751c1de87',
-            'cycle_count_count_status': '67d32f752aa3844751c1de88'
+            'cycle_count_count_status': '67d32f752aa3844751c1de88',
+            'cycle_count_ready_week': '67d9a1e83197ffa77bc1dfb3'
         })
 
     def add_dicts(self, dict1, dict2):
@@ -2555,7 +2556,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def create_response(self, status, status_code, message="", data=[]):
         """
-            Crea una respuesta estructurada para la API.
+            Crea una respuesta estructurada.
 
             Parámetros:
                 status (str): Indica que sucedio con la petición(error, success, etc.).
@@ -2739,6 +2740,21 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         })
 
         answers = {}
+
+        rows = data.get('rows')
+        cols = data.get('columns')
+        adjust_quantity = data.get('adjust_quantity')
+        total = (rows * cols) + adjust_quantity
+        data['total'] = total
+
+        if adjust_quantity < 0:
+            data['adjust'] = 'minus'
+        elif adjust_quantity > 0:
+            data['adjust'] = 'pluse'
+
+        if not data.get('count_status'):
+            data['count_status'] = 'first_count'
+
         try:
             for key, value in data.items():
                 if key == 'warehouse_name':
@@ -2764,11 +2780,12 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     answers[self.f['cycle_count_comment']] = value
                 elif key == 'count_status':
                     answers[self.f['cycle_count_count_status']] = value
+                elif key == 'ready_week':
+                    answers[self.f['cycle_count_ready_week']] = value
                 else:
                     pass
             metadata.update({'answers':answers})
             request = self.lkf_api.post_forms_answers(metadata)
-            print(request)
             status_code = request.get('status_code')
             if status_code == 201:
                 response = self.create_response("success", 200, "Cycle Counts agregado con exito")
@@ -2787,6 +2804,21 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             return response
         
         answers = {}
+
+        rows = data.get('rows')
+        cols = data.get('columns')
+        adjust_quantity = data.get('adjust_quantity')
+        total = (rows * cols) + adjust_quantity
+        data['total'] = total
+
+        if adjust_quantity < 0:
+            data['adjust'] = 'minus'
+        elif adjust_quantity > 0:
+            data['adjust'] = 'pluse'
+
+        if not data.get('count_status'):
+            data['count_status'] = 'miscount'
+
         try:
             for key, value in data.items():
                 if key == 'warehouse_name':
@@ -2812,6 +2844,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     answers[self.f['cycle_count_comment']] = value
                 elif key == 'count_status':
                     answers[self.f['cycle_count_count_status']] = value
+                elif key == 'ready_week':
+                    answers[self.f['cycle_count_ready_week']] = value
                 else:
                     pass
             if answers or folio:
@@ -2820,7 +2854,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     response = self.create_response("success", 200, "Se actualizo exitosamente el registro en Cycle Count")
                     return response
                 else:
-                    print(res)
                     data = [res.get('json')]
                     response = self.create_response("error", 500, "Cycle Counts tuvo un error al agregar el registro", data)
                     return response
