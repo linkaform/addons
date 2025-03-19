@@ -2896,7 +2896,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             response = self.create_response("error", 404, "No se encontro los folios correspondiente")
             return response
         
-    def search_cycle_count(self, search_params={}):
+    def search_cycle_counts(self, search_params={}):
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": 130586,
