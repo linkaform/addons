@@ -164,6 +164,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             'cycle_count_warehouse_name': '6442e4831198daf81456f274',
             'cycle_count_location': '65ac6fbc070b93e656bd7fbe',
             'cycle_count_product_code': '61ef32bcdf0ec2ba73dec33d',
+            'cycle_count_product_name': '61ef32bcdf0ec2ba73dec33e',
             'cycle_count_rows': '67d32f752aa3844751c1de82',
             'cycle_count_columns': '67d32f752aa3844751c1de83',
             'cycle_count_adjust': '67d32f752aa3844751c1de84',
@@ -2710,7 +2711,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     'folio': cycle.get('folio'),
                     'warehouse': cycle.get('cycle_count_warehouse_name'),
                     'location': cycle.get('cycle_count_location'),
-                    'product': cycle.get('cycle_count_product_code'),
+                    'product_code': cycle.get('cycle_count_product_code'),
+                    'product_name': cycle.get('cycle_count_product_name', [])[0],
                     'total': cycle.get('cycle_count_total')
                 })
                 formated_cycle_counts_list.append(format_cycle)
@@ -2764,7 +2766,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     }
                 elif key == 'product_code':
                     answers[self.Product.PRODUCT_OBJ_ID] = {
-                        self.f['cycle_count_product_code']: value
+                        self.f['cycle_count_product_code']: value,
+                        self.f['cycle_count_product_name']: [data.get('product_name')]
                     }
                 elif key == 'rows':
                     answers[self.f['cycle_count_rows']] = value
@@ -2828,7 +2831,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     }
                 elif key == 'product_code':
                     answers[self.Product.PRODUCT_OBJ_ID] = {
-                        self.f['cycle_count_product_code']: value
+                        self.f['cycle_count_product_code']: value,
+                        self.f['cycle_count_product_name']: [data.get('product_name')]
                     }
                 elif key == 'rows':
                     answers[self.f['cycle_count_rows']] = value
@@ -2890,4 +2894,59 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 return response
         else:
             response = self.create_response("error", 404, "No se encontro los folios correspondiente")
+            return response
+        
+    def search_cycle_count(self, search_params={}):
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": 130586,
+        }
+
+        if search_params.get('warehouse_name'):
+            match_query.update({
+                f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['cycle_count_warehouse_name']}": search_params.get('warehouse_name'),
+            })
+        if search_params.get('location'):
+            match_query.update({
+                f"answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['cycle_count_location']}": search_params.get('location'),
+            })
+        if search_params.get('product_code'):
+            match_query.update({
+                f"answers.{self.PRODUCT_OBJ_ID}.{self.f['cycle_count_product_code']}": search_params.get('product_code'),
+            })
+        if search_params.get('product_name'):
+            match_query.update({
+                f"answers.{self.PRODUCT_OBJ_ID}.{self.f['cycle_count_product_name']}": search_params.get('product_name'),
+            })
+
+        proyect_fields = {
+            '_id': 1,
+            'folio': '$folio',
+            'warehouse': f"$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['cycle_count_warehouse_name']}",
+            'location': f"$answers.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['cycle_count_location']}",
+            'product_code': f"$answers.{self.PRODUCT_OBJ_ID}.{self.f['cycle_count_product_code']}",
+            'product_name': f"$answers.{self.PRODUCT_OBJ_ID}.{self.f['cycle_count_product_name']}",
+            'total': f"$answers.{self.f['cycle_count_total']}",
+        }
+
+        query = [
+            {'$match': match_query},
+            {'$project': proyect_fields},
+        ]
+
+        try:
+            cycle_counts = self.format_cr(self.cr.aggregate(query))
+
+            if not cycle_counts:
+                response = self.create_response("success", 200, "No se encontraron registros en Cycle Counts")
+                return response
+
+            for cycle_count in cycle_counts:
+                cycle_count['id'] = cycle_count['_id']
+                cycle_count['product_name'] = cycle_count['product_name'][0]
+                cycle_count.pop('_id')
+            response = self.create_response("success", 200, "Cycle Counts obtenidos con exito", cycle_counts)
+            return response
+        except Exception as e:
+            response = self.create_response("error", 500, f"Error al realizar la busqueda: {e}")
             return response
