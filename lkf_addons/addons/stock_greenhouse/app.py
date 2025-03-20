@@ -2643,6 +2643,11 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     'table': location.get(self.f['warehouse_location']),
                 })
                 formated_locations_list.append(format_location)
+            formated_locations_list = sorted(
+                formated_locations_list, 
+                key=lambda x: int(x['table'].split()[1]), 
+                reverse=False
+            )
             response = self.create_response("success", 200, "Mesas obtenidas con exito", formated_locations_list)
             return response
         
@@ -2716,6 +2721,11 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     'total': cycle.get('cycle_count_total')
                 })
                 formated_cycle_counts_list.append(format_cycle)
+            formated_cycle_counts_list = sorted(
+                formated_cycle_counts_list, 
+                key=lambda x: int(x['folio'].split('-')[0]), 
+                reverse=True
+            )
             response = self.create_response("success", 200, "Cycle Counts obtenidos con exito", formated_cycle_counts_list)
             return response
         except Exception as e:
@@ -2945,6 +2955,11 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 cycle_count['id'] = cycle_count['_id']
                 cycle_count['product_name'] = cycle_count['product_name'][0]
                 cycle_count.pop('_id')
+            cycle_counts = sorted(
+                cycle_counts, 
+                key=lambda x: int(x['folio'].split('-')[0]), 
+                reverse=True
+            )
             response = self.create_response("success", 200, "Cycle Counts obtenidos con exito", cycle_counts)
             return response
         except Exception as e:
