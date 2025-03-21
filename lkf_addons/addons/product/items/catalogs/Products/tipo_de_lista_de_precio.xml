@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>{}</confirmation>
+    <description />
+    <_rev>3-07399c3e3c88fefab16bbffd4c39f9bd</_rev>
+    <updated_at>2025-03-05T23:27:02.408595+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Tipo de Lista de Precio</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2025-03-05T23:27:02.408595+00:00Z</created_at>
+    <advanced_options>{}</advanced_options>
+    <catalog_id>130116</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>67c8ddc6810f3eafed183e1c</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>True</fav>
+                    <required>True</required>
+                    <field_id>67c8ddc6810f3eafed183e1d</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Nombre Lista de Precios</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>True</fav>
+                    <required>True</required>
+                    <field_id>67c8ddc6810f3eafed183e1e</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Tipo de Lista de Precios</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>compra</value>
+                            <label>Compra</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>venta</value>
+                            <label>Venta</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>renta</value>
+                            <label>Renta</label>
+                        </item>
+                    </options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+            </page_fields>
+            <page_description>None</page_description>
+            <page_name>Página 1</page_name>
+        </item>
+    </catalog_pages>
+</lkf>

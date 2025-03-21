@@ -158,7 +158,7 @@ class Employee(Base):
         res = self.format_cr_result(self.cr.aggregate(query), get_one=get_one)
         return res 
 
-    def get_user_booth(self, search_default=True, **kwargs):
+    def get_user_booth(self, search_default=True, turn_areas=True, **kwargs):
         if kwargs.get('user_id'):
             user_id = kwargs['user_id']
         else:
@@ -192,6 +192,30 @@ class Employee(Base):
         caseta = None
         user_booths = []
         for x in res:
+            if not x.get('area') and not turn_areas:
+                selector = {}
+                selector.update({f"answers.{self.f['ubicacion']}": x.get('location')})
+
+                if not selector:
+                    selector = {"_id": {"$gt": None}}
+
+                fields = ["_id", f"answers.{self.f['nombre_area']}"]
+
+                mango_query = {
+                    "selector": selector,
+                    "fields": fields,
+                    "limit": 1000
+                }
+
+                row_catalog = self.lkf_api.search_catalog(self.Location.AREAS_DE_LAS_UBICACIONES_CAT_ID, mango_query)
+                if row_catalog:
+                    for r in row_catalog:
+                        res.append({
+                            'area': r.get(self.f['nombre_area']),
+                            'location': x.get('location'),
+                            'employee': x.get('employee'),
+                            'marcada_como': 'normal',
+                        })
             if x['marcada_como'] == 'default' and not caseta:
                 caseta = x
             else:

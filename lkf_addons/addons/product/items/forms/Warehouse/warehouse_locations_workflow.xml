@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.warehouse_locations.id }}</form_id>
+    <id>67c8eaecaf768990bb183e26</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>67c8eaecaf768990bb183e1a</_id>
+                    <action_id>12</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <synched_catalogs>
+                            <item>
+                                <couch_id>{{ catalog.warehouse_locations.obj_id }}</couch_id>
+                                <id>{{ catalog.warehouse_locations.id }}</id>
+                                <name>Warehouse Locations</name>
+                            </item>
+                        </synched_catalogs>
+                    </configuration>
+                    <name>None</name>
+                </item>
+                <item>
+                    <_id>67c8eaecaf768990bb183e1b</_id>
+                    <action_id>9</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <catalog>
+                            <couch_id>{{ catalog.warehouse_location_destination.obj_id }}</couch_id>
+                            <created_at>1741202869</created_at>
+                            <created_by_id>17213</created_by_id>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <form_id>130053</form_id>
+                            <group_id>None</group_id>
+                            <id>{{ catalog.warehouse_location_destination.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <is_shared>False</is_shared>
+                            <is_shared_from_connection>False</is_shared_from_connection>
+                            <is_shared_root>False</is_shared_root>
+                            <itype>catalog</itype>
+                            <leaf_node>True</leaf_node>
+                            <name>{{ catalog.warehouse_location_destination.name }}</name>
+                            <owner_id>17213</owner_id>
+                            <parent_id>130049</parent_id>
+                            <perm>can_manage_item</perm>
+                            <resource_uri>/api/infosync/get_catalogs/{{ catalog.warehouse_location_destination.id }}/</resource_uri>
+                            <shared_id>None</shared_id>
+                            <start_date>2025-03-05T19:41:00.34647+00:00</start_date>
+                            <updated_at>1741203660</updated_at>
+                            <updated_by_id>17213</updated_by_id>
+                        </catalog>
+                        <mapping>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>catalog-select</field_type>
+                                    <id>6442e4831198daf81456f274</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>65bdc71b3e183f49761a33b9</id>
+                                </output>
+                            </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>text</field_type>
+                                    <id>65ac6fbc070b93e656bd7fbe</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>65c12749cfed7d3a0e1a341b</id>
+                                </output>
+                            </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>integer</field_type>
+                                    <id>65c12898feb41e0fcd1a33b7</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>65c128f249abea352147ee08</id>
+                                </output>
+                            </item>
+                        </mapping>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>67c8eaecaf768990bb183e1c</id>
+            <name>Sincronizacion a catalogos</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-03-06T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-03-06T00:21:25.994Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

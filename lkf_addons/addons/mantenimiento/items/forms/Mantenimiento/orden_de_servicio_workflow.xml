@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.orden_de_servicio.id }}</form_id>
+    <id>67cb133740e0f34d97183dee</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>67cb6846028e53c786f27e18</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2025-03-07T15:38:32.962313</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.get_orden_servicio_totals.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.get_orden_servicio_totals.name }}</name>
+                            <start_date>2025-03-07T15:38:32.957679</start_date>
+                            <updated_at>2025-03-07T21:41:38.411786</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>67cb169a9d7eb4cd05183df0</id>
+            <name>Obtener totales y subtotales</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-03-08T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-03-07T15:38:48.477Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>False</created>
+                    <deleted>False</deleted>
+                    <edited>False</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>before</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

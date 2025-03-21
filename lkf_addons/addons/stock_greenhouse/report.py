@@ -4,7 +4,7 @@ from datetime import timedelta, datetime
 import math, simplejson, time
 from copy import deepcopy
 
-from .stock_utils import Stock
+from .app import Stock
 
 
 from linkaform_api import base

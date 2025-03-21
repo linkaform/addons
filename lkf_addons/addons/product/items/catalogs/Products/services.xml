@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>{}</confirmation>
+    <description />
+    <_rev>5-1a160cd8b898483e7e0f073b0de47de4</_rev>
+    <updated_at>2025-03-05T23:12:36.962796+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Services</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2025-03-05T23:12:36.962796+00:00Z</created_at>
+    <advanced_options>{}</advanced_options>
+    <catalog_id>130114</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>67c8da641eeb80b05b183de8</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>67c8db071eeb80b05b183dea</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Servicio</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>textarea</field_type>
+                    <field_id>67c8dbffae48ab7c10183e02</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Descripcion del servicio</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_description>None</page_description>
+            <page_name>Informacion del servicio</page_name>
+        </item>
+    </catalog_pages>
+</lkf>

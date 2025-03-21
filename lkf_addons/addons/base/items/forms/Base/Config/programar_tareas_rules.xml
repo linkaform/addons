@@ -883,5 +883,39 @@
             <rule_type>required</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>abcde0001000000000020003</field_id>
+                        <group_id>abcde0001000000000020002</group_id>
+                        <id>abcde0001000000000020003</id>
+                        <label>Asignar a</label>
+                        <type>radio</type>
+                    </field>
+                    <value>grupo</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>67ad6e90067960b5f2ce1e15</field_id>
+                    <group_id>abcde0001000000000020002</group_id>
+                    <id>67ad6e90067960b5f2ce1e15</id>
+                    <label>Como se crear el registro</label>
+                    <type>radio</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Asignacion de Grupo</name>
+            <operator>and</operator>
+            <rule_id>55e79e134f18da</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
     </rules>
 </lkf>
