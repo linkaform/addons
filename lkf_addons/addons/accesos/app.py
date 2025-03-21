@@ -1247,10 +1247,32 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res = {k:v[0] for k,v in res.items() if len(v)>0}
         return res
 
-    def catalogo_config_area_empleado(self):
+    def catalogo_config_area_empleado(self, bitacora, location=''):
+        #TODO Verificar si objetos perdidos tambien necesita solo los empleados de una location
+        #TODO Mejorar funcion, de momento funcional
         catalog_id = self.CONF_AREA_EMPLEADOS_CAT_ID
-        form_id= self.BITACORA_OBJETOS_PERDIDOS
-        return self.lkf_api.catalog_view(catalog_id, form_id) 
+        if bitacora == 'Objetos Perdidos':
+            form_id= self.BITACORA_OBJETOS_PERDIDOS
+            response = self.lkf_api.catalog_view(catalog_id, form_id)
+        elif bitacora == 'Incidencias':
+            form_id= self.BITACORA_INCIDENCIAS
+            group_level = 2
+            if location:
+                options = {
+                    "group_level": group_level,
+                    "startkey": [
+                        location
+                    ],
+                    "endkey": [
+                        f"{location}\n",
+                        {}
+                    ]
+                }
+            else:
+                form_id= self.BITACORA_OBJETOS_PERDIDOS
+                options = {}
+            response = self.lkf_api.catalog_view(catalog_id, form_id, options) 
+        return response
 
     def catalogo_config_area_empleado_apoyo(self):
         catalog_id = self.CONF_AREA_EMPLEADOS_AP_CAT_ID
