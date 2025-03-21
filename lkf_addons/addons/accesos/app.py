@@ -1449,10 +1449,20 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #---Define Answers
         answers = {}
         for key, value in data_articles.items():
-            if key == 'tipo_articulo_perdido':
-                answers[self.perdidos_fields['tipo_articulo_catalog']] = {self.perdidos_fields['tipo_articulo_perdido']:value}
-            elif key == 'articulo_seleccion':
-                answers[self.perdidos_fields['articulo_seleccion_catalog']] = {self.perdidos_fields['articulo_seleccion']:value}
+            if  key == 'tipo_articulo_perdido' or key == 'articulo_seleccion':
+                if data_articles['tipo_articulo_perdido'] and not data_articles['articulo_seleccion']:
+                    answers[self.perdidos_fields['tipo_articulo_catalog']] = {
+                        self.perdidos_fields['tipo_articulo_perdido']: data_articles['tipo_articulo_perdido']
+                        }
+                elif data_articles['articulo_seleccion'] and not data_articles['tipo_articulo_perdido']:
+                    answers[self.perdidos_fields['tipo_articulo_catalog']] = {
+                        self.perdidos_fields['articulo_seleccion']: data_articles['articulo_seleccion']
+                        }
+                elif data_articles['articulo_seleccion'] and data_articles['tipo_articulo_perdido']: 
+                    answers[self.perdidos_fields['tipo_articulo_catalog']] = {
+                    self.perdidos_fields['tipo_articulo_perdido']:data_articles['tipo_articulo_perdido'],
+                    self.perdidos_fields['articulo_seleccion']:data_articles['articulo_seleccion']}
+
             elif  key == 'ubicacion_perdido' or key == 'area_perdido':
                 if data_articles['ubicacion_perdido'] and not data_articles['area_perdido']:
                     answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:data_articles['ubicacion_perdido']}
@@ -1461,10 +1471,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 elif data_articles['area_perdido'] and data_articles['ubicacion_perdido']: 
                     answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:data_articles['ubicacion_perdido'],
                     self.perdidos_fields['area_perdido']:data_articles['area_perdido']}
-            # elif key == 'ubicacion_perdido':
-            #     answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:value}
-            # elif key == 'area_perdido':
-            #     answers[self.perdidos_fields['area_catalog']] = {self.perdidos_fields['area_perdido']:value}
             elif key == 'quien_entrega_interno':
                 answers[self.perdidos_fields['quien_entrega_catalog']] = {self.perdidos_fields['quien_entrega_interno']:value}
             elif key == 'locker_perdido':
