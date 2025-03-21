@@ -2718,6 +2718,11 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     'location': cycle.get('cycle_count_location'),
                     'product_code': cycle.get('cycle_count_product_code'),
                     'product_name': cycle.get('cycle_count_product_name', [])[0],
+                    'ready_week': cycle.get('cycle_count_ready_week'),
+                    'rows': cycle.get('cycle_count_rows'),
+                    'columns': cycle.get('cycle_count_columns'),
+                    'adjust_quantity': cycle.get('cycle_count_adjust_quantity'),
+                    'comment': cycle.get('cycle_count_comment'),
                     'total': cycle.get('cycle_count_total')
                 })
                 formated_cycle_counts_list.append(format_cycle)
