@@ -50,7 +50,12 @@ class Mantenimiento(Base):
         # self.load(module='Product', module_class='Warehouse', import_as='WH', **self.kwargs)
         
         f = {
-            'test_field':'66ce2441d63bb7a3871adeaf',
+            'nick_eco': '67d258ea799fb700b898120f',
+            'placa': '67d258ea799fb700b8981214',
+            'marca_campo': '67d258ea799fb700b8981211',
+            'modelo_campo': '67d258ea799fb700b8981210',
+            'fecha_de_adquisicion': '6646393c3fa8b818265d0327',
+            'imagen_del_equipo': '6646393c3fa8b818265d0326'
         }
 
         if hasattr(self, 'f'):
