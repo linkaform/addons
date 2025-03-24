@@ -54,7 +54,7 @@ class Mantenimiento(Base):
             'placa': '67d258ea799fb700b8981214',
             'marca_campo': '67d258ea799fb700b8981211',
             'modelo_campo': '67d258ea799fb700b8981210',
-            'fecha_de_adquisicion': '6646393c3fa8b818265d0327',
+            'fecha_de_instalacion': '6646393c3fa8b818265d0327',
             'imagen_del_equipo': '6646393c3fa8b818265d0326'
         }
 
