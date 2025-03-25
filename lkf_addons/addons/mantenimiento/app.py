@@ -49,25 +49,13 @@ class Mantenimiento(Base):
         # self.load(module='Product', **self.kwargs)
         # self.load(module='Product', module_class='Warehouse', import_as='WH', **self.kwargs)
         
-        #Catalogos
-        self.MANTENIMIENTO_CAT_CIUDAD_X_REGION = self.lkm.catalog_id('ciudades_por_region')
-        self.MANTENIMIENTO_CAT_CIUDAD_X_REGION_ID = self.MANTENIMIENTO_CAT_CIUDAD_X_REGION.get('id')
-        self.MANTENIMIENTO_CAT_CIUDAD_X_REGION_OBJ_ID = self.MANTENIMIENTO_CAT_CIUDAD_X_REGION.get('obj_id')
-        
-        self.MANTENIMIENTO_CAT_CLIENTES = self.lkm.catalog_id('clientes')
-        self.MANTENIMIENTO_CAT_CLIENTES_ID = self.MANTENIMIENTO_CAT_CLIENTES.get('id')
-        self.MANTENIMIENTO_CAT_CLIENTES_OBJ_ID = self.MANTENIMIENTO_CAT_CLIENTES.get('obj_id')
-
-        self.MANTENIMIENTO_CAT_INSTRUMENTOS = self.lkm.catalog_id('instrumentos')
-        self.MANTENIMIENTO_CAT_INSTRUMENTOS_ID = self.MANTENIMIENTO_CAT_INSTRUMENTOS.get('id')
-        self.MANTENIMIENTO_CAT_INSTRUMENTOS_OBJ_ID = self.MANTENIMIENTO_CAT_INSTRUMENTOS.get('obj_id')
-
-        self.MANTENIMIENTO_CAT_INV_DE_EQUIPOS = self.lkm.catalog_id('inventario_de_equipos')
-        self.MANTENIMIENTO_CAT_INV_DE_EQUIPOS_ID = self.MANTENIMIENTO_CAT_INV_DE_EQUIPOS.get('id')
-        self.MANTENIMIENTO_CAT_INV_DE_EQUIPOS_OBJ_ID = self.MANTENIMIENTO_CAT_INV_DE_EQUIPOS.get('obj_id')
-
         f = {
-            'test_field':'66ce2441d63bb7a3871adeaf',
+            'nick_eco': '67d258ea799fb700b898120f',
+            'placa': '67d258ea799fb700b8981214',
+            'marca_campo': '67d258ea799fb700b8981211',
+            'modelo_campo': '67d258ea799fb700b8981210',
+            'fecha_de_instalacion': '6646393c3fa8b818265d0327',
+            'imagen_del_equipo': '6646393c3fa8b818265d0326'
         }
 
         if hasattr(self, 'f'):
@@ -82,15 +70,3 @@ class Mantenimiento(Base):
             self.mf.update(mf)
         else:
             self.mf = mf
-
-    def test_module(self):
-        print('Entra en test module...')
-        test_dic = {
-            'id1': self.MANTENIMIENTO_CAT_CIUDAD_X_REGION_ID,
-            'id2': self.MANTENIMIENTO_CAT_CLIENTES_ID,
-            'id3': self.MANTENIMIENTO_CAT_INSTRUMENTOS_ID,
-            'id4': self.MANTENIMIENTO_CAT_INV_DE_EQUIPOS_ID,
-            # 'id5': self.Product.SKU_OBJ_ID,
-            'id6': self.f['test_field'],
-        }
-        print(test_dic)
