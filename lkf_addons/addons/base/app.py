@@ -253,8 +253,6 @@ class Base(base.LKF_Base):
         return self.project_format(data)
 
     def get_config(self, *args, **kwargs):
-        print('args',args)
-        print('selfl config', self.config_fields)
         if not self.GET_CONFIG:
             # print(dddd)
             match_query ={ 
@@ -305,7 +303,7 @@ class Base(base.LKF_Base):
             f"{self.envio_correo_fields['nombre']}":data['nombre'],
             f"{self.envio_correo_fields['email_to']}":data['email_to'],
             f"{self.envio_correo_fields['msj']}":data['mensaje'],
-            f"{self.envio_correo_fields['enviado_desde']}":data['enviado_desde'],
+            f"{self.envio_correo_fields['enviado_desde']}":data.get('enviado_desde'),
             })
         return answers
 
@@ -585,7 +583,7 @@ class CargaUniversal(Base):
         self.current_record['answers'][self.field_id_status] = status
         if msg_comentarios:
             self.current_record['answers'][self.field_id_comentarios] = msg_comentarios
-        self.lkf_api.patch_record(self.current_record, self.record_id)
+        res = self.lkf_api.patch_record(self.current_record, self.record_id)
         return False
 
     def make_header_dict(self, header):
