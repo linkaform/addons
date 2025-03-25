@@ -4229,10 +4229,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for key, value in data_articles.items():
             if key == 'list_comments' or key == 'note_comments':
                 answers.update({self.notes_fields['note_comments_group']:{-1:{f"{self.notes_fields[key]}": value}}})
-            if key == 'tipo_articulo_perdido':
-                answers[self.perdidos_fields['tipo_articulo_catalog']] = {self.perdidos_fields['tipo_articulo_perdido']:value}
-            elif key == 'articulo_seleccion':
-                answers[self.perdidos_fields['articulo_seleccion_catalog']] = {self.perdidos_fields['articulo_seleccion']:value}
+            elif  key == 'tipo_articulo_perdido' or key == 'articulo_seleccion':
+                if data_articles['tipo_articulo_perdido'] and not data_articles['articulo_seleccion']:
+                    answers[self.perdidos_fields['tipo_articulo_catalog']] = {
+                        self.perdidos_fields['tipo_articulo_perdido']: data_articles['tipo_articulo_perdido']
+                        }
+                elif data_articles['articulo_seleccion'] and not data_articles['tipo_articulo_perdido']:
+                    answers[self.perdidos_fields['tipo_articulo_catalog']] = {
+                        self.perdidos_fields['articulo_seleccion']: data_articles['articulo_seleccion']
+                        }
+                elif data_articles['articulo_seleccion'] and data_articles['tipo_articulo_perdido']: 
+                    answers[self.perdidos_fields['tipo_articulo_catalog']] = {
+                    self.perdidos_fields['tipo_articulo_perdido']:data_articles['tipo_articulo_perdido'],
+                    self.perdidos_fields['articulo_seleccion']:data_articles['articulo_seleccion']}
             elif  key == 'ubicacion_perdido' or key == 'area_perdido':
                 if data_articles['ubicacion_perdido'] and not data_articles['area_perdido']:
                     answers[self.perdidos_fields['ubicacion_catalog']] = {self.perdidos_fields['ubicacion_perdido']:data_articles['ubicacion_perdido']}
