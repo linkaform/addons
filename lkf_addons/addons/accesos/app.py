@@ -1458,7 +1458,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers.update({f"{self.consecionados_fields[key]}":value})
 
         print("ANSWERS", simplejson.dumps(answers, indent=4))
-        print(err)
+        # print(err)
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
