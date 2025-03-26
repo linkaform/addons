@@ -161,9 +161,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.GRUPOS_CAT_OBJ_ID = self.GRUPOS_CAT.get('obj_id')
 
         self.ACTIVOS_FIJOS_CAT = self.lkm.catalog_id('activos_fijos')
-        self.ACTIVOS_FIJOS_CAT_ID = self.GRUPOS_CAT.get('id')
-        self.ACTIVOS_FIJOS_CAT_OBJ_ID = self.GRUPOS_CAT.get('obj_id')
-        
+        self.ACTIVOS_FIJOS_CAT_ID = self.ACTIVOS_FIJOS_CAT.get('id')
+        self.ACTIVOS_FIJOS_CAT_OBJ_ID = self.ACTIVOS_FIJOS_CAT.get('obj_id')
+
         self.load(module='Employee', **self.kwargs)
 
         # self.CONF_PERFIL = self.lkm.catalog_id('configuracion_de_perfiles','id')
@@ -1463,7 +1463,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         print("CATTTT", self.ACTIVOS_FIJOS_CAT_ID, self.ACTIVOS_FIJOS_CAT_OBJ_ID)
         print("ANSWERS", simplejson.dumps(answers, indent=4))
-        # print(err)
+        print(err)
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
