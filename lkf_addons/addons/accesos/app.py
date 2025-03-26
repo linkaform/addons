@@ -163,6 +163,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.ACTIVOS_FIJOS_CAT = self.lkm.catalog_id('activos_fijos')
         self.ACTIVOS_FIJOS_CAT_ID = self.GRUPOS_CAT.get('id')
         self.ACTIVOS_FIJOS_CAT_OBJ_ID = self.GRUPOS_CAT.get('obj_id')
+        
         self.load(module='Employee', **self.kwargs)
 
         # self.CONF_PERFIL = self.lkm.catalog_id('configuracion_de_perfiles','id')
@@ -396,12 +397,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'caseta_concesion':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
             'fecha_concesion':'66469ef8c9d58517f85d035f',
             'equipo_catalog_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}",
-            'equipo_imagen_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{'6646393c3fa8b818265d0326'}",
-            'area_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{'663e5d44f5b8a7ce8211ed0f'}",
-            'equipo_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{'6646373dda020fe797cafa20'}",
+            'equipo_imagen_concesion':'6646393c3fa8b818265d0326',
+            'area_concesion':'663e5d44f5b8a7ce8211ed0f',
+            'equipo_concesion':'6646373dda020fe797cafa20',
             'observacion_concesion':'66469f47c0580e5ead07e39a',
-            'fecha_devolucion_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{'66469f47c0580e5ead07e39b'}",
-            "catalogo_ubicacion_concesion": f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{'66a83a74de752e12018fbc3c'}",
+            'fecha_devolucion_concesion':'66469f47c0580e5ead07e39b',
         }
         #- Para creación , edición y lista de fallas
         self.fallas_fields = {
@@ -1429,15 +1429,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         })
         #---Define Answers
         answers = {}
+        print("ARTICULOS", data_articles)
         for key, value in data_articles.items():
-            if  key == 'ubicacion_concesion' or key == 'area_concesion':
-                if data_articles['ubicacion_concesion'] and not data_articles['area_concesion']:
-                    answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion']}
-                elif data_articles['area_concesion'] and not data_articles['ubicacion_concesion']:
-                    answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['nombre_area_salida']:data_articles['area_concesion']}
-                elif data_articles['area_concesion'] and data_articles['ubicacion_concesion']: 
-                    answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion'],
-                    self.mf['nombre_area_salida']:data_articles['area_concesion']}
+            # if  key == 'ubicacion_concesion' or key == 'area_concesion':
+            #     if data_articles['ubicacion_concesion'] and not data_articles['area_concesion']:
+            #         answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion']}
+            #     elif data_articles['area_concesion'] and not data_articles['ubicacion_concesion']:
+            #         answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['nombre_area_salida']:data_articles['area_concesion']}
+            #     elif data_articles['area_concesion'] and data_articles['ubicacion_concesion']: 
+            #         answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion'],
+            #         self.mf['nombre_area_salida']:data_articles['area_concesion']}
             if  key =='status_concesion':
                 answers[self.consecionados_fields['status_concesion']] = value
             if  key == 'solicita_concesion':
@@ -1446,17 +1447,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.consecionados_fields['persona_catalog_concesion']] = { self.mf['nombre_guardia_apoyo'] : value}
             elif  key == 'caseta_concesion':
                 answers[self.consecionados_fields['area_catalog_concesion']] = { self.mf['nombre_area_salida']: value}
+            elif  key == 'ubicacion_concesion':
+                answers[self.consecionados_fields['ubicacion_catalog_concesion']] = { self.mf['ubicacion']: value}
             elif  key == 'area_concesion':
-                dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
-                dic_prev[self.consecionados_fields['area_concesion']] = value 
-                answers[self.consecionados_fields['equipo_catalog_concesion']] = dic_prev
+                # dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
+                # dic_prev[self.consecionados_fields['area_concesion']] = value 
+                answers[self.consecionados_fields['equipo_catalog_concesion']] =   { self.consecionados_fields['area_concesion']: value}
             elif  key == 'equipo_concesion':
-                dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
-                dic_prev[self.consecionados_fields['equipo_concesion']] = value 
-                answers[self.consecionados_fields['equipo_catalog_concesion']] = dic_prev
+                # dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
+                # dic_prev[self.consecionados_fields['equipo_concesion']] = value 
+                answers[self.consecionados_fields['equipo_catalog_concesion']] =   { self.consecionados_fields['equipo_concesion']: value}
             else:
+                print("KEYYY", key)
                 answers.update({f"{self.consecionados_fields[key]}":value})
 
+        print("CATTTT", self.ACTIVOS_FIJOS_CAT_ID, self.ACTIVOS_FIJOS_CAT_OBJ_ID)
         print("ANSWERS", simplejson.dumps(answers, indent=4))
         # print(err)
         metadata.update({'answers':answers})
