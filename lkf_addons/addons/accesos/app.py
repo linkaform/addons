@@ -87,6 +87,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
         self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
         self.CONF_MODULO_SEGURIDAD = self.lkm.form_id('configuracion_modulo_seguridad','id')
+        self.PAQUETERIA = self.lkm.form_id('paqueteria','id')
+
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
         # self.FORM_ALTA_EQUIPOS = self.lkm.form_id('alta_de_equipos','id')
@@ -160,9 +162,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.GRUPOS_CAT_ID = self.GRUPOS_CAT.get('id')
         self.GRUPOS_CAT_OBJ_ID = self.GRUPOS_CAT.get('obj_id')
 
-        self.ACTIVOS_FIJOS_CAT = self.lkm.catalog_id('activos_fijos')
-        self.ACTIVOS_FIJOS_CAT_ID = self.GRUPOS_CAT.get('id')
-        self.ACTIVOS_FIJOS_CAT_OBJ_ID = self.GRUPOS_CAT.get('obj_id')
+        self.PROVEEDORES_CAT = self.lkm.catalog_id('proveedores')
+        self.PROVEEDORES_CAT_ID = self.PROVEEDORES_CAT.get('id')
+        self.PROVEEDORES_CAT_OBJ_ID = self.PROVEEDORES_CAT.get('obj_id')
+
         self.load(module='Employee', **self.kwargs)
 
         # self.CONF_PERFIL = self.lkm.catalog_id('configuracion_de_perfiles','id')
@@ -336,8 +339,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'locker_perdido':f"{self.mf['locker_id']}"
         }
 
-
-
         #- Para salida de bitacora y lista
         self.bitacora_fields = {
             "pase_entrada": f"{self.PASE_ENTRADA_OBJ_ID}",
@@ -396,12 +397,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'caseta_concesion':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
             'fecha_concesion':'66469ef8c9d58517f85d035f',
             'equipo_catalog_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}",
-            'equipo_imagen_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{'6646393c3fa8b818265d0326'}",
-            'area_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{'663e5d44f5b8a7ce8211ed0f'}",
-            'equipo_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{'6646373dda020fe797cafa20'}",
+            'equipo_imagen_concesion':'6646393c3fa8b818265d0326',
+            'area_concesion':'663e5d44f5b8a7ce8211ed0f',
+            'equipo_concesion':'6646373dda020fe797cafa20',
             'observacion_concesion':'66469f47c0580e5ead07e39a',
-            'fecha_devolucion_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{'66469f47c0580e5ead07e39b'}",
-            "catalogo_ubicacion_concesion": f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{'66a83a74de752e12018fbc3c'}",
+            'fecha_devolucion_concesion':'66469f47c0580e5ead07e39b',
         }
         #- Para creación , edición y lista de fallas
         self.fallas_fields = {
@@ -616,6 +616,23 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'ubicacion':"663e5c57f5b8a7ce8211ed0b",
             'grupo_requisitos':"676975321df93a68a609f9ce",
             'datos_requeridos':"6769756fc728a0b63b8431ea",
+        }
+
+        self.paquetes_fields = {
+            'ubicacion_paqueteria':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+            'area_paqueteria':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+            'fotografia_paqueteria': "67e46624da3191c5ef4ab6d0",
+            'descripcion_paqueteria':"67e4652619b4be1c5a76a485",
+            'quien_recibe_catalogo': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}",
+            'quien_recibe_paqueteria':f"{self.mf['nombre_empleado']}",
+            # 'guardado_en_paqueteria_catalogo': f"{self.LOCKERS_CAT_OBJ_ID}",
+            'guardado_en_paqueteria': f"{self.LOCKERS_CAT_OBJ_ID}.{self.mf['66480101786e8cdb66e70124']}",
+            'fecha_recibido_paqueteria': '67e4652619b4be1c5a76a486',
+            'fecha_entregado_paqueteria': '67e4652619b4be1c5a76a487',
+            'estatus_paqueteria': '67e4652619b4be1c5a76a488',
+            'entregado_a_paqueteria':'67e4652619b4be1c5a76a489',
+            # 'proveedor_catalogo':f"",
+            'proveedor':f"{self.LOCKERS_CAT_OBJ_ID}.{'667468e3e577b8b98c852aaa'}",
         }
 
         self.notes_project_fields.update(self.notes_fields)
@@ -948,6 +965,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             return self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_GAFETES_LOCKERS, folios=[folio])
         else:
             self.LKFException('No se mandarón parametros para actualizar')
+
+    def delete_paquete(self, folio):
 
     def do_access(self, qr_code, location, area, data):
         '''
@@ -1284,6 +1303,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         form_id= self.BITACORA_FALLAS
         return self.lkf_api.catalog_view(catalog_id, form_id) 
 
+    def catalogo_tipo_concesion(self, tipo=""):
+        options={}
+        if tipo:
+            options = {
+                'startkey': [tipo],
+                'endkey': [f"{tipo}\n",{}],
+                'group_level':2
+            }
+        catalog_id = self.ACTIVOS_FIJOS_CAT_ID
+        form_id = self.ACTIVOS_FIJOS
+        return self.catalogo_view(catalog_id, form_id, options)
+
     def catalogo_falla(self, tipo=""):
         options={}
         if tipo:
@@ -1307,19 +1338,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         catalog_id = self.TIPO_ARTICULOS_PERDIDOS_CAT_ID
         form_id = self.BITACORA_OBJETOS_PERDIDOS
         return self.catalogo_view(catalog_id, form_id, options)
-
-    def catalogo_tipo_concesion(self, tipo=""):
-        options={}
-        if tipo:
-            options = {
-                'startkey': [tipo],
-                'endkey': [f"{tipo}\n",{}],
-                'group_level':2
-            }
-        catalog_id = self.ACTIVOS_FIJOS_CAT_ID
-        form_id = self.CONCESSIONED_ARTICULOS
-        return self.catalogo_view(catalog_id, form_id, options)
-
 
     def check_status_code(self, data_response):
         for item in data_response:
@@ -1415,6 +1433,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_article_concessioned(self, data_articles):
         #---Define Metadata
+        print("HASAAAAA", self.PAQUETERIA)
         metadata = self.lkf_api.get_metadata(form_id=self.CONCESSIONED_ARTICULOS)
         metadata.update({
             "properties": {
@@ -1430,14 +1449,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #---Define Answers
         answers = {}
         for key, value in data_articles.items():
-            if  key == 'ubicacion_concesion' or key == 'area_concesion':
-                if data_articles['ubicacion_concesion'] and not data_articles['area_concesion']:
-                    answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion']}
-                elif data_articles['area_concesion'] and not data_articles['ubicacion_concesion']:
-                    answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['nombre_area_salida']:data_articles['area_concesion']}
-                elif data_articles['area_concesion'] and data_articles['ubicacion_concesion']: 
-                    answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion'],
-                    self.mf['nombre_area_salida']:data_articles['area_concesion']}
             if  key =='status_concesion':
                 answers[self.consecionados_fields['status_concesion']] = value
             if  key == 'solicita_concesion':
@@ -1446,18 +1457,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.consecionados_fields['persona_catalog_concesion']] = { self.mf['nombre_guardia_apoyo'] : value}
             elif  key == 'caseta_concesion':
                 answers[self.consecionados_fields['area_catalog_concesion']] = { self.mf['nombre_area_salida']: value}
+            elif  key == 'ubicacion_concesion':
+                answers[self.consecionados_fields['ubicacion_catalog_concesion']] = { self.mf['ubicacion']: value}
             elif  key == 'area_concesion':
-                dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
-                dic_prev[self.consecionados_fields['area_concesion']] = value 
-                answers[self.consecionados_fields['equipo_catalog_concesion']] = dic_prev
+                answers[self.consecionados_fields['equipo_catalog_concesion']] =   { self.consecionados_fields['area_concesion']: value}
             elif  key == 'equipo_concesion':
-                dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
-                dic_prev[self.consecionados_fields['equipo_concesion']] = value 
-                answers[self.consecionados_fields['equipo_catalog_concesion']] = dic_prev
+                answers[self.consecionados_fields['equipo_catalog_concesion']] =   { self.consecionados_fields['equipo_concesion']: value}
             else:
                 answers.update({f"{self.consecionados_fields[key]}":value})
 
-        print("ANSWERS", simplejson.dumps(answers, indent=4))
+        print("CATTTT", self.ACTIVOS_FIJOS_CAT_ID, self.ACTIVOS_FIJOS_CAT_OBJ_ID)
         print(err)
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
@@ -1875,6 +1884,36 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers.update({f"{self.notes_fields['note_open_date']}":fecha_hora_str})
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
+
+    def create_paquete(self, data_paquete):
+        #---Define Metadata
+        metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_OBJETOS_PERDIDOS)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Script",
+                    "Module": "Accesos",
+                    "Process": "Creación de Bitacora Articulo Perdido",
+                    "Action": "create_article_lose",
+                    "File": "accesos/app.py"
+                }
+            },
+        })
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        #---Define Answers
+        answers = {}
+        for key, value in data_paquete.items():
+            if  key == 'area_paqueteria':
+                answers[self.consecionados_fields['area_paqueteria']] = value
+            elif  key == 'ubicacion_paqueteria':
+                answers[self.consecionados_fields['ubicacion_paqueteria']] = value
+            elif key == 'quien_recibe_paqueteria':
+                answers[self.paquetes_fields['quien_recibe_catalogo']] = {self.paquetes_fields['quien_recibe_paqueteria']:value}
+            else:
+                answers.update({f"{self.paquetes_fields[key]}":value})
+        metadata.update({'answers':answers})
+        res=self.lkf_api.post_forms_answers(metadata)
+        return res
 
     def _get_ics_file(self, meetings=[]):
         _logger = logging.getLogger(__name__)
@@ -3846,6 +3885,41 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
         return answers
+
+    def get_paquetes(self, location= "", area="", status=""):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.PAQUETERIA,
+        }
+        if location:
+             match_query[f"answers.{self.paquetes_fields['ubicacion_paqueteria']}"] = location
+        if area:
+             match_query[f"answers.{self.paquetes_fields['area_paqueteria']}"] = area
+        if status:
+             match_query[f"answers.{self.paquetes_fields['status_paqueteria']}"] = status
+        query = [
+            {'$match': match_query },
+            #{'$project': self.proyect_format(self.perdidos_fields)},
+            {'$project': {
+                "folio":"$folio",
+                "_id":"$_id",
+                'ubicacion_paqueteria':f"{self.paquetes_fields['ubicacion_paqueteria']}",
+                'area_paqueteria': f"{self.paquetes_fields['area_paqueteria']}",
+                'fotografia_paqueteria':f"{self.paquetes_fields['fotografia_paqueteria']}",
+                'descripcion_paqueteria':f"{self.paquetes_fields['descripcion_paqueteria']}",
+                'quien_recibe_paqueteria':f"{self.paquetes_fields['quien_recibe_catalogo']}.{self.paquetes_fields['quien_recibe_paqueteria']}",
+                'guardado_en_paqueteria': f"{self.paquetes_fields['guardado_en_paqueteria']}",
+                'fecha_recibido_paqueteria': f"{self.paquetes_fields['fecha_recibido_paqueteria']}",
+                'fecha_entregado_paqueteria': f"{self.paquetes_fields['fecha_recibido_paqueteria']}",
+                'estatus_paqueteria': f"{self.paquetes_fields['estatus_paqueteria']}",
+                'entregado_a_paqueteria': f"{self.paquetes_fields['entregado_a_paqueteria']}",
+                'proveedor': f"{self.paquetes_fields['proveedor_catalogo']}.{self.paquetes_fields['proveedor']}",
+            }},
+            {'$sort':{'folio':-1}},
+        ]
+        # pr= self.format_cr_result(self.cr.aggregate(query))
+        print("paqueteria", pr)
+        return pr
     
     def get_user_booths_availability(self, turn_areas=True):
         '''
@@ -4267,9 +4341,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.consecionados_fields['equipo_catalog_concesion']] = dic_prev
             else:
                 answers.update({f"{self.consecionados_fields[key]}":value})
-        print("ANSWERS", answers)
-        print(err)
-
         if answers or folio:
             return self.lkf_api.patch_multi_record( answers = answers, form_id=self.CONCESSIONED_ARTICULOS, folios=[folio])
         else:
@@ -5422,6 +5493,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         
         return res.matched_count
         # print("records=",stop)
+
+    def update_paquete(self):
+         answers = {}
+        for key, value in data_paquete_actualizar.items():
+             if  key == 'area_paqueteria':
+                answers[self.consecionados_fields['area_paqueteria']] = value
+            elif  key == 'ubicacion_paqueteria':
+                answers[self.consecionados_fields['ubicacion_paqueteria']] = value
+            elif key == 'quien_recibe_paqueteria':
+                answers[self.paquetes_fields['quien_recibe_catalogo']] = {self.paquetes_fields['quien_recibe_paqueteria']:value}
+            else:
+                answers.update({f"{self.paquetes_fields[key]}":value})
+        if answers or folio:
+            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.PAQUETERIA, folios=[folio])
+        else:
+            self.LKFException('No se mandarón parametros para actualizar')
 
     def validate_access_pass_location(self, qr_code, location):
         #TODO

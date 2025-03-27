@@ -46,7 +46,8 @@ from lkf_addons.addons.base.app import Base
 class Vehiculo(Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
+
         #--Variables 
         ### Forms ###
         '''
@@ -108,6 +109,8 @@ class Vehiculo(Base):
         self.MODELO_ID = self.MODELO.get('id')
         self.MODELO_OBJ_ID = self.MODELO.get('obj_id')
 
+
+        self.CONCESSIONED_ARTICULOS = self.lkm.form_id('concesion_de_activos_unico','id')
         ## Module Fields ##
         ''' self.mf : Estos son los campos que deseas mantener solo dentro de este modulo '''
         self.mf = {}
@@ -154,3 +157,15 @@ class Vehiculo(Base):
             )
 
 
+    # def catalogo_activo_fijo(self, tipo=""):
+    #     print("UIDDDDDD", self.ACTIVOS_FIJOS_CAT_ID, self.ACTIVOS_FIJOS)
+    #     options={}
+    #     if tipo:
+    #         options = {
+    #             'startkey': [tipo],
+    #             'endkey': [f"{tipo}\n",{}],
+    #             'group_level':2
+    #         }
+    #     catalog_id = self.ACTIVOS_FIJOS_CAT_ID
+    #     form_id = self.ACTIVOS_FIJOS
+    #     return self.catalogo_view(catalog_id, form_id, options)

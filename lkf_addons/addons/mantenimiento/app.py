@@ -55,7 +55,10 @@ class Mantenimiento(Base):
             'marca_campo': '67d258ea799fb700b8981211',
             'modelo_campo': '67d258ea799fb700b8981210',
             'fecha_de_instalacion': '6646393c3fa8b818265d0327',
-            'imagen_del_equipo': '6646393c3fa8b818265d0326'
+            'imagen_del_equipo': '6646393c3fa8b818265d0326',
+            'hora_inicio_instalacion': '67c8c67734cc8b94bc183eca',
+            'hora_final_instalacion': '67d218329d65ba66bf981253',
+            'total_minutos_instalacion': '67d218329d65ba66bf981254'
         }
 
         if hasattr(self, 'f'):
