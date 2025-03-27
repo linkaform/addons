@@ -966,8 +966,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
-    def delete_paquete(self, folio):
-
     def do_access(self, qr_code, location, area, data):
         '''
         Valida pase de entrada y crea registro de entrada al pase
