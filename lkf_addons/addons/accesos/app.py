@@ -87,6 +87,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
         self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
         self.CONF_MODULO_SEGURIDAD = self.lkm.form_id('configuracion_modulo_seguridad','id')
+        self.PAQUETERIA = self.lkm.form_id('paqueteria','id')
+
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
         # self.FORM_ALTA_EQUIPOS = self.lkm.form_id('alta_de_equipos','id')
@@ -159,10 +161,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.GRUPOS_CAT = self.lkm.catalog_id('grupos')
         self.GRUPOS_CAT_ID = self.GRUPOS_CAT.get('id')
         self.GRUPOS_CAT_OBJ_ID = self.GRUPOS_CAT.get('obj_id')
-
-        self.ACTIVOS_FIJOS_CAT = self.lkm.catalog_id('activos_fijos')
-        self.ACTIVOS_FIJOS_CAT_ID = self.ACTIVOS_FIJOS_CAT.get('id')
-        self.ACTIVOS_FIJOS_CAT_OBJ_ID = self.ACTIVOS_FIJOS_CAT.get('obj_id')
 
         self.load(module='Employee', **self.kwargs)
 
@@ -1284,6 +1282,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         form_id= self.BITACORA_FALLAS
         return self.lkf_api.catalog_view(catalog_id, form_id) 
 
+    def catalogo_tipo_concesion(self, tipo=""):
+        options={}
+        if tipo:
+            options = {
+                'startkey': [tipo],
+                'endkey': [f"{tipo}\n",{}],
+                'group_level':2
+            }
+        catalog_id = self.ACTIVOS_FIJOS_CAT_ID
+        form_id = self.ACTIVOS_FIJOS
+        return self.catalogo_view(catalog_id, form_id, options)
+
     def catalogo_falla(self, tipo=""):
         options={}
         if tipo:
@@ -1307,19 +1317,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         catalog_id = self.TIPO_ARTICULOS_PERDIDOS_CAT_ID
         form_id = self.BITACORA_OBJETOS_PERDIDOS
         return self.catalogo_view(catalog_id, form_id, options)
-
-    def catalogo_tipo_concesion(self, tipo=""):
-        options={}
-        if tipo:
-            options = {
-                'startkey': [tipo],
-                'endkey': [f"{tipo}\n",{}],
-                'group_level':2
-            }
-        catalog_id = self.ACTIVOS_FIJOS_CAT_ID
-        form_id = self.CONCESSIONED_ARTICULOS
-        return self.catalogo_view(catalog_id, form_id, options)
-
 
     def check_status_code(self, data_response):
         for item in data_response:
@@ -1415,6 +1412,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_article_concessioned(self, data_articles):
         #---Define Metadata
+        print("HASAAAAA", self.PAQUETERIA)
         metadata = self.lkf_api.get_metadata(form_id=self.CONCESSIONED_ARTICULOS)
         metadata.update({
             "properties": {
@@ -1429,16 +1427,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         })
         #---Define Answers
         answers = {}
-        print("ARTICULOS", data_articles)
         for key, value in data_articles.items():
-            # if  key == 'ubicacion_concesion' or key == 'area_concesion':
-            #     if data_articles['ubicacion_concesion'] and not data_articles['area_concesion']:
-            #         answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion']}
-            #     elif data_articles['area_concesion'] and not data_articles['ubicacion_concesion']:
-            #         answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['nombre_area_salida']:data_articles['area_concesion']}
-            #     elif data_articles['area_concesion'] and data_articles['ubicacion_concesion']: 
-            #         answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion'],
-            #         self.mf['nombre_area_salida']:data_articles['area_concesion']}
             if  key =='status_concesion':
                 answers[self.consecionados_fields['status_concesion']] = value
             if  key == 'solicita_concesion':
@@ -1450,19 +1439,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             elif  key == 'ubicacion_concesion':
                 answers[self.consecionados_fields['ubicacion_catalog_concesion']] = { self.mf['ubicacion']: value}
             elif  key == 'area_concesion':
-                # dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
-                # dic_prev[self.consecionados_fields['area_concesion']] = value 
                 answers[self.consecionados_fields['equipo_catalog_concesion']] =   { self.consecionados_fields['area_concesion']: value}
             elif  key == 'equipo_concesion':
-                # dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
-                # dic_prev[self.consecionados_fields['equipo_concesion']] = value 
                 answers[self.consecionados_fields['equipo_catalog_concesion']] =   { self.consecionados_fields['equipo_concesion']: value}
             else:
-                print("KEYYY", key)
                 answers.update({f"{self.consecionados_fields[key]}":value})
 
         print("CATTTT", self.ACTIVOS_FIJOS_CAT_ID, self.ACTIVOS_FIJOS_CAT_OBJ_ID)
-        print("ANSWERS", simplejson.dumps(answers, indent=4))
         print(err)
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
