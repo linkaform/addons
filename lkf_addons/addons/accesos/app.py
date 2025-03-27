@@ -5497,7 +5497,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def update_paquete(self):
          answers = {}
         for key, value in data_paquete_actualizar.items():
-             if  key == 'area_paqueteria':
+            if  key == 'area_paqueteria':
                 answers[self.consecionados_fields['area_paqueteria']] = value
             elif  key == 'ubicacion_paqueteria':
                 answers[self.consecionados_fields['ubicacion_paqueteria']] = value
