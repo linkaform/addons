@@ -14,8 +14,10 @@ Se permite la redistribución y el uso en formas de código fuente y binario, co
 '''
 
 
+import simplejson
 from linkaform_api import base
 from lkf_addons.addons.base.app import Base
+
 
 
 class Product(Base, base.LKF_Base):
@@ -189,6 +191,7 @@ class Warehouse(Base ,base.LKF_Base):
         # ME TRAJE ESTAS DOS LINEAS DE stock_utils / PACO
         self.CATALOG_WAREHOUSE = self.lkm.catalog_id('warehouse')
         self.CATALOG_WAREHOUSE_ID = self.CATALOG_WAREHOUSE.get('id')
+        self.CONFIG_ALMACENES = self.lkm.form_id('configuracion_almacenes', 'id')
 
         self.WAREHOUSE = self.lkm.catalog_id('warehouse')
         self.WAREHOUSE_ID = self.WAREHOUSE.get('id')
@@ -210,14 +213,19 @@ class Warehouse(Base ,base.LKF_Base):
 
         self.f.update( {
             'config_wh_group':'66ed0baac9aefada5b04b817',
+            'location_type':'66ed0c88c9aefada5b04b818',
             'warehouse':'6442e4831198daf81456f274',
             'warehouse_dest':'65bdc71b3e183f49761a33b9',
             'warehouse_location':'65ac6fbc070b93e656bd7fbe',
             'warehouse_location_dest':'65c12749cfed7d3a0e1a341b',
             'warehouse_type':'6514f51b6cfe23860299abfa',
             'warehouse_type_dest':'65bdc74a9c6a5b1adf424b5b',
+            'grupo_config_almacenes':'66ed0baac9aefada5b04b817',
+
             }
         )
+
+        self.warehouse_config_cache = {}
 
     def get_all_stock_warehouse(self):
         return self.get_warehouse(warehouse_type='Stock')
@@ -233,6 +241,51 @@ class Warehouse(Base ,base.LKF_Base):
         res = self.lkf_api.search_catalog( self.WAREHOUSE_ID, mango_query)
         warehouse = [r[self.f['warehouse']] for r in res]
         return warehouse
+
+    def get_warehouse_config(self, warehouse, location_type=None):
+        if location_type:
+            if self.warehouse_config_cache.get(warehouse,{}).get(location_type):
+                for d in self.warehouse_config_cache[warehouse]['data']:
+                    if d.get('location_type') and d['location_type'] == location_type:
+                        return d
+                return self.warehouse_config_cache[warehouse]['data']
+        if not location_type and self.warehouse_config_cache.get(warehouse):
+            if self.warehouse_config_cache.get(warehouse,{}).get('all_locations'):
+                return self.warehouse_config_cache[warehouse]
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.CONFIG_ALMACENES
+            }
+        match_query_warehouse = {
+            f"answers.{self.f['grupo_config_almacenes']}.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}":warehouse
+        }
+        if location_type:
+            match_query_warehouse.update(
+                {f"answers.{self.f['grupo_config_almacenes']}.{self.f['location_type']}":location_type }
+                ) 
+        query = [
+            {'$match': match_query },
+            {'$unwind': f"$answers.{self.f['grupo_config_almacenes']}"},
+            {'$match': match_query_warehouse },
+            {'$project':
+                {'_id': 1,
+                    'location_type': f"$answers.{self.f['grupo_config_almacenes']}.{self.f['location_type']}",
+                    'warehouse': f"$answers.{self.f['grupo_config_almacenes']}.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
+                    'warehouse_location': f"$answers.{self.f['grupo_config_almacenes']}.{self.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse_location']}",
+                    }
+            }
+            ]
+        res = self.format_cr_result(self.cr.aggregate(query))
+        for r in res:
+            self.warehouse_config_cache[r['warehouse']] = {'data':[]}
+            self.warehouse_config_cache[r['warehouse']]['data'].append(r)
+            self.warehouse_config_cache[r['warehouse']][r['location_type']] = True
+            if not location_type:
+                self.warehouse_config_cache[r['warehouse']]['all_locations'] = True
+        if len(res) == 1:
+            res = res[0]
+        return res
+
 
     def match_query(self, warehouse=None, location=None, group_id=None):
         query = {}
