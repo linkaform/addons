@@ -514,7 +514,6 @@ class CargaUniversal(Base):
         #     print("------------------- error:",e)
         #     return self.update_status_record(current_record, record_id, 'error', msg_comentarios='Ocurrió un error inesperado, favor de contactar a soporte')
 
-
     def crea_directorio_temporal(self, nueva_ruta):
         try:
             if not os.path.exists(str(nueva_ruta)):
