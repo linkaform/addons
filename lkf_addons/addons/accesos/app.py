@@ -626,13 +626,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'quien_recibe_catalogo': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}",
             'quien_recibe_paqueteria':f"{self.mf['nombre_empleado']}",
             # 'guardado_en_paqueteria_catalogo': f"{self.LOCKERS_CAT_OBJ_ID}",
-            'guardado_en_paqueteria': f"{self.LOCKERS_CAT_OBJ_ID}.{self.mf['66480101786e8cdb66e70124']}",
+            # 'guardado_en_paqueteria': f"{self.LOCKERS_CAT_OBJ_ID}.{self.mf['66480101786e8cdb66e70124']}",
             'fecha_recibido_paqueteria': '67e4652619b4be1c5a76a486',
             'fecha_entregado_paqueteria': '67e4652619b4be1c5a76a487',
             'estatus_paqueteria': '67e4652619b4be1c5a76a488',
             'entregado_a_paqueteria':'67e4652619b4be1c5a76a489',
             # 'proveedor_catalogo':f"",
-            'proveedor':f"{self.LOCKERS_CAT_OBJ_ID}.{'667468e3e577b8b98c852aaa'}",
+            # 'proveedor':f"{self.LOCKERS_CAT_OBJ_ID}.{'667468e3e577b8b98c852aaa'}",
         }
 
         self.notes_project_fields.update(self.notes_fields)
@@ -5493,7 +5493,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # print("records=",stop)
 
     def update_paquete(self):
-         answers = {}
+        answers = {}
         for key, value in data_paquete_actualizar.items():
             if  key == 'area_paqueteria':
                 answers[self.consecionados_fields['area_paqueteria']] = value
