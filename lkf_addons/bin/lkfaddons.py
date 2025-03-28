@@ -90,6 +90,7 @@ def do_load_modules(load_modules, **kwargs):
     if kwargs.get('dependencies'):
         depend_modules = kwargs['depends_on']
         print('Installing Denpendencies: ', depend_modules)
+        depend_modules += load_modules
     else:
         depend_modules = load_modules
     for module in depend_modules:

@@ -235,6 +235,7 @@ class JIT(Base):
         self.DEMANDA_PLAN = self.lkm.form_id('demand_plan','id')
         self.PROCURMENT = self.lkm.form_id('procurment_record','id')
         self.REGLAS_REORDEN = self.lkm.form_id('reglas_de_reorden','id')
+        self.RUTAS_TRANSPASO = self.lkm.form_id('rutas_de_transpaso','id')
 
         #Catalogos
         self.BOM_CAT = self.lkm.catalog_id('bom')
@@ -375,6 +376,7 @@ class JIT(Base):
                     "process": "Create Reorder Rule", 
                     "accion": 'create_reorder_rule', 
                     "archive": "jit/app.py",
+                    "script":"upsert_reorder_point.py"
                 },
             }
         metadata.update({
@@ -529,16 +531,25 @@ class JIT(Base):
         return res
     
     def get_procurments(self, warehouse=None, location=None, product_code=None, sku=None, status='programmed', group_by=False):
-        match_query ={ 
-             'form_id': self.PROCURMENT,  
-             'deleted_at' : {'$exists':False},
-             f'answers.{self.mf["procurment_status"]}': status,
-         }
+        match_query = {
+            'form_id': self.PROCURMENT,
+            'deleted_at': {'$exists': False},
+            
+        }
+        if status and status != 'programmed':
+            match_query.update({f'answers.{self.mf["jit_procurment_status"]}': 'programmed'})
+        else:
+            match_query.update({
+                '$or': [
+                        {f'answers.{self.mf["jit_procurment_status"]}': 'programmed'},  # Matches "programmed"
+                        {f'answers.{self.mf["jit_procurment_status"]}': {'$exists': False}}  # Matches missing key
+                    ]
+                })
         if type(product_code) == list:
             match_query.update({
                  f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": {"$in": product_code}
                 })
-        else:
+        elif product_code:
             match_query.update({
                 f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_code
                  })
@@ -557,7 +568,7 @@ class JIT(Base):
         query = [
             {'$match': match_query},
             {'$project':{
-                    '_id':0,
+                    '_id':1,
                     'bom_name':f'$answers.{self.BOM_CAT_OBJ_ID}.{self.mf["bom_name"]}',
                     'date':f'$answers.{self.mf["procurment_date"]}',
                     'date_schedule':f'$answers.{self.mf["procurment_schedule_date"]}',
@@ -570,6 +581,7 @@ class JIT(Base):
                     'warehouse':f'$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse"]}',
                     'warehouse_location':f'$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f["warehouse_location"]}',
             }},
+
             ]
 
         return self.format_cr(self.cr.aggregate(query))
@@ -619,32 +631,76 @@ class JIT(Base):
         # print('query=', simplejson.dumps(query, indent=4))
         return self.format_cr(self.cr.aggregate(query))
 
-    def get_rutas_transpaso(self, product_codes):
+    def get_rutas_transpaso(self, product_codes=None):
         match_query ={ 
-             # 'form_id': self.RUTAS_REORDEN,  
-             'form_id': 125127,  
+             'form_id': self.RUTAS_TRANSPASO,  
+             #'form_id': 125127,  
              'deleted_at' : {'$exists':False},
-             f'answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}':{"$in": product_codes},
          } 
+
+        if type(product_codes) == list:
+            match_query.update({
+                 f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": {"$in": product_codes}
+                })
+        elif product_codes:
+            match_query.update({
+                f"answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}": product_codes
+                 }) 
         query = [
             {'$match': match_query},
             {'$sort': {'created_at': 1}},
-            {'$limit':1},
+            # {'$limit':1},
             {'$unwind':f'$answers.{self.mf["rutas_group"]}'},
             {'$project':{
                     '_id':0,
                     'product_code':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}',
                     'sku':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["sku"]}',
                     'standar_pack':f'$answers.{self.mf["rutas_group"]}.{self.mf["standar_pack"]}',
-                    'warehouse':f'$answers.{self.mf["rutas_group"]}{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse"]}',
-                    'warehouse_location':f'$answers.{self.mf["rutas_group"]}{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse_location"]}',
-                    'warehouse_dest':f'$answers.{self.mf["rutas_group"]}{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f["warehouse_dest"]}',
-                    'warehouse_location_dest':f'$answers.{self.mf["rutas_group"]}{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f["warehouse_location_dest"]}',
+                    'warehouse':f'$answers.{self.mf["rutas_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse"]}',
+                    'warehouse_location':f'$answers.{self.mf["rutas_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse_location"]}',
+                    'warehouse_dest':f'$answers.{self.mf["rutas_group"]}.{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f["warehouse_dest"]}',
+                    'warehouse_location_dest':f'$answers.{self.mf["rutas_group"]}.{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f["warehouse_location_dest"]}',
             }},
             ]
+        # print('rrrquery', simplejson.dumps(query,indent=4))
         res =  self.format_cr(self.cr.aggregate(query))
         return res
     
+    def set_rutas_transpaso(self, product_code=None, update=False):
+        if hasattr(self , 'ROUTE_RULES') and not update:
+            return True
+        data = self.get_rutas_transpaso(product_codes=product_code)
+        self.ROUTE_RULES = {}
+        for entry in data:
+            product_code = entry['product_code']
+            sku = entry['sku']
+            warehouse = entry['warehouse']
+            warehouse_location = entry['warehouse_location']
+            warehouse_dest = entry['warehouse_dest']
+            warehouse_location_dest = entry['warehouse_location_dest']
+            standar_pack = entry['standar_pack']
+
+            if product_code not in self.ROUTE_RULES:
+                self.ROUTE_RULES[product_code] = {}
+
+            if sku not in self.ROUTE_RULES[product_code]:
+                self.ROUTE_RULES[product_code][sku] = {}
+
+            if warehouse not in self.ROUTE_RULES[product_code][sku]:
+                self.ROUTE_RULES[product_code][sku][warehouse] = {}
+
+            if warehouse_location not in self.ROUTE_RULES[product_code][sku][warehouse]:
+                self.ROUTE_RULES[product_code][sku][warehouse][warehouse_location] = {}
+
+            if warehouse_dest not in self.ROUTE_RULES[product_code][sku][warehouse][warehouse_location]:
+                self.ROUTE_RULES[product_code][sku][warehouse][warehouse_location][warehouse_dest] = {}
+
+            if warehouse_location_dest not in self.ROUTE_RULES[product_code][sku][warehouse][warehouse_location][warehouse_dest]:
+                self.ROUTE_RULES[product_code][sku][warehouse][warehouse_location][warehouse_dest][warehouse_location_dest] = {}
+
+            self.ROUTE_RULES[product_code][sku][warehouse][warehouse_location][warehouse_dest][warehouse_location_dest] = {'standar_pack':standar_pack}
+        return True
+
     def get_product_average_demand_by_warehouse(self):
         #TODO obtener de registros de formularios o de salidas de almacen
         match_query ={ 
@@ -687,6 +743,7 @@ class JIT(Base):
             wh['warehouse'] = wh.get(self.f['warehouse'])
             if wh.get(key) and wh[key] == value:
                 res = wh.get(get_key)
+        print('esto sigue siendo valido o hay que actualizar')
         return res
 
     def model_procurment(self, qty, product_code, sku, warehouse, location, uom=None, schedule_date=None, \
@@ -722,7 +779,6 @@ class JIT(Base):
     def model_reorder_point(self, product_code, sku, uom, warehouse, location, ave_daily_demand ):
         answers = {}
         config = self.get_config( *['lead_time', 'demora', 'factor_seguridad_jit','factor_crecimiento_jit','uom'])
-        print('33333',config )
         lead_time = config.get('lead_time')
         demora = config.get('demora')
         safety_factor = config.get('factor_seguridad_jit',1)
@@ -746,8 +802,11 @@ class JIT(Base):
         answers[self.mf['reorder_point']] = self.calc_reorder_point(answers[self.mf['min_stock']], answers[self.mf['safety_stock']])
         answers[self.mf['trigger']] = 'auto'
         answers[self.mf['status']] = 'active'
-        print('answers model_reorder_point', answers)
         return answers
+
+    def update_procurmet(self, records, **kwargs):
+        print('111updating records', records)
+        return []
 
     def upsert_procurment(self, product_by_warehouse, **kwargs):
 
@@ -773,7 +832,8 @@ class JIT(Base):
 
             print('update_records', update_records)
             print('create_records', create_records)
-            response = self.create_procurment(create_records, **kwargs)
+            response = self.update_procurmet(update_records, **kwargs)
+            response += self.create_procurment(create_records, **kwargs)
 
         return response
 
@@ -784,7 +844,6 @@ class JIT(Base):
         product_by_warehouse = {}
         config = self.get_config(*['uom'])
         for rec in records:
-            print('rec=',rec)
             product_code = rec.get('product_code')
             demanda_12_meses = rec.get('demanda_12_meses',0)
             sku = rec.get('sku')
@@ -795,8 +854,12 @@ class JIT(Base):
             warehouse = rec.get('warehouse')
             product_by_warehouse[warehouse] = product_by_warehouse.get(warehouse,[])
             location = rec.get('location')
+            if not location:
+                wh_config = self.WH.get_warehouse_config(warehouse, location_type='abastacimiento')
+                location = wh_config.get('warehouse_location')
+                if not location:
+                    self.LKFException({"status_code":400, "msg":f"Se debe de configura una ubicacion de Abastecimiento para el almacen {warehouse}."})
             uom = rec.get('uom', config.get('uom'))
-            print('1111111', self.GET_CONFIG)
             ans = self.model_reorder_point(
                 product_code, 
                 sku,
@@ -805,11 +868,9 @@ class JIT(Base):
                 location,
                 consumo_promedio_diario,
                 )
-
             product_by_warehouse[warehouse].append(ans)
 
         for wh, create_records in product_by_warehouse.items():
-            print(f'----------------{wh}--------------------')
             update_records = []
             existing_products = self.get_reorder_rules(warehouse=wh)
             existing_skus = [prod['sku'] for prod in existing_products]
@@ -827,10 +888,7 @@ class JIT(Base):
                             except ValueError:
                                 print('allready removed')
 
-            print('create_records', create_records)
-            print('update_records', update_records)
             response = self.create_reorder_rule(create_records)
-            print('response', response)
             # repose_edit = self.update_reorder_rule(update_records)
 
         return True

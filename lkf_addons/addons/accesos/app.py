@@ -966,8 +966,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
+
     def delete_paquete(self, folio):
         print("del", folio)
+
 
     def do_access(self, qr_code, location, area, data):
         '''

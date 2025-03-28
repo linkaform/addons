@@ -228,6 +228,7 @@ class Stock(Base):
             'set_total_produced':'61f1fcf8c66d2990c8fc7cc3',
             'status':'620ad6247a217dbcb888d175',
             'stock_move_comments':'66b561232c91d2011147118c',
+            'stock_move_status':'ad00000000000000000ad999',
             'stock_status':'6442e4537775ce64ef72dd6a',
             'time_in':'61f1fcf8c66d2990c8fc7cc5',
             'time_out':'61f1fcf8c66d2990c8fc7cc6',
