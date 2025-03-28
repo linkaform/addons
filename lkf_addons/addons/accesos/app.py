@@ -966,6 +966,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
+
+    def delete_paquete(self, folio):
+        print("del", folio)
+
+
     def do_access(self, qr_code, location, area, data):
         '''
         Valida pase de entrada y crea registro de entrada al pase
@@ -1278,16 +1283,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             response = self.lkf_api.catalog_view(catalog_id, form_id)
         elif bitacora == 'Incidencias':
             form_id= self.BITACORA_INCIDENCIAS
-            group_level = 2
             if location:
                 options = {
-                    "group_level": group_level,
+                    "group_level": 2,
                     "startkey": [
                         location
                     ],
                     "endkey": [
                         f"{location}\n",
-                        {}
                     ]
                 }
             else:
@@ -1301,17 +1304,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         form_id= self.BITACORA_FALLAS
         return self.lkf_api.catalog_view(catalog_id, form_id) 
 
-    def catalogo_tipo_concesion(self, tipo=""):
-        options={}
-        if tipo:
-            options = {
-                'startkey': [tipo],
-                'endkey': [f"{tipo}\n",{}],
-                'group_level':2
-            }
+    def catalogo_tipo_concesion(self,location="", tipo=""):
         catalog_id = self.ACTIVOS_FIJOS_CAT_ID
-        form_id = self.ACTIVOS_FIJOS
-        return self.catalogo_view(catalog_id, form_id, options)
+        form_id= self.CONCESSIONED_ARTICULOS
+        options={}
+        if location and tipo:
+            options = {
+                "group_level": 3,
+                "startkey": [location,tipo],
+                "endkey": [location, f"{tipo}\n"]
+            }
+        else:
+            if location and not tipo:
+                options = {
+                    "group_level": 2,
+                    "startkey": [location],
+                    "endkey": [f"{location}\n"]
+                }
+            elif tipo and not location:
+                self.LKFException('Location es requerido')
+        response= self.catalogo_view(catalog_id, form_id, options)
+        return response
+
 
     def catalogo_falla(self, tipo=""):
         options={}
@@ -3894,29 +3908,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if area:
              match_query[f"answers.{self.paquetes_fields['area_paqueteria']}"] = area
         if status:
-             match_query[f"answers.{self.paquetes_fields['status_paqueteria']}"] = status
+             match_query[f"answers.{self.paquetes_fields['estatus_paqueteria']}"] = status
         query = [
             {'$match': match_query },
-            #{'$project': self.proyect_format(self.perdidos_fields)},
             {'$project': {
                 "folio":"$folio",
                 "_id":"$_id",
-                'ubicacion_paqueteria':f"{self.paquetes_fields['ubicacion_paqueteria']}",
-                'area_paqueteria': f"{self.paquetes_fields['area_paqueteria']}",
-                'fotografia_paqueteria':f"{self.paquetes_fields['fotografia_paqueteria']}",
-                'descripcion_paqueteria':f"{self.paquetes_fields['descripcion_paqueteria']}",
-                'quien_recibe_paqueteria':f"{self.paquetes_fields['quien_recibe_catalogo']}.{self.paquetes_fields['quien_recibe_paqueteria']}",
-                'guardado_en_paqueteria': f"{self.paquetes_fields['guardado_en_paqueteria']}",
-                'fecha_recibido_paqueteria': f"{self.paquetes_fields['fecha_recibido_paqueteria']}",
-                'fecha_entregado_paqueteria': f"{self.paquetes_fields['fecha_recibido_paqueteria']}",
-                'estatus_paqueteria': f"{self.paquetes_fields['estatus_paqueteria']}",
-                'entregado_a_paqueteria': f"{self.paquetes_fields['entregado_a_paqueteria']}",
-                'proveedor': f"{self.paquetes_fields['proveedor_catalogo']}.{self.paquetes_fields['proveedor']}",
+                'ubicacion_paqueteria':f"$answers.{self.paquetes_fields['ubicacion_paqueteria']}",
+                'area_paqueteria': f"$answers.{self.paquetes_fields['area_paqueteria']}",
+                'fotografia_paqueteria':f"$answers.{self.paquetes_fields['fotografia_paqueteria']}",
+                'descripcion_paqueteria':f"$answers.{self.paquetes_fields['descripcion_paqueteria']}",
+                'quien_recibe_paqueteria':f"$answers.{self.paquetes_fields['quien_recibe_catalogo']}.{self.paquetes_fields['quien_recibe_paqueteria']}",
+                'guardado_en_paqueteria': f"$answers.{self.paquetes_fields['guardado_en_paqueteria']}",
+                'fecha_recibido_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
+                'fecha_entregado_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
+                'estatus_paqueteria': f"$answers.{self.paquetes_fields['estatus_paqueteria']}",
+                'entregado_a_paqueteria': f"$answers.{self.paquetes_fields['entregado_a_paqueteria']}",
+                'proveedor': f"$answers.{self.paquetes_fields['proveedor']}",
             }},
             {'$sort':{'folio':-1}},
         ]
-        # pr= self.format_cr_result(self.cr.aggregate(query))
-        print("paqueteria", pr)
+        pr= self.format_cr_result(self.cr.aggregate(query))
+        for x in pr:
+            status = x.get('estatus_paqueteria', [])
+            x['estatus_paqueteria'] = status.pop() if status else ""
+        print("+++pr" ,pr)
         return pr
     
     def get_user_booths_availability(self, turn_areas=True):
@@ -5492,12 +5508,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res.matched_count
         # print("records=",stop)
 
-    def update_paquete(self):
+    def update_paquete(self, data_paquete_actualizar, folio):
         answers = {}
         for key, value in data_paquete_actualizar.items():
             if  key == 'area_paqueteria':
                 answers[self.consecionados_fields['area_paqueteria']] = value
-            elif  key == 'ubicacion_paqueteria':
+            elif key == 'ubicacion_paqueteria':
                 answers[self.consecionados_fields['ubicacion_paqueteria']] = value
             elif key == 'quien_recibe_paqueteria':
                 answers[self.paquetes_fields['quien_recibe_catalogo']] = {self.paquetes_fields['quien_recibe_paqueteria']:value}
