@@ -623,16 +623,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'area_paqueteria':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
             'fotografia_paqueteria': "67e46624da3191c5ef4ab6d0",
             'descripcion_paqueteria':"67e4652619b4be1c5a76a485",
-            'quien_recibe_catalogo': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}",
+            'quien_recibe_cat': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}",
             'quien_recibe_paqueteria':f"{self.mf['nombre_empleado']}",
-            # 'guardado_en_paqueteria_catalogo': f"{self.LOCKERS_CAT_OBJ_ID}",
-            # 'guardado_en_paqueteria': f"{self.LOCKERS_CAT_OBJ_ID}.{self.mf['66480101786e8cdb66e70124']}",
+            'guardado_en_paqueteria_cat': f"{self.LOCKERS_CAT_OBJ_ID}",
+            'guardado_en_paqueteria': '66480101786e8cdb66e70124',
             'fecha_recibido_paqueteria': '67e4652619b4be1c5a76a486',
             'fecha_entregado_paqueteria': '67e4652619b4be1c5a76a487',
             'estatus_paqueteria': '67e4652619b4be1c5a76a488',
             'entregado_a_paqueteria':'67e4652619b4be1c5a76a489',
-            # 'proveedor_catalogo':f"",
-            # 'proveedor':f"{self.LOCKERS_CAT_OBJ_ID}.{'667468e3e577b8b98c852aaa'}",
+            'proveedor_cat':f"{self.PROVEEDORES_CAT_OBJ_ID}",
+            'proveedor':'667468e3e577b8b98c852aaa',
         }
 
         self.notes_project_fields.update(self.notes_fields)
@@ -966,10 +966,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
-
     def delete_paquete(self, folio):
         print("del", folio)
-
 
     def do_access(self, qr_code, location, area, data):
         '''
@@ -1326,7 +1324,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         response= self.catalogo_view(catalog_id, form_id, options)
         return response
 
-
     def catalogo_falla(self, tipo=""):
         options={}
         if tipo:
@@ -1535,7 +1532,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_badge(self, data_badge):
         #---Define Metadata
-        print("DATA BADGE", data_badge)
         metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_GAFETES_LOCKERS)
         metadata.update({
             "properties": {
@@ -3918,13 +3914,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'area_paqueteria': f"$answers.{self.paquetes_fields['area_paqueteria']}",
                 'fotografia_paqueteria':f"$answers.{self.paquetes_fields['fotografia_paqueteria']}",
                 'descripcion_paqueteria':f"$answers.{self.paquetes_fields['descripcion_paqueteria']}",
-                'quien_recibe_paqueteria':f"$answers.{self.paquetes_fields['quien_recibe_catalogo']}.{self.paquetes_fields['quien_recibe_paqueteria']}",
-                'guardado_en_paqueteria': f"$answers.{self.paquetes_fields['guardado_en_paqueteria']}",
+                'quien_recibe_paqueteria':f"$answers.{self.paquetes_fields['quien_recibe_cat']}.{self.paquetes_fields['quien_recibe_paqueteria']}",
+                'guardado_en_paqueteria': f"$answers.{self.paquetes_fields['guardado_en_paqueteria_cat']}.{self.paquetes_fields['guardado_en_paqueteria']}",
                 'fecha_recibido_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
                 'fecha_entregado_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
                 'estatus_paqueteria': f"$answers.{self.paquetes_fields['estatus_paqueteria']}",
                 'entregado_a_paqueteria': f"$answers.{self.paquetes_fields['entregado_a_paqueteria']}",
-                'proveedor': f"$answers.{self.paquetes_fields['proveedor']}",
+                'proveedor': f"$answers.{self.paquetes_fields['proveedor_cat']}.{self.paquetes_fields['proveedor']}",
             }},
             {'$sort':{'folio':-1}},
         ]
@@ -3932,7 +3928,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for x in pr:
             status = x.get('estatus_paqueteria', [])
             x['estatus_paqueteria'] = status.pop() if status else ""
-        print("+++pr" ,pr)
+        print("+++pr" ,simplejson.dumps(pr, indent=4))
         return pr
     
     def get_user_booths_availability(self, turn_areas=True):
