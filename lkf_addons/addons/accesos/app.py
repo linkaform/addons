@@ -1901,8 +1901,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "device_properties":{
                     "System": "Script",
                     "Module": "Accesos",
-                    "Process": "Creación de Bitacora Articulo Perdido",
-                    "Action": "create_article_lose",
+                    "Process": "Creación de Paquetes",
+                    "Action": "nuevo_paquete",
                     "File": "accesos/app.py"
                 }
             },
