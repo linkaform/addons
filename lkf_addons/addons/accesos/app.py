@@ -1283,7 +1283,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             response = self.lkf_api.catalog_view(catalog_id, form_id)
         elif bitacora == 'Incidencias':
             form_id= self.BITACORA_INCIDENCIAS
-            if location and tipo:
+            if location:
                 options = {
                     "group_level": 2,
                     "startkey": [
