@@ -157,15 +157,4 @@ class Vehiculo(Base):
             )
 
 
-    # def catalogo_activo_fijo(self, tipo=""):
-    #     print("UIDDDDDD", self.ACTIVOS_FIJOS_CAT_ID, self.ACTIVOS_FIJOS)
-    #     options={}
-    #     if tipo:
-    #         options = {
-    #             'startkey': [tipo],
-    #             'endkey': [f"{tipo}\n",{}],
-    #             'group_level':2
-    #         }
-    #     catalog_id = self.ACTIVOS_FIJOS_CAT_ID
-    #     form_id = self.ACTIVOS_FIJOS
-    #     return self.catalogo_view(catalog_id, form_id, options)
+       
