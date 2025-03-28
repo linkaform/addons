@@ -3359,7 +3359,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return self.format_lockers(self.lkf_api.search_catalog( self.LOCKERS_CAT_ID, mango_query))
 
-    def get_list_bitacora(self, location=None, area=None, prioridades=[]):
+    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo=''):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ACCESOS
@@ -3370,6 +3370,27 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area})
         if prioridades:
             match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
+       
+        if dateFrom:
+            dateFrom = dateFrom + " 00:00:00"
+        if dateTo:
+            dateTo = dateTo + " 23:59:59"
+        print(dateFrom)
+        print(dateTo)
+
+        if dateFrom and dateTo:
+            match_query.update({
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom},
+                f"answers.{self.mf['fecha_salida']}": {"$lte": dateTo}
+            })
+        elif dateFrom:
+            match_query.update({
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom}
+            })
+        elif dateTo:
+            match_query.update({
+                f"answers.{self.mf['fecha_salida']}": {"$lte": dateTo}
+            })
 
         proyect_fields ={
             '_id': 1,
@@ -3424,8 +3445,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$match': match_query },
             {'$project': proyect_fields},
             {'$lookup': lookup},
-            {'$sort':{'folio':-1}},
         ]
+        if dateFrom:
+            query.append(
+                {'$sort':{'folio':1}},
+            )
+        else:
+            query.append(
+                {'$sort':{'folio':-1}},
+            )
         records = self.format_cr(self.cr.aggregate(query))
         # print( simplejson.dumps(records, indent=4))
         for r in records:
