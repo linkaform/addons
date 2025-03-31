@@ -14,7 +14,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1729535273.0</created_at>
+    <created_at>1736440562.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -115,6 +115,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -181,6 +182,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -247,6 +249,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -284,7 +287,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>
-                            <body>{% raw %}{{record.answers.670d2d9d0337e410e4353550}}{% endraw %}</body>
+                            <body>{{record.answers.670d2d9d0337e410e4353550}}</body>
                             <email_fields>[]</email_fields>
                             <emails>[]</emails>
                             <embed_company_picture>False</embed_company_picture>
@@ -297,8 +300,8 @@
                             <resend>DONT_RESEND</resend>
                             <send_attachments>False</send_attachments>
                             <send_pdf>False</send_pdf>
-                            <sender> {% raw %}{{record.answers.67169f72c736cc47794404f8}}{% endraw %}</sender>
-                            <subject>{% raw %}{{record.answers.67169f72c736cc47794404f9}}{% endraw %}</subject>
+                            <sender>{{record.answers.67169f72c736cc47794404f8}}</sender>
+                            <subject>{{record.answers.67169f72c736cc47794404f9}}</subject>
                             <template_html>None</template_html>
                             <templates>[]</templates>
                             <timer_config>
@@ -339,6 +342,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -405,6 +409,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -471,6 +476,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -499,7 +505,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/124797/</resource_uri>
+    <resource_uri>/api/infosync/form/127825/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -520,5 +526,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1729536471.0</updated_at>
+    <updated_at>1743458393.0</updated_at>
 </lkf>
