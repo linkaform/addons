@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.envio_de_correos.id }}</form_id>
+    <id>67567e6840a55b8a1c487f21</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>67567e6840a55b8a1c487f1a</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>{}</configuration>
+                    <name>Notificar Inbox</name>
+                </item>
+            </actions>
+            <id>67567e6840a55b8a1c487f1b</id>
+            <name>None</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-12-09T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-12-09T05:21:11.926Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>67eb140769a6f0f0114d9e2d</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} {{record.answers.670d2d9d0337e410e4353550}} {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>670d2e32756833542954716c</field_id>
+                                <group_id>None</group_id>
+                                <label>emai para</label>
+                            </item>
+                        </email_fields>
+                        <emails>[]</emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>False</send_pdf>
+                        <sender>{{record.answers.67169f72c736cc47794404f8}}</sender>
+                        <subject>{% raw %} {{record.answers.67169f72c736cc47794404f9}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>Se envia el correo</name>
+                </item>
+            </actions>
+            <id>67eb140769a6f0f0114d9e31</id>
+            <name>Se envia el correo</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-04-01T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-03-31T22:14:27.875Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
