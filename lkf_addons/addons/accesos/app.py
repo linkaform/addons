@@ -2025,6 +2025,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers = {}
         perfil_pase = access_pass.get('perfil_pase')
         location_name = access_pass.get('ubicacion')
+        if not location:
+            location = location_name
         address = self.get_location_address(location_name=location_name)
         access_pass['direccion'] = [address.get('address', '')]
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
