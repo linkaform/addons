@@ -4046,9 +4046,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             default_booth , user_booths = self.get_user_booth(search_default=False)
             # location = default_booth.get('location')
             if not booth_location:
-                booth_area = default_booth['area']
+                booth_area = default_booth.get('area')
             if not booth_location:
-                booth_location = default_booth['location']
+                booth_location = default_booth.get('location')
             if not default_booth:
                 return self.LKFException({"status_code":400, "msg":'No booth found or configure for user'})
             location_employees = self.get_booths_guards(booth_location, booth_area, solo_disponibles=True)
