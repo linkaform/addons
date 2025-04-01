@@ -3012,6 +3012,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
             perfil_pase = self._labels(perfil_pase, self.mf)
+            if x.get('fecha_de_caducidad') == "":
+                x['fecha_de_caducidad'] = x.get('fecha_de_expedicion')
             if perfil_pase:
                 x['tipo_de_pase'] = perfil_pase.pop('nombre_perfil')
                 empresa = x.get('empresa')
