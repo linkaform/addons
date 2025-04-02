@@ -6,49 +6,6 @@
         <item>
             <actions>
                 <item>
-                    <_id>67567e6840a55b8a1c487f1a</_id>
-                    <action_id>5</action_id>
-                    <action_settings>{}</action_settings>
-                    <configuration>{}</configuration>
-                    <name>Notificar Inbox</name>
-                </item>
-            </actions>
-            <id>67567e6840a55b8a1c487f1b</id>
-            <name>None</name>
-            <rules>
-                <metadata>
-                    <connection>[]</connection>
-                    <date>
-                        <period>
-                            <month>1</month>
-                            <selected>False</selected>
-                            <year>2014</year>
-                        </period>
-                        <range>
-                            <end>2024-12-09T06:00:00.000Z</end>
-                            <selected>False</selected>
-                            <start>2024-12-09T05:21:11.926Z</start>
-                        </range>
-                    </date>
-                    <grading>{}</grading>
-                    <user>[]</user>
-                </metadata>
-                <record>
-                    <created>True</created>
-                    <deleted>False</deleted>
-                    <edited>True</edited>
-                    <run_multiple_times>False</run_multiple_times>
-                    <runtime>after</runtime>
-                </record>
-                <wf_fields>
-                    <operator>all</operator>
-                    <triggers>[]</triggers>
-                </wf_fields>
-            </rules>
-        </item>
-        <item>
-            <actions>
-                <item>
                     <_id>67eb140769a6f0f0114d9e2d</_id>
                     <action_id>5</action_id>
                     <action_settings>{}</action_settings>
@@ -68,7 +25,7 @@
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>False</send_pdf>
-                        <sender>{{record.answers.67169f72c736cc47794404f8}}</sender>
+                        <sender>OWNER_EMAIL</sender>
                         <subject>{% raw %} {{record.answers.67169f72c736cc47794404f9}} {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
@@ -209,7 +166,7 @@
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>False</send_pdf>
-                        <sender>soter@envios.mx</sender>
+                        <sender>OWNER_EMAIL</sender>
                         <subject>{% raw %} {{record.answers.67169f72c736cc47794404f9}} {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
