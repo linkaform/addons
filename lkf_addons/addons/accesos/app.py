@@ -998,6 +998,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if total_entradas['total_records']>= int(limite_acceso) :
                 self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
         
+        timezone = pytz.timezone('America/Mexico_City')
+        fecha_actual = datetime.now(timezone).replace(microsecond=0)
+        fecha_caducidad = access_pass.get('fecha_de_caducidad')
+        fecha_obj_caducidad = datetime.strptime(fecha_caducidad, "%Y-%m-%d %H:%M:%S")
+        fecha_caducidad = timezone.localize(fecha_obj_caducidad)
+
+        # Se agregan 15 minutos como margen de tolerancia
+        fecha_caducidad_con_margen = fecha_caducidad + timedelta(minutes=15)
+
+        if fecha_caducidad_con_margen < fecha_actual:
+            self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
+        
         if access_pass.get("ubicacion") != location:
             self.LKFException({'msg':"No se puede realizar un ingreso en una ubicación diferente.","title":'Revisa la Configuración'})
         
