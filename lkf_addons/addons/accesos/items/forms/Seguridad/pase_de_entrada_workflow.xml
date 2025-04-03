@@ -939,7 +939,7 @@
                     <action_settings>{}</action_settings>
                     <configuration>
                         <arguments>
-                            <pre_sms>true</pre_sms>
+                            <pre_sms>True</pre_sms>
                         </arguments>
                         <integration>None</integration>
                         <script>
@@ -956,7 +956,7 @@
                         <scriptArguments>
                             <item>
                                 <label>pre_sms</label>
-                                <value>true</value>
+                                <value>True</value>
                             </item>
                         </scriptArguments>
                         <scriptQuery>None</scriptQuery>

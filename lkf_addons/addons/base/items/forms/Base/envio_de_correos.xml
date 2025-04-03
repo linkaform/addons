@@ -14,13 +14,13 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1729535273.0</created_at>
+    <created_at>1736440562.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
     <email_configuration>
-        <body>None</body>
+        <body>Has contestado el formulario Envio de Correos</body>
         <email_fields>[]</email_fields>
         <emails>[]</emails>
         <embed_company_picture>False</embed_company_picture>
@@ -30,11 +30,18 @@
         <resend>DONT_RESEND</resend>
         <send_attachments>False</send_attachments>
         <send_pdf>False</send_pdf>
-        <sender>None</sender>
-        <subject>None</subject>
+        <sender>OWNER_EMAIL</sender>
+        <subject>Una forma ha sido contestada</subject>
         <template_html>None</template_html>
         <templates>[]</templates>
-        <timer_config>None</timer_config>
+        <timer_config>
+            <active>False</active>
+            <clicks_to_expire>None</clicks_to_expire>
+            <goodbye_text>None</goodbye_text>
+            <minutes>None</minutes>
+            <seconds_to_expire>None</seconds_to_expire>
+            <welcome_text>None</welcome_text>
+        </timer_config>
     </email_configuration>
     <emails>[]</emails>
     <enable_geolocation>True</enable_geolocation>
@@ -70,21 +77,31 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>
-                            <body>None</body>
+                            <body>Has contestado el formulario Envio de Correos</body>
                             <email_fields>[]</email_fields>
                             <emails>[]</emails>
                             <embed_company_picture>False</embed_company_picture>
                             <embed_fields>[]</embed_fields>
-                            <pdf_template>{}</pdf_template>
+                            <pdf_template>
+                                <id>0</id>
+                                <name>Selecciona una plantilla</name>
+                            </pdf_template>
                             <reply_to>None</reply_to>
                             <resend>DONT_RESEND</resend>
                             <send_attachments>False</send_attachments>
                             <send_pdf>False</send_pdf>
-                            <sender>None</sender>
-                            <subject>None</subject>
+                            <sender>OWNER_EMAIL</sender>
+                            <subject>Una forma ha sido contestada</subject>
                             <template_html>None</template_html>
                             <templates>[]</templates>
-                            <timer_config>None</timer_config>
+                            <timer_config>
+                                <active>False</active>
+                                <clicks_to_expire>None</clicks_to_expire>
+                                <goodbye_text>None</goodbye_text>
+                                <minutes>None</minutes>
+                                <seconds_to_expire>None</seconds_to_expire>
+                                <welcome_text>None</welcome_text>
+                            </timer_config>
                         </email_configuration>
                         <enable_barcode>None</enable_barcode>
                         <fieldId>[]</fieldId>
@@ -115,6 +132,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -181,6 +199,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -247,6 +266,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -284,7 +304,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>
-                            <body>{% raw %}{{record.answers.670d2d9d0337e410e4353550}}{% endraw %}</body>
+                            <body />
                             <email_fields>[]</email_fields>
                             <emails>[]</emails>
                             <embed_company_picture>False</embed_company_picture>
@@ -297,8 +317,8 @@
                             <resend>DONT_RESEND</resend>
                             <send_attachments>False</send_attachments>
                             <send_pdf>False</send_pdf>
-                            <sender> {% raw %}{{record.answers.67169f72c736cc47794404f8}}{% endraw %}</sender>
-                            <subject>{% raw %}{{record.answers.67169f72c736cc47794404f9}}{% endraw %}</subject>
+                            <sender>OWNER_EMAIL</sender>
+                            <subject />
                             <template_html>None</template_html>
                             <templates>[]</templates>
                             <timer_config>
@@ -339,6 +359,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -405,6 +426,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -471,6 +493,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -488,6 +511,7 @@
         </item>
     </form_pages>
     <grading>
+        <_round>False</_round>
         <active>False</active>
         <grade_type>points</grade_type>
         <max_points>0</max_points>
@@ -499,7 +523,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/124797/</resource_uri>
+    <resource_uri>/api/infosync/form/127825/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -520,5 +544,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1729536471.0</updated_at>
+    <updated_at>1743552105.0</updated_at>
 </lkf>
