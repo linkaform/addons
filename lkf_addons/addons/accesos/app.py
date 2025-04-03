@@ -3954,16 +3954,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         default_booth , user_booths = self.get_user_booth(search_default=False, turn_areas=turn_areas)
         user_booths.insert(0, default_booth)
+        user_booths_with_area = []
         for booth in user_booths:
             booth_area = booth.get('area')
-            location = booth.get('location')
-            booth_status = self.get_booth_status(booth_area, location)
-            booth['status'] = booth_status.get('status', 'Disponible')
-            booth_address = self.get_area_address(location, booth_area)
-            booth_address.pop('_id')
-            booth_address.pop('folio')
-            booth.update(booth_address)
-        return user_booths
+            if booth_area:
+                location = booth.get('location')
+                booth_status = self.get_booth_status(booth_area, location)
+                booth['status'] = booth_status.get('status', 'Disponible')
+                booth_address = self.get_area_address(location, booth_area)
+                booth_address.pop('_id')
+                booth_address.pop('folio')
+                booth.update(booth_address)
+                user_booths_with_area.append(booth)
+        return user_booths_with_area
 
     def get_user_contacts(self):
         user_id = self.user['user_id']
