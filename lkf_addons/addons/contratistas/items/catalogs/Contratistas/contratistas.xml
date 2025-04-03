@@ -176,8 +176,8 @@
                         <item>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>completado</value>
-                            <label>Completado</label>
+                            <value>completada</value>
+                            <label>Completada</label>
                         </item>
                     </options>
                     <key>False</key>
