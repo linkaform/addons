@@ -3358,6 +3358,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area})
         if prioridades:
             match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
+
+        if not dateFrom and not dateTo:
+            today = datetime.today()
+            two_days_ago = today - timedelta(days=2)
+            dateFromPred = two_days_ago.strftime("%Y-%m-%d") + " 00:00:00"
+            dateToPred = today.strftime("%Y-%m-%d") + " 23:59:59"
        
         if dateFrom:
             dateFrom = dateFrom + " 00:00:00"
@@ -3377,6 +3383,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         elif dateTo:
             match_query.update({
                 f"answers.{self.mf['fecha_entrada']}": {"$lte": dateTo}
+            })
+        else:
+            match_query.update({
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFromPred, "$lte": dateToPred},
             })
 
         proyect_fields ={
