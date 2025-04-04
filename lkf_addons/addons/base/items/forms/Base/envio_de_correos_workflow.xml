@@ -206,7 +206,7 @@
                     <operator>all</operator>
                     <triggers>
                         <item>
-                            <condition>icontains=</condition>
+                            <condition>iexact=</condition>
                             <form_id>None</form_id>
                             <other_value>None</other_value>
                             <prefix>answer</prefix>
