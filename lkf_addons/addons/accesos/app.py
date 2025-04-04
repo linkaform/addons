@@ -3368,8 +3368,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         if dateFrom and dateTo:
             match_query.update({
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom},
-                f"answers.{self.mf['fecha_salida']}": {"$lte": dateTo}
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom, "$lte": dateTo},
             })
         elif dateFrom:
             match_query.update({
@@ -3377,7 +3376,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             })
         elif dateTo:
             match_query.update({
-                f"answers.{self.mf['fecha_salida']}": {"$lte": dateTo}
+                f"answers.{self.mf['fecha_entrada']}": {"$lte": dateTo}
             })
 
         proyect_fields ={
