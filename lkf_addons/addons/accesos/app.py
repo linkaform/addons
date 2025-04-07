@@ -625,8 +625,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'descripcion_paqueteria':"67e4652619b4be1c5a76a485",
             'quien_recibe_cat': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}",
             'quien_recibe_paqueteria':f"{self.mf['nombre_empleado']}",
-            'guardado_en_paqueteria_cat': f"{self.LOCKERS_CAT_OBJ_ID}",
-            'guardado_en_paqueteria': '66480101786e8cdb66e70124',
+            'guardado_en_paqueteria': f"{self.LOCKERS_CAT_OBJ_ID}.{self.mf['locker_id']}",
             'fecha_recibido_paqueteria': '67e4652619b4be1c5a76a486',
             'fecha_entregado_paqueteria': '67e4652619b4be1c5a76a487',
             'estatus_paqueteria': '67e4652619b4be1c5a76a488',
@@ -1348,6 +1347,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         form_id = self.BITACORA_OBJETOS_PERDIDOS
         return self.catalogo_view(catalog_id, form_id, options)
 
+    
+
     def check_status_code(self, data_response):
         for item in data_response:
             if 'status_code' in item[1]:
@@ -1893,35 +1894,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
-    def create_paquete(self, data_paquete):
-        #---Define Metadata
-        metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_OBJETOS_PERDIDOS)
-        metadata.update({
-            "properties": {
-                "device_properties":{
-                    "System": "Script",
-                    "Module": "Accesos",
-                    "Process": "Creación de Paquetes",
-                    "Action": "nuevo_paquete",
-                    "File": "accesos/app.py"
-                }
-            },
-        })
-        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
-        #---Define Answers
-        answers = {}
-        for key, value in data_paquete.items():
-            if  key == 'area_paqueteria':
-                answers[self.consecionados_fields['area_paqueteria']] = value
-            elif  key == 'ubicacion_paqueteria':
-                answers[self.consecionados_fields['ubicacion_paqueteria']] = value
-            elif key == 'quien_recibe_paqueteria':
-                answers[self.paquetes_fields['quien_recibe_catalogo']] = {self.paquetes_fields['quien_recibe_paqueteria']:value}
-            else:
-                answers.update({f"{self.paquetes_fields[key]}":value})
-        metadata.update({'answers':answers})
-        res=self.lkf_api.post_forms_answers(metadata)
-        return res
+    
 
     def _get_ics_file(self, meetings=[]):
         _logger = logging.getLogger(__name__)
@@ -3359,121 +3332,121 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return self.format_lockers(self.lkf_api.search_catalog( self.LOCKERS_CAT_ID, mango_query))
 
-    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo=''):
-        match_query = {
-            "deleted_at":{"$exists":False},
-            "form_id": self.BITACORA_ACCESOS
-        }
-        if location:
-            match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}":location})
-        if area:
-            match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area})
-        if prioridades:
-            match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
+    # def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo=''):
+    #     match_query = {
+    #         "deleted_at":{"$exists":False},
+    #         "form_id": self.BITACORA_ACCESOS
+    #     }
+    #     if location:
+    #         match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}":location})
+    #     if area:
+    #         match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area})
+    #     if prioridades:
+    #         match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
        
-        if dateFrom:
-            dateFrom = dateFrom + " 00:00:00"
-        if dateTo:
-            dateTo = dateTo + " 23:59:59"
-        print(dateFrom)
-        print(dateTo)
+    #     if dateFrom:
+    #         dateFrom = dateFrom + " 00:00:00"
+    #     if dateTo:
+    #         dateTo = dateTo + " 23:59:59"
+    #     print(dateFrom)
+    #     print(dateTo)
 
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom},
-                f"answers.{self.mf['fecha_salida']}": {"$lte": dateTo}
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.mf['fecha_salida']}": {"$lte": dateTo}
-            })
+    #     if dateFrom and dateTo:
+    #         match_query.update({
+    #             f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom},
+    #             f"answers.{self.mf['fecha_salida']}": {"$lte": dateTo}
+    #         })
+    #     elif dateFrom:
+    #         match_query.update({
+    #             f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom}
+    #         })
+    #     elif dateTo:
+    #         match_query.update({
+    #             f"answers.{self.mf['fecha_salida']}": {"$lte": dateTo}
+    #         })
 
-        proyect_fields ={
-            '_id': 1,
-            'folio': "$folio",
-            'created_at': "$created_at",
-            'updated_at': "$updated_at",
-            'a_quien_visita':f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
-            'documento': f"$answers.{self.mf['documento']}",
-            'caseta_entrada':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
-            'codigo_qr':f"$answers.{self.mf['codigo_qr']}",
-            'comentarios':f"$answers.{self.bitacora_fields['grupo_comentario']}",
-            'fecha_salida':f"$answers.{self.mf['fecha_salida']}",
-            'fecha_entrada':f"$answers.{self.mf['fecha_entrada']}",
-            'foto_url': {"$arrayElemAt": [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}.file_url", 0]},
-            'equipos':f"$answers.{self.mf['grupo_equipos']}",
-            'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
-            'id_gafet': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
-            'id_locker': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.lockers_fields['locker_id']}",
-            'identificacion':  {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}"},
-            'pase_id':{"$toObjectId":f"$answers.{self.mf['codigo_qr']}"},
-            'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
-            'nombre_area_salida':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
-            'nombre_visitante':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
-            'contratista':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['empresa']}",
-            'perfil_visita':{'$arrayElemAt': [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",0]},
-            'status_gafete':f"$answers.{self.mf['status_gafete']}",
-            'status_visita':f"$answers.{self.mf['tipo_registro']}",
-            'ubicacion':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
-            'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
-            'visita_a': f"$answers.{self.mf['grupo_visitados']}"
-            }
-        lookup = {
-         'from': 'form_answer',
-         'localField': 'pase_id',
-         'foreignField': '_id',
-         "pipeline": [
-                {'$match':{
-                    "deleted_at":{"$exists":False},
-                    "form_id": self.PASE_ENTRADA,
-                    }
-                },
-                {'$project':{
-                    "_id":0, 
-                    'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
-                    'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",                    
-                    }
-                },
-                ],
-         'as': 'pase',
-        }
-        query = [
-            {'$match': match_query },
-            {'$project': proyect_fields},
-            {'$lookup': lookup},
-        ]
-        if dateFrom:
-            query.append(
-                {'$sort':{'folio':1}},
-            )
-        else:
-            query.append(
-                {'$sort':{'folio':-1}},
-            )
-        records = self.format_cr(self.cr.aggregate(query))
-        # print( simplejson.dumps(records, indent=4))
-        for r in records:
-            pase = r.pop('pase')
-            r.pop('pase_id')
-            if len(pase) > 0 :
-                pase = pase[0]
-                r['motivo_visita'] = self.unlist(pase.get('motivo_visita',''))
-                r['grupo_areas_acceso'] = self._labels_list(pase.get('grupo_areas_acceso',[]), self.mf)
-            r['id_gafet'] = r.get('id_gafet','')
-            r['status_visita'] = r.get('status_visita','').title().replace('_', ' ')
-            r['contratista'] = self.unlist(r.get('contratista',[]))
-            r['status_gafete'] = r.get('status_gafete','').title().replace('_', ' ')
-            r['documento'] = r.get('documento','')
-            r['grupo_areas_acceso'] = self._labels_list(r.pop('grupo_areas_acceso',[]), self.mf)
-            r['comentarios'] = self.format_comentarios(r.get('comentarios',[]))
-            r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
-            r['equipos'] = self.format_equipos(r.get('equipos',[]))
-            r['visita_a'] = self.format_visita(r.get('visita_a',[]))
-        return  records
+    #     proyect_fields ={
+    #         '_id': 1,
+    #         'folio': "$folio",
+    #         'created_at': "$created_at",
+    #         'updated_at': "$updated_at",
+    #         'a_quien_visita':f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
+    #         'documento': f"$answers.{self.mf['documento']}",
+    #         'caseta_entrada':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+    #         'codigo_qr':f"$answers.{self.mf['codigo_qr']}",
+    #         'comentarios':f"$answers.{self.bitacora_fields['grupo_comentario']}",
+    #         'fecha_salida':f"$answers.{self.mf['fecha_salida']}",
+    #         'fecha_entrada':f"$answers.{self.mf['fecha_entrada']}",
+    #         'foto_url': {"$arrayElemAt": [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}.file_url", 0]},
+    #         'equipos':f"$answers.{self.mf['grupo_equipos']}",
+    #         'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
+    #         'id_gafet': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
+    #         'id_locker': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.lockers_fields['locker_id']}",
+    #         'identificacion':  {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}"},
+    #         'pase_id':{"$toObjectId":f"$answers.{self.mf['codigo_qr']}"},
+    #         'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
+    #         'nombre_area_salida':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
+    #         'nombre_visitante':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
+    #         'contratista':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['empresa']}",
+    #         'perfil_visita':{'$arrayElemAt': [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",0]},
+    #         'status_gafete':f"$answers.{self.mf['status_gafete']}",
+    #         'status_visita':f"$answers.{self.mf['tipo_registro']}",
+    #         'ubicacion':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+    #         'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
+    #         'visita_a': f"$answers.{self.mf['grupo_visitados']}"
+    #         }
+    #     lookup = {
+    #      'from': 'form_answer',
+    #      'localField': 'pase_id',
+    #      'foreignField': '_id',
+    #      "pipeline": [
+    #             {'$match':{
+    #                 "deleted_at":{"$exists":False},
+    #                 "form_id": self.PASE_ENTRADA,
+    #                 }
+    #             },
+    #             {'$project':{
+    #                 "_id":0, 
+    #                 'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
+    #                 'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",                    
+    #                 }
+    #             },
+    #             ],
+    #      'as': 'pase',
+    #     }
+    #     query = [
+    #         {'$match': match_query },
+    #         {'$project': proyect_fields},
+    #         {'$lookup': lookup},
+    #     ]
+    #     if dateFrom:
+    #         query.append(
+    #             {'$sort':{'folio':1}},
+    #         )
+    #     else:
+    #         query.append(
+    #             {'$sort':{'folio':-1}},
+    #         )
+    #     records = self.format_cr(self.cr.aggregate(query))
+    #     # print( simplejson.dumps(records, indent=4))
+    #     for r in records:
+    #         pase = r.pop('pase')
+    #         r.pop('pase_id')
+    #         if len(pase) > 0 :
+    #             pase = pase[0]
+    #             r['motivo_visita'] = self.unlist(pase.get('motivo_visita',''))
+    #             r['grupo_areas_acceso'] = self._labels_list(pase.get('grupo_areas_acceso',[]), self.mf)
+    #         r['id_gafet'] = r.get('id_gafet','')
+    #         r['status_visita'] = r.get('status_visita','').title().replace('_', ' ')
+    #         r['contratista'] = self.unlist(r.get('contratista',[]))
+    #         r['status_gafete'] = r.get('status_gafete','').title().replace('_', ' ')
+    #         r['documento'] = r.get('documento','')
+    #         r['grupo_areas_acceso'] = self._labels_list(r.pop('grupo_areas_acceso',[]), self.mf)
+    #         r['comentarios'] = self.format_comentarios(r.get('comentarios',[]))
+    #         r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
+    #         r['equipos'] = self.format_equipos(r.get('equipos',[]))
+    #         r['visita_a'] = self.format_visita(r.get('visita_a',[]))
+    #     return  records
 
     def get_list_fallas(self, location=None, area=None,status=None, folio=None):
         match_query = {
@@ -3562,6 +3535,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         ]
         result = self.format_cr_result(self.cr.aggregate(query))
         result = self.format_cr(result)
+        print("++result", simplejson.dumps(result, indent=4))
         for r in result:
             r['personas_involucradas_incidencia'] = self.format_personas_involucradas(r.get('personas_involucradas_incidencia',[]))
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
@@ -3840,7 +3814,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$limit':15}
         ]
         records = self.format_cr(self.cr.aggregate(query))
-        print("PRIMER PROINT", simplejson.dumps(records, indent=4))
 
         for x in records:
             visita_a =[]
@@ -3892,13 +3865,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 visita['email'] = visita['email'][0] if isinstance(visita.get('email'), list) and visita.get('email') else visita.get('email', "")
 
             x['visita_a'] = [visita]
-            print("ESTATUSS",x.get('estatus', ""))
             x['status_pase'] = x.get('estatus', "")
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self.format_equipos(x.pop('grupo_equipos',[]))
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
-            # x['comentario'] = self._labels_list(x.pop('comentario',[]), self.mf)
+            x['comentarios'] = x['grupo_instrucciones_pase']
+
+            comentarios = []
+            for item in x.pop('comentarios', []):
+                comentario_pase = item.get('comentario_pase', '') 
+                tipo_comentario = item.get('tipo_de_comentario', '')
+                comentarios.append({
+                    'comentario_pase': comentario_pase,
+                    'tipo_comentario': tipo_comentario
+                })
+            x['comentarios'] = comentarios
 
             x.pop('visita_a_nombre', None)
             x.pop('visita_a_departamento', None)
@@ -3906,8 +3888,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
 
-        print("RECORDDD", simplejson.dumps(records, indent=4))
-
+        print("records++", simplejson.dumps(records, indent=4))
         return  records
 
     def get_pdf(self, qr_code, template_id=491, name_pdf='Pase de Entrada'):
@@ -3943,7 +3924,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'fotografia_paqueteria':f"$answers.{self.paquetes_fields['fotografia_paqueteria']}",
                 'descripcion_paqueteria':f"$answers.{self.paquetes_fields['descripcion_paqueteria']}",
                 'quien_recibe_paqueteria':f"$answers.{self.paquetes_fields['quien_recibe_cat']}.{self.paquetes_fields['quien_recibe_paqueteria']}",
-                'guardado_en_paqueteria': f"$answers.{self.paquetes_fields['guardado_en_paqueteria_cat']}.{self.paquetes_fields['guardado_en_paqueteria']}",
+                'guardado_en_paqueteria': f"$answers.{self.paquetes_fields['guardado_en_paqueteria']}",
                 'fecha_recibido_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
                 'fecha_entregado_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
                 'estatus_paqueteria': f"$answers.{self.paquetes_fields['estatus_paqueteria']}",
@@ -5079,7 +5060,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in acciones:
                         acciones_list.append(
                             {
-                                self.pase_entrada_fields['tipo_comentario']:c.get('tipo_comentario').lower(),
+                                self.pase_entrada_fields['tipo_comentario']:c.get('tipo_comentario'),
                                 self.pase_entrada_fields['comentario_pase'] :c.get('comentario_pase')
                             }
                         )
