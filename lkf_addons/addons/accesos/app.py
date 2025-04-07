@@ -997,6 +997,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if total_entradas['total_records']>= int(limite_acceso) :
                 self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
         
+        timezone = pytz.timezone('America/Mexico_City')
+        fecha_actual = datetime.now(timezone).replace(microsecond=0)
+        fecha_caducidad = access_pass.get('fecha_de_caducidad')
+        fecha_obj_caducidad = datetime.strptime(fecha_caducidad, "%Y-%m-%d %H:%M:%S")
+        fecha_caducidad = timezone.localize(fecha_obj_caducidad)
+
+        # Se agregan 15 minutos como margen de tolerancia
+        fecha_caducidad_con_margen = fecha_caducidad + timedelta(minutes=15)
+
+        if fecha_caducidad_con_margen < fecha_actual:
+            self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
+        
         if access_pass.get("ubicacion") != location:
             self.LKFException({'msg':"No se puede realizar un ingreso en una ubicación diferente.","title":'Revisa la Configuración'})
         
@@ -1998,6 +2010,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers = {}
         perfil_pase = access_pass.get('perfil_pase')
         location_name = access_pass.get('ubicacion')
+        if not location:
+            location = location_name
         address = self.get_location_address(location_name=location_name)
         access_pass['direccion'] = [address.get('address', '')]
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
@@ -2534,39 +2548,33 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         if page == 'Turnos':
             #Visitas dentro, Gafetes pendientes y Vehiculos estacionados
-            match_query_visitas = {
-                "deleted_at": {"$exists": False},
-                "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
-                f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
-                f"answers.{self.bitacora_fields['ubicacion']}": location,
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
-            }
-
-            proyect_fields_visitas = {
-                '_id': 1,
-                'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
-                'id_gafete': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
-                'status_gafete': f"$answers.{self.mf['status_gafete']}"
-            }
-
-            group_by_visitas = {
-                '_id': None,
-                'total_visitas_dentro': {'$sum': 1},
-                'total_vehiculos_dentro': {'$sum': {'$size': '$vehiculos'}},
-                'gafetes_info': {
-                    '$push': {
-                        'id_gafete':'$id_gafete',
-                        'status_gafete':'$status_gafete'
-                    }
-                }
-            }
-
             query_visitas = [
-                {'$match': match_query_visitas},
-                {'$project': proyect_fields_visitas},
-                {'$group': group_by_visitas}
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_ACCESOS,
+                    f"answers.{self.bitacora_fields['status_visita']}": "entrada",
+                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                    f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
+                    f"answers.{self.bitacora_fields['ubicacion']}": location,
+                    f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                }},
+                {'$project': {
+                    '_id': 1,
+                    'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
+                    'id_gafete': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
+                    'status_gafete': f"$answers.{self.mf['status_gafete']}"
+                }},
+                {'$group': {
+                    '_id': None,
+                    'total_visitas_dentro': {'$sum': 1},
+                    'total_vehiculos_dentro': {'$sum': {'$size': '$vehiculos'}},
+                    'gafetes_info': {
+                        '$push': {
+                            'id_gafete':'$id_gafete',
+                            'status_gafete':'$status_gafete'
+                        }
+                    }
+                }}
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_visitas))
@@ -2583,25 +2591,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['gafetes_pendientes'] = gafetes_pendientes
 
             #Articulos concesionados
-            match_query_concesionados = {
-                "deleted_at": {"$exists": False},
-                "form_id": self.CONCESSIONED_ARTICULOS,
-                f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
-            }
-
-            proyect_fields_concesionados = {
-                '_id': 1,
-            }
-
-            group_by_concesionados = {
-                '_id': None,
-                'articulos_concesionados': {'$sum': 1}
-            }
-
             query_concesionados = [
-                {'$match': match_query_concesionados},
-                {'$project': proyect_fields_concesionados},
-                {'$group': group_by_concesionados}
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.CONCESSIONED_ARTICULOS,
+                    f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
+                }},
+                {'$project': {
+                    '_id': 1,
+                }},
+                {'$group': {
+                    '_id': None,
+                    'articulos_concesionados': {'$sum': 1}
+                }}
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_concesionados))
@@ -2610,27 +2612,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['articulos_concesionados'] = articulos_concesionados
 
             #Incidentes pendientes
-            match_query_incidentes = {
-                "deleted_at": {"$exists": False},
-                "form_id": self.BITACORA_INCIDENCIAS,
-                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
-                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location
-            }
-
-            proyect_fields_incidentes = {
-                '_id': 1,
-                'acciones_tomadas_incidencia': f"$answers.{self.incidence_fields['acciones_tomadas_incidencia']}",
-            }
-
-            group_by_incidentes = {
-                '_id': None,
-                'incidentes_pendientes': {'$sum': {'$cond': [{'$or': [{'$eq': [{'$size': {'$ifNull': ['$acciones_tomadas_incidencia', []]}}, 0]},{'$eq': ['$acciones_tomadas_incidencia', None]}]}, 1, 0]}}
-            }
-
             query_incidentes = [
-                {'$match': match_query_incidentes},
-                {'$project': proyect_fields_incidentes},
-                {'$group': group_by_incidentes}
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_INCIDENCIAS,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location
+                }},
+                {'$project': {
+                    '_id': 1,
+                    'acciones_tomadas_incidencia': f"$answers.{self.incidence_fields['acciones_tomadas_incidencia']}",
+                }},
+                {'$group': {
+                    '_id': None,
+                    'incidentes_pendientes': {'$sum': {'$cond': [{'$or': [{'$eq': [{'$size': {'$ifNull': ['$acciones_tomadas_incidencia', []]}}, 0]},{'$eq': ['$acciones_tomadas_incidencia', None]}]}, 1, 0]}}
+                }}
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_incidentes))
@@ -2638,84 +2634,99 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             
             res['incidentes_pendites'] = incidentes_pendientes
         elif page == 'Accesos' or page == 'Bitacoras':
-            #Visitas en el dia, personal dentro, vehiculos dentro y salidas registradas
-            match_query_visitas = {
-                "deleted_at": {"$exists": False},
-                "form_id": self.BITACORA_ACCESOS,
-                # f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
-                f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
-                f"answers.{self.bitacora_fields['ubicacion']}": location,
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
-            }
-
-            proyect_fields_visitas = {
-                '_id': 1,
-                'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
-                'perfil': f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",
-                'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"
-            }
-
-            group_by_visitas = {
-                '_id': None,
-                'visitas_en_dia': {'$sum': 1},
-                'total_vehiculos_dentro': {
-                    '$sum': {
-                        '$cond': {
-                            'if': {'$eq': ['$status_visita', 'entrada']},
-                            'then': {'$size': '$vehiculos'},
-                            'else': 0
+            #Visitas en el dia, personal dentro, vehiculos dentro, salidas registradas y personas dentro
+            query_visitas = [
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_ACCESOS,
+                    # f"answers.{self.bitacora_fields['status_visita']}": "entrada",
+                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                    f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
+                    f"answers.{self.bitacora_fields['ubicacion']}": location,
+                    f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                }},
+                {'$project': {
+                    '_id': 1,
+                    'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
+                    'equipos': {"$ifNull": [f"$answers.{self.mf['grupo_equipos']}", []]},
+                    'perfil': f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",
+                    'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"
+                }},
+                {'$group': {
+                    '_id': None,
+                    'visitas_en_dia': {'$sum': 1},
+                    'total_vehiculos_dentro': {
+                        '$sum': {
+                            '$cond': {
+                                'if': {'$eq': ['$status_visita', 'entrada']},
+                                'then': {'$size': '$vehiculos'},
+                                'else': 0
+                            }
+                        }
+                    },
+                    'total_equipos_dentro': {
+                        '$sum': {
+                            '$cond': {
+                                'if': {'$eq': ['$status_visita', 'entrada']},
+                                'then': {'$size': '$equipos'},
+                                'else': 0
+                            }
+                        }
+                    },
+                    'detalle_visitas': {
+                        '$push': {
+                            'perfil': '$perfil',
+                            'status_visita': '$status_visita'
                         }
                     }
-                },
-                'detalle_visitas': {
-                    '$push': {
-                        'perfil': '$perfil',
-                        'status_visita': '$status_visita'
-                    }
-                }
-            }
-
-            query_visitas = [
-                {'$match': match_query_visitas},
-                {'$project': proyect_fields_visitas},
-                {'$group': group_by_visitas}
+                }}
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_visitas))
             total_vehiculos_dentro = resultado[0]['total_vehiculos_dentro'] if resultado else 0
+            total_equipos_dentro = resultado[0]['total_equipos_dentro'] if resultado else 0
             visitas_en_dia = resultado[0]['visitas_en_dia'] if resultado else 0
             detalle_visitas = resultado[0]['detalle_visitas'] if resultado else []
-            personal_dentro = sum(1 for visita in detalle_visitas if visita['perfil'][0].lower() != "visita general")
-            salidas = sum(1 for visita in detalle_visitas if visita['status_visita'].lower() == "salida")
+
+            personal_dentro = 0
+            salidas = 0
+            personas_dentro = 0
+
+            for visita in detalle_visitas:
+                status_visita = visita['status_visita'].lower()
+
+                if visita['perfil'][0].lower() != "visita general":
+                    personal_dentro += 1
+
+                if status_visita == "salida":
+                    salidas += 1
+
+                if status_visita == "entrada":
+                    personas_dentro += 1
 
             res['total_vehiculos_dentro'] = total_vehiculos_dentro
+            res['total_equipos_dentro'] = total_equipos_dentro
             res['visitas_en_dia'] = visitas_en_dia
             res['personal_dentro'] = personal_dentro
             res['salidas_registradas'] = salidas
+            res['personas_dentro'] = personas_dentro
         elif page == 'Incidencias':
             #Incidentes por dia
-            match_query_incidentes = {
-                "deleted_at": {"$exists": False},
-                "form_id": self.BITACORA_INCIDENCIAS,
-                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
-                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
-                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
-            }
-
-            proyect_fields_incidentes = {
-                '_id': 1,
-            }
-
-            group_by_incidentes = {
-                '_id': None,
-                'incidentes_x_dia': {'$sum': 1}
-            }
-
             query_incidentes = [
-                {'$match': match_query_incidentes},
-                {'$project': proyect_fields_incidentes},
-                {'$group': group_by_incidentes}
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_INCIDENCIAS,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
+                    f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                }},
+                {'$project': {
+                    '_id': 1,
+                }},
+                {'$group': {
+                    '_id': None,
+                    'incidentes_x_dia': {'$sum': 1}
+                }}
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_incidentes))
@@ -2724,28 +2735,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['incidentes_x_dia'] = incidentes_x_dia
 
             #Fallas pendientes
-            match_query_fallas = {
-                "deleted_at": {"$exists": False},
-                "form_id": self.BITACORA_FALLAS,
-                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
-                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
-                f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
-                # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
-            }
-
-            proyect_fields_fallas = {
-                '_id': 1,
-            }
-
-            group_by_fallas = {
-                '_id': None,
-                'fallas_pendientes': {'$sum': 1}
-            }
-
             query_fallas = [
-                {'$match': match_query_fallas},
-                {'$project': proyect_fields_fallas},
-                {'$group': group_by_fallas}
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_FALLAS,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
+                    f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
+                    # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                }},
+                {'$project': {
+                    '_id': 1,
+                }},
+                {'$group': {
+                    '_id': None,
+                    'fallas_pendientes': {'$sum': 1}
+                }}
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_fallas))
@@ -2754,26 +2759,20 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['fallas_pendientes'] = fallas_pendientes
         elif page == 'Articulos':
             #Articulos concesionados pendientes
-            match_query_concesionados = {
-                "deleted_at": {"$exists": False},
-                "form_id": self.CONCESSIONED_ARTICULOS,
-                f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
-                f"answers.{self.consecionados_fields['status_concesion']}": "abierto",
-            }
-
-            proyect_fields_concesionados = {
-                '_id': 1,
-            }
-
-            group_by_concesionados = {
-                '_id': None,
-                'articulos_concesionados_pendientes': {'$sum': 1}
-            }
-
             query_concesionados = [
-                {'$match': match_query_concesionados},
-                {'$project': proyect_fields_concesionados},
-                {'$group': group_by_concesionados}
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.CONCESSIONED_ARTICULOS,
+                    f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
+                    f"answers.{self.consecionados_fields['status_concesion']}": "abierto",
+                }},
+                {'$project': {
+                    '_id': 1,
+                }},
+                {'$group': {
+                    '_id': None,
+                    'articulos_concesionados_pendientes': {'$sum': 1}
+                }}
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_concesionados))
@@ -2782,31 +2781,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['articulos_concesionados_pendientes'] = articulos_concesionados_pendientes
 
             #Articulos perdidos
-            match_query_perdidos = {
-                "deleted_at": {"$exists": False},
-                "form_id": self.BITACORA_OBJETOS_PERDIDOS,
-                f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}": location,
-                f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['area_perdido']}": booth_area,
-            }
-
-            proyect_fields_perdidos = {
-                '_id': 1,
-                'status_perdido': f"$answers.{self.perdidos_fields['estatus_perdido']}",
-            }
-
-            group_by_perdidos = {
-                '_id': None,
-                'perdidos_info': {
-                    '$push': {
-                        'status_perdido':'$status_perdido'
-                    }
-                }
-            }
-
             query_perdidos = [
-                {'$match': match_query_perdidos},
-                {'$project': proyect_fields_perdidos},
-                {'$group': group_by_perdidos}
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_OBJETOS_PERDIDOS,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}": location,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['area_perdido']}": booth_area,
+                }},
+                {'$project': {
+                    '_id': 1,
+                    'status_perdido': f"$answers.{self.perdidos_fields['estatus_perdido']}",
+                }},
+                {'$group': {
+                    '_id': None,
+                    'perdidos_info': {
+                        '$push': {
+                            'status_perdido':'$status_perdido'
+                        }
+                    }
+                }}
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_perdidos))
@@ -2820,13 +2813,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
             res['articulos_perdidos'] = articulos_perdidos
 
-        # res ={
-        #         "in_invitees":0,
-        #         "articulos_concesionados":0,
-        #         "incidentes_pendites": incidentes_pendientes,
-        #         "vehiculos_estacionados": total_vehiculos,
-        #         "gefetes_pendientes": 0,
-        #     }
         return res
 
     def get_certificacion(self, certificacion, id_user, empresa=None):
@@ -3011,6 +2997,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
             perfil_pase = self._labels(perfil_pase, self.mf)
+            if x.get('fecha_de_caducidad') == "":
+                x['fecha_de_caducidad'] = x.get('fecha_de_expedicion')
             if perfil_pase:
                 x['tipo_de_pase'] = perfil_pase.pop('nombre_perfil')
                 empresa = x.get('empresa')
@@ -3020,7 +3008,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
         if not x:
-            self.LKFException({'title':'Advertencia', 'msg':'Pase de Entrada Invalido'})
+            self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
         return x
 
     def get_ids_labels(self, data):
@@ -3332,121 +3320,123 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return self.format_lockers(self.lkf_api.search_catalog( self.LOCKERS_CAT_ID, mango_query))
 
-    # def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo=''):
-    #     match_query = {
-    #         "deleted_at":{"$exists":False},
-    #         "form_id": self.BITACORA_ACCESOS
-    #     }
-    #     if location:
-    #         match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}":location})
-    #     if area:
-    #         match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area})
-    #     if prioridades:
-    #         match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
-       
-    #     if dateFrom:
-    #         dateFrom = dateFrom + " 00:00:00"
-    #     if dateTo:
-    #         dateTo = dateTo + " 23:59:59"
-    #     print(dateFrom)
-    #     print(dateTo)
+    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo=''):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.BITACORA_ACCESOS
+        }
+        if location:
+            match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}":location})
+        if area:
+            match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area})
+        if prioridades:
+            match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
 
-    #     if dateFrom and dateTo:
-    #         match_query.update({
-    #             f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom},
-    #             f"answers.{self.mf['fecha_salida']}": {"$lte": dateTo}
-    #         })
-    #     elif dateFrom:
-    #         match_query.update({
-    #             f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom}
-    #         })
-    #     elif dateTo:
-    #         match_query.update({
-    #             f"answers.{self.mf['fecha_salida']}": {"$lte": dateTo}
-    #         })
+        if not dateFrom and not dateTo:
+            today = datetime.today()
+            two_days_ago = today - timedelta(days=2)
+            dateFromPred = two_days_ago.strftime("%Y-%m-%d") + " 00:00:00"
+            dateToPred = today.strftime("%Y-%m-%d") + " 23:59:59"
 
-    #     proyect_fields ={
-    #         '_id': 1,
-    #         'folio': "$folio",
-    #         'created_at': "$created_at",
-    #         'updated_at': "$updated_at",
-    #         'a_quien_visita':f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
-    #         'documento': f"$answers.{self.mf['documento']}",
-    #         'caseta_entrada':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
-    #         'codigo_qr':f"$answers.{self.mf['codigo_qr']}",
-    #         'comentarios':f"$answers.{self.bitacora_fields['grupo_comentario']}",
-    #         'fecha_salida':f"$answers.{self.mf['fecha_salida']}",
-    #         'fecha_entrada':f"$answers.{self.mf['fecha_entrada']}",
-    #         'foto_url': {"$arrayElemAt": [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}.file_url", 0]},
-    #         'equipos':f"$answers.{self.mf['grupo_equipos']}",
-    #         'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
-    #         'id_gafet': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
-    #         'id_locker': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.lockers_fields['locker_id']}",
-    #         'identificacion':  {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}"},
-    #         'pase_id':{"$toObjectId":f"$answers.{self.mf['codigo_qr']}"},
-    #         'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
-    #         'nombre_area_salida':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
-    #         'nombre_visitante':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
-    #         'contratista':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['empresa']}",
-    #         'perfil_visita':{'$arrayElemAt': [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",0]},
-    #         'status_gafete':f"$answers.{self.mf['status_gafete']}",
-    #         'status_visita':f"$answers.{self.mf['tipo_registro']}",
-    #         'ubicacion':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
-    #         'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
-    #         'visita_a': f"$answers.{self.mf['grupo_visitados']}"
-    #         }
-    #     lookup = {
-    #      'from': 'form_answer',
-    #      'localField': 'pase_id',
-    #      'foreignField': '_id',
-    #      "pipeline": [
-    #             {'$match':{
-    #                 "deleted_at":{"$exists":False},
-    #                 "form_id": self.PASE_ENTRADA,
-    #                 }
-    #             },
-    #             {'$project':{
-    #                 "_id":0, 
-    #                 'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
-    #                 'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",                    
-    #                 }
-    #             },
-    #             ],
-    #      'as': 'pase',
-    #     }
-    #     query = [
-    #         {'$match': match_query },
-    #         {'$project': proyect_fields},
-    #         {'$lookup': lookup},
-    #     ]
-    #     if dateFrom:
-    #         query.append(
-    #             {'$sort':{'folio':1}},
-    #         )
-    #     else:
-    #         query.append(
-    #             {'$sort':{'folio':-1}},
-    #         )
-    #     records = self.format_cr(self.cr.aggregate(query))
-    #     # print( simplejson.dumps(records, indent=4))
-    #     for r in records:
-    #         pase = r.pop('pase')
-    #         r.pop('pase_id')
-    #         if len(pase) > 0 :
-    #             pase = pase[0]
-    #             r['motivo_visita'] = self.unlist(pase.get('motivo_visita',''))
-    #             r['grupo_areas_acceso'] = self._labels_list(pase.get('grupo_areas_acceso',[]), self.mf)
-    #         r['id_gafet'] = r.get('id_gafet','')
-    #         r['status_visita'] = r.get('status_visita','').title().replace('_', ' ')
-    #         r['contratista'] = self.unlist(r.get('contratista',[]))
-    #         r['status_gafete'] = r.get('status_gafete','').title().replace('_', ' ')
-    #         r['documento'] = r.get('documento','')
-    #         r['grupo_areas_acceso'] = self._labels_list(r.pop('grupo_areas_acceso',[]), self.mf)
-    #         r['comentarios'] = self.format_comentarios(r.get('comentarios',[]))
-    #         r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
-    #         r['equipos'] = self.format_equipos(r.get('equipos',[]))
-    #         r['visita_a'] = self.format_visita(r.get('visita_a',[]))
-    #     return  records
+        if dateFrom and dateTo:
+            match_query.update({
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom, "$lte": dateTo},
+            })
+        elif dateFrom:
+            match_query.update({
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom}
+            })
+        elif dateTo:
+            match_query.update({
+                f"answers.{self.mf['fecha_entrada']}": {"$lte": dateTo}
+            })
+        else:
+            match_query.update({
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFromPred, "$lte": dateToPred},
+            })
+
+        proyect_fields ={
+            '_id': 1,
+            'folio': "$folio",
+            'created_at': "$created_at",
+            'updated_at': "$updated_at",
+            'a_quien_visita':f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
+            'documento': f"$answers.{self.mf['documento']}",
+            'caseta_entrada':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+            'codigo_qr':f"$answers.{self.mf['codigo_qr']}",
+            'comentarios':f"$answers.{self.bitacora_fields['grupo_comentario']}",
+            'fecha_salida':f"$answers.{self.mf['fecha_salida']}",
+            'fecha_entrada':f"$answers.{self.mf['fecha_entrada']}",
+            'foto_url': {"$arrayElemAt": [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}.file_url", 0]},
+            'equipos':f"$answers.{self.mf['grupo_equipos']}",
+            'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
+            'id_gafet': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
+            'id_locker': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.lockers_fields['locker_id']}",
+            'identificacion':  {"$first":f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['identificacion']}"},
+            'pase_id':{"$toObjectId":f"$answers.{self.mf['codigo_qr']}"},
+            'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
+            'nombre_area_salida':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
+            'nombre_visitante':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_visita']}",
+            'contratista':f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['empresa']}",
+            'perfil_visita':{'$arrayElemAt': [f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",0]},
+            'status_gafete':f"$answers.{self.mf['status_gafete']}",
+            'status_visita':f"$answers.{self.mf['tipo_registro']}",
+            'ubicacion':f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+            'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
+            'visita_a': f"$answers.{self.mf['grupo_visitados']}"
+            }
+        lookup = {
+         'from': 'form_answer',
+         'localField': 'pase_id',
+         'foreignField': '_id',
+         "pipeline": [
+                {'$match':{
+                    "deleted_at":{"$exists":False},
+                    "form_id": self.PASE_ENTRADA,
+                    }
+                },
+                {'$project':{
+                    "_id":0, 
+                    'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
+                    'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",                    
+                    }
+                },
+                ],
+         'as': 'pase',
+        }
+        query = [
+            {'$match': match_query },
+            {'$project': proyect_fields},
+            {'$lookup': lookup},
+        ]
+        if dateFrom:
+            query.append(
+                {'$sort':{'folio':1}},
+            )
+        else:
+            query.append(
+                {'$sort':{'folio':-1}},
+            )
+        records = self.format_cr(self.cr.aggregate(query))
+        print("records bitacoras++", simplejson.dumps(records, indent=4))
+        for r in records:
+            pase = r.pop('pase')
+            r.pop('pase_id')
+            if len(pase) > 0 :
+                pase = pase[0]
+                r['motivo_visita'] = self.unlist(pase.get('motivo_visita',''))
+                r['grupo_areas_acceso'] = self._labels_list(pase.get('grupo_areas_acceso',[]), self.mf)
+            r['id_gafet'] = r.get('id_gafet','')
+            r['status_visita'] = r.get('status_visita','').title().replace('_', ' ')
+            r['contratista'] = self.unlist(r.get('contratista',[]))
+            r['status_gafete'] = r.get('status_gafete','').title().replace('_', ' ')
+            r['documento'] = r.get('documento','')
+            r['grupo_areas_acceso'] = self._labels_list(r.pop('grupo_areas_acceso',[]), self.mf)
+            r['comentarios'] = self.format_comentarios(r.get('comentarios',[]))
+            r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
+            r['equipos'] = self.format_equipos(r.get('equipos',[]))
+            r['visita_a'] = self.format_visita(r.get('visita_a',[]))
+        return  records
 
     def get_list_fallas(self, location=None, area=None,status=None, folio=None):
         match_query = {
@@ -3947,16 +3937,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         default_booth , user_booths = self.get_user_booth(search_default=False, turn_areas=turn_areas)
         user_booths.insert(0, default_booth)
+        user_booths_with_area = []
         for booth in user_booths:
             booth_area = booth.get('area')
-            location = booth.get('location')
-            booth_status = self.get_booth_status(booth_area, location)
-            booth['status'] = booth_status.get('status', 'Disponible')
-            booth_address = self.get_area_address(location, booth_area)
-            booth_address.pop('_id')
-            booth_address.pop('folio')
-            booth.update(booth_address)
-        return user_booths
+            if booth_area:
+                location = booth.get('location')
+                booth_status = self.get_booth_status(booth_area, location)
+                booth['status'] = booth_status.get('status', 'Disponible')
+                booth_address = self.get_area_address(location, booth_area)
+                booth_address.pop('_id')
+                booth_address.pop('folio')
+                booth.update(booth_address)
+                user_booths_with_area.append(booth)
+        return user_booths_with_area
 
     def get_user_contacts(self):
         user_id = self.user['user_id']
@@ -4025,9 +4018,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             default_booth , user_booths = self.get_user_booth(search_default=False)
             # location = default_booth.get('location')
             if not booth_location:
-                booth_area = default_booth['area']
+                booth_area = default_booth.get('area')
             if not booth_location:
-                booth_location = default_booth['location']
+                booth_location = default_booth.get('location')
             if not default_booth:
                 return self.LKFException({"status_code":400, "msg":'No booth found or configure for user'})
             location_employees = self.get_booths_guards(booth_location, booth_area, solo_disponibles=True)
