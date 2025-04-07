@@ -58,7 +58,9 @@ class Mantenimiento(Base):
             'imagen_del_equipo': '6646393c3fa8b818265d0326',
             'hora_inicio_instalacion': '67c8c67734cc8b94bc183eca',
             'hora_final_instalacion': '67d218329d65ba66bf981253',
-            'total_minutos_instalacion': '67d218329d65ba66bf981254'
+            'total_minutos_instalacion': '67d218329d65ba66bf981254',
+            'cliente_instalacion': '66bfc0accd15883ed163e9b0',
+            'mobile_id_instalacion': '67e2eddf63e826145d5a045d'
         }
 
         if hasattr(self, 'f'):
