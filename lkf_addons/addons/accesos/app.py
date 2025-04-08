@@ -3418,7 +3418,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 {'$sort':{'folio':-1}},
             )
         records = self.format_cr(self.cr.aggregate(query))
-        print("records bitacoras++", simplejson.dumps(records, indent=4))
+        # print( simplejson.dumps(records, indent=4))
         for r in records:
             pase = r.pop('pase')
             r.pop('pase_id')
