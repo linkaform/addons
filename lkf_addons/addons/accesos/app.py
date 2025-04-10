@@ -42,6 +42,7 @@ import simplejson, time
 from bson import ObjectId
 from datetime import datetime, timedelta
 from copy import deepcopy
+from math import ceil
 import urllib.parse
 
 from linkaform_api import base
@@ -3320,7 +3321,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return self.format_lockers(self.lkf_api.search_catalog( self.LOCKERS_CAT_ID, mango_query))
 
-    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo=''):
+    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', limit=10, offset=0):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ACCESOS
@@ -3331,12 +3332,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}":area})
         if prioridades:
             match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
-
-        if not dateFrom and not dateTo:
-            today = datetime.today()
-            two_days_ago = today - timedelta(days=2)
-            dateFromPred = two_days_ago.strftime("%Y-%m-%d") + " 00:00:00"
-            dateToPred = today.strftime("%Y-%m-%d") + " 23:59:59"
 
         if dateFrom and dateTo:
             match_query.update({
@@ -3349,10 +3344,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         elif dateTo:
             match_query.update({
                 f"answers.{self.mf['fecha_entrada']}": {"$lte": dateTo}
-            })
-        else:
-            match_query.update({
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFromPred, "$lte": dateToPred},
             })
 
         proyect_fields ={
@@ -3417,8 +3408,23 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             query.append(
                 {'$sort':{'folio':-1}},
             )
+
+        query.append({'$skip': offset})
+        query.append({'$limit': limit})
+
         records = self.format_cr(self.cr.aggregate(query))
         # print( simplejson.dumps(records, indent=4))
+
+        count_query = [
+            {'$match': match_query},
+            {'$count': 'total'}
+        ]
+
+        count_result = self.format_cr(self.cr.aggregate(count_query))
+        total_count = count_result[0]['total'] if count_result else 0
+        total_pages = ceil(total_count / limit) if limit else 1
+        current_page = (offset // limit) + 1 if limit else 1
+
         for r in records:
             pase = r.pop('pase')
             r.pop('pase_id')
@@ -3436,7 +3442,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['vehiculos'] = self.format_vehiculos(r.get('vehiculos',[]))
             r['equipos'] = self.format_equipos(r.get('equipos',[]))
             r['visita_a'] = self.format_visita(r.get('visita_a',[]))
-        return  records
+        bitacora = {
+            'records': records,
+            'total_records': total_count,
+            'total_pages': total_pages,
+            'actual_page': current_page
+        }
+        return bitacora
 
     def get_list_fallas(self, location=None, area=None,status=None, folio=None):
         match_query = {
