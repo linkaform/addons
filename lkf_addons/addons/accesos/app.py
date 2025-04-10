@@ -1456,7 +1456,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_article_concessioned(self, data_articles):
         #---Define Metadata
-        print("HASAAAAA", self.PAQUETERIA)
         metadata = self.lkf_api.get_metadata(form_id=self.CONCESSIONED_ARTICULOS)
         metadata.update({
             "properties": {
@@ -1489,8 +1488,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             else:
                 answers.update({f"{self.consecionados_fields[key]}":value})
 
-        print("CATTTT", self.ACTIVOS_FIJOS_CAT_ID, self.ACTIVOS_FIJOS_CAT_OBJ_ID)
-        print(err)
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
@@ -3195,19 +3192,40 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.format_cr(res, get_one=True)
         # return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_list_article_lost(self, location, area, status=None):
+    def get_list_article_lost(self, location, area, status=None, dateFrom="", dateTo="", filterDate=""):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_OBJETOS_PERDIDOS,
-            # f"answers.{self.perdidos_fields['ubicacion_perdido']}":location,
-            # f"answers.{self.perdidos_fields['area_perdido']}":area,
         }
         if location:
-             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}"] = location
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['ubicacion']}"] = location
         if area:
-             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['area_perdido']}"] = area
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
         if status:
              match_query[f"answers.{self.perdidos_fields['estatus_perdido']}"] = status
+
+        match={}
+        if filterDate != "range":
+            dateFrom, dateTo = self.get_period_dates(filterDate)
+            if dateFrom:
+                dateFrom = str(dateFrom)[:10]
+            if dateTo:
+                dateTo = str(dateTo)[:10]
+        if dateFrom and dateTo:
+            match = {
+                f"answers.{self.perdidos_fields['date_hallazgo_perdido']}": {"$gte": dateFrom},
+                f"answers.{self.perdidos_fields['date_entrega_perdido']}": {"$lte": dateTo},
+            }
+        elif dateFrom:
+            match = {
+                f"answers.{self.perdidos_fields['date_hallazgo_perdido']}": {"$gte": dateFrom}
+            }
+        elif dateTo:
+            match = {
+                f"answers.{self.perdidos_fields['date_entrega_perdido']}": {"$lte": dateTo}
+            }
+        match_query.update(match)
+
         query = [
             {'$match': match_query },
             #{'$project': self.proyect_format(self.perdidos_fields)},
@@ -3239,30 +3257,46 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         pr= self.format_cr_result(self.cr.aggregate(query))
         return self.format_cr_result(self.cr.aggregate(query))
 
-    def get_list_article_concessioned(self):
+    def get_list_article_concessioned(self, location="", area="", status="", dateFrom="", dateTo="", filterDate=""):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
         }
 
+        if location:
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}"] = location
+        if area:
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
+        if status:
+             match_query[f"answers.{self.consecionados_fields['status_concesion']}"] = status
+
+        match={}
+        if filterDate != "range":
+            dateFrom, dateTo = self.get_period_dates(filterDate)
+            if dateFrom:
+                dateFrom = str(dateFrom)[:10]
+            if dateTo:
+                dateTo = str(dateTo)[:10]
+        if dateFrom and dateTo:
+            match = {
+                f"answers.{self.consecionados_fields['fecha_concesion']}": {"$gte": dateFrom},
+                f"answers.{self.consecionados_fields['fecha_devolucion_concesion']}": {"$lte": dateTo}
+            }
+        elif dateFrom:
+            match = {
+                f"answers.{self.consecionados_fields['fecha_concesion']}": {"$gte": dateFrom}
+            }
+        elif dateTo:
+            match = {
+                f"answers.{self.consecionados_fields['fecha_devolucion_concesion']}": {"$lte": dateTo}
+            }
+        match_query.update(match)
 
         query = [
             {'$match': match_query },
             {'$project': {
                 "_id" : "$_id",
                 "folio": "$folio",
-                # "status_concesion": f"$answers.{self.consecionados_fields['status_concesion']}",
-                # "ubicacion_concesion": f"$answers.{self.consecionados_fields['ubicacion_concesion']}",
-                # "solicita_concesion": f"$answers.{self.consecionados_fields['solicita_concesion']}",
-                # "nombre_concesion": f"$answers.{self.consecionados_fields['persona_catalog_concesion']}.{self.consecionados_fields['persona_nombre_concesion']}",
-                # "caseta_concesion": f"$answers.{self.consecionados_fields['caseta_concesion']}",
-                # "fecha_concesion": f"$answers.{self.consecionados_fields['fecha_concesion']}",
-                # "area_concesion": f"$answers.{self.consecionados_fields['equipo_catalog_concesion']}.{self.consecionados_fields['area_concesion']}",
-                # "equipo_concesion": f"$answers.{self.consecionados_fields['equipo_catalog_concesion']}.{self.consecionados_fields['equipo_concesion']}",
-                # "imagen_concesion": f"$answers.{self.consecionados_fields['equipo_catalog_concesion']}.{self.consecionados_fields['equipo_imagen_concesion']}",
-                # "observacion_concesion": f"$answers.{self.consecionados_fields['observacion_concesion']}",
-                # "fecha_devolucion_concesion": f"$answers.{self.consecionados_fields['fecha_devolucion_concesion']}",
-
                 'status_concesion':f"$answers.{self.consecionados_fields['status_concesion']}",
                 'ubicacion_concesion':f"$answers.{self.consecionados_fields['ubicacion_concesion']}",
                 'solicita_concesion':f"$answers.{self.consecionados_fields['solicita_concesion']}",
@@ -3450,7 +3484,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return bitacora
 
-    def get_list_fallas(self, location=None, area=None,status=None, folio=None):
+    def get_list_fallas(self, location=None, area=None,status=None, folio=None, dateFrom="", dateTo="", filterDate=""):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_FALLAS,
@@ -3463,6 +3497,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
         if folio:
             match_query.update({"folio":folio})
+
+        match={}
+        if filterDate != "range":
+            dateFrom, dateTo = self.get_period_dates(filterDate)
+            if dateFrom:
+                dateFrom = str(dateFrom)[:10]
+            if dateTo:
+                dateTo = str(dateTo)[:10]
+        if dateFrom and dateTo:
+            match = {
+                f"answers.{self.fallas_fields['falla_fecha_hora']}": {"$gte": dateFrom},
+                f"answers.{self.fallas_fields['falla_fecha_hora_solucion']}": {"$lte": dateTo}
+            }
+        elif dateFrom:
+            match = {
+                f"answers.{self.fallas_fields['falla_fecha_hora']}": {"$gte": dateFrom}
+            }
+        elif dateTo:
+            match = {
+                f"answers.{self.fallas_fields['falla_fecha_hora_solucion']}": {"$lte": dateTo}
+            }
+        match_query.update(match)
 
         query = [
             {'$match': match_query },
@@ -3498,7 +3554,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print(simplejson.dumps(result, indent=4))
         return result
 
-    def get_list_incidences(self, location, area, prioridades=[]):
+    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate=""):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_INCIDENCIAS,
@@ -3508,8 +3564,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if area:
              match_query[f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}"] = area
         if prioridades:
-            match_query[f"answers.{self.incidence_fields['prioridad_incidencia']}"] = {"$in": prioridades}
+            match_query[f"answers.{self.incidence_fields['prioridad_incidencia']}"] = {"$eq": prioridades}
 
+        match = {}
+        if filterDate != "range":
+            dateFrom, dateTo = self.get_period_dates(filterDate)
+            if dateFrom:
+                dateFrom = str(dateFrom)[:10]
+            if dateTo:
+                dateTo = str(dateTo)[:10]
+        if dateFrom and dateTo:
+                match = {
+                    f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": dateFrom,"$lte": dateTo},
+                }
+        elif dateFrom:
+            match = {
+                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": dateFrom}
+            }
+        elif dateTo:
+            match = {
+                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$lte": dateTo}
+            }
+        match_query.update(match)
 
         query = [
             {'$match': match_query },
@@ -3734,6 +3810,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'deleted_at':{'$exists':False},
             f"answers.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.pase_entrada_fields['autorizado_por']}":employee.get('worker_name'),
         }
+
         if tab_status == "Favoritos":
             match_query.update({f"answers.{self.pase_entrada_fields['favoritos']}":'si'})
         elif tab_status == "Activos":
@@ -3905,7 +3982,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers['folio']= pass_selected.get("folio")
         return answers
 
-    def get_paquetes(self, location= "", area="", status=""):
+    def get_paquetes(self, location= "", area="", status="", dateFrom="", dateTo="", filterDate=""):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.PAQUETERIA,
@@ -3916,6 +3993,29 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
              match_query[f"answers.{self.paquetes_fields['area_paqueteria']}"] = area
         if status:
              match_query[f"answers.{self.paquetes_fields['estatus_paqueteria']}"] = status
+
+        match={}
+        if filterDate != "range":
+            dateFrom, dateTo = self.get_period_dates(filterDate)
+            if dateFrom:
+                dateFrom = str(dateFrom)[:10]
+            if dateTo:
+                dateTo = str(dateTo)[:10]
+        if dateFrom and dateTo:
+            match = {
+                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$gte": dateFrom},
+                f"answers.{self.paquetes_fields['fecha_entregado_paqueteria']}": {"$lte": dateTo}
+            }
+        elif dateFrom:
+            match = {
+                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$gte": dateFrom}
+            }
+        elif dateTo:
+            match = {
+                f"answers.{self.paquetes_fields['fecha_entregado_paqueteria']}": {"$lte": dateTo}
+            }
+        match_query.update(match)
+
         query = [
             {'$match': match_query },
             {'$project': {
@@ -3928,7 +4028,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'quien_recibe_paqueteria':f"$answers.{self.paquetes_fields['quien_recibe_cat']}.{self.paquetes_fields['quien_recibe_paqueteria']}",
                 'guardado_en_paqueteria': f"$answers.{self.paquetes_fields['guardado_en_paqueteria']}",
                 'fecha_recibido_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
-                'fecha_entregado_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
+                'fecha_entregado_paqueteria': f"$answers.{self.paquetes_fields['fecha_entregado_paqueteria']}",
                 'estatus_paqueteria': f"$answers.{self.paquetes_fields['estatus_paqueteria']}",
                 'entregado_a_paqueteria': f"$answers.{self.paquetes_fields['entregado_a_paqueteria']}",
                 'proveedor': f"$answers.{self.paquetes_fields['proveedor_cat']}.{self.paquetes_fields['proveedor']}",
@@ -3939,7 +4039,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for x in pr:
             status = x.get('estatus_paqueteria', [])
             x['estatus_paqueteria'] = status.pop() if status else ""
-        print("+++pr" ,simplejson.dumps(pr, indent=4))
         return pr
     
     def get_user_booths_availability(self, turn_areas=True):
@@ -5595,3 +5694,4 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return self.catalogo_view(catalog_id, form_id, options, detail=True)
     
+
