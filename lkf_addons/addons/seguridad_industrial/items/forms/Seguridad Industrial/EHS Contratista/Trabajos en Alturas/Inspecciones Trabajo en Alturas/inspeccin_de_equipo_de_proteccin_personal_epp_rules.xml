@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.inspeccin_de_equipo_de_proteccin_personal_epp.id }}</form_id>
+    <id>6733da65e74b7cb6c68e7ec5</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6733d5b4acd29f670299bc20</field_id>
+                        <group_id>None</group_id>
+                        <id>6733d5b4acd29f670299bc20</id>
+                        <label>Ubicación de la Actividad</label>
+                        <type>radio</type>
+                    </field>
+                    <value>exterior</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6733d5b4acd29f670299bc21</field_id>
+                    <group_id>None</group_id>
+                    <id>6733d5b4acd29f670299bc21</id>
+                    <label>Pronóstico de Clima</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar pronóstico de clima</name>
+            <operator>and</operator>
+            <rule_id>f8a11307932667</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6733d5b4acd29f670299bc20</field_id>
+                        <group_id>None</group_id>
+                        <id>6733d5b4acd29f670299bc20</id>
+                        <label>Ubicación de la Actividad</label>
+                        <type>radio</type>
+                    </field>
+                    <value>exterior</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6733d5b4acd29f670299bc21</field_id>
+                    <group_id>None</group_id>
+                    <id>6733d5b4acd29f670299bc21</id>
+                    <label>Pronóstico de Clima</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar pronóstico de clima</name>
+            <operator>and</operator>
+            <rule_id>14ec2086cc8137a</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

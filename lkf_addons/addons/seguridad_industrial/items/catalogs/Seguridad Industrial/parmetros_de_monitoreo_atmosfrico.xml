@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>{}</confirmation>
+    <description />
+    <_rev>7-ea8ceaf5892ec8f193be3d40b28a1629</_rev>
+    <updated_at>2024-11-20T18:48:44.954794+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Parámetros de Monitoreo Atmosférico</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-11-20T18:48:44.954794+00:00Z</created_at>
+    <advanced_options>{}</advanced_options>
+    <catalog_id>126193</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>673e2f0c4704164cc3b9d143</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>673f8cf0b28a491f29b27a13</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Nombre del Parámetro</label>
+                    <key>False</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>673f8d86c1b46e26d097873c</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Nivel Aceptable (según la norma)</label>
+                    <key>False</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_description>None</page_description>
+            <page_name>Página 1</page_name>
+        </item>
+    </catalog_pages>
+</lkf>

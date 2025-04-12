@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.plan_de_izaje.id }}</form_id>
+    <id>673e33f707e64d79db15ab39</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>6712b684b87f69fc4357b22b</catalog_id>
+                        <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                        <group_id>None</group_id>
+                        <id>663e5c57f5b8a7ce8211ed0b</id>
+                        <label>Ubicación</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6713dfbdb0d4187959cf9bda</field_id>
+                    <group_id>None</group_id>
+                    <id>6713dfbdb0d4187959cf9bda</id>
+                    <label>Fecha y Hora Fin de Trabajo</label>
+                    <type>datetime</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar Fecha fin</name>
+            <operator>and</operator>
+            <rule_id>a951415fdae43</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
