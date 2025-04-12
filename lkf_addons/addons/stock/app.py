@@ -881,7 +881,7 @@ class Stock(Base):
             return {}
         return recipe
 
-    def get_products_inventory(self, product_code, warehouse, location=None, status='active'):
+    def get_products_inventory(self, product_code, warehouse=None, location=None, status='active'):
 
         match_query ={ 
          'form_id': self.FORM_INVENTORY_ID,  

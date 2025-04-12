@@ -1414,7 +1414,7 @@
         <max_points>0</max_points>
     </grading>
     <has_voucher>False</has_voucher>
-    <name>Reglas de Reorden</name>
+    <name>Reglas de Reorden JIT</name>
     <notification>
         <active>False</active>
     </notification>

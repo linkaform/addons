@@ -1937,7 +1937,7 @@
                     <descriptor>None</descriptor>
                     <fav>True</fav>
                     <field_id>6441d33a153b3521f5b2afc9</field_id>
-                    <field_type>integer</field_type>
+                    <field_type>decimal</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
@@ -2003,7 +2003,7 @@
                     <descriptor>None</descriptor>
                     <fav>True</fav>
                     <field_id>620ad6247a217dbcb888d172</field_id>
-                    <field_type>integer</field_type>
+                    <field_type>decimal</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
