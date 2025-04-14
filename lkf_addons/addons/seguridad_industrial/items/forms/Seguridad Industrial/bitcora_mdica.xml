@@ -1,12 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <advanced_options>
-        <active>True</active>
-        <folio>
-            <config>False</config>
-            <manual>False</manual>
-            <required>False</required>
-        </folio>
+        <active>False</active>
     </advanced_options>
     <allow_page_navigation>True</allow_page_navigation>
     <confirmation>
@@ -14,13 +9,13 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1730223144.0</created_at>
+    <created_at>1729280160.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
     <email_configuration>
-        <body>None</body>
+        <body />
         <email_fields>[]</email_fields>
         <emails>[]</emails>
         <embed_company_picture>False</embed_company_picture>
@@ -31,7 +26,7 @@
         <send_attachments>False</send_attachments>
         <send_pdf>False</send_pdf>
         <sender>None</sender>
-        <subject>None</subject>
+        <subject />
         <template_html>None</template_html>
         <templates>[]</templates>
         <timer_config>None</timer_config>
@@ -49,37 +44,33 @@
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.sku_catalog.id }}</catalog_id>
+                        <catalog_id>{{ catalog.visita_autorizada.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters>None</filters>
+                        <filters />
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>
-                            <item>61ef32bcdf0ec2ba73dec33d</item>
-                            <item>65dec64a3199f9a040829243</item>
+                            <item>5ea0693a0c12d5a8e43d37df</item>
                         </view_fields>
                         <view_index>0</view_index>
                     </catalog>
                     <catalog_fields>
-                        <item>61ef32bcdf0ec2ba73dec33e</item>
-                        <item>61ef32bcdf0ec2ba73dec343</item>
-                        <item>61ef32bcdf0ec2ba73dec342</item>
-                        <item>61ef32bcdf0ec2ba73dec33d</item>
-                        <item>65dec64a3199f9a040829243</item>
+                        <item>5ea35de83ab7dad56c66e045</item>
+                        <item>5ea0693a0c12d5a8e43d37df</item>
                     </catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>{{ catalog.sku_catalog.obj_id }}</field_id>
+                    <field_id>{{ catalog.visita_autorizada.obj_id }}</field_id>
                     <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Producto</label>
+                    <label>Nombre</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -118,7 +109,6 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
-                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -134,10 +124,247 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.sku_catalog.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.sku_catalog.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.visita_autorizada.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters>None</filters>
+                        <filters />
+                        <geofence>None</geofence>
+                        <last>True</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>[]</view_fields>
+                        <view_index>1</view_index>
+                    </catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>5ea0693a0c12d5a8e43d37df</field_id>
+                    <field_type>catalog-select</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Nombre Completo</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>True</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>{{ catalog.visita_autorizada.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.visita_autorizada.id }}</catalog_id>
+                        <field_type>images</field_type>
+                        <filters />
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>[]</view_fields>
+                        <view_index>0</view_index>
+                    </catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>5ea35de83ab7dad56c66e045</field_id>
+                    <field_type>catalog-detail</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Foto</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.id }}</catalog_id>
+                        <field_type>None</field_type>
+                        <filters>ActividadesAbiertas</filters>
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>
+                            <item>663e5c57f5b8a7ce8211ed0b</item>
+                            <item>663e5d44f5b8a7ce8211ed0f</item>
+                            <item>6712b5c647ba2f70d30977b3</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                    </catalog>
+                    <catalog_fields>
+                        <item>6712b9da439a0f8a676415c3</item>
+                        <item>663e5c57f5b8a7ce8211ed0b</item>
+                        <item>663e5d44f5b8a7ce8211ed0f</item>
+                        <item>6712b5c647ba2f70d30977b3</item>
+                    </catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.obj_id }}</field_id>
+                    <field_type>catalog</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Actividad</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.id }}</catalog_id>
+                        <field_type>text</field_type>
+                        <filters />
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -150,13 +377,13 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>61ef32bcdf0ec2ba73dec33d</field_id>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
                     <field_type>catalog-select</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Product Code</label>
+                    <label>Ubicación</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -195,13 +422,12 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
-                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
                         <watermark_enable>False</watermark_enable>
                     </properties>
-                    <required>True</required>
+                    <required>False</required>
                     <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -211,12 +437,12 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.sku_catalog.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.sku_catalog.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters>None</filters>
+                        <filters />
                         <geofence>None</geofence>
-                        <last>True</last>
+                        <last>False</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>[]</view_fields>
                         <view_index>2</view_index>
@@ -227,13 +453,13 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>65dec64a3199f9a040829243</field_id>
+                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
                     <field_type>catalog-select</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>SKU</label>
+                    <label>Nombre de Area</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -272,13 +498,12 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
-                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
                         <watermark_enable>False</watermark_enable>
                     </properties>
-                    <required>True</required>
+                    <required>False</required>
                     <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -288,10 +513,10 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.sku_catalog.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.sku_catalog.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters>None</filters>
+                        <filters />
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -303,14 +528,14 @@
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>61ef32bcdf0ec2ba73dec33e</field_id>
-                    <field_type>catalog-detail</field_type>
+                    <fav>True</fav>
+                    <field_id>6712b5c647ba2f70d30977b3</field_id>
+                    <field_type>catalog-select</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Nombre de Producto</label>
+                    <label>Actividad a Realizar</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -349,7 +574,6 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
-                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -365,29 +589,29 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.sku_catalog.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.sku_catalog.id }}</catalog_id>
-                        <field_type>select</field_type>
-                        <filters>None</filters>
+                        <catalog_field_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.id }}</catalog_id>
+                        <field_type>checkbox</field_type>
+                        <filters />
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>[]</view_fields>
-                        <view_index>0</view_index>
+                        <view_index>4</view_index>
                     </catalog>
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>61ef32bcdf0ec2ba73dec343</field_id>
+                    <fav>True</fav>
+                    <field_id>6712b9da439a0f8a676415c3</field_id>
                     <field_type>catalog-detail</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Familia</label>
+                    <label>Trabajo de Alto Riezgo</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -426,84 +650,6 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.sku_catalog.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.sku_catalog.id }}</catalog_id>
-                        <field_type>select</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>0</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>61ef32bcdf0ec2ba73dec342</field_id>
-                    <field_type>catalog-detail</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>None</group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Linea de Producto</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -524,876 +670,57 @@
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>671b2266ecd538747985d0ac</field_id>
-                    <field_type>group</field_type>
+                    <fav>True</fav>
+                    <field_id>6712bb1fb5f3212aeab49728</field_id>
+                    <field_type>checkbox</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
-                    <groups_fields>
-                        <item>66dfc4de6b95c11a3b58720f</item>
-                        <item>6442e4831198daf81456f274</item>
-                        <item>65ac6fbc070b93e656bd7fbe</item>
-                        <item>66dfc4e3e9a8bfcb768133f5</item>
-                        <item>65bdc71b3e183f49761a33b9</item>
-                        <item>65c12749cfed7d3a0e1a341b</item>
-                        <item>66dfc4c36b95c11a3b58720d</item>
-                        <item>669efc6f47920d1b51663d29</item>
-                        <item>671b22d738a541183685d077</item>
-                        <item>66d92acdb22bcdcc2f341ebf</item>
-                    </groups_fields>
-                    <help_text>None</help_text>
-                    <label>Rutas</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>0</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>0</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.warehouse_locations.id }}</catalog_id>
-                        <field_type>None</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>
-                            <item>6442e4831198daf81456f274</item>
-                            <item>65ac6fbc070b93e656bd7fbe</item>
-                        </view_fields>
-                        <view_index>0</view_index>
-                    </catalog>
-                    <catalog_fields>
-                        <item>6442e4831198daf81456f274</item>
-                        <item>65ac6fbc070b93e656bd7fbe</item>
-                    </catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>{{ catalog.warehouse_locations.obj_id }}</field_id>
-                    <field_type>catalog</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>671b2266ecd538747985d0ac</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Ubicacion Origen</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.warehouse_locations.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.warehouse_locations.id }}</catalog_id>
-                        <field_type>text</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>1</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>6442e4831198daf81456f274</field_id>
-                    <field_type>catalog-select</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>671b2266ecd538747985d0ac</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Warehouse Name</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>True</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.warehouse_locations.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.warehouse_locations.id }}</catalog_id>
-                        <field_type>text</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>2</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>65ac6fbc070b93e656bd7fbe</field_id>
-                    <field_type>catalog-select</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>671b2266ecd538747985d0ac</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Location</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.warehouse_location_destination.id }}</catalog_id>
-                        <field_type>None</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>
-                            <item>65bdc71b3e183f49761a33b9</item>
-                            <item>65c12749cfed7d3a0e1a341b</item>
-                        </view_fields>
-                        <view_index>0</view_index>
-                    </catalog>
-                    <catalog_fields>
-                        <item>65bdc71b3e183f49761a33b9</item>
-                        <item>65c12749cfed7d3a0e1a341b</item>
-                    </catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>{{ catalog.warehouse_location_destination.obj_id }}</field_id>
-                    <field_type>catalog</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>671b2266ecd538747985d0ac</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Ubicacion Destino</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.warehouse_location_destination.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.warehouse_location_destination.id }}</catalog_id>
-                        <field_type>text</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>1</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>65bdc71b3e183f49761a33b9</field_id>
-                    <field_type>catalog-select</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>671b2266ecd538747985d0ac</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Warehouse Name</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>True</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.warehouse_location_destination.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.warehouse_location_destination.id }}</catalog_id>
-                        <field_type>text</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>2</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>65c12749cfed7d3a0e1a341b</field_id>
-                    <field_type>catalog-select</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>671b2266ecd538747985d0ac</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Location</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
-                        <field_type>None</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>
-                            <item>669efc6f47920d1b51663d29</item>
-                        </view_fields>
-                        <view_index>0</view_index>
-                    </catalog>
-                    <catalog_fields>
-                        <item>669efc6f47920d1b51663d29</item>
-                    </catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>{{ catalog.unidad_de_medida.obj_id }}</field_id>
-                    <field_type>catalog</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>671b2266ecd538747985d0ac</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Unidad de Medida</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.unidad_de_medida.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
-                        <field_type>text</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
-                        <last>False</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>1</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>669efc6f47920d1b51663d29</field_id>
-                    <field_type>catalog-select</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>671b2266ecd538747985d0ac</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Unidad de Media</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>True</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>None</catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>671b22d738a541183685d077</field_id>
-                    <field_type>decimal</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>671b2266ecd538747985d0ac</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Standar Pack</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>True</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>None</catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>66d92acdb22bcdcc2f341ebf</field_id>
-                    <field_type>select</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>
-                        <group_id>671b2266ecd538747985d0ac</group_id>
-                        <group_set_id>0</group_set_id>
-                    </group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Procurment Method</label>
+                    <label>Actividad del Empleado a Realizar</label>
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Buy</label>
+                            <label>Cote y Soldadura</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>buy</value>
+                            <value>cote_y_soldadura</value>
                         </item>
                         <item>
-                            <label>Demand</label>
+                            <label>Elevación de Carga</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>demand</value>
+                            <value>elevación_de_carga</value>
                         </item>
                         <item>
-                            <label>Document</label>
+                            <label>Espacios Confinados</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>document</value>
+                            <value>espacios_confinados</value>
                         </item>
                         <item>
-                            <label>Produce</label>
+                            <label>Excavación</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>produce</value>
+                            <value>excavación</value>
                         </item>
                         <item>
-                            <label>Produce from Template</label>
+                            <label>Maquinaria en Movimiento</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>produce_from_template</value>
+                            <value>maquinaria_en_movimiento</value>
                         </item>
                         <item>
-                            <label>Requierment</label>
+                            <label>Trabajo En Alturas</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>requierment</value>
+                            <value>trabajo_en_alturas</value>
                         </item>
                         <item>
-                            <label>Service</label>
+                            <label>Trabajos Eléctricos</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>service</value>
-                        </item>
-                        <item>
-                            <label>Stock Min-Max</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>stock_min-max</value>
-                        </item>
-                        <item>
-                            <label>Transfer</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>transfer</value>
+                            <value>trabajos_eléctricos</value>
                         </item>
                     </options>
                     <properties>
@@ -1432,7 +759,349 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
-                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>6712b8a0ff9dd639c5f1fc99</field_id>
+                    <field_type>integer</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Presion Arterial Sitolica</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>True</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>6712b8a0ff9dd639c5f1fc9a</field_id>
+                    <field_type>integer</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Presion Areterial Astolica</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>True</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>6712b8a0ff9dd639c5f1fc9b</field_id>
+                    <field_type>radio</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>¿El paciente es apto para trabajar?</label>
+                    <number_type>None</number_type>
+                    <options>
+                        <item>
+                            <label>Apto</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>apto</value>
+                        </item>
+                        <item>
+                            <label>NO Apto</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>no_apto</value>
+                        </item>
+                    </options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>True</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>6712b8a0ff9dd639c5f1fc9c</field_id>
+                    <field_type>signature</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Firma Trabajador</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>True</fav>
+                    <field_id>6712b8a0ff9dd639c5f1fc9d</field_id>
+                    <field_type>signature</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Firma del Doctor</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -1452,16 +1121,15 @@
     <grading>
         <active>False</active>
         <grade_type>points</grade_type>
-        <max_points>0</max_points>
     </grading>
     <has_voucher>False</has_voucher>
-    <name>Rutas de Transpaso</name>
+    <name>Bitácora Médica</name>
     <notification>
         <active>False</active>
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/125306/</resource_uri>
+    <resource_uri>/api/infosync/form/124797/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -1482,5 +1150,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1742358767.0</updated_at>
+    <updated_at>1731088490.0</updated_at>
 </lkf>

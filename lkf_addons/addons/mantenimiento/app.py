@@ -60,7 +60,16 @@ class Mantenimiento(Base):
             'hora_final_instalacion': '67d218329d65ba66bf981253',
             'total_minutos_instalacion': '67d218329d65ba66bf981254',
             'cliente_instalacion': '66bfc0accd15883ed163e9b0',
-            'mobile_id_instalacion': '67e2eddf63e826145d5a045d'
+            'mobile_id_instalacion': '67e2eddf63e826145d5a045d',
+            's_n': '67e2eddf63e826145d5a045e',
+            'p_n': '67e2eddf63e826145d5a045f',
+            'imei': '67e2eddf63e826145d5a0460',
+            'sim': '67e2eddf63e826145d5a0461',
+            'activo_mobile_id': '67f80cb9190938b5447c1533',
+            'activo_s_n': '67f80cb9190938b5447c1534',
+            'activo_p_n': '67f80cb9190938b5447c1535',
+            'activo_imei': '67f80cb9190938b5447c1536',
+            'activo_sim': '67f80cb9190938b5447c1537'
         }
 
         if hasattr(self, 'f'):

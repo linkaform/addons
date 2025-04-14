@@ -1,0 +1,319 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <redirect_url>default</redirect_url>
+        <button_message>Mandar respuestas</button_message>
+    </confirmation>
+    <description />
+    <_rev>31-06ef7ead85c0eba933c0fb5416b6e352</_rev>
+    <updated_at>2024-10-18T19:27:00.532574+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>
+        <ActividadesAbiertas>
+            <amp_and>
+                <item>
+                    <num_66353daa223b8a43d7f274b5>
+                        <amp_eq>Abierta</amp_eq>
+                    </num_66353daa223b8a43d7f274b5>
+                </item>
+            </amp_and>
+        </ActividadesAbiertas>
+    </filters>
+    <name>Actividades de Alto Riesgo (Análisis de Riesgo)</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-10-18T19:27:00.532574+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <config>False</config>
+            <required>False</required>
+            <manual>False</manual>
+        </folio>
+    </advanced_options>
+    <catalog_id>124796</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>6712b684b87f69fc4357b22b</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>True</fav>
+                    <required>True</required>
+                    <field_id>6712b5c647ba2f70d30977b2</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Nombre del Solicitante</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>
+                        <item>663e5c57f5b8a7ce8211ed0b</item>
+                        <item>663e5d44f5b8a7ce8211ed0f</item>
+                        <item>6713e3ecec1ae4749cdda0ea</item>
+                    </catalog_fields>
+                    <fav>None</fav>
+                    <required>False</required>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <view_fields>
+                            <item>663e5c57f5b8a7ce8211ed0b</item>
+                            <item>663e5d44f5b8a7ce8211ed0f</item>
+                        </view_fields>
+                        <name>{{ catalog.areas_de_las_ubicaciones.name }}</name>
+                    </catalog>
+                    <relation_type>None</relation_type>
+                    <label>Departamento/Area</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Ubicación</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Nombre de Area</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>6713e3ecec1ae4749cdda0ea</field_id>
+                    <label>Geolocalizacion de Area</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>geolocation</field_type>
+                        <view_index>3</view_index>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>checkbox</field_type>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <field_id>6713e3d0326569265c2a1dc8</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Ubicación de la Actividad</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>exterior</value>
+                            <label>Exterior</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>interior</value>
+                            <label>Interior</label>
+                        </item>
+                    </options>
+                </item>
+                <item>
+                    <field_type>checkbox</field_type>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <field_id>6712b9da439a0f8a676415c3</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Trabajo de Alto Riesgo</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>trabajo_en_alturas</value>
+                            <label>Trabajo En Alturas</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>espacios_confinados</value>
+                            <label>Espacios Confinados</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>cote_y_soldadura</value>
+                            <label>Cote y Soldadura</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>elevación_de_carga</value>
+                            <label>Elevación de Carga</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>trabajos_eléctricos</value>
+                            <label>Trabajos Eléctricos</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>excavación</value>
+                            <label>Excavación</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>maquinaria_en_movimiento</value>
+                            <label>Maquinaria en Movimiento</label>
+                        </item>
+                    </options>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>6712b5c647ba2f70d30977b3</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Actividad a Realizar</label>
+                    <properties>
+                        <help_text>False</help_text>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>date</field_type>
+                    <field_id>6712b5c647ba2f70d30977b4</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Fecha Inicial de Actividad</label>
+                    <properties>
+                        <help_text>False</help_text>
+                        <custom>None</custom>
+                        <format>vertical</format>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>date</field_type>
+                    <field_id>6712b5c647ba2f70d30977b5</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Fecha Final de Actividad</label>
+                    <properties>
+                        <custom>None</custom>
+                        <format>vertical</format>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>6712b6dad4739d76d1097799</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Superivsor</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>select</field_type>
+                    <field_id>66353daa223b8a43d7f274b5</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Estatus de Actividad</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>abierta</value>
+                            <label>Abierta</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>cerrada</value>
+                            <label>Cerrada</label>
+                        </item>
+                    </options>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                </item>
+            </page_fields>
+            <page_name>Generales</page_name>
+            <page_description>None</page_description>
+        </item>
+    </catalog_pages>
+</lkf>
