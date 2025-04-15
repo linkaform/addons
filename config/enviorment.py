@@ -8,6 +8,7 @@ ENV = 'preprod'
 mongo_hosts = config.get('mongo_hosts')
 PROTOCOL = config.get('PROTOCOL')
 HOST = config.get('HOST')
+COUCH_ENV = config.get('COUCH_ENV')
 
 if ENV == 'prod':
     mongo_hosts = 'db2.linkaform.com:27017,db3.linkaform.com:27017,db4.linkaform.com:27017'
