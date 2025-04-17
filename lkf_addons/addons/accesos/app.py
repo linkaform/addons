@@ -2812,6 +2812,37 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     articulos_perdidos += 1
 
             res['articulos_perdidos'] = articulos_perdidos
+        elif page == 'Notas':
+            #Notas
+            query_notas = [
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.ACCESOS_NOTAS,
+                }},
+                {'$project': {
+                    '_id': 1,
+                    'nota_status': f"$answers.{self.notes_fields['note_status']}",
+                    'fecha_apertura': f"$answers.{self.notes_fields['note_open_date']}",
+                    'fecha_cierre': f"$answers.{self.notes_fields['note_close_date']}"
+                }},
+            ]
+
+            notas = self.format_cr(self.cr.aggregate(query_notas))
+            notas_del_dia = 0
+            notas_abiertas = 0
+            notas_estancadas = 0
+
+            for nota in notas:
+                if(nota.get('nota_status') == 'abierto'):
+                    notas_abiertas += 1
+                if(nota.get('fecha_apertura') >= today and nota.get('fecha_apertura') <= f"{today}T23:59:59"):
+                    notas_del_dia += 1
+                if(nota.get('fecha_apertura') < today and nota.get('nota_status') == 'abierto'):
+                   notas_estancadas += 1
+
+            res['notas_abiertas'] = notas_abiertas
+            res['notas_del_dia'] = notas_del_dia
+            res['notas_estancadas'] = notas_estancadas
 
         return res
 
