@@ -4,6 +4,7 @@ from settings import config
 #ENV = 'prod' 
 ENV = 'preprod' 
 #ENV = 'local' 
+
 # print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
 mongo_hosts = config.get('mongo_hosts')
 PROTOCOL = config.get('PROTOCOL')
@@ -33,11 +34,12 @@ config.update({
         'COUCH_ENV':COUCH_ENV,
         #'MONGODB_URI': MONGODB_URI,
         'AIRFLOW_PROTOCOL' : 'https', #http or https
-        #'AIRFLOW_PORT' : 5000, #http or https
         'AIRFLOW_HOST' : 'bob.linkaform.com',
         #'AIRFLOW_PROTOCOL' : 'http', #http or https
         #'AIRFLOW_HOST' : '192.168.0.25',
-        #'AIRFLOW_HOST' : 'airflow.linkaform.com',
+        'AIRFLOW_PROTOCOL' : 'http', #http or https
+        'AIRFLOW_PORT' : 5000, #http or https
+        'AIRFLOW_HOST' : 'airflow.linkaform.com',
 
     })
 

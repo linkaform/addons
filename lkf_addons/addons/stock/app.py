@@ -15,6 +15,7 @@ Se permite la redistribución y el uso en formas de código fuente y binario, co
 
 from datetime import timedelta, datetime
 import math, simplejson, time
+from bson.json_util import dumps
 from copy import deepcopy
 from bson import ObjectId
 
@@ -109,6 +110,8 @@ class Stock(Base):
             'adjustments':'aaaaa0000000000000000000',
             'cat_stock_folio':'62c44f96dae331e750428732',
             'cuarentin':'6442e2fbc0dd855fe856fddd',
+            'fecha_recepcion':'000000000000000000000111',
+            'fecha_caucidad_inventario':'65dfecbf3199f9a04082955e',
             'grading_date':'000000000000000000000111',
             'grading_flats':'644bf9a04b1761305b080013',
             'grading_group':'644bf7ccfa9830903f087867',
@@ -203,8 +206,7 @@ class Stock(Base):
             'production_year':'61f1da41b112fe4e7fe8582f',
             'production':'6271dc35e84e2577579eafeb',
             'recipe_type':'63483f8e2c8c769718b102b1',
-            'sku_package':'6209705080c17c97320e3382',
-            'sku_container':'6209705080c17c97320e3382',
+            'observaciones_stock':'6799c243cf81bd103124bf51',
             'reicpe_end_week':'6209705080c17c97320e3381',
             'reicpe_growth_weeks':'6205f73281bb36a6f1573357',
             'reicpe_mult_rate':'6205f73281bb36a6f157334d',
@@ -226,6 +228,8 @@ class Stock(Base):
             'set_products_per_hours':'61f1fcf8c66d2990c8fc7cc9',
             'set_total_hours':'61f1fcf8c66d2990c8fc7cc7',
             'set_total_produced':'61f1fcf8c66d2990c8fc7cc3',
+            'sku_package':'6209705080c17c97320e3382',
+            'sku_container':'6209705080c17c97320e3382',
             'status':'620ad6247a217dbcb888d175',
             'stock_move_comments':'66b561232c91d2011147118c',
             'stock_move_status':'ad00000000000000000ad999',
@@ -242,6 +246,7 @@ class Stock(Base):
             'worker_name':'62c5ff407febce07043024dd',
             'worker_obj_id':'62c5ff243c63280985580087',
         })
+        print('si existe....', self.f['stock_move_comments'])
        
         self.f.update(self.Product.f)
 
@@ -472,7 +477,6 @@ class Stock(Base):
         S4_overage = plant_data.get('recipe').get('S4_overage', 0)
         qty_proyected = math.floor(qty_produced * (1 - S4_overage))
         if not greenhouse_inventory:
-            print(stop)
             answers_to_record = {
                 self.f['product_lot_produced']: qty_produced,
                 self.f['product_estimated_ready_date']: ready_date, # Estimated Ready Week
@@ -575,6 +579,9 @@ class Stock(Base):
         product_code, sku, lot_number, warehouse, location = self.get_product_lot_location(answers)
         product_exist = self.product_stock_exists(product_code, sku=sku,  lot_number=lot_number, warehouse=warehouse, location=location)
         res = self.update_calc_fields(product_code, sku,  lot_number, warehouse, location=location)
+        print('??????????????????? product_exist ?????????????????????????????')
+        print('product_exist',product_exist)
+        print('????????????????????????????????????????????????')
         if product_exist:
             res = self.update_stock(answers=product_exist.get('answers'), form_id=product_exist.get('form_id'), folios=product_exist.get('folio') )
             return res
@@ -961,12 +968,12 @@ class Stock(Base):
 
     def get_product_stock(self, product_code, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
-        # print(f'**************Get Stock: {product_code}****************')
-        # print('product_code', product_code)
-        # print('sku', sku)
-        # print('lot_number', lot_number)
-        # print('warehouse', warehouse)
-        # print('location', location)
+        print(f'**************Get Stock: {product_code}****************')
+        print('product_code', product_code)
+        print('sku', sku)
+        print('lot_number', lot_number)
+        print('warehouse', warehouse)
+        print('location', location)
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         location = self.validate_value(location)
@@ -989,6 +996,7 @@ class Stock(Base):
         # print('stock adjustments', stock['adjustments'])
         stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
+        print('--------------------stock', stock['move_out'])
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -1025,7 +1033,7 @@ class Stock(Base):
         stock['scrap_perc']  = 0
         if stock.get('stock_in') and stock.get('scrapped'):
             stock['scrap_perc'] = round(stock.get('scrapped',0)/stock.get('stock_in',1),2)
-        # print('stock=', stock)
+        print('stock=', stock)
         return stock
   
     def get_plant_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main' ):
@@ -2362,7 +2370,7 @@ class Stock(Base):
         unwind = {'$unwind': '$answers.{}'.format(self.f['move_group'])}
         unwind_query = {}
         unwind_stage = []
-        # print('move type.............', move_type)
+        print('move type.............', move_type)
         # print('warehouse', warehouse)
         # print('location', location)
         # print('product_code', product_code)
@@ -2440,6 +2448,7 @@ class Stock(Base):
             {'$sort': {'product_code': 1}}
             ]
         res = self.cr.aggregate(query)
+        print('query=',dumps(query, indent=3))
         result = {}
         for r in res:
             pcode = r.get('product_code')

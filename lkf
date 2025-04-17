@@ -261,7 +261,7 @@ _update(){
   echo 'Running update...'
   case $Enviorment in
     prod)
-    echo '--------------'
+      echo '--------------', $IMAGE_NAME
       env -i ssh -i $HOME/.ssh/keys/$Account_id _lkf_docker_remote@ansible.linkaform.com prod $IMAGE_NAME
     ;;
     preprod)

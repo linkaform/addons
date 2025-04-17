@@ -36,6 +36,7 @@ class FormResource(items.Items):
             if action == 'create':
                 res = self.lkf_api.upload_rules(rules_model, 'POST')
             elif action =='update':
+                #TODO porque da un 500?? dice como que form_id esta repetido
                 res = self.lkf_api.upload_rules(rules_model, 'PATCH')
                 if res.get('status_code') == 404:
                     res = self.lkf_api.upload_rules(rules_model, 'POST')
