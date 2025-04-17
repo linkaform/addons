@@ -88,6 +88,7 @@ class FormResource(items.Items):
                     if config == 'rules':
                         self.setup_rules(conf_files, res['status'], this_path)
             elif res.get('status_code') == 400:
+                print('Status Code 400:', res)
                 error = res.get('json',{}).get('error','Please try again!!!')
                 raise self.LKFException(f'Error installing form: {form_name}. Error msg {error}')
         return response
