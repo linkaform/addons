@@ -37,6 +37,7 @@ class Stock(Base):
         if self.__class__.__name__ not in kwargs:
             self.kwargs['MODULES'].append(self.__class__.__name__)
         # self.load('JIT', **self.kwargs)
+
         self.load(module='Product', **self.kwargs)
         self.load(module='Product', module_class='Warehouse', import_as='WH', **self.kwargs)
         # if not  self.__dict__.get('STOCK'):
