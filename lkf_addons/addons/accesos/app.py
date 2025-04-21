@@ -791,7 +791,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 visit_list2.append(
                    { f"{self.bitacora_fields['visita']}":{ 
                        self.bitacora_fields['visita_nombre_empleado']:c.get('nombre'),
-                       self.bitacora_fields['visita_user_id_empleado'] :[c.get('user_id')],
+                       self.mf['id_usuario'] :[c.get('user_id')],
                        self.bitacora_fields['visita_departamento_empleado']:[c.get('departamento')],
                        self.bitacora_fields['puesto_empleado']:[c.get('puesto')],
                        self.bitacora_fields['email_empleado'] :[c.get('email')]
@@ -2981,7 +2981,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'visita_a_departamento':
                     f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['departamento_empleado']}",
                 'visita_a_user_id':
-                    f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['user_id_empleado']}",
+                    f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['id_usuario']}",
                 'visita_a_email':
                     f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_visita_a']}",
                 'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
