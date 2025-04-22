@@ -61,6 +61,8 @@
                     <action_id>7</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
+                        <arguments>{}</arguments>
+                        <integration>None</integration>
                         <script>
                             <created_at>2025-01-13T14:25:48.296341</created_at>
                             <deleted_at>None</deleted_at>
@@ -72,7 +74,33 @@
                             <start_date>2025-01-13T14:25:48.294146</start_date>
                             <updated_at>2025-01-13T14:25:48.540056</updated_at>
                         </script>
+                        <scriptArguments>
+                            <item>
+                                <label>None</label>
+                                <value>None</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
                         <user>SCRIPT_OWNER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
+                            </item>
+                            <item>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
+                            </item>
+                            <item>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
+                            </item>
+                            <item>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
+                            </item>
+                        </userOptions>
                     </configuration>
                     <name>Se ejecuta script para sync catalogo</name>
                 </item>

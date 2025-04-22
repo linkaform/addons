@@ -7,8 +7,8 @@
         <button_message>Mandar respuestas</button_message>
     </confirmation>
     <description />
-    <_rev>7-cf155661f13ce83efd357b2e5f2700a6</_rev>
-    <updated_at>2025-01-09T16:51:24.130370+00:00Z</updated_at>
+    <_rev>23-09a3c592d3e96ab34c609582d31bb185</_rev>
+    <updated_at>2024-07-30T00:58:29.677376+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Configuracion Areas y Empleados</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2025-01-09T16:51:24.130370+00:00Z</created_at>
+    <created_at>2024-07-30T00:58:29.677376+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,9 +25,9 @@
             <manual>False</manual>
         </folio>
     </advanced_options>
-    <catalog_id>127887</catalog_id>
+    <catalog_id>121688</catalog_id>
     <sync_last_update>None</sync_last_update>
-    <_id>677ffe8c638c8536ff37effb</_id>
+    <_id>66a83ab5ca3453e21ea08d19</_id>
     <public>False</public>
     <catalog_pages>
         <item>
