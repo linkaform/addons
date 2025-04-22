@@ -3665,7 +3665,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         
         return result
 
-    def get_list_notes(self, location, area, status=None):
+    def get_list_notes(self, location, area, status=None, limit=10, offset=0):
         '''
         Función para crear nota, psandole los datos de area para filtrar las notas de la caseta
 
@@ -3701,7 +3701,30 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$sort':{'folio':-1}},
         ]
         # print('answers', simplejson.dumps(query, indent=4))
-        return self.format_cr(self.cr.aggregate(query))
+        query.append({'$skip': offset})
+        query.append({'$limit': limit})
+        
+        records = self.format_cr(self.cr.aggregate(query))
+
+        count_query = [
+            {'$match': match_query},
+            {'$count': 'total'}
+        ]
+
+        count_result = self.format_cr(self.cr.aggregate(count_query))
+        total_count = count_result[0]['total'] if count_result else 0
+        total_pages = ceil(total_count / limit) if limit else 1
+        current_page = (offset // limit) + 1 if limit else 1
+
+        notes = {
+            'records': records,
+            'total_records': total_count,
+            'total_pages': total_pages,
+            'actual_page': current_page
+        }
+
+        return notes
+        # return self.format_cr(self.cr.aggregate(query))
 
     def get_lista_pase(self, location, status='activo', inActive="true"):
         status_value = self.pase_entrada_fields.get('status_pase', '')
