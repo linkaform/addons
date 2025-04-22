@@ -794,7 +794,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                        self.mf['id_usuario'] :[c.get('user_id')],
                        self.bitacora_fields['visita_departamento_empleado']:[c.get('departamento')],
                        self.bitacora_fields['puesto_empleado']:[c.get('puesto')],
-                       self.bitacora_fields['email_empleado'] :[c.get('email')]
+                       self.mf['email_visita_a']:[c.get('email')]
                    }}
                 )
             answers.update({self.bitacora_fields['visita_a']:visit_list2})
