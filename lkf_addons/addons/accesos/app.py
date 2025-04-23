@@ -3665,21 +3665,48 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         
         return result
 
-    def get_list_notes(self, location, area, status=None, limit=10, offset=0):
+    def get_list_notes(self, location, area, status=None, limit=10, offset=0, dateFrom="", dateTo=""):
         '''
-        Función para crear nota, psandole los datos de area para filtrar las notas de la caseta
-
+        Función para obtener las notas, puedes pasarle un area, una ubicacion, un estatus, una fecha desde
+        y una fecha hasta
         '''
-        response = []
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.ACCESOS_NOTAS,
-            # f"answers.{self.notes_fields['note_catalog_booth']}.{self.notes_fields['note_booth']}":area,
             f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location,
             f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}":area
         }
+
         if status:
             match_query.update({f"answers.{self.notes_fields['note_status']}":status})
+        if dateFrom and dateTo:
+            if dateFrom == dateTo:
+                if "T" not in dateFrom:
+                    dateFrom += " 00:00:00"
+                    dateTo += " 23:59:59"
+            else:
+                if "T" not in dateFrom:
+                    dateFrom += " 00:00:00"
+                if "T" not in dateTo:
+                    dateTo += " 23:59:59"
+
+            match_query.update({
+                f"answers.{self.notes_fields['note_open_date']}": {"$gte": dateFrom, "$lte": dateTo}
+            })
+        elif dateFrom:
+            if "T" not in dateFrom:
+                dateFrom += " 00:00:00"
+            match_query.update({
+                f"answers.{self.notes_fields['note_open_date']}": {"$gte": dateFrom}
+            })
+        elif dateTo:
+            if "T" not in dateTo:
+                dateTo += " 23:59:59"
+            match_query.update({
+                f"answers.{self.notes_fields['note_open_date']}": {"$lte": dateTo}
+            })
+        print('fechas:', dateFrom, dateTo)
+
         query = [
             {'$match': match_query },
             {'$project': {
@@ -3700,11 +3727,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }},
             {'$sort':{'folio':-1}},
         ]
-        # print('answers', simplejson.dumps(query, indent=4))
+
         query.append({'$skip': offset})
         query.append({'$limit': limit})
         
         records = self.format_cr(self.cr.aggregate(query))
+        for r in records:
+            print(r)
 
         count_query = [
             {'$match': match_query},
@@ -3724,7 +3753,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
 
         return notes
-        # return self.format_cr(self.cr.aggregate(query))
 
     def get_lista_pase(self, location, status='activo', inActive="true"):
         status_value = self.pase_entrada_fields.get('status_pase', '')
