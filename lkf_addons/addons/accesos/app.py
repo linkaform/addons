@@ -2830,19 +2830,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             notas = self.format_cr(self.cr.aggregate(query_notas))
             notas_del_dia = 0
             notas_abiertas = 0
-            notas_estancadas = 0
+            notas_cerradas = 0
 
             for nota in notas:
                 if(nota.get('nota_status') == 'abierto'):
                     notas_abiertas += 1
                 if(nota.get('fecha_apertura') >= today and nota.get('fecha_apertura') <= f"{today}T23:59:59"):
                     notas_del_dia += 1
-                if(nota.get('fecha_apertura') < today and nota.get('nota_status') == 'abierto'):
-                   notas_estancadas += 1
+                if(nota.get('fecha_cierre') and nota.get('nota_status') == 'cerrado'):
+                    notas_cerradas += 1
 
             res['notas_abiertas'] = notas_abiertas
             res['notas_del_dia'] = notas_del_dia
-            res['notas_estancadas'] = notas_estancadas
+            res['notas_cerradas'] = notas_cerradas
 
         return res
 
