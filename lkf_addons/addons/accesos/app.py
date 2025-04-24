@@ -2192,8 +2192,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     if index==0 :
                         docs+="-"
                 link_pass= f"{link_info['link']}?id={res.get('json')['id']}&user={link_info['creado_por_id']}&docs={docs}"
-                id_forma = 121736
-                id_campo = '673773741b2adb2d05d99d63'
+                id_forma = self.PASE_ENTRADA
+                id_campo = self.pase_entrada_fields['archivo_invitacion']
 
                 tema_cita = access_pass.get("tema_cita")
                 descripcion = access_pass.get("descripcion")
