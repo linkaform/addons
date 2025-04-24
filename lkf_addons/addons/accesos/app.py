@@ -3677,7 +3677,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}":area
         }
 
-        if status:
+        if status != 'dia':
             match_query.update({f"answers.{self.notes_fields['note_status']}":status})
         if dateFrom and dateTo:
             if dateFrom == dateTo:
@@ -3705,7 +3705,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query.update({
                 f"answers.{self.notes_fields['note_open_date']}": {"$lte": dateTo}
             })
-        print('fechas:', dateFrom, dateTo)
 
         query = [
             {'$match': match_query },
@@ -3732,8 +3731,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         query.append({'$limit': limit})
         
         records = self.format_cr(self.cr.aggregate(query))
-        for r in records:
-            print(r)
 
         count_query = [
             {'$match': match_query},
