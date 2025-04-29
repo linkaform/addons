@@ -428,6 +428,20 @@
                             </trigger_field>
                             <value>Visita General</value>
                         </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6734c6d5254e9a61df8e7f51</field_id>
+                                <group>{}</group>
+                                <label>Enviar correo pre registro</label>
+                                <type>checkbox</type>
+                            </trigger_field>
+                            <value>enviar_correo_pre_registro</value>
+                        </item>
                     </triggers>
                 </wf_fields>
             </rules>

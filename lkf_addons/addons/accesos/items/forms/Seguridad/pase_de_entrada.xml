@@ -20,7 +20,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1736446810.0</created_at>
+    <created_at>1722301145.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -2169,7 +2169,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>677ffe8c638c8536ff37effb</item>
+                        <item>66a83ab5ca3453e21ea08d19</item>
                         <item>62c5ff407febce07043024dd</item>
                         <item>638a9a99616398d2e392a9f5</item>
                         <item>6759e4a7a9a6e13c7b26da33</item>
@@ -2410,7 +2410,7 @@
                         <catalog_field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
                         <field_type>integer</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -2490,7 +2490,7 @@
                         <catalog_field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -2730,7 +2730,7 @@
                         <catalog_field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
                         <field_type>email</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -3452,7 +3452,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>666718cf50ea4554f2aa1c6d</item>
+                        <item>66a83a77cfed7f342775c161</item>
                         <item>663e5d44f5b8a7ce8211ed0f</item>
                         <item>66af1a77d703592958dca5eb</item>
                     </groups_fields>
@@ -3762,11 +3762,11 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>677ffb1f57c138170137efe9</item>
+                        <item>66a83abdde752e12018fbc4c</item>
                         <item>65f22098d1dc5e0b9529e89a</item>
                         <item>65f22098d1dc5e0b9529e89b</item>
                         <item>65f22098d1dc5e0b9529e89c</item>
-                        <item>666718c4f93c1df447226b7c</item>
+                        <item>66a82f669c55d3e6ec8fbbe0</item>
                         <item>663a7dd6e48382c5b12308ff</item>
                         <item>663e4691f54d395ed7f27464</item>
                         <item>663e4691f54d395ed7f27465</item>
@@ -6080,7 +6080,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/127951/</resource_uri>
+    <resource_uri>/api/infosync/form/121736/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -6126,5 +6126,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1743458295.0</updated_at>
+    <updated_at>1744073899.0</updated_at>
 </lkf>
