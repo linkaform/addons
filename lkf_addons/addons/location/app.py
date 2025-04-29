@@ -48,6 +48,7 @@ class Location(Base):
 
         self.f.update( {
             'location':'663e5c57f5b8a7ce8211ed0b',
+            'location_id':'68101945f4996c72247baac4',
             'area':'663e5d44f5b8a7ce8211ed0f',
             'area_state':'663e5e4bf5b8a7ce8211ed14',
             'area_status':'663e5e4bf5b8a7ce8211ed15',
