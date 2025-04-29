@@ -3989,6 +3989,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         records = self.format_cr(self.cr.aggregate(query))
 
         for x in records:
+            qr_code = x.get('_id')
+            total_entradas = self.get_count_ingresos(qr_code)
+            if total_entradas:
+                x['total_entradas'] = total_entradas.get('total_records')
+            else:
+                x['total_entradas'] = 0
+
             visita_a =[]
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
             d = x.get('visita_a_departamento',[])
@@ -4061,7 +4068,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
 
-        print("records++", simplejson.dumps(records, indent=4))
+        # print("records++", simplejson.dumps(records, indent=4))
         return  records
 
     def get_pdf(self, qr_code, template_id=491, name_pdf='Pase de Entrada'):
