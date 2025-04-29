@@ -618,6 +618,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'ubicacion':"663e5c57f5b8a7ce8211ed0b",
             'grupo_requisitos':"676975321df93a68a609f9ce",
             'datos_requeridos':"6769756fc728a0b63b8431ea",
+            'envio_por':"6810180169eeaca9517baa5b",
         }
 
         self.paquetes_fields = {
@@ -2893,6 +2894,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$project': {
                 # "ubicacion":f"$answers.{self.conf_modulo_seguridad['ubicacion_cat']}.{self.conf_modulo_seguridad['ubicacion']}",
                 "grupo_requisitos":f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
+                "grupo_envio":f"$answers.{self.conf_modulo_seguridad['envio_por']}",
                 # "datos_requeridos": f"$answers.{self.conf_modulo_seguridad['datos_requeridos']}",
             }},
         ]
@@ -2904,7 +2906,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 if grupo.get("ubicacion", '') == ubicacion:
                     requerimientos = {
                         "ubicacion": grupo["ubicacion"],
-                        "requerimientos": grupo.get(self.conf_modulo_seguridad['datos_requeridos'], [])
+                        "requerimientos": grupo.get(self.conf_modulo_seguridad['datos_requeridos'], []),
+                        "envios": grupo.get(self.conf_modulo_seguridad['envio_por'], [])
                     }
                 
         return requerimientos
