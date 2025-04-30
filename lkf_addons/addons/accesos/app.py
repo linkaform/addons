@@ -3408,14 +3408,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query[f"answers.{self.bitacora_fields['status_visita']}"] = {"$in": prioridades}
 
         if dateFrom and dateTo:
+            dateFrom = f"{dateFrom} 00:00:00"
+            dateTo = f"{dateTo} 23:59:59"
             match_query.update({
                 f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom, "$lte": dateTo},
             })
         elif dateFrom:
+            dateFrom = f"{dateFrom} 00:00:00"
             match_query.update({
                 f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom}
             })
         elif dateTo:
+            dateTo = f"{dateTo} 23:59:59"
             match_query.update({
                 f"answers.{self.mf['fecha_entrada']}": {"$lte": dateTo}
             })
