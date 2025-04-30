@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.alta_de_actividades_de_alto_riesgo_anlisis_de_riesgo.id }}</form_id>
+    <id>6712b719ea6cac9157fd92ba</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>6712b71ec995a86742f1fcb6</_id>
+                    <action_id>12</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <synched_catalogs>
+                            <item>
+                                <couch_id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.obj_id }}</couch_id>
+                                <id>{{ catalog.actividades_de_alto_riesgo_anlisis_de_riesgo.id }}</id>
+                                <name>Actividades de Alto Riesgo</name>
+                            </item>
+                        </synched_catalogs>
+                    </configuration>
+                    <name>Alta Catalogo</name>
+                </item>
+            </actions>
+            <id>6712b71ec995a86742f1fcb7</id>
+            <name>Sync</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-10-19T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-10-18T19:29:04.325Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

@@ -1,0 +1,273 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <redirect_url>default</redirect_url>
+        <button_message>Mandar respuestas</button_message>
+    </confirmation>
+    <description />
+    <_rev>19-e8364d1d08ecf69b7b80039cb58887c4</_rev>
+    <updated_at>2024-07-30T00:58:29.677376+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Configuracion Areas y Empleados</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2024-07-30T00:58:29.677376+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <config>False</config>
+            <required>False</required>
+            <manual>False</manual>
+        </folio>
+    </advanced_options>
+    <catalog_id>121688</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>66a83ab5ca3453e21ea08d19</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>62c5ff407febce07043024dd</item>
+                        <item>663bc4ed8a6b120eab4d7f1e</item>
+                        <item>663bc4c79b8046ce89e97cf4</item>
+                        <item>6653f3709c6d89925dc04b2e</item>
+                        <item>663bd32d7fb8869bbc4d7f7b</item>
+                        <item>663bcbe2274189281359eb71</item>
+                        <item>6653f3709c6d89925dc04b2f</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.empleados.obj_id }}</field_id>
+                    <label>Empleado</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>62c5ff407febce07043024dd</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.empleados.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters>None</filters>
+                        <name>{{ catalog.empleados.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>62c5ff407febce07043024dd</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Nombre completo</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663bc4ed8a6b120eab4d7f1e</field_id>
+                    <label>Nombre del departamento</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663bc4c79b8046ce89e97cf4</field_id>
+                    <label>Nombre del puesto</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>6653f3709c6d89925dc04b2e</field_id>
+                    <label>Username</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663bd32d7fb8869bbc4d7f7b</field_id>
+                    <label>ID de Usaurio</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>integer</field_type>
+                        <view_index>3</view_index>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663bcbe2274189281359eb71</field_id>
+                    <label>RFC</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>4</view_index>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>6653f3709c6d89925dc04b2f</field_id>
+                    <label>email</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>email</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>663bcbe2274189281359eb78</field_id>
+                    <label>Estatus de disponibilidad</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>[]</view_fields>
+                        <field_type>radio</field_type>
+                        <view_index>0</view_index>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>663e5c57f5b8a7ce8211ed0b</item>
+                        <item>663e5d44f5b8a7ce8211ed0f</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</field_id>
+                    <label>Áreas</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>663e5c57f5b8a7ce8211ed0b</item>
+                            <item>663e5d44f5b8a7ce8211ed0f</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <filters>None</filters>
+                        <name>{{ catalog.areas_de_las_ubicaciones.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Ubicación</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre de Area</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+            </page_fields>
+            <page_description>None</page_description>
+            <page_name>Página 1</page_name>
+        </item>
+    </catalog_pages>
+</lkf>

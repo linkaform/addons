@@ -52,6 +52,7 @@ class Location(Base):
             'area_state':'663e5e4bf5b8a7ce8211ed14',
             'area_status':'663e5e4bf5b8a7ce8211ed15',
             'area_qr_code':'663e5e4bf5b8a7ce8211ed13',
+            'new_city': '6654187fc85ce22aaf8bb070'
         }
         )
 
@@ -107,7 +108,7 @@ class Location(Base):
                     'address_type': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_type']}"},
                     'address_geolocation': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_geolocation']}"},
                     'state': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['state']}"},
-                    'city': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['city']}"},
+                    'city': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['new_city']}"},
                     'zip_code': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['zip_code']}"},
                     'country': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['country']}"},
                     'phone': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['phone']}"},

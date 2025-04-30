@@ -344,6 +344,24 @@ class Base(base.LKF_Base):
                 res = res.strip()
         return res
 
+    def upload_docto(self, nueva_ruta, file_to_load, id_forma_seleccionada, id_field):
+        file_link, file_name = os.path.split(file_to_load)
+        rb_file = open(nueva_ruta+file_name,'rb')
+        dir_file = {'File': rb_file}
+        try:
+            upload_data = {'form_id': id_forma_seleccionada, 'field_id':id_field}
+            upload_url = self.lkf_api.post_upload_file(data=upload_data, up_file=dir_file)
+            rb_file.close()
+        except Exception as e:
+            rb_file.close()
+        try:
+            file_url = upload_url['data']['file']
+            update_file = {'file_name':file_to_load, 'file_url':file_url}
+        except Exception as e:
+            print('------- error al subir el docto:',e)
+            update_file = {"error":"Fallo al subir el archivo"}
+        return update_file
+
 from linkaform_api import  upload_file
 
 #fields_no_update = ['post_status', 'next_cut_week', 'cut_week', 'cycle_group', 'ready_year_week']
@@ -595,24 +613,6 @@ class CargaUniversal(Base):
                 text_col = 'folio__enCampo'
             header_dict[text_col] = position
         return header_dict
-
-    def upload_docto(self, nueva_ruta, file_to_load, id_forma_seleccionada, id_field):
-        file_link, file_name = os.path.split(file_to_load)
-        rb_file = open(nueva_ruta+file_name,'rb')
-        dir_file = {'File': rb_file}
-        try:
-            upload_data = {'form_id': id_forma_seleccionada, 'field_id':id_field}
-            upload_url = self.lkf_api.post_upload_file(data=upload_data, up_file=dir_file)
-            rb_file.close()
-        except Exception as e:
-            rb_file.close()
-        try:
-            file_url = upload_url['data']['file']
-            update_file = {'file_name':file_to_load, 'file_url':file_url}
-        except Exception as e:
-            print('------- error al subir el docto:',e)
-            update_file = {"error":"Fallo al subir el archivo"}
-        return update_file
 
     def procesa_zip(self, current_record, record_id):
         ruta_destino = "/tmp/"

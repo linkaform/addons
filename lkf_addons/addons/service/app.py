@@ -56,10 +56,15 @@ class Service(Base):
         # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
-
+        self.load(module='Stock', **self.kwargs)
 
 
         self.f = {
             'first_date':'fffff0001000000000000001',
             'due_date':'fffff0001000000000000002',
             }
+
+    def get_product_info(self, **kwargs):
+        print('hereda esta........... desde service')
+        res = super(self.Stock).get_product_info(**kwargs)
+        print('res', res)
