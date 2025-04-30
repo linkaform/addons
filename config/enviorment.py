@@ -2,7 +2,7 @@
 from settings import config
 
 # ENV = 'preprod' 
-#ENV = 'local' 
+# ENV = 'local' 
 ENV = 'prod' 
 # print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
 mongo_hosts = config.get('mongo_hosts')
@@ -13,11 +13,13 @@ if ENV == 'prod':
     mongo_hosts = 'db2.linkaform.com:27017,db3.linkaform.com:27017,db4.linkaform.com:27017'
     HOST = 'app.linkaform.com'
     PROTOCOL = 'https'
+    COUCH_ENV = 'prod'
 
 elif ENV == 'preprod':
     mongo_hosts = 'dbs2.lkf.cloud:27918'
     HOST = 'preprod.linkaform.com'
     PROTOCOL = 'https'
+    COUCH_ENV = 'dev'
 
 
 MAX_POOL_SIZE = 1000
@@ -30,6 +32,7 @@ config.update({
         'MONGODB_PORT':27017,
         'MONGODB_HOST': mongo_hosts,
         #'MONGODB_URI': MONGODB_URI,
+        'COUCH_ENV':COUCH_ENV,
         'AIRFLOW_PROTOCOL' : 'https', #http or https
         'AIRFLOW_PORT' : 5000, #http or https
         'AIRFLOW_HOST' : 'airflow.linkaform.com',
