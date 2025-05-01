@@ -48,3 +48,7 @@ Además, se pueden heredar funciones de cualquier clase antecesora usando el mé
 '''
 
 class Name_Your_Object(Base):
+    
+    def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False):
+        # base.LKF_Base.__init__(self, settings, sys_argv=sys_argv)
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
