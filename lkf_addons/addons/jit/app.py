@@ -106,9 +106,8 @@ class JIT(Base):
         self.kwargs['MODULES'] = self.kwargs.get('MODULES',[])       
         if self.__class__.__name__ not in kwargs:
             self.kwargs['MODULES'].append(self.__class__.__name__)
-        self.load('Stock', **self.kwargs)
-        self.load('Product', **self.kwargs)
-        self.load(module='Product', module_class='Warehouse', import_as='WH', **self.kwargs)
+        # self.load('Product', **self.kwargs)
+        # self.load(module='Product', module_class='Warehouse', import_as='WH', **self.kwargs)
         # if not hasattr(self, 'STOCK'):
         #     print('hasattr', hasattr(self, 'STOCK'))
         #     self.JIT =True
@@ -294,6 +293,7 @@ class JIT(Base):
         return True
 
     def balance_warehouse(self, warehouse=None, location=None, product_code=None, sku=None, status='active'):
+        self.load('Stock', **self.kwargs)
         product_rules = self.get_reorder_rules(
             warehouse=warehouse, 
             location=location, 

@@ -32,6 +32,8 @@ RUN apt-get update && \
     mongodb-org-tools
 
 COPY ./secrets/lkf_jwt_key.pub /etc/ssl/certs/lkf_jwt_key.pub
+COPY ./lkfpwd.py /usr/local/lib/python3.10
+
 
 WORKDIR /srv/scripts/addons/modules
 

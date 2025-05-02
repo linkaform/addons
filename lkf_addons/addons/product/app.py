@@ -160,7 +160,6 @@ class Product(Base, base.LKF_Base):
 
         list_response.sort()           
         return list_response
-        
     
     def get_catalog_product(self, query={}):
         return self.get_product_catalog(query)
@@ -285,7 +284,6 @@ class Warehouse(Base ,base.LKF_Base):
         if len(res) == 1:
             res = res[0]
         return res
-
 
     def match_query(self, warehouse=None, location=None, group_id=None):
         query = {}
