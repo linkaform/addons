@@ -5903,17 +5903,20 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         metadata.update({'answers': answers})
 
+        email_status = 'Correo: No se realizo la peticion.'
         email_response = self.lkf_api.post_forms_answers(metadata)
         if email_response.get('status_code') == 201:
             email_status = 'Correo: Enviado correctamente'
         else:
             email_status = 'Correo: Hubo un error...'
 
-        sms_response = self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
-        if sms_response.status in ["queued", "sent", "delivered"]:
-            message_status = 'Mensaje: Enviado correctamente'
-        else:
-            message_status = 'Mensaje: Hubo un error...'
+        message_status = 'Mensaje: No se realizo la peticion.'
+        if phone_to:
+            sms_response = self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
+            if hasattr(sms_response, "status") and sms_response.status in ["queued", "sent", "delivered"]:
+                message_status = 'Mensaje: Enviado correctamente'
+            else:
+                message_status = 'Mensaje: Hubo un error...'
         
         return {
             "email_status": email_status,
