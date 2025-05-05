@@ -2557,7 +2557,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                     f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                     f"answers.{self.bitacora_fields['ubicacion']}": location,
-                    f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                    f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
                 }},
                 {'$project': {
                     '_id': 1,
@@ -2634,6 +2634,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             incidentes_pendientes = resultado[0]['incidentes_pendientes'] if resultado else 0
             
             res['incidentes_pendites'] = incidentes_pendientes
+
+            #Fallas pendientes
+            query_fallas = [
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_FALLAS,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
+                    f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
+                    # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                }},
+                {'$project': {
+                    '_id': 1,
+                }},
+                {'$group': {
+                    '_id': None,
+                    'fallas_pendientes': {'$sum': 1}
+                }}
+            ]
+
+            resultado = self.format_cr(self.cr.aggregate(query_fallas))
+            fallas_pendientes = resultado[0]['fallas_pendientes'] if resultado else 0
+
+            res['fallas_pendientes'] = fallas_pendientes
+
         elif page == 'Accesos' or page == 'Bitacoras':
             #Visitas en el dia, personal dentro, vehiculos dentro, salidas registradas y personas dentro
             query_visitas = [
@@ -2644,7 +2669,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                     f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                     f"answers.{self.bitacora_fields['ubicacion']}": location,
-                    f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                    f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
                 }},
                 {'$project': {
                     '_id': 1,
@@ -2719,7 +2744,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "form_id": self.BITACORA_INCIDENCIAS,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
-                    f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                    f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
                 }},
                 {'$project': {
                     '_id': 1,
@@ -2836,7 +2861,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             for nota in notas:
                 if(nota.get('nota_status') == 'abierto'):
                     notas_abiertas += 1
-                if(nota.get('fecha_apertura') >= today and nota.get('fecha_apertura') <= f"{today}T23:59:59"):
+                if(nota.get('fecha_apertura') >= f"{today} 00:00:00" and nota.get('fecha_apertura') <= f"{today} 23:59:59"):
                     notas_del_dia += 1
                 if(nota.get('fecha_cierre') and nota.get('nota_status') == 'cerrado'):
                     notas_cerradas += 1
