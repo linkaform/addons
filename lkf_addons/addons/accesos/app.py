@@ -2844,6 +2844,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 {'$match': {
                     "deleted_at": {"$exists": False},
                     "form_id": self.ACCESOS_NOTAS,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}": booth_area,
                 }},
                 {'$project': {
                     '_id': 1,
