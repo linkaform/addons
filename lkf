@@ -194,6 +194,7 @@ _build(){
     ;;
     dev)
       cd docker
+      docker pull linkaform/addons:base
       if [ "$NOCACHE" = "1" ]; then
         docker compose build --no-cache lkf-addons
       else
@@ -205,6 +206,7 @@ _build(){
     ;;
     local)
       cd docker
+      docker pull linkaform/addons:base
       if [ "$NOCACHE" = "1" ]; then
         docker compose -f docker-prod.yml build --no-cache
       else
@@ -223,6 +225,7 @@ _build(){
       done
     ;;
     prod)
+      #docker pull linkaform/addons:develop
       cd docker
       if [ "$NOCACHE" != "0" ]; then
         docker compose -f docker-prod.yml build
