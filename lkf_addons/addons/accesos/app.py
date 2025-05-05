@@ -5875,3 +5875,47 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.catalogo_view(catalog_id, form_id, options, detail=True)
     
 
+    def send_email_and_sms(self, data):
+        answers = {}
+        phone_to = data['phone_to']
+        mensaje = data['mensaje']
+
+        metadata = self.lkf_api.get_metadata(form_id=self.ENVIO_DE_CORREOS)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Addons",
+                    "Process": "Creación de envio de correo",
+                    "Action": "send_email_and_sms",
+                }
+            },
+        })
+
+        #---Define Answers
+        answers.update({
+            f"{self.envio_correo_fields['email_from']}": data['email_from'],
+            f"{self.envio_correo_fields['titulo']}": data['titulo'],
+            f"{self.envio_correo_fields['nombre']}": data['nombre'],
+            f"{self.envio_correo_fields['email_to']}": data['email_to'],
+            f"{self.envio_correo_fields['msj']}": mensaje,
+            f"{self.envio_correo_fields['enviado_desde']}": 'Accesos Aviso',
+        })
+
+        metadata.update({'answers': answers})
+
+        email_response = self.lkf_api.post_forms_answers(metadata)
+        if email_response.get('status_code') == 201:
+            email_status = 'Correo: Enviado correctamente'
+        else:
+            email_status = 'Correo: Hubo un error...'
+
+        sms_response = self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
+        if sms_response.status in ["queued", "sent", "delivered"]:
+            message_status = 'Mensaje: Enviado correctamente'
+        else:
+            message_status = 'Mensaje: Hubo un error...'
+        
+        return {
+            "email_status": email_status,
+            "message_status": message_status
+        }
