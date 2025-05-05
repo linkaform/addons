@@ -2634,6 +2634,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             incidentes_pendientes = resultado[0]['incidentes_pendientes'] if resultado else 0
             
             res['incidentes_pendites'] = incidentes_pendientes
+
+            #Fallas pendientes
+            query_fallas = [
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_FALLAS,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
+                    f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
+                    # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                }},
+                {'$project': {
+                    '_id': 1,
+                }},
+                {'$group': {
+                    '_id': None,
+                    'fallas_pendientes': {'$sum': 1}
+                }}
+            ]
+
+            resultado = self.format_cr(self.cr.aggregate(query_fallas))
+            fallas_pendientes = resultado[0]['fallas_pendientes'] if resultado else 0
+
+            res['fallas_pendientes'] = fallas_pendientes
+
         elif page == 'Accesos' or page == 'Bitacoras':
             #Visitas en el dia, personal dentro, vehiculos dentro, salidas registradas y personas dentro
             query_visitas = [
