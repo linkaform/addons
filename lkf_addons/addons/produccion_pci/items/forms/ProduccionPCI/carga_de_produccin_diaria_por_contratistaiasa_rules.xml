@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.carga_de_produccin_diaria_por_contratistaiasa.id }}</form_id>
+    <id>629140e68af7ecce03d59fd7</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>f1074100a010000000000005</field_id>
+                        <group_id>None</group_id>
+                        <id>f1074100a010000000000005</id>
+                        <label>Status</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1074100a010000000000002</field_id>
+                    <group_id>None</group_id>
+                    <id>f1074100a010000000000002</id>
+                    <label>RESULTADO DE LA CARGA</label>
+                    <type>textarea</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1074100a010000000000cc1</field_id>
+                    <group_id>None</group_id>
+                    <id>f1074100a010000000000cc1</id>
+                    <label>Cope</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1074100a010000000000003</field_id>
+                    <group_id>None</group_id>
+                    <id>f1074100a010000000000003</id>
+                    <label>Archivo de Folios con Error</label>
+                    <type>file</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1074100a010000000000a12</field_id>
+                    <group_id>None</group_id>
+                    <id>f1074100a010000000000a12</id>
+                    <label>Folios cargados con éxito</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1074100a01000000000ac12</field_id>
+                    <group_id>None</group_id>
+                    <id>f1074100a01000000000ac12</id>
+                    <label>Folios modificados con éxito</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1074100a010000000000a11</field_id>
+                    <group_id>None</group_id>
+                    <id>f1074100a010000000000a11</id>
+                    <label>Folios NO cargados por ser duplicados o bloqueados</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1074100a010000000000a13</field_id>
+                    <group_id>None</group_id>
+                    <id>f1074100a010000000000a13</id>
+                    <label>Folios no cargados por tener error</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f088b6d7df8cf7fe42f215c</field_id>
+                    <group_id>None</group_id>
+                    <id>5f088b6d7df8cf7fe42f215c</id>
+                    <label>Folios procesados exitosamente</label>
+                    <type>file</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>and</operator>
+            <rule_id>bf022c9195a1e3a</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>nin=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>f1074100a010000000000005</field_id>
+                        <group_id>None</group_id>
+                        <id>f1074100a010000000000005</id>
+                        <label>Estatus</label>
+                        <type>select</type>
+                    </field>
+                    <value>error</value>
+                </item>
+                <item>
+                    <condition>nin=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>f1074100a010000000000005</field_id>
+                        <group_id>None</group_id>
+                        <id>f1074100a010000000000005</id>
+                        <label>Estatus</label>
+                        <type>select</type>
+                    </field>
+                    <value>procesando</value>
+                </item>
+                <item>
+                    <condition>nin=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>f1074100a010000000000005</field_id>
+                        <group_id>None</group_id>
+                        <id>f1074100a010000000000005</id>
+                        <label>Estatus</label>
+                        <type>select</type>
+                    </field>
+                    <value>cargado</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1074100a010000000000005</field_id>
+                    <group_id>None</group_id>
+                    <id>f1074100a010000000000005</id>
+                    <label>Estatus</label>
+                    <type>select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 2</name>
+            <operator>and</operator>
+            <rule_id>115117aa14dc1720</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

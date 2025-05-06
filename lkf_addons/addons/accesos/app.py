@@ -298,7 +298,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'vigencia_certificado':'662962bb203407ab90c886e6',
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
             'walkin':'66c4261351cc14058b020d48',
-            'email_visita_a': '638a9a7767c332f5d459fc82'
+            'email_visita_a': '638a9a7767c332f5d459fc82',
+            'telefono_visita_a': '67be0c43a31e5161c47f2bba'
         }
         self.mf = mf
         ## Form Fields ##
@@ -2557,7 +2558,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                     f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                     f"answers.{self.bitacora_fields['ubicacion']}": location,
-                    f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                    f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
                 }},
                 {'$project': {
                     '_id': 1,
@@ -2634,6 +2635,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             incidentes_pendientes = resultado[0]['incidentes_pendientes'] if resultado else 0
             
             res['incidentes_pendites'] = incidentes_pendientes
+
+            #Fallas pendientes
+            query_fallas = [
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_FALLAS,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
+                    f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
+                    # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                }},
+                {'$project': {
+                    '_id': 1,
+                }},
+                {'$group': {
+                    '_id': None,
+                    'fallas_pendientes': {'$sum': 1}
+                }}
+            ]
+
+            resultado = self.format_cr(self.cr.aggregate(query_fallas))
+            fallas_pendientes = resultado[0]['fallas_pendientes'] if resultado else 0
+
+            res['fallas_pendientes'] = fallas_pendientes
+
         elif page == 'Accesos' or page == 'Bitacoras':
             #Visitas en el dia, personal dentro, vehiculos dentro, salidas registradas y personas dentro
             query_visitas = [
@@ -2644,7 +2670,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                     f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                     f"answers.{self.bitacora_fields['ubicacion']}": location,
-                    f"answers.{self.mf['fecha_entrada']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                    f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
                 }},
                 {'$project': {
                     '_id': 1,
@@ -2719,7 +2745,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "form_id": self.BITACORA_INCIDENCIAS,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
-                    f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
+                    f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
                 }},
                 {'$project': {
                     '_id': 1,
@@ -2815,11 +2841,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['articulos_perdidos'] = articulos_perdidos
         elif page == 'Notas':
             #Notas
+            match_query = {
+                "deleted_at": {"$exists": False},
+                "form_id": self.ACCESOS_NOTAS,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
+            }
+
+            if booth_area and not booth_area == "todas" and not booth_area == "":
+                match_query.update({
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}": booth_area,
+                })
+            
             query_notas = [
-                {'$match': {
-                    "deleted_at": {"$exists": False},
-                    "form_id": self.ACCESOS_NOTAS,
-                }},
+                {'$match': match_query},
                 {'$project': {
                     '_id': 1,
                     'nota_status': f"$answers.{self.notes_fields['note_status']}",
@@ -2836,7 +2870,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             for nota in notas:
                 if(nota.get('nota_status') == 'abierto'):
                     notas_abiertas += 1
-                if(nota.get('fecha_apertura') >= today and nota.get('fecha_apertura') <= f"{today}T23:59:59"):
+                if(nota.get('fecha_apertura') >= f"{today} 00:00:00" and nota.get('fecha_apertura') <= f"{today} 23:59:59"):
                     notas_del_dia += 1
                 if(nota.get('fecha_cierre') and nota.get('nota_status') == 'cerrado'):
                     notas_cerradas += 1
@@ -2987,6 +3021,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['id_usuario']}",
                 'visita_a_email':
                     f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_visita_a']}",
+                'visita_a_telefono':
+                    f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['telefono_visita_a']}",
                 'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
                 # 'grupo_commentario_area': f"$answers.{self.mf['grupo_commentario_area']}",
                 'grupo_equipos': f"$answers.{self.mf['grupo_equipos']}",
@@ -3012,6 +3048,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             p = x.get('visita_a_puesto',[])
             e =  x.get('visita_a_user_id',[])
             u =  x.get('visita_a_email',[])
+            f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['email'] =self.unlist(x.get('email',''))
             x['telefono'] = self.unlist(x.get('telefono',''))
@@ -3027,6 +3064,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     emp.update({'user_id':e[idx].pop(0) if e[idx] else ""})
                 if u:
                     emp.update({'email': u[idx].pop(0) if u[idx] else ""})
+                if f:
+                    emp.update({'telefono': f[idx].pop(0) if f[idx] else ""})
                 visita_a.append(emp)
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
@@ -3680,10 +3719,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.ACCESOS_NOTAS,
-            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location,
-            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}":area
+            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location
         }
 
+        if area and not area == 'todas':
+            match_query.update({
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}":area
+            })
         if status != 'dia':
             match_query.update({f"answers.{self.notes_fields['note_status']}":status})
         if dateFrom and dateTo:
@@ -5848,3 +5890,50 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.catalogo_view(catalog_id, form_id, options, detail=True)
     
 
+    def send_email_and_sms(self, data):
+        answers = {}
+        phone_to = data['phone_to']
+        mensaje = data['mensaje']
+
+        metadata = self.lkf_api.get_metadata(form_id=self.ENVIO_DE_CORREOS)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Addons",
+                    "Process": "Creación de envio de correo",
+                    "Action": "send_email_and_sms",
+                }
+            },
+        })
+
+        #---Define Answers
+        answers.update({
+            f"{self.envio_correo_fields['email_from']}": data['email_from'],
+            f"{self.envio_correo_fields['titulo']}": data['titulo'],
+            f"{self.envio_correo_fields['nombre']}": data['nombre'],
+            f"{self.envio_correo_fields['email_to']}": data['email_to'],
+            f"{self.envio_correo_fields['msj']}": mensaje,
+            f"{self.envio_correo_fields['enviado_desde']}": 'Accesos Aviso',
+        })
+
+        metadata.update({'answers': answers})
+
+        email_status = 'Correo: No se realizo la peticion.'
+        email_response = self.lkf_api.post_forms_answers(metadata)
+        if email_response.get('status_code') == 201:
+            email_status = 'Correo: Enviado correctamente'
+        else:
+            email_status = 'Correo: Hubo un error...'
+
+        message_status = 'Mensaje: No se realizo la peticion.'
+        if phone_to:
+            sms_response = self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
+            if hasattr(sms_response, "status") and sms_response.status in ["queued", "sent", "delivered"]:
+                message_status = 'Mensaje: Enviado correctamente'
+            else:
+                message_status = 'Mensaje: Hubo un error...'
+        
+        return {
+            "email_status": email_status,
+            "message_status": message_status
+        }

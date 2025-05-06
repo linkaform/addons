@@ -7,7 +7,7 @@
         <button_message>Mandar respuestas</button_message>
     </confirmation>
     <description />
-    <_rev>23-09a3c592d3e96ab34c609582d31bb185</_rev>
+    <_rev>24-35aa598a23a8b8310e9c3111a87960e4</_rev>
     <updated_at>2024-07-30T00:58:29.677376+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -25,10 +25,6 @@
             <manual>False</manual>
         </folio>
     </advanced_options>
-    <catalog_id>121688</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>66a83ab5ca3453e21ea08d19</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -36,6 +32,7 @@
                     <field_type>catalog</field_type>
                     <catalog_fields>
                         <item>62c5ff407febce07043024dd</item>
+                        <item>67be0c43a31e5161c47f2bba</item>
                         <item>6759e4a7a9a6e13c7b26da33</item>
                         <item>638a9a99616398d2e392a9f5</item>
                         <item>663bc4ed8a6b120eab4d7f1e</item>
@@ -76,6 +73,24 @@
                         <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <filters>None</filters>
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <properties>{}</properties>
+                    <required>False</required>
+                    <field_id>67be0c43a31e5161c47f2bba</field_id>
+                    <label>Telefono</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <filters />
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -270,4 +285,8 @@
             <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>66a83ab5ca3453e21ea08d19</_id>
+    <public>False</public>
+    <catalog_id>121688</catalog_id>
 </lkf>
