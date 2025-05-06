@@ -344,6 +344,13 @@ class Base(base.LKF_Base):
                 res = res.strip()
         return res
 
+    def update_status_record(self,  status, msg_comentarios='' ):
+        self.current_record['answers'][self.field_id_status] = status
+        if msg_comentarios:
+            self.current_record['answers'][self.field_id_comentarios] = msg_comentarios
+        res = self.lkf_api.patch_record(self.current_record, self.record_id)
+        return res
+
     def upload_docto(self, nueva_ruta, file_to_load, id_forma_seleccionada, id_field):
         file_link, file_name = os.path.split(file_to_load)
         rb_file = open(nueva_ruta+file_name,'rb')
@@ -595,13 +602,6 @@ class CargaUniversal(Base):
         record = self.cr.find(query, select_columns)
         existentes = {rec['folio']:rec for rec in record}
         return existentes
-
-    def update_status_record(self,  status, msg_comentarios='' ):
-        self.current_record['answers'][self.field_id_status] = status
-        if msg_comentarios:
-            self.current_record['answers'][self.field_id_comentarios] = msg_comentarios
-        res = self.lkf_api.patch_record(self.current_record, self.record_id)
-        return False
 
     def make_header_dict(self, header):
         ### Return the directory with
@@ -1705,7 +1705,8 @@ class Schedule(Base):
             "retry_delay" : "timedelta(seconds=30)"
         }
 
-        body['params'] = {'api_key':self.settings.config['APIKEY']}
+        APIKEY = self.settings.config.get('APIKEY',self.settings.config.get('API_KEY'))
+        body['params'] = {'api_key':APIKEY}
         #TODO calcular el first date , para que arrance la recurrencia tomando en cuenta
         # el tiempo de anticipacion
         body['dag_params'] = {
@@ -1840,7 +1841,6 @@ class Schedule(Base):
 
     def subscribe_cron(self, body):
         # print('sub=',body)
-        print('subscribe=',simplejson.dumps(body, indent=4))
         subscribe = self.lkf_api.subscribe_cron(body)
         return subscribe
         #todo borrar regla
