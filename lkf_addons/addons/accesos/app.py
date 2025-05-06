@@ -298,7 +298,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'vigencia_certificado':'662962bb203407ab90c886e6',
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
             'walkin':'66c4261351cc14058b020d48',
-            'email_visita_a': '638a9a7767c332f5d459fc82'
+            'email_visita_a': '638a9a7767c332f5d459fc82',
+            'telefono_visita_a': '67be0c43a31e5161c47f2bba'
         }
         self.mf = mf
         ## Form Fields ##
@@ -3014,6 +3015,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['id_usuario']}",
                 'visita_a_email':
                     f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_visita_a']}",
+                'visita_a_telefono':
+                    f"$answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['telefono_visita_a']}",
                 'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",
                 # 'grupo_commentario_area': f"$answers.{self.mf['grupo_commentario_area']}",
                 'grupo_equipos': f"$answers.{self.mf['grupo_equipos']}",
@@ -3039,6 +3042,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             p = x.get('visita_a_puesto',[])
             e =  x.get('visita_a_user_id',[])
             u =  x.get('visita_a_email',[])
+            f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['email'] =self.unlist(x.get('email',''))
             x['telefono'] = self.unlist(x.get('telefono',''))
@@ -3054,6 +3058,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     emp.update({'user_id':e[idx].pop(0) if e[idx] else ""})
                 if u:
                     emp.update({'email': u[idx].pop(0) if u[idx] else ""})
+                if f:
+                    emp.update({'telefono': f[idx].pop(0) if f[idx] else ""})
                 visita_a.append(emp)
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
