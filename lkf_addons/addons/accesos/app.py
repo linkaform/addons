@@ -2841,13 +2841,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['articulos_perdidos'] = articulos_perdidos
         elif page == 'Notas':
             #Notas
-            query_notas = [
-                {'$match': {
-                    "deleted_at": {"$exists": False},
-                    "form_id": self.ACCESOS_NOTAS,
-                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
+            match_query = {
+                "deleted_at": {"$exists": False},
+                "form_id": self.ACCESOS_NOTAS,
+                f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
+            }
+
+            if booth_area and not booth_area == "todas" and not booth_area == "":
+                match_query.update({
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}": booth_area,
-                }},
+                })
+            
+            query_notas = [
+                {'$match': match_query},
                 {'$project': {
                     '_id': 1,
                     'nota_status': f"$answers.{self.notes_fields['note_status']}",
