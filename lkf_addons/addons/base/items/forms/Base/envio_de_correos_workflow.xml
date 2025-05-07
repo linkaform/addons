@@ -1,85 +1,22 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.envio_de_correos.id }}</form_id>
-    <id>67567e6840a55b8a1c487f21</id>
+    <id>67bf83eccc585c13f70f7c1d</id>
     <workflows>
         <item>
             <actions>
                 <item>
-                    <_id>67eb140769a6f0f0114d9e2d</_id>
-                    <action_id>5</action_id>
-                    <action_settings>{}</action_settings>
-                    <configuration>
-                        <body>{% raw %} {{record.answers.670d2d9d0337e410e4353550}} {% endraw %}</body>
-                        <email_fields>
-                            <item>
-                                <field_id>670d2e32756833542954716c</field_id>
-                                <group_id>None</group_id>
-                                <label>emai para</label>
-                            </item>
-                        </email_fields>
-                        <emails>[]</emails>
-                        <embed_company_picture>True</embed_company_picture>
-                        <fields_attached>[]</fields_attached>
-                        <pdf_template>{}</pdf_template>
-                        <resend>RESEND</resend>
-                        <send_attachments>False</send_attachments>
-                        <send_pdf>False</send_pdf>
-                        <sender>OWNER_EMAIL</sender>
-                        <subject>{% raw %} {{record.answers.67169f72c736cc47794404f9}} {% endraw %}</subject>
-                        <timer_config>
-                            <seconds_to_expire>None</seconds_to_expire>
-                        </timer_config>
-                    </configuration>
-                    <name>Se envia el correo</name>
-                </item>
-            </actions>
-            <id>67eb140769a6f0f0114d9e31</id>
-            <name>Se envia el correo</name>
-            <rules>
-                <metadata>
-                    <connection>[]</connection>
-                    <date>
-                        <period>
-                            <month>1</month>
-                            <selected>False</selected>
-                            <year>2014</year>
-                        </period>
-                        <range>
-                            <end>2025-04-01T06:00:00.000Z</end>
-                            <selected>False</selected>
-                            <start>2025-03-31T22:14:27.875Z</start>
-                        </range>
-                    </date>
-                    <grading>{}</grading>
-                    <user>[]</user>
-                </metadata>
-                <record>
-                    <created>True</created>
-                    <deleted>False</deleted>
-                    <edited>True</edited>
-                    <run_multiple_times>True</run_multiple_times>
-                    <runtime>after</runtime>
-                </record>
-                <wf_fields>
-                    <operator>all</operator>
-                    <triggers>[]</triggers>
-                </wf_fields>
-            </rules>
-        </item>
-        <item>
-            <actions>
-                <item>
-                    <_id>67ec76ba994bc838fa8e7c43</_id>
+                    <_id>67bf841dbda235e4ad67d61c</_id>
                     <action_id>5</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
                         <body>{% raw %} &lt;!DOCTYPE html&gt;
 &lt;html&gt;
+
 &lt;head&gt;
     &lt;meta charset="UTF-8"&gt;
     &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;Registro de Ingreso Confirmado&lt;/title&gt;
+    &lt;title&gt;Notificación de Visita&lt;/title&gt;
     &lt;style&gt;
         body {
             font-family: Arial, sans-serif;
@@ -87,70 +24,137 @@
             margin: 0;
             padding: 0;
         }
+
         .email-container {
             max-width: 600px;
-            margin: 20px auto;
+            margin: 0 auto;
             background-color: #ffffff;
+            border: 1px solid #ddd;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
+
         .header {
             background-color: #021d49;
             color: #ffffff;
-            text-align: center;
             padding: 20px;
+            display: flex;
+            align-items: center;
         }
+
         .header img {
-            max-width: 120px;
-            margin-bottom: 10px;
+            max-width: 100px;
+            margin-right: 20px;
         }
+
         .content {
             padding: 20px;
             color: #333333;
-            text-align: center;
         }
-        .content h2 {
+
+        .content h3 {
             color: #021d49;
         }
+
+        .highlighted-message {
+            background-color: #f8f9fa;
+            border-left: 5px solid #005bb5;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333333;
+            margin-top: 20px;
+        }
+
+        .highlighted-message p {
+            margin: 10px 0;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #005bb5;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid #004a99;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .button:hover {
+            background-color: #004a99;
+            transform: scale(1.05);
+        }
+
+        .button:active {
+            background-color: #003d80;
+            transform: scale(0.95);
+        }
+
         .footer {
             background-color: #f4f4f4;
             text-align: center;
             color: #666666;
-            padding: 15px;
+            padding: 10px;
             font-size: 12px;
         }
+
         .footer a {
             color: #021d49;
             text-decoration: none;
-            font-weight: bold;
         }
     &lt;/style&gt;
 &lt;/head&gt;
+
 &lt;body&gt;
     &lt;div class="email-container"&gt;
         &lt;!-- Header --&gt;
         &lt;div class="header"&gt;
-            &lt;img alt="logo" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66b4093ed409d27d4ff620ea.png"&gt;
-            &lt;h1&gt;Registro de Ingreso Confirmado&lt;/h1&gt;
+            &lt;img alt="logo"
+                src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66b4093ed409d27d4ff620ea.png"&gt;
         &lt;/div&gt;
 
         &lt;!-- Content --&gt;
         &lt;div class="content"&gt;
-            &lt;h2&gt;Tu ingreso ha sido registrado&lt;/h2&gt;
-            &lt;p&gt;Tu ingreso ha sido registrado exitosamente y la persona a la que visitas ha sido notificada.&lt;/p&gt;
-            &lt;p&gt;Si necesitas más información o asistencia, no dudes en contactarnos.&lt;/p&gt;
+            &lt;p&gt;Hola,&lt;/p&gt;
+            &lt;p&gt;Has recibido un nuevo mensaje desde el sistema de Accesos.&lt;/p&gt;
+
+            &lt;!-- Mensaje resaltado --&gt;
+            &lt;div class="highlighted-message"&gt;
+                &lt;p&gt;&lt;strong&gt;📩 Mensaje:&lt;/strong&gt;&lt;/p&gt;
+                &lt;p&gt;"{{record.answers.670d2d9d0337e410e4353550}}"&lt;/p&gt;
+            &lt;/div&gt;
+
+            &lt;p&gt;
+                🔹 &lt;strong&gt;Enviado por:&lt;/strong&gt; Guardia de Seguridad&lt;br&gt;
+                🔹 &lt;strong&gt;Motivo:&lt;/strong&gt; {{record.answers.67169f72c736cc47794404f9}}
+            &lt;/p&gt;
+
+            &lt;p&gt;Si tienes alguna duda, no dudes en contactarnos.&lt;/p&gt;
+            &lt;p&gt;Saludos,&lt;br&gt;Sistema de Accesos - Soter&lt;/p&gt;
         &lt;/div&gt;
 
         &lt;!-- Footer --&gt;
         &lt;div class="footer"&gt;
-            &lt;p&gt;&amp;copy; 2024 &lt;a href="https://soter-app.webflow.io/" target="_blank"&gt;Soter&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
+            &lt;p&gt;&amp;copy; 2025 &lt;a href="https://soter-app.webflow.io/" target="_blank"&gt;Soter&lt;/a&gt;. Todos los derechos
+                reservados.&lt;/p&gt;
             &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
-                &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" width="150px"&gt;
+                &lt;img alt=""
+                    src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png"
+                    width="150px"&gt;
             &lt;/a&gt;
         &lt;/div&gt;
     &lt;/div&gt;
 &lt;/body&gt;
+
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>
                             <item>
@@ -166,17 +170,17 @@
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>False</send_pdf>
-                        <sender>OWNER_EMAIL</sender>
+                        <sender>{{record.answers.67169f72c736cc47794404f8}}</sender>
                         <subject>{% raw %} {{record.answers.67169f72c736cc47794404f9}} {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
                     </configuration>
-                    <name>Se envia el correo</name>
+                    <name>Se envia el correo de aviso</name>
                 </item>
             </actions>
-            <id>67ec76ba994bc838fa8e7c4a</id>
-            <name>Se envia correo de Bivenvenida Soter</name>
+            <id>67bf841dbda235e4ad67d61d</id>
+            <name>Envio aviso llegada</name>
             <rules>
                 <metadata>
                     <connection>[]</connection>
@@ -187,9 +191,9 @@
                             <year>2014</year>
                         </period>
                         <range>
-                            <end>2025-04-02T06:00:00.000Z</end>
+                            <end>2025-02-27T06:00:00.000Z</end>
                             <selected>False</selected>
-                            <start>2025-04-01T23:08:41.325Z</start>
+                            <start>2025-02-26T17:19:33.640Z</start>
                         </range>
                     </date>
                     <grading>{}</grading>
@@ -199,7 +203,7 @@
                     <created>True</created>
                     <deleted>False</deleted>
                     <edited>True</edited>
-                    <run_multiple_times>True</run_multiple_times>
+                    <run_multiple_times>False</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
@@ -217,7 +221,7 @@
                                 <label>Enviado desde:</label>
                                 <type>text</type>
                             </trigger_field>
-                            <value>Accesos Bienvenida</value>
+                            <value>Accesos Aviso</value>
                         </item>
                     </triggers>
                 </wf_fields>
