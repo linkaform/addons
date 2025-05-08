@@ -5896,6 +5896,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers = {}
         phone_to = data['phone_to']
         mensaje = data['mensaje']
+        titulo = 'Aviso desde Soter - Accesos'
 
         metadata = self.lkf_api.get_metadata(form_id=self.ENVIO_DE_CORREOS)
         metadata.update({
@@ -5911,7 +5912,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #---Define Answers
         answers.update({
             f"{self.envio_correo_fields['email_from']}": data['email_from'],
-            f"{self.envio_correo_fields['titulo']}": 'Aviso desde Soter - Accesos',
+            f"{self.envio_correo_fields['titulo']}": titulo,
             f"{self.envio_correo_fields['nombre']}": data['nombre'],
             f"{self.envio_correo_fields['email_to']}": data['email_to'],
             f"{self.envio_correo_fields['msj']}": mensaje,
