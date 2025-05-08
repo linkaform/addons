@@ -5909,7 +5909,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #---Define Answers
         answers.update({
             f"{self.envio_correo_fields['email_from']}": data['email_from'],
-            f"{self.envio_correo_fields['titulo']}": data['titulo'],
+            f"{self.envio_correo_fields['titulo']}": 'Aviso desde Soter - Accesos',
             f"{self.envio_correo_fields['nombre']}": data['nombre'],
             f"{self.envio_correo_fields['email_to']}": data['email_to'],
             f"{self.envio_correo_fields['msj']}": mensaje,
