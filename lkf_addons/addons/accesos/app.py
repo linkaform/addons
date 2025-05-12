@@ -3030,7 +3030,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'tema_cita': f"$answers.{self.pase_entrada_fields['tema_cita']}",
                 'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}",
                 'link': f"$answers.{self.pase_entrada_fields['link']}",
-                'google_wallet_pass_url': f"$answers.{self.pase_entrada_fields['google_wallet_pass_url']}"
+                'google_wallet_pass_url': f"$answers.{self.pase_entrada_fields['google_wallet_pass_url']}",
+                'pdf_to_img': f"$answers.{self.pase_entrada_fields['pdf_to_img']}"
                 },
             },
             {'$sort':{'folio':-1}},
@@ -5289,6 +5290,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
                 res['json'].update({'asunto':pass_selected.get('tema_cita')})
                 res['json'].update({'descripcion':pass_selected.get('descripcion')})
+                res['json'].update({'pdf_to_img': pass_selected.get('pdf_to_img')})
                 res['json'].update({'pdf': pdf})
                 return res
             else: 
