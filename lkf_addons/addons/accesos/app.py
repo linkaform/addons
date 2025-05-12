@@ -54,6 +54,9 @@ from lkf_addons.addons.employee.app import Employee
 from lkf_addons.addons.activo_fijo.app import Vehiculo
 from lkf_addons.addons.location.app import Location
 import arrow
+
+from pdf2image import convert_from_bytes
+from zipfile import ZipFile
 ### Objeto o Clase de Módulo ###
 '''
 Cada módulo puede tener múltiples objetos, configurados en clases.
@@ -531,6 +534,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'nombre_tipo_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.66297e1579900d9018c886ad",
             'nombre_perfil':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'nombre_visitante_registrado': '5ea0693a0c12d5a8e43d37df',
+            'pdf_to_img': '682222d27e0ea505751e17b4',
             'perfil_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.661dc67e901906b7e9b73bac",
             'perfil_pase_id':f"661dc67e901906b7e9b73bac",
             'requerimientos_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e5",
@@ -2147,6 +2151,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         metadata.update({'answers':answers})
         res = self.lkf_api.post_forms_answers(metadata)
         qrcode_to_google_pass = ''
+        id_forma = ''
         if res.get("status_code") ==200 or res.get("status_code")==201:
             qrcode_to_google_pass = res.get('json', {}).get('id', '')
             link_info=access_pass.get('link', "")
@@ -2221,10 +2226,23 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "address": address.get('address'),
                 }
 
-                google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
+                id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
+                pdf = self.lkf_api.get_pdf_record(qrcode_to_google_pass, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
+                pdf_url = pdf.get('json', {}).get('download_url')
+
+                # google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
+                pass_img_url = self.upload_pdf_as_image(id_forma, id_campo_pdf_to_img, pdf_url)
+                pass_img_file_name = pass_img_url.get('file_name')
+                pass_img_file_url = pass_img_url.get('file_url')
                 
                 access_pass_custom.update({
-                    "google_wallet_pass_url": google_wallet_pass_url
+                    # "google_wallet_pass_url": google_wallet_pass_url,
+                    "pdf_to_img": [
+                        {
+                            "file_name": pass_img_file_name,
+                            "file_url": pass_img_file_url
+                        }
+                    ]
                 })
                 
                 self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
@@ -5243,6 +5261,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers.update({f"{self.pase_entrada_fields[key]}": value})
             elif key == "google_wallet_pass_url":
                 answers.update({f"{self.pase_entrada_fields[key]}": value})
+            elif key == "pdf_to_img":
+                answers.update({f"{self.pase_entrada_fields[key]}": value})
             elif key == 'favoritos':
                 answers.update({f"{self.pase_entrada_fields[key]}": [value]})    
             else:
@@ -6054,3 +6074,63 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print('Agrega tu pase con este link:', save_url)
 
         return save_url
+
+    def upload_pdf_as_image(self, id_forma_seleccionada, id_field, pdf_url, convert_all=False):
+        # 1. Descargar PDF desde la URL
+        try:
+            response = requests.get(pdf_url)
+            response.raise_for_status()
+        except Exception as e:
+            print("Error al descargar el PDF:", e)
+            return {"error": "Fallo al descargar el PDF"}
+
+        # 2. Convertir PDF a imágenes
+        try:
+            images = convert_from_bytes(response.content, dpi=150)
+        except Exception as e:
+            print("Error al convertir el PDF:", e)
+            return {"error": "Fallo al convertir el PDF"}
+
+        temp_dir = tempfile.gettempdir()
+
+        if convert_all and len(images) > 1:
+            # 3a. Guardar todas las imágenes en un archivo ZIP
+            zip_path = os.path.join(temp_dir, "converted_images.zip")
+            with ZipFile(zip_path, 'w') as zipf:
+                for i, img in enumerate(images):
+                    img_path = os.path.join(temp_dir, f"page_{i+1}.png")
+                    img.save(img_path, "PNG")
+                    zipf.write(img_path, arcname=f"page_{i+1}.png")
+                    os.remove(img_path)
+            file_to_upload_path = zip_path
+            filename = "converted_images.zip"
+        else:
+            # 3b. Guardar solo la primera imagen como PNG
+            img_path = os.path.join(temp_dir, "converted_image.png")
+            images[0].save(img_path, "PNG")
+            file_to_upload_path = img_path
+            filename = "converted_image.png"
+
+        rb_file = open(file_to_upload_path, 'rb')
+        dir_file = {'File': rb_file}
+
+        try:
+            upload_data = {'form_id': id_forma_seleccionada, 'field_id': id_field}
+            upload_url = self.lkf_api.post_upload_file(data=upload_data, up_file=dir_file)
+            rb_file.close()
+        except Exception as e:
+            rb_file.close()
+            os.remove(file_to_upload_path)
+            print("Error al subir el archivo:", e)
+            return {"error": "Fallo al subir el archivo"}
+
+        try:
+            file_url = upload_url['data']['file']
+            update_file = {'file_name': filename, 'file_url': file_url}
+        except KeyError:
+            print('No se pudo obtener la URL del archivo')
+            update_file = {"error": "Fallo al obtener la URL del archivo"}
+        finally:
+            os.remove(file_to_upload_path)
+
+        return update_file
