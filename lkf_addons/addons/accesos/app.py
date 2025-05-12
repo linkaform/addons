@@ -2013,7 +2013,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             },
         })
         #---Define Answers
-
         answers = {}
         perfil_pase = access_pass.get('perfil_pase')
         location_name = access_pass.get('ubicacion')
@@ -2042,7 +2041,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
             answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
             answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
-            # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
             answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',"") 
             answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"") 
             answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',"") 
@@ -2145,45 +2143,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
            type(answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']]) == str:
             answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']] = [answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']],]
 
-
-        # elif key == 'grupo_vehiculos':
-        #         list_vehiculos = []
-        #         for item in value:
-        #             tipo = item.get('tipo','')
-        #             marca = item.get('marca','')
-        #             modelo = item.get('modelo','')
-        #             estado = item.get('estado','')
-        #             placas = item.get('placas','')
-        #             color = item.get('color','')
-        #             list_vehiculos.append({
-        #                 self.TIPO_DE_VEHICULO_OBJ_ID:{
-        #                     self.mf['tipo_vehiculo']:tipo,
-        #                     self.mf['marca_vehiculo']:marca,
-        #                     self.mf['modelo_vehiculo']:modelo,
-        #                 },
-        #                 self.ESTADO_OBJ_ID:{
-        #                     self.mf['nombre_estado']:estado,
-        #                 },
-        #                 self.mf['placas_vehiculo']:placas,
-        #                 self.mf['color_vehiculo']:color,
-        #             })
-        #         answers[self.mf['grupo_vehiculos']] = list_vehiculos  
-        #     elif key == 'grupo_equipos':
-        #         list_equipos = []
-        #         for item in value:
-        #             nombre = item.get('nombre','')
-        #             marca = item.get('marca','')
-        #             color = item.get('color','')
-        #             tipo = item.get('tipo','')
-        #             serie = item.get('serie','')
-        #             list_equipos.append({
-        #                 self.mf['tipo_equipo']:tipo,
-        #                 self.mf['nombre_articulo']:nombre,
-        #                 self.mf['marca_articulo']:marca,
-        #                 self.mf['numero_serie']:serie,
-        #                 self.mf['color_articulo']:color,
-        #             })
-        #         answers[self.mf['grupo_equipos']] = list_equipos  
         #---Valor
         metadata.update({'answers':answers})
         res = self.lkf_api.post_forms_answers(metadata)
@@ -2267,13 +2226,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 access_pass_custom.update({
                     "google_wallet_pass_url": google_wallet_pass_url
                 })
-                resUp= self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
-            else:
-                link_pass=""
-            
-
-            # access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])}
-
+                
+                self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
             
         return res
     
