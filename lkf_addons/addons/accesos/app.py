@@ -2187,7 +2187,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #---Valor
         metadata.update({'answers':answers})
         res = self.lkf_api.post_forms_answers(metadata)
+        qrcode_to_google_pass = ''
         if res.get("status_code") ==200 or res.get("status_code")==201:
+            qrcode_to_google_pass = res.get('json', {}).get('id', '')
             link_info=access_pass.get('link', "")
             docs=""
             
@@ -2248,13 +2250,20 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         ]
                     }
                 else:
-                    # stop_datetime = datetime.strptime(fecha_desde_hasta, "%Y-%m-%d %H:%M:%S")
                     access_pass_custom={
                         "link":link_pass,
                         "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])
                     }
 
-                google_wallet_pass_url = self.create_class_google_wallet()
+                data_to_google_pass = {
+                    "nombre": access_pass.get("nombre"),
+                    "visita_a": access_pass.get("visita_a"),
+                    "ubicacion": access_pass.get("ubicacion"),
+                    "address": address.get('address'),
+                }
+
+                google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
+                
                 access_pass_custom.update({
                     "google_wallet_pass_url": google_wallet_pass_url
                 })
@@ -5959,10 +5968,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "message_status": message_status
         }
 
-    def create_class_google_wallet(self, data={}, qr_code='6810f4026d0667ebf41d9a11'):
-        google_wallet_creds = self.lkf_api.get_user_google_wallet(use_api_key=True, jwt_settings_key=False)
+    def create_class_google_wallet(self, data, qr_code):
         ISSUER_ID = '3388000000022924601'
         CLASS_ID = f'{ISSUER_ID}.passClass-08'
+
+        google_wallet_creds = self.lkf_api.get_user_google_wallet(use_api_key=True, jwt_settings_key=False)
         QR_CODE_VALUE = qr_code
         OBJECT_ID = f'{ISSUER_ID}.pase-entrada-{QR_CODE_VALUE}-{uuid.uuid4()}'
 
@@ -6003,10 +6013,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return response
 
     def create_pass_google_wallet(self, object_id, class_id, qr_code, data, headers, client_email, private_key):
-        nombre = data.get('nombre', 'Alejandro Fernandez')
-        ubicacion = data.get('ubicacion', 'Planta Monterrey')
-        address = data.get('address', 'Av. Revolución 123, Zapata, MX')
-        visita_a = data.get('visita_a', 'Emiliano Zapata')
+        nombre = data.get('nombre', '')
+        ubicacion = data.get('ubicacion', '')
+        address = data.get('address', '')
+        visita_a = data.get('visita_a', '')
 
         object_body = {
             "genericType": "GENERIC_ENTRY_TICKET",
@@ -6019,31 +6029,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             },
             'cardTitle': {
                 'defaultValue': {
-                    'language': 'en-US',
+                    'language': 'es-MX',
                     'value': 'Pase de Entrada'
                 }
             },
             "subheader": {
                 'defaultValue': {
-                    'language': 'en-US',
+                    'language': 'es-MX',
                     'value': f"Visita a: {visita_a}"
                 }
             },
             'header': {
                 'defaultValue': {
-                    'language': 'en-US',
+                    'language': 'es-MX',
                     'value': nombre
                 }
             },
             'logo': {
                 'sourceUri': {
                     'uri':
-                        'https://f001.backblazeb2.com/file/app-linkaform/public-client-126/68600/6076166dfd84fa7ea446b917/2025-04-28T11:11:42.png'
+                        'https://f001.backblazeb2.com/file/app-linkaform/public-client-126/68600/6076166dfd84fa7ea446b917/2025-05-12T08:19:51.png'
                 },
                 'contentDescription': {
                     'defaultValue': {
-                        'language': 'en-US',
-                        'value': 'Generic card logo'
+                        'language': 'es-MX',
+                        'value': 'Soter Logo'
                     }
                 }
             },
@@ -6052,27 +6062,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 {
                     "header": "Ubicación",
                     "body": ubicacion,
-                    "id": "123"
+                    "id": "ubication_field"
                 },
                 {
                     "header": "Dirección",
                     "body": address,
-                    "id": "124"
+                    "id": "address_field"
                 },
                 {
                     "header": "Visita a",
                     "body": visita_a,
-                    "id": "125"
+                    "id": "visit_field"
                 }
-            ],
-            "validTimeInterval": {
-                "start": {
-                    "date": data.get("start_time", "2025-05-09T17:00:00Z")
-                },
-                "end": {
-                    "date": data.get("end_time", "2025-05-09T17:40:00Z")
-                }
-            }
+            ]
         }
 
         requests.post(
@@ -6087,7 +6089,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "origins": [],
             "typ": "savetowallet",
             "payload": {
-                "eventTicketObjects": [
+                "genericObjects": [
                     {"id": object_id}
                 ]
             }
