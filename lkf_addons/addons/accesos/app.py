@@ -992,7 +992,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         
         diasDisponibles = access_pass.get("limitado_a_dias", [])
         dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
-        hoy = datetime.now()
+        tz = pytz.timezone("America/Mexico_City")
+        hoy = datetime.now(tz)
         dia_semana = hoy.weekday()
         nombre_dia = dias_semana[dia_semana]
 
@@ -1003,7 +1004,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         if diasDisponibles:
             if nombre_dia not in diasDisponibles:
-                self.LKFException({'msg':"No se permite realizar ingresos este día.","title":'Revisa la Configuración'})
+                dias_capitalizados = [dia.capitalize() for dia in diasDisponibles]
+
+                if len(dias_capitalizados) > 1:
+                    dias_formateados = ', '.join(dias_capitalizados[:-1]) + ' y ' + dias_capitalizados[-1]
+                else:
+                    dias_formateados = dias_capitalizados[0]
+
+                self.LKFException({
+                        'msg': f"Este pase no te permite ingresar hoy {nombre_dia.capitalize()}. Solo tiene acceso los siguientes dias: {dias_formateados}",
+                        "title":'Aviso'
+                    })
         
         limite_acceso = access_pass.get('limite_de_acceso')
         if len(total_entradas) > 0 and limite_acceso and int(limite_acceso) > 0:
