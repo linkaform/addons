@@ -154,7 +154,6 @@ class Location(Base):
             f"answers.{self.f['area']}":area,
             f"answers.{self.f['area_state']}":state,
         }
-        res = self.format_cr(self.cr.find(match_query, {f"answers.{self.f['area_status']}":1}), get_one=True)
-        ans = res.get('answers',{})
-        res = ans.get(self.f['area_status'], 'No Configurada')
+        response = self.format_cr(self.cr.find(match_query, {f"answers.{self.f['area_status']}":1}), get_one=True)
+        res = response.get('area_status', 'No Configurada')
         return res.title()
