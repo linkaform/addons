@@ -2424,6 +2424,32 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res.append(row)
         return res
 
+    def format_vehiculos_simple(self, data):
+        res = []
+        for v in data:
+            row = {}
+            row['color'] = v.get('color_vehiculo','') or v.get('color','') or ''
+            row['placas'] = v.get('placas_vehiculo','') or v.get('placas','') or ''
+            row['tipo'] = v.get('tipo_vehiculo','') or v.get('tipo','') or ''
+            row['marca'] = v.get('marca_vehiculo','') or ''
+            row['modelo'] = v.get('modelo_vehiculo','') or ''
+            row['estado'] = v.get('nombre_estado','') or ''
+            res.append(row)
+        return res
+
+    def format_equipos_simple(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['modelo'] = r.get('modelo_articulo','') or ''
+            row['marca'] = r.get('marca_articulo','') or ''
+            row['serie'] = r.get('numero_serie','') or ''
+            row['nombre'] = r.get('nombre_articulo','') or ''
+            row['tipo'] = r.get('tipo_equipo','').title() or ''
+            row['color'] = r.get('color_articulo','').title() or ''
+            res.append(row)
+        return res
+
     def format_vehiculos_last_move(self, data):
         res = []
         for v in data:
@@ -4506,14 +4532,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             access_pass = self.get_detail_access_pass(qr_code)
             if not last_move or last_move.get('status_visita') == 'salida':
                 tipo_movimiento = 'Entrada'
-                access_pass['grupo_vehiculos'] = access_pass.get('grupo_vehiculos',[])
-                access_pass['grupo_equipos'] = access_pass.get('grupo_equipos',[])
+                access_pass['grupo_vehiculos'] = self.format_vehiculos_simple(access_pass.get('grupo_vehiculos',[]))
+                access_pass['grupo_equipos'] = self.format_equipos_simple(access_pass.get('grupo_equipos',[]))
+                print("entrada",access_pass['grupo_vehiculos'])
             else:
                 gafete_info['gafete_id'] = last_move.get('gafete_id')
                 gafete_info['locker_id'] = last_move.get('locker_id')
-                access_pass['grupo_vehiculos'] = self.format_vehiculos_last_move(last_move.get('vehiculos',[]))
-                access_pass['grupo_equipos'] = last_move.get('equipos',[])
+                access_pass['grupo_vehiculos'] = self.format_vehiculos_simple(last_move.get('vehiculos',[]))
+                access_pass['grupo_equipos'] = self.format_equipos_simple(last_move.get('equipos',[]))
                 tipo_movimiento = 'Salida'
+                print("salida", access_pass['grupo_vehiculos'],access_pass['grupo_equipos'])
+                print("last_move", simplejson.dumps(last_move, indent=4))
             #---Last Access
             access_pass['ultimo_acceso'] = last_moves
             access_pass['tipo_movimiento'] = tipo_movimiento
