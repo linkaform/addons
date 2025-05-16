@@ -373,7 +373,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 'answers': answers_to_record
             })
 
-            resp_create = self.lkf_api.post_forms_answers(metadata, jwt_settings_key='APIKEY_JWT_KEY')
+            resp_create = self.lkf_api.post_forms_answers(metadata)
             return resp_create
         new_qty_produced = qty_produced + greenhouse_inventory['answers'].get(self.f['product_lot_produced'], 0)
         new_qty_proyected = qty_proyected + greenhouse_inventory['answers'].get(self.f['product_lot_proyected_qty'], 0)
@@ -393,7 +393,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 })
             #greenhouse_inventory['properties'] = {'kwargs':{'production':qty_produced}}
             #greenhouse_inventory['kwargs'] = {'production':qty_produced}
-        resp_update = self.lkf_api.patch_record(greenhouse_inventory, jwt_settings_key='APIKEY_JWT_KEY')
+        resp_update = self.lkf_api.patch_record(greenhouse_inventory)
         return resp_update
 
     def calc_work_hours(self, data):
@@ -474,8 +474,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 resp_delete = self.lkf_api.delete_catalog_record(
                     self.FORM_CATALOG_DIR[form_id], 
                     info_record_catalog.get('_id'), 
-                    info_record_catalog.get('_rev'), 
-                    jwt_settings_key='APIKEY_JWT_KEY')
+                    info_record_catalog.get('_rev'))
                 return resp_delete
 
     def detail_stock_moves(self, warehouse=None, move_type=[], product_code=None, lot_number=None,  location=None, date_from=None, date_to=None, status='done', **kwargs):
@@ -934,7 +933,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 mango_query = self.plant_recipe_query(all_codes, "Ln72", "S4", recipe_type)
             else:
                 mango_query = self.plant_recipe_query(all_codes, "S4", "S3", recipe_type)
-            recipe_s4 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query, jwt_settings_key='APIKEY_JWT_KEY')
+            recipe_s4 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query)
         if recipe_s2 and not recipe:
             for this_recipe in recipe_s2:
                 plant_code = this_recipe.get(self.f['product_code'])
@@ -1225,7 +1224,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             mango_query['selector']['answers'].update({self.f['cat_stock_folio']:self.folio})
         else:
             mango_query['selector']['answers'].update({self.f['inventory_status']: "Done"})
-        res = self.lkf_api.search_catalog( self.FORM_CATALOG_DIR[self.form_id], mango_query, jwt_settings_key='APIKEY_JWT_KEY')
+        res = self.lkf_api.search_catalog( self.FORM_CATALOG_DIR[self.form_id], mango_query)
         return res
 
     def get_record_catalog(self,  folio ):
@@ -1236,7 +1235,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                 ]}},
             "limit":1,
             "skip":0}
-        res = self.lkf_api.search_catalog( self.CATALOG_INVENTORY_ID, mango_query, jwt_settings_key='APIKEY_JWT_KEY')
+        res = self.lkf_api.search_catalog( self.CATALOG_INVENTORY_ID, mango_query
+)
         return res
 
     def get_stock_query(self, query_dict):
@@ -1866,7 +1866,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
     def process_record_to_catalog(self, current_record ):
         # Obtengo los campos de la forma
-        form_fields = self.lkf_api.get_form_id_fields(current_record['form_id'], jwt_settings_key='APIKEY_JWT_KEY')
+        form_fields = self.lkf_api.get_form_id_fields(current_record['form_id'])
         fields = form_fields[0]['fields']
         # Obtengo solo los índices que necesito de cada campo
         info_fields = [{k:n[k] for k in ('label','field_type','field_id','groups_fields','group','options','catalog_fields','catalog') if k in n} for n in fields]
@@ -1883,7 +1883,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                     self.answers[ field_id ] = val_catalog_answers
 
         # Obtengo los campos del catalogo
-        catalog_fields = self.lkf_api.get_catalog_id_fields( self.CATALOG_INVENTORY_ID, jwt_settings_key='APIKEY_JWT_KEY' )
+        catalog_fields = self.lkf_api.get_catalog_id_fields( self.CATALOG_INVENTORY_ID )
         info_catalog = catalog_fields.get('catalog', {})
         fields = info_catalog['fields']
         dict_idfield_typefield = { \
@@ -1924,17 +1924,17 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
 
             if self.answers.get(self.f['product_lot_actuals'], 1) <= 0:
                 # Se elimina el registro del catalogo
-                response_delete_catalog = self.lkf_api.delete_catalog_record(self.CATALOG_INVENTORY_ID, info_record_catalog.pop('_id'), info_record_catalog.pop('_rev'), jwt_settings_key='APIKEY_JWT_KEY')
+                response_delete_catalog = self.lkf_api.delete_catalog_record(self.CATALOG_INVENTORY_ID, info_record_catalog.pop('_id'), info_record_catalog.pop('_rev'))
                 return True
 
             info_record_catalog.update(dict_answers_to_catalog)
 
 
             catalogo_metadata.update({'record_id': info_record_catalog.pop('_id'), '_rev': info_record_catalog.pop('_rev'), 'answers': info_record_catalog})
-            response_update_catalog = self.lkf_api.bulk_patch_catalog([catalogo_metadata,], self.CATALOG_INVENTORY_ID, jwt_settings_key='APIKEY_JWT_KEY')
+            response_update_catalog = self.lkf_api.bulk_patch_catalog([catalogo_metadata,], self.CATALOG_INVENTORY_ID)
         else:
             catalogo_metadata.update({'answers': dict_answers_to_catalog})
-            res_crea_cat = self.lkf_api.post_catalog_answers(catalogo_metadata, jwt_settings_key='APIKEY_JWT_KEY')
+            res_crea_cat = self.lkf_api.post_catalog_answers(catalogo_metadata)
         return True
 
     def product_stock_exists(self, product_code, warehouse, location=None, lot_number=None, status=None):
