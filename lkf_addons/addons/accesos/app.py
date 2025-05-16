@@ -40,7 +40,7 @@ import os
 import uuid
 import simplejson, time
 from bson import ObjectId
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time, date
 from copy import deepcopy
 from math import ceil
 import urllib.parse
@@ -2773,28 +2773,73 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['salidas_registradas'] = salidas
             res['personas_dentro'] = personas_dentro
         elif page == 'Incidencias':
-            #Incidentes por dia
+            #Incidentes por dia, por semana y por mes
+            now = datetime.now(pytz.timezone("America/Mexico_City"))
+            today_date = now.date()
+
             query_incidentes = [
                 {'$match': {
                     "deleted_at": {"$exists": False},
                     "form_id": self.BITACORA_INCIDENCIAS,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
-                    f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
                 }},
-                {'$project': {
-                    '_id': 1,
+                {'$addFields': {
+                    'fecha_incidencia': {
+                        '$dateFromString': {
+                            'dateString': f"$answers.{self.incidence_fields['fecha_hora_incidencia']}",
+                            'format': "%Y-%m-%d %H:%M:%S"
+                        }
+                    }
                 }},
-                {'$group': {
-                    '_id': None,
-                    'incidentes_x_dia': {'$sum': 1}
+                {'$facet': {
+                    'por_dia': [
+                        {'$match': {
+                            'fecha_incidencia': {
+                                '$gte': datetime.combine(today_date, time.min),
+                                '$lte': datetime.combine(today_date, time.max)
+                            }
+                        }},
+                        {'$count': 'incidentes_x_dia'}
+                    ],
+                    'por_semana': [
+                        {'$match': {
+                            'fecha_incidencia': {
+                                '$gte': datetime.combine(today_date - timedelta(days=6), time.min),
+                                '$lte': datetime.combine(today_date, time.max)
+                            }
+                        }},
+                        {'$group': {
+                            '_id': {
+                                'year': {'$isoWeekYear': '$fecha_incidencia'},
+                                'week': {'$isoWeek': '$fecha_incidencia'}
+                            },
+                            'incidentes_x_semana': {'$sum': 1}
+                        }}
+                    ],
+                    'por_mes': [
+                        {'$match': {
+                            'fecha_incidencia': {
+                                '$gte': datetime.combine(today_date.replace(day=1), time.min),
+                                '$lte': datetime.combine(today_date, time.max)
+                            }
+                        }},
+                        {'$group': {
+                            '_id': {
+                                'year': {'$year': '$fecha_incidencia'},
+                                'month': {'$month': '$fecha_incidencia'}
+                            },
+                            'incidentes_x_mes': {'$sum': 1}
+                        }}
+                    ]
                 }}
             ]
 
-            resultado = self.format_cr(self.cr.aggregate(query_incidentes))
-            incidentes_x_dia = resultado[0]['incidentes_x_dia'] if resultado else 0
+            resultado = self.format_cr(self.cr.aggregate(query_incidentes))[0]
 
-            res['incidentes_x_dia'] = incidentes_x_dia
+            res['incidentes_x_dia'] = resultado['por_dia'][0]['incidentes_x_dia'] if resultado['por_dia'] else 0
+            res['incidentes_x_semana'] = resultado['por_semana'][0]['incidentes_x_semana'] if resultado['por_semana'] else 0
+            res['incidentes_x_mes'] = resultado['por_mes'][0]['incidentes_x_mes'] if resultado['por_mes'] else 0
 
             #Fallas pendientes
             query_fallas = [
@@ -2804,7 +2849,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
                     f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
-                    # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
                 }},
                 {'$project': {
                     '_id': 1,
