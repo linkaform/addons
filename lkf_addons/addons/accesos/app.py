@@ -732,12 +732,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if vehiculos:
             list_vehiculos = []
             for item in vehiculos:
-                tipo = item.get('tipo_vehiculo','')
-                marca = item.get('marca_vehiculo','')
-                modelo = item.get('modelo_vehiculo','')
-                estado = item.get('nombre_estado','')
-                placas = item.get('placas_vehiculo','')
-                color = item.get('color_vehiculo','')
+                tipo = item.get('tipo','')
+                marca = item.get('marca','')
+                modelo = item.get('modelo','')
+                estado = item.get('estado','')
+                placas = item.get('vehiculo','')
+                color = item.get('color','')
                 list_vehiculos.append({
                     self.TIPO_DE_VEHICULO_OBJ_ID:{
                         self.mf['tipo_vehiculo']:tipo,
@@ -757,12 +757,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if equipos:
             list_equipos = []
             for item in equipos:
-                tipo = item.get('tipo_equipo','').lower().replace(' ', '_')
-                nombre = item.get('nombre_articulo','')
-                marca = item.get('marca_articulo','')
-                modelo = item.get('modelo_articulo','')
-                color = item.get('color_articulo','')
-                serie = item.get('numero_serie','')
+                tipo = item.get('tipo','').lower().replace(' ', '_')
+                nombre = item.get('nombre','')
+                marca = item.get('marca','')
+                modelo = item.get('modelo','')
+                color = item.get('color','')
+                serie = item.get('serie','')
                 list_equipos.append({
                     self.mf['tipo_equipo']:tipo,
                     self.mf['nombre_articulo']:nombre,
@@ -1053,6 +1053,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }
             # self.update_pase_entrada(values, record_id=[str(access_pass['_id']),])
         res = self._do_access(access_pass, location, area, data)
+        return res
 
     def do_checkin(self, location, area, employee_list=[]):
         # Realiza el check-in en una ubicación y área específica.
