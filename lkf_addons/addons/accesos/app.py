@@ -306,7 +306,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
             'walkin':'66c4261351cc14058b020d48',
             'email_visita_a': '638a9a7767c332f5d459fc82',
-            'telefono_visita_a': '67be0c43a31e5161c47f2bba'
+            'telefono_visita_a': '67be0c43a31e5161c47f2bba',
+            'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
+            'acepto_aviso_datos_personales': '6827488724317731cb288117',
+            'conservar_datos_por': '6827488724317731cb288118'
         }
         self.mf = mf
         ## Form Fields ##
@@ -565,7 +568,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'walkin_nombre':'662c2937108836dec6d92580',
             'walkin_telefono':'662c2937108836dec6d92582',
             'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",    
-            'favoritos':'674642e2d53ce9476994dd89',    
+            'favoritos':'674642e2d53ce9476994dd89',  
+            'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
+            'acepto_aviso_datos_personales': '6827488724317731cb288117',
+            'conservar_datos_por': '6827488724317731cb288118'  
         }
         self.pase_grupo_visitados:{
         }
@@ -3113,7 +3119,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}",
                 'link': f"$answers.{self.pase_entrada_fields['link']}",
                 'google_wallet_pass_url': f"$answers.{self.pase_entrada_fields['google_wallet_pass_url']}",
-                'pdf_to_img': f"$answers.{self.pase_entrada_fields['pdf_to_img']}"
+                'pdf_to_img': f"$answers.{self.pase_entrada_fields['pdf_to_img']}",
+                'acepto_aviso_privacidad': f"$answers.{self.pase_entrada_fields['acepto_aviso_privacidad']}",
+                'acepto_aviso_datos_personales': f"$answers.{self.pase_entrada_fields['acepto_aviso_datos_personales']}",
+                'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
                 },
             },
             {'$sort':{'folio':-1}},
@@ -5350,7 +5359,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             elif key == "pdf_to_img":
                 answers.update({f"{self.pase_entrada_fields[key]}": value})
             elif key == 'favoritos':
-                answers.update({f"{self.pase_entrada_fields[key]}": [value]})    
+                answers.update({f"{self.pase_entrada_fields[key]}": [value]})  
+            elif key == 'conservar_datos_por':
+                answers.update({f"{self.pase_entrada_fields[key]}": value.replace(" ", "_")})      
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
 
