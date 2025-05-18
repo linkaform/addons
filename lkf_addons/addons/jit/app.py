@@ -656,6 +656,7 @@ class JIT(Base):
                     'product_code':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}',
                     'sku':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["sku"]}',
                     'standar_pack':f'$answers.{self.mf["rutas_group"]}.{self.mf["standar_pack"]}',
+                    'unit_of_measure':f'$answers.{self.mf["rutas_group"]}.{self.UOM_OBJ_ID}.{self.f["uom"]}',
                     'warehouse':f'$answers.{self.mf["rutas_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse"]}',
                     'warehouse_location':f'$answers.{self.mf["rutas_group"]}.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f["warehouse_location"]}',
                     'warehouse_dest':f'$answers.{self.mf["rutas_group"]}.{self.WH.WAREHOUSE_LOCATION_DEST_OBJ_ID}.{self.f["warehouse_dest"]}',
