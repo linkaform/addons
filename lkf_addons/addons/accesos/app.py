@@ -40,16 +40,23 @@ import os
 import uuid
 import simplejson, time
 from bson import ObjectId
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time, date
 from copy import deepcopy
 from math import ceil
 import urllib.parse
+from google.oauth2 import service_account
+from google.auth.transport.requests import Request
+import requests
+import jwt
 
 from linkaform_api import base
 from lkf_addons.addons.employee.app import Employee
 from lkf_addons.addons.activo_fijo.app import Vehiculo
 from lkf_addons.addons.location.app import Location
 import arrow
+
+from pdf2image import convert_from_bytes
+from zipfile import ZipFile
 ### Objeto o Clase de Módulo ###
 '''
 Cada módulo puede tener múltiples objetos, configurados en clases.
@@ -299,7 +306,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
             'walkin':'66c4261351cc14058b020d48',
             'email_visita_a': '638a9a7767c332f5d459fc82',
-            'telefono_visita_a': '67be0c43a31e5161c47f2bba'
+            'telefono_visita_a': '67be0c43a31e5161c47f2bba',
+            'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
+            'acepto_aviso_datos_personales': '6827488724317731cb288117',
+            'conservar_datos_por': '6827488724317731cb288118'
         }
         self.mf = mf
         ## Form Fields ##
@@ -527,6 +537,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'nombre_tipo_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.66297e1579900d9018c886ad",
             'nombre_perfil':f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'nombre_visitante_registrado': '5ea0693a0c12d5a8e43d37df',
+            'pdf_to_img': '682222d27e0ea505751e17b4',
             'perfil_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.661dc67e901906b7e9b73bac",
             'perfil_pase_id':f"661dc67e901906b7e9b73bac",
             'requerimientos_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e5",
@@ -537,6 +548,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'email_pase':'662c2937108836dec6d92581',
             'empresa_pase':'66357d5e4f00f9018ce97ce9',
             'grupo_equipos':'663e446cadf967542759ebbb',
+            'google_wallet_pass_url': '6820df5a6cfcee960fb4275c',
             'fecha_hasta_pase':'662c304fad7432d296d92583',
             'grupo_instrucciones_pase':'65e0a68a06799422eded24aa',
             'nombre_pase':'662c2937108836dec6d92580',
@@ -556,7 +568,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'walkin_nombre':'662c2937108836dec6d92580',
             'walkin_telefono':'662c2937108836dec6d92582',
             'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",    
-            'favoritos':'674642e2d53ce9476994dd89',    
+            'favoritos':'674642e2d53ce9476994dd89',  
+            'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
+            'acepto_aviso_datos_personales': '6827488724317731cb288117',
+            'conservar_datos_por': '6827488724317731cb288118'  
         }
         self.pase_grupo_visitados:{
         }
@@ -723,12 +738,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if vehiculos:
             list_vehiculos = []
             for item in vehiculos:
-                tipo = item.get('tipo_vehiculo','')
-                marca = item.get('marca_vehiculo','')
-                modelo = item.get('modelo_vehiculo','')
-                estado = item.get('nombre_estado','')
-                placas = item.get('placas_vehiculo','')
-                color = item.get('color_vehiculo','')
+                tipo = item.get('tipo','')
+                marca = item.get('marca','')
+                modelo = item.get('modelo','')
+                estado = item.get('estado','')
+                placas = item.get('vehiculo','')
+                color = item.get('color','')
                 list_vehiculos.append({
                     self.TIPO_DE_VEHICULO_OBJ_ID:{
                         self.mf['tipo_vehiculo']:tipo,
@@ -748,12 +763,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if equipos:
             list_equipos = []
             for item in equipos:
-                tipo = item.get('tipo_equipo','').lower().replace(' ', '_')
-                nombre = item.get('nombre_articulo','')
-                marca = item.get('marca_articulo','')
-                modelo = item.get('modelo_articulo','')
-                color = item.get('color_articulo','')
-                serie = item.get('numero_serie','')
+                tipo = item.get('tipo','').lower().replace(' ', '_')
+                nombre = item.get('nombre','')
+                marca = item.get('marca','')
+                modelo = item.get('modelo','')
+                color = item.get('color','')
+                serie = item.get('serie','')
                 list_equipos.append({
                     self.mf['tipo_equipo']:tipo,
                     self.mf['nombre_articulo']:nombre,
@@ -983,7 +998,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         
         diasDisponibles = access_pass.get("limitado_a_dias", [])
         dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
-        hoy = datetime.now()
+        tz = pytz.timezone("America/Mexico_City")
+        hoy = datetime.now(tz)
         dia_semana = hoy.weekday()
         nombre_dia = dias_semana[dia_semana]
 
@@ -994,7 +1010,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         if diasDisponibles:
             if nombre_dia not in diasDisponibles:
-                self.LKFException({'msg':"No se permite realizar ingresos este día.","title":'Revisa la Configuración'})
+                dias_capitalizados = [dia.capitalize() for dia in diasDisponibles]
+
+                if len(dias_capitalizados) > 1:
+                    dias_formateados = ', '.join(dias_capitalizados[:-1]) + ' y ' + dias_capitalizados[-1]
+                else:
+                    dias_formateados = dias_capitalizados[0]
+
+                self.LKFException({
+                        'msg': f"Este pase no te permite ingresar hoy {nombre_dia.capitalize()}. Solo tiene acceso los siguientes dias: {dias_formateados}",
+                        "title":'Aviso'
+                    })
         
         limite_acceso = access_pass.get('limite_de_acceso')
         if len(total_entradas) > 0 and limite_acceso and int(limite_acceso) > 0:
@@ -1033,6 +1059,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }
             # self.update_pase_entrada(values, record_id=[str(access_pass['_id']),])
         res = self._do_access(access_pass, location, area, data)
+        return res
 
     def do_checkin(self, location, area, employee_list=[]):
         # Realiza el check-in en una ubicación y área específica.
@@ -2008,7 +2035,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             },
         })
         #---Define Answers
-
         answers = {}
         perfil_pase = access_pass.get('perfil_pase')
         location_name = access_pass.get('ubicacion')
@@ -2037,7 +2063,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
             answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
             answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
-            # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
             answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',"") 
             answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"") 
             answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',"") 
@@ -2140,49 +2165,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
            type(answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']]) == str:
             answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']] = [answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']],]
 
-
-        # elif key == 'grupo_vehiculos':
-        #         list_vehiculos = []
-        #         for item in value:
-        #             tipo = item.get('tipo','')
-        #             marca = item.get('marca','')
-        #             modelo = item.get('modelo','')
-        #             estado = item.get('estado','')
-        #             placas = item.get('placas','')
-        #             color = item.get('color','')
-        #             list_vehiculos.append({
-        #                 self.TIPO_DE_VEHICULO_OBJ_ID:{
-        #                     self.mf['tipo_vehiculo']:tipo,
-        #                     self.mf['marca_vehiculo']:marca,
-        #                     self.mf['modelo_vehiculo']:modelo,
-        #                 },
-        #                 self.ESTADO_OBJ_ID:{
-        #                     self.mf['nombre_estado']:estado,
-        #                 },
-        #                 self.mf['placas_vehiculo']:placas,
-        #                 self.mf['color_vehiculo']:color,
-        #             })
-        #         answers[self.mf['grupo_vehiculos']] = list_vehiculos  
-        #     elif key == 'grupo_equipos':
-        #         list_equipos = []
-        #         for item in value:
-        #             nombre = item.get('nombre','')
-        #             marca = item.get('marca','')
-        #             color = item.get('color','')
-        #             tipo = item.get('tipo','')
-        #             serie = item.get('serie','')
-        #             list_equipos.append({
-        #                 self.mf['tipo_equipo']:tipo,
-        #                 self.mf['nombre_articulo']:nombre,
-        #                 self.mf['marca_articulo']:marca,
-        #                 self.mf['numero_serie']:serie,
-        #                 self.mf['color_articulo']:color,
-        #             })
-        #         answers[self.mf['grupo_equipos']] = list_equipos  
         #---Valor
         metadata.update({'answers':answers})
         res = self.lkf_api.post_forms_answers(metadata)
+        qrcode_to_google_pass = ''
+        id_forma = ''
         if res.get("status_code") ==200 or res.get("status_code")==201:
+            qrcode_to_google_pass = res.get('json', {}).get('id', '')
             link_info=access_pass.get('link', "")
             docs=""
             
@@ -2232,24 +2221,49 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     file_name = respuesta_ics.get('file_name', '')
                     file_url = respuesta_ics.get('file_url', '')
 
-                    access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[]),
-                    "archivo_invitacion": [
-                        {
-                            "file_name": f"{file_name}",
-                            "file_url": f"{file_url}"
-                        }
-                    ]}
+                    access_pass_custom={
+                        "link":link_pass,
+                        "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[]),
+                        "archivo_invitacion": [
+                            {
+                                "file_name": f"{file_name}",
+                                "file_url": f"{file_url}"
+                            }
+                        ]
+                    }
                 else:
-                    # stop_datetime = datetime.strptime(fecha_desde_hasta, "%Y-%m-%d %H:%M:%S")
-                    access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])}
+                    access_pass_custom={
+                        "link":link_pass,
+                        "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])
+                    }
 
-                resUp= self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
-            else:
-                link_pass=""
-            
+                data_to_google_pass = {
+                    "nombre": access_pass.get("nombre"),
+                    "visita_a": access_pass.get("visita_a"),
+                    "ubicacion": access_pass.get("ubicacion"),
+                    "address": address.get('address'),
+                }
 
-            # access_pass_custom={"link":link_pass, "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])}
+                id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
+                pdf = self.lkf_api.get_pdf_record(qrcode_to_google_pass, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
+                pdf_url = pdf.get('json', {}).get('download_url')
 
+                # google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
+                pass_img_url = self.upload_pdf_as_image(id_forma, id_campo_pdf_to_img, pdf_url)
+                pass_img_file_name = pass_img_url.get('file_name')
+                pass_img_file_url = pass_img_url.get('file_url')
+                
+                access_pass_custom.update({
+                    # "google_wallet_pass_url": google_wallet_pass_url,
+                    "pdf_to_img": [
+                        {
+                            "file_name": pass_img_file_name,
+                            "file_url": pass_img_file_url
+                        }
+                    ]
+                })
+                
+                self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
             
         return res
     
@@ -2414,6 +2428,32 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row['marca_vehiculo'] = v.get(self.mf['marca_vehiculo'],'')
             row['modelo_vehiculo'] = v.get(self.mf['modelo_vehiculo'],'')
             row['nombre_estado'] = v.get('state','')
+            res.append(row)
+        return res
+
+    def format_vehiculos_simple(self, data):
+        res = []
+        for v in data:
+            row = {}
+            row['color'] = v.get('color_vehiculo','') or v.get('color','') or ''
+            row['placas'] = v.get('placas_vehiculo','') or v.get('placas','') or ''
+            row['tipo'] = v.get('tipo_vehiculo','') or v.get('tipo','') or ''
+            row['marca'] = v.get('marca_vehiculo','') or ''
+            row['modelo'] = v.get('modelo_vehiculo','') or ''
+            row['estado'] = v.get('nombre_estado','') or ''
+            res.append(row)
+        return res
+
+    def format_equipos_simple(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['modelo'] = r.get('modelo_articulo','') or ''
+            row['marca'] = r.get('marca_articulo','') or ''
+            row['serie'] = r.get('numero_serie','') or ''
+            row['nombre'] = r.get('nombre_articulo','') or ''
+            row['tipo'] = r.get('tipo_equipo','').title() or ''
+            row['color'] = r.get('color_articulo','').title() or ''
             res.append(row)
         return res
 
@@ -2739,28 +2779,73 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['salidas_registradas'] = salidas
             res['personas_dentro'] = personas_dentro
         elif page == 'Incidencias':
-            #Incidentes por dia
+            #Incidentes por dia, por semana y por mes
+            now = datetime.now(pytz.timezone("America/Mexico_City"))
+            today_date = now.date()
+
             query_incidentes = [
                 {'$match': {
                     "deleted_at": {"$exists": False},
                     "form_id": self.BITACORA_INCIDENCIAS,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
-                    f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
                 }},
-                {'$project': {
-                    '_id': 1,
+                {'$addFields': {
+                    'fecha_incidencia': {
+                        '$dateFromString': {
+                            'dateString': f"$answers.{self.incidence_fields['fecha_hora_incidencia']}",
+                            'format': "%Y-%m-%d %H:%M:%S"
+                        }
+                    }
                 }},
-                {'$group': {
-                    '_id': None,
-                    'incidentes_x_dia': {'$sum': 1}
+                {'$facet': {
+                    'por_dia': [
+                        {'$match': {
+                            'fecha_incidencia': {
+                                '$gte': datetime.combine(today_date, time.min),
+                                '$lte': datetime.combine(today_date, time.max)
+                            }
+                        }},
+                        {'$count': 'incidentes_x_dia'}
+                    ],
+                    'por_semana': [
+                        {'$match': {
+                            'fecha_incidencia': {
+                                '$gte': datetime.combine(today_date - timedelta(days=6), time.min),
+                                '$lte': datetime.combine(today_date, time.max)
+                            }
+                        }},
+                        {'$group': {
+                            '_id': {
+                                'year': {'$isoWeekYear': '$fecha_incidencia'},
+                                'week': {'$isoWeek': '$fecha_incidencia'}
+                            },
+                            'incidentes_x_semana': {'$sum': 1}
+                        }}
+                    ],
+                    'por_mes': [
+                        {'$match': {
+                            'fecha_incidencia': {
+                                '$gte': datetime.combine(today_date.replace(day=1), time.min),
+                                '$lte': datetime.combine(today_date, time.max)
+                            }
+                        }},
+                        {'$group': {
+                            '_id': {
+                                'year': {'$year': '$fecha_incidencia'},
+                                'month': {'$month': '$fecha_incidencia'}
+                            },
+                            'incidentes_x_mes': {'$sum': 1}
+                        }}
+                    ]
                 }}
             ]
 
-            resultado = self.format_cr(self.cr.aggregate(query_incidentes))
-            incidentes_x_dia = resultado[0]['incidentes_x_dia'] if resultado else 0
+            resultado = self.format_cr(self.cr.aggregate(query_incidentes))[0]
 
-            res['incidentes_x_dia'] = incidentes_x_dia
+            res['incidentes_x_dia'] = resultado['por_dia'][0]['incidentes_x_dia'] if resultado['por_dia'] else 0
+            res['incidentes_x_semana'] = resultado['por_semana'][0]['incidentes_x_semana'] if resultado['por_semana'] else 0
+            res['incidentes_x_mes'] = resultado['por_mes'][0]['incidentes_x_mes'] if resultado['por_mes'] else 0
 
             #Fallas pendientes
             query_fallas = [
@@ -2770,7 +2855,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
                     f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
-                    # f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": today,"$lt": f"{today}T23:59:59"}
                 }},
                 {'$project': {
                     '_id': 1,
@@ -3033,7 +3117,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'qr_pase': f"$answers.{self.mf['qr_pase']}",
                 'tema_cita': f"$answers.{self.pase_entrada_fields['tema_cita']}",
                 'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}",
-                'link': f"$answers.{self.pase_entrada_fields['link']}"
+                'link': f"$answers.{self.pase_entrada_fields['link']}",
+                'google_wallet_pass_url': f"$answers.{self.pase_entrada_fields['google_wallet_pass_url']}",
+                'pdf_to_img': f"$answers.{self.pase_entrada_fields['pdf_to_img']}",
+                'acepto_aviso_privacidad': f"$answers.{self.pase_entrada_fields['acepto_aviso_privacidad']}",
+                'acepto_aviso_datos_personales': f"$answers.{self.pase_entrada_fields['acepto_aviso_datos_personales']}",
+                'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
                 },
             },
             {'$sort':{'folio':-1}},
@@ -4122,7 +4211,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         pass_selected= self.get_detail_access_pass(qr_code=qr_code)
         answers={}
         for key, value in pass_selected.items():
-            if key == 'nombre' or key == 'email' or key == 'telefono' or key == 'visita_a' or key == 'ubicacion' or key == 'fecha_de_expedicion' or key == 'fecha_de_caducidad' or key == "qr_pase" or key =="_id" or key == "estatus" or key == "foto" or key == "identificacion" or key == "grupo_equipos" or key == "grupo_vehiculos":
+            if key == 'nombre' or key == 'email' or key == 'telefono' or key == 'visita_a' or key == 'ubicacion' or key == 'fecha_de_expedicion' or key == 'fecha_de_caducidad' or key == "qr_pase" or key =="_id" or key == "estatus" or key == "foto" or key == "identificacion" or key == "grupo_equipos" or key == "grupo_vehiculos" or key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
         return answers
@@ -4497,14 +4586,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             access_pass = self.get_detail_access_pass(qr_code)
             if not last_move or last_move.get('status_visita') == 'salida':
                 tipo_movimiento = 'Entrada'
-                access_pass['grupo_vehiculos'] = access_pass.get('grupo_vehiculos',[])
-                access_pass['grupo_equipos'] = access_pass.get('grupo_equipos',[])
+                access_pass['grupo_vehiculos'] = self.format_vehiculos_simple(access_pass.get('grupo_vehiculos',[]))
+                access_pass['grupo_equipos'] = self.format_equipos_simple(access_pass.get('grupo_equipos',[]))
+                print("entrada",access_pass['grupo_vehiculos'])
             else:
                 gafete_info['gafete_id'] = last_move.get('gafete_id')
                 gafete_info['locker_id'] = last_move.get('locker_id')
-                access_pass['grupo_vehiculos'] = self.format_vehiculos_last_move(last_move.get('vehiculos',[]))
-                access_pass['grupo_equipos'] = last_move.get('equipos',[])
+                access_pass['grupo_vehiculos'] = self.format_vehiculos_simple(last_move.get('vehiculos',[]))
+                access_pass['grupo_equipos'] = self.format_equipos_simple(last_move.get('equipos',[]))
                 tipo_movimiento = 'Salida'
+                print("salida", access_pass['grupo_vehiculos'],access_pass['grupo_equipos'])
+                print("last_move", simplejson.dumps(last_move, indent=4))
             #---Last Access
             access_pass['ultimo_acceso'] = last_moves
             access_pass['tipo_movimiento'] = tipo_movimiento
@@ -5262,8 +5354,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers.update({f"{self.pase_entrada_fields[key]}":value.lower()})
             elif key == 'archivo_invitacion':
                 answers.update({f"{self.pase_entrada_fields[key]}": value})
+            elif key == "google_wallet_pass_url":
+                answers.update({f"{self.pase_entrada_fields[key]}": value})
+            elif key == "pdf_to_img":
+                answers.update({f"{self.pase_entrada_fields[key]}": value})
             elif key == 'favoritos':
-                answers.update({f"{self.pase_entrada_fields[key]}": [value]})    
+                answers.update({f"{self.pase_entrada_fields[key]}": [value]})  
+            elif key == 'conservar_datos_por':
+                answers.update({f"{self.pase_entrada_fields[key]}": value.replace(" ", "_")})      
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
 
@@ -5288,6 +5386,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
                 res['json'].update({'asunto':pass_selected.get('tema_cita')})
                 res['json'].update({'descripcion':pass_selected.get('descripcion')})
+                res['json'].update({'pdf_to_img': pass_selected.get('pdf_to_img')})
                 res['json'].update({'pdf': pdf})
                 return res
             else: 
@@ -5940,3 +6039,196 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "email_status": email_status,
             "message_status": message_status
         }
+
+    def create_class_google_wallet(self, data, qr_code):
+        ISSUER_ID = '3388000000022924601'
+        CLASS_ID = f'{ISSUER_ID}.passClass-08'
+
+        google_wallet_creds = self.lkf_api.get_user_google_wallet(use_api_key=True, jwt_settings_key=False)
+        QR_CODE_VALUE = qr_code
+        OBJECT_ID = f'{ISSUER_ID}.pase-entrada-{QR_CODE_VALUE}-{uuid.uuid4()}'
+
+        credentials_data = google_wallet_creds.get('data', {})
+        private_key = credentials_data.get('private_key')
+        client_email = credentials_data.get('client_email')
+
+        credentials = service_account.Credentials.from_service_account_info(
+            credentials_data,
+            scopes=['https://www.googleapis.com/auth/wallet_object.issuer']
+        )
+
+        auth_req = Request()
+        credentials.refresh(auth_req)
+        access_token = credentials.token
+
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Content-Type': 'application/json',
+        }
+
+        class_url = f'https://walletobjects.googleapis.com/walletobjects/v1/genericClass/{CLASS_ID}'
+        class_check = requests.get(class_url, headers={'Authorization': f'Bearer {access_token}'})
+        
+        if class_check.status_code != 200:
+            class_body = {
+                "id": CLASS_ID,
+            }
+            response = requests.post(
+                'https://walletobjects.googleapis.com/walletobjects/v1/genericClass',
+                headers=headers,
+                json=class_body
+            )
+            print("Status code:", response.status_code)
+            print("Response text:", response.text)
+
+        response = self.create_pass_google_wallet(OBJECT_ID, CLASS_ID, QR_CODE_VALUE, data, headers, client_email, private_key)
+        return response
+
+    def create_pass_google_wallet(self, object_id, class_id, qr_code, data, headers, client_email, private_key):
+        nombre = data.get('nombre', '')
+        ubicacion = data.get('ubicacion', '')
+        address = data.get('address', '')
+        visita_a = data.get('visita_a', '')
+
+        object_body = {
+            "genericType": "GENERIC_ENTRY_TICKET",
+            "id": object_id,
+            "classId": class_id,
+            "state": "ACTIVE",
+            "barcode": {
+                "type": "QR_CODE",
+                "value": qr_code,
+            },
+            'cardTitle': {
+                'defaultValue': {
+                    'language': 'es-MX',
+                    'value': 'Pase de Entrada'
+                }
+            },
+            "subheader": {
+                'defaultValue': {
+                    'language': 'es-MX',
+                    'value': f"Visita a: {visita_a}"
+                }
+            },
+            'header': {
+                'defaultValue': {
+                    'language': 'es-MX',
+                    'value': nombre
+                }
+            },
+            'logo': {
+                'sourceUri': {
+                    'uri':
+                        'https://f001.backblazeb2.com/file/app-linkaform/public-client-126/68600/6076166dfd84fa7ea446b917/2025-05-12T08:19:51.png'
+                },
+                'contentDescription': {
+                    'defaultValue': {
+                        'language': 'es-MX',
+                        'value': 'Soter Logo'
+                    }
+                }
+            },
+            'hexBackgroundColor': '#ffffff',
+            "textModulesData": [
+                {
+                    "header": "Ubicación",
+                    "body": ubicacion,
+                    "id": "ubication_field"
+                },
+                {
+                    "header": "Dirección",
+                    "body": address,
+                    "id": "address_field"
+                },
+                {
+                    "header": "Visita a",
+                    "body": visita_a,
+                    "id": "visit_field"
+                }
+            ]
+        }
+
+        requests.post(
+            'https://walletobjects.googleapis.com/walletobjects/v1/genericObject',
+            headers=headers,
+            json=object_body
+        )
+
+        jwt_payload = {
+            "iss": client_email,
+            "aud": "google",
+            "origins": [],
+            "typ": "savetowallet",
+            "payload": {
+                "genericObjects": [
+                    {"id": object_id}
+                ]
+            }
+        }
+
+        signed_jwt = jwt.encode(jwt_payload, private_key, algorithm='RS256')
+        save_url = f'https://pay.google.com/gp/v/save/{signed_jwt}'
+        print('Agrega tu pase con este link:', save_url)
+
+        return save_url
+
+    def upload_pdf_as_image(self, id_forma_seleccionada, id_field, pdf_url, convert_all=False):
+        # 1. Descargar PDF desde la URL
+        try:
+            response = requests.get(pdf_url)
+            response.raise_for_status()
+        except Exception as e:
+            print("Error al descargar el PDF:", e)
+            return {"error": "Fallo al descargar el PDF"}
+
+        # 2. Convertir PDF a imágenes
+        try:
+            images = convert_from_bytes(response.content, dpi=150)
+        except Exception as e:
+            print("Error al convertir el PDF:", e)
+            return {"error": "Fallo al convertir el PDF"}
+
+        temp_dir = tempfile.gettempdir()
+
+        if convert_all and len(images) > 1:
+            # 3a. Guardar todas las imágenes en un archivo ZIP
+            zip_path = os.path.join(temp_dir, "converted_images.zip")
+            with ZipFile(zip_path, 'w') as zipf:
+                for i, img in enumerate(images):
+                    img_path = os.path.join(temp_dir, f"page_{i+1}.png")
+                    img.save(img_path, "PNG")
+                    zipf.write(img_path, arcname=f"page_{i+1}.png")
+                    os.remove(img_path)
+            file_to_upload_path = zip_path
+            filename = "converted_images.zip"
+        else:
+            # 3b. Guardar solo la primera imagen como PNG
+            img_path = os.path.join(temp_dir, "converted_image.png")
+            images[0].save(img_path, "PNG")
+            file_to_upload_path = img_path
+            filename = "converted_image.png"
+
+        rb_file = open(file_to_upload_path, 'rb')
+        dir_file = {'File': rb_file}
+
+        try:
+            upload_data = {'form_id': id_forma_seleccionada, 'field_id': id_field}
+            upload_url = self.lkf_api.post_upload_file(data=upload_data, up_file=dir_file)
+            rb_file.close()
+        except Exception as e:
+            rb_file.close()
+            os.remove(file_to_upload_path)
+            print("Error al subir el archivo:", e)
+            return {"error": "Fallo al subir el archivo"}
+
+        try:
+            file_url = upload_url['data']['file']
+            update_file = {'file_name': filename, 'file_url': file_url}
+        except KeyError:
+            print('No se pudo obtener la URL del archivo')
+            update_file = {"error": "Fallo al obtener la URL del archivo"}
+        finally:
+            os.remove(file_to_upload_path)
+
+        return update_file
