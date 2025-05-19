@@ -4115,6 +4115,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'link':f"$answers.{self.pase_entrada_fields['link']}",
                     'perfil_pase': f"$answers.{self.mf['nombre_perfil']}",
                     'status_pase': f"$answers.{self.pase_entrada_fields['status_pase']}",
+                    'pdf_to_img': f"$answers.{self.pase_entrada_fields['pdf_to_img']}"
                 }
             },
             {'$sort':{'_id':-1}},
