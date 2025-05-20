@@ -2778,6 +2778,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['personal_dentro'] = personal_dentro
             res['salidas_registradas'] = salidas
             res['personas_dentro'] = personas_dentro
+
+            query_paqueteria = [
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.PAQUETERIA,
+                    f"answers.{self.paquetes_fields['estatus_paqueteria']}": "guardado",
+                    f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
+                }},
+                {'$project': {
+                    '_id': 1,
+                }},
+                {'$group': {
+                    '_id': None,
+                    'paquetes_recibidos': {'$sum': 1},
+                }}
+            ]
+
+            resultado_paquetes = self.format_cr(self.cr.aggregate(query_paqueteria))
+            paquetes_recibidos = resultado_paquetes[0]['paquetes_recibidos'] if resultado_paquetes else 0
+
+            res['paquetes_recibidos'] = paquetes_recibidos
+
         elif page == 'Incidencias':
             #Incidentes por dia, por semana y por mes
             now = datetime.now(pytz.timezone("America/Mexico_City"))
@@ -2924,6 +2946,38 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     articulos_perdidos += 1
 
             res['articulos_perdidos'] = articulos_perdidos
+
+            match_query_paqueteria = {
+                "deleted_at": {"$exists": False},
+                "form_id": self.PAQUETERIA,
+                f"answers.{self.paquetes_fields['estatus_paqueteria']}": "guardado",
+            }
+
+            if location:
+                match_query_paqueteria.update({
+                    f"answers.{self.paquetes_fields['ubicacion_paqueteria']}": location,
+                })
+            if booth_area and not booth_area == "todas" and not booth_area == "":
+                match_query_paqueteria.update({
+                    f"answers.{self.paquetes_fields['area_paqueteria']}": booth_area,
+                })
+
+            query_paqueteria = [
+                {'$match': match_query_paqueteria },
+                {'$project': {
+                    '_id': 1,
+                }},
+                {'$group': {
+                    '_id': None,
+                    'paquetes_recibidos': {'$sum': 1},
+                }}
+            ]
+
+            resultado_paquetes = self.format_cr(self.cr.aggregate(query_paqueteria))
+            paquetes_recibidos = resultado_paquetes[0]['paquetes_recibidos'] if resultado_paquetes else 0
+
+            res['paquetes_recibidos'] = paquetes_recibidos
+
         elif page == 'Notas':
             #Notas
             match_query = {
