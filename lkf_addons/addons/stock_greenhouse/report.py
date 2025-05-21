@@ -134,6 +134,17 @@ class Reports(base.LKF_Report, Stock):
                 date_from=date_from, date_to=date_to, **{'result':moves})
         return moves
 
+    def get_dock_moves(self,moves):
+        res = 0 
+        for idx, move_list in moves.items():
+            for move in move_list:
+                if move.get('warehouse_to') == 'dock':
+                    res += move.get('qty_out')
+                elif move.get('warehouse_from') == 'dock':
+                    res -= move.get('qty_out')
+        return res
+
+
     def get_product_kardex(self):
         data = self.data.get('data')
         product_code = data.get('product_code', [])
@@ -159,6 +170,7 @@ class Reports(base.LKF_Report, Stock):
         if not product_code:
             self.LKFException('prduct code is missing...')
         stock = self.get_product_stock(product_code, lot_number=lot_number, date_from=date_from, date_to=date_to)
+        stock_dock = self.get_product_stock(product_code, lot_number=lot_number, warehouse='dock', date_from=date_from, date_to=date_to)
         if not warehouse or warehouse == '':
             warehouse = self.get_warehouse('Stock')
         result = []
@@ -167,6 +179,7 @@ class Reports(base.LKF_Report, Stock):
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         date_since = self.validate_value(date_since)
+        stock_dock = 0
         for idx, wh in enumerate(warehouse):
             # if wh != 'Lab B':
             #     continue
@@ -197,10 +210,11 @@ class Reports(base.LKF_Report, Stock):
                 }
             if warehouse_data.get("balance_table") or warehouse_data.get('serviceHistory'):
                 result.append(warehouse_data)
+            stock_dock += self.get_dock_moves(moves)
             #scrap = self.detail_stock_move(wh)
             #todo_gradinscraping
             # print('moves=', moves)
-        return result, stock.get('actuals',)
+        return result, stock.get('actuals',) - stock_dock
 
     def get_scrap_report(self):
         self.scrap_by_product = {}
