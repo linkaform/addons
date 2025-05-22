@@ -2249,13 +2249,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 pdf = self.lkf_api.get_pdf_record(qrcode_to_google_pass, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
                 pdf_url = pdf.get('json', {}).get('download_url')
 
-                # google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
+                google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
                 pass_img_url = self.upload_pdf_as_image(id_forma, id_campo_pdf_to_img, pdf_url)
                 pass_img_file_name = pass_img_url.get('file_name')
                 pass_img_file_url = pass_img_url.get('file_url')
                 
                 access_pass_custom.update({
-                    # "google_wallet_pass_url": google_wallet_pass_url,
+                    "google_wallet_pass_url": google_wallet_pass_url,
                     "pdf_to_img": [
                         {
                             "file_name": pass_img_file_name,
