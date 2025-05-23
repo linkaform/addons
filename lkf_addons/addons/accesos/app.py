@@ -3175,6 +3175,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'descripcion': f"$answers.{self.pase_entrada_fields['descripcion']}",
                 'link': f"$answers.{self.pase_entrada_fields['link']}",
                 'google_wallet_pass_url': f"$answers.{self.pase_entrada_fields['google_wallet_pass_url']}",
+                'apple_wallet_pass': f"$answers.{self.pase_entrada_fields['apple_wallet_pass']}",
                 'pdf_to_img': f"$answers.{self.pase_entrada_fields['pdf_to_img']}",
                 'acepto_aviso_privacidad': f"$answers.{self.pase_entrada_fields['acepto_aviso_privacidad']}",
                 'acepto_aviso_datos_personales': f"$answers.{self.pase_entrada_fields['acepto_aviso_datos_personales']}",
