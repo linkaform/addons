@@ -549,6 +549,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'empresa_pase':'66357d5e4f00f9018ce97ce9',
             'grupo_equipos':'663e446cadf967542759ebbb',
             'google_wallet_pass_url': '6820df5a6cfcee960fb4275c',
+            'apple_wallet_pass': '682785fbedd82a9104287e25',
             'fecha_hasta_pase':'662c304fad7432d296d92583',
             'grupo_instrucciones_pase':'65e0a68a06799422eded24aa',
             'nombre_pase':'662c2937108836dec6d92580',
@@ -5411,6 +5412,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             elif key == 'archivo_invitacion':
                 answers.update({f"{self.pase_entrada_fields[key]}": value})
             elif key == "google_wallet_pass_url":
+                answers.update({f"{self.pase_entrada_fields[key]}": value})
+            elif key == "apple_wallet_pass":
                 answers.update({f"{self.pase_entrada_fields[key]}": value})
             elif key == "pdf_to_img":
                 answers.update({f"{self.pase_entrada_fields[key]}": value})
