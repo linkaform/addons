@@ -572,7 +572,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'favoritos':'674642e2d53ce9476994dd89',  
             'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
             'acepto_aviso_datos_personales': '6827488724317731cb288117',
-            'conservar_datos_por': '6827488724317731cb288118'  
+            'conservar_datos_por': '6827488724317731cb288118',
+            'ubicaciones':'6834e34fa6242006acedda0f'
         }
         self.pase_grupo_visitados:{
         }
@@ -622,6 +623,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'enviar_correo_pre_registro':'6734c6d5254e9a61df8e7f51',
             'created_by': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'comentario_area_pase':self.mf['commentario_area'],
+            'ubicaciones': '6834e34fa6242006acedda0f'
         })
 
         self.conf_accesos_fields = {
@@ -2058,6 +2060,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
             },
         })
+
         #---Define Answers
         answers = {}
         perfil_pase = access_pass.get('perfil_pase')
@@ -2076,7 +2079,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             nombre_visita_a = access_pass.get('visita_a')
 
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
-        answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
+        # answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
         if access_pass.get('custom') == True :
             answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase',"")
             answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',"")
@@ -2086,7 +2089,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:nombre_visita_a}
             answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
             answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
-            answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
+            # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
             answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',"") 
             answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"") 
             answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',"") 
@@ -2103,6 +2106,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
         answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
         
+        if access_pass.get('ubicaciones'):
+            ubicaciones = access_pass.get('ubicaciones',[])
+            if ubicaciones:
+                ubicaciones_list = []
+                for ubi in ubicaciones:
+                    ubicaciones_list.append(
+                        {
+                            self.pase_entrada_fields['ubicacion_cat']:{ self.mf["ubicacion"] : ubi}
+                        }
+                    )
+                answers.update({self.pase_entrada_fields['ubicaciones']:ubicaciones_list})
+                
         if access_pass.get('comentarios'):
             comm = access_pass.get('comentarios',[])
             if comm:
@@ -5450,7 +5465,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print("ans", simplejson.dumps(answers, indent=4))
         # print(ans)
        
-        # employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
@@ -5461,8 +5476,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
-                # res['json'].update({'enviar_de':employee.get('worker_name')})
-                # res['json'].update({'enviar_de_correo':employee.get('email')})
+                res['json'].update({'enviar_de':employee.get('worker_name')})
+                res['json'].update({'enviar_de_correo':employee.get('email')})
                 res['json'].update({'ubicacion':pass_selected.get('ubicacion')})
                 res['json'].update({'fecha_desde':pass_selected.get('fecha_de_expedicion')})
                 res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
