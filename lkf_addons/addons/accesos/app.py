@@ -2292,7 +2292,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 data_to_google_pass = {
                     "nombre": access_pass.get("nombre"),
                     "visita_a": access_pass.get("visita_a"),
-                    "ubicacion": access_pass.get("ubicacion"),
+                    "ubicacion": access_pass.get("ubicaciones"),
                     "address": address.get('address'),
                 }
 
@@ -3230,6 +3230,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'acepto_aviso_privacidad': f"$answers.{self.pase_entrada_fields['acepto_aviso_privacidad']}",
                 'acepto_aviso_datos_personales': f"$answers.{self.pase_entrada_fields['acepto_aviso_datos_personales']}",
                 'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
+                'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}"
                 },
             },
             {'$sort':{'folio':-1}},
@@ -3276,6 +3277,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
+            ubicaciones = x.get('ubicaciones', [])
+            ubicaciones_format = []
+            for ubicacion in ubicaciones:
+                ubicaciones_format.append(ubicacion.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.mf['ubicacion'], ''))
+            x['ubicaciones'] = ubicaciones_format
         if not x:
             self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
         return x
@@ -6196,7 +6202,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_pass_google_wallet(self, object_id, class_id, qr_code, data, headers, client_email, private_key):
         nombre = data.get('nombre', '')
-        ubicacion = data.get('ubicacion', '')
+        ubicaciones_list = data.get('ubicacion', '')
+        format_ubicacion = self.format_ubicaciones_to_google_pass(ubicaciones_list)
         address = data.get('address', '')
         visita_a = data.get('visita_a', '')
 
@@ -6243,7 +6250,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "textModulesData": [
                 {
                     "header": "Ubicación",
-                    "body": ubicacion,
+                    "body": format_ubicacion,
                     "id": "ubication_field"
                 },
                 {
@@ -6282,6 +6289,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print('Agrega tu pase con este link:', save_url)
 
         return save_url
+    
+    def format_ubicaciones_to_google_pass(self, ubicaciones_list):
+        if not ubicaciones_list:
+            return ''
+        if len(ubicaciones_list) == 1:
+            return self.unlist(ubicaciones_list)
+        if len(ubicaciones_list) == 2:
+            return f"{ubicaciones_list[0]} y {ubicaciones_list[1]}"
+        return ', '.join(ubicaciones_list[:-1]) + ' y ' + ubicaciones_list[-1]
 
     def upload_pdf_as_image(self, id_forma_seleccionada, id_field, pdf_url, convert_all=False):
         # 1. Descargar PDF desde la URL
