@@ -474,7 +474,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'total_deposito_incidencia':'66ec6821ea3c921534b22c30',
             'datos_deposito_incidencia':'66ec6793eb386ff970218f1f',
             'tipo_deposito': '66ec67dc608b1faed7b22c45',
-            'cantidad':'66ec67e42bcc75c3a458778e'
+            'cantidad':'66ec67e42bcc75c3a458778e',
+            'tags':'6834e4e8b0ed467efade7972',
+            'tag':'6834e5220bacdbe44ede794f'
         }
         #- Para creación , edición y lista de gafetes y lockers
         self.gafetes_fields = {
@@ -1907,6 +1909,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             }
                         )
                     answers.update({self.incidence_fields['datos_deposito_incidencia']:depositos_list})
+            elif key == 'tags':
+                tags = data_incidences.get('tags',[])
+                if tags:
+                    tag_list = []
+                    for c in tags:
+                        tag_list.append(
+                            {
+                                self.incidence_fields['tag']:c,
+                            }
+                        )
+                    answers.update({self.incidence_fields['tags']:tag_list})
             elif key == 'prioridad_incidencia':
                 answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
             else:
