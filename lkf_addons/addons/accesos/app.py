@@ -1277,6 +1277,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res['ubicaciones_user'] = ubicaciones
         return res
 
+    def catalogos_pase_location(self):
+        user_id= self.user.get("user_id")
+        res = {}
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.CONF_AREA_EMPLEADOS,
+        }
+        if user_id:
+            match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}"] = user_id
+
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                'area':f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+            }}
+        ]
+        response = self.format_cr_result(self.cr.aggregate(query), get_one=True )
+        ubicaciones = response.get('area', [])
+        ubicaciones = list(set(ubicaciones))
+        res['ubicaciones_user'] = ubicaciones
+        return res
+
     def catalagos_pase_no_jwt(self, qr_code):
         cat_vehiculos= self.catalogo_vehiculos({})
         cat_estados= self.catalogo_estados({})
@@ -5229,12 +5251,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         action = data.get('action', 'create')
         equipos = data.get('equipos', data.get('equipo'))
         if equipos:
-            tipo = equipos.get('tipo_equipo','').lower().replace(' ', '_')
-            nombre = equipos.get('nombre_articulo','')
-            marca = equipos.get('marca_articulo','')
-            modelo = equipos.get('modelo_articulo','')
-            color = equipos.get('color_articulo','')
-            serie = equipos.get('numero_serie','')
+            tipo = equipos.get('tipo','').lower().replace(' ', '_')
+            nombre = equipos.get('nombre','')
+            marca = equipos.get('marca','')
+            modelo = equipos.get('modelo','')
+            color = equipos.get('color','')
+            serie = equipos.get('serie','')
             ans = {
                 self.mf['tipo_equipo']:tipo,
                 self.mf['nombre_articulo']:nombre,
@@ -5250,10 +5272,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         vehiculos = data.get('vehiculo',[])
         if vehiculos:
-            tipo = vehiculos.get('tipo_vehiculo', vehiculos.get('tipo',''))
-            marca = vehiculos.get('marca_vehiculo','')
-            modelo = vehiculos.get('modelo_vehiculo','')
-            estado = vehiculos.get('nombre_estado','')
+            tipo = vehiculos.get('tipo', vehiculos.get('tipo',''))
+            marca = vehiculos.get('marca','')
+            modelo = vehiculos.get('modelo','')
+            estado = vehiculos.get('estado','')
             placas = vehiculos.get('placas',vehiculos.get('placas_vehiculo',''))
             color = vehiculos.get('color',vehiculos.get('color_vehiculo',''))
             ans = {
@@ -5428,7 +5450,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print("ans", simplejson.dumps(answers, indent=4))
         # print(ans)
        
-        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        # employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
@@ -5439,8 +5461,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
-                res['json'].update({'enviar_de':employee.get('worker_name')})
-                res['json'].update({'enviar_de_correo':employee.get('email')})
+                # res['json'].update({'enviar_de':employee.get('worker_name')})
+                # res['json'].update({'enviar_de_correo':employee.get('email')})
                 res['json'].update({'ubicacion':pass_selected.get('ubicacion')})
                 res['json'].update({'fecha_desde':pass_selected.get('fecha_de_expedicion')})
                 res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
