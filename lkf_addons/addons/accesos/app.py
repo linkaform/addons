@@ -215,15 +215,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'fecha_salida':'662c51eb194f1cb7a91e5af0',
             'fecha_entrada':'662c51eb194f1cb7a91e5aef',
             'comentario_pase':'65e0a69a322b61fbf9ed23af',
-            'nombre_area':'663e5d44f5b8a7ce8211ed0f',
-            'nombre_area_salida':'663fb45992f2c5afcfe97ca8',
-            'nombre_ubicacion_salida': '663e5c57f5b8a7ce8211ed0b',
+            'commentario_area': '66af1a77d703592958dca5eb',
             'color_vehiculo': '663e4691f54d395ed7f27465',
             'color_articulo': '663e4730724f688b3059eb3b',
-            'config_dia_de_acceso': '662c304fad7432d296d92584',
-            'config_limitar_acceso': '6635380dc9b3e7db4d59eb49',
-            'config_dias_acceso': '662c304fad7432d296d92585',
             'codigo_qr':'6685da34f065523d8d09052b',
+            'config_dias_acceso': '662c304fad7432d296d92585',
+            'config_limitar_acceso': '6635380dc9b3e7db4d59eb49',
+            'config_dia_de_acceso': '662c304fad7432d296d92584',
             'curp': '5ea0897550b8dfe1f4d83a9f',
             'departamento_empleado': '663bc4ed8a6b120eab4d7f1e',
             'dias_acceso_pase':'662c304fad7432d296d92585',
@@ -243,19 +241,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'fecha_desde_hasta': '662c304fad7432d296d92583',
             'fecha_cetrificado_expedicion': '66427511e93cc23f04f27469',
             'fecha_cetrificado_caducidad': '66427511e93cc23f04f2746a',
-
             'field_note':'6647fadc96f80017ac388648',
             'foto':'5ea35de83ab7dad56c66e045',
             'status_gafete':'663e530af52d352956832f72',
             'status_locker':'663961d5390b9ec511e97ca5',
             'grupo_equipos':'663e446cadf967542759ebbb',
             'grupo_areas_acceso':'663fed6cb8262fd454326cb3',
-            'commentario_area': '66af1a77d703592958dca5eb',
             'grupo_instrucciones_pase':'65e0a68a06799422eded24aa',
             'guard_group':'663fae53fa005c70de59eb95',
+            "grupo_puestos": "663c015f3ac46d98e8f27495",
             'grupo_visitados': '663d4ba61b14fab90559ebb0',
             'grupo_vehiculos': '663e446cadf967542759ebba',
-            "grupo_puestos": "663c015f3ac46d98e8f27495",
+            'grupo_ubicaciones_pase':'6834e34fa6242006acedda0f',
             'identificacion':'65ce34985fa9df3dbf9dd2d0',
             'id_grupo':'639b65dfaf316bacfc551ba2',
             'id_usuario':'638a9a99616398d2e392a9f5',
@@ -267,6 +264,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'motivo':'66ad58a3a5515ee3174f2bb5',
             'nombre_pase':'662c2937108836dec6d92580',
             'nota': '6647fadc96f80017ac388647',
+            'nombre_area':'663e5d44f5b8a7ce8211ed0f',
+            'nombre_area_salida':'663fb45992f2c5afcfe97ca8',
+            'nombre_ubicacion_salida': '663e5c57f5b8a7ce8211ed0b',
             'nombre_articulo': '663e4730724f688b3059eb39',
             'nombre_estado': '663a7dd6e48382c5b12308ff',
             'nombre_empleado': '62c5ff407febce07043024dd',
@@ -1045,8 +1045,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if fecha_caducidad_con_margen < fecha_actual:
             self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
         
-        if access_pass.get("ubicacion") != location:
-            self.LKFException({'msg':"No se puede realizar un ingreso en una ubicación diferente.","title":'Revisa la Configuración'})
+        if location not in access_pass.get("ubicacion",[]):
+            msg = f"La ubicación {location}, no se encuentra en el pase. Pase valido para las siguientes ubicaciones: {access_pass.get('ubicacion',[])}."
+            self.LKFException({'msg':msg,"title":'Revisa la Configuración'})
         
         if self.validate_access_pass_location(qr_code, location):
             self.LKFException("En usuario ya se encuentra dentro de una ubicacion")
@@ -1271,36 +1272,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         query = [
             {'$match': match_query },
+            {'$unwind': f"$answers.{self.mf['areas_grupo']}"},
             {'$project': {
                 'area':f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
-            }}
-        ]
-        response = self.format_cr_result(self.cr.aggregate(query), get_one=True )
-        ubicaciones = response.get('area', [])
-        ubicaciones = list(set(ubicaciones))
-        res['ubicaciones_user'] = ubicaciones
-        return res
-
-    def catalogos_pase_location(self):
-        user_id= self.user.get("user_id")
-        res = {}
-        match_query = {
-            "deleted_at":{"$exists":False},
-            "form_id": self.CONF_AREA_EMPLEADOS,
-        }
-        if user_id:
-            match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}"] = user_id
-
-        query = [
-            {'$match': match_query },
+                'set_as':f"$answers.{self.mf['areas_grupo']}.{self.Employee.f['area_default']}",
+            }},
+            {'$group': {
+                '_id': {
+                    'set_as': '$set_as',
+                    'area': '$area',
+                },
+            }},
             {'$project': {
-                'area':f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+                '_id':0,
+                'area':'$_id.area',
+                'set_as':'$_id.set_as',
             }}
         ]
-        response = self.format_cr_result(self.cr.aggregate(query), get_one=True )
-        ubicaciones = response.get('area', [])
-        ubicaciones = list(set(ubicaciones))
-        res['ubicaciones_user'] = ubicaciones
+        response = self.cr.aggregate(query)
+        res = {'ubicaciones_user':[],'ubicaciones_default':[]}
+        for x in response:
+            if x.get('area') not in res['ubicaciones_user']:
+                res['ubicaciones_user'].append(x.get('area'))
+            if x.get('set_as')  == 'default':
+                if x.get('area') not in res['ubicaciones_default']:
+                    res['ubicaciones_default'].append(x.get('area'))
         return res
 
     def catalagos_pase_no_jwt(self, qr_code):
@@ -1418,8 +1414,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         catalog_id = self.TIPO_ARTICULOS_PERDIDOS_CAT_ID
         form_id = self.BITACORA_OBJETOS_PERDIDOS
         return self.catalogo_view(catalog_id, form_id, options)
-
-    
 
     def check_status_code(self, data_response):
         for item in data_response:
@@ -1973,8 +1967,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers.update({f"{self.notes_fields['note_open_date']}":fecha_hora_str})
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
-
-    
 
     def _get_ics_file(self, meetings=[]):
         _logger = logging.getLogger(__name__)
@@ -3167,7 +3159,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$project': 
                 {'_id':1,
                 'folio': f"$folio",
-                'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+                'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                 'nombre': {"$ifNull":[
                     f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
                     f"$answers.{self.mf['nombre_pase']}"]},
@@ -4000,8 +3992,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.PASE_ENTRADA,
-            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location,
         }
+        
 
         if inActive =="true":
               match_query[f"answers.{self.pase_entrada_fields['status_pase']}"] =  {"$ne": "activo"}
@@ -4010,7 +4002,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         proyect_fields = {'_id':1,
             'folio': f"$folio",
-            'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+            'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
             'nombre': {"$ifNull":[
                 f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
                 f"$answers.{self.mf['nombre_pase']}"]},
@@ -4024,6 +4016,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }
         query = [
             {'$match': match_query },
+            {'$unwind': f"$answers.{self.mf['grupo_ubicaciones_pase']}"},
+            {'$match': {f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location}},
             {'$project': proyect_fields},
             {'$sort':{'_id':-1}},
         ]
@@ -4319,7 +4313,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         pass_selected= self.get_detail_access_pass(qr_code=qr_code)
         answers={}
         for key, value in pass_selected.items():
-            if key == 'nombre' or key == 'email' or key == 'telefono' or key == 'visita_a' or key == 'ubicacion' or key == 'fecha_de_expedicion' or key == 'fecha_de_caducidad' or key == "qr_pase" or key =="_id" or key == "estatus" or key == "foto" or key == "identificacion" or key == "grupo_equipos" or key == "grupo_vehiculos" or key == "google_wallet_pass_url":
+            if key == 'nombre' or \
+               key == 'email' or \
+               key == 'telefono' or \
+               key == 'visita_a' or \
+               key == 'ubicacion' or \
+               key == 'fecha_de_expedicion' or \
+               key == 'fecha_de_caducidad' or \
+               key == "qr_pase" or \
+               key =="_id" or \
+               key == "estatus" or \
+               key == "foto" or \
+               key == "identificacion" or \
+               key == "grupo_equipos" or \
+               key == "grupo_vehiculos" or \
+               key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
         return answers

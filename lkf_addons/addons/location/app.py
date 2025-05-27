@@ -147,10 +147,12 @@ class Location(Base):
         return self.catalogo_view(catalog_id, form_id, options=options)
 
     def get_area_status(self, location, area, state='activa'):
+        if not isinstance(location, list):
+            location = [location]
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.AREAS_DE_LAS_UBICACIONES,
-            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location,
+            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": {"$in": location},
             f"answers.{self.f['area']}":area,
             f"answers.{self.f['area_state']}":state,
         }
