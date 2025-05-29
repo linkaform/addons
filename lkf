@@ -22,7 +22,7 @@ _usage(){
       echo "    Acction & Enviorment"
       echo "      $APP <start|stop> addons     Starts the addons development environment"
       echo "      $APP <start|stop> test       Starts the testing environment"
-      echo "      $APP build <base|dev|local|prod>      Starts the testing environment"
+      echo "      $APP build <base|dev|local|prod|preprod>   Build container for preprod enviorment"
       echo "      $APP restart <preprod|prod> <account_id>  [depricated] use update"
       echo "      $APP update <preprod|prod> <account_id>  Update a given account addons containers image on given environment"
       echo "      $APP test                    Runs all tests"
@@ -234,6 +234,21 @@ _build(){
       fi
       if [ "$UPLOAD" = "1" ]; then
         docker push linkaform/addons:latest
+      fi  
+     ;;
+    preprod)
+      #docker pull linkaform/addons:develop
+      cd docker
+      if [ "$NOCACHE" != "0" ]; then
+        docker compose -f docker-prod.yml build
+      else
+        docker compose -f docker-prod.yml build --no-cache
+      fi
+      echo "Nameing image:  linkaform/addons:develop"
+      docker tag linkaform/addons:latest linkaform/addons:develop
+      if [ "$UPLOAD" = "1" ]; then
+        echo "Uploading image:  linkaform/addons:develop"
+        docker push linkaform/addons:develop
       fi  
      ;;
     test)
