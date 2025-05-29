@@ -2769,6 +2769,52 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                     f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                     f"answers.{self.bitacora_fields['ubicacion']}": location,
+                }},
+                {'$project': {
+                    '_id': 1,
+                    'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
+                    'equipos': {"$ifNull": [f"$answers.{self.mf['grupo_equipos']}", []]},
+                    'perfil': f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",
+                    'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"
+                }},
+                {'$group': {
+                    '_id': None,
+                    'visitas_en_dia': {'$sum': 1},
+                    'total_vehiculos_dentro': {
+                        '$sum': {
+                            '$cond': {
+                                'if': {'$eq': ['$status_visita', 'entrada']},
+                                'then': {'$size': '$vehiculos'},
+                                'else': 0
+                            }
+                        }
+                    },
+                    'total_equipos_dentro': {
+                        '$sum': {
+                            '$cond': {
+                                'if': {'$eq': ['$status_visita', 'entrada']},
+                                'then': {'$size': '$equipos'},
+                                'else': 0
+                            }
+                        }
+                    },
+                    'detalle_visitas': {
+                        '$push': {
+                            'perfil': '$perfil',
+                            'status_visita': '$status_visita'
+                        }
+                    }
+                }}
+            ]
+
+            query_visitas_dia = [
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_ACCESOS,
+                    # f"answers.{self.bitacora_fields['status_visita']}": "entrada",
+                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                    f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
+                    f"answers.{self.bitacora_fields['ubicacion']}": location,
                     f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
                 }},
                 {'$project': {
@@ -2809,10 +2855,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_visitas))
+            resultado_dia = self.format_cr(self.cr.aggregate(query_visitas_dia))
+
             total_vehiculos_dentro = resultado[0]['total_vehiculos_dentro'] if resultado else 0
             total_equipos_dentro = resultado[0]['total_equipos_dentro'] if resultado else 0
-            visitas_en_dia = resultado[0]['visitas_en_dia'] if resultado else 0
-            detalle_visitas = resultado[0]['detalle_visitas'] if resultado else []
+            detalle_visitas_todas = resultado[0]['detalle_visitas'] if resultado else []
+            visitas_en_dia = resultado_dia[0]['visitas_en_dia'] if resultado_dia else 0
+            detalle_visitas = resultado_dia[0]['detalle_visitas'] if resultado_dia else []
 
             personal_dentro = 0
             salidas = 0
@@ -2821,11 +2870,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             for visita in detalle_visitas:
                 status_visita = visita['status_visita'].lower()
 
-                if visita['perfil'][0].lower() != "visita general":
-                    personal_dentro += 1
-
                 if status_visita == "salida":
                     salidas += 1
+
+            for visita in detalle_visitas_todas:
+                status_visita = visita['status_visita'].lower()
 
                 if status_visita == "entrada":
                     personas_dentro += 1
