@@ -41,6 +41,7 @@ import uuid
 import simplejson, time
 from bson import ObjectId
 from datetime import datetime, timedelta, time, date
+import time as time_module
 from copy import deepcopy
 from math import ceil
 import urllib.parse
@@ -744,24 +745,25 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if vehiculos:
             list_vehiculos = []
             for item in vehiculos:
-                tipo = item.get('tipo','')
-                marca = item.get('marca','')
-                modelo = item.get('modelo','')
-                estado = item.get('estado','')
-                placas = item.get('vehiculo','')
-                color = item.get('color','')
-                list_vehiculos.append({
-                    self.TIPO_DE_VEHICULO_OBJ_ID:{
-                        self.mf['tipo_vehiculo']:tipo,
-                        self.mf['marca_vehiculo']:marca,
-                        self.mf['modelo_vehiculo']:modelo,
-                    },
-                    self.ESTADO_OBJ_ID:{
-                        self.mf['nombre_estado']:estado,
-                    },
-                    self.mf['placas_vehiculo']:placas,
-                    self.mf['color_vehiculo']:color,
-                })
+                if item:
+                    tipo = item.get('tipo','')
+                    marca = item.get('marca','')
+                    modelo = item.get('modelo','')
+                    estado = item.get('estado','')
+                    placas = item.get('vehiculo','')
+                    color = item.get('color','')
+                    list_vehiculos.append({
+                        self.TIPO_DE_VEHICULO_OBJ_ID:{
+                            self.mf['tipo_vehiculo']:tipo,
+                            self.mf['marca_vehiculo']:marca,
+                            self.mf['modelo_vehiculo']:modelo,
+                        },
+                        self.ESTADO_OBJ_ID:{
+                            self.mf['nombre_estado']:estado,
+                        },
+                        self.mf['placas_vehiculo']:placas,
+                        self.mf['color_vehiculo']:color,
+                    })
             answers[self.mf['grupo_vehiculos']] = list_vehiculos  
 
         equipos = data.get('equipo',[])
@@ -1210,7 +1212,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             tz_mexico = pytz.timezone('America/Mexico_City')
             now = datetime.now(tz_mexico)
             fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
-            duration = time.strftime('%H:%M:%S', time.gmtime( self.date_2_epoch(fecha_hora_str) - self.date_2_epoch(checkin_date_str)))
+            duration = time_module.strftime('%H:%M:%S', time_module.gmtime(
+                self.date_2_epoch(fecha_hora_str) - self.date_2_epoch(checkin_date_str)
+            ))
             if self.user_in_facility(status_visita=last_check_out.get('status_visita')):
                 answers = {
                     f"{self.mf['tipo_registro']}":'salida',
