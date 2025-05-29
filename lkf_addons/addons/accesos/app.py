@@ -3235,6 +3235,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'acepto_aviso_privacidad': f"$answers.{self.pase_entrada_fields['acepto_aviso_privacidad']}",
                 'acepto_aviso_datos_personales': f"$answers.{self.pase_entrada_fields['acepto_aviso_datos_personales']}",
                 'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
+                'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}"                
                 },
             },
             {'$sort':{'folio':-1}},
@@ -3282,6 +3283,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
             x['ubicacion'] = x.get('ubicacion', [])
+            ubicaciones = x.get('ubicaciones', [])
+            ubicaciones_format = []
+            for ubicacion in ubicaciones:
+                ubicaciones_format.append(ubicacion.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.mf['ubicacion'], ''))
+            x['ubicaciones'] = ubicaciones_format
         if not x:
             self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
         print("x", simplejson.dumps(x, indent=4))
