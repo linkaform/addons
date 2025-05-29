@@ -2009,7 +2009,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if meeting.get("description"):
                 event.add('description').value = meeting["description"]
             if meeting.get("location"):
-                event.add('location').value = meeting["location"]
+                location_value = meeting["location"]
+                if isinstance(location_value, list):
+                    location_value = self.format_ubicaciones_to_google_pass(location_value)
+                event.add('location').value = location_value
             if meeting.get("rrule"):
                 event.add('rrule').value = meeting["rrule"]
 
