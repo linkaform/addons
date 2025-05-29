@@ -4793,6 +4793,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             access_pass['limitado_a_dias']= access_pass.get('limitado_a_dias','')
             access_pass['limitado_a_acceso']= access_pass.get('limite_de_acceso','')
             access_pass['config_dia_de_acceso']=access_pass.get('config_dia_de_acceso',"").replace("_", " ")
+            access_pass['total_entradas'] = self.get_count_ingresos(qr_code)
             if access_pass.get('grupo_areas_acceso'):
                 for area in access_pass['grupo_areas_acceso']:
                     area['status'] = self.get_area_status(access_pass['ubicacion'], area['nombre_area'])
