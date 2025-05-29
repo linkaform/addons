@@ -2261,7 +2261,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             "attendee_ids": [{"email": email, "nombre": nombre}, {"email": creado_por_email, "nombre": visita_a}],
                         }
                     ]
-                    respuesta_ics = self.upload_ics(id_forma, id_campo, meetings=meeting)
+
+                    try:
+                        respuesta_ics = self.upload_ics(id_forma, id_campo, meetings=meeting)
+                    except Exception as e:
+                        print(f"Error al generar o subir el archivo ICS: {e}")
+                        respuesta_ics = {}
+
                     file_name = respuesta_ics.get('file_name', '')
                     file_url = respuesta_ics.get('file_url', '')
 
