@@ -2912,13 +2912,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             now = datetime.now(pytz.timezone("America/Mexico_City"))
             today_date = now.date()
 
-            query_incidentes = [
-                {'$match': {
-                    "deleted_at": {"$exists": False},
-                    "form_id": self.BITACORA_INCIDENCIAS,
-                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
+            match_query_incidentes = {
+                "deleted_at": {"$exists": False},
+                "form_id": self.BITACORA_INCIDENCIAS,
+            }
+
+            if location:
+                match_query_incidentes.update({
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
-                }},
+                })
+            if booth_area:
+                match_query_incidentes.update({
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
+                })
+
+            query_incidentes = [
+                {'$match': match_query_incidentes},
                 {'$addFields': {
                     'fecha_incidencia': {
                         '$dateFromString': {
@@ -2976,15 +2985,24 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res['incidentes_x_semana'] = resultado['por_semana'][0]['incidentes_x_semana'] if resultado['por_semana'] else 0
             res['incidentes_x_mes'] = resultado['por_mes'][0]['incidentes_x_mes'] if resultado['por_mes'] else 0
 
+            match_query_fallas = {
+                "deleted_at": {"$exists": False},
+                "form_id": self.BITACORA_FALLAS,
+                f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
+            }
+
+            if location:
+                match_query_fallas.update({
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
+                })
+            if booth_area:
+                match_query_fallas.update({
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
+                })
+
             #Fallas pendientes
             query_fallas = [
-                {'$match': {
-                    "deleted_at": {"$exists": False},
-                    "form_id": self.BITACORA_FALLAS,
-                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}": booth_area,
-                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}": location,
-                    f"answers.{self.fallas_fields['falla_estatus']}": 'abierto',
-                }},
+                {'$match': match_query_fallas},
                 {'$project': {
                     '_id': 1,
                 }},
