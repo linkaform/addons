@@ -147,13 +147,64 @@ class Location(Base):
         return self.catalogo_view(catalog_id, form_id, options=options)
 
     def get_area_status(self, location, area, state='activa'):
+        if not isinstance(location, list):
+            location = [location]
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.AREAS_DE_LAS_UBICACIONES,
-            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location,
+            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": {"$in": location},
             f"answers.{self.f['area']}":area,
             f"answers.{self.f['area_state']}":state,
         }
         response = self.format_cr(self.cr.find(match_query, {f"answers.{self.f['area_status']}":1}), get_one=True)
         res = response.get('area_status', 'No Configurada')
         return res.title()
+
+
+    def get_area_record_by_name(self, name, select_cols=[], get_one=True):
+        """ Busca area por nombre y regresa registros que cumplan con el nombre. 
+        Si se le solicita select_cols, solo regresa las columnas solicitadas
+        Args:
+            name: Nombre del area
+            select_cols (opcional): lista de nombres o id de los campos deseados
+            get_one (ocpional): La funcion regresa 1 dato al menos que se indique false
+        Returns:
+            record id directo del cr de la base de datos
+        """        
+        select_c = {}
+        if select_cols:
+            for c in select_cols:
+                try:
+                    ObjectId(c)
+                    is_field_id = True
+                except:
+                    is_field_id = False
+                r = f'answers.{c}' if is_field_id else c
+                select_c[r] = 1
+        name_id = self.f['area']
+        if select_c:
+            cr_res = self.cr.find({
+                        'deleted_at': {'$exists': False},
+                        'form_id': self.AREAS_DE_LAS_UBICACIONES,
+                        f'answers.{name_id}':name
+                        }, select_c)
+        else:
+            cr_res = self.cr.find({
+                        'deleted_at': {'$exists': False},
+                        'form_id': self.AREAS_DE_LAS_UBICACIONES,
+                        f'answers.{name_id}':name
+                        })
+        return self.format_cr(cr_res, get_one=get_one)
+
+    def update_status_habitacion(self, name, status):
+        """ Esta funcion actualiza el status de una areas segun su nombre
+        Args:
+            name: nombre del area 
+            status: nuevo status
+        Returns:
+            El resultado directo del patch
+        """
+        status_id = self.f['area_state']
+        answers = {self.f['area_state']:status}
+        record_id = self.get_area_record_by_name(name, ['folio']).get('_id')
+        return self.lkf_api.patch_multi_record( answers = answers, form_id=self.AREAS_DE_LAS_UBICACIONES, record_id=[record_id])

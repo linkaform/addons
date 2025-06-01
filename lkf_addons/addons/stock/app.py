@@ -968,12 +968,12 @@ class Stock(Base):
 
     def get_product_stock(self, product_code, sku=None, lot_number=None, warehouse=None, location=None, date_from=None, date_to=None,  **kwargs):
         #GET INCOME PRODUCT
-        print(f'**************Get Stock: {product_code}****************')
-        print('product_code', product_code)
-        print('sku', sku)
-        print('lot_number', lot_number)
-        print('warehouse', warehouse)
-        print('location', location)
+        # print(f'**************Get Stock: {product_code}****************')
+        # print('product_code', product_code)
+        # print('sku', sku)
+        # print('lot_number', lot_number)
+        # print('warehouse', warehouse)
+        # print('location', location)
         lot_number = self.validate_value(lot_number)
         warehouse = self.validate_value(warehouse)
         location = self.validate_value(location)
@@ -996,7 +996,7 @@ class Stock(Base):
         # print('stock adjustments', stock['adjustments'])
         stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
-        print('--------------------stock', stock['move_out'])
+        # print('--------------------stock', stock['move_out'])
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -1033,7 +1033,7 @@ class Stock(Base):
         stock['scrap_perc']  = 0
         if stock.get('stock_in') and stock.get('scrapped'):
             stock['scrap_perc'] = round(stock.get('scrapped',0)/stock.get('stock_in',1),2)
-        print('stock=', stock)
+        # print('stock=', stock)
         return stock
   
     def get_plant_recipe(self, all_codes, stage=[2,3,4], recipe_type='Main' ):
@@ -2368,7 +2368,7 @@ class Stock(Base):
         unwind = {'$unwind': '$answers.{}'.format(self.f['move_group'])}
         unwind_query = {}
         unwind_stage = []
-        print('move type.............', move_type)
+        # print('move type.............', move_type)
         # print('warehouse', warehouse)
         # print('location', location)
         # print('product_code', product_code)
@@ -2446,7 +2446,7 @@ class Stock(Base):
             {'$sort': {'product_code': 1}}
             ]
         res = self.cr.aggregate(query)
-        print('query=',dumps(query, indent=3))
+        # print('query=',dumps(query, indent=3))
         result = {}
         for r in res:
             pcode = r.get('product_code')

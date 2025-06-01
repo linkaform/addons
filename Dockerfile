@@ -50,6 +50,7 @@ RUN chmod a+x /usr/local/bin/lkfaddons
 RUN pip install --upgrade pip
 RUN pip install -r /tmp/requires.txt
 RUN pip install twilio
+RUN pip install git+https://github.com/Bastian-Kuhn/wallet.git
 WORKDIR /tmp/
 ADD https://f001.backblazeb2.com/file/lkf-resources/backblaze_utils-0.1.tar.gz ./backblaze_utils-0.1.tar.gz 
 RUN pip install backblaze_utils-0.1.tar.gz

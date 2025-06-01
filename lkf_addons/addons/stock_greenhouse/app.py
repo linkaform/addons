@@ -920,7 +920,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         stage = [2,] if stage == 'S2' else stage
         stage = [3,] if stage == 'S3' else stage
         stage = [4,] if stage == 'S4' else stage
-        
         if 2 in stage:
             mango_query = self.plant_recipe_query(all_codes, "S2", "S2", recipe_type)
             recipe_s2 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query)
@@ -928,9 +927,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             mango_query = self.plant_recipe_query(all_codes, "S3", "S2", recipe_type)
             recipe_s3 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query)
         if 4 in stage:
-
             if 'Ln72' in stage:
-                mango_query = self.plant_recipe_query(all_codes, "Ln72", "S4", recipe_type)
+                mango_query = self.plant_recipe_query(all_codes, "S4", "Ln72",  recipe_type)
             else:
                 mango_query = self.plant_recipe_query(all_codes, "S4", "S3", recipe_type)
             recipe_s4 = self.lkf_api.search_catalog(self.CATALOG_PRODUCT_RECIPE_ID, mango_query)
