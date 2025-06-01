@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.orden_compra_contratista_cobre_norte_socio.id }}</form_id>
+    <id>683b1065bacb7d1b6bca31eb</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>683b1065bacb7d1b6bca31e4</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2025-05-29T22:58:18.578858</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.validar_factura_contratista.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.validar_factura_contratista.name }}</name>
+                            <start_date>2025-05-29T22:58:18.576811</start_date>
+                            <updated_at>2025-05-31T14:05:45.897078</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>683b1065bacb7d1b6bca31e5</id>
+            <name>validar factura</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-06-01T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-05-31T14:21:00.804Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>False</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>before</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>f19620000000000000000fc5</field_id>
+                                <group>{}</group>
+                                <label>Estatus de OC</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>validar_factura</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
