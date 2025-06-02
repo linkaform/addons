@@ -2404,6 +2404,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row['fecha_fin'] = r.get(self.incidence_fields['fecha_fin_accion_correctiva_incidencia'],'')
             res.append(row)
         return res
+    
+    def format_tags_incidencias(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['tags'] = r.get(self.incidence_fields['tag'],'')
+            res.append(row)
+        return res
 
     def format_personas_involucradas(self, data):
         res = []
@@ -3998,6 +4006,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'total_deposito_incidencia':f"$answers.{self.incidence_fields['total_deposito_incidencia']}",
                 'datos_deposito_incidencia':f"$answers.{self.incidence_fields['datos_deposito_incidencia']}",
                 'grupo_seguimiento_incidencia':f"$answers.{self.incidence_fields['grupo_seguimiento_incidencia']}",
+                'tags':f"$answers.{self.incidence_fields['tags']}"
             }},
             {'$sort':{'folio':-1}},
         ]
@@ -4009,6 +4018,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
             r['datos_deposito_incidencia'] = self.format_datos_deposito(r.get('datos_deposito_incidencia',[]))
             r['grupo_seguimiento_incidencia'] = self.format_seguimiento_incidencias(r.get('grupo_seguimiento_incidencia',[]))
+            r['tags'] = self.format_tags_incidencias(r.get('tags',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
         
         return result
@@ -5308,6 +5318,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             }
                         )
                     answers.update({self.incidence_fields['datos_deposito_incidencia']:depositos_list})
+            elif key == 'tags':
+                tags = incidencia_seg.get('tags',[])
+                if tags:
+                    tags_list = []
+                    for c in tags:
+                        tags_list.append(
+                            {
+                                self.incidence_fields['tag']:c.get('tags'),
+                            }
+                        )
+                    answers.update({self.incidence_fields['tags']:tags_list})
             elif key == 'incidencia_grupo_seguimiento':
                 incidencias_seguimiento = [incidencia_seg.get('incidencia_grupo_seguimiento',{})]
                 if incidencias_seguimiento:
