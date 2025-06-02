@@ -2248,6 +2248,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 nombre = access_pass.get("nombre")
                 visita_a = access_pass.get("visita_a")
                 email = access_pass.get("email")
+                empresa = access_pass.get("empresa", "")
 
                 start_datetime = datetime.strptime(fecha_desde_visita, "%Y-%m-%d %H:%M:%S")
 
@@ -2300,6 +2301,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "visita_a": access_pass.get("visita_a"),
                     "ubicacion": access_pass.get("ubicaciones"),
                     "address": address.get('address'),
+                    "empresa": empresa
                 }
 
                 id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
@@ -6299,6 +6301,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         format_ubicacion = self.format_ubicaciones_to_google_pass(ubicaciones_list)
         address = data.get('address', '')
         visita_a = data.get('visita_a', '')
+        empresa = data.get('empresa', '')
 
         object_body = {
             "genericType": "GENERIC_ENTRY_TICKET",
@@ -6312,7 +6315,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'cardTitle': {
                 'defaultValue': {
                     'language': 'es-MX',
-                    'value': 'Pase de Entrada'
+                    'value': empresa
                 }
             },
             "subheader": {
