@@ -535,6 +535,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'nombre_permiso':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e4",
             'email_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['email_vista']}",
             'empresa_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['empresa']}",
+            'email':'662c2937108836dec6d92581',
+            'nombre':'662c2937108836dec6d92580',
             'direccion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['direccion']}",
             'foto_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}",
             'foto_pase_id':f"{self.mf['foto']}",
