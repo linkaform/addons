@@ -1792,7 +1792,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def create_enviar_msj_pase(self, folio=None):
         access_pass={"enviar_correo": ["enviar_sms"]}
         res_update= self.update_pass(access_pass=access_pass, folio=folio)
-        print("RES UPDATE", res_update)
         return res_update
 
     def create_enviar_correo(self, data_msj, folio=None, envio=[]):
@@ -3081,7 +3080,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def get_config_accesos(self):
         response = []
-        print("self.user['user_id']",self.user)
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_ACCESOS,
@@ -3271,7 +3269,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['ubicacion'] = x.get('ubicacion', [])
         if not x:
             self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
-        print("x", simplejson.dumps(x, indent=4))
         return x
 
     def get_ids_labels(self, data):
@@ -3347,10 +3344,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
             }}
             ]
-        # print('checkin query=', simplejson.dumps(query, indent=4))
         data = self.format_cr(self.cr.aggregate(query))
         res = {}
-        print("DATAAAA EN GET",data)
         for rec in data:
             status = 'in' if rec.get('checkin_status') in ['in','entrada'] else 'out'
             res[int(rec.get('user_id',0))] = {
@@ -3532,7 +3527,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
         }
-        print("form",self.CONCESSIONED_ARTICULOS)
         if location:
              match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}"] = location
         if area:
@@ -3720,8 +3714,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         query.append({'$limit': limit})
 
         records = self.format_cr(self.cr.aggregate(query))
-        # print( simplejson.dumps(records, indent=4))
-
         count_query = [
             {'$match': match_query},
             {'$count': 'total'}
@@ -3826,7 +3818,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if r:
                 r['falla_grupo_seguimiento_formated'] = self.format_seguimiento_fallas(r.get('falla_grupo_seguimiento',[]))
                 r.pop('falla_grupo_seguimiento', None)
-        print(simplejson.dumps(result, indent=4))
         return result
 
     def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate=""):
@@ -3892,7 +3883,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         ]
         result = self.format_cr_result(self.cr.aggregate(query))
         result = self.format_cr(result)
-        print("++result", simplejson.dumps(result, indent=4))
         for r in result:
             r['personas_involucradas_incidencia'] = self.format_personas_involucradas(r.get('personas_involucradas_incidencia',[]))
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
@@ -4077,7 +4067,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             # if r.get('comentario'):
             #     coment=[]
             #     for c in r['comentario']:
-            #         print('c=',c)
             #         row = {
             #             'comentario':c.get(self.bitacora_fields['comentario']),
             #             'tipo_comentario':c.get(self.bitacora_fields['tipo_comentario'])
@@ -4305,7 +4294,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
 
-        # print("records++", simplejson.dumps(records, indent=4))
         return  records
 
     def get_pdf(self, qr_code, template_id=491, name_pdf='Pase de Entrada'):
@@ -4396,7 +4384,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for x in pr:
             status = x.get('estatus_paqueteria', [])
             x['estatus_paqueteria'] = status.pop() if status else ""
-        print("PRINT",simplejson.dumps(pr, indent=4))
         return pr
     
     def get_range_dates(self, period, zona):
