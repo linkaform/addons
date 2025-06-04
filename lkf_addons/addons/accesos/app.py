@@ -4269,7 +4269,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     '_id': 1,
                     'folio': "$folio",
                     'favoritos':f"$answers.{self.pase_entrada_fields['favoritos']}",
-                    'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+                     'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                    # 'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
                     'nombre': {"$ifNull":[
                         f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
                         f"$answers.{self.mf['nombre_pase']}"]},
@@ -4417,7 +4418,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x.pop('visita_a_puesto', None)
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
-
         return  records
 
     def get_pdf(self, qr_code, template_id=491, name_pdf='Pase de Entrada'):
@@ -5801,8 +5801,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
         answers[self.mf['grupo_visitados']] = []
-        answers[self.UBICACIONES_CAT_OBJ_ID] = {}
-        answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
+        # answers[self.UBICACIONES_CAT_OBJ_ID] = {}
+        # answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
         answers[self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID] = {}
         answers[self.CONFIG_PERFILES_OBJ_ID] = {}
         answers[self.VISITA_AUTORIZADA_CAT_OBJ_ID] = {}
@@ -5898,7 +5898,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
                 answers.update({f"{self.pase_entrada_fields[key]}":link_pass}) 
             elif key == 'ubicacion':
-                answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
+                # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
+                ubicaciones = access_pass.get('ubicacion',[])
+                if ubicaciones:
+                    ubicaciones_list = []
+                    for ubi in ubicaciones:
+                        ubicaciones_list.append(
+                            {
+                                self.pase_entrada_fields['ubicacion_cat']:{ self.mf["ubicacion"] : ubi}
+                            }
+                        )
+                    answers.update({self.pase_entrada_fields['ubicaciones']:ubicaciones_list})
             elif key == 'visita_a': 
                 #Visita A
                 answers[self.mf['grupo_visitados']] = []
