@@ -2095,6 +2095,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        company = employee.get('company', 'Soter')
         nombre_visita_a = employee.get('worker_name')
 
         if(access_pass.get('site', '') == 'accesos'):
@@ -2258,7 +2259,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 nombre = access_pass.get("nombre")
                 visita_a = access_pass.get("visita_a")
                 email = access_pass.get("email")
-                empresa = access_pass.get("empresa", "")
 
                 start_datetime = datetime.strptime(fecha_desde_visita, "%Y-%m-%d %H:%M:%S")
 
@@ -2311,7 +2311,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "visita_a": access_pass.get("visita_a"),
                     "ubicacion": access_pass.get("ubicaciones"),
                     "address": address.get('address'),
-                    "empresa": empresa
+                    "empresa": company
                 }
 
                 id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']

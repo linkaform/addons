@@ -75,6 +75,7 @@ class Employee(Base):
 
         self.employee_fields = {
             'city':'6654187fc85ce22aaf8bb070',
+            'company': f"{self.COMPANY_OBJ_ID}.663a8153e48382c5b1230918",
             'address':'663a7e0fe48382c5b1230902',
             'areas_group':'663cf9d77500019d1359eb9f',
             'department_code':'670f571af57af9032464176e',
