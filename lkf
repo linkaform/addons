@@ -226,6 +226,7 @@ _build(){
     ;;
     prod)
       #docker pull linkaform/addons:develop
+      git pull origin master
       cd docker
       if [ "$NOCACHE" != "0" ]; then
         docker compose -f docker-prod.yml build
