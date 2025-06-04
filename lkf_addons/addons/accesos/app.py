@@ -2792,15 +2792,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         elif page == 'Accesos' or page == 'Bitacoras':
             #Visitas en el dia, personal dentro, vehiculos dentro, salidas registradas y personas dentro
-            query_visitas = [
-                {'$match': {
-                    "deleted_at": {"$exists": False},
-                    "form_id": self.BITACORA_ACCESOS,
-                    # f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+            match_query_one = {
+                "deleted_at": {"$exists": False},
+                "form_id": self.BITACORA_ACCESOS,
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                f"answers.{self.bitacora_fields['ubicacion']}": location,
+            }
+
+            match_query_two = {
+                "deleted_at": {"$exists": False},
+                "form_id": self.BITACORA_ACCESOS,
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                f"answers.{self.bitacora_fields['ubicacion']}": location,
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
+            }
+
+            if not booth_area == 'todas' and booth_area:
+                match_query_one.update({
                     f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
-                    f"answers.{self.bitacora_fields['ubicacion']}": location,
-                }},
+                })
+                match_query_two.update({
+                    f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
+                })
+
+            query_visitas = [
+                {'$match': match_query_one},
                 {'$project': {
                     '_id': 1,
                     'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
@@ -2839,15 +2855,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             ]
 
             query_visitas_dia = [
-                {'$match': {
-                    "deleted_at": {"$exists": False},
-                    "form_id": self.BITACORA_ACCESOS,
-                    # f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
-                    f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
-                    f"answers.{self.bitacora_fields['ubicacion']}": location,
-                    f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
-                }},
+                {'$match': match_query_two},
                 {'$project': {
                     '_id': 1,
                     'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
