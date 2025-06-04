@@ -1214,6 +1214,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
         if not area:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar el area de donde se realizara la salida."})
+        if last_check_out.get('ubicacion_entrada') != location:
+            self.LKFException({"status_code":400, "msg":f"Este usuario ingreso en {location} y no puede salir en {last_check_out.get('ubicacion_entrada')}."})
         if last_check_out.get('folio'):
             folio = last_check_out.get('folio',0)
             checkin_date_str = last_check_out.get('checkin_date')
@@ -3574,6 +3576,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'checkout_date': f"$answers.{self.bitacora_fields['fecha_salida']}",
                 'gafete_id': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
                 'locker_id': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.mf['locker_id']}",
+                'ubicacion_entrada': f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
                 }
             ).sort('updated_at', -1).limit(1)
         return self.format_cr(res, get_one=True)
