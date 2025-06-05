@@ -3225,14 +3225,14 @@ class Stock(Base):
         # if False:
             #trying to move more containeres that there are...
             cont_diff = move_qty - acctual_containers
-            msg = f"There actually only {acctual_containers} containers and you are trying to move {move_qty} containers."
-            msg += f"Check this out...! Your are trying to move {cont_diff} more containers than they are. "
+            msg = f"There actually only {acctual_containers} products and you are trying to move {move_qty} products."
+            msg += f"Check this out...! Your are trying to move {cont_diff} more products than they are. "
             msg += f"If this is the case, please frist make an inventory adjustment of {cont_diff} "
             msg += f"On warehouse {warehouse} at location {location} and lot number {lot_number}"
             msg_error_app = {
                     f"{self.f['inv_move_qty']}": {
                         "msg": [msg],
-                        "label": "Please check your Flats to move",
+                        "label": "Please check your products to move",
                         "error":[]
       
                     }
