@@ -33,6 +33,7 @@ Si tienes más de una aplicación, puedes:
     b. Guardar los archivos a nivel raíz.
     c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
 '''
+from tkinter import NO
 import pytz
 import logging
 import tempfile
@@ -4254,7 +4255,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         res.append(r['perfil'])
         return res
     
-    def get_my_pases(self, tab_status, limit=10, skip=0):
+    def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None):
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         employee['timezone'] = user_data.get('timezone','America/Monterrey')
@@ -4272,6 +4273,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'activo'})
         elif tab_status == "Vencidos":
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'vencido'})
+
+        if search_name:
+            match_query.update({
+                f"$or": [
+                    {f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}": {"$regex": search_name, "$options": "i"}},
+                    {f"answers.{self.mf['nombre_pase']}": {"$regex": search_name, "$options": "i"}}
+                ]
+            })
 
         # Conteo total de registros
         count_query = [
