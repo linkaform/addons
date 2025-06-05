@@ -442,6 +442,20 @@
                             </trigger_field>
                             <value>enviar_correo_pre_registro</value>
                         </item>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>673773741b2adb2d05d99d63</field_id>
+                                <group>{}</group>
+                                <label>Archivo de invitacion</label>
+                                <type>files</type>
+                            </trigger_field>
+                            <value>null</value>
+                        </item>
                     </triggers>
                 </wf_fields>
             </rules>
@@ -725,6 +739,20 @@
                             </trigger_field>
                             <value>Visita General</value>
                         </item>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>673773741b2adb2d05d99d63</field_id>
+                                <group>{}</group>
+                                <label>Archivo de invitacion</label>
+                                <type>files</type>
+                            </trigger_field>
+                            <value>null</value>
+                        </item>
                     </triggers>
                 </wf_fields>
             </rules>
@@ -803,7 +831,7 @@
                     <user>[]</user>
                 </metadata>
                 <record>
-                    <created>True</created>
+                    <created>False</created>
                     <deleted>False</deleted>
                     <edited>True</edited>
                     <run_multiple_times>False</run_multiple_times>
@@ -839,6 +867,20 @@
                                 <type>radio</type>
                             </trigger_field>
                             <value>alta_de_nuevo_visitante</value>
+                        </item>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6732aa1189fc6b0ae27e3824</field_id>
+                                <group>{}</group>
+                                <label>Link</label>
+                                <type>text</type>
+                            </trigger_field>
+                            <value> </value>
                         </item>
                     </triggers>
                 </wf_fields>
@@ -940,6 +982,20 @@
                                 <type>checkbox</type>
                             </trigger_field>
                             <value>enviar_sms</value>
+                        </item>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6732aa1189fc6b0ae27e3824</field_id>
+                                <group>{}</group>
+                                <label>Link</label>
+                                <type>text</type>
+                            </trigger_field>
+                            <value> </value>
                         </item>
                     </triggers>
                 </wf_fields>
@@ -1057,6 +1113,62 @@
                             <value>enviar_sms_pre_registro</value>
                         </item>
                     </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>683a01b4e609cab29a75e8c7</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2025-05-30T20:35:39.717774</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.update_pass_with_utils.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.update_pass_with_utils.name }}</name>
+                            <start_date>2025-05-30T20:35:39.715745</start_date>
+                            <updated_at>2025-05-30T20:35:40.039600</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>Se ejecuta script</name>
+                </item>
+            </actions>
+            <id>683a01b4e609cab29a75e8dd</id>
+            <name>Se actualiza pase con invite, img en png y google wallet url</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-05-31T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-05-30T19:05:53.127Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>False</created>
+                    <deleted>False</deleted>
+                    <edited>False</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
                 </wf_fields>
             </rules>
         </item>

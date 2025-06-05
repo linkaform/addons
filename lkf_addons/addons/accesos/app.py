@@ -33,6 +33,7 @@ Si tienes más de una aplicación, puedes:
     b. Guardar los archivos a nivel raíz.
     c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
 '''
+from tkinter import NO
 import pytz
 import logging
 import tempfile
@@ -2095,6 +2096,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        company = employee.get('company', 'Soter')
         nombre_visita_a = employee.get('worker_name')
 
         if(access_pass.get('site', '') == 'accesos'):
@@ -2258,7 +2260,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 nombre = access_pass.get("nombre")
                 visita_a = access_pass.get("visita_a")
                 email = access_pass.get("email")
-                empresa = access_pass.get("empresa", "")
 
                 start_datetime = datetime.strptime(fecha_desde_visita, "%Y-%m-%d %H:%M:%S")
 
@@ -2311,7 +2312,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "visita_a": access_pass.get("visita_a"),
                     "ubicacion": access_pass.get("ubicaciones"),
                     "address": address.get('address'),
-                    "empresa": empresa
+                    "empresa": company
                 }
 
                 id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
@@ -4254,7 +4255,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         res.append(r['perfil'])
         return res
     
-    def get_my_pases(self, tab_status):
+    def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None):
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         employee['timezone'] = user_data.get('timezone','America/Monterrey')
@@ -4272,6 +4273,24 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'activo'})
         elif tab_status == "Vencidos":
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'vencido'})
+
+        if search_name:
+            match_query.update({
+                f"$or": [
+                    {f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}": {"$regex": search_name, "$options": "i"}},
+                    {f"answers.{self.mf['nombre_pase']}": {"$regex": search_name, "$options": "i"}}
+                ]
+            })
+
+        # Conteo total de registros
+        count_query = [
+            {"$match": match_query},
+            {"$count": "total"}
+        ]
+        count_result = self.format_cr(self.cr.aggregate(count_query))
+        total_count = count_result[0]['total'] if count_result else 0
+        current_page = (skip // limit) + 1
+        total_pages = ceil(total_count / limit) if limit else 1
 
         query = [ 
             {"$match":match_query},
@@ -4347,8 +4366,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
             },
             {'$sort':{'_id':-1}},
-            {'$limit':15}
         ]
+        query.append({'$skip': skip})
+        query.append({'$limit': limit})
         records = self.format_cr(self.cr.aggregate(query))
 
         for x in records:
@@ -4429,7 +4449,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x.pop('visita_a_puesto', None)
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
-        return  records
+
+        return  {
+            "records": records,
+            "total_records": total_count,
+            "total_pages": total_pages,
+            "actual_page": current_page,
+            "records_on_page": len(records)
+        }
 
     def get_pdf(self, qr_code, template_id=491, name_pdf='Pase de Entrada'):
         return self.lkf_api.get_pdf_record(qr_code, template_id = template_id, name_pdf =name_pdf, send_url=True)
