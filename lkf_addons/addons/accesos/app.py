@@ -4440,12 +4440,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             
             x['grupo_vehiculos'] = self.format_vehiculos_simple(x.pop('grupo_vehiculos',[]))
             x['grupo_equipos'] = self.format_equipos_simple(x.pop('grupo_equipos',[]))
-
-            print("equipos", simplejson.dumps(x, indent=4))
-            print("vehiculos",x['grupo_vehiculos'])
-            print(stop)
-            # x['grupo_equipos'] = self.format_equipos(x.pop('grupo_equipos',[]))
-            # x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
             x['comentarios'] = x['grupo_instrucciones_pase']
 
             comentarios = []
