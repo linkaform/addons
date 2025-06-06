@@ -1811,7 +1811,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res_update
 
     def create_enviar_correo(self, data_msj, folio=None, envio=[]):
-        access_pass={"status_pase":"Activo", "enviar_correo": envio}
+        access_pass={"status_pase":"Proceso", "enviar_correo_pre_registro": envio}
         res_update= self.update_pass(access_pass=access_pass, folio=folio)
         # res_update.get('status_code') == 201
         return res_update
