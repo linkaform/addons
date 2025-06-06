@@ -43,10 +43,14 @@ settings = update_settings(settings)
 
 try:
     from local_settings import *
-    # print('loaidng local_settings')
 except Exception as e:
-    print('local_settings... NOT FOUND!!!', e)
+    print('===='*40)
+    print('local_settings... NOT FOUND!!!')
     print('create a file with you own local_settings, just import this file with from  settings import * ')
     print('Then update your config with your own keys')
+    print('Error: ', e)
+    print('Envioroment: ', ENV)
+    print('===='*40)
+
 
 
