@@ -2527,12 +2527,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for v in data:
             row = {}
-            row['color'] = v.get('color_vehiculo','') or v.get('color','') or ''
-            row['placas'] = v.get('placas_vehiculo','') or v.get('placas','') or ''
-            row['tipo'] = v.get('tipo_vehiculo','') or v.get('tipo','') or ''
-            row['marca'] = v.get('marca_vehiculo','') or ''
-            row['modelo'] = v.get('modelo_vehiculo','') or ''
-            row['estado'] = v.get('nombre_estado','') or ''
+            row['color'] = v.get('color_vehiculo','') or v.get('color','') or  v.get(self.mf['color_vehiculo'],'')or ''
+            row['placas'] = v.get('placas_vehiculo','') or v.get('placas','')  or v.get(self.mf['placas_vehiculo'],'')or  ''
+            row['tipo'] = v.get('tipo_vehiculo','') or v.get('tipo','') or v.get(self.mf['tipo_vehiculo'],'') or ''
+            row['marca'] = v.get('marca_vehiculo','') or v.get(self.mf['marca_vehiculo'],'') or ''
+            row['modelo'] = v.get('modelo_vehiculo','') or v.get(self.mf['modelo_vehiculo'],'') or ''
+            row['estado'] = v.get('nombre_estado','')or v.get('state','') or v.get(self.mf['nombre_estado'],'') or ''
             res.append(row)
         return res
 
@@ -2540,12 +2540,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for r in data:
             row = {}
-            row['modelo'] = r.get('modelo_articulo','') or ''
-            row['marca'] = r.get('marca_articulo','') or ''
-            row['serie'] = r.get('numero_serie','') or ''
-            row['nombre'] = r.get('nombre_articulo','') or ''
-            row['tipo'] = r.get('tipo_equipo','').title() or ''
-            row['color'] = r.get('color_articulo','').title() or ''
+            row['modelo'] = r.get('modelo_articulo','')  or r.get(self.mf['marca_articulo'],'') or ''
+            row['marca'] = r.get('marca_articulo','') or r.get(self.mf['marca_articulo'],'') or ''
+            row['serie'] = r.get('numero_serie','') or r.get(self.mf['numero_serie'],'') or''
+            row['nombre'] = r.get('nombre_articulo','') or r.get(self.mf['nombre_articulo'],'') or ''
+            row['tipo'] = r.get('tipo_equipo','').title() or r.get(self.mf['tipo_equipo'],'') or ''
+            row['color'] = r.get('color_articulo','').title() or r.get(self.mf['color_articulo'],'') or ''
             res.append(row)
         return res
 
@@ -4305,7 +4305,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     '_id': 1,
                     'folio': "$folio",
                     'favoritos':f"$answers.{self.pase_entrada_fields['favoritos']}",
-                     'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                    'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                     # 'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
                     'nombre': {"$ifNull":[
                         f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
@@ -4436,8 +4436,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['status_pase'] = x.get('estatus', "")
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
-            x['grupo_equipos'] = self.format_equipos(x.pop('grupo_equipos',[]))
-            x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
+
+            
+            x['grupo_vehiculos'] = self.format_vehiculos_simple(x.pop('grupo_vehiculos',[]))
+            x['grupo_equipos'] = self.format_equipos_simple(x.pop('grupo_equipos',[]))
+
+            print("equipos", simplejson.dumps(x, indent=4))
+            print("vehiculos",x['grupo_vehiculos'])
+            print(stop)
+            # x['grupo_equipos'] = self.format_equipos(x.pop('grupo_equipos',[]))
+            # x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
             x['comentarios'] = x['grupo_instrucciones_pase']
 
             comentarios = []
