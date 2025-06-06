@@ -3220,35 +3220,41 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         ]
         return self.format_cr_result(self.cr.aggregate(query),  get_one=True)
 
-    def get_config_modulo_seguridad(self, ubicacion):
-        response = []
+    def get_config_modulo_seguridad(self, ubicaciones=[]):
+        requerimientos = set()
+        envios = set()
         match_query = {
-            "deleted_at":{"$exists":False},
+            "deleted_at": {"$exists": False},
             "form_id": self.CONF_MODULO_SEGURIDAD,
-            # f"answers.{self.USUARIOS_OBJ_ID}.{self.Employee.f['user_id']}":self.user['user_id'],
-            # f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": ubicacion,
         }
         query = [
             {'$match': match_query},
             {'$project': {
-                # "ubicacion":f"$answers.{self.conf_modulo_seguridad['ubicacion_cat']}.{self.conf_modulo_seguridad['ubicacion']}",
-                "grupo_requisitos":f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
-                # "datos_requeridos": f"$answers.{self.conf_modulo_seguridad['datos_requeridos']}",
+                "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
             }},
         ]
-
-        requerimientos = {}
+    
         raw_result = self.format_cr_result(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
-                if grupo.get("ubicacion", '') == ubicacion:
-                    requerimientos = {
-                        "ubicacion": grupo["ubicacion"],
-                        "requerimientos": grupo.get(self.conf_modulo_seguridad['datos_requeridos'], []),
-                        "envios": grupo.get(self.conf_modulo_seguridad['envio_por'], [])
-                    }
-                
-        return requerimientos
+                ubicacion = grupo.get('ubicacion', '')
+                if ubicacion in ubicaciones:
+                    reqs = grupo.get(self.conf_modulo_seguridad['datos_requeridos'], [])
+                    if isinstance(reqs, list):
+                        requerimientos.update(reqs)
+                    envs = grupo.get(self.conf_modulo_seguridad['envio_por'], [])
+                    if isinstance(envs, list):
+                        envios.update(envs)
+                    if requerimientos == {"identificacion", "fotografia"} and envios == {"correo", "sms"}:
+                        break
+            if requerimientos == {"identificacion", "fotografia"} and envios == {"correo", "sms"}:
+                break
+    
+        return {
+            "ubicaciones": ubicaciones,
+            "requerimientos": list(requerimientos),
+            "envios": list(envios)
+        }
 
     def get_count_ingresos(self, qr_code):
         total_entradas=""
