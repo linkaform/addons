@@ -192,6 +192,9 @@ class Warehouse(Base ,base.LKF_Base):
         self.CATALOG_WAREHOUSE_ID = self.CATALOG_WAREHOUSE.get('id')
         self.CONFIG_ALMACENES = self.lkm.form_id('configuracion_almacenes', 'id')
 
+        self.FORM_WAREHOUSE_ID = self.lkm.form_id('warehouse','id')
+        self.FORM_WAREHOUSE_LOCATION_ID = self.lkm.form_id('warehouse_locations','id')
+
         self.WAREHOUSE = self.lkm.catalog_id('warehouse')
         self.WAREHOUSE_ID = self.WAREHOUSE.get('id')
         self.WAREHOUSE_OBJ_ID = self.WAREHOUSE.get('obj_id')
@@ -231,7 +234,7 @@ class Warehouse(Base ,base.LKF_Base):
 
     def get_warehouse(self, warehouse_type=None):
         mango_query = {
-            "selector":{"_id": {"$gt":None}},
+            "selector":match_query,
             "limit":1000,
             "skip":0
             }
@@ -300,6 +303,24 @@ class Warehouse(Base ,base.LKF_Base):
         return query
 
     def warehouse_type(self, warehouse_name):
+        """
+        Busca el tipo de almacén por nombre en los registros de formularios. 
+        Si no encuentra el tipo de almacén en los registros de los catalogos.
+
+        args:
+            warehouse_name (str): nombre del almacén
+
+        returns:
+            str: tipo de almacén
+        """
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.FORM_WAREHOUSE_ID,
+            f"answers.{self.f['warehouse']}": warehouse_name
+            }
+        res = self.format_cr(self.cr.find(match_query,{f"answers.{self.f['warehouse_type']}":1}), get_one=True)
+        if res.get('warehouse_type'):
+            return res.get('warehouse_type')
         answers = {f"{self.f['warehouse']}":warehouse_name}
         catalog_record = self.lkf_api.search_catalog_answers(self.WAREHOUSE_ID, answers, **{'limit':1})
         if not catalog_record:

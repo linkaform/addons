@@ -33,6 +33,7 @@ Si tienes más de una aplicación, puedes:
     b. Guardar los archivos a nivel raíz.
     c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
 '''
+from tkinter import NO
 import pytz
 import logging
 import tempfile
@@ -477,7 +478,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'tipo_deposito': '66ec67dc608b1faed7b22c45',
             'cantidad':'66ec67e42bcc75c3a458778e',
             'tags':'6834e4e8b0ed467efade7972',
-            'tag':'6834e5220bacdbe44ede794f'
+            'tag':'6834e5220bacdbe44ede794f',
+            'grupo_seguimiento_incidencia': '683de3cfcf4a5d248ffbaf89',
+            'accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed7',
+            'comentario_accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed8',
+            'fecha_inicio_accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed9',
+            'fecha_fin_accion_correctiva_incidencia': '683de45ddcf6fcee78e61eda',
+            'evidencia_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edb',
+            'documento_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edc'
         }
         #- Para creación , edición y lista de gafetes y lockers
         self.gafetes_fields = {
@@ -528,6 +536,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'nombre_permiso':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e4",
             'email_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['email_vista']}",
             'empresa_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['empresa']}",
+            'email':'662c2937108836dec6d92581',
+            'nombre':'662c2937108836dec6d92580',
             'direccion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['direccion']}",
             'foto_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}",
             'foto_pase_id':f"{self.mf['foto']}",
@@ -1205,6 +1215,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
         if not area:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar el area de donde se realizara la salida."})
+        if last_check_out.get('ubicacion_entrada') != location:
+            self.LKFException({"status_code":400, "msg":f"Este usuario ingreso en {location} y no puede salir en {last_check_out.get('ubicacion_entrada')}."})
         if last_check_out.get('folio'):
             folio = last_check_out.get('folio',0)
             checkin_date_str = last_check_out.get('checkin_date')
@@ -1796,7 +1808,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def create_enviar_msj_pase(self, folio=None):
         access_pass={"enviar_correo": ["enviar_sms"]}
         res_update= self.update_pass(access_pass=access_pass, folio=folio)
-        print("RES UPDATE", res_update)
         return res_update
 
     def create_enviar_correo(self, data_msj, folio=None, envio=[]):
@@ -2085,6 +2096,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        company = employee.get('company', 'Soter')
         nombre_visita_a = employee.get('worker_name')
 
         if(access_pass.get('site', '') == 'accesos'):
@@ -2300,6 +2312,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "visita_a": access_pass.get("visita_a"),
                     "ubicacion": access_pass.get("ubicaciones"),
                     "address": address.get('address'),
+                    "empresa": company
                 }
 
                 id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
@@ -2380,6 +2393,27 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row['documento'] = r.get(self.fallas_fields['falla_documento_solucion'],'')
             row['fecha_inicio'] = r.get(self.fallas_fields['falla_inicio_seguimiento'],'')
             row['fecha_fin'] = r.get(self.fallas_fields['falla_fin_seguimiento'],'')
+            res.append(row)
+        return res
+
+    def format_seguimiento_incidencias(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['accion_correctiva'] = r.get(self.incidence_fields['accion_correctiva_incidencia'],'')
+            row['comentario'] = r.get(self.incidence_fields['comentario_accion_correctiva_incidencia'],'')
+            row['evidencia'] = r.get(self.incidence_fields['evidencia_accion_correctiva_incidencia'],'')
+            row['documento'] = r.get(self.incidence_fields['documento_accion_correctiva_incidencia'],'')
+            row['fecha_inicio'] = r.get(self.incidence_fields['fecha_inicio_accion_correctiva_incidencia'],'')
+            row['fecha_fin'] = r.get(self.incidence_fields['fecha_fin_accion_correctiva_incidencia'],'')
+            res.append(row)
+        return res
+    
+    def format_tags_incidencias(self, data):
+        res = []
+        for r in data:
+            row = {}
+            row['tags'] = r.get(self.incidence_fields['tag'],'')
             res.append(row)
         return res
 
@@ -2761,15 +2795,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         elif page == 'Accesos' or page == 'Bitacoras':
             #Visitas en el dia, personal dentro, vehiculos dentro, salidas registradas y personas dentro
-            query_visitas = [
-                {'$match': {
-                    "deleted_at": {"$exists": False},
-                    "form_id": self.BITACORA_ACCESOS,
-                    # f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+            match_query_one = {
+                "deleted_at": {"$exists": False},
+                "form_id": self.BITACORA_ACCESOS,
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                f"answers.{self.bitacora_fields['ubicacion']}": location,
+            }
+
+            match_query_two = {
+                "deleted_at": {"$exists": False},
+                "form_id": self.BITACORA_ACCESOS,
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                f"answers.{self.bitacora_fields['ubicacion']}": location,
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
+            }
+
+            if not booth_area == 'todas' and booth_area:
+                match_query_one.update({
                     f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
-                    f"answers.{self.bitacora_fields['ubicacion']}": location,
-                }},
+                })
+                match_query_two.update({
+                    f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
+                })
+
+            query_visitas = [
+                {'$match': match_query_one},
                 {'$project': {
                     '_id': 1,
                     'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
@@ -2808,15 +2858,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             ]
 
             query_visitas_dia = [
-                {'$match': {
-                    "deleted_at": {"$exists": False},
-                    "form_id": self.BITACORA_ACCESOS,
-                    # f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
-                    f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
-                    f"answers.{self.bitacora_fields['ubicacion']}": location,
-                    f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
-                }},
+                {'$match': match_query_two},
                 {'$project': {
                     '_id': 1,
                     'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
@@ -3162,7 +3204,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def get_config_accesos(self):
         response = []
-        print("self.user['user_id']",self.user)
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_ACCESOS,
@@ -3358,7 +3399,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x['ubicaciones'] = ubicaciones_format
         if not x:
             self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
-        print("x", simplejson.dumps(x, indent=4))
         return x
 
     def get_ids_labels(self, data):
@@ -3434,10 +3474,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
             }}
             ]
-        # print('checkin query=', simplejson.dumps(query, indent=4))
         data = self.format_cr(self.cr.aggregate(query))
         res = {}
-        print("DATAAAA EN GET",data)
         for rec in data:
             status = 'in' if rec.get('checkin_status') in ['in','entrada'] else 'out'
             res[int(rec.get('user_id',0))] = {
@@ -3539,6 +3577,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'checkout_date': f"$answers.{self.bitacora_fields['fecha_salida']}",
                 'gafete_id': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
                 'locker_id': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.mf['locker_id']}",
+                'ubicacion_entrada': f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
                 }
             ).sort('updated_at', -1).limit(1)
         return self.format_cr(res, get_one=True)
@@ -3619,7 +3658,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
         }
-        print("form",self.CONCESSIONED_ARTICULOS)
         if location:
              match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}"] = location
         if area:
@@ -3807,8 +3845,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         query.append({'$limit': limit})
 
         records = self.format_cr(self.cr.aggregate(query))
-        # print( simplejson.dumps(records, indent=4))
-
         count_query = [
             {'$match': match_query},
             {'$count': 'total'}
@@ -3913,10 +3949,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if r:
                 r['falla_grupo_seguimiento_formated'] = self.format_seguimiento_fallas(r.get('falla_grupo_seguimiento',[]))
                 r.pop('falla_grupo_seguimiento', None)
-        print(simplejson.dumps(result, indent=4))
         return result
 
-    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate=""):
+    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_INCIDENCIAS,
@@ -3927,7 +3962,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
              match_query[f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}"] = area
         if prioridades:
             match_query[f"answers.{self.incidence_fields['prioridad_incidencia']}"] = {"$in": prioridades}
-
+        if folio:
+            match_query.update({"folio":folio})
        
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         zona = user_data.get('timezone','America/Monterrey')
@@ -3974,16 +4010,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'notificacion_incidencia':f"$answers.{self.incidence_fields['notificacion_incidencia']}",
                 'total_deposito_incidencia':f"$answers.{self.incidence_fields['total_deposito_incidencia']}",
                 'datos_deposito_incidencia':f"$answers.{self.incidence_fields['datos_deposito_incidencia']}",
+                'grupo_seguimiento_incidencia':f"$answers.{self.incidence_fields['grupo_seguimiento_incidencia']}",
+                'tags':f"$answers.{self.incidence_fields['tags']}"
             }},
             {'$sort':{'folio':-1}},
         ]
         result = self.format_cr_result(self.cr.aggregate(query))
         result = self.format_cr(result)
-        print("++result", simplejson.dumps(result, indent=4))
         for r in result:
             r['personas_involucradas_incidencia'] = self.format_personas_involucradas(r.get('personas_involucradas_incidencia',[]))
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
             r['datos_deposito_incidencia'] = self.format_datos_deposito(r.get('datos_deposito_incidencia',[]))
+            r['grupo_seguimiento_incidencia'] = self.format_seguimiento_incidencias(r.get('grupo_seguimiento_incidencia',[]))
+            r['tags'] = self.format_tags_incidencias(r.get('tags',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
         
         return result
@@ -4164,7 +4203,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             # if r.get('comentario'):
             #     coment=[]
             #     for c in r['comentario']:
-            #         print('c=',c)
             #         row = {
             #             'comentario':c.get(self.bitacora_fields['comentario']),
             #             'tipo_comentario':c.get(self.bitacora_fields['tipo_comentario'])
@@ -4217,7 +4255,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         res.append(r['perfil'])
         return res
     
-    def get_my_pases(self, tab_status):
+    def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None):
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         employee['timezone'] = user_data.get('timezone','America/Monterrey')
@@ -4236,6 +4274,24 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         elif tab_status == "Vencidos":
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'vencido'})
 
+        if search_name:
+            match_query.update({
+                f"$or": [
+                    {f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}": {"$regex": search_name, "$options": "i"}},
+                    {f"answers.{self.mf['nombre_pase']}": {"$regex": search_name, "$options": "i"}}
+                ]
+            })
+
+        # Conteo total de registros
+        count_query = [
+            {"$match": match_query},
+            {"$count": "total"}
+        ]
+        count_result = self.format_cr(self.cr.aggregate(count_query))
+        total_count = count_result[0]['total'] if count_result else 0
+        current_page = (skip // limit) + 1
+        total_pages = ceil(total_count / limit) if limit else 1
+
         query = [ 
             {"$match":match_query},
             {'$project':
@@ -4243,7 +4299,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     '_id': 1,
                     'folio': "$folio",
                     'favoritos':f"$answers.{self.pase_entrada_fields['favoritos']}",
-                    'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+                     'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                    # 'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
                     'nombre': {"$ifNull":[
                         f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
                         f"$answers.{self.mf['nombre_pase']}"]},
@@ -4309,8 +4366,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
             },
             {'$sort':{'_id':-1}},
-            {'$limit':15}
         ]
+        query.append({'$skip': skip})
+        query.append({'$limit': limit})
         records = self.format_cr(self.cr.aggregate(query))
 
         for x in records:
@@ -4392,8 +4450,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
 
-        # print("records++", simplejson.dumps(records, indent=4))
-        return  records
+        return  {
+            "records": records,
+            "total_records": total_count,
+            "total_pages": total_pages,
+            "actual_page": current_page,
+            "records_on_page": len(records)
+        }
 
     def get_pdf(self, qr_code, template_id=491, name_pdf='Pase de Entrada'):
         return self.lkf_api.get_pdf_record(qr_code, template_id = template_id, name_pdf =name_pdf, send_url=True)
@@ -4483,7 +4546,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for x in pr:
             status = x.get('estatus_paqueteria', [])
             x['estatus_paqueteria'] = status.pop() if status else ""
-        print("PRINT",simplejson.dumps(pr, indent=4))
         return pr
     
     def get_range_dates(self, period, zona):
@@ -5178,6 +5240,173 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
+    def update_incidence_seguimiento(self, folio, incidencia_grupo_seguimiento, location=None, area=None):
+        """
+        Actualiza el seguimiento de una incidencia existente.
+        folio: Folio de la incidencia a actualizar.
+        incidencia_grupo_seguimiento: Lista de diccionarios con los datos del seguimiento.
+        """
+        incidence_selected = self.get_list_incidences(location, area, folio=folio)
+        if incidence_selected:
+            incidence_selected = incidence_selected[0]
+        else:
+            self.LKFException('No hay una incidencia registrada.')
+        qr_code = incidence_selected.get('_id')
+        incidencia_nuevo_grupo = incidence_selected.get('grupo_seguimiento_incidencia', [])
+        incidencia_nuevo_grupo_con_ids = []
+        for incidencia in incidencia_nuevo_grupo:
+            incidencia = {
+                self.incidence_fields['comentario_accion_correctiva_incidencia']: incidencia.get('comentario'),
+                self.incidence_fields['accion_correctiva_incidencia']: incidencia.get('accion_correctiva'),
+                self.incidence_fields['evidencia_accion_correctiva_incidencia']: incidencia.get('evidencia'),
+                self.incidence_fields['documento_accion_correctiva_incidencia']: incidencia.get('documento'),
+                self.incidence_fields['fecha_inicio_accion_correctiva_incidencia']: incidencia.get('fecha_inicio'),
+                self.incidence_fields['fecha_fin_accion_correctiva_incidencia']: incidencia.get('fecha_fin'),    
+            }
+            incidencia_nuevo_grupo_con_ids.append(incidencia)
+
+        incidencia_seg = {
+            "incidencia_reporta_nombre": incidence_selected.get('reporta_incidencia', {}),
+            "fecha_hora_incidencia": incidence_selected.get('fecha_hora_incidencia', ''),
+            "incidencia_ubicacion": incidence_selected.get('ubicacion_incidencia', ''),
+            "area_incidencia": incidence_selected.get('area_incidencia', ''),
+            "incidencia": incidence_selected.get('incidencia', ''),
+            "tipo_incidencia": incidence_selected.get('tipo_incidencia', ''),
+            "comentario_incidencia": incidence_selected.get('comentario_incidencia', ''),
+            "tipo_dano_incidencia": incidence_selected.get('tipo_dano_incidencia', []),
+            "dano_incidencia": incidence_selected.get('dano_incidencia', ''),
+            "personas_involucradas_incidencia": incidence_selected.get('personas_involucradas_incidencia', []),
+            "acciones_tomadas_incidencia": incidence_selected.get('acciones_tomadas_incidencia', []),
+            "evidencia_incidencia": incidence_selected.get('evidencia_incidencia', []),
+            "documento_incidencia": incidence_selected.get('documento_incidencia', []),
+            "prioridad_incidencia": incidence_selected.get('prioridad_incidencia', '').lower(),
+            "notificacion_incidencia": incidence_selected.get('notificacion_incidencia', ''),
+            "tags": incidence_selected.get('tags', []),
+            "datos_deposito_incidencia": incidence_selected.get('datos_deposito_incidencia', []),
+            "total_deposito_incidencia": incidence_selected.get('total_deposito_incidencia', []),
+            "incidencia_grupo_seguimiento": incidencia_grupo_seguimiento,
+        }
+
+        answers = {}
+
+        for key, value in incidencia_seg.items():
+            if key == 'incidencia_reporta_nombre':
+                answers.update({
+                    self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
+                        self.incidence_fields['reporta_incidencia']: value
+                    }
+                })
+            elif key == 'incidencia_ubicacion' or key == 'area_incidencia':
+                answers.update({
+                    self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID: {
+                        self.mf['ubicacion']: incidencia_seg.get('incidencia_ubicacion'),
+                        self.mf['nombre_area']: incidencia_seg.get('area_incidencia')
+                    }
+                })
+            elif key == 'incidencia':
+                answers.update({
+                    self.LISTA_INCIDENCIAS_CAT_OBJ_ID: {
+                        self.incidence_fields['incidencia']: incidencia_seg.get('incidencia'),
+                    }
+                })
+            elif key == 'personas_involucradas_incidencia':
+                personas = incidencia_seg.get('personas_involucradas_incidencia',[])
+                if personas:
+                    personas_list = []
+                    for c in personas:
+                        personas_list.append(
+                            {
+                                self.incidence_fields['nombre_completo']:c.get('nombre_completo'),
+                                self.incidence_fields['tipo_persona'] :c.get('tipo_persona')
+                            }
+                        )
+                    answers.update({self.incidence_fields['personas_involucradas_incidencia']:personas_list})
+            elif key == 'acciones_tomadas_incidencia':
+                acciones = incidencia_seg.get('acciones_tomadas_incidencia',[])
+                if acciones:
+                    acciones_list = []
+                    for c in acciones:
+                        acciones_list.append(
+                            {
+                                self.incidence_fields['responsable_accion']:c.get('responsable_accion'),
+                                self.incidence_fields['acciones_tomadas']:c.get('acciones_tomadas'),
+                            }
+                        )
+                    answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
+            elif key == 'datos_deposito_incidencia':
+                depositos = incidencia_seg.get('datos_deposito_incidencia',[])
+                if depositos:
+                    depositos_list = []
+                    for c in depositos:
+                        depositos_list.append(
+                            {
+                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower(),
+                                self.incidence_fields['cantidad']:c.get('cantidad'),
+                            }
+                        )
+                    answers.update({self.incidence_fields['datos_deposito_incidencia']:depositos_list})
+            elif key == 'tags':
+                tags = incidencia_seg.get('tags',[])
+                if tags:
+                    tags_list = []
+                    for c in tags:
+                        tags_list.append(
+                            {
+                                self.incidence_fields['tag']:c.get('tags'),
+                            }
+                        )
+                    answers.update({self.incidence_fields['tags']:tags_list})
+            elif key == 'incidencia_grupo_seguimiento':
+                incidencias_seguimiento = [incidencia_seg.get('incidencia_grupo_seguimiento',{})]
+                if incidencias_seguimiento:
+                    list_incidencias_seguimiento = []
+                    for item in incidencias_seguimiento:
+                        print(item)
+                        incidencia_folio = item.get('incidencia_folio_accion_correctiva','')
+                        incidencia_comentario = item.get('incidencia_comentario_solucion','')
+                        incidencia_foto_evidencia = item.get('incidencia_evidencia_solucion','')
+                        incidencia_documento = item.get('incidencia_documento_solucion','')
+                        incidencia_inicio_incidencia = item.get('fechaInicioIncidenciaCompleta','')
+                        incidencia_fin_incidencia = item.get('fechaFinIncidenciaCompleta','')
+                        list_incidencias_seguimiento.append({
+                            self.incidence_fields['accion_correctiva_incidencia']:incidencia_folio,
+                            self.incidence_fields['comentario_accion_correctiva_incidencia']:incidencia_comentario,
+                            self.incidence_fields['evidencia_accion_correctiva_incidencia']:incidencia_foto_evidencia,
+                            self.incidence_fields['documento_accion_correctiva_incidencia']:incidencia_documento,
+                            self.incidence_fields['fecha_inicio_accion_correctiva_incidencia']:incidencia_inicio_incidencia,
+                            self.incidence_fields['fecha_fin_accion_correctiva_incidencia']:incidencia_fin_incidencia,
+                        })
+                    incidencia_nuevo_grupo_con_ids.append(list_incidencias_seguimiento[0])
+                    answers[self.incidence_fields['grupo_seguimiento_incidencia']] = incidencia_nuevo_grupo_con_ids
+            else:
+                answers.update({f"{self.incidence_fields[key]}":value})
+
+        if answers or folio:
+            metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_INCIDENCIAS)
+            metadata.update(self.get_record_by_folio(folio, self.BITACORA_INCIDENCIAS, select_columns={'_id':1}, limit=1))
+
+            metadata.update({
+                    'properties': {
+                        "device_properties":{
+                            "system": "Addons",
+                            "process":"Actualizacion de Incidencia", 
+                            "accion":'update_incidence_seguimiento', 
+                            "folio": folio, 
+                            "archive": "incidencias.py"
+                        }
+                    },
+                    'answers': answers,
+                    '_id': qr_code
+                })
+            print(simplejson.dumps(metadata, indent=3))
+            res= self.net.patch_forms_answers(metadata)
+            if res.get('status_code') == 201 or res.get('status_code') == 202:
+                return res
+            else:
+                return res
+        else:
+            self.LKFException('No se mandarón parametros para actualizar') 
+
     def update_incidence(self, data_incidences, folio):
         '''
             Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
@@ -5610,8 +5839,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
         answers[self.mf['grupo_visitados']] = []
-        answers[self.UBICACIONES_CAT_OBJ_ID] = {}
-        answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
+        # answers[self.UBICACIONES_CAT_OBJ_ID] = {}
+        # answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
         answers[self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID] = {}
         answers[self.CONFIG_PERFILES_OBJ_ID] = {}
         answers[self.VISITA_AUTORIZADA_CAT_OBJ_ID] = {}
@@ -5707,7 +5936,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
                 answers.update({f"{self.pase_entrada_fields[key]}":link_pass}) 
             elif key == 'ubicacion':
-                answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
+                # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
+                ubicaciones = access_pass.get('ubicacion',[])
+                if ubicaciones:
+                    ubicaciones_list = []
+                    for ubi in ubicaciones:
+                        ubicaciones_list.append(
+                            {
+                                self.pase_entrada_fields['ubicacion_cat']:{ self.mf["ubicacion"] : ubi}
+                            }
+                        )
+                    answers.update({self.pase_entrada_fields['ubicaciones']:ubicaciones_list})
             elif key == 'visita_a': 
                 #Visita A
                 answers[self.mf['grupo_visitados']] = []
@@ -6299,6 +6538,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         format_ubicacion = self.format_ubicaciones_to_google_pass(ubicaciones_list)
         address = data.get('address', '')
         visita_a = data.get('visita_a', '')
+        empresa = data.get('empresa', '')
 
         object_body = {
             "genericType": "GENERIC_ENTRY_TICKET",
@@ -6312,7 +6552,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'cardTitle': {
                 'defaultValue': {
                     'language': 'es-MX',
-                    'value': 'Pase de Entrada'
+                    'value': empresa
                 }
             },
             "subheader": {
