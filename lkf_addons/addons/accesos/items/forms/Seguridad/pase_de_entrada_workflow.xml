@@ -834,7 +834,7 @@
                     <created>False</created>
                     <deleted>False</deleted>
                     <edited>True</edited>
-                    <run_multiple_times>False</run_multiple_times>
+                    <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
@@ -881,6 +881,20 @@
                                 <type>text</type>
                             </trigger_field>
                             <value> </value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66353daa223b8a43d7f274b5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del pase</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>proceso</value>
                         </item>
                     </triggers>
                 </wf_fields>
@@ -996,6 +1010,20 @@
                                 <type>text</type>
                             </trigger_field>
                             <value> </value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66353daa223b8a43d7f274b5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del pase</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>activo</value>
                         </item>
                     </triggers>
                 </wf_fields>
