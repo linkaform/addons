@@ -7,8 +7,8 @@
         <button_message>Mandar respuestas</button_message>
     </confirmation>
     <description />
-    <_rev>4-e1f2a72a93712d056b14f008d688f29f</_rev>
-    <updated_at>2024-05-23T17:41:47.512764+00:00Z</updated_at>
+    <_rev>2-090bc6a220a8b1bbbd1b8dc8decf7de0</_rev>
+    <updated_at>2025-04-28T14:23:42.827668+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Areas de las Ubicaciones Salidas</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-05-23T17:41:47.512764+00:00Z</created_at>
+    <created_at>2025-04-28T14:23:42.827668+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -51,9 +51,14 @@
                 </item>
                 <item>
                     <field_type>catalog</field_type>
+                    <properties>{}</properties>
+                    <key>None</key>
                     <catalog_fields>[]</catalog_fields>
-                    <required>False</required>
                     <field_id>{{ catalog.ubicaciones.obj_id }}</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Ubicacion</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -67,13 +72,21 @@
                         <filters>None</filters>
                         <name>{{ catalog.ubicaciones.name }}</name>
                     </catalog>
-                    <properties>{}</properties>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
                     <properties>{}</properties>
-                    <required>False</required>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Ubicación</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -85,12 +98,13 @@
                         <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>images</field_type>
-                    <required>False</required>
-                    <field_id>663fb4b992f2c5afcfe97ca9</field_id>
                     <properties>
                         <date_format>None</date_format>
                         <multi_selection>True</multi_selection>
@@ -116,13 +130,30 @@
                             <position>None</position>
                         </watermark_config>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>663fb4b992f2c5afcfe97ca9</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>QR Area</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog</field_type>
+                    <properties>{}</properties>
+                    <key>None</key>
                     <catalog_fields>[]</catalog_fields>
-                    <required>False</required>
                     <field_id>{{ catalog.tipo_de_areas.obj_id }}</field_id>
+                    <required>False</required>
+                    <fav>None</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Tipo de Area</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -136,14 +167,21 @@
                         <filters>None</filters>
                         <name>{{ catalog.tipo_de_areas.name }}</name>
                     </catalog>
-                    <properties>{}</properties>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
                     <properties>{}</properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>663e5e68f5b8a7ce8211ed18</field_id>
                     <required>False</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Tipo de Area</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -155,14 +193,30 @@
                         <catalog_id>{{ catalog.tipo_de_areas.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>[]</options>
+                    <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>select</field_type>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>663fb50503e3a5d11b59ebcd</field_id>
                     <required>False</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Estatus del Area</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>
                         <item>
                             <points>None</points>
@@ -201,19 +255,27 @@
                             <label>Ocupada</label>
                         </item>
                     </options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
                     <properties>
-                        <selected>0</selected>
+                        <selected>None</selected>
                         <openChoice>False</openChoice>
                         <orientation>vertical</orientation>
                         <custom>None</custom>
                     </properties>
-                </item>
-                <item>
-                    <field_type>radio</field_type>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
                     <field_id>663fb50503e3a5d11b59ebce</field_id>
                     <required>True</required>
                     <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
                     <label>Estatus</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>
                         <item>
                             <points>None</points>
@@ -228,20 +290,90 @@
                             <label>Inactiva</label>
                         </item>
                     </options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>6762f7b0922cc2a2f57d4044</field_id>
                     <properties>
-                        <selected>None</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
+                        <send_email>False</send_email>
+                        <size>complete</size>
                         <custom>None</custom>
+                    </properties>
+                    <label>TagId</label>
+                </item>
+                <item>
+                    <field_type>images</field_type>
+                    <field_id>6763096aa99cee046ba766ad</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Foto de la Ubicacion</label>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>15</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>images</field_type>
+                    <field_id>663e5e4bf5b8a7ce8211ed13</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>QR Area</label>
+                    <properties>
+                        <date_format />
+                        <multi_selection>True</multi_selection>
+                        <file_name />
+                        <max_images_count>15</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
+                        <image_origin>
+                            <from_draw>True</from_draw>
+                            <from_camera>True</from_camera>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <min_images_count>0</min_images_count>
+                        <watermark_config>
+                            <color>None</color>
+                            <text_data />
+                            <font_size>None</font_size>
+                            <text_data_array>[]</text_data_array>
+                            <position>None</position>
+                        </watermark_config>
                     </properties>
                 </item>
             </page_fields>
-            <page_description>None</page_description>
             <page_name>Página 1</page_name>
+            <page_description>None</page_description>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>664f7fdb3e59756b3c62ff36</_id>
+    <_id>680f8f6e5e58cbbb4d83f768</_id>
     <public>False</public>
-    <catalog_id>119125</catalog_id>
+    <catalog_id>131889</catalog_id>
 </lkf>
