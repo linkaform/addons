@@ -1351,9 +1351,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "endkey": [f"{cat}\n"]
                 }
         res = self.lkf_api.catalog_view(catalog_id, form_id, options)
-        if res == [None] and cat and not sub_cat:
+        response = {"tipo":"sub_category", "data":res }
+        if response["data"] == [None] and cat and not sub_cat:
             res = self.catalogo_incidencias(cat="", sub_cat= cat)
-        return res
+            response = {"tipo":"incidence", "data":res }
+        return response
 
     def catalogo_vehiculos(self, options={}):
         catalog_id = self.TIPO_DE_VEHICULO_ID
