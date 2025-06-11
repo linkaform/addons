@@ -1350,7 +1350,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "startkey": [cat],
                     "endkey": [f"{cat}\n"]
                 }
-        res = self.lkf_api.catalog_view(catalog_id, form_id, options) 
+        res = self.lkf_api.catalog_view(catalog_id, form_id, options)
+        if res == [None] and cat and not sub_cat:
+            res = self.catalogo_incidencias(cat="", sub_cat= cat)
         return res
 
     def catalogo_vehiculos(self, options={}):
