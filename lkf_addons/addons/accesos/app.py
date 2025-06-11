@@ -3245,6 +3245,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         query = [
             {'$match': match_query},
+            {'$sort': {'updated_at': -1}},
+            {'$limit': 1},
             {'$project': {
                 "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
             }},
@@ -3253,7 +3255,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         raw_result = self.format_cr_result(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
-                ubicacion = grupo.get('ubicacion', '')
+                ubicacion = grupo.get('ubicacion', grupo.get('ubicacion_recorrido', ''))
                 if ubicacion in ubicaciones:
                     reqs = grupo.get(self.conf_modulo_seguridad['datos_requeridos'], [])
                     if isinstance(reqs, list):
