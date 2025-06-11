@@ -1333,10 +1333,24 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         form_id = self.PASE_ENTRADA
         return self.catalogo_view(catalog_id, form_id)
 
-    def catalogo_incidencias(self):
+    def catalogo_incidencias(self, cat="", sub_cat=""):
         catalog_id = self.LISTA_INCIDENCIAS_CAT_ID
         form_id = self.BITACORA_INCIDENCIAS
-        res=self.catalogo_view(catalog_id, form_id)
+        options={}
+        if cat and sub_cat:
+            options = {
+                "group_level": 3,
+                "startkey": [cat,sub_cat],
+                "endkey": [cat, f"{sub_cat}\n"]
+            }
+        else:
+            if cat and not sub_cat:
+                options = {
+                    "group_level": 2,
+                    "startkey": [cat],
+                    "endkey": [f"{cat}\n"]
+                }
+        res = self.lkf_api.catalog_view(catalog_id, form_id, options) 
         return res
 
     def catalogo_vehiculos(self, options={}):
