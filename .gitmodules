@@ -2,3 +2,6 @@
 	path = modules
 	url = git@github.com:linkaform/modules.git
 	#url = https://github.com/linkaform/modules.git
+[submodule "test/sdk_testing"]
+	path = test/sdk_testing
+	url = git@github.com:linkaform/sdk_testing.git
