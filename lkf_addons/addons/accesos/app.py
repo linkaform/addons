@@ -1354,7 +1354,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         response = {"tipo":"sub_category", "data":res }
         if response["data"] == [None] and cat and not sub_cat:
             res = self.catalogo_incidencias(cat="", sub_cat= cat)
-            response = {"tipo":"incidence", "data":res }
+            response = {"tipo":"incidence", "data":res["data"] }
         return response
 
     def catalogo_vehiculos(self, options={}):
