@@ -760,7 +760,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     marca = item.get('marca','')
                     modelo = item.get('modelo','')
                     estado = item.get('estado','')
-                    placas = item.get('vehiculo','')
+                    placas = item.get('placas','')
                     color = item.get('color','')
                     list_vehiculos.append({
                         self.TIPO_DE_VEHICULO_OBJ_ID:{
