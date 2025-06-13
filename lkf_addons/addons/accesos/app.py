@@ -485,7 +485,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'fecha_inicio_accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed9',
             'fecha_fin_accion_correctiva_incidencia': '683de45ddcf6fcee78e61eda',
             'evidencia_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edb',
-            'documento_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edc'
+            'documento_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edc',
+            #Persona extraviada
+            'nombre_completo_persona_extraviada':'684c3e026d974f9625e11303',
+            'edad':'684c3e026d974f9625e11304',
+            'color_piel':'684c3e026d974f9625e11305',
+            'color_cabello': '684c3e026d974f9625e11306',
+            'estatura_aproximada': '684c3e026d974f9625e11307',
+            'descripcion_fisica_vestimenta': '684c3e026d974f9625e11308',
+            'nombre_completo_responsable': '684c3e026d974f9625e11309',
+            'prentesco': '684c3e026d974f9625e1130a',
+            'num_doc_identidad': '684c3e026d974f9625e1130b',
+            'telefono': '684c3e026d974f9625e1130c',
+            'info_coincide_con_videos': '684c3e026d974f9625e1130d',
+            'responsable_que_entrega': '684c3e026d974f9625e1130e',
+            'responsable_que_recibe': '684c3e026d974f9625e1130f',
+            #Robo de cableado
+            'valor_estimado': '684c3e6821796d7880117f22',
+            'pertenencias_sustraidas': '684c3e6821796d7880117f23',
+            #Robo de vehiculo
+            'placas': '684c3eaa04aaab135d7dfbb3',
+            'tipo': '684c3eaa04aaab135d7dfbb2',
+            'marca': '684c3eaa04aaab135d7dfbb4',
+            'modelo': '684c3eaa04aaab135d7dfbb5',
+            'color': '684c3eaa04aaab135d7dfbb6',
+
         }
         #- Para creación , edición y lista de gafetes y lockers
         self.gafetes_fields = {
