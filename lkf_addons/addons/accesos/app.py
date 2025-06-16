@@ -486,6 +486,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'fecha_fin_accion_correctiva_incidencia': '683de45ddcf6fcee78e61eda',
             'evidencia_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edb',
             'documento_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edc',
+
+            'categoria':'6848893f4f18021ab10c6a12',
+            'sub_categoria': '68488a6c5cf05798e09f3eec',
+            'incidente':'663973809fa65cafa759eb97',
             #Persona extraviada
             'nombre_completo_persona_extraviada':'684c3e026d974f9625e11303',
             'edad':'684c3e026d974f9625e11304',
@@ -1909,8 +1913,23 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         })
         #---Define Answers
         answers = {}
+        answers[self.incidence_fields['incidencia_catalog']]={}
         for key, value in data_incidences.items():
-            if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
+            if key == 'categoria':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['categoria']:data_incidences['categoria']
+                })
+                print("lista de incidentes", answers)
+
+            if key == 'sub_categoria':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['sub_categoria']: data_incidences['sub_categoria']
+                })
+            if key == 'incidente':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['incidente']: data_incidences['incidente']
+                })
+            if key == 'ubicacion_incidencia' or key == 'area_incidencia':
                 if data_incidences['ubicacion_incidencia'] and not data_incidences['area_incidencia']:
                     answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['ubicacion_incidencia']:data_incidences['ubicacion_incidencia']}
                 elif data_incidences['area_incidencia'] and not data_incidences['ubicacion_incidencia']:
@@ -1918,10 +1937,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 elif data_incidences['area_incidencia'] and data_incidences['ubicacion_incidencia']: 
                     answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['ubicacion_incidencia']:data_incidences['ubicacion_incidencia'],
                     self.incidence_fields['area_incidencia']:data_incidences['area_incidencia']}
-            elif  key == 'reporta_incidencia':
+            elif key == 'reporta_incidencia':
                 answers[self.incidence_fields['reporta_incidencia_catalog']] = {self.incidence_fields['reporta_incidencia']:value}
-            elif  key == 'incidencia':
-                answers[self.incidence_fields['incidencia_catalog']] = {self.incidence_fields['incidencia']:value}
+            # elif key == 'incidencia':
+            #     answers[self.incidence_fields['incidencia_catalog']] = {self.incidence_fields['incidencia']:value}
             elif key == 'personas_involucradas_incidencia':
                 personas = data_incidences.get('personas_involucradas_incidencia',[])
                 if personas:
@@ -1973,6 +1992,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
+        print("categorias", simplejson.dumps(answers, indent=4))
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
