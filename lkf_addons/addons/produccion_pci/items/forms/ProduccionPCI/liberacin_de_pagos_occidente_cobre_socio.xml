@@ -13,13 +13,13 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1746668179.0</created_at>
+    <created_at>1747109031.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
     <email_configuration>
-        <body />
+        <body>None</body>
         <email_fields>[]</email_fields>
         <emails>[]</emails>
         <embed_company_picture>False</embed_company_picture>
@@ -30,7 +30,7 @@
         <send_attachments>False</send_attachments>
         <send_pdf>False</send_pdf>
         <sender>None</sender>
-        <subject />
+        <subject>None</subject>
         <template_html>None</template_html>
         <templates>[]</templates>
         <timer_config>None</timer_config>
@@ -489,6 +489,36 @@
                             <selected>False</selected>
                             <value>qi</value>
                         </item>
+                        <item>
+                            <label>GD</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>gd</value>
+                        </item>
+                        <item>
+                            <label>TV</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>tv</value>
+                        </item>
+                        <item>
+                            <label>EB</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>eb</value>
+                        </item>
+                        <item>
+                            <label>F8</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>f8</value>
+                        </item>
+                        <item>
+                            <label>F5</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>f5</value>
+                        </item>
                     </options>
                     <properties>
                         <body_payload>[]</body_payload>
@@ -848,10 +878,18 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/132414/</resource_uri>
+    <resource_uri>/api/infosync/form/132849/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
-    <template_conf>None</template_conf>
+    <template_conf>
+        <account_id>None</account_id>
+        <configuration>{}</configuration>
+        <is_master>True</is_master>
+        <is_public>False</is_public>
+        <master_id>None</master_id>
+        <name />
+        <unify_ids>False</unify_ids>
+    </template_conf>
     <templates>[]</templates>
     <timer_config>
         <active>False</active>
@@ -861,5 +899,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1746669425.0</updated_at>
+    <updated_at>1750177310.0</updated_at>
 </lkf>
