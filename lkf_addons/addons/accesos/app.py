@@ -1237,7 +1237,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         response = False
         last_check_out = self.get_last_user_move(qr, location)
-        if last_check_out.get('gafete_id') and not gafete_id:
+        print("last", last_check_out)
+        if last_check_out.get('status_gafete') != "entregado":
             self.LKFException({"status_code":400, "msg":f"Se necesita liberar el gafete antes de regitrar la salida"})
         if not location:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
@@ -3644,8 +3645,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'checkin_date': f"$answers.{self.bitacora_fields['fecha_entrada']}",
                 'checkout_date': f"$answers.{self.bitacora_fields['fecha_salida']}",
                 'gafete_id': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
+                'gafete_id': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
                 'locker_id': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.mf['locker_id']}",
                 'ubicacion_entrada': f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+                'status_gafete':f"$answers.{self.bitacora_fields['status_gafete']}"
                 }
             ).sort('updated_at', -1).limit(1)
         return self.format_cr(res, get_one=True)
@@ -4079,7 +4082,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'total_deposito_incidencia':f"$answers.{self.incidence_fields['total_deposito_incidencia']}",
                 'datos_deposito_incidencia':f"$answers.{self.incidence_fields['datos_deposito_incidencia']}",
                 'grupo_seguimiento_incidencia':f"$answers.{self.incidence_fields['grupo_seguimiento_incidencia']}",
-                'tags':f"$answers.{self.incidence_fields['tags']}"
+                'tags':f"$answers.{self.incidence_fields['tags']}",
+
+                'nombre_completo_persona_extraviada':f"$answers.{self.incidence_fields['nombre_completo_persona_extraviada']}",
+                'edad':f"$answers.{self.incidence_fields['edad']}",
+                'color_piel':f"$answers.{self.incidence_fields['color_piel']}",
+                'color_cabello': f"$answers.{self.incidence_fields['color_cabello']}",
+                'estatura_aproximada':f"$answers.{self.incidence_fields['estatura_aproximada']}",
+                'descripcion_fisica_vestimenta':f"$answers.{self.incidence_fields['descripcion_fisica_vestimenta']}",
+                'nombre_completo_responsable': f"$answers.{self.incidence_fields['nombre_completo_responsable']}",
+                'prentesco': f"$answers.{self.incidence_fields['prentesco']}",
+                'num_doc_identidad': f"$answers.{self.incidence_fields['num_doc_identidad']}",
+                'telefono': f"$answers.{self.incidence_fields['telefono']}",
+                'info_coincide_con_videos': f"$answers.{self.incidence_fields['info_coincide_con_videos']}",
+                'responsable_que_entrega': f"$answers.{self.incidence_fields['responsable_que_entrega']}",
+                'responsable_que_recibe':f"$answers.{self.incidence_fields['responsable_que_recibe']}",
+                #Robo de cableado
+                'valor_estimado': f"$answers.{self.incidence_fields['valor_estimado']}",
+                'pertenencias_sustraidas': f"$answers.{self.incidence_fields['pertenencias_sustraidas']}",
+                #Robo de vehiculo
+                'placas': f"$answers.{self.incidence_fields['placas']}",
+                'tipo': f"$answers.{self.incidence_fields['tipo']}",
+                'marca':f"$answers.{self.incidence_fields['marca']}",
+                'modelo':f"$answers.{self.incidence_fields['modelo']}",
+                'color': f"$answers.{self.incidence_fields['color']}",
+
             }},
             {'$sort':{'folio':-1}},
         ]
