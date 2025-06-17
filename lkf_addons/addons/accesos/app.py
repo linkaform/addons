@@ -4079,7 +4079,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'total_deposito_incidencia':f"$answers.{self.incidence_fields['total_deposito_incidencia']}",
                 'datos_deposito_incidencia':f"$answers.{self.incidence_fields['datos_deposito_incidencia']}",
                 'grupo_seguimiento_incidencia':f"$answers.{self.incidence_fields['grupo_seguimiento_incidencia']}",
-                'tags':f"$answers.{self.incidence_fields['tags']}"
+                'tags':f"$answers.{self.incidence_fields['tags']}",
+
+                'nombre_completo_persona_extraviada':f"$answers.{self.incidence_fields['nombre_completo_persona_extraviada']}",
+                'edad':f"$answers.{self.incidence_fields['edad']}",
+                'color_piel':f"$answers.{self.incidence_fields['color_piel']}",
+                'color_cabello': f"$answers.{self.incidence_fields['color_cabello']}",
+                'estatura_aproximada':f"$answers.{self.incidence_fields['estatura_aproximada']}",
+                'descripcion_fisica_vestimenta':f"$answers.{self.incidence_fields['descripcion_fisica_vestimenta']}",
+                'nombre_completo_responsable': f"$answers.{self.incidence_fields['nombre_completo_responsable']}",
+                'prentesco': f"$answers.{self.incidence_fields['prentesco']}",
+                'num_doc_identidad': f"$answers.{self.incidence_fields['num_doc_identidad']}",
+                'telefono': f"$answers.{self.incidence_fields['telefono']}",
+                'info_coincide_con_videos': f"$answers.{self.incidence_fields['info_coincide_con_videos']}",
+                'responsable_que_entrega': f"$answers.{self.incidence_fields['responsable_que_entrega']}",
+                'responsable_que_recibe':f"$answers.{self.incidence_fields['responsable_que_recibe']}",
+                #Robo de cableado
+                'valor_estimado': f"$answers.{self.incidence_fields['valor_estimado']}",
+                'pertenencias_sustraidas': f"$answers.{self.incidence_fields['pertenencias_sustraidas']}",
+                #Robo de vehiculo
+                'placas': f"$answers.{self.incidence_fields['placas']}",
+                'tipo': f"$answers.{self.incidence_fields['tipo']}",
+                'marca':f"$answers.{self.incidence_fields['marca']}",
+                'modelo':f"$answers.{self.incidence_fields['modelo']}",
+                'color': f"$answers.{self.incidence_fields['color']}",
+
             }},
             {'$sort':{'folio':-1}},
         ]
