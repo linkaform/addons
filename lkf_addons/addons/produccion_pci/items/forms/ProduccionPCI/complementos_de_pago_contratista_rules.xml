@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.complementos_de_pago_contratista.id }}</form_id>
+    <id>62792f2cf0da25ea5db94980</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>62793beeee0f419f7b6bfbaf</field_id>
+                        <group_id>None</group_id>
+                        <id>62793beeee0f419f7b6bfbaf</id>
+                        <label>Status</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>62793beeee0f419f7b6bfbaf</field_id>
+                        <group_id>None</group_id>
+                        <id>62793beeee0f419f7b6bfbaf</id>
+                        <label>Status</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>62793beeee0f419f7b6bfbb0</field_id>
+                    <group_id>None</group_id>
+                    <id>62793beeee0f419f7b6bfbb0</id>
+                    <label>Comentarios</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>62d23a29738a5d6da5632a4a</field_id>
+                    <group_id>None</group_id>
+                    <id>62d23a29738a5d6da5632a4a</id>
+                    <label>Status de complemento</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>62d06e882fd9244967a3c166</field_id>
+                    <group_id>None</group_id>
+                    <id>62d06e882fd9244967a3c166</id>
+                    <label>Importe de Complemento</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>62792ee16fa283d88a102c30</field_id>
+                    <group_id>None</group_id>
+                    <id>62792ee16fa283d88a102c30</id>
+                    <label>Folio de Orden de Compra</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>62792ee16fa283d88a102c31</field_id>
+                    <group_id>None</group_id>
+                    <id>62792ee16fa283d88a102c31</id>
+                    <label>División de la Orden de Compra</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>or</operator>
+            <rule_id>1a2a23cf17b31301</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>62793beeee0f419f7b6bfbaf</field_id>
+                        <group_id>None</group_id>
+                        <id>62793beeee0f419f7b6bfbaf</id>
+                        <label>Status</label>
+                        <type>select</type>
+                    </field>
+                    <value>error</value>
+                </item>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>62793beeee0f419f7b6bfbaf</field_id>
+                        <group_id>None</group_id>
+                        <id>62793beeee0f419f7b6bfbaf</id>
+                        <label>Status</label>
+                        <type>select</type>
+                    </field>
+                    <value>procesando</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>62793beeee0f419f7b6bfbaf</field_id>
+                    <group_id>None</group_id>
+                    <id>62793beeee0f419f7b6bfbaf</id>
+                    <label>Status</label>
+                    <type>select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 2</name>
+            <operator>or</operator>
+            <rule_id>16701d747629ca</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
