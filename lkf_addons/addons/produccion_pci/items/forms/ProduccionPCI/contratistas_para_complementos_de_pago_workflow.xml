@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.contratistas_para_complementos_de_pago.id }}</form_id>
+    <id>685076d0513f0cfc867b582d</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>68507797e80c2a5bd77b57e7</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2025-06-13T20:28:21.292229</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.autorizacion_complementos_pago.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.autorizacion_complementos_pago.name }}</name>
+                            <start_date>2025-06-13T20:28:21.290309</start_date>
+                            <updated_at>2025-06-13T20:29:57.231646</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>68507797e80c2a5bd77b57e8</id>
+            <name>Autorizar Complemento en Catalogo</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-06-17T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-06-16T19:54:33.234Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>False</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>any</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>62d071930a1b1ff9eaa3c0f5</field_id>
+                                <group>{}</group>
+                                <label>Autorizar Facturación sin complemento</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>sí</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>62d071930a1b1ff9eaa3c0f5</field_id>
+                                <group>{}</group>
+                                <label>Autorizar Facturación sin complemento</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>no</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
