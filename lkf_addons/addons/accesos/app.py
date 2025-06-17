@@ -1237,7 +1237,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         response = False
         last_check_out = self.get_last_user_move(qr, location)
-        if last_check_out.get('gafete_id') and not gafete_id:
+        print("last", last_check_out)
+        if last_check_out.get('status_gafete') != "entregado":
             self.LKFException({"status_code":400, "msg":f"Se necesita liberar el gafete antes de regitrar la salida"})
         if not location:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
@@ -3644,8 +3645,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'checkin_date': f"$answers.{self.bitacora_fields['fecha_entrada']}",
                 'checkout_date': f"$answers.{self.bitacora_fields['fecha_salida']}",
                 'gafete_id': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
+                'gafete_id': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
                 'locker_id': f"$answers.{self.LOCKERS_CAT_OBJ_ID}.{self.mf['locker_id']}",
                 'ubicacion_entrada': f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+                'status_gafete':f"$answers.{self.bitacora_fields['status_gafete']}"
                 }
             ).sort('updated_at', -1).limit(1)
         return self.format_cr(res, get_one=True)
