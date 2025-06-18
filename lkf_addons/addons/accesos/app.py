@@ -1176,6 +1176,37 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             resp_create['json'].update({'boot_status':{'guard_on_duty':user_data['name']}})
         return resp_create
 
+    def do_checkout_aux_guard(self, checkin_id=None, location=None, area=None, guards=[], forzar=False, comments=False):
+        """
+        Realiza el checkout de los guardias auxiliares especificados en guards.
+        """
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
+        now_datetime = self.today_str(timezone, date_format='datetime')
+        last_chekin = {}
+
+        # Solo buscamos el último checkin de los guards especificados
+        if not checkin_id and guards:
+            last_chekin = self.get_guard_last_checkin(guards)
+            checkin_id = last_chekin.get('_id')
+
+        if not checkin_id:
+            self.LKFException({
+                "msg": "No encontramos un checking valido del cual podemos hacer checkout...", 
+                "title": "Una Disculpa!!!"
+            })
+
+        record = self.get_record_by_id(checkin_id)
+        checkin_answers = record['answers']
+        folio = record['folio']
+
+        # Realiza el checkout solo de los guards especificados
+        data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
+        checkin_answers = self.check_in_out_employees('out', now_datetime, checkin=checkin_answers, employee_list=guards)
+        data['answers'] = checkin_answers
+        response = self.lkf_api.patch_record(data=data, record_id=checkin_id)
+        return response
+
     def do_checkout(self, checkin_id=None, location=None, area=None, guards=[], forzar=False, comments=False):
         # self.get_answer(keys)
         employee =  self.get_employee_data(email=self.user.get('email'), get_one=True)
@@ -1223,6 +1254,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         checkin_answers = self.check_in_out_employees('out', now_datetime, checkin=checkin_answers, employee_list=guards)
         # response = self.lkf_api.patch_multi_record( answers=checkin, form_id=self.CHECKIN_CASETAS, folios=[folio,])
         data['answers'] = checkin_answers
+
+        #Verificar si el guardia es un guardia de apoyo para hacer su checkout correctamente
+        check_aux_guard = self.check_in_aux_guard()
+        if check_aux_guard:
+            for user_id_aux, each_user in check_aux_guard.items():
+                if user_id_aux == self.unlist(employee.get('usuario_id')) and each_user.get('checkin_position') == 'guardia_de_apoyo':
+                    resp = self.do_checkout_aux_guard(guards=[self.unlist(employee.get('usuario_id'))], location=location, area=area)
+                    return resp
+
         response = self.lkf_api.patch_record( data=data, record_id=checkin_id)
         if response.get('status_code') == 401:
             return self.LKFException({
@@ -4740,6 +4780,66 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$sort':{'nombre':-1}},
             ]
         return self.format_cr(self.cr.aggregate(query))        
+    
+    def check_in_aux_guard(self):
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.CHECKIN_CASETAS,
+        }
+        query = [
+            {'$match': match_query},
+            {'$unwind': f"$answers.{self.f['guard_group']}"},
+            {'$project': {
+                '_id': 1,
+                'folio': "$folio",
+                'created_at': "$created_at",
+                'name': f"$answers.{self.f['guard_group']}.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_jefes']}",
+                'user_id': {"$first": f"$answers.{self.f['guard_group']}.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['user_id_jefes']}"},
+                'location': f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+                'area': f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+                'checkin_date': f"$answers.{self.f['guard_group']}.{self.f['checkin_date']}",
+                'checkout_date': f"$answers.{self.f['guard_group']}.{self.f['checkout_date']}",
+                'checkin_status': f"$answers.{self.f['guard_group']}.{self.f['checkin_status']}",
+                'checkin_position': f"$answers.{self.f['guard_group']}.{self.f['checkin_position']}",
+            }},
+            {'$sort': {'updated_at': -1}},
+            {'$group': {
+                '_id': {'user_id': '$user_id'},
+                'name': {'$last': '$name'},
+                'location': {'$last': '$location'},
+                'area': {'$last': '$area'},
+                'checkin_date': {'$last': '$checkin_date'},
+                'checkout_date': {'$last': '$checkout_date'},
+                'checkin_status': {'$last': '$checkin_status'},
+                'checkin_position': {'$last': '$checkin_position'},
+            }},
+            {'$project': {
+                '_id': 0,
+                'user_id': '$_id.user_id',
+                'name': '$name',
+                'location': '$location',
+                'area': '$area',
+                'checkin_date': '$checkin_date',
+                'checkout_date': '$checkout_date',
+                'checkin_status': {'$cond': [{'$eq': ['$checkin_status', 'entrada']}, 'in', 'out']},
+                'checkin_position': '$checkin_position',
+            }},
+        ]
+        data = self.format_cr(self.cr.aggregate(query))
+        res = {}
+        for rec in data:
+            status = 'in' if rec.get('checkin_status') in ['in', 'entrada'] else 'out'
+            res[int(rec.get('user_id', 0))] = {
+                'status': status,
+                'name': rec.get('name'),
+                'user_id': rec.get('user_id'),
+                'location': rec.get('location'),
+                'area': rec.get('area'),
+                'checkin_date': rec.get('checkin_date'),
+                'checkout_date': rec.get('checkout_date'),
+                'checkin_position': rec.get('checkin_position')
+            }
+        return res
 
     def get_shift_data(self, booth_location=None, booth_area=None, search_default=True):
         """
@@ -4759,6 +4859,20 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         guards_positions = self.config_get_guards_positions()
         if not guards_positions:
             self.LKFException({"status_code":400, "msg":'No Existen puestos de guardias configurados.'})
+
+        if this_user and this_user.get('status') == 'out':
+            check_aux_guard = self.check_in_aux_guard()
+
+            for user_id_aux, each_user in check_aux_guard.items():
+                if user_id_aux == user_id:
+                    this_user = each_user
+                    this_user['status'] = 'in' if each_user.get('status') == 'in' else 'out'
+                    this_user['location'] = each_user.get('location')
+                    this_user['area'] = each_user.get('area')
+                    this_user['checkin_date'] = each_user.get('checkin_date')
+                    this_user['checkout_date'] = each_user.get('checkout_date')
+                    this_user['checkin_position'] = each_user.get('checkin_position')
+
         if this_user and this_user.get('status') == 'in':
             location_employees = {self.chife_guard:{},self.support_guard:[]}
             booth_area = this_user['area']
