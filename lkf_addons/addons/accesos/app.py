@@ -498,7 +498,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'estatura_aproximada': '684c3e026d974f9625e11307',
             'descripcion_fisica_vestimenta': '684c3e026d974f9625e11308',
             'nombre_completo_responsable': '684c3e026d974f9625e11309',
-            'prentesco': '684c3e026d974f9625e1130a',
+            'parentesco': '684c3e026d974f9625e1130a',
             'num_doc_identidad': '684c3e026d974f9625e1130b',
             'telefono': '684c3e026d974f9625e1130c',
             'info_coincide_con_videos': '684c3e026d974f9625e1130d',
@@ -1960,8 +1960,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.incidence_fields['incidencia_catalog']].update({
                     self.incidence_fields['categoria']:data_incidences['categoria']
                 })
-                print("lista de incidentes", answers)
-
             if key == 'sub_categoria':
                 answers[self.incidence_fields['incidencia_catalog']].update({
                     self.incidence_fields['sub_categoria']: data_incidences['sub_categoria']
@@ -4131,7 +4129,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'estatura_aproximada':f"$answers.{self.incidence_fields['estatura_aproximada']}",
                 'descripcion_fisica_vestimenta':f"$answers.{self.incidence_fields['descripcion_fisica_vestimenta']}",
                 'nombre_completo_responsable': f"$answers.{self.incidence_fields['nombre_completo_responsable']}",
-                'prentesco': f"$answers.{self.incidence_fields['prentesco']}",
+                'parentesco': f"$answers.{self.incidence_fields['parentesco']}",
                 'num_doc_identidad': f"$answers.{self.incidence_fields['num_doc_identidad']}",
                 'telefono': f"$answers.{self.incidence_fields['telefono']}",
                 'info_coincide_con_videos': f"$answers.{self.incidence_fields['info_coincide_con_videos']}",
@@ -4147,6 +4145,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'modelo':f"$answers.{self.incidence_fields['modelo']}",
                 'color': f"$answers.{self.incidence_fields['color']}",
 
+                'categoria':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['categoria']}",
+                'sub_categoria':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['sub_categoria']}",
+                'incidente':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['incidente']}",
+
             }},
             {'$sort':{'folio':-1}},
         ]
@@ -4159,7 +4161,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['grupo_seguimiento_incidencia'] = self.format_seguimiento_incidencias(r.get('grupo_seguimiento_incidencia',[]))
             r['tags'] = self.format_tags_incidencias(r.get('tags',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
-        
+        print("resultados", simplejson.dumps(result, indent=4))
         return result
 
     def get_list_notes(self, location, area, status=None, limit=10, offset=0, dateFrom="", dateTo=""):
@@ -5624,6 +5626,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         answers = {}
         for key, value in data_incidences.items():
+            if key == 'categoria':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['categoria']:data_incidences['categoria']
+                })
+            if key == 'sub_categoria':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['sub_categoria']: data_incidences['sub_categoria']
+                })
+            if key == 'incidente':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['incidente']: data_incidences['incidente']
+                })
             if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
                 if data_incidences['ubicacion_incidencia'] and not data_incidences['area_incidencia']:
                     answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['ubicacion_incidencia']:data_incidences['ubicacion_incidencia']}
