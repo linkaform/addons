@@ -1278,7 +1278,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         response = False
         last_check_out = self.get_last_user_move(qr, location)
         print("last", last_check_out)
-        if last_check_out.get('status_gafete') != "entregado":
+        if last_check_out.get('status_gafete') and last_check_out.get('status_gafete')!= "entregado":
             self.LKFException({"status_code":400, "msg":f"Se necesita liberar el gafete antes de regitrar la salida"})
         if not location:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
