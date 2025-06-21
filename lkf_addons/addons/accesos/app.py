@@ -1419,6 +1419,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "startkey": [cat],
                     "endkey": [f"{cat}\n"]
                 }
+            if sub_cat and not cat:
+                options = {
+                    "group_level": 3,
+                    "startkey": [sub_cat],
+                    "endkey": [f"{sub_cat}\n"]
+                }
+
         res = self.lkf_api.catalog_view(catalog_id, form_id, options)
         if res == [None] and cat and not sub_cat:
             res = self.catalogo_incidencias(cat="", sub_cat= cat)
