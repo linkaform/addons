@@ -1406,12 +1406,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         catalog_id = self.LISTA_INCIDENCIAS_CAT_ID
         form_id = self.BITACORA_INCIDENCIAS
         options={}
+        search=""
         if cat and sub_cat:
             options = {
                 "group_level": 3,
                 "startkey": [cat,sub_cat],
                 "endkey": [cat, f"{sub_cat}\n"]
             }
+            search="incidence"
         else:
             if cat and not sub_cat:
                 options = {
@@ -1419,17 +1421,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "startkey": [cat],
                     "endkey": [f"{cat}\n"]
                 }
+                search="sub_catalog"
             if sub_cat and not cat:
                 options = {
                     "group_level": 3,
                     "startkey": [sub_cat],
                     "endkey": [f"{sub_cat}\n"]
                 }
+                search="incidence"
 
         res = self.lkf_api.catalog_view(catalog_id, form_id, options)
+        formatted= {
+            "selected":cat, 
+            "data":res, 
+            "type": search
+        }
         if res == [None] and cat and not sub_cat:
-            res = self.catalogo_incidencias(cat="", sub_cat= cat)
-        return res
+            res_obj = self.catalogo_incidencias(cat="", sub_cat= cat)
+            formatted["selected"] = cat
+            formatted["data"] = res_obj["data"] 
+            formatted["type"] = "incidence"
+        print("formatedo", simplejson.dumps(formatted, indent=4))
+        return formatted
 
     def catalogo_vehiculos(self, options={}):
         catalog_id = self.TIPO_DE_VEHICULO_ID
