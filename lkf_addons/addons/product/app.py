@@ -61,6 +61,7 @@ class Product(Base, base.LKF_Base):
             self.PRODUCT_RECIPE_OBJ_ID = self.SKU.get('obj_id')
 
         self.f.update( {
+            'peso':'68590322a36cc9e84ba64740',
             'product_code':'61ef32bcdf0ec2ba73dec33d',
             'product_name':'61ef32bcdf0ec2ba73dec33e',
             'product_category':'61ef32bcdf0ec2ba73dec342',
