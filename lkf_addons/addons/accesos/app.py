@@ -5503,7 +5503,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 self.incidence_fields['fecha_fin_accion_correctiva_incidencia']: incidencia.get('fecha_fin'),    
             }
             incidencia_nuevo_grupo_con_ids.append(incidencia)
-
+        print("cat", incidence_selected)
         incidencia_seg = {
             "incidencia_reporta_nombre": incidence_selected.get('reporta_incidencia', {}),
             "fecha_hora_incidencia": incidence_selected.get('fecha_hora_incidencia', ''),
@@ -5524,11 +5524,26 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "datos_deposito_incidencia": incidence_selected.get('datos_deposito_incidencia', []),
             "total_deposito_incidencia": incidence_selected.get('total_deposito_incidencia', []),
             "incidencia_grupo_seguimiento": incidencia_grupo_seguimiento,
+            "categoria": incidence_selected.get("categoria", ''),
+            "sub_categoria": incidence_selected.get("sub_categoria", ''),
+            "incidente": incidence_selected.get("incidente", ''),
         }
 
         answers = {}
 
         for key, value in incidencia_seg.items():
+            if key == 'categoria':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['categoria']: value
+                })
+            if key == 'sub_categoria':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['sub_categoria']: value
+                })
+            if key == 'incidente':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['incidente']: value
+                })
             if key == 'incidencia_reporta_nombre':
                 answers.update({
                     self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
