@@ -498,7 +498,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'estatura_aproximada': '684c3e026d974f9625e11307',
             'descripcion_fisica_vestimenta': '684c3e026d974f9625e11308',
             'nombre_completo_responsable': '684c3e026d974f9625e11309',
-            'prentesco': '684c3e026d974f9625e1130a',
+            'parentesco': '684c3e026d974f9625e1130a',
             'num_doc_identidad': '684c3e026d974f9625e1130b',
             'telefono': '684c3e026d974f9625e1130c',
             'info_coincide_con_videos': '684c3e026d974f9625e1130d',
@@ -1278,7 +1278,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         response = False
         last_check_out = self.get_last_user_move(qr, location)
         print("last", last_check_out)
-        if last_check_out.get('status_gafete') != "entregado":
+        if last_check_out.get('status_gafete') and last_check_out.get('status_gafete')!= "entregado":
             self.LKFException({"status_code":400, "msg":f"Se necesita liberar el gafete antes de regitrar la salida"})
         if not location:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
@@ -1406,12 +1406,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         catalog_id = self.LISTA_INCIDENCIAS_CAT_ID
         form_id = self.BITACORA_INCIDENCIAS
         options={}
+        search=""
         if cat and sub_cat:
             options = {
                 "group_level": 3,
                 "startkey": [cat,sub_cat],
                 "endkey": [cat, f"{sub_cat}\n"]
             }
+            search="incidence"
         else:
             if cat and not sub_cat:
                 options = {
@@ -1419,10 +1421,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "startkey": [cat],
                     "endkey": [f"{cat}\n"]
                 }
+                search="sub_catalog"
+            if sub_cat and not cat:
+                options = {
+                    "group_level": 3,
+                    "startkey": [sub_cat],
+                    "endkey": [f"{sub_cat}\n"]
+                }
+                search="incidence"
+
         res = self.lkf_api.catalog_view(catalog_id, form_id, options)
+        formatted= {
+            "selected":cat, 
+            "data":res, 
+            "type": search
+        }
         if res == [None] and cat and not sub_cat:
-            res = self.catalogo_incidencias(cat="", sub_cat= cat)
-        return res
+            res_obj = self.catalogo_incidencias(cat="", sub_cat= cat)
+            formatted["selected"] = cat
+            formatted["data"] = res_obj["data"] 
+            formatted["type"] = "incidence"
+        print("formatedo", simplejson.dumps(formatted, indent=4))
+        return formatted
 
     def catalogo_vehiculos(self, options={}):
         catalog_id = self.TIPO_DE_VEHICULO_ID
@@ -1960,8 +1980,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.incidence_fields['incidencia_catalog']].update({
                     self.incidence_fields['categoria']:data_incidences['categoria']
                 })
-                print("lista de incidentes", answers)
-
             if key == 'sub_categoria':
                 answers[self.incidence_fields['incidencia_catalog']].update({
                     self.incidence_fields['sub_categoria']: data_incidences['sub_categoria']
@@ -4131,7 +4149,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'estatura_aproximada':f"$answers.{self.incidence_fields['estatura_aproximada']}",
                 'descripcion_fisica_vestimenta':f"$answers.{self.incidence_fields['descripcion_fisica_vestimenta']}",
                 'nombre_completo_responsable': f"$answers.{self.incidence_fields['nombre_completo_responsable']}",
-                'prentesco': f"$answers.{self.incidence_fields['prentesco']}",
+                'parentesco': f"$answers.{self.incidence_fields['parentesco']}",
                 'num_doc_identidad': f"$answers.{self.incidence_fields['num_doc_identidad']}",
                 'telefono': f"$answers.{self.incidence_fields['telefono']}",
                 'info_coincide_con_videos': f"$answers.{self.incidence_fields['info_coincide_con_videos']}",
@@ -4147,6 +4165,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'modelo':f"$answers.{self.incidence_fields['modelo']}",
                 'color': f"$answers.{self.incidence_fields['color']}",
 
+                'categoria':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['categoria']}",
+                'sub_categoria':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['sub_categoria']}",
+                'incidente':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['incidente']}",
+
             }},
             {'$sort':{'folio':-1}},
         ]
@@ -4159,7 +4181,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['grupo_seguimiento_incidencia'] = self.format_seguimiento_incidencias(r.get('grupo_seguimiento_incidencia',[]))
             r['tags'] = self.format_tags_incidencias(r.get('tags',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
-        
+        print("resultados", simplejson.dumps(result, indent=4))
         return result
 
     def get_list_notes(self, location, area, status=None, limit=10, offset=0, dateFrom="", dateTo=""):
@@ -4416,7 +4438,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     {f"answers.{self.mf['nombre_pase']}": {"$regex": search_name, "$options": "i"}}
                 ]
             })
-
         # Conteo total de registros
         count_query = [
             {"$match": match_query},
@@ -4540,12 +4561,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 x['telefono'] = x.get('telefono', [""]) if x.get('telefono') else ""
                 # x['pdf'] = self.lkf_api.get_pdf_record(x['_id'], template_id = 447, name_pdf='Pase de Entrada', send_url=True)
             else:
+                print("empresa email telefono",  x.get('empresa'))
                 x['visita_a'] = visita_a
-                x['favoritos'] = x.get('favoritos', [""])[0] if x.get('favoritos') else ""
-                x['motivo_visita'] = x.get('motivo_visita', [""])[0] if x.get('motivo_visita') else ""
-                x['email']= x.get('email', [""])[0] if x.get('email') else ""
-                x['empresa']= x.get('empresa', [""])[0] if x.get('empresa') else ""
-                x['telefono']= x.get('telefono', [""])[0] if x.get('telefono') else ""
+                x['favoritos'] = x.get('favoritos') or ""
+                x['motivo_visita'] =x.get('motivo_visita') or ""
+                x['email']= x.get('email') or ""
+                x['empresa']= x.get('empresa') or ""
+                x['telefono']= x.get('telefono') or ""
                 # x['pdf'] = self.lkf_api.get_pdf_record(x[' # for idx, dic in enumerate(x['grupo_areas_acceso']):
             # x['comentario_area_pase']=x.pop('comentario_area_pase',[])
            
@@ -4586,7 +4608,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             x.pop('visita_a_puesto', None)
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
-
+        print("data", simplejson.dumps(records, indent=4))
         return  {
             "records": records,
             "total_records": total_count,
@@ -5624,6 +5646,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
         answers = {}
         for key, value in data_incidences.items():
+            if key == 'categoria':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['categoria']:data_incidences['categoria']
+                })
+            if key == 'sub_categoria':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['sub_categoria']: data_incidences['sub_categoria']
+                })
+            if key == 'incidente':
+                answers[self.incidence_fields['incidencia_catalog']].update({
+                    self.incidence_fields['incidente']: data_incidences['incidente']
+                })
             if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
                 if data_incidences['ubicacion_incidencia'] and not data_incidences['area_incidencia']:
                     answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['ubicacion_incidencia']:data_incidences['ubicacion_incidencia']}
