@@ -392,6 +392,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'checkin_position':'66a28f3ca6b0f085b1518ca9',
             'forzar_cierre':'66a5b9bed0c44910177eb723',
             'guard_group': mf['guard_group'],
+            'checkin_image': '685ac4e836c1c936b97275ad',
             'employee_position':'665f482cc9a2f8acf685c20b',
             'cat_created_by': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'created_by': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
@@ -1108,7 +1109,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = self._do_access(access_pass, location, area, data)
         return res
 
-    def do_checkin(self, location, area, employee_list=[]):
+    def do_checkin(self, location, area, employee_list=[], check_in_manual={}):
         # Realiza el check-in en una ubicación y área específica.
 
         if not self.is_boot_available(location, area):
@@ -1169,6 +1170,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     }
                 },
                 'answers': checkin
+            })
+        if check_in_manual:
+            checkin.update({
+                self.checkin_fields['checkin_image']: check_in_manual.get('image', []),
+                self.checkin_fields['commentario_checkin_caseta']: check_in_manual.get('comment', '')
             })
         resp_create = self.lkf_api.post_forms_answers(data)
         #TODO agregar nombre del Guardia Quien hizo el checkin
