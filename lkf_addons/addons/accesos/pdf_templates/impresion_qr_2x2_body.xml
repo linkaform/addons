@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+{% load PrintFields %}
+{% load set_var %}
+{% load custom_tags %}
+<document filename="Avery Prestar 94103" xmlns:doc="http://namespaces.zope.org/rml/doc">
+    <template title="Insa" author="LinkaForm">
+        <pageTemplate pageSize="22.5cm,11in" id="first">
+            <frame id="first"  x1="0.1cm"   y1="-0.3cm" width="22cm"  height="30cm"/>
+            <pageGraphics>
+                <setFont name="Helvetica" size="7.5"/>
+
+                <!-- Cabecera de documento -->
+                {% Header company_logo parent user form Template meta %}
+                <!-- Pie del documento -->
+                {% Footer user form Template meta %}
+            </pageGraphics>
+        </pageTemplate>
+    </template>
+    <stylesheet>
+        {% autoescape on %}
+        {{ Template.style|safe }}
+        {% endautoescape %}
+    </stylesheet>
+    <story>
+    {% set list_page = "" %}
+    {% range_tag 'list_page' answers.684883d52595dedd260c6a71 %}
+    {% for page in list_page  %}
+        <spacer length="15"/>
+        <blockTable colWidths="5.4cm, 5.4cm, 5.4cm, 5.4cm" style="table_images"> 
+            <tr>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+            </tr>
+            <tr>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+            </tr>
+            <tr>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+            </tr>
+            <tr>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+            </tr>
+            <tr>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 25%}" width="3.8cm" height="3.8cm"/></td>  
+            </tr>
+        </blockTable> 
+    {% endfor %}
+            <!-- <blockTable colWidths="5.4cm, 5.4cm, 5.4cm, 5.4cm" style="table_images"> 
+                <tr>
+                    <td>  <imageAndFlowables  imageName="{% generate_qr_base64 30%}" width="1.5in" height="1.5in"/></td>  
+                    <td>  <imageAndFlowables  imageName="{% generate_qr_base64 30%}" width="1.5in" height="1.5in"/></td>  
+                    <td>  <imageAndFlowables  imageName="{% generate_qr_base64 30%}" width="1.5in" height="1.5in"/></td>  
+                    <td>  <imageAndFlowables  imageName="{% generate_qr_base64 30%}" width="1.5in" height="1.5in"/></td>  
+                </tr>
+            </blockTable>  -->
+    </story>
+</document>

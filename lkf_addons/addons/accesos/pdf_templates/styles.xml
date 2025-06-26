@@ -1,0 +1,18 @@
+<blockTableStyle id="general">
+    <lineStyle thickness="0.5" kind="GRID" colorName="#cfd8dc" start="0,0" stop="-1,-1" />
+    <blockAlignment value="center" start="0,0" stop="-1,-1"/>
+    <blockValign value="middle"/>
+</blockTableStyle>
+
+
+
+<blockTableStyle id="table_images">
+    <blockValign value="TOP" start="0,0" stop="-1,-1"/>
+    <!-- <blockRightPadding length="15"  start="0,0" stop="0,-1"/>
+    <blockRightPadding length="30"  start="1,0" stop="-1,-1"/>
+     <blockBottomPadding length="20" start="0,0" stop="1,0"/>
+     <blockBottomPadding length="30" start="1,1" stop="-1,-1"/> -->
+</blockTableStyle>
+
+<paraStyle name="textTag" fontName="Helvetica-Bold" fontSize="10" alignment="center"/>
+<paraStyle name="textTagII" fontName="Helvetica-Bold" fontSize="5" alignment="center"/>
