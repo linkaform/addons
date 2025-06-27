@@ -2950,7 +2950,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
                     'equipos': {"$ifNull": [f"$answers.{self.mf['grupo_equipos']}", []]},
                     'perfil': f"$answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}",
-                    'status_visita': f"$answers.{self.bitacora_fields['status_visita']}"
+                    'status_visita': f"$answers.{self.bitacora_fields['status_visita']}",
+                    'fecha_salida': f"$answers.{self.mf['fecha_salida']}"
                 }},
                 {'$group': {
                     '_id': None,
@@ -2976,7 +2977,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'detalle_visitas': {
                         '$push': {
                             'perfil': '$perfil',
-                            'status_visita': '$status_visita'
+                            'status_visita': '$status_visita',
+                            'fecha_salida': '$fecha_salida'
                         }
                     }
                 }}
@@ -3022,29 +3024,26 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_visitas))
+            today_salida = f"{today} 00:00:00"
             resultado_dia = self.format_cr(self.cr.aggregate(query_visitas_dia))
 
             total_vehiculos_dentro = resultado[0]['total_vehiculos_dentro'] if resultado else 0
             total_equipos_dentro = resultado[0]['total_equipos_dentro'] if resultado else 0
             detalle_visitas_todas = resultado[0]['detalle_visitas'] if resultado else []
             visitas_en_dia = resultado_dia[0]['visitas_en_dia'] if resultado_dia else 0
-            detalle_visitas = resultado_dia[0]['detalle_visitas'] if resultado_dia else []
 
             personal_dentro = 0
             salidas = 0
             personas_dentro = 0
-
-            for visita in detalle_visitas:
-                status_visita = visita['status_visita'].lower()
-
-                if status_visita == "salida":
-                    salidas += 1
 
             for visita in detalle_visitas_todas:
                 status_visita = visita['status_visita'].lower()
 
                 if status_visita == "entrada":
                     personas_dentro += 1
+                    
+                if visita.get('fecha_salida') and visita.get('fecha_salida') >= today_salida:
+                    salidas += 1
 
             res['total_vehiculos_dentro'] = total_vehiculos_dentro
             res['total_equipos_dentro'] = total_equipos_dentro
@@ -3078,6 +3077,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             #Incidentes por dia, por semana y por mes
             now = datetime.now(pytz.timezone("America/Mexico_City"))
             today_date = now.date()
+            user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
+            zona = user_data.get('timezone','America/Monterrey')
+            dateFromWeek, dateToWeek = self.get_range_dates('this_week', zona)
 
             match_query_incidentes = {
                 "deleted_at": {"$exists": False},
@@ -3116,8 +3118,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'por_semana': [
                         {'$match': {
                             'fecha_incidencia': {
-                                '$gte': datetime.combine(today_date - timedelta(days=6), time.min),
-                                '$lte': datetime.combine(today_date, time.max)
+                                '$gte': dateFromWeek,
+                                '$lte': dateToWeek
                             }
                         }},
                         {'$group': {
