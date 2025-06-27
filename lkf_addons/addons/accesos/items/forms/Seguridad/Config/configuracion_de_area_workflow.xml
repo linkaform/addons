@@ -19,7 +19,7 @@
                             <itype>script</itype>
                             <name>{{ script.update_area.name }}</name>
                             <start_date>2025-06-10T20:27:27.488083</start_date>
-                            <updated_at>2025-06-10T20:27:27.736368</updated_at>
+                            <updated_at>2025-06-13T18:46:47.027862</updated_at>
                         </script>
                         <user>SCRIPT_OWNER</user>
                     </configuration>
