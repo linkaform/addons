@@ -2536,9 +2536,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
     def format_tags_incidencias(self, data):
         res = []
         for r in data:
-            row = {}
-            row['tags'] = r.get(self.incidence_fields['tag'],'')
-            res.append(row)
+            tag = r.get(self.incidence_fields['tag'], '')
+            if tag:
+                res.append(tag)
         return res
 
     def format_personas_involucradas(self, data):
@@ -4176,8 +4176,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'sub_categoria':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['sub_categoria']}",
                 'incidente':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['incidente']}",
 
-            }},
-            {'$sort':{'folio':-1}},
+                }
+            },
+            {'$sort':{'folio':-1}}
         ]
         result = self.format_cr_result(self.cr.aggregate(query))
         result = self.format_cr(result)
@@ -4188,7 +4189,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['grupo_seguimiento_incidencia'] = self.format_seguimiento_incidencias(r.get('grupo_seguimiento_incidencia',[]))
             r['tags'] = self.format_tags_incidencias(r.get('tags',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
-        print("resultados", simplejson.dumps(result, indent=4))
+        # print("resultados", simplejson.dumps(result, indent=4))
         return result
 
     def get_list_notes(self, location, area, status=None, limit=10, offset=0, dateFrom="", dateTo=""):
