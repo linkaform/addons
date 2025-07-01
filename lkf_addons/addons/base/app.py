@@ -622,7 +622,7 @@ class CargaUniversal(Base):
         directorio_temporal = self.crea_directorio_temporal(nueva_ruta)
         if directorio_temporal:
             os.chdir(nueva_ruta)
-            ruta_zip = current_record['answers'][self.field_id_zip]['file_url']
+            ruta_zip = current_record['answers'][self.field_id_zip][0]['file_url']
             fileoszip = wget.download(ruta_zip,nueva_ruta)
             path, file = os.path.split(fileoszip)
             archivo_zip = zipfile.ZipFile(nueva_ruta+file)
