@@ -13,13 +13,13 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1653686675.0</created_at>
+    <created_at>1747109034.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
     <email_configuration>
-        <body />
+        <body>None</body>
         <email_fields>[]</email_fields>
         <emails>[]</emails>
         <embed_company_picture>False</embed_company_picture>
@@ -30,7 +30,7 @@
         <send_attachments>False</send_attachments>
         <send_pdf>False</send_pdf>
         <sender>None</sender>
-        <subject />
+        <subject>None</subject>
         <template_html>None</template_html>
         <templates>[]</templates>
         <timer_config>None</timer_config>
@@ -44,14 +44,7 @@
             <page_description>None</page_description>
             <page_fields>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>196199c4661b32</rule_id>
-                            <rule_index>5</rule_index>
-                            <rule_type>invisible</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -733,14 +726,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>e9126e71297197c</rule_id>
-                            <rule_index>1</rule_index>
-                            <rule_type>disabled</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -2964,7 +2950,7 @@
                         <item>
                             <applied>False</applied>
                             <rule_id>b5e5501f121e5f</rule_id>
-                            <rule_index>8</rule_index>
+                            <rule_index>7</rule_index>
                             <rule_type>invisible</rule_type>
                         </item>
                     </affecting_rules>
@@ -3808,20 +3794,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>8db6c49e423ee</rule_id>
-                            <rule_index>1</rule_index>
-                            <rule_type>disabled</rule_type>
-                        </item>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>265268520cc1b14</rule_id>
-                            <rule_index>2</rule_index>
-                            <rule_type>required</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -3839,12 +3812,6 @@
                     <label>Metros Bajante</label>
                     <number_type>None</number_type>
                     <options>
-                        <item>
-                            <label>0</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>0</value>
-                        </item>
                         <item>
                             <label>25</label>
                             <points>None</points>
@@ -3905,6 +3872,12 @@
                             <selected>False</selected>
                             <value>300</value>
                         </item>
+                        <item>
+                            <label>0</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>0</value>
+                        </item>
                     </options>
                     <properties>
                         <body_payload>[]</body_payload>
@@ -3949,9 +3922,141 @@
                         <watermark_enable>False</watermark_enable>
                     </properties>
                     <required>False</required>
-                    <rules>
-                        <item>239d1f4112a2194c</item>
-                    </rules>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>f1054000a02000000000007a</field_id>
+                    <field_type>select</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Metraje Calculado</label>
+                    <number_type>None</number_type>
+                    <options>
+                        <item>
+                            <label>25</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>25</value>
+                        </item>
+                        <item>
+                            <label>50</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>50</value>
+                        </item>
+                        <item>
+                            <label>75</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>75</value>
+                        </item>
+                        <item>
+                            <label>100</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>100</value>
+                        </item>
+                        <item>
+                            <label>125</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>125</value>
+                        </item>
+                        <item>
+                            <label>150</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>150</value>
+                        </item>
+                        <item>
+                            <label>175</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>175</value>
+                        </item>
+                        <item>
+                            <label>200</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>200</value>
+                        </item>
+                        <item>
+                            <label>250</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>250</value>
+                        </item>
+                        <item>
+                            <label>300</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>300</value>
+                        </item>
+                        <item>
+                            <label>0</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>0</value>
+                        </item>
+                    </options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>False</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>1</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>0</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
                     <visible>True</visible>
@@ -3963,12 +4068,6 @@
                             <rule_id>8db6c49e423ee</rule_id>
                             <rule_index>1</rule_index>
                             <rule_type>disabled</rule_type>
-                        </item>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>239d1f4112a2194c</rule_id>
-                            <rule_index>6</rule_index>
-                            <rule_type>show</rule_type>
                         </item>
                     </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
@@ -5011,14 +5110,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>e9126e71297197c</rule_id>
-                            <rule_index>1</rule_index>
-                            <rule_type>disabled</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -6732,7 +6824,7 @@
                         <item>
                             <applied>False</applied>
                             <rule_id>fac20ad11461dad</rule_id>
-                            <rule_index>7</rule_index>
+                            <rule_index>6</rule_index>
                             <rule_type>disabled</rule_type>
                         </item>
                     </affecting_rules>
@@ -9344,7 +9436,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/84724/</resource_uri>
+    <resource_uri>/api/infosync/form/132851/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -9359,7 +9451,7 @@
     <templates>
         <item>
             <default>True</default>
-            <description>Oden de servicio Metro </description>
+            <description>Oden de servicio Metro</description>
             <id>33</id>
             <name>Orden Servicio Metro</name>
             <resource_uri>/api/infosync/templates/33/</resource_uri>
@@ -9373,5 +9465,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1723680842.0</updated_at>
+    <updated_at>1750139856.0</updated_at>
 </lkf>

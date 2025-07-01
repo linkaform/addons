@@ -1,0 +1,285 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.orden_de_servicio_metro_cobreiasa.id }}</form_id>
+    <id>685ef9d278cfcaefc54fbd00</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>f1054000a030000000000012</field_id>
+                        <group_id>None</group_id>
+                        <id>f1054000a030000000000012</id>
+                        <label>Estatus de Cobranza PC</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>f1054000a030000000000012</field_id>
+                        <group_id>None</group_id>
+                        <id>f1054000a030000000000012</id>
+                        <label>Estatus de Cobranza PC</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>58e6d4cff851c244a78f35cb</field_id>
+                    <group_id>None</group_id>
+                    <id>58e6d4cff851c244a78f35cb</id>
+                    <label>Numero de Contacto</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5a623e30f851c2271179f822</field_id>
+                    <group_id>None</group_id>
+                    <id>5a623e30f851c2271179f822</id>
+                    <label>Orden de Servicio Escaneada</label>
+                    <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5e17674c50f45bac939c932e</field_id>
+                    <group_id>None</group_id>
+                    <id>5e17674c50f45bac939c932e</id>
+                    <label>Cargado desde script</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5eb091915ae0d087df1163de</field_id>
+                    <group_id>None</group_id>
+                    <id>5eb091915ae0d087df1163de</id>
+                    <label>Técnico PIC</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5eb0326a9e6fda7cb11163f1</field_id>
+                    <group_id>None</group_id>
+                    <id>5eb0326a9e6fda7cb11163f1</id>
+                    <label>Cargado desde PIC</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5efa00c62542e523f391c636</field_id>
+                    <group_id>None</group_id>
+                    <id>5efa00c62542e523f391c636</id>
+                    <label>E50</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f40131c9bca6a32f518d9a9</field_id>
+                    <group_id>None</group_id>
+                    <id>5f40131c9bca6a32f518d9a9</id>
+                    <label>Folio Orden de Compra Contratista</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f0e23eaca2ca23aa12f21a9</field_id>
+                    <group_id>None</group_id>
+                    <id>5f0e23eaca2ca23aa12f21a9</id>
+                    <label>Fecha de Carga Contratista</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>60882afbf33276990d3f8edf</field_id>
+                    <group_id>None</group_id>
+                    <id>60882afbf33276990d3f8edf</id>
+                    <label>Fecha de Carga PDF</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>59de71beb43fdd3bcc771d99</field_id>
+                    <group_id>None</group_id>
+                    <id>59de71beb43fdd3bcc771d99</id>
+                    <label>Observacion</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>59de6ef2f851c2189286b9ac</field_id>
+                    <group_id>None</group_id>
+                    <id>59de6ef2f851c2189286b9ac</id>
+                    <label>Liquidación necesaria de cobre para migración</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820482</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820482</id>
+                    <label>Bonificacion por distancia y volumen de 1 a 5 o.s construidas</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820483</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820483</id>
+                    <label>Bonificacion por distancia y volumen de 6 a 15 o.s construidas</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820484</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820484</id>
+                    <label>Bonificacion por distancia y volumen de 16 a 25 o.s construidas</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820485</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820485</id>
+                    <label>Bonificacion por distancia y volumen mas de 25 o.s construidas</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820486</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820486</id>
+                    <label>Montaje de puente en distribuidor general</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820487</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820487</id>
+                    <label>INSTALACIÓN DE POSTE DE 25'</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820488</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820488</id>
+                    <label>Pruebas de transmision de datos vdsl en roseta de datos con equipo homologado</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820489</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820489</id>
+                    <label>Cableado interior 1 aparato y modem para infinitum (dit con splitter con proteccion)</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b82048a</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b82048a</id>
+                    <label>IDENTIFICACION DE NUMERO TELEFONICO EN RED PRINCIPAL, INCLUYE MARCACION *080</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b82048b</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b82048b</id>
+                    <label>IDENTIFICACION DE NUMERO TELEFONICO EN RED SECUNDARIA, INCLUYE MARCACION *080</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b82048c</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b82048c</id>
+                    <label>UBICACIÓN DEL CLIENTE Y PRUEBA DE TRANSMISION VDSL EN TERMINAL AEREA</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b82048d</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b82048d</id>
+                    <label>PRUEBA DE TRANSMISION VDSL ADICIONAL EN TERMINAL AREA</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1f5efb3198fe9c5ccef32d</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1f5efb3198fe9c5ccef32d</id>
+                    <label>Radial en banqueta</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1f5efb3198fe9c5ccef32f</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1f5efb3198fe9c5ccef32f</id>
+                    <label>Reparacion de tropezon en radial</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1f5efb3198fe9c5ccef32e</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1f5efb3198fe9c5ccef32e</id>
+                    <label>Radial en cepa libre</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f7f627c6ca87fa5ca92cd1c</field_id>
+                    <group_id>None</group_id>
+                    <id>5f7f627c6ca87fa5ca92cd1c</id>
+                    <label>Cableado interior adicional para el dit con splitter con proteccion (extension)</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f90e812f84ca4590ebc5946</field_id>
+                    <group_id>None</group_id>
+                    <id>5f90e812f84ca4590ebc5946</id>
+                    <label>Migración TBA</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f90e812f84ca4590ebc5947</field_id>
+                    <group_id>None</group_id>
+                    <id>5f90e812f84ca4590ebc5947</id>
+                    <label>QUEJAS</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>605cd146f499106724acb8c7</field_id>
+                    <group_id>None</group_id>
+                    <id>605cd146f499106724acb8c7</id>
+                    <label>Construccion o rehabilitacion de cableado interior para 1 aparato</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar Campos</name>
+            <operator>or</operator>
+            <rule_id>7bf230d68d98c</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

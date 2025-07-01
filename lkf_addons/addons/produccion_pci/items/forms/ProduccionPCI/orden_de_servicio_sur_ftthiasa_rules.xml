@@ -1,0 +1,581 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.orden_de_servicio_sur_ftthiasa.id }}</form_id>
+    <id>685ef73ee515a74a8bbdf3f2</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>f1054000a030000000000012</field_id>
+                        <group_id>None</group_id>
+                        <id>f1054000a030000000000012</id>
+                        <label>Estatus Cobranza PC</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>f1054000a030000000000012</field_id>
+                        <group_id>None</group_id>
+                        <id>f1054000a030000000000012</id>
+                        <label>Estatus Cobranza PC</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a010000000000001</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a010000000000001</id>
+                    <label>Fol_Pisaplex</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a0100000000000b2</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a0100000000000b2</id>
+                    <label>Division</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a0100000000000c2</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a0100000000000c2</id>
+                    <label>Subdireccion</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a0100000000000a2</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a0100000000000a2</id>
+                    <label>AREA</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a0100000000000d6</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a0100000000000d6</id>
+                    <label>Expediente Del Tecnico</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000e14</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000e14</id>
+                    <label>Fecha Reportado</label>
+                    <type>date</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5ad14051f851c220dd0eb772</field_id>
+                    <group_id>None</group_id>
+                    <id>5ad14051f851c220dd0eb772</id>
+                    <label>Orden de Servicio Escaneada (PDF)</label>
+                    <type>file</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5e17674c50f45bac939c932e</field_id>
+                    <group_id>None</group_id>
+                    <id>5e17674c50f45bac939c932e</id>
+                    <label>Cargado desde script</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5eb091915ae0d087df1163de</field_id>
+                    <group_id>None</group_id>
+                    <id>5eb091915ae0d087df1163de</id>
+                    <label>Técnico PIC</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5eb0326a9e6fda7cb11163f1</field_id>
+                    <group_id>None</group_id>
+                    <id>5eb0326a9e6fda7cb11163f1</id>
+                    <label>Cargado desde PIC</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5efa00c62542e523f391c636</field_id>
+                    <group_id>None</group_id>
+                    <id>5efa00c62542e523f391c636</id>
+                    <label>E50</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f40131c9bca6a32f518d9a9</field_id>
+                    <group_id>None</group_id>
+                    <id>5f40131c9bca6a32f518d9a9</id>
+                    <label>Folio Orden de Compra Contratista</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f0e23eaca2ca23aa12f21a9</field_id>
+                    <group_id>None</group_id>
+                    <id>5f0e23eaca2ca23aa12f21a9</id>
+                    <label>Fecha de Carga Contratista</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5fc9269ce5363f7e3b9e3867</field_id>
+                    <group_id>None</group_id>
+                    <id>5fc9269ce5363f7e3b9e3867</id>
+                    <label>Cobro mínimo</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5fd3cde61b0c8e82ae9d4d60</field_id>
+                    <group_id>None</group_id>
+                    <id>5fd3cde61b0c8e82ae9d4d60</id>
+                    <label>Autorizado por PIC</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>601c7ae006478d9cbee17e00</field_id>
+                    <group_id>None</group_id>
+                    <id>601c7ae006478d9cbee17e00</id>
+                    <label>Descuento por 15 días</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6021ba39dae34bd70dcd40b5</field_id>
+                    <group_id>None</group_id>
+                    <id>6021ba39dae34bd70dcd40b5</id>
+                    <label>Metraje Anterior</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>60882afbf33276990d3f8edf</field_id>
+                    <group_id>None</group_id>
+                    <id>60882afbf33276990d3f8edf</id>
+                    <label>Fecha de Carga PDF</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>608c13104d2fd015a1c15192</field_id>
+                    <group_id>None</group_id>
+                    <id>608c13104d2fd015a1c15192</id>
+                    <label>estimado anteriormente</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a020000000000001</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a020000000000001</id>
+                    <label>Folio Tek</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>587e802db43fdd09d7d475ec</field_id>
+                    <group_id>None</group_id>
+                    <id>587e802db43fdd09d7d475ec</id>
+                    <label>--------- Llenar solo en casos Requeridos -------</label>
+                    <type>description</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a020000100000009</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a020000100000009</id>
+                    <label>Cantidad de Extensiones</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a020000100000008</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a020000100000008</id>
+                    <label>Bonificacion por distancia y volumen</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a02000000000fb04</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a02000000000fb04</id>
+                    <label>Clave del Tecnico</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a02000000000fa04</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a02000000000fa04</id>
+                    <label>Tecnico</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a020000000000c12</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a020000000000c12</id>
+                    <label>Activacion Claro Video</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a020000200000004</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a020000200000004</id>
+                    <label>Velocidad Subida</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a020000200000005</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a020000200000005</id>
+                    <label>Velocidad Bajada</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000002</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000002</id>
+                    <label>Estatus de Orden</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000004</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000004</id>
+                    <label>SOLO en caso de no ser cerrado por IVR seleccionar el motivo</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000005</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000005</id>
+                    <label>Comentarios</label>
+                    <type>textarea</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000006</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000006</id>
+                    <label>Visitas</label>
+                    <type>group</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1078200a030000100010001</field_id>
+                    <group_id>None</group_id>
+                    <id>f1078200a030000100010001</id>
+                    <label>Número de Vistia</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1078200a030000100010002</field_id>
+                    <group_id>None</group_id>
+                    <id>f1078200a030000100010002</id>
+                    <label>Fecha de la Vistia</label>
+                    <type>date</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1078200a030000100010003</field_id>
+                    <group_id>None</group_id>
+                    <id>f1078200a030000100010003</id>
+                    <label>Cita Programada</label>
+                    <type>date</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1078200a030000100010004</field_id>
+                    <group_id>None</group_id>
+                    <id>f1078200a030000100010004</id>
+                    <label>Foto de evidencia de la vista</label>
+                    <type>image</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000150</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000150</id>
+                    <label>Paco</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000012</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000012</id>
+                    <label>Estatus Cobranza PC</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000013</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000013</id>
+                    <label>Estatus Cobranza Contratista</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000e13</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000e13</id>
+                    <label>Error Reportado</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000e16</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000e16</id>
+                    <label>Portalero</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000e17</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000e17</id>
+                    <label>Supervisor</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000e20</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000e20</id>
+                    <label>Historial de Estatus</label>
+                    <type>group</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000e21</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000e21</id>
+                    <label>Estatus Origen</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000e22</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000e22</id>
+                    <label>Estatus Destino</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000e23</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000e23</id>
+                    <label>Fecha Cambio de Estatus</label>
+                    <type>date</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>f1054000a030000000000e15</field_id>
+                    <group_id>None</group_id>
+                    <id>f1054000a030000000000e15</id>
+                    <label>Observacion</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>59de71beb43fdd3bcc771d9a</field_id>
+                    <group_id>None</group_id>
+                    <id>59de71beb43fdd3bcc771d9a</id>
+                    <label>Detalle</label>
+                    <type>checkbox</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5be9b504f851c220e1b8994e</field_id>
+                    <group_id>None</group_id>
+                    <id>5be9b504f851c220e1b8994e</id>
+                    <label>Firma del Cliente</label>
+                    <type>signature</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820482</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820482</id>
+                    <label>Bonificacion por distancia y volumen de 1 a 5 o.s construidas</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820483</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820483</id>
+                    <label>Bonificacion por distancia y volumen de 6 a 15 o.s construidas</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820484</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820484</id>
+                    <label>Bonificacion por distancia y volumen de 16 a 25 o.s construidas</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820485</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820485</id>
+                    <label>Bonificacion por distancia y volumen mas de 25 o.s construidas</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820486</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820486</id>
+                    <label>Montaje de puente en distribuidor general</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820487</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820487</id>
+                    <label>INSTALACIÓN DE POSTE DE 25'</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820488</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820488</id>
+                    <label>Pruebas de transmision de datos vdsl en roseta de datos con equipo homologado</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b820489</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b820489</id>
+                    <label>Cableado interior 1 aparato y modem para infinitum (dit con splitter con proteccion)</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b82048a</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b82048a</id>
+                    <label>IDENTIFICACION DE NUMERO TELEFONICO EN RED PRINCIPAL, INCLUYE MARCACION *080</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b82048b</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b82048b</id>
+                    <label>IDENTIFICACION DE NUMERO TELEFONICO EN RED SECUNDARIA, INCLUYE MARCACION *080</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b82048c</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b82048c</id>
+                    <label>UBICACIÓN DEL CLIENTE Y PRUEBA DE TRANSMISION VDSL EN TERMINAL AEREA</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1721afa63c9a750b82048d</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1721afa63c9a750b82048d</id>
+                    <label>PRUEBA DE TRANSMISION VDSL ADICIONAL EN TERMINAL AREA</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1f5efb3198fe9c5ccef32d</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1f5efb3198fe9c5ccef32d</id>
+                    <label>Radial en banqueta</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1f5efb3198fe9c5ccef32e</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1f5efb3198fe9c5ccef32e</id>
+                    <label>Radial en cepa libre</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f1f5efb3198fe9c5ccef32f</field_id>
+                    <group_id>None</group_id>
+                    <id>5f1f5efb3198fe9c5ccef32f</id>
+                    <label>Reparacion de tropezon en radial</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f7f627c6ca87fa5ca92cd1c</field_id>
+                    <group_id>None</group_id>
+                    <id>5f7f627c6ca87fa5ca92cd1c</id>
+                    <label>Cableado interior adicional para el dit con splitter con proteccion (extension)</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f90e812f84ca4590ebc5946</field_id>
+                    <group_id>None</group_id>
+                    <id>5f90e812f84ca4590ebc5946</id>
+                    <label>Migración TBA</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f90e812f84ca4590ebc5947</field_id>
+                    <group_id>None</group_id>
+                    <id>5f90e812f84ca4590ebc5947</id>
+                    <label>QUEJAS</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar campos</name>
+            <operator>or</operator>
+            <rule_id>1a5c19aa1d9d18ae</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
