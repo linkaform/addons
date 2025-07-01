@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>7-b9ddf113fd38dda7e6308c59eadb3017</_rev>
-    <updated_at>2024-07-30T00:58:58.066677+00:00Z</updated_at>
+    <_rev>4-bd9d7cf764036829ca3ddccb938aa2c3</_rev>
+    <updated_at>2025-04-28T14:28:00.122066+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Configuracion de Recorridos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-07-30T00:58:58.066677+00:00Z</created_at>
+    <created_at>2025-04-28T14:28:00.122066+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,10 +25,6 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>121727</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>66a83ad2e004a874a4a08d7f</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -38,7 +34,7 @@
                     <catalog_fields>[]</catalog_fields>
                     <fav>True</fav>
                     <required>True</required>
-                    <field_id>6644fb97e14dcb705407e0ef</field_id>
+                    <field_id>6645050d873fc2d733961eba</field_id>
                     <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Nombre del recorrido</label>
@@ -176,8 +172,12 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_description>None</page_description>
             <page_name>Página 1</page_name>
+            <page_description>None</page_description>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>680f90707ae52a33a76e3609</_id>
+    <public>False</public>
+    <catalog_id>131962</catalog_id>
 </lkf>

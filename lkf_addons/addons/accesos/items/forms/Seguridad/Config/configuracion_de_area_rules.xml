@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.configuracion_de_area.id }}</form_id>
-    <id>6848782ade0a838ec2117f2a</id>
+    <id>6849aedd96a801af26117f3b</id>
     <rules>
         <item>
             <conditions>
@@ -47,9 +47,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Nombre</name>
+            <name>nombre</name>
             <operator>and</operator>
-            <rule_id>6e01d6b5c922ef</rule_id>
+            <rule_id>1ae98d0adb13b6</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -83,7 +83,7 @@
             <group_conditions>{}</group_conditions>
             <name>qr</name>
             <operator>and</operator>
-            <rule_id>be51c932625dd2</rule_id>
+            <rule_id>230715b61719168b</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -105,6 +105,14 @@
             <element_ids>[]</element_ids>
             <empty>False</empty>
             <fields_ruled>
+                <item>
+                    <catalog_id>680f8f6f3aae12aabc6c3996</catalog_id>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <group_id>None</group_id>
+                    <id>663e5c57f5b8a7ce8211ed0b</id>
+                    <label>Ubicación</label>
+                    <type>catalog-select</type>
+                </item>
                 <item>
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id}}</field_id>
@@ -129,19 +137,11 @@
                     <label>Nombre de Area</label>
                     <type>catalog-select</type>
                 </item>
-                <item>
-                    <catalog_id>680f8f6f3aae12aabc6c3996</catalog_id>
-                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
-                    <group_id>None</group_id>
-                    <id>663e5c57f5b8a7ce8211ed0b</id>
-                    <label>Ubicación</label>
-                    <type>catalog-select</type>
-                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Alta QR</name>
+            <name>todo</name>
             <operator>and</operator>
-            <rule_id>1e1b1a0ffe11d2c</rule_id>
+            <rule_id>d5a125017992645</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>

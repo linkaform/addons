@@ -159,5 +159,84 @@
                 </wf_fields>
             </rules>
         </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68504c159138d877591180d2</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Se ha realizado el rondin en {{record.answers.680f90707ae52a33a76e3609.663e5c57f5b8a7ce8211ed0b}}: &lt;br&gt;
+Hora de Inicio: {{record.answers.6818ea068a7f3446f1bae3b3}} &lt;br&gt;
+Hora fin : {{record.answers.6760a8e68cef14ecd7f8b6ff}} &lt;br&gt;
+Duracion del Recorrido: {{record.answers.6639b47565d8e5c06fe97cf3}} &lt;br&gt;
+Realizado Por: {{record.user.name}} {% endraw %}</body>
+                        <email_fields>[]</email_fields>
+                        <emails>
+                            <item>josepato@linkaform.com</item>
+                        </emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Rondin Realizado en {{record.answers.680f90707ae52a33a76e3609.663e5c57f5b8a7ce8211ed0b}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>68504c159138d877591180d9</id>
+            <name>None</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-06-17T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-06-16T16:51:16.684Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6639b2744bb44059fc59eb62</field_id>
+                                <group>{}</group>
+                                <label>Estatus del recorrido</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>realizado</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
     </workflows>
 </lkf>
