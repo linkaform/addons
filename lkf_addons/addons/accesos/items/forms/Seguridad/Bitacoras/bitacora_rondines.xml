@@ -11,7 +11,7 @@
             <padding_zeros>3</padding_zeros>
             <prefix>%y%m%d-</prefix>
             <required>False</required>
-            <suffix />
+            <suffix>None</suffix>
         </folio>
     </advanced_options>
     <allow_page_navigation>True</allow_page_navigation>
@@ -20,7 +20,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1745877744.0</created_at>
+    <created_at>1745850511.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -338,7 +338,10 @@
                         <watermark_enable>False</watermark_enable>
                     </properties>
                     <required>True</required>
-                    <rules>[]</rules>
+                    <rules>
+                        <item>a851e2ecefa57</item>
+                        <item>25c21d1b1ba89b1</item>
+                    </rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
                     <visible>True</visible>
@@ -360,17 +363,18 @@
                                 <item>674e2bf892bcb80c1816037d</item>
                                 <item>674e2e9eecf32979019392af</item>
                                 <item>680ffa2c87c49a88ab7ba9b6</item>
+                                <item>680f8f6f3aae12aabc6c3996</item>
                             </childs>
                         </related_catalog>
                         <view_fields>
                             <item>663e5c57f5b8a7ce8211ed0b</item>
-                            <item>6644fb97e14dcb705407e0ef</item>
+                            <item>6645050d873fc2d733961eba</item>
                         </view_fields>
                         <view_index>0</view_index>
                     </catalog>
                     <catalog_fields>
                         <item>663e5c57f5b8a7ce8211ed0b</item>
-                        <item>6644fb97e14dcb705407e0ef</item>
+                        <item>6645050d873fc2d733961eba</item>
                     </catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
@@ -518,7 +522,7 @@
                         <catalog_field_id>{{ catalog.configuracion_de_recorridos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_de_recorridos.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters>None</filters>
+                        <filters />
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -531,7 +535,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>6644fb97e14dcb705407e0ef</field_id>
+                    <field_id>6645050d873fc2d733961eba</field_id>
                     <field_type>catalog-select</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -582,7 +586,7 @@
                         <watermark_config>None</watermark_config>
                         <watermark_enable>False</watermark_enable>
                     </properties>
-                    <required>True</required>
+                    <required>False</required>
                     <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -603,7 +607,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>680ffa2c87c49a88ab7ba9b6</item>
+                        <item>680f8f6f3aae12aabc6c3996</item>
                         <item>663e5d44f5b8a7ce8211ed0f</item>
                         <item>6760a908a43b1b0e41abad6b</item>
                         <item>66462b9d7124d1540f962087</item>
@@ -664,7 +668,14 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>[]</affecting_rules>
+                    <affecting_rules>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>a851e2ecefa57</rule_id>
+                            <rule_index>0</rule_index>
+                            <rule_type>invisible</rule_type>
+                        </item>
+                    </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -731,7 +742,14 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>[]</affecting_rules>
+                    <affecting_rules>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>25c21d1b1ba89b1</rule_id>
+                            <rule_index>1</rule_index>
+                            <rule_type>show</rule_type>
+                        </item>
+                    </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -804,11 +822,11 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>
-                            <catalog_id>132147</catalog_id>
+                            <catalog_id>131962</catalog_id>
                             <related_fields>
                                 <item>663e5c57f5b8a7ce8211ed0b</item>
                             </related_fields>
@@ -960,7 +978,7 @@
                         <watermark_config>None</watermark_config>
                         <watermark_enable>False</watermark_enable>
                     </properties>
-                    <required>True</required>
+                    <required>False</required>
                     <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -1344,7 +1362,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/132167/</resource_uri>
+    <resource_uri>/api/infosync/form/131982/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -1379,5 +1397,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1747846634.0</updated_at>
+    <updated_at>1749929267.0</updated_at>
 </lkf>

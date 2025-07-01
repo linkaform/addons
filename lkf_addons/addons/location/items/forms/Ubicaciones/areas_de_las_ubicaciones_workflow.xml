@@ -50,22 +50,7 @@
                 </record>
                 <wf_fields>
                     <operator>all</operator>
-                    <triggers>
-                        <item>
-                            <condition>not__empty=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>{}</catalog>
-                                <field_id>663e5e4bf5b8a7ce8211ed13</field_id>
-                                <group>{}</group>
-                                <label>QR Area</label>
-                                <type>images</type>
-                            </trigger_field>
-                            <value> </value>
-                        </item>
-                    </triggers>
+                    <triggers>[]</triggers>
                 </wf_fields>
             </rules>
         </item>
@@ -186,6 +171,34 @@
                                     <id>663fb50503e3a5d11b59ebce</id>
                                 </output>
                             </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>text</field_type>
+                                    <id>6762f7b0922cc2a2f57d4044</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>6762f7b0922cc2a2f57d4044</id>
+                                </output>
+                            </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>images</field_type>
+                                    <id>6763096aa99cee046ba766ad</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>6763096aa99cee046ba766ad</id>
+                                </output>
+                            </item>
                         </mapping>
                     </configuration>
                     <name>Sincronizar Forma a catálog</name>
@@ -220,22 +233,7 @@
                 </record>
                 <wf_fields>
                     <operator>all</operator>
-                    <triggers>
-                        <item>
-                            <condition>not__empty=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>{}</catalog>
-                                <field_id>663e5e4bf5b8a7ce8211ed13</field_id>
-                                <group>{}</group>
-                                <label>QR Area</label>
-                                <type>images</type>
-                            </trigger_field>
-                            <value> </value>
-                        </item>
-                    </triggers>
+                    <triggers>[]</triggers>
                 </wf_fields>
             </rules>
         </item>
