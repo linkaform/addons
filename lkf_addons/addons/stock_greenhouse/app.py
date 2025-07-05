@@ -14,7 +14,7 @@ Se permite la redistribución y el uso en formas de código fuente y binario, co
 
 '''
 
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 import math, simplejson, time
 from copy import deepcopy
 from bson import ObjectId
@@ -242,7 +242,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         plant_info = current_record['answers'].get(self.f['product_recipe'], {})
         plant_code = plant_info.get(self.f['product_code'])
         lot_number = current_record['answers'].get(self.f['production_lote'], {})
-
         new_production = {}
         recipes = None
 
@@ -251,12 +250,14 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         year = current_record['answers'].get(self.f['production_year'])
         if not week or not year:
             return []
-        production_date = time.strptime('{} {} 1'.format(year, week), '%Y %W %w')
-        production_date = datetime.fromtimestamp(time.mktime(production_date))
+        #production_date = time.strptime('{} {} 1'.format(year, week), '%Y %W %w')
+        production_date = date.fromisocalendar(int(year), int(week), 1)
+        print('production date', production_date)
         recipe = self.select_S4_recipe(recipes[plant_code], week)
         grow_weeks = recipe.get('S4_growth_weeks')
         ready_date = production_date + timedelta(weeks=grow_weeks)
-        calc_lot_number = int(ready_date.strftime('%Y%W'))
+        year, week_num, iso_weekday = ready_date.isocalendar()
+        calc_lot_number = int(f"{year}{week_num}")
         lot_number = self.answers.get(self.f['production_lote'], calc_lot_number)
 
         total_produced =0
@@ -318,6 +319,8 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         res = []
         self.current_record['answers'][self.f['total_produced']] = total_produced
         for lot_number, plant_data in new_production.items():
+            print('va  a crear el inventario.... lot_number', lot_number)
+            
             res.append(self.calculates_inventory_greenhouse(plant_info, planting_house, lot_number, plant_data, grow_weeks, force_lot=force_lot))
         return res
 
@@ -325,7 +328,12 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         #plant_data is an object with the following keys 'qty','recipe', 'planted_date'
         plant_code = plant_info[self.f['product_code']]
         greenhouse_inventory = self.get_record_greenhouse_inventory(ready_date, warehouse, plant_code)
-        plant_yearWeek = plant_data.get('plant_date').strftime('%Y%W')
+        plant_yearWeek = plant_data.get('plant_date').isocalendar()
+
+        #plant_yearWeek = plant_data.get('plant_date').strftime('%Y%W')
+        year, week_num, iso_weekday = plant_yearWeek
+        plant_yearWeek = int(f"{year}{week_num}")
+
         qty_produced = plant_data.get('qty',0)
         container_type = plant_data.get('container_type')
         qty_per_container = plant_data.get('qty_per_container')
@@ -1509,9 +1517,11 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
                         ready_date = lot_number
                         year = str(ready_date)[:4]
                         week = str(ready_date)[4:]
-                        plant_ready_date = datetime.strptime('%04d-%02d-1'%(int(year), int(week)), '%Y-%W-%w')
+                        # plant_ready_date = datetime.strptime('%04d-%02d-1'%(int(year), int(week)), '%Y-%W-%w')
+                        plant_ready_date = date.fromisocalendar(int(year), int(week), 1)
                         yearWeek = plant_ready_date - timedelta(weeks=growth_weeks)
-                        yearWeek = int(yearWeek.strftime('%Y%W'))
+                        year, week_num, iso_weekday = yearWeek.isocalendar()
+                        yearWeek = int(f'{year}{week_num}')
 
                     else:
                         not_found.append(product_code)
@@ -1966,6 +1976,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         week = int(lot_ready_week[-2:])
         year = int(lot_ready_week[:4])
         ready_week = datetime.strptime('%04d-%02d-1' % (year, week), '%Y-%W-%w')
+        ready_week = date.fromisocalendar(int(year), int(week), 1)
         # ready_week = this_date.strftime('%Y%W')
         sets = []
         for week, qty in gradin_totals.items():
