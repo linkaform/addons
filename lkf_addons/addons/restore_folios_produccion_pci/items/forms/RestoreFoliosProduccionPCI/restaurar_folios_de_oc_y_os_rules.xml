@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.restaurar_folios_de_oc_y_os.id }}</form_id>
+    <id>60c0d8aa40e70926bab2b86c</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>60c0d66a88affe8ff3ef3294</field_id>
+                        <group_id>None</group_id>
+                        <id>60c0d66a88affe8ff3ef3294</id>
+                        <label>Proceso a ejecutar</label>
+                        <type>select</type>
+                    </field>
+                    <value>eliminar_oc_y_restaurar_liberaciones</value>
+                </item>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>60c0d66a88affe8ff3ef3294</field_id>
+                        <group_id>None</group_id>
+                        <id>60c0d66a88affe8ff3ef3294</id>
+                        <label>Proceso a ejecutar</label>
+                        <type>select</type>
+                    </field>
+                    <value>restaurar_liberaciones_para_nueva_oc</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>60c0d66a88affe8ff3ef3295</field_id>
+                    <group_id>None</group_id>
+                    <id>60c0d66a88affe8ff3ef3295</id>
+                    <label>Errores</label>
+                    <type>file</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>60c18efba467daa9c9e6c31a</field_id>
+                    <group_id>None</group_id>
+                    <id>60c18efba467daa9c9e6c31a</id>
+                    <label>Comentarios</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar campo errores</name>
+            <operator>or</operator>
+            <rule_id>6416fc2412e4b</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
