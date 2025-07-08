@@ -588,8 +588,7 @@ class JIT(Base):
 
         return self.format_cr(self.cr.aggregate(query))
 
-    def get_reorder_rules(self, warehouse=None, location=None, product_code=None, sku=None, status='active', group_by=False):
-        #TODO agregar el rule_type
+    def get_reorder_rules(self, warehouse=None, location=None, product_code=None, sku=None, status='active', group_by=False, method=None):
         match_query ={ 
              'form_id': self.REGLAS_REORDEN,  
              'deleted_at' : {'$exists':False},
@@ -611,6 +610,10 @@ class JIT(Base):
             match_query.update({
                 f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse_location']}":location
                 })
+        if method:
+            match_query.update({
+                f"answers.{self.f['procurment_method']}": method
+                })
         query = [
             {'$match': match_query},
             {'$project':{
@@ -618,6 +621,7 @@ class JIT(Base):
                     'bom_name':f'$answers.{self.BOM_CAT_OBJ_ID}.{self.mf["bom_name"]}',
                     'demora':f'$answers.{self.mf["demora"]}',
                     'product_code':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}',
+                    'procurment_method':f'$answers.{self.f["procurment_method"]}',
                     'lead_time':f'$answers.{self.mf["lead_time"]}',
                     'min_stock':f'$answers.{self.mf["min_stock"]}',
                     'max_stock':f'$answers.{self.mf["max_stock"]}',
@@ -801,47 +805,9 @@ class JIT(Base):
 
         return answers
 
-    def get_product_config(self, product_code):
-        mango_query = {
-            "selector": {f"answers.{self.f['product_code']}": product_code},
-            "fields": [f"answers.{self.f['family']}"],
-            "limit": 1,
-        }
-        family = self.lkf_api.search_catalog(self.Product.PRODUCT_ID, mango_query)
-        family = self.unlist(family)
-        family = family.get(self.f['family'], None)
-        
-        query = [
-            {'$match': {
-                "deleted_at": {"$exists": False},
-                "form_id": 127098,
-                f"answers.{self.Product.PRODUCT_OBJ_ID}.{self.f['family']}": family,
-            }},
-            {'$project': {
-                "_id": 0,
-                "lead_time": f"$answers.{self.f['lead_time']}",
-                "demora": f"$answers.{self.f['demora']}",
-                "factor_seguridad_jit": f"$answers.{self.f['factor_seguridad_jit']}",
-                "factor_crecimiento_jit": f"$answers.{self.f['factor_crecimiento_jit']}",
-            }}
-        ]
-        response = self.format_cr(self.cr.aggregate(query))
-        if response:
-            response = self.unlist(response)
-            #! Agregar uom en forma pendiente
-            response.update({
-                'uom': 'unit'
-            })
-        return response
-
-    def model_reorder_point(self, product_code, sku, uom, warehouse, location, ave_daily_demand ):
+    def model_reorder_point(self, product_code, sku, uom, warehouse, location, ave_daily_demand, method ):
         answers = {}
-        product_config = self.get_product_config(product_code)
-        if not product_config:
-            print(f'No product config found for product_code: {product_code}. Using default config.')
-            config = self.get_config( *['lead_time', 'demora', 'factor_seguridad_jit','factor_crecimiento_jit','uom'])
-        else:
-            config = product_config
+        config = self.get_config( *['lead_time', 'demora', 'factor_seguridad_jit','factor_crecimiento_jit','uom'])
         print('config', config)
         lead_time = config.get('lead_time')
         demora = config.get('demora')
@@ -857,6 +823,7 @@ class JIT(Base):
         answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID] = {}
         answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.WH.f['warehouse']] = warehouse
         answers[self.WH.WAREHOUSE_LOCATION_OBJ_ID][self.WH.f['warehouse_location']] = location
+        answers[self.f['procurment_method']] = method
         answers[self.config_fields['lead_time']] = lead_time
         answers[self.config_fields['demora']] = demora
         answers[self.mf['safety_stock']] = self.calc_safety_stock(ave_daily_demand, lead_time, demora, safety_factor )
@@ -931,6 +898,7 @@ class JIT(Base):
                 warehouse,
                 location,
                 consumo_promedio_diario,
+                method='transfer'
                 )
             product_by_warehouse[warehouse].append(ans)
 
@@ -945,7 +913,8 @@ class JIT(Base):
                     sku = product[self.Product.SKU_OBJ_ID].get(self.f['sku'])
                     for existing_product in existing_products:
                         if existing_product.get('product_code') == product_code and \
-                            existing_product.get('sku') == sku:
+                            existing_product.get('sku') == sku and \
+                            existing_product.get('procurment_method') == 'transfer':
                             update_records.append(product)
                             try:
                                create_records.remove(product)
