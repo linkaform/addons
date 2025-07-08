@@ -587,6 +587,7 @@ class JIT(Base):
         return self.format_cr(self.cr.aggregate(query))
 
     def get_reorder_rules(self, warehouse=None, location=None, product_code=None, sku=None, status='active', group_by=False):
+        #TODO agregar el rule_type
         match_query ={ 
              'form_id': self.REGLAS_REORDEN,  
              'deleted_at' : {'$exists':False},
@@ -702,7 +703,7 @@ class JIT(Base):
             self.ROUTE_RULES[product_code][sku][warehouse][warehouse_location][warehouse_dest][warehouse_location_dest] = {'standar_pack':standar_pack}
         return True
 
-    def get_product_average_demand_by_warehouse(self):
+    def get_product_average_demand(self):
         #TODO obtener de registros de formularios o de salidas de almacen
         match_query ={ 
              'form_id': self.DEMANDA_UTIMOS_12_MES,  
@@ -726,13 +727,34 @@ class JIT(Base):
                 '_id':{
                     'product_code':'$product_code',
                     'sku':'$sku',
+                },
+                'demanda_12_meses': {'$first': '$demanda_12_meses' },
+                'consumo_promedio_diario':{'$first':'$consumo_promedio_diario'},
+            }}
+            ]
+        return query
+
+    def get_product_average_demand_by_product(self):
+        #TODO obtener de registros de formularios o de salidas de almacen
+        query = self.get_product_average_demand()
+        return self.format_cr(self.cr.aggregate(query))
+
+    def get_product_average_demand_by_warehouse(self):
+        #TODO obtener de registros de formularios o de salidas de almacen
+        query = self.get_product_average_demand()
+        query.pop(3)
+        query.append({
+            '$group':{
+                '_id':{
+                    'product_code':'$product_code',
+                    'sku':'$sku',
                     'warehouse':'$warehouse',
                 },
                 'folio':{'$first':'$folio'},
                 'demanda_12_meses': {'$first': '$demanda_12_meses' },
                 'consumo_promedio_diario':{'$first':'$consumo_promedio_diario'},
             }}
-            ]
+            )
         return self.format_cr(self.cr.aggregate(query))
 
     def get_warehouse_config(self, key, value, get_key):
