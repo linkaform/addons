@@ -176,6 +176,7 @@ class JIT(Base):
             'rutas_group':'671b2266ecd538747985d0ac',
             'trigger':'66eb14ffc9aefada5b04b793',
             'year': '6206b9ae8209a9677f9b8bda',
+            'family': '61ef32bcdf0ec2ba73dec343'
             }
 
         self.config_fields = {
@@ -235,6 +236,7 @@ class JIT(Base):
         self.PROCURMENT = self.lkm.form_id('procurment_record','id')
         self.REGLAS_REORDEN = self.lkm.form_id('reglas_de_reorden','id')
         self.RUTAS_TRANSPASO = self.lkm.form_id('rutas_de_transpaso','id')
+        self.CONFIGURACIONES_JIT = self.lkm.form_id('configuraciones_jit','id')
 
         #Catalogos
         self.BOM_CAT = self.lkm.catalog_id('bom')
@@ -777,9 +779,48 @@ class JIT(Base):
 
         return answers
 
+    def get_product_config(self, product_code):
+        mango_query = {
+            "selector": {f"answers.{self.f['product_code']}": product_code},
+            "fields": [f"answers.{self.f['family']}"],
+            "limit": 1,
+        }
+        family = self.lkf_api.search_catalog(self.Product.PRODUCT_ID, mango_query)
+        family = self.unlist(family)
+        family = family.get(self.f['family'], None)
+        
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": 127098,
+                f"answers.{self.Product.PRODUCT_OBJ_ID}.{self.f['family']}": family,
+            }},
+            {'$project': {
+                "_id": 0,
+                "lead_time": f"$answers.{self.f['lead_time']}",
+                "demora": f"$answers.{self.f['demora']}",
+                "factor_seguridad_jit": f"$answers.{self.f['factor_seguridad_jit']}",
+                "factor_crecimiento_jit": f"$answers.{self.f['factor_crecimiento_jit']}",
+            }}
+        ]
+        response = self.format_cr(self.cr.aggregate(query))
+        if response:
+            response = self.unlist(response)
+            #! Agregar uom en forma pendiente
+            response.update({
+                'uom': 'unit'
+            })
+        return response
+
     def model_reorder_point(self, product_code, sku, uom, warehouse, location, ave_daily_demand ):
         answers = {}
-        config = self.get_config( *['lead_time', 'demora', 'factor_seguridad_jit','factor_crecimiento_jit','uom'])
+        product_config = self.get_product_config(product_code)
+        if not product_config:
+            print(f'No product config found for product_code: {product_code}. Using default config.')
+            config = self.get_config( *['lead_time', 'demora', 'factor_seguridad_jit','factor_crecimiento_jit','uom'])
+        else:
+            config = product_config
+        print('config', config)
         lead_time = config.get('lead_time')
         demora = config.get('demora')
         safety_factor = config.get('factor_seguridad_jit',1)
