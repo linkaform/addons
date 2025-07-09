@@ -14,13 +14,13 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1726203487.0</created_at>
+    <created_at>1744177818.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
     <email_configuration>
-        <body />
+        <body>None</body>
         <email_fields>[]</email_fields>
         <emails>[]</emails>
         <embed_company_picture>False</embed_company_picture>
@@ -31,7 +31,7 @@
         <send_attachments>False</send_attachments>
         <send_pdf>False</send_pdf>
         <sender>None</sender>
-        <subject />
+        <subject>None</subject>
         <template_html>None</template_html>
         <templates>[]</templates>
         <timer_config>None</timer_config>
@@ -99,6 +99,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -165,6 +166,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -235,6 +237,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>
@@ -307,6 +310,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -338,22 +342,118 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Tipo Uno</label>
+                            <label>Agave</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>tipo_uno</value>
+                            <value>agave</value>
                         </item>
                         <item>
-                            <label>Tipo Dos</label>
+                            <label>Agapanthus</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>tipo_dos</value>
+                            <value>agapanthus</value>
                         </item>
                         <item>
-                            <label>Tipo Tres</label>
+                            <label>Aloe</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>tipo_tres</value>
+                            <value>aloe</value>
+                        </item>
+                        <item>
+                            <label>Alpina</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>alpina</value>
+                        </item>
+                        <item>
+                            <label>Asparagus</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>asparagus</value>
+                        </item>
+                        <item>
+                            <label>Callistemon</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>callistemon</value>
+                        </item>
+                        <item>
+                            <label>Cordyline</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>cordyline</value>
+                        </item>
+                        <item>
+                            <label>Dianella</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>dianella</value>
+                        </item>
+                        <item>
+                            <label>Karl Forester</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>karl_forester</value>
+                        </item>
+                        <item>
+                            <label>Liriope</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>liriope</value>
+                        </item>
+                        <item>
+                            <label>Loropetalum</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>loropetalum</value>
+                        </item>
+                        <item>
+                            <label>Magnolia</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>magnolia</value>
+                        </item>
+                        <item>
+                            <label>Muhly</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>muhly</value>
+                        </item>
+                        <item>
+                            <label>Nandina</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>nandina</value>
+                        </item>
+                        <item>
+                            <label>Peacock Ginger</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>peacock_ginger</value>
+                        </item>
+                        <item>
+                            <label>Pennisetum</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>pennisetum</value>
+                        </item>
+                        <item>
+                            <label>Rubus</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>rubus</value>
+                        </item>
+                        <item>
+                            <label>Standing Ovation</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>standing_ovation</value>
+                        </item>
+                        <item>
+                            <label>Yucca</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>yucca</value>
                         </item>
                     </options>
                     <properties>
@@ -392,6 +492,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -423,34 +524,10 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Almacen</label>
+                            <label>Administracion</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>almacen</value>
-                        </item>
-                        <item>
-                            <label>Atencion al Cliente</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>atencion_al_cliente</value>
-                        </item>
-                        <item>
-                            <label>Compras</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>compras</value>
-                        </item>
-                        <item>
-                            <label>Investigación y desarrollo (I+D)</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>investigación_y_desarrollo_(i+d)</value>
-                        </item>
-                        <item>
-                            <label>Logistica</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>logistica</value>
+                            <value>administracion</value>
                         </item>
                         <item>
                             <label>Mantenimiento</label>
@@ -459,34 +536,22 @@
                             <value>mantenimiento</value>
                         </item>
                         <item>
+                            <label>Operaciones</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>operaciones</value>
+                        </item>
+                        <item>
                             <label>Marketing</label>
                             <points>None</points>
                             <selected>False</selected>
                             <value>marketing</value>
                         </item>
                         <item>
-                            <label>Produccion</label>
+                            <label>Servicios</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>produccion</value>
-                        </item>
-                        <item>
-                            <label>Recursos Humanos</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>recursos_humanos</value>
-                        </item>
-                        <item>
-                            <label>Tecnología de la información</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>tecnología_de_la_información</value>
-                        </item>
-                        <item>
-                            <label>Ventas</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>ventas</value>
+                            <value>servicios</value>
                         </item>
                     </options>
                     <properties>
@@ -525,6 +590,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -556,16 +622,64 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Categoria 1</label>
+                            <label>Edible</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>categoria_1</value>
+                            <value>edible</value>
                         </item>
                         <item>
-                            <label>Categoria 2</label>
+                            <label>Grass</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>categoria_2</value>
+                            <value>grass</value>
+                        </item>
+                        <item>
+                            <label>Ground Cover</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>ground_cover</value>
+                        </item>
+                        <item>
+                            <label>Houseplant</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>houseplant</value>
+                        </item>
+                        <item>
+                            <label>Perennial</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>perennial</value>
+                        </item>
+                        <item>
+                            <label>Rose</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>rose</value>
+                        </item>
+                        <item>
+                            <label>Shrub</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>shrub</value>
+                        </item>
+                        <item>
+                            <label>Succulent</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>succulent</value>
+                        </item>
+                        <item>
+                            <label>Tree</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>tree</value>
+                        </item>
+                        <item>
+                            <label>Tropical</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>tropical</value>
                         </item>
                     </options>
                     <properties>
@@ -604,6 +718,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -625,7 +740,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>66e3c65ffbac26ea3cb54bb7</field_id>
+                    <field_id>61ef32bcdf0ec2ba73dec344</field_id>
                     <field_type>select</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -689,6 +804,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -707,7 +823,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -771,6 +887,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -789,7 +906,7 @@
                         <catalog_field_id>{{ catalog.unidad_de_medida.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -847,6 +964,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -865,7 +983,7 @@
                         <catalog_field_id>{{ catalog.unidad_de_medida.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.unidad_de_medida.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -923,6 +1041,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -941,7 +1060,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.unidad_de_medida_destino.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1005,6 +1124,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -1023,7 +1143,7 @@
                         <catalog_field_id>{{ catalog.unidad_de_medida_destino.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.unidad_de_medida_destino.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1081,6 +1201,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -1099,7 +1220,7 @@
                         <catalog_field_id>{{ catalog.unidad_de_medida_destino.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.unidad_de_medida_destino.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1157,6 +1278,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -1242,6 +1364,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -1273,16 +1396,22 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Opción 1</label>
+                            <label>Activo</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>opción_1</value>
+                            <value>activo</value>
                         </item>
                         <item>
-                            <label>Opción 2</label>
+                            <label>Descontinuado</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>opción_2</value>
+                            <value>descontinuado</value>
+                        </item>
+                        <item>
+                            <label>Reserva</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>reserva</value>
                         </item>
                     </options>
                     <properties>
@@ -1321,6 +1450,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -1412,6 +1542,7 @@
                         <service_name />
                         <update_values>{}</update_values>
                         <url />
+                        <username>False</username>
                         <visible_on />
                         <wait_response>False</wait_response>
                         <watermark_config>None</watermark_config>
@@ -1440,7 +1571,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/123305/</resource_uri>
+    <resource_uri>/api/infosync/form/131434/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -1461,5 +1592,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1726203559.0</updated_at>
+    <updated_at>1752074508.0</updated_at>
 </lkf>
