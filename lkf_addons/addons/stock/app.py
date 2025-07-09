@@ -919,6 +919,8 @@ class Stock(Base):
                 '_id':0,
                 'product_code':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
                 'family':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['family']}",
+                'nombre_producto':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_name']}",
+                'categoria':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_category']}",
                 'warehouse':f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
                 'actuals':f"$answers.{self.f['actual_eaches_on_hand']}",
             }},
@@ -926,7 +928,9 @@ class Stock(Base):
                 '_id':{
                     'product_code':'$product_code',
                     'warehouse':'$warehouse',
-                    'family':'$family'
+                    'family':'$family',
+                    'nombre_producto':'$nombre_producto',
+                    'categoria':'$categoria',
                 },
                 'actuals':{'$sum':'$actuals'}
             }},
@@ -935,6 +939,8 @@ class Stock(Base):
                 "product_code":"$_id.product_code",
                 "warehouse":"$_id.warehouse",
                 "family":"$_id.family",
+                "nombre_producto":"$_id.nombre_producto",
+                "categoria":"$_id.categoria",
                 "actuals": "$actuals",
             }},
         ]
