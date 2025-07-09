@@ -918,13 +918,15 @@ class Stock(Base):
             {'$project':{
                 '_id':0,
                 'product_code':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
+                'family':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['family']}",
                 'warehouse':f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
                 'actuals':f"$answers.{self.f['actual_eaches_on_hand']}",
             }},
             {'$group':{
                 '_id':{
                     'product_code':'$product_code',
-                    'warehouse':'$warehouse'
+                    'warehouse':'$warehouse',
+                    'family':'$family'
                 },
                 'actuals':{'$sum':'$actuals'}
             }},
@@ -932,6 +934,7 @@ class Stock(Base):
                 "_id":0,
                 "product_code":"$_id.product_code",
                 "warehouse":"$_id.warehouse",
+                "family":"$_id.family",
                 "actuals": "$actuals",
             }},
         ]
