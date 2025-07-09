@@ -709,11 +709,12 @@ class JIT(Base):
             self.ROUTE_RULES[product_code][sku][warehouse][warehouse_location][warehouse_dest][warehouse_location_dest] = {'standar_pack':standar_pack}
         return True
 
-    def get_product_average_demand(self):
+    def get_product_average_demand(self, procurement_method):
         #TODO obtener de registros de formularios o de salidas de almacen
         match_query ={ 
              'form_id': self.DEMANDA_UTIMOS_12_MES,  
              'deleted_at' : {'$exists':False},
+            #  f'answers.{self.f["procurment_method"]}': procurement_method,
          } 
         query = [
             {'$match': match_query},
@@ -723,9 +724,11 @@ class JIT(Base):
                     'sku':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["product_sku"]}',
                     'product_code':f'$answers.{self.Product.SKU_OBJ_ID}.{self.f["product_code"]}',
                     'warehouse':f'$answers.{self.WH.WAREHOUSE_OBJ_ID}.{self.WH.f["warehouse"]}',
-                    'demanda_12_meses':f'$answers.{self.mf["demanda_12_meses"]}',
-                    'consumo_promedio_diario':f'$answers.{self.mf["consumo_promedio_diario"]}',
-                    'fecha':f'$answers.{self.mf["fecha_demanda"]}',
+                    'demanda_12_meses':f'$answers.{self.f["demanda_12_meses"]}',
+                    'consumo_promedio_diario': {
+                        '$toDouble': f'$answers.{self.f["consumo_promedio_diario"]}'
+                    },
+                    'fecha':f'$answers.{self.f["fecha_demanda"]}',
                 }
             },
             {'$sort':{'fecha':-1}},
@@ -734,20 +737,20 @@ class JIT(Base):
                     'product_code':'$product_code',
                     'sku':'$sku',
                 },
-                'demanda_12_meses': {'$first': '$demanda_12_meses' },
-                'consumo_promedio_diario':{'$first':'$consumo_promedio_diario'},
+                'demanda_12_meses': {'$sum': '$demanda_12_meses' },
+                'consumo_promedio_diario':{'$sum':'$consumo_promedio_diario'},
             }}
             ]
         return query
 
-    def get_product_average_demand_by_product(self):
+    def get_product_average_demand_by_product(self, procurement_method):
         #TODO obtener de registros de formularios o de salidas de almacen
-        query = self.get_product_average_demand()
+        query = self.get_product_average_demand(procurement_method)
         return self.format_cr(self.cr.aggregate(query))
 
-    def get_product_average_demand_by_warehouse(self):
+    def get_product_average_demand_by_warehouse(self, procurement_method):
         #TODO obtener de registros de formularios o de salidas de almacen
-        query = self.get_product_average_demand()
+        query = self.get_product_average_demand(procurement_method)
         query.pop(3)
         query.append({
             '$group':{
@@ -871,7 +874,7 @@ class JIT(Base):
     def upsert_reorder_point(self):
         if self.current_record:
             print('record, product base')
-        records = self.get_product_average_demand_by_warehouse()
+        records = self.get_product_average_demand_by_warehouse(procurement_method='transfer')
         product_by_warehouse = {}
         config = self.get_config(*['uom'])
         for rec in records:
