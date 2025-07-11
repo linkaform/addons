@@ -917,16 +917,16 @@ class Stock(Base):
             {'$match': match_query},
             {'$project':{
                 '_id':0,
-                'product_code':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
-                'family':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['family']}",
-                'warehouse':f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
+                'product_code':f"$answers.{self.Product.SKU_OBJ_ID}.{self.Product.f['product_code']}",
+                'product_type':f"$answers.{self.Product.SKU_OBJ_ID}.{self.Product.f['product_type']}",
+                'warehouse':f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse']}",
                 'actuals':f"$answers.{self.f['actual_eaches_on_hand']}",
             }},
             {'$group':{
                 '_id':{
                     'product_code':'$product_code',
                     'warehouse':'$warehouse',
-                    'family':'$family'
+                    'product_type':'$product_type'
                 },
                 'actuals':{'$sum':'$actuals'}
             }},
@@ -934,7 +934,7 @@ class Stock(Base):
                 "_id":0,
                 "product_code":"$_id.product_code",
                 "warehouse":"$_id.warehouse",
-                "family":"$_id.family",
+                "product_type":"$_id.product_type",
                 "actuals": "$actuals",
             }},
         ]
