@@ -917,16 +917,30 @@ class Stock(Base):
             {'$match': match_query},
             {'$project':{
                 '_id':0,
+<<<<<<< HEAD
                 'product_code':f"$answers.{self.Product.SKU_OBJ_ID}.{self.Product.f['product_code']}",
                 'product_type':f"$answers.{self.Product.SKU_OBJ_ID}.{self.Product.f['product_type']}",
                 'warehouse':f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse']}",
+=======
+                'product_code':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_code']}",
+                'family':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['family']}",
+                'nombre_producto':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_name']}",
+                'categoria':f"$answers.{self.Product.SKU_OBJ_ID}.{self.f['product_category']}",
+                'warehouse':f"$answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.f['warehouse']}",
+>>>>>>> 66b770359799671bb424567e6ed443e0e627c3ca
                 'actuals':f"$answers.{self.f['actual_eaches_on_hand']}",
             }},
             {'$group':{
                 '_id':{
                     'product_code':'$product_code',
                     'warehouse':'$warehouse',
+<<<<<<< HEAD
                     'product_type':'$product_type'
+=======
+                    'family':'$family',
+                    'nombre_producto':'$nombre_producto',
+                    'categoria':'$categoria',
+>>>>>>> 66b770359799671bb424567e6ed443e0e627c3ca
                 },
                 'actuals':{'$sum':'$actuals'}
             }},
@@ -934,7 +948,13 @@ class Stock(Base):
                 "_id":0,
                 "product_code":"$_id.product_code",
                 "warehouse":"$_id.warehouse",
+<<<<<<< HEAD
                 "product_type":"$_id.product_type",
+=======
+                "family":"$_id.family",
+                "nombre_producto":"$_id.nombre_producto",
+                "categoria":"$_id.categoria",
+>>>>>>> 66b770359799671bb424567e6ed443e0e627c3ca
                 "actuals": "$actuals",
             }},
         ]
