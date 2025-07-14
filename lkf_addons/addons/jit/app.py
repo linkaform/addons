@@ -392,7 +392,6 @@ class JIT(Base):
 
         result = [dict(metadata, answers=answer) for answer in answers]
         response = self.lkf_api.post_forms_answers_list(result)
-        print('response=',response)
         return response
 
     def exec_reorder_rules(self, rule, product_stock):
@@ -811,7 +810,6 @@ class JIT(Base):
     def model_reorder_point(self, product_code, sku, uom, warehouse, location, ave_daily_demand, method ):
         answers = {}
         config = self.get_config( *['lead_time', 'demora', 'factor_seguridad_jit','factor_crecimiento_jit','uom'])
-        print('config', config)
         lead_time = config.get('lead_time')
         demora = config.get('demora')
         safety_factor = config.get('factor_seguridad_jit',1)
