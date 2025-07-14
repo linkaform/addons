@@ -367,7 +367,6 @@ class JIT(Base):
 
         result = [dict(metadata, answers=answer) for answer in answers]
         response = self.lkf_api.post_forms_answers_list(result)
-        print('response', response)
         return response
 
     def create_reorder_rule(self, answers, **kwargs):
@@ -837,12 +836,10 @@ class JIT(Base):
         return answers
 
     def update_procurmet(self, records, **kwargs):
-        print('111updating records', records)
         return []
 
     def upsert_procurment(self, product_by_warehouse, **kwargs):
 
-        print('product by warehouse',product_by_warehouse)
         response = {}
         for wh, create_records in product_by_warehouse.items():
             print(f'----------------{wh}--------------------')
@@ -862,8 +859,6 @@ class JIT(Base):
                             except ValueError:
                                  print('allready removed')
 
-            print('update_records', update_records)
-            print('create_records', create_records)
             response = self.update_procurmet(update_records, **kwargs)
             response += self.create_procurment(create_records, **kwargs)
 
