@@ -530,7 +530,8 @@ class JIT(Base):
             res.append(prod)
         return res
     
-    def get_procurments(self, warehouse=None, location=None, product_code=None, sku=None, status='programmed', group_by=False):
+    def get_procurments(self, warehouse=None, location=None, product_code=None, sku=None, status='programmed', group_by=False, \
+        procurment_method=None):
         match_query = {
             'form_id': self.PROCURMENT,
             'deleted_at': {'$exists': False},
@@ -564,6 +565,10 @@ class JIT(Base):
         if location:
             match_query.update({
                 f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse_location']}":location
+                })
+        if procurment_method:
+            match_query.update({
+                f"answers.{self.mf['procurment_method']}": procurment_method
                 })
         query = [
             {'$match': match_query},
