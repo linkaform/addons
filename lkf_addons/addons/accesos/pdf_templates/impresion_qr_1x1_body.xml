@@ -5,7 +5,7 @@
 <document filename="Avery Prestar 94103" xmlns:doc="http://namespaces.zope.org/rml/doc">
     <template title="Insa" author="LinkaForm">
         <pageTemplate pageSize="22.5cm,11in" id="first">
-            <frame id="first"  x1="0.1cm"   y1="-0.3cm" width="22cm"  height="30cm"/>
+            <frame id="first"  x1="-0.45cm"   y1="-1.2cm" width="22cm"  height="30cm"/>
             <pageGraphics>
                 <setFont name="Helvetica" size="7.5"/>
 
@@ -26,47 +26,120 @@
     {% range_tag 'list_page' answers.684883d52595dedd260c6a71 %}
     {% for page in list_page  %}
         <spacer length="15"/>
-        <blockTable colWidths="2.5cm, 0.6cm,2.5cm, 0.6cm,2.5cm, 0.6cm,2.5cm, 0.6cm,2.5cm, 0.6cm,2.5cm" style="table_images"> 
+        <blockTable colWidths="2.8cm, 0.65cm,2.8cm, 0.65cm,2.8cm, 0.65cm,2.8cm, 0.65cm,2.8cm, 0.65cm,2.8cm" style="table_images"> 
             <tr>
-                <td><imageAndFlowables  imageName="{% generate_qr_base64 128 %}" width="2.5cm" height="2.5cm"/></td>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 128 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 128 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64  256 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 256 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 256 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
             </tr>
+            <tr></tr>
             <tr>
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 316 %}" width="2.5cm" height="2.5cm"/></td>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 316 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 316 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 512 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 512 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 512 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
             </tr>
+            <tr></tr>
             <tr>
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.8 %}" width="2.5cm" height="2.5cm"/></td>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.8 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.8 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.8 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.8 %}" width="2.5cm" height="2.5cm"/></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
                 <td></td>  
-                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.8 %}" width="2.5cm" height="2.5cm"/></td>  
-            </tr> 
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+            </tr>
+            <tr></tr>
+            <tr>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+            </tr>
+            <tr></tr>
+            <tr>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+            </tr>
+            <tr></tr>
+            <tr>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+            </tr>
+            <tr></tr>
+            <tr>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+            </tr>
+            <tr></tr>
+            <tr>
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+                <td></td>  
+                <td>  <imageAndFlowables  imageName="{% generate_qr_base64 18.9 %}" imageTopPadding=".2cm" imageRightPadding=".25cm" /></td>  
+            </tr>
         </blockTable> 
+        <condPageBreak height="5cm"/>
     {% endfor %}
 
     </story>
