@@ -769,15 +769,15 @@
                         </arguments>
                         <integration>None</integration>
                         <script>
-                            <created_at>2025-05-07T22:59:54.060244</created_at>
+                            <created_at>2025-01-09T22:01:48.894727</created_at>
                             <deleted_at>None</deleted_at>
                             <end_date>None</end_date>
-                            <id>{{ script.send_sms_new.id }}</id>
+                            <id>{{ script.send_sms.id }}</id>
                             <is_fileShared>False</is_fileShared>
                             <itype>script</itype>
-                            <name>{{ script.send_sms_new.name }}</name>
-                            <start_date>2025-05-07T22:59:54.056395</start_date>
-                            <updated_at>2025-05-08T18:58:00.399664</updated_at>
+                            <name>{{ script.send_sms.name }}</name>
+                            <start_date>2025-01-09T22:01:48.892854</start_date>
+                            <updated_at>2025-02-14T14:51:56.337181</updated_at>
                         </script>
                         <scriptArguments>
                             <item>
@@ -880,7 +880,7 @@
                                 <label>Link</label>
                                 <type>text</type>
                             </trigger_field>
-                            <value> </value>
+                            <value>null</value>
                         </item>
                         <item>
                             <condition>in=</condition>
@@ -912,15 +912,15 @@
                         </arguments>
                         <integration>None</integration>
                         <script>
-                            <created_at>2025-05-07T22:59:54.060244</created_at>
+                            <created_at>2025-01-09T22:01:48.894727</created_at>
                             <deleted_at>None</deleted_at>
                             <end_date>None</end_date>
-                            <id>{{ script.send_sms_new.id }}</id>
+                            <id>{{ script.send_sms.id }}</id>
                             <is_fileShared>False</is_fileShared>
                             <itype>script</itype>
-                            <name>{{ script.send_sms_new.name }}</name>
-                            <start_date>2025-05-07T22:59:54.056395</start_date>
-                            <updated_at>2025-05-08T18:58:00.399664</updated_at>
+                            <name>{{ script.send_sms.name }}</name>
+                            <start_date>2025-01-09T22:01:48.892854</start_date>
+                            <updated_at>2025-02-14T14:51:56.337181</updated_at>
                         </script>
                         <scriptArguments>
                             <item>
@@ -1009,7 +1009,7 @@
                                 <label>Link</label>
                                 <type>text</type>
                             </trigger_field>
-                            <value> </value>
+                            <value>null</value>
                         </item>
                         <item>
                             <condition>in=</condition>

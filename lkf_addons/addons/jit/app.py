@@ -367,7 +367,6 @@ class JIT(Base):
 
         result = [dict(metadata, answers=answer) for answer in answers]
         response = self.lkf_api.post_forms_answers_list(result)
-        print('response', response)
         return response
 
     def create_reorder_rule(self, answers, **kwargs):
@@ -392,7 +391,6 @@ class JIT(Base):
 
         result = [dict(metadata, answers=answer) for answer in answers]
         response = self.lkf_api.post_forms_answers_list(result)
-        print('response=',response)
         return response
 
     def exec_reorder_rules(self, rule, product_stock):
@@ -532,7 +530,8 @@ class JIT(Base):
             res.append(prod)
         return res
     
-    def get_procurments(self, warehouse=None, location=None, product_code=None, sku=None, status='programmed', group_by=False):
+    def get_procurments(self, warehouse=None, location=None, product_code=None, sku=None, status='programmed', group_by=False, \
+        procurment_method=None):
         match_query = {
             'form_id': self.PROCURMENT,
             'deleted_at': {'$exists': False},
@@ -566,6 +565,10 @@ class JIT(Base):
         if location:
             match_query.update({
                 f"answers.{self.WH.WAREHOUSE_LOCATION_OBJ_ID}.{self.WH.f['warehouse_location']}":location
+                })
+        if procurment_method:
+            match_query.update({
+                f"answers.{self.mf['procurment_method']}": procurment_method
                 })
         query = [
             {'$match': match_query},
@@ -811,7 +814,6 @@ class JIT(Base):
     def model_reorder_point(self, product_code, sku, uom, warehouse, location, ave_daily_demand, method ):
         answers = {}
         config = self.get_config( *['lead_time', 'demora', 'factor_seguridad_jit','factor_crecimiento_jit','uom'])
-        print('config', config)
         lead_time = config.get('lead_time')
         demora = config.get('demora')
         safety_factor = config.get('factor_seguridad_jit',1)
@@ -839,12 +841,10 @@ class JIT(Base):
         return answers
 
     def update_procurmet(self, records, **kwargs):
-        print('111updating records', records)
         return []
 
     def upsert_procurment(self, product_by_warehouse, **kwargs):
 
-        print('product by warehouse',product_by_warehouse)
         response = {}
         for wh, create_records in product_by_warehouse.items():
             print(f'----------------{wh}--------------------')
@@ -862,10 +862,8 @@ class JIT(Base):
                             try:
                                 create_records.remove(product)
                             except ValueError:
-                                 print('allready removed')
+                                pass
 
-            print('update_records', update_records)
-            print('create_records', create_records)
             response = self.update_procurmet(update_records, **kwargs)
             response += self.create_procurment(create_records, **kwargs)
 
@@ -922,7 +920,7 @@ class JIT(Base):
                             try:
                                create_records.remove(product)
                             except ValueError:
-                                print('allready removed')
+                                pass
 
             response = self.create_reorder_rule(create_records)
             # repose_edit = self.update_reorder_rule(update_records)

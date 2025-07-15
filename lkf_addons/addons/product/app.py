@@ -87,6 +87,7 @@ class Product(Base, base.LKF_Base):
             'servicio_descuento': '67c8e048810f3eafed183e21',
             'refaccion_cantidad': '67c8e1341eeb80b05b183df2',
             'refaccion_costo_unitario': '67c8e1341eeb80b05b183df3',
+            'family': '61ef32bcdf0ec2ba73dec343'
             }
             )
 
