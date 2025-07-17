@@ -118,7 +118,7 @@
                                 <field_id>663bffc28d00553254f274e0</field_id>
                                 <group>{}</group>
                                 <label>Estatus</label>
-                                <type>radio</type>
+                                <type>select</type>
                             </trigger_field>
                             <value>iniciar_turno</value>
                         </item>
