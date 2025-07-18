@@ -83,6 +83,14 @@
                     <label>Fotografia - Cierre de Turno</label>
                     <type>images</type>
                 </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68798dd1205f333d8f53a1c7</field_id>
+                    <group_id>None</group_id>
+                    <id>68798dd1205f333d8f53a1c7</id>
+                    <label>Comentarios - Cierre de Turno</label>
+                    <type>textarea</type>
+                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
             <name>Ocultar fotografia de cierre</name>
@@ -116,6 +124,14 @@
                     <id>6855e761adab5d93274da7d7</id>
                     <label>Fotografia - Inicio de Turno</label>
                     <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66a5b9bed0c44910177eb724</field_id>
+                    <group_id>None</group_id>
+                    <id>66a5b9bed0c44910177eb724</id>
+                    <label>Comentarios - Inicio de Turno</label>
+                    <type>textarea</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
@@ -158,6 +174,22 @@
                     <id>6879823d856f580aa0e05a3b</id>
                     <label>Fotografia - Cierre de Turno</label>
                     <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68798dd1205f333d8f53a1c7</field_id>
+                    <group_id>None</group_id>
+                    <id>68798dd1205f333d8f53a1c7</id>
+                    <label>Comentarios - Cierre de Turno</label>
+                    <type>textarea</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66a5b9bed0c44910177eb724</field_id>
+                    <group_id>None</group_id>
+                    <id>66a5b9bed0c44910177eb724</id>
+                    <label>Comentarios - Inicio de Turno</label>
+                    <type>textarea</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
