@@ -49,7 +49,6 @@
                     <buttons_ids>
                         <item>684877eab2fb29c44fe1127e</item>
                         <item>684877eab2fb29c44fe1127d</item>
-                        <item>684878c9083a798009117f29</item>
                     </buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -68,22 +67,22 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Actualizar foto con Scann de QR</label>
+                            <label>Actualizar foto con scann de QR</label>
                             <points>None</points>
                             <selected>False</selected>
                             <value>actualizar_foto_con_scann_de_qr</value>
                         </item>
                         <item>
-                            <label>Actualizar foto con Seleccion de Nombre</label>
+                            <label>Actualizar foto con selección de nombre</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>actualizar_foto_con_seleccion_de_nombre</value>
+                            <value>actualizar_foto_con_selección_de_nombre</value>
                         </item>
                         <item>
-                            <label>Acutalizacion de QR</label>
+                            <label>Actualización de QR</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>acutalizacion_de_qr</value>
+                            <value>actualización_de_qr</value>
                         </item>
                     </options>
                     <properties>
@@ -166,7 +165,7 @@
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Area</label>
+                    <label>Área</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -387,7 +386,7 @@
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>QR del Area</label>
+                    <label>QR del área</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -454,7 +453,7 @@
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Foto del Area</label>
+                    <label>Foto del área</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -531,7 +530,7 @@
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Comment</label>
+                    <label>Comentario</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -589,152 +588,6 @@
         <item>
             <page_description />
             <page_fields>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>None</catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>684877eab2fb29c44fe1127d</field_id>
-                    <field_type>button</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>None</group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Scann</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color>#4a4848</color>
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>
-                            <css_class>fa-barcode</css_class>
-                            <name>barcode</name>
-                            <unicode>f02a</unicode>
-                        </icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method>POST</method>
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>
-                            <num_68487646684fe30a8f9f3ef2>actualizar_foto_con_scann_de_qr</num_68487646684fe30a8f9f3ef2>
-                        </update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on>edit-preview</visible_on>
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>None</catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>684877eab2fb29c44fe1127e</field_id>
-                    <field_type>button</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>None</group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Seleccion</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color>#1820db</color>
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>
-                            <css_class>fa-picture-o</css_class>
-                            <name>picture-o</name>
-                            <unicode>f03e</unicode>
-                        </icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method>POST</method>
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>
-                            <num_68487646684fe30a8f9f3ef2>actualizar_foto_con_seleccion_de_nombre</num_68487646684fe30a8f9f3ef2>
-                        </update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on>edit-preview</visible_on>
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
                 <item>
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
@@ -847,5 +700,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1750285236.0</updated_at>
+    <updated_at>1753114870.0</updated_at>
 </lkf>
