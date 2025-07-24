@@ -50,22 +50,7 @@
                 </record>
                 <wf_fields>
                     <operator>all</operator>
-                    <triggers>
-                        <item>
-                            <condition>not__empty=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>{}</catalog>
-                                <field_id>663e5e4bf5b8a7ce8211ed13</field_id>
-                                <group>{}</group>
-                                <label>QR Area</label>
-                                <type>images</type>
-                            </trigger_field>
-                            <value>null</value>
-                        </item>
-                    </triggers>
+                    <triggers>[]</triggers>
                 </wf_fields>
             </rules>
         </item>
