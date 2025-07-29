@@ -3347,6 +3347,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.format_cr_result(self.cr.aggregate(query),  get_one=True)
 
     def get_config_modulo_seguridad(self, ubicaciones=[]):
+        #TODO Verificar por que se envia asi la lista
+        if isinstance(ubicaciones, list) and ubicaciones and isinstance(ubicaciones[0], dict):
+            ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
         requerimientos = set()
         envios = set()
         match_query = {
@@ -3365,7 +3368,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         raw_result = self.format_cr_result(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
-                ubicacion = grupo.get('ubicacion', grupo.get('ubicacion_recorrido', ''))
+                #TODO Verficiar el cambio de key
+                ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
                 if ubicacion in ubicaciones:
                     reqs = grupo.get(self.conf_modulo_seguridad['datos_requeridos'], [])
                     if isinstance(reqs, list):

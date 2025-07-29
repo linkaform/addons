@@ -176,13 +176,13 @@
                                     <conditions>[]</conditions>
                                 </etl>
                                 <input>
-                                    <field_type>text</field_type>
-                                    <id>6762f7b0922cc2a2f57d4044</id>
+                                    <field_type>integer</field_type>
+                                    <id>680977786d022b9bff6e3645</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>
                                 <output>
-                                    <id>6762f7b0922cc2a2f57d4044</id>
+                                    <id>68097c1366b60f853351bbb6</id>
                                 </output>
                             </item>
                             <item>
@@ -190,13 +190,13 @@
                                     <conditions>[]</conditions>
                                 </etl>
                                 <input>
-                                    <field_type>images</field_type>
-                                    <id>6763096aa99cee046ba766ad</id>
+                                    <field_type>integer</field_type>
+                                    <id>680977786d022b9bff6e3646</id>
                                     <type>field_to_field</type>
                                     <value>None</value>
                                 </input>
                                 <output>
-                                    <id>6763096aa99cee046ba766ad</id>
+                                    <id>68097c1366b60f853351bbb7</id>
                                 </output>
                             </item>
                         </mapping>
@@ -233,7 +233,22 @@
                 </record>
                 <wf_fields>
                     <operator>all</operator>
-                    <triggers>[]</triggers>
+                    <triggers>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>663e5e4bf5b8a7ce8211ed13</field_id>
+                                <group>{}</group>
+                                <label>QR Area</label>
+                                <type>images</type>
+                            </trigger_field>
+                            <value>null</value>
+                        </item>
+                    </triggers>
                 </wf_fields>
             </rules>
         </item>
@@ -311,10 +326,10 @@
                     <user>[]</user>
                 </metadata>
                 <record>
-                    <created>True</created>
+                    <created>False</created>
                     <deleted>False</deleted>
-                    <edited>True</edited>
-                    <run_multiple_times>True</run_multiple_times>
+                    <edited>False</edited>
+                    <run_multiple_times>False</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
@@ -333,44 +348,6 @@
                                 <type>images</type>
                             </trigger_field>
                             <value>null</value>
-                        </item>
-                        <item>
-                            <condition>not__empty=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>{}</catalog>
-                                <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
-                                <group>{}</group>
-                                <label>Nombre de Area</label>
-                                <type>text</type>
-                            </trigger_field>
-                            <value> </value>
-                        </item>
-                        <item>
-                            <condition>not__empty=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>
-                                    <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
-                                    <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
-                                    <field_type>text</field_type>
-                                    <filters>None</filters>
-                                    <geofence>None</geofence>
-                                    <last>False</last>
-                                    <related_catalog>{}</related_catalog>
-                                    <view_fields>[]</view_fields>
-                                    <view_index>1</view_index>
-                                </catalog>
-                                <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
-                                <group>{}</group>
-                                <label>Ubicación</label>
-                                <type>catalog-select</type>
-                            </trigger_field>
-                            <value> </value>
                         </item>
                     </triggers>
                 </wf_fields>

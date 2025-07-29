@@ -717,7 +717,7 @@ class JIT(Base):
         match_query ={ 
              'form_id': self.DEMANDA_UTIMOS_12_MES,  
              'deleted_at' : {'$exists':False},
-            #  f'answers.{self.f["procurment_method"]}': procurement_method,
+             f'answers.{self.f["procurment_method"]}': procurement_method,
          } 
         query = [
             {'$match': match_query},
@@ -873,6 +873,7 @@ class JIT(Base):
         if self.current_record:
             print('record, product base')
         records = self.get_product_average_demand_by_warehouse(procurement_method='transfer')
+        print(len(records), 'records found')
         product_by_warehouse = {}
         config = self.get_config(*['uom'])
         for rec in records:
