@@ -2436,7 +2436,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "visita_a": access_pass.get("visita_a"),
                     "ubicacion": access_pass.get("ubicaciones"),
                     "address": address.get('address'),
-                    "empresa": company
+                    "empresa": company,
+                    "all_data": access_pass
                 }
 
                 id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
@@ -6765,7 +6766,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
     def create_class_google_wallet(self, data, qr_code):
         ISSUER_ID = '3388000000022924601'
-        CLASS_ID = f'{ISSUER_ID}.passClass-08'
+        CLASS_ID = f'{ISSUER_ID}.ProdPassClass'
 
         google_wallet_creds = self.lkf_api.get_user_google_wallet(use_api_key=True, jwt_settings_key=False)
         QR_CODE_VALUE = qr_code
@@ -6814,64 +6815,82 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         address = data.get('address', '')
         visita_a = data.get('visita_a', '')
         empresa = data.get('empresa', '')
+        num_accesos = data.get('all_data', {}).get('config_limitar_acceso', 1)
+        fecha_desde = data.get('all_data', {}).get('fecha_desde_visita', '')
+        fecha_hasta = data.get('all_data', {}).get('fecha_hasta_visita', '')
+        if not fecha_hasta:
+            fecha_hasta = fecha_desde
 
         object_body = {
-            "genericType": "GENERIC_ENTRY_TICKET",
             "id": object_id,
             "classId": class_id,
             "state": "ACTIVE",
-            "barcode": {
-                "type": "QR_CODE",
-                "value": qr_code,
-            },
-            'cardTitle': {
-                'defaultValue': {
-                    'language': 'es-MX',
-                    'value': empresa
+            "genericType": "GENERIC_TYPE_UNSPECIFIED",
+            "cardTitle": {
+                "defaultValue": {
+                    "language": "es-MX",
+                    "value": empresa
                 }
             },
             "subheader": {
-                'defaultValue': {
-                    'language': 'es-MX',
-                    'value': f"Visita a: {visita_a}"
+                "defaultValue": {
+                    "language": "es-MX",
+                    "value": 'Pase de Entrada'
                 }
             },
-            'header': {
-                'defaultValue': {
-                    'language': 'es-MX',
-                    'value': nombre
+            "header": {
+                "defaultValue": {
+                    "language": "es-MX",
+                    "value": f'Visita a: {visita_a}'
                 }
             },
-            'logo': {
-                'sourceUri': {
-                    'uri':
-                        'https://f001.backblazeb2.com/file/app-linkaform/public-client-126/68600/6076166dfd84fa7ea446b917/2025-05-12T08:19:51.png'
-                },
-                'contentDescription': {
-                    'defaultValue': {
-                        'language': 'es-MX',
-                        'value': 'Soter Logo'
-                    }
+            "logo": {
+                "sourceUri": {
+                    "uri": "https://f001.backblazeb2.com/file/app-linkaform/public-client-126/68600/6076166dfd84fa7ea446b917/2025-05-12T08:19:51.png"
                 }
             },
-            'hexBackgroundColor': '#ffffff',
+            "hexBackgroundColor": "#FFFFFF",
+            "groupingInfo": {
+                "sortIndex": 1,
+                "groupingId": "pase_de_entrada",
+            },
             "textModulesData": [
                 {
-                    "header": "Ubicación",
-                    "body": format_ubicacion,
-                    "id": "ubication_field"
+                    "id": "ubicacion",
+                    "header": "UBICACION",
+                    "body": format_ubicacion
                 },
                 {
-                    "header": "Dirección",
-                    "body": address,
-                    "id": "address_field"
+                    "id": "fecha_entrada",
+                    "header": "FECHA ENTRADA",
+                    "body": fecha_desde
                 },
                 {
-                    "header": "Visita a",
-                    "body": visita_a,
-                    "id": "visit_field"
+                    "id": "fecha_salida",
+                    "header": "FECHA SALIDA",
+                    "body": fecha_hasta
+                },
+                {
+                    "id": "accesos",
+                    "header": "ACCESOS",
+                    "body": num_accesos
+                },
+                {
+                    "id": "vehiculos",
+                    "header": "VEHICULOS",
+                    "body": "1"
+                },
+                {
+                    "id": "equipos",
+                    "header": "EQUIPOS",
+                    "body": "1"
                 }
-            ]
+            ],
+            "barcode": {
+                "type": "QR_CODE",
+                "value": qr_code,
+                "alternateText": "Muestra tu QR para ingresar"
+            },
         }
 
         requests.post(
