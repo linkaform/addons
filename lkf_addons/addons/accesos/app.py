@@ -5607,12 +5607,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     answers.update({self.incidence_fields['datos_deposito_incidencia']:depositos_list})
             elif key == 'tags':
                 tags = incidencia_seg.get('tags',[])
+                tags=["Accidente", "urgente"]
                 if tags:
                     tags_list = []
                     for c in tags:
+                        print("tags", c)
+
                         tags_list.append(
                             {
-                                self.incidence_fields['tag']:c.get('tags'),
+                                self.incidence_fields['tag']:c,
                             }
                         )
                     answers.update({self.incidence_fields['tags']:tags_list})
