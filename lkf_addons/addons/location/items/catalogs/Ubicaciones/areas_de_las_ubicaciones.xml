@@ -7,7 +7,7 @@
         <button_message>Mandar respuestas</button_message>
     </confirmation>
     <description />
-    <_rev>2-6865693553f691feafc32844e0374f6a</_rev>
+    <_rev>4-50de6d1cc263f4f79684861bb5b96fb7</_rev>
     <updated_at>2025-04-28T14:23:43.416989+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -48,6 +48,13 @@
                     <view_fields>[]</view_fields>
                     <options>[]</options>
                     <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>geolocation</field_type>
+                    <required>False</required>
+                    <field_id>688bac1ecfdcf8b16eb209b5</field_id>
+                    <properties>{}</properties>
+                    <label>Geolocalizacion de Area</label>
                 </item>
                 <item>
                     <field_type>catalog</field_type>
