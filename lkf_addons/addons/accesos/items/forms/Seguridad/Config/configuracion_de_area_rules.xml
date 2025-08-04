@@ -52,21 +52,71 @@
         <item>
             <conditions>
                 <item>
-                    <condition>iexact=</condition>
+                    <condition>in=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>688a33d9e61fcd2c299ff39e</field_id>
                         <group_id>None</group_id>
                         <id>688a33d9e61fcd2c299ff39e</id>
-                        <label>Crear area(opcional)</label>
-                        <type>radio</type>
+                        <label>¿Existe el area que buscabas en el catalogo?</label>
+                        <type>select</type>
                     </field>
-                    <value>crear_nueva_area</value>
+                    <value>no</value>
                 </item>
             </conditions>
             <element_ids>[]</element_ids>
             <empty>False</empty>
             <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>688bac1ecfdcf8b16eb209b5</field_id>
+                    <group_id>None</group_id>
+                    <id>688bac1ecfdcf8b16eb209b5</id>
+                    <label>Geolocalizacion de Area</label>
+                    <type>geolocation</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>688a33d9e61fcd2c299ff39f</field_id>
+                    <group_id>None</group_id>
+                    <id>688a33d9e61fcd2c299ff39f</id>
+                    <label>Nombre del area se va a crear</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 2</name>
+            <operator>and</operator>
+            <rule_id>dd51d38136b1132</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>688a33d9e61fcd2c299ff39e</field_id>
+                        <group_id>None</group_id>
+                        <id>688a33d9e61fcd2c299ff39e</id>
+                        <label>¿Existe el area que buscabas en el catalogo?</label>
+                        <type>select</type>
+                    </field>
+                    <value>no</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>688a33d9e61fcd2c299ff39f</field_id>
+                    <group_id>None</group_id>
+                    <id>688a33d9e61fcd2c299ff39f</id>
+                    <label>Nombre del area se va a crear</label>
+                    <type>text</type>
+                </item>
                 <item>
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id}}</field_id>
@@ -85,98 +135,10 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Requerir ubicacion</name>
+            <name>Regla 3</name>
             <operator>and</operator>
-            <rule_id>152dce88c917c9</rule_id>
+            <rule_id>16b8ad1124921ee</rule_id>
             <rule_type>required</rule_type>
-            <user_conditions>{}</user_conditions>
-        </item>
-        <item>
-            <conditions>
-                <item>
-                    <condition>iexact=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>688a33d9e61fcd2c299ff39e</field_id>
-                        <group_id>None</group_id>
-                        <id>688a33d9e61fcd2c299ff39e</id>
-                        <label>Crear area(opcional)</label>
-                        <type>radio</type>
-                    </field>
-                    <value>crear_nueva_area</value>
-                </item>
-            </conditions>
-            <element_ids>[]</element_ids>
-            <empty>False</empty>
-            <fields_ruled>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>688a33d9e61fcd2c299ff39f</field_id>
-                    <group_id>None</group_id>
-                    <id>688a33d9e61fcd2c299ff39f</id>
-                    <label>Nombre del area</label>
-                    <type>text</type>
-                </item>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>688bac1ecfdcf8b16eb209b5</field_id>
-                    <group_id>None</group_id>
-                    <id>688bac1ecfdcf8b16eb209b5</id>
-                    <label>Geolocalizacion de Area</label>
-                    <type>geolocation</type>
-                </item>
-            </fields_ruled>
-            <group_conditions>{}</group_conditions>
-            <name>Mostrar campo de nueva area</name>
-            <operator>and</operator>
-            <rule_id>12efc3e59f156a</rule_id>
-            <rule_type>show</rule_type>
-            <user_conditions>{}</user_conditions>
-        </item>
-        <item>
-            <conditions>
-                <item>
-                    <condition>iexact=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>68487646684fe30a8f9f3ef2</field_id>
-                        <group_id>None</group_id>
-                        <id>68487646684fe30a8f9f3ef2</id>
-                        <label>Tipo de Movimiento</label>
-                        <type>radio</type>
-                    </field>
-                    <value>actualizar_foto_con_selección_de_nombre</value>
-                </item>
-                <item>
-                    <condition>iexact=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>68487646684fe30a8f9f3ef2</field_id>
-                        <group_id>None</group_id>
-                        <id>68487646684fe30a8f9f3ef2</id>
-                        <label>Tipo de Movimiento</label>
-                        <type>radio</type>
-                    </field>
-                    <value>actualización_de_qr</value>
-                </item>
-            </conditions>
-            <element_ids>[]</element_ids>
-            <empty>False</empty>
-            <fields_ruled>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>688a33d9e61fcd2c299ff39e</field_id>
-                    <group_id>None</group_id>
-                    <id>688a33d9e61fcd2c299ff39e</id>
-                    <label>Crear area(opcional)</label>
-                    <type>radio</type>
-                </item>
-            </fields_ruled>
-            <group_conditions>{}</group_conditions>
-            <name>Regla 4</name>
-            <operator>or</operator>
-            <rule_id>21e2d8a18dc95c</rule_id>
-            <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
     </rules>

@@ -131,8 +131,6 @@
                     <rules>
                         <item>20ee20c2824255d</item>
                         <item>20ee20c2824255d</item>
-                        <item>21e2d8a18dc95c</item>
-                        <item>21e2d8a18dc95c</item>
                     </rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -142,8 +140,8 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>152dce88c917c9</rule_id>
-                            <rule_index>1</rule_index>
+                            <rule_id>16b8ad1124921ee</rule_id>
+                            <rule_index>2</rule_index>
                             <rule_type>required</rule_type>
                         </item>
                     </affecting_rules>
@@ -232,8 +230,8 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>152dce88c917c9</rule_id>
-                            <rule_index>1</rule_index>
+                            <rule_id>16b8ad1124921ee</rule_id>
+                            <rule_index>2</rule_index>
                             <rule_type>required</rule_type>
                         </item>
                     </affecting_rules>
@@ -390,42 +388,35 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>21e2d8a18dc95c</rule_id>
-                            <rule_index>3</rule_index>
-                            <rule_type>show</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>True</default>
-                    <default_value>utilizar_seleccion_en_catalogo</default_value>
+                    <default_value>si</default_value>
                     <descriptor>None</descriptor>
                     <fav>False</fav>
                     <field_id>688a33d9e61fcd2c299ff39e</field_id>
-                    <field_type>radio</field_type>
+                    <field_type>select</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>Si no encuentras la area en el catalogo selecciona la segunda opcion.</help_text>
-                    <label>Crear area(opcional)</label>
+                    <help_text>None</help_text>
+                    <label>¿Existe el area que buscabas en el catalogo?</label>
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>Utilizar seleccion en catalogo</label>
+                            <label>Si</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>utilizar_seleccion_en_catalogo</value>
+                            <value>si</value>
                         </item>
                         <item>
-                            <label>Crear nueva area</label>
+                            <label>No</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>crear_nueva_area</value>
+                            <value>no</value>
                         </item>
                     </options>
                     <properties>
@@ -439,7 +430,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>True</help_text>
+                        <help_text>False</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -472,8 +463,8 @@
                     </properties>
                     <required>False</required>
                     <rules>
-                        <item>152dce88c917c9</item>
-                        <item>12efc3e59f156a</item>
+                        <item>dd51d38136b1132</item>
+                        <item>16b8ad1124921ee</item>
                     </rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -483,9 +474,15 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>12efc3e59f156a</rule_id>
-                            <rule_index>2</rule_index>
+                            <rule_id>dd51d38136b1132</rule_id>
+                            <rule_index>1</rule_index>
                             <rule_type>show</rule_type>
+                        </item>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>16b8ad1124921ee</rule_id>
+                            <rule_index>2</rule_index>
+                            <rule_type>required</rule_type>
                         </item>
                     </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
@@ -502,7 +499,7 @@
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Nombre del area</label>
+                    <label>Nombre del area se va a crear</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -557,8 +554,8 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>12efc3e59f156a</rule_id>
-                            <rule_index>2</rule_index>
+                            <rule_id>dd51d38136b1132</rule_id>
+                            <rule_index>1</rule_index>
                             <rule_type>show</rule_type>
                         </item>
                     </affecting_rules>
@@ -1177,5 +1174,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1753988089.0</updated_at>
+    <updated_at>1754324941.0</updated_at>
 </lkf>
