@@ -1,10 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <templates>[]</templates>
-    <confirmation>{}</confirmation>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <redirect_url>default</redirect_url>
+        <button_message>Mandar respuestas</button_message>
+    </confirmation>
     <description />
-    <_rev>2-9feb596f66ba23eddf580bc2096050c6</_rev>
-    <updated_at>2024-12-02T22:13:44.259513+00:00Z</updated_at>
+    <_rev>6-d5538388f34e226814c6064718d9f0f7</_rev>
+    <updated_at>2025-04-28T14:28:07.213419+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -12,60 +16,86 @@
     <filters>{}</filters>
     <name>Bitacora de Rondines</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-12-02T22:13:44.259513+00:00Z</created_at>
-    <advanced_options>{}</advanced_options>
+    <created_at>2025-04-28T14:28:07.213419+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <config>False</config>
+            <required>False</required>
+            <manual>False</manual>
+        </folio>
+    </advanced_options>
     <catalog_pages>
         <item>
             <page_fields>
                 <item>
                     <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <key>True</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>674e31186a5f08049c82844d</field_id>
-                    <required>True</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>True</required>
+                    <field_id>674e31186a5f08049c82844d</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Folio</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>True</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
-                    <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>674e31186a5f08049c82844e</field_id>
-                    <required>True</required>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>6645050d873fc2d733961eba</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.configuracion_de_recorridos.obj_id }}</field_id>
+                    <label>Recorrido</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_recorridos.id }}</catalog_id>
+                        <view_fields>
+                            <item>6645050d873fc2d733961eba</item>
+                        </view_fields>
+                        <name>{{ catalog.configuracion_de_recorridos.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <properties>{}</properties>
+                    <field_id>6645050d873fc2d733961eba</field_id>
+                    <required>False</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Nombre de Rondin</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <label>Nombre del recorrido</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.configuracion_de_recorridos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.configuracion_de_recorridos.id }}</catalog_id>
+                        <filters />
+                    </catalog>
                     <options>[]</options>
-                    <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>674e31186a5f08049c82844c</_id>
+    <_id>680f9077631b529e3851bbe4</_id>
     <public>False</public>
-    <catalog_id>126802</catalog_id>
+    <catalog_id>131968</catalog_id>
 </lkf>
