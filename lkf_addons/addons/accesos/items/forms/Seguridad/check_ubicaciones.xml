@@ -165,7 +165,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode />
+                        <enable_barcode>barcode</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -609,7 +609,7 @@
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
-                    <fav>True</fav>
+                    <fav>False</fav>
                     <field_id>681144fb0d423e25b42818d3</field_id>
                     <field_type>group</field_type>
                     <grading_criteria>{}</grading_criteria>
@@ -1648,5 +1648,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1753307182.0</updated_at>
+    <updated_at>1754598127.0</updated_at>
 </lkf>

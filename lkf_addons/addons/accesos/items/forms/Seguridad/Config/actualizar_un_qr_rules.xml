@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.actualizar_un_qr.id }}</form_id>
+    <id>68928d1f7c911cea58372921</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>68928c76fc027d15895fa23c</field_id>
+                        <group_id>None</group_id>
+                        <id>68928c76fc027d15895fa23c</id>
+                        <label>Metodo de actualizacion</label>
+                        <type>select</type>
+                    </field>
+                    <value>seleccionar_area_y_ubicacion</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>680f8f6f3aae12aabc6c3996</catalog_id>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <group_id>None</group_id>
+                    <id>663e5c57f5b8a7ce8211ed0b</id>
+                    <label>Ubicación</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>680f8f6f3aae12aabc6c3996</id>
+                    <label>Area</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>680f8f6f3aae12aabc6c3996</catalog_id>
+                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <group_id>None</group_id>
+                    <id>663e5d44f5b8a7ce8211ed0f</id>
+                    <label>Nombre de Area</label>
+                    <type>catalog-select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>and</operator>
+            <rule_id>ace1556fc7112d</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>68928c76fc027d15895fa23c</field_id>
+                        <group_id>None</group_id>
+                        <id>68928c76fc027d15895fa23c</id>
+                        <label>Metodo de actualizacion</label>
+                        <type>select</type>
+                    </field>
+                    <value>escanear_qr_anterior</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68928cfdc847e631ba2c157e</field_id>
+                    <group_id>None</group_id>
+                    <id>68928cfdc847e631ba2c157e</id>
+                    <label>Anterior QR</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 2</name>
+            <operator>and</operator>
+            <rule_id>20f272a10d7871</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>68928c76fc027d15895fa23c</field_id>
+                        <group_id>None</group_id>
+                        <id>68928c76fc027d15895fa23c</id>
+                        <label>Metodo de actualizacion</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>68928c76fc027d15895fa23c</field_id>
+                        <group_id>None</group_id>
+                        <id>68928c76fc027d15895fa23c</id>
+                        <label>Metodo de actualizacion</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68929562c6b050d5066a2aec</field_id>
+                    <group_id>None</group_id>
+                    <id>68929562c6b050d5066a2aec</id>
+                    <label>Status</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68929562c6b050d5066a2aed</field_id>
+                    <group_id>None</group_id>
+                    <id>68929562c6b050d5066a2aed</id>
+                    <label>Detalles</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 3</name>
+            <operator>or</operator>
+            <rule_id>1e93e9017b43f0</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
