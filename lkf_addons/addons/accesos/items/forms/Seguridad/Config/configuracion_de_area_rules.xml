@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.configuracion_de_area.id }}</form_id>
-    <id>68912dd9cb5b26eb6616eb6a</id>
+    <id>68935e755af7ef5c445fa2ec</id>
     <rules>
         <item>
             <conditions>
@@ -23,48 +23,14 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>688a33d9e61fcd2c299ff39f</field_id>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>688a33d9e61fcd2c299ff39f</id>
-                    <label>Nombre del area se va a crear</label>
-                    <type>text</type>
+                    <id>680f8f6f3aae12aabc6c3996</id>
+                    <label>Área</label>
+                    <type>catalog</type>
                 </item>
                 <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>688bac1ecfdcf8b16eb209b5</field_id>
-                    <group_id>None</group_id>
-                    <id>688bac1ecfdcf8b16eb209b5</id>
-                    <label>Geolocalizacion de Area</label>
-                    <type>geolocation</type>
-                </item>
-            </fields_ruled>
-            <group_conditions>{}</group_conditions>
-            <name>Nombre de Area</name>
-            <operator>and</operator>
-            <rule_id>14891d9e20cca87</rule_id>
-            <rule_type>show</rule_type>
-            <user_conditions>{}</user_conditions>
-        </item>
-        <item>
-            <conditions>
-                <item>
-                    <condition>in=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>688a33d9e61fcd2c299ff39e</field_id>
-                        <group_id>None</group_id>
-                        <id>688a33d9e61fcd2c299ff39e</id>
-                        <label>¿Existe el area que buscabas en el catalogo?</label>
-                        <type>select</type>
-                    </field>
-                    <value>no</value>
-                </item>
-            </conditions>
-            <element_ids>[]</element_ids>
-            <empty>False</empty>
-            <fields_ruled>
-                <item>
-                    <catalog_id>None</catalog_id>
+                    <catalog_id>680f8f6f3aae12aabc6c3996</catalog_id>
                     <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
                     <group_id>None</group_id>
                     <id>663e5c57f5b8a7ce8211ed0b</id>
@@ -81,9 +47,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Requerir Area y Ubicacion</name>
+            <name>Regla 1</name>
             <operator>and</operator>
-            <rule_id>177a167f1a7b1216</rule_id>
+            <rule_id>22811701174faf6</rule_id>
             <rule_type>required</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -107,18 +73,26 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <field_id>688a33d9e61fcd2c299ff39f</field_id>
                     <group_id>None</group_id>
-                    <id>663e5d44f5b8a7ce8211ed0f</id>
-                    <label>Nombre de Area</label>
-                    <type>catalog-select</type>
+                    <id>688a33d9e61fcd2c299ff39f</id>
+                    <label>Nombre del area a crear</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>688bac1ecfdcf8b16eb209b5</field_id>
+                    <group_id>None</group_id>
+                    <id>688bac1ecfdcf8b16eb209b5</id>
+                    <label>Geolocalizacion de Area</label>
+                    <type>geolocation</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Ocultar Catalogo de Area</name>
+            <name>Regla 2</name>
             <operator>and</operator>
-            <rule_id>bc21543453974</rule_id>
-            <rule_type>invisible</rule_type>
+            <rule_id>a0316c614b413fd</rule_id>
+            <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
         <item>
@@ -153,25 +127,25 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>6889337c4db2c8b3de148e77</field_id>
+                    <field_id>689a46342038ded0e949be08</field_id>
                     <group_id>None</group_id>
-                    <id>6889337c4db2c8b3de148e77</id>
-                    <label>Status</label>
-                    <type>text</type>
+                    <id>689a46342038ded0e949be08</id>
+                    <label>Status comment</label>
+                    <type>textarea</type>
                 </item>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>689270a245f31ca65437292b</field_id>
+                    <field_id>689a46342038ded0e949be07</field_id>
                     <group_id>None</group_id>
-                    <id>689270a245f31ca65437292b</id>
-                    <label>Detalles</label>
-                    <type>textarea</type>
+                    <id>689a46342038ded0e949be07</id>
+                    <label>Status</label>
+                    <type>select</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Regla 4</name>
+            <name>Regla 3</name>
             <operator>or</operator>
-            <rule_id>1e351917191fd93</rule_id>
+            <rule_id>18ad1d282480171f</rule_id>
             <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
