@@ -14,7 +14,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1749583575.0</created_at>
+    <created_at>1749827323.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -120,10 +120,10 @@
                     </properties>
                     <required>False</required>
                     <rules>
-                        <item>22811701174faf6</item>
-                        <item>a0316c614b413fd</item>
-                        <item>18ad1d282480171f</item>
-                        <item>18ad1d282480171f</item>
+                        <item>11ec241f9ed4f8</item>
+                        <item>1b098de1604999</item>
+                        <item>8949f6157d871</item>
+                        <item>8949f6157d871</item>
                     </rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -133,7 +133,7 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>22811701174faf6</rule_id>
+                            <rule_id>11ec241f9ed4f8</rule_id>
                             <rule_index>0</rule_index>
                             <rule_type>required</rule_type>
                         </item>
@@ -223,7 +223,7 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>22811701174faf6</rule_id>
+                            <rule_id>11ec241f9ed4f8</rule_id>
                             <rule_index>0</rule_index>
                             <rule_type>required</rule_type>
                         </item>
@@ -233,7 +233,7 @@
                         <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -384,13 +384,13 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>22811701174faf6</rule_id>
+                            <rule_id>11ec241f9ed4f8</rule_id>
                             <rule_index>0</rule_index>
                             <rule_type>required</rule_type>
                         </item>
                         <item>
                             <applied>False</applied>
-                            <rule_id>a0316c614b413fd</rule_id>
+                            <rule_id>1b098de1604999</rule_id>
                             <rule_index>1</rule_index>
                             <rule_type>show</rule_type>
                         </item>
@@ -464,7 +464,7 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>a0316c614b413fd</rule_id>
+                            <rule_id>1b098de1604999</rule_id>
                             <rule_index>1</rule_index>
                             <rule_type>show</rule_type>
                         </item>
@@ -749,7 +749,7 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>18ad1d282480171f</rule_id>
+                            <rule_id>8949f6157d871</rule_id>
                             <rule_index>2</rule_index>
                             <rule_type>invisible</rule_type>
                         </item>
@@ -836,7 +836,7 @@
                     <affecting_rules>
                         <item>
                             <applied>False</applied>
-                            <rule_id>18ad1d282480171f</rule_id>
+                            <rule_id>8949f6157d871</rule_id>
                             <rule_index>2</rule_index>
                             <rule_type>invisible</rule_type>
                         </item>
@@ -1150,7 +1150,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/134931/</resource_uri>
+    <resource_uri>/api/infosync/form/135007/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -1171,5 +1171,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1754941932.0</updated_at>
+    <updated_at>1754954026.0</updated_at>
 </lkf>
