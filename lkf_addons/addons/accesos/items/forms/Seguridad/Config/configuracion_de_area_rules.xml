@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.configuracion_de_area.id }}</form_id>
-    <id>68935e755af7ef5c445fa2ec</id>
+    <id>6848782ade0a838ec2117f2a</id>
     <rules>
         <item>
             <conditions>
@@ -25,12 +25,12 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>680f8f6f3aae12aabc6c3996</id>
+                    <id>66a83a77cfed7f342775c161</id>
                     <label>Área</label>
                     <type>catalog</type>
                 </item>
                 <item>
-                    <catalog_id>680f8f6f3aae12aabc6c3996</catalog_id>
+                    <catalog_id>66a83a77cfed7f342775c161</catalog_id>
                     <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
                     <group_id>None</group_id>
                     <id>663e5c57f5b8a7ce8211ed0b</id>
@@ -49,7 +49,7 @@
             <group_conditions>{}</group_conditions>
             <name>Regla 1</name>
             <operator>and</operator>
-            <rule_id>22811701174faf6</rule_id>
+            <rule_id>11ec241f9ed4f8</rule_id>
             <rule_type>required</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -91,7 +91,7 @@
             <group_conditions>{}</group_conditions>
             <name>Regla 2</name>
             <operator>and</operator>
-            <rule_id>a0316c614b413fd</rule_id>
+            <rule_id>1b098de1604999</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -127,25 +127,25 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>689a46342038ded0e949be08</field_id>
-                    <group_id>None</group_id>
-                    <id>689a46342038ded0e949be08</id>
-                    <label>Status comment</label>
-                    <type>textarea</type>
-                </item>
-                <item>
-                    <catalog_id>None</catalog_id>
                     <field_id>689a46342038ded0e949be07</field_id>
                     <group_id>None</group_id>
                     <id>689a46342038ded0e949be07</id>
                     <label>Status</label>
                     <type>select</type>
                 </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>689a46342038ded0e949be08</field_id>
+                    <group_id>None</group_id>
+                    <id>689a46342038ded0e949be08</id>
+                    <label>Status comment</label>
+                    <type>textarea</type>
+                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
             <name>Regla 3</name>
             <operator>or</operator>
-            <rule_id>18ad1d282480171f</rule_id>
+            <rule_id>8949f6157d871</rule_id>
             <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
