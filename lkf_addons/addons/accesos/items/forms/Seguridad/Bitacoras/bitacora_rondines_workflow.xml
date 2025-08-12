@@ -258,6 +258,10 @@
         {% if record.answers.6639b47565d8e5c06fe97cf3 %}
           &lt;li&gt;&lt;strong&gt;Duración:&lt;/strong&gt; {{record.answers.6639b47565d8e5c06fe97cf3}}&lt;/li&gt;
         {% endif %}
+
+        {% if record.answers.689a7ecfbf2b4be31039388e %}
+          &lt;li&gt;&lt;strong&gt;Porcentaje de Areas Inspeccionadas:&lt;/strong&gt; {{record.answers.689a7ecfbf2b4be31039388e}}&lt;/li&gt;
+        {% endif %}
       
         &lt;li&gt;&lt;strong&gt;Realizado por:&lt;/strong&gt; {{record.user.name}}&lt;/li&gt;
       &lt;/ul&gt;      
@@ -304,8 +308,10 @@
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>[]</email_fields>
                         <emails>
+                            <item>segpatrimonial@afal.mx</item>
+                            <item>vorozco@afal.mx</item>
+                            <item>pgonzalez@afal.mx</item>
                             <item>josepato@linkaform.com</item>
-                            <item>karina@linkaform.com</item>
                         </emails>
                         <embed_company_picture>True</embed_company_picture>
                         <fields_attached>[]</fields_attached>
@@ -314,7 +320,7 @@
                         <send_attachments>False</send_attachments>
                         <send_pdf>True</send_pdf>
                         <sender>OWNER_EMAIL</sender>
-                        <subject>{% raw %} Rondin Realizado en {{record.answers.680f90707ae52a33a76e3609.663e5c57f5b8a7ce8211ed0b}} {% endraw %}</subject>
+                        <subject>{% raw %} Rondin Realizado en: {{record.answers.680f90707ae52a33a76e3609.663e5c57f5b8a7ce8211ed0b}} el: {{record.answers.6818ea068a7f3446f1bae3b3}} {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
@@ -346,7 +352,7 @@
                     <created>True</created>
                     <deleted>False</deleted>
                     <edited>True</edited>
-                    <run_multiple_times>True</run_multiple_times>
+                    <run_multiple_times>False</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
