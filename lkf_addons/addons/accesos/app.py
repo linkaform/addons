@@ -5761,7 +5761,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
             Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
         '''
-        print("data_incidences", simplejson.dumps(data_incidences, indent=4))
         answers = {}
         for key, value in data_incidences.items():
             if key == 'categoria':
