@@ -2006,7 +2006,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
             },
         })
-        print( "Entrando a crear" ,simplejson.dumps(data_incidences, indent=4))
+        # print( "Entrando a crear" ,simplejson.dumps(data_incidences, indent=4))
         #---Define Answers
         answers = {}
         answers[self.incidence_fields['incidencia_catalog']]={}
@@ -2039,7 +2039,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 if personas:
                     personas_list = []
                     for c in personas:
-                        print( "personas listas",c)
                         personas_list.append(
                             {
                                 self.incidence_fields['nombre_completo']:c.get('nombre_completo'),
@@ -2595,8 +2594,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row['accion_correctiva_incidencia'] = r.get(self.incidence_fields['accion_correctiva_incidencia'],'')
             row['incidencia_personas_involucradas'] = r.get(self.incidence_fields['incidencia_personas_involucradas'],'')
             row['fecha_inicio_seg'] = r.get(self.incidence_fields['fecha_inicio_seg'],'')
-            row['incidencia_documento_solucion'] = r.get(self.incidence_fields['documento_accion_correctiva_incidencia'],'')
-            row['incidencia_evidencia_solucion'] = r.get(self.incidence_fields['evidencia_accion_correctiva_incidencia'],'')
+            row['incidencia_documento_solucion'] = r.get(self.incidence_fields['incidencia_documento_solucion'],'')
+            row['incidencia_evidencia_solucion'] = r.get(self.incidence_fields['incidencia_evidencia_solucion'],'')
             res.append(row)
         return res
     
@@ -4266,7 +4265,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'personas_involucradas_incidencia':f"$answers.{self.incidence_fields['personas_involucradas_incidencia']}",
                 'afectacion_patrimonial_incidencia':f"$answers.{self.incidence_fields['afectacion_patrimonial_incidencia']}",
                 'acciones_tomadas_incidencia':f"$answers.{self.incidence_fields['acciones_tomadas_incidencia']}",
-                'seguimientos_incidencia':f"$answers.{self.incidence_fields['seguimiento_incidencia']}",
+                'seguimientos_incidencia':f"$answers.{self.incidence_fields['seguimientos_incidencia']}",
                 }
             },
             {'$sort':{'folio':-1}}
@@ -5762,6 +5761,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         '''
             Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
         '''
+        print("data_incidences", simplejson.dumps(data_incidences, indent=4))
         answers = {}
         for key, value in data_incidences.items():
             if key == 'categoria':
@@ -5829,7 +5829,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['accion_correctiva_incidencia']:c.get('accion_correctiva_incidencia'),
                                 self.incidence_fields['incidencia_personas_involucradas'] :c.get('incidencia_personas_involucradas'),
-                                self.incidence_fields['fecha_inicio_sig'] :c.get('fechaInicioIncidenciaCompleta'),
+                                self.incidence_fields['fecha_inicio_seg'] :c.get('fecha_inicio_seg'),
                                 self.incidence_fields['incidencia_documento_solucion'] :c.get('incidencia_documento_solucion'),
                                 self.incidence_fields['incidencia_evidencia_solucion'] :c.get('incidencia_evidencia_solucion')
                             }
@@ -5861,10 +5861,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             }
                         )
                     answers.update({self.incidence_fields['datos_deposito_incidencia']:acciones_list})
+            elif key == 'tags':
+                tags = data_incidences.get('tags',[])
+                if tags:
+                    tag_list = []
+                    for c in tags:
+                        tag_list.append(
+                            {
+                                self.incidence_fields['tag']:c,
+                            }
+                        )
+                    answers.update({self.incidence_fields['tags']:tag_list})
             elif key == 'prioridad_incidencia':
                 answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
+        # print("incidencias answers", simplejson.dumps(answers, indent=4) )
         if answers or folio:
             metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_INCIDENCIAS)
             metadata.update(self.get_record_by_folio(folio, self.BITACORA_INCIDENCIAS, select_columns={'_id':1}, limit=1))
