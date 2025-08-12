@@ -5819,8 +5819,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             }
                         )
                     answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
-            elif key == 'seguimientos_incidencias':
-                seg = data_incidences.get('seguimientos_incidencias',[])
+            elif key == 'seguimientos_incidencia':
+                seg = data_incidences.get('seguimientos_incidencia',[])
                 if seg:
                     seg_list = []
                     for c in seg:
@@ -5833,7 +5833,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['incidencia_evidencia_solucion'] :c.get('incidencia_evidencia_solucion')
                             }
                         )
-                    answers.update({self.incidence_fields['seguimientos_incidencias']:seg_list})
+                    answers.update({self.incidence_fields['seguimientos_incidencia']:seg_list})
             elif key == 'afectacion_patrimonial_incidencia':
                 ap = data_incidences.get('afectacion_patrimonial_incidencia',[])
                 if ap:
