@@ -5835,7 +5835,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         )
                     answers.update({self.incidence_fields['seguimientos_incidencias']:seg_list})
             elif key == 'afectacion_patrimonial_incidencia':
-                ap = data_incidences.get('afectacion_patrimonial_incidencias',[])
+                ap = data_incidences.get('afectacion_patrimonial_incidencia',[])
                 if ap:
                     ap_list = []
                     for c in ap:
