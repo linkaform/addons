@@ -2122,7 +2122,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         depositos_list.append(
                             {
                                 self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(" ","_"),
-                                self.incidence_fields['cantidad'] :c.get('cantidad')
+                                self.incidence_fields['cantidad'] :c.get('cantidad'),
                                 self.incidence_fields['origen'] :c.get('origen')
                             }
                         )
@@ -5877,7 +5877,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         acciones_list.append(
                             {
                                 self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(" ","_"),
-                                self.incidence_fields['cantidad'] :c.get('cantidad')
+                                self.incidence_fields['cantidad'] :c.get('cantidad'),
                                 self.incidence_fields['origen'] :c.get('origen')
                             }
                         )
