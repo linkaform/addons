@@ -1457,8 +1457,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         form_id = self.BITACORA_INCIDENCIAS
         options={}
         search=""
-        cat= ""
-        sub_cat= ""
+        # cat= ""
+        # sub_cat= ""
         
         if cat and sub_cat:
             options = {
