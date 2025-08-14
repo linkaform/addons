@@ -476,6 +476,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'total_deposito_incidencia':'66ec6821ea3c921534b22c30',
             'datos_deposito_incidencia':'66ec6793eb386ff970218f1f',
             'tipo_deposito': '66ec67dc608b1faed7b22c45',
+            'origen': '689e391c7ce783d3860f3f0e',
             'cantidad':'66ec67e42bcc75c3a458778e',
             'tags':'6834e4e8b0ed467efade7972',
             'tag':'6834e5220bacdbe44ede794f',
@@ -1438,10 +1439,27 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.catalogo_view(catalog_id, form_id)
 
     def catalogo_incidencias(self, cat="", sub_cat=""):
+        # selector = {} #Aqui filtras igual que con mongo de que answers.tal.tal: name_hotel
+        # fields = ["_id"] #Aqui que te retorne los campos que quieras
+
+        # mango_query = {
+        #     "selector": selector,
+        #     "fields": fields,
+        #     "limit": 1000
+        # }
+
+        # row_catalog = self.lkf_api.search_catalog(self.LISTA_INCIDENCIAS_CAT_ID, mango_query)
+        # print(f"Consulta de catálogo: {row_catalog}")
+
+
+
         catalog_id = self.LISTA_INCIDENCIAS_CAT_ID
         form_id = self.BITACORA_INCIDENCIAS
         options={}
         search=""
+        cat= ""
+        sub_cat= ""
+        
         if cat and sub_cat:
             options = {
                 "group_level": 3,
@@ -1466,6 +1484,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 search="incidence"
 
         res = self.lkf_api.catalog_view(catalog_id, form_id, options)
+        print("CATALGOO", catalog_id, form_id,res)
         formatted= {
             "selected":cat, 
             "data":res, 
@@ -2104,6 +2123,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(" ","_"),
                                 self.incidence_fields['cantidad'] :c.get('cantidad')
+                                self.incidence_fields['origen'] :c.get('origen')
                             }
                         )
                     answers.update({self.incidence_fields['datos_deposito_incidencia']:depositos_list})
@@ -2626,6 +2646,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row = {}
             row['tipo_deposito'] = r.get(self.incidence_fields['tipo_deposito'],'').title().replace('_', ' ')
             row['cantidad'] = r.get(self.incidence_fields['cantidad'],'')
+            row['origen'] = r.get(self.incidence_fields['origen'],'')
             res.append(row)
         return res
 
@@ -5857,6 +5878,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(" ","_"),
                                 self.incidence_fields['cantidad'] :c.get('cantidad')
+                                self.incidence_fields['origen'] :c.get('origen')
                             }
                         )
                     answers.update({self.incidence_fields['datos_deposito_incidencia']:acciones_list})
