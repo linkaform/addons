@@ -514,13 +514,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'marca': '684c3eaa04aaab135d7dfbb4',
             'modelo': '684c3eaa04aaab135d7dfbb5',
             'color': '684c3eaa04aaab135d7dfbb6',
-
             #Grupos Repetitivos
             'personas_involucradas_incidencia':'66ec69144a27bb6151a0255b',
             'acciones_tomadas_incidencia':'66ec6987f251a9c2cef0126f',
             'seguimientos_incidencia':'683de3cfcf4a5d248ffbaf89',
             'afectacion_patrimonial_incidencia':'689a939e0365c9bf344fb108',
-
             #Campos en grupo repetitivo Seguimiento:
             'accion_correctiva_incidencia':'683de45ddcf6fcee78e61ed7',
             'incidencia_personas_involucradas':'689a94e0fdddc884ad49be1b',
