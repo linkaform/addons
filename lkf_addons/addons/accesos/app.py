@@ -527,6 +527,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'fecha_inicio_seg':'683de45ddcf6fcee78e61ed9',
             'incidencia_documento_solucion':'683de45ddcf6fcee78e61edc',
             'incidencia_evidencia_solucion':'683de45ddcf6fcee78e61edb',
+            'tiempo_transcurrido': '688d1b7ad3268f1968d5ddf0',
             #Campos en grupo repetid    ivo personas involucradas:
             'nombre_completo': '66ec69239938c882f8222036',
             'rol':'689a92f436426ef5290121a6',
@@ -2095,6 +2096,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['accion_correctiva_incidencia']:c.get('accion_correctiva_incidencia'),
                                 self.incidence_fields['incidencia_personas_involucradas'] :c.get('incidencia_personas_involucradas'),
                                 self.incidence_fields['fecha_inicio_seg'] :c.get('fechaInicioIncidenciaCompleta'),
+                                self.incidence_fields['tiempo_transcurrido'] : c.get('tiempo_transcurrido'),
                                 self.incidence_fields['incidencia_documento_solucion'] :c.get('incidencia_documento_solucion'),
                                 self.incidence_fields['incidencia_evidencia_solucion'] :c.get('incidencia_evidencia_solucion')
                             }
@@ -2614,6 +2616,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row['accion_correctiva_incidencia'] = r.get(self.incidence_fields['accion_correctiva_incidencia'],'')
             row['incidencia_personas_involucradas'] = r.get(self.incidence_fields['incidencia_personas_involucradas'],'')
             row['fecha_inicio_seg'] = r.get(self.incidence_fields['fecha_inicio_seg'],'')
+            row['tiempo_transcurrido'] = r.get('tiempo_transcurrido','')
             row['incidencia_documento_solucion'] = r.get(self.incidence_fields['incidencia_documento_solucion'],'')
             row['incidencia_evidencia_solucion'] = r.get(self.incidence_fields['incidencia_evidencia_solucion'],'')
             res.append(row)
@@ -5850,6 +5853,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['accion_correctiva_incidencia']:c.get('accion_correctiva_incidencia'),
                                 self.incidence_fields['incidencia_personas_involucradas'] :c.get('incidencia_personas_involucradas'),
                                 self.incidence_fields['fecha_inicio_seg'] :c.get('fecha_inicio_seg'),
+                                self.incidence_fields['tiempo_transcurrido'] : c.get('tiempo_transcurrido'),
                                 self.incidence_fields['incidencia_documento_solucion'] :c.get('incidencia_documento_solucion'),
                                 self.incidence_fields['incidencia_evidencia_solucion'] :c.get('incidencia_evidencia_solucion')
                             }
