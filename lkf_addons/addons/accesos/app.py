@@ -2011,7 +2011,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             elif key == 'falla_responsable_solucionar_nombre':
                 answers[self.fallas_fields['falla_responsable_solucionar_catalog']] = {self.fallas_fields['falla_responsable_solucionar_nombre']:value}
             elif key == 'falla_grupo_seguimiento':
-                seg = data_incidences.get('falla_grupo_seguimiento',[])
+                seg = data_failures.get('falla_grupo_seguimiento',[])
                 if seg:
                     seg_list = []
                     for c in seg:
@@ -5479,7 +5479,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers.update({
                     f"{self.fallas_fields['falla_estatus']}":value})
             elif key == 'falla_grupo_seguimiento':
-                seg = data_incidences.get('falla_grupo_seguimiento',[])
+                seg = data_failures.get('falla_grupo_seguimiento',[])
                 if seg:
                     seg_list = []
                     for c in seg:
