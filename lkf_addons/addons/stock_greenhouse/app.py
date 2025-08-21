@@ -1076,8 +1076,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             stock['actuals'] += initial_stock.get('actuals',0)
         stock['adjustments'] = self.stock_adjustments_moves( product_code=product_code, lot_number=lot_number, \
             warehouse=warehouse, location=location, date_from=date_from, date_to=date_to, **kwargs)
-        # print('adjustments=', stock['adjustments'])
-        # print('adjustments',  stock['adjustments'])
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -1085,18 +1083,12 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         #     stock['adjustments'] = 0
         stock['production'] = self.stock_production(date_from =date_from, date_to=date_to ,\
              product_code=product_code, lot_number=lot_number, warehouse=warehouse, location=location, **kwargs )
-        # print('stock production....',stock['production'])
         stock['move_in'] = self.stock_moves('in', product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, **kwargs)
-        # print('move_in=', stock['move_in'])
-        #GET PRODUCT EXITS
-        # print('stock IN....',stock['move_in'])
         stock['move_out'] = self.stock_moves('out', product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, **kwargs)
-        # print('stock OUT....',stock['move_out'])
         scrapped, cuarentin = self.stock_scrap(product_code=product_code, warehouse=warehouse, location=location, \
             lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs )  
-        # print('stock scrapped',scrapped)  
         stock['scrapped'] = scrapped
         stock['cuarentin'] = cuarentin
 
@@ -2297,6 +2289,10 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         match_query.update(self.stock_kwargs_query(**kwargs))
         match_query_stage2 = {}
         if date_from or date_to:
+            if date_from:
+                date_from = date_from[:10]
+            if date_to:
+                date_to = date_to[:10]
             match_query_stage2.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field_id=f"{self.f['production_group']}.{self.f['set_production_date']}"))
         if product_code:
             match_query.update({f"answers.{self.CATALOG_PRODUCT_RECIPE_OBJ_ID}.{self.f['product_code']}":product_code})
@@ -2335,6 +2331,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             },
             {'$sort': {'product_code': 1}}
             ]
+        print('query',simplejson.dumps(query, indent=4))
         res = self.cr.aggregate(query)
         result = {}
 
