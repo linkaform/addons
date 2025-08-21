@@ -38,6 +38,7 @@ Si tienes más de una aplicación, puedes:
 # Importaciones necesarias
 import simplejson, importlib
 import re, os, zipfile, wget, random, shutil, datetime
+from bson.objectid import ObjectId
 from datetime import timedelta
 
 from linkaform_api import base
@@ -55,6 +56,7 @@ class Base(base.LKF_Base):
             self.mf.update(mf)
         else:
             self.mf = mf
+        
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
        #--Variables 
@@ -344,11 +346,42 @@ class Base(base.LKF_Base):
                 res = res.strip()
         return res
 
-    def update_status_record(self,  status, msg_comentarios='' ):
+    def update_parent_record(self, answers):
+        res = self.cr_wkf.find({'workflow_record_id':ObjectId(self.record_id)})
+        response = []
+        for x in res:
+            response.append(self.lkf_api.patch_multi_record( 
+                answers = answers, 
+                form_id=self.PARENT_FORM_ID, 
+                record_id=[str(x.get('record_id'))]
+            ))
+            print('response',response)
+        return response
+
+    def update_status_record(self,  status, msg_comentarios='', record_ids=[], form_id=None ):
+        """
+        Acutaliza el status de un registro, ya se el registro propio o si se propirciona record_ids
+        los registros de los record ids
+
+        Params:
+        OJO: La funcion se base a self.current_record['answers'], si se va  acutalizar otro registro, 
+        actualizar el current_record['asnwers'], con los valores deseados
+        msg_comentarios: Id de comentarios
+        record_ids:  Opcional, lista de registros a acutalizar
+        form_id: Opcional, pero obligatoria si se envia reocrd_ids
+        """
         self.current_record['answers'][self.field_id_status] = status
         if msg_comentarios:
             self.current_record['answers'][self.field_id_comentarios] = msg_comentarios
-        res = self.lkf_api.patch_record(self.current_record, self.record_id)
+        if record_id:
+            if not form_id:
+                self.LKFException('Necesitas proporcionar un Form Id para hacer la actualizacion')
+            res = self.lkf_api.patch_multi_record( 
+                answers = self.current_record['answers'], 
+                form_id = form_id, 
+                record_id = record_ids)
+        else:
+            res = self.lkf_api.patch_record(self.current_record, self.record_id)
         return res
 
     def upload_docto(self, nueva_ruta, file_to_load, id_forma_seleccionada, id_field):
