@@ -440,13 +440,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'falla_responsable_solucionar_documento':'663bc4ed8a6b120eab4d7f1e',
             'falla_comentario_solucion':'66f2dfb2c80d24e5e82332b3',
             'falla_folio_accion_correctiva':'66f2dfb2c80d24e5e82332b4',
+            'falla_subconcepto': '679124a8483c5220455bcb99',
+
+            #Seguimientos
             'falla_grupo_seguimiento': '6799125d9f8d78842caa22af',
-            'falla_inicio_seguimiento': '679a485c66c5d089fa6b8ef9',
-            'falla_fin_seguimiento': '679a485c66c5d089fa6b8efa',
-            'falla_evidencia_solucion':'66f2dfb2c80d24e5e82332b5',
+            
+            'falla_fecha_seguimiento':'679a485c66c5d089fa6b8ef9',
+            'falla_tiempo_transcurrido':'68a667d24ac4254634d87f3e',
+            'falla_accion_realizada': '66f2dfb2c80d24e5e82332b3',
+            'falla_personas_involucradas':'66f2dfb2c80d24e5e82332b4',
             'falla_documento_solucion':'66f2dfb2c80d24e5e82332b6',
-            'falla_fecha_hora_solucion':'66fae1f1d4e5e97eb12170ef',
-            'falla_subconcepto': '679124a8483c5220455bcb99'
+            'falla_evidencia_solucion':'66f2dfb2c80d24e5e82332b5',
+
         }
         #- Para creación , edición y lista de incidencias
         self.incidence_fields = {
@@ -2005,6 +2010,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.fallas_fields['falla_reporta_catalog']] = {self.fallas_fields['falla_reporta_nombre']:value}
             elif key == 'falla_responsable_solucionar_nombre':
                 answers[self.fallas_fields['falla_responsable_solucionar_catalog']] = {self.fallas_fields['falla_responsable_solucionar_nombre']:value}
+            elif key == 'falla_grupo_seguimiento':
+                seg = data_incidences.get('falla_grupo_seguimiento',[])
+                if seg:
+                    seg_list = []
+                    for c in seg:
+                        seg_list.append(
+                            {
+                                self.fallas_fields['falla_accion_realizada']:item.get('accion_correctiva_incidencia',''),
+                                self.fallas_fields['falla_personas_involucradas']: item.get('incidencia_personas_involucradas',''),
+                                self.fallas_fields['falla_evidencia_solucion']:item.get('incidencia_evidencia_solucion',''),
+                                self.fallas_fields['falla_documento_solucion']: item.get('incidencia_documento_solucion',''),
+                                self.fallas_fields['falla_fecha_seguimiento']:item.get('fecha_inicio_seg',''),
+                                self.fallas_fields['falla_tiempo_transcurrido']:item.get('tiempo_transcurrido', '')
+                            }
+                        )
+                    answers.update({self.incidence_fields['falla_grupo_seguimiento']:seg_list})
             else:
                 answers.update({f"{self.fallas_fields[key]}":value})
         metadata.update({'answers':answers})
@@ -2093,7 +2114,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['accion_correctiva_incidencia']:c.get('accion_correctiva_incidencia'),
                                 self.incidence_fields['incidencia_personas_involucradas'] :c.get('incidencia_personas_involucradas'),
-                                self.incidence_fields['fecha_inicio_seg'] :c.get('fechaInicioIncidenciaCompleta'),
+                                self.incidence_fields['fecha_inicio_seg'] :c.get('fecha_inicio_seg'),
                                 self.incidence_fields['tiempo_transcurrido'] : c.get('tiempo_transcurrido'),
                                 self.incidence_fields['incidencia_documento_solucion'] :c.get('incidencia_documento_solucion'),
                                 self.incidence_fields['incidencia_evidencia_solucion'] :c.get('incidencia_evidencia_solucion')
@@ -2598,12 +2619,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for r in data:
             row = {}
-            row['accion_correctiva'] = r.get(self.fallas_fields['falla_folio_accion_correctiva'],'')
-            row['comentario'] = r.get(self.fallas_fields['falla_comentario_solucion'],'')
-            row['evidencia'] = r.get(self.fallas_fields['falla_evidencia_solucion'],'')
-            row['documento'] = r.get(self.fallas_fields['falla_documento_solucion'],'')
-            row['fecha_inicio'] = r.get(self.fallas_fields['falla_inicio_seguimiento'],'')
-            row['fecha_fin'] = r.get(self.fallas_fields['falla_fin_seguimiento'],'')
+            row['falla_fecha_seguimiento'] = r.get(self.fallas_fields['falla_fecha_seguimiento'],'')
+            row['falla_tiempo_transcurrido'] = r.get(self.fallas_fields['falla_tiempo_transcurrido'],'')
+            row['falla_accion_realizada'] = r.get(self.fallas_fields['falla_accion_realizada'],'')
+            row['falla_personas_involucradas'] = r.get(self.fallas_fields['falla_personas_involucradas'],'')
+            row['falla_documento_solucion'] = r.get(self.fallas_fields['falla_documento_solucion'],'')
+            row['falla_evidencia_solucion'] = r.get(self.fallas_fields['falla_evidencia_solucion'],'')
             res.append(row)
         return res
 
@@ -4183,7 +4204,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'falla_folio_accion_correctiva':f"$answers.{self.fallas_fields['falla_folio_accion_correctiva']}",
                 'falla_evidencia_solucion':f"$answers.{self.fallas_fields['falla_evidencia_solucion']}",
                 'falla_documento_solucion':f"$answers.{self.fallas_fields['falla_documento_solucion']}",
-                'falla_fecha_hora_solucion':f"$answers.{self.fallas_fields['falla_fecha_hora_solucion']}",
+                # 'falla_fecha_hora_solucion':f"$answers.{self.fallas_fields['falla_fecha_hora_solucion']}",
                 'falla_grupo_seguimiento':f"$answers.{self.fallas_fields['falla_grupo_seguimiento']}",
             }},
             {'$sort':{'folio':-1}},
@@ -5457,6 +5478,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"{self.fallas_fields['falla_fecha_hora_solucion']}":falla_fecha_hora_solucion})
                 answers.update({
                     f"{self.fallas_fields['falla_estatus']}":value})
+            elif key == 'falla_grupo_seguimiento':
+                seg = data_incidences.get('falla_grupo_seguimiento',[])
+                if seg:
+                    seg_list = []
+                    for c in seg:
+                        seg_list.append(
+                            {
+                                self.fallas_fields['falla_accion_realizada']:item.get('accion_correctiva_incidencia',''),
+                                self.fallas_fields['falla_personas_involucradas']: item.get('incidencia_personas_involucradas',''),
+                                self.fallas_fields['falla_evidencia_solucion']:item.get('incidencia_evidencia_solucion',''),
+                                self.fallas_fields['falla_documento_solucion']: item.get('incidencia_documento_solucion',''),
+                                self.fallas_fields['falla_fecha_seguimiento']:item.get('fecha_inicio_seg',''),
+                                self.fallas_fields['falla_tiempo_transcurrido']:item.get('tiempo_transcurrido', '')
+                            }
+                        )
+                    answers.update({self.incidence_fields['falla_grupo_seguimiento']:seg_list})
             else:
                 answers.update({f"{self.fallas_fields[key]}":value})
         if answers or folio:
