@@ -2014,7 +2014,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 seg = data_failures.get('falla_grupo_seguimiento',[])
                 if seg:
                     seg_list = []
-                    for c in seg:
+                    for item in seg:
                         seg_list.append(
                             {
                                 self.fallas_fields['falla_accion_realizada']:item.get('accion_correctiva_incidencia',''),
@@ -2025,7 +2025,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.fallas_fields['falla_tiempo_transcurrido']:item.get('tiempo_transcurrido', '')
                             }
                         )
-                    answers.update({self.incidence_fields['falla_grupo_seguimiento']:seg_list})
+                    answers.update({self.fallas_fields['falla_grupo_seguimiento']:seg_list})
             else:
                 answers.update({f"{self.fallas_fields[key]}":value})
         metadata.update({'answers':answers})
@@ -5482,7 +5482,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 seg = data_failures.get('falla_grupo_seguimiento',[])
                 if seg:
                     seg_list = []
-                    for c in seg:
+                    for item in seg:
                         seg_list.append(
                             {
                                 self.fallas_fields['falla_accion_realizada']:item.get('accion_correctiva_incidencia',''),
@@ -5493,7 +5493,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.fallas_fields['falla_tiempo_transcurrido']:item.get('tiempo_transcurrido', '')
                             }
                         )
-                    answers.update({self.incidence_fields['falla_grupo_seguimiento']:seg_list})
+                    answers.update({self.fallas_fields['falla_grupo_seguimiento']:seg_list})
             else:
                 answers.update({f"{self.fallas_fields[key]}":value})
         if answers or folio:
