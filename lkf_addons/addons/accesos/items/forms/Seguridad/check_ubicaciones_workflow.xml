@@ -11,15 +11,15 @@
                     <action_settings>{}</action_settings>
                     <configuration>
                         <script>
-                            <created_at>2025-06-10T22:36:40.088747</created_at>
+                            <created_at>2025-08-21T21:52:17.329757</created_at>
                             <deleted_at>None</deleted_at>
                             <end_date>None</end_date>
-                            <id>{{ script.check_ubicacion_rondin.id }}</id>
+                            <id>{{ script.rondines_cache.id }}</id>
                             <is_fileShared>False</is_fileShared>
                             <itype>script</itype>
-                            <name>{{ script.check_ubicacion_rondin.name }}</name>
-                            <start_date>2025-06-10T22:36:40.086551</start_date>
-                            <updated_at>2025-06-10T22:36:40.332070</updated_at>
+                            <name>{{ script.rondines_cache.name }}</name>
+                            <start_date>2025-08-21T21:52:17.328130</start_date>
+                            <updated_at>2025-08-21T21:52:17.336637</updated_at>
                         </script>
                         <user>SCRIPT_OWNER</user>
                     </configuration>
