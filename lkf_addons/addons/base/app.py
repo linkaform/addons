@@ -373,7 +373,7 @@ class Base(base.LKF_Base):
         self.current_record['answers'][self.field_id_status] = status
         if msg_comentarios:
             self.current_record['answers'][self.field_id_comentarios] = msg_comentarios
-        if record_id:
+        if record_ids:
             if not form_id:
                 self.LKFException('Necesitas proporcionar un Form Id para hacer la actualizacion')
             res = self.lkf_api.patch_multi_record( 
