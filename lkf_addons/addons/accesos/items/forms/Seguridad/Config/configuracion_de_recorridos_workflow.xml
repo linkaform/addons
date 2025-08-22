@@ -22,7 +22,7 @@
                 </item>
             </actions>
             <id>684c86b9542a20408c0c6a23</id>
-            <name>None</name>
+            <name>Sincroniza con catalogo</name>
             <rules>
                 <metadata>
                     <connection>[]</connection>
@@ -43,9 +43,9 @@
                 </metadata>
                 <record>
                     <created>True</created>
-                    <deleted>False</deleted>
+                    <deleted>True</deleted>
                     <edited>True</edited>
-                    <run_multiple_times>False</run_multiple_times>
+                    <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
