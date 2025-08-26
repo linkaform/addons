@@ -521,34 +521,35 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'color': '684c3eaa04aaab135d7dfbb6',
             #Grupos Repetitivos
             'personas_involucradas_incidencia':'66ec69144a27bb6151a0255b',
-            'acciones_tomadas_incidencia':'66ec6987f251a9c2cef0126f',
+            'acciones_tomadas_incidencia':'688bbd509b98fd9afaf2c401',
             'seguimientos_incidencia':'683de3cfcf4a5d248ffbaf89',
-            'afectacion_patrimonial_incidencia':'689a939e0365c9bf344fb108',
+            'afectacion_patrimonial_incidencia':'688a9cbda7b2dd2b599ff381',
             #Campos en grupo repetitivo Seguimiento:
             'accion_correctiva_incidencia':'683de45ddcf6fcee78e61ed7',
-            'incidencia_personas_involucradas':'689a94e0fdddc884ad49be1b',
+            'incidencia_personas_involucradas':'684c3e026d974f9625e1130f',
             'fecha_inicio_seg':'683de45ddcf6fcee78e61ed9',
             'incidencia_documento_solucion':'683de45ddcf6fcee78e61edc',
             'incidencia_evidencia_solucion':'683de45ddcf6fcee78e61edb',
             'tiempo_transcurrido': '688d1b7ad3268f1968d5ddf0',
-            #Campos en grupo repetid    ivo personas involucradas:
+            #Campos en grupo repetitivo personas involucradas:
             'nombre_completo': '66ec69239938c882f8222036',
-            'rol':'689a92f436426ef5290121a6',
-            'sexo':'689a92f436426ef5290121a7',
-            'grupo_etario':'689a92f436426ef5290121a8',
-            'atencion_medica':'689a92f436426ef5290121a9',
-            'retenido':'689a92f436426ef5290121aa',
-            'comentarios':'689a92f436426ef5290121ab',
+            'rol':'66ec6936fc1f0f3f111d818f',
+            'sexo':'688a9a59244b64c3c374c9e6',
+            'grupo_etario':'688a9b96ccfd13dc0c12b188',
+            'atencion_medica':'688a9b96ccfd13dc0c12b189',
+            'retenido':'688bc5ef1037e90c4ccd4eb1',
+            'comentarios':'688bfecfa1b4ecf477a6010a',
             #Campos en grupo repetitivo acciones tomadas:
             'acciones_tomadas': '66ec69a914bf1142b6a024e3',
-            'llamo_a_policia': '689a9380fa74370bb5546070',
-            'autoridad': '66ec69a914bf1142b6a024e2',
-            'numero_folio_referencia': '689a9380fa74370bb5546071',
-            'responsable': '689a9380fa74370bb5546072',
+            'llamo_a_policia': '688bbddbd40db062d071862f',
+            'autoridad': '688bc5ef1037e90c4ccd4eb3',
+            'numero_folio_referencia': '688bc5ef1037e90c4ccd4eb4',
+            'responsable': '688bbddbd40db062d0718630',
             #Campos en grupo repetitivo afectacion patrimonial:
-            'tipo_afectacion': '689a9f297a657196d50121b5',
-            'monto_estimado': '689a940357ae87d51a393878',
-            'duracion_estimada': '689a940357ae87d51a393879',
+            'tipo_afectacion': '688a9d52c1ce871f545b3b98',
+            'descripcion_afectacion':'688a9d52c1ce871f545b3b9d',
+            'monto_estimado': '688a9d52c1ce871f545b3b99',
+            'duracion_estimada': '688a9d52c1ce871f545b3b9c',
         }
         #- Para creación , edición y lista de gafetes y lockers
         self.gafetes_fields = {
@@ -2015,6 +2016,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 if seg:
                     seg_list = []
                     for item in seg:
+                        print("item", item)
                         seg_list.append(
                             {
                                 self.fallas_fields['falla_accion_realizada']:item.get('accion_correctiva_incidencia',''),
@@ -2080,13 +2082,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in personas:
                         personas_list.append(
                             {
-                                self.incidence_fields['nombre_completo']:c.get('nombre_completo'),
-                                self.incidence_fields['rol'] :c.get('rol'),
-                                self.incidence_fields['sexo'] :c.get('sexo'),
-                                self.incidence_fields['grupo_etario'] :c.get('grupo_etario'),
-                                self.incidence_fields['atencion_medica'] :c.get('atencion_medica'),
-                                self.incidence_fields['retenido'] :c.get('retenido'),
-                                self.incidence_fields['comentarios'] :c.get('comentarios')
+                                self.incidence_fields['nombre_completo']:c.get('nombre_completo',""),
+                                self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
+                                self.incidence_fields['sexo'] :c.get('sexo',"").lower().replace(" ","_"),
+                                self.incidence_fields['grupo_etario'] :c.get('grupo_etario',"").lower().replace(" ","_"),
+                                self.incidence_fields['atencion_medica'] :c.get('atencion_medica',""),
+                                self.incidence_fields['retenido'] :c.get('retenido',""),
+                                self.incidence_fields['comentarios'] :c.get('comentarios',"")
                             }
                         )
                     answers.update({self.incidence_fields['personas_involucradas_incidencia']:personas_list})
@@ -2097,11 +2099,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in acciones:
                         acciones_list.append(
                             {
-                                self.incidence_fields['acciones_tomadas']:c.get('acciones_tomadas'),
-                                self.incidence_fields['llamo_a_policia'] :c.get('llamo_a_policia'),
-                                self.incidence_fields['autoridad'] :c.get('autoridad'),
-                                self.incidence_fields['numero_folio_referencia'] :c.get('numero_folio_referencia'),
-                                self.incidence_fields['responsable'] :c.get('responsable'),
+                                self.incidence_fields['acciones_tomadas']:c.get('acciones_tomadas',""),
+                                self.incidence_fields['llamo_a_policia'] :c.get('llamo_a_policia',""),
+                                self.incidence_fields['autoridad'] :c.get('autoridad','').lower().replace(" ","_"),
+                                self.incidence_fields['numero_folio_referencia'] :c.get('numero_folio_referencia',""),
+                                self.incidence_fields['responsable'] :c.get('responsable',""),
                             }
                         )
                     answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
@@ -2112,10 +2114,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in seg:
                         seg_list.append(
                             {
-                                self.incidence_fields['accion_correctiva_incidencia']:c.get('accion_correctiva_incidencia'),
-                                self.incidence_fields['incidencia_personas_involucradas'] :c.get('incidencia_personas_involucradas'),
-                                self.incidence_fields['fecha_inicio_seg'] :c.get('fecha_inicio_seg'),
-                                self.incidence_fields['tiempo_transcurrido'] : c.get('tiempo_transcurrido'),
+                                self.incidence_fields['accion_correctiva_incidencia']:c.get('accion_correctiva_incidencia',""),
+                                self.incidence_fields['incidencia_personas_involucradas'] :c.get('incidencia_personas_involucradas',""),
+                                self.incidence_fields['fecha_inicio_seg'] :c.get('fecha_inicio_seg',""),
+                                self.incidence_fields['tiempo_transcurrido'] : c.get('tiempo_transcurrido',""),
                                 self.incidence_fields['incidencia_documento_solucion'] :c.get('incidencia_documento_solucion'),
                                 self.incidence_fields['incidencia_evidencia_solucion'] :c.get('incidencia_evidencia_solucion')
                             }
@@ -2128,13 +2130,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in ap:
                         ap_list.append(
                             {
-                                self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion'),
-                                self.incidence_fields['monto_estimado'] :c.get('monto_estimado'),
-                                self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada')
+                                self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion',"").lower().replace(" ","_"),
+                                self.incidence_fields['descripcion_afectacion']:c.get('descripcion_afectacion',""),
+                                self.incidence_fields['monto_estimado'] :c.get('monto_estimado',""),
+                                self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',"")
                             }
                         )
                     answers.update({self.incidence_fields['afectacion_patrimonial_incidencia']:ap_list})
-
             elif key == 'datos_deposito_incidencia':
                 depositos = data_incidences.get('datos_deposito_incidencia',[])
                 if depositos:
@@ -2142,9 +2144,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in depositos:
                         depositos_list.append(
                             {
-                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(" ","_"),
-                                self.incidence_fields['cantidad'] :c.get('cantidad'),
-                                self.incidence_fields['origen'] :c.get('origen')
+                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito',"").lower().replace(" ","_"),
+                                self.incidence_fields['cantidad'] :c.get('cantidad',""),
+                                self.incidence_fields['origen'] :c.get('origen',"")
                             }
                         )
                     answers.update({self.incidence_fields['datos_deposito_incidencia']:depositos_list})
@@ -2163,7 +2165,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
-        print("categorias", simplejson.dumps(answers, indent=4))
+        print("RESPUESTAS", simplejson.dumps(answers, indent=4))
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
@@ -5496,6 +5498,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     answers.update({self.fallas_fields['falla_grupo_seguimiento']:seg_list})
             else:
                 answers.update({f"{self.fallas_fields[key]}":value})
+        print("seguimientos", simplejson.dumps(answers, indent=4))
         if answers or folio:
             res = self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_FALLAS, folios=[folio])
             if res.get('status_code') == 201 or res.get('status_code') == 202:
@@ -5853,13 +5856,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in personas:
                         personas_list.append(
                             {
-                                self.incidence_fields['nombre_completo']:c.get('nombre_completo'),
-                                self.incidence_fields['rol'] :c.get('rol'),
-                                self.incidence_fields['sexo'] :c.get('sexo'),
-                                self.incidence_fields['grupo_etario'] :c.get('grupo_etario'),
-                                self.incidence_fields['atencion_medica'] :c.get('atencion_medica'),
-                                self.incidence_fields['retenido'] :c.get('retenido'),
-                                self.incidence_fields['comentarios'] :c.get('comentarios')
+                                self.incidence_fields['nombre_completo']:c.get('nombre_completo',""),
+                                self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
+                                self.incidence_fields['sexo'] :c.get('sexo',""),
+                                self.incidence_fields['grupo_etario'] :c.get('grupo_etario',"").lower().replace(" ","_"),
+                                self.incidence_fields['atencion_medica'] :c.get('atencion_medica',""),
+                                self.incidence_fields['retenido'] :c.get('retenido',""),
+                                self.incidence_fields['comentarios'] :c.get('comentarios',"")
                             }
                         )
                     answers.update({self.incidence_fields['personas_involucradas_incidencia']:personas_list})
@@ -5870,11 +5873,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in acciones:
                         acciones_list.append(
                             {
-                                self.incidence_fields['acciones_tomadas']:c.get('acciones_tomadas'),
-                                self.incidence_fields['llamo_a_policia'] :c.get('llamo_a_policia'),
-                                self.incidence_fields['autoridad'] :c.get('autoridad'),
-                                self.incidence_fields['numero_folio_referencia'] :c.get('numero_folio_referencia'),
-                                self.incidence_fields['responsable'] :c.get('responsable')
+                                self.incidence_fields['acciones_tomadas']:c.get('acciones_tomadas', ''),
+                                self.incidence_fields['llamo_a_policia'] :c.get('llamo_a_policia', ''),
+                                self.incidence_fields['autoridad'] :c.get('autoridad', '').lower().replace(" ","_"),
+                                self.incidence_fields['numero_folio_referencia'] :c.get('numero_folio_referencia', ''),
+                                self.incidence_fields['responsable'] :c.get('responsable', '')
                             }
                         )
                     answers.update({self.incidence_fields['acciones_tomadas_incidencia']:acciones_list})
@@ -5885,10 +5888,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in seg:
                         seg_list.append(
                             {
-                                self.incidence_fields['accion_correctiva_incidencia']:c.get('accion_correctiva_incidencia'),
-                                self.incidence_fields['incidencia_personas_involucradas'] :c.get('incidencia_personas_involucradas'),
-                                self.incidence_fields['fecha_inicio_seg'] :c.get('fecha_inicio_seg'),
-                                self.incidence_fields['tiempo_transcurrido'] : c.get('tiempo_transcurrido'),
+                                self.incidence_fields['accion_correctiva_incidencia']:c.get('accion_correctiva_incidencia',""),
+                                self.incidence_fields['incidencia_personas_involucradas'] :c.get('incidencia_personas_involucradas',""),
+                                self.incidence_fields['fecha_inicio_seg'] :c.get('fecha_inicio_seg',""),
+                                self.incidence_fields['tiempo_transcurrido'] : c.get('tiempo_transcurrido',""),
                                 self.incidence_fields['incidencia_documento_solucion'] :c.get('incidencia_documento_solucion'),
                                 self.incidence_fields['incidencia_evidencia_solucion'] :c.get('incidencia_evidencia_solucion')
                             }
@@ -5901,9 +5904,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in ap:
                         ap_list.append(
                             {
-                                self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion'),
-                                self.incidence_fields['monto_estimado'] :c.get('monto_estimado'),
-                                self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada')
+                                self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion',"").lower().replace(" ","_"),
+                                self.incidence_fields['monto_estimado'] :c.get('monto_estimado',""),
+                                self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',"")
                             }
                         )
                     answers.update({self.incidence_fields['afectacion_patrimonial_incidencia']:ap_list})
@@ -5915,9 +5918,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     for c in acciones:
                         acciones_list.append(
                             {
-                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito').lower().replace(" ","_"),
-                                self.incidence_fields['cantidad'] :c.get('cantidad'),
-                                self.incidence_fields['origen'] :c.get('origen')
+                                self.incidence_fields['tipo_deposito']:c.get('tipo_deposito','').lower().replace(" ","_"),
+                                self.incidence_fields['cantidad'] :c.get('cantidad',''),
+                                self.incidence_fields['origen'] :c.get('origen','')
                             }
                         )
                     answers.update({self.incidence_fields['datos_deposito_incidencia']:acciones_list})
