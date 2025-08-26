@@ -2331,7 +2331,7 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
             },
             {'$sort': {'product_code': 1}}
             ]
-        print('query',simplejson.dumps(query, indent=4))
+        print('query', query)
         res = self.cr.aggregate(query)
         result = {}
 
