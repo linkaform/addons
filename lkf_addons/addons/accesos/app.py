@@ -2117,7 +2117,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['accion_correctiva_incidencia']:c.get('accion_correctiva_incidencia',""),
                                 self.incidence_fields['incidencia_personas_involucradas'] :c.get('incidencia_personas_involucradas',""),
                                 self.incidence_fields['fecha_inicio_seg'] :c.get('fecha_inicio_seg',""),
-                                self.incidence_fields['tiempo_transcurrido'] : c.get('tiempo_transcurrido',""),
+                                self.incidence_fields['tiempo_transcurrido'] : c.get('tiempo_transcurrido',"12 horas"),
                                 self.incidence_fields['incidencia_documento_solucion'] :c.get('incidencia_documento_solucion'),
                                 self.incidence_fields['incidencia_evidencia_solucion'] :c.get('incidencia_evidencia_solucion')
                             }
@@ -2637,7 +2637,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row['accion_correctiva_incidencia'] = r.get(self.incidence_fields['accion_correctiva_incidencia'],'')
             row['incidencia_personas_involucradas'] = r.get(self.incidence_fields['incidencia_personas_involucradas'],'')
             row['fecha_inicio_seg'] = r.get(self.incidence_fields['fecha_inicio_seg'],'')
-            row['tiempo_transcurrido'] = r.get('tiempo_transcurrido','')
+            row['tiempo_transcurrido'] = r.get(self.incidence_fields['tiempo_transcurrido'],'')
             row['incidencia_documento_solucion'] = r.get(self.incidence_fields['incidencia_documento_solucion'],'')
             row['incidencia_evidencia_solucion'] = r.get(self.incidence_fields['incidencia_evidencia_solucion'],'')
             res.append(row)
@@ -2680,7 +2680,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row = {}
             row['acciones_tomadas'] = r.get(self.incidence_fields['acciones_tomadas'],'')
             row['llamo_a_policia'] = r.get(self.incidence_fields['llamo_a_policia'],'')
-            row['autoridad'] = r.get(self.incidence_fields['autoridad'],'')
+            row['autoridad'] = r.get(self.incidence_fields['autoridad'],'').capitalize().replace("_"," ")
             row['numero_folio_referencia'] = r.get(self.incidence_fields['numero_folio_referencia'],'')
             row['responsable'] = r.get(self.incidence_fields['responsable'],'')
             res.append(row)
@@ -2689,7 +2689,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for r in data:
             row = {}
-            row['tipo_afectacion'] = r.get(self.incidence_fields['tipo_afectacion'],'')
+            row['tipo_afectacion'] = r.get(self.incidence_fields['tipo_afectacion'],'').capitalize().replace("_"," ")
             row['monto_estimado'] = r.get(self.incidence_fields['monto_estimado'],'')
             row['duracion_estimada'] = r.get(self.incidence_fields['duracion_estimada'],'')
             res.append(row)
@@ -4322,6 +4322,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
             r['afectacion_patrimonial_incidencia'] = self.format_afectacion_patrimonial(r.get('afectacion_patrimonial_incidencia',[]))
             r['datos_deposito_incidencia'] = self.format_datos_deposito(r.get('datos_deposito_incidencia',[]))
+            print("seguimientos",r.get('seguimientos_incidencia',[]))
             r['seguimientos_incidencia'] = self.format_seguimiento_incidencias(r.get('seguimientos_incidencia',[]))
             r['tags'] = self.format_tags_incidencias(r.get('tags',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
