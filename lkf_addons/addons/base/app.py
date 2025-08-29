@@ -677,12 +677,13 @@ class CargaUniversal(Base):
             if not record[pos] and field.get('default_value'):
                 record[pos] = field['default_value']
             if record[pos] or record[pos] == 0:
-                if field['field_type'] in ('images','file'):
+                if field['field_type'] in ('images','file','files','signature'):
                     res_upload_docto = self.upload_docto(nueva_ruta, record[pos], id_forma_seleccionada, field['field_id'])
+                    print("+++ res_upload_docto:",res_upload_docto)
                     if res_upload_docto.get('error'):
                         error.append('Ocurrió un error al cargar el documento %s'%(str(record[pos])))
                     else:
-                        if field['field_type'] == 'images':
+                        if field['field_type'] in ('images', 'files'):
                             field_add = {field['field_id']: [res_upload_docto]}
                         else:
                             field_add = {field['field_id']: res_upload_docto}
@@ -837,6 +838,8 @@ class CargaUniversal(Base):
             if not answers.get('dict_errors'):
                 answers.update({'dict_errors':{}})
             answers['dict_errors'].update({p: msg_errores_row})
+        # print("\n\n *** *** *** *** answers =",answers)
+        # stop
         return answers
 
     def get_diff_values(self, current_values, new_values, ids_to_compare):
@@ -1162,7 +1165,7 @@ class CargaUniversal(Base):
                     group_records[grupo].append(i)
             print("++++ group_records",group_records)
             # Obtengo una lista de campos que son de tipo file o images
-            file_records = [i for i in pos_field_dict if pos_field_dict[i]['field_type'] in ('file','images')]
+            file_records = [i for i in pos_field_dict if pos_field_dict[i]['field_type'] in ('file','images', 'files')]
             print("++++ file_records",file_records)
             # Agrego información de la carga
             metadata_form.update({'properties': {"device_properties":{"system": "SCRIPT","process":"Carga Universal", "accion":'CREA Y ACTUALIZA REGISTROS DE CUALQUIER FORMA', "folio carga":self.current_record['folio'], "archive":"carga_documentos_a_forma.py"}}})
@@ -1183,6 +1186,7 @@ class CargaUniversal(Base):
                     continue
                 # Recorro la lista de campos de tipo documento para determinar si el contenido en esa posición está dentro del zip de carga
                 no_en_zip = [record[i] for i in file_records if record[i] and record[i] not in files_dir]
+                # print("------ no_en_zip:", no_en_zip)
                 new_record = [record[i] for i in not_groups if record[i] and i in list_cols_for_upload]
                 if new_record and p != 0:
                     if metadata.get('answers',{}):
