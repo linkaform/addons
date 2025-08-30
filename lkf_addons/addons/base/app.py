@@ -912,12 +912,17 @@ class CargaUniversal(Base):
                 metadata.update({
                     'sets_in_row': new_sets_in_row
                 })
-                dict_records_to_multi['create'].append(metadata)
-                response_sistema = {'status_code': 0}
-                proceso = ''
-                # response_sistema = self.lkf_api.post_forms_answers(metadata)
-                # print("----- response crear registro:", response_sistema)
-                # proceso = 'creados'
+
+                # Para SIGA se deben crear los registros uno por uno, se evita el post list
+                if self.account_id == 17860:
+                    response_sistema = self.lkf_api.post_forms_answers(metadata)
+                    print("----- response crear registro:", response_sistema)
+                    proceso = 'creados'
+                else:
+                    dict_records_to_multi['create'].append(metadata)
+                    response_sistema = {'status_code': 0}
+                    proceso = ''
+
             if response_sistema.get('status_code') > 300:
                 proceso = 'error'
                 msg_error_sistema = self.arregla_msg_error_sistema(response_sistema)
