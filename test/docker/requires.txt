@@ -15,10 +15,12 @@ cx-Oracle==8.3.0
 httplib2==0.12.1
 #facturapi
 googlemaps==4.5.3
+google-auth==2.39.0
 haversine==2.5.1
 Jinja2==3.1.2
 openpyxl==3.0.10
 pandas==2.2.3
+pdf2image
 pdf2pptx
 PyJWT==2.6.0
 pydantic==1.10.2
