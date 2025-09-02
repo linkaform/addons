@@ -8,6 +8,8 @@ install_order = [
                     'lista_de_objetos',
                     'subconceptos_fallas',
                     'lista_de_fallas',
+                    'categora_incidentes',
+                    'subcategoras_incidentes'
                     'lista_de_incidentes',
                     'lockers',
                     'definicion_de_examenes',
