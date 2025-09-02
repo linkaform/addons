@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>9-7c1b4b2e7820153808ae924c5a45963a</_rev>
-    <updated_at>2024-07-30T00:58:56.058724+00:00Z</updated_at>
+    <_rev>8-d1dbfbf1e9b09ee9e7b5d509be4bd15e</_rev>
+    <updated_at>2025-04-28T14:27:55.175127+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Lista de incidentes</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-07-30T00:58:56.058724+00:00Z</created_at>
+    <created_at>2025-04-28T14:27:55.175127+00:00Z</created_at>
     <advanced_options>
         <folio>
             <manual>False</manual>
@@ -24,32 +24,148 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>121723</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>66a83ad07776b332fb75c147</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
                 <item>
-                    <field_type>text</field_type>
-                    <view_fields>[]</view_fields>
-                    <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>686807d46e41614d708f6fc9</item>
+                        <item>686807d46e41614d708f6fca</item>
+                    </catalog_fields>
                     <required>False</required>
-                    <field_id>663973809fa65cafa759eb97</field_id>
-                    <catalog>{}</catalog>
-                    <relation_type>None</relation_type>
-                    <label>Tipo de incidente</label>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <field_id>{{ catalog.categora_incidentes.obj_id }}</field_id>
+                    <label>Categoría</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.categora_incidentes.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.categora_incidentes.id }}</catalog_id>
+                        <view_fields>
+                            <item>686807d46e41614d708f6fc9</item>
+                        </view_fields>
+                        <name>{{ catalog.categora_incidentes.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>686807d46e41614d708f6fc9</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Categoría</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.categora_incidentes.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.categora_incidentes.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
                     <options>[]</options>
-                    <catalog_id>None</catalog_id>
-                    <key>None</key>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <required>False</required>
+                    <field_id>686807d46e41614d708f6fca</field_id>
+                    <label>Icono categoría</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.categora_incidentes.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.categora_incidentes.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <catalog_fields>
+                        <item>686807a7ee7705c5c8eb181a</item>
+                        <item>686807a7ee7705c5c8eb181b</item>
+                    </catalog_fields>
+                    <required>False</required>
+                    <field_id>{{ catalog.subcategoras_incidentes.obj_id }}</field_id>
+                    <label>Subcategoría</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.subcategoras_incidentes.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.subcategoras_incidentes.id }}</catalog_id>
+                        <view_fields>
+                            <item>686807a7ee7705c5c8eb181a</item>
+                        </view_fields>
+                        <name>{{ catalog.subcategoras_incidentes.name }}</name>
+                    </catalog>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>686807a7ee7705c5c8eb181a</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Subcategoría</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.subcategoras_incidentes.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.subcategoras_incidentes.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <required>False</required>
+                    <field_id>686807a7ee7705c5c8eb181b</field_id>
+                    <label>Icono subcategoría</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.subcategoras_incidentes.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.subcategoras_incidentes.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
                     <properties>
                         <send_email>False</send_email>
-                        <custom>None</custom>
                         <size>complete</size>
+                        <custom>None</custom>
                     </properties>
+                    <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>663973809fa65cafa759eb97</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Tipo de incidente</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
@@ -57,4 +173,8 @@
             <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>680f906b2b29c49a817ba9a5</_id>
+    <public>False</public>
+    <catalog_id>131958</catalog_id>
 </lkf>
