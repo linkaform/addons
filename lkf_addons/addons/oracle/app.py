@@ -52,43 +52,64 @@ from lkf_addons.addons.base.app import Base
 class Oracle(Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
-        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
+        super().__init__(settings, sys_argv=sys_argv, use_api=use_api)
         self.name =  __class__.__name__
         self.settings = settings
         self.ORACLE_HOST = self.settings.config['ORACLE_HOST']
         self.ORACLE_PORT = self.settings.config['ORACLE_PORT']
-        self.ORACLE_SERVICE_NAME = self.settings.config['ORACLE_SERVICE_NAME']
+        self.ORACLE_SERVICE_NAME = self.settings.config.get('ORACLE_SERVICE_NAME')
+        self.ORACLE_SID = self.settings.config.get('ORACLE_SID')
         self.ORACLE_USERNAME = self.settings.config['ORACLE_USERNAME']
         self.ORACLE_PASSWORD = self.settings.config['ORACLE_PASSWORD']
         self.oracle = self.connect_to_oracle()
+        self.f={}
 
     def connect_to_oracle(self):
+        print('=== Establishing Connection to Oracle ===')
         try:
-            dsn_tns = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME) 
-            self.orcale_connection = cx_Oracle.connect(user=self.ORACLE_USERNAME, password=self.ORACLE_PASSWORD,  dsn=dsn_tns)
+            if self.ORACLE_SERVICE_NAME:
+                print('Service Name:', self.ORACLE_SERVICE_NAME)
+                dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME) 
+            elif self.ORACLE_SID:
+                print('ORACLE_SID:', self.ORACLE_SID)
+                dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, sid=self.ORACLE_SID) 
+            else:
+                self.LKFException("No se proporciono un service_name o sid")
+            
+            try:
+                self.orcale_connection = cx_Oracle.connect(self.ORACLE_USERNAME, self.ORACLE_PASSWORD, dsn)
+            except cx_Oracle.DatabaseError as e:
+                error, = e.args
+                print(f"Error code: {error.code}")
+                print(f"Error message: {error.message}")
+                print('Error',e)
+                return None
+                #return self.LKFException(f"Error code: {error.code} - {error.message}")
             return self.orcale_connection
         except  cx_Oracle.DatabaseError as e:
             error, = e.args
             print(f"Error code: {error.code}")
             print(f"Error message: {error.message}")
-            return None
+            print('Error=',e)
+            return self.LKFException(f"Error code: {error.code} - {error.message}")
 
-    def query_view(self, view_name, query=False):
+    def query_view(self, view_name, query=False, date_format=False):
         result = []
         columns = []
         try:
             cursor = self.orcale_connection.cursor()
             # Query to fetch data from the view
             if not query:
-                query = f"SELECT * FROM {view_name}"
+                query = f"SELECT * FROM {view_name} WHERE ROWNUM <= 100"
+            if date_format:
+                cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'DD/MM/RR'")
+                cursor.execute("ALTER SESSION SET NLS_DATE_LANGUAGE = 'SPANISH'")
             cursor.execute(query)
             columns = [col[0] for col in cursor.description]
             rows = cursor.fetchall()
             for row in rows:
                 result.append(dict(zip(columns, row)))
-            # for row in rows:
-            #     print(row)
         except cx_Oracle.DatabaseError as e:
             error, = e.args
             print(f"Error querying view: {error.code} - {error.message}")
