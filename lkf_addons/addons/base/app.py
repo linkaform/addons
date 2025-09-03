@@ -1702,7 +1702,7 @@ class Schedule(Base):
         group_field_map = {'abcde0001000000000000008': self.answers.get('abcde0001000000000000008')}
 
         asigne_to = self.answers.get('abcde0001000000000020001',[])
-        assigned_users = self.answers.get('abcde0001000000000020002')
+        assigned_users = self.answers.get('abcde0001000000000020002',[])
         custom_cron = False
 
 
