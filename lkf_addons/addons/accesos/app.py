@@ -493,8 +493,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             # 'evidencia_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edb',
             # 'documento_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edc',
 
-            'categoria':'6848893f4f18021ab10c6a12',
-            'sub_categoria': '68488a6c5cf05798e09f3eec',
+            'categoria':'686807d46e41614d708f6fc9',
+            'sub_categoria': '686807a7ee7705c5c8eb181a',
             'incidente':'663973809fa65cafa759eb97',
             #Persona extraviada
             'nombre_completo_persona_extraviada':'684c3e026d974f9625e11303',
@@ -5777,12 +5777,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     list_incidencias_seguimiento = []
                     for item in incidencias_seguimiento:
                         print("itemmm", item)
-                        # accion_correctiva_incidencia = item.get('accion_correctiva_incidencia',""),
-                        # incidencia_personas_involucradas= item.get('incidencia_personas_involucradas',""),
-                        # fecha_inicio_seg = item.get('fecha_inicio_seg',""),
-                        # tiempo_transcurrido= item.get('tiempo_transcurrido',""),
-                        # incidencia_documento_solucion = item.get('incidencia_documento_solucion'),
-                        # incidencia_evidencia_solucion = item.get('incidencia_evidencia_solucion')
+                        accion_correctiva_incidencia = item['accion_correctiva_incidencia'] if 'accion_correctiva_incidencia' in item else ''
+                        incidencia_personas_involucradas= item.get('incidencia_personas_involucradas',"")
+                        fecha_inicio_seg = item.get('fecha_inicio_seg',"")
+                        tiempo_transcurrido= item.get('tiempo_transcurrido',"")
+                        incidencia_documento_solucion = item.get('incidencia_documento_solucion')
+                        incidencia_evidencia_solucion = item.get('incidencia_evidencia_solucion')
 
                         # incidencia_folio = item.get('accion_correctiva_incidencia','')
                         # incidencia_comentario = item.get('incidencia_comentario_solucion','')
@@ -5791,12 +5791,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         # incidencia_inicio_incidencia = item.get('fechaInicioIncidenciaCompleta','')
                         # incidencia_fin_incidencia = item.get('fechaFinIncidenciaCompleta','')
                         list_incidencias_seguimiento.append({
-                            self.incidence_fields['accion_correctiva_incidencia']:item.get('accion_correctiva_incidencia',""),
-                            self.incidence_fields['incidencia_personas_involucradas']:item.get('incidencia_personas_involucradas',""),
-                            self.incidence_fields['fecha_inicio_seg']:item.get('fecha_inicio_seg',""),
-                            self.incidence_fields['tiempo_transcurrido']:item.get('tiempo_transcurrido',""),
-                            self.incidence_fields['incidencia_documento_solucion']:item.get('incidencia_documento_solucion'),
-                            self.incidence_fields['incidencia_evidencia_solucion']:item.get('incidencia_evidencia_solucion'),
+                            self.incidence_fields['accion_correctiva_incidencia']:accion_correctiva_incidencia,
+                            self.incidence_fields['incidencia_personas_involucradas']:incidencia_personas_involucradas,
+                            self.incidence_fields['fecha_inicio_seg']:fecha_inicio_seg,
+                            self.incidence_fields['tiempo_transcurrido']:tiempo_transcurrido,
+                            self.incidence_fields['incidencia_documento_solucion']:incidencia_documento_solucion,
+                            self.incidence_fields['incidencia_evidencia_solucion']:incidencia_evidencia_solucion
                         })
                         print("LISTA", list_incidencias_seguimiento)
                     incidencia_nuevo_grupo_con_ids.append(list_incidencias_seguimiento[0])
