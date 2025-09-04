@@ -2085,7 +2085,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['nombre_completo']:c.get('nombre_completo',""),
                                 self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
                                 self.incidence_fields['sexo'] :c.get('sexo',"").lower().replace(" ","_"),
-                                self.incidence_fields['grupo_etario'] :"",
+                                self.incidence_fields['grupo_etario'] :c.get("grupo_etario").lower().replace(" ","_"),
                                 self.incidence_fields['atencion_medica'] :c.get('atencion_medica',""),
                                 self.incidence_fields['retenido'] :c.get('retenido',""),
                                 self.incidence_fields['comentarios'] :c.get('comentarios',"")
