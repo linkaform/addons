@@ -493,8 +493,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             # 'evidencia_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edb',
             # 'documento_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edc',
 
-            'categoria':'6848893f4f18021ab10c6a12',
-            'sub_categoria': '68488a6c5cf05798e09f3eec',
+            'categoria':'686807d46e41614d708f6fc9',
+            'sub_categoria': '686807a7ee7705c5c8eb181a',
             'incidente':'663973809fa65cafa759eb97',
             #Persona extraviada
             'nombre_completo_persona_extraviada':'684c3e026d974f9625e11303',
@@ -2085,7 +2085,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['nombre_completo']:c.get('nombre_completo',""),
                                 self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
                                 self.incidence_fields['sexo'] :c.get('sexo',"").lower().replace(" ","_"),
-                                self.incidence_fields['grupo_etario'] :c.get('grupo_etario',"").lower().replace(" ","_"),
+                                self.incidence_fields['grupo_etario'] :c.get("grupo_etario").lower().replace(" ","_"),
                                 self.incidence_fields['atencion_medica'] :c.get('atencion_medica',""),
                                 self.incidence_fields['retenido'] :c.get('retenido',""),
                                 self.incidence_fields['comentarios'] :c.get('comentarios',"")
@@ -2101,7 +2101,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['acciones_tomadas']:c.get('acciones_tomadas',""),
                                 self.incidence_fields['llamo_a_policia'] :c.get('llamo_a_policia',""),
-                                self.incidence_fields['autoridad'] :c.get('autoridad','').lower().replace(" ","_"),
+                                self.incidence_fields['autoridad'] :c.get('autoridad','').lower(),
                                 self.incidence_fields['numero_folio_referencia'] :c.get('numero_folio_referencia',""),
                                 self.incidence_fields['responsable'] :c.get('responsable',""),
                             }
@@ -5499,7 +5499,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     answers.update({self.fallas_fields['falla_grupo_seguimiento']:seg_list})
             else:
                 answers.update({f"{self.fallas_fields[key]}":value})
-        print("seguimientos", simplejson.dumps(answers, indent=4))
         if answers or folio:
             res = self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_FALLAS, folios=[folio])
             if res.get('status_code') == 201 or res.get('status_code') == 202:
@@ -5517,7 +5516,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             failure_selected = failure_selected[0]
         else:
             self.LKFException('No hay una falla registrada.')
-        print('failure_selecteddddddddd', failure_selected)
         qr_code = failure_selected.get('_id')
         falla_nuevo_grupo = failure_selected.get('falla_grupo_seguimiento_formated', [])
         falla_nuevo_grupo_con_ids = []
@@ -5647,16 +5645,22 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         else:
             self.LKFException('No hay una incidencia registrada.')
         qr_code = incidence_selected.get('_id')
-        incidencia_nuevo_grupo = incidence_selected.get('grupo_seguimiento_incidencia', [])
+        incidencia_nuevo_grupo = incidence_selected.get('seguimientos_incidencia', [])
         incidencia_nuevo_grupo_con_ids = []
         for incidencia in incidencia_nuevo_grupo:
             incidencia = {
-                self.incidence_fields['comentario_accion_correctiva_incidencia']: incidencia.get('comentario'),
-                self.incidence_fields['accion_correctiva_incidencia']: incidencia.get('accion_correctiva'),
-                self.incidence_fields['evidencia_accion_correctiva_incidencia']: incidencia.get('evidencia'),
-                self.incidence_fields['documento_accion_correctiva_incidencia']: incidencia.get('documento'),
-                self.incidence_fields['fecha_inicio_seg']: incidencia.get('fecha_inicio'),
-                self.incidence_fields['fecha_fin_accion_correctiva_incidencia']: incidencia.get('fecha_fin'),    
+                self.incidence_fields['accion_correctiva_incidencia']:incidencia.get('accion_correctiva_incidencia',""),
+                self.incidence_fields['incidencia_personas_involucradas'] :incidencia.get('incidencia_personas_involucradas',""),
+                self.incidence_fields['fecha_inicio_seg'] :incidencia.get('fecha_inicio_seg',""),
+                self.incidence_fields['tiempo_transcurrido'] : incidencia.get('tiempo_transcurrido',""),
+                self.incidence_fields['incidencia_documento_solucion'] :incidencia.get('incidencia_documento_solucion'),
+                self.incidence_fields['incidencia_evidencia_solucion'] :incidencia.get('incidencia_evidencia_solucion')
+                # self.incidence_fields['comentario_accion_correctiva_incidencia']: incidencia.get('comentario'),
+                # self.incidence_fields['accion_correctiva_incidencia']: incidencia.get('accion_correctiva'),
+                # self.incidence_fields['evidencia_accion_correctiva_incidencia']: incidencia.get('evidencia'),
+                # self.incidence_fields['documento_accion_correctiva_incidencia']: incidencia.get('documento'),
+                # self.incidence_fields['fecha_inicio_seg']: incidencia.get('fecha_inicio'),
+                # self.incidence_fields['fecha_fin_accion_correctiva_incidencia']: incidencia.get('fecha_fin'),    
             }
             incidencia_nuevo_grupo_con_ids.append(incidencia)
         print("cat", incidence_selected)
@@ -5679,7 +5683,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "tags": incidence_selected.get('tags', []),
             "datos_deposito_incidencia": incidence_selected.get('datos_deposito_incidencia', []),
             "total_deposito_incidencia": incidence_selected.get('total_deposito_incidencia', []),
-            "incidencia_grupo_seguimiento": incidencia_grupo_seguimiento,
+            "seguimientos_incidencia": incidencia_grupo_seguimiento,
             "categoria": incidence_selected.get("categoria", ''),
             "sub_categoria": incidence_selected.get("sub_categoria", ''),
             "incidente": incidence_selected.get("incidente", ''),
@@ -5761,36 +5765,44 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 if tags:
                     tags_list = []
                     for c in tags:
-                        print("tags", c)
-
                         tags_list.append(
                             {
                                 self.incidence_fields['tag']:c,
                             }
                         )
                     answers.update({self.incidence_fields['tags']:tags_list})
-            elif key == 'incidencia_grupo_seguimiento':
-                incidencias_seguimiento = [incidencia_seg.get('incidencia_grupo_seguimiento',{})]
+            elif key == 'seguimientos_incidencia':
+                incidencias_seguimiento = [incidencia_seg.get('seguimientos_incidencia',{})]
                 if incidencias_seguimiento:
                     list_incidencias_seguimiento = []
                     for item in incidencias_seguimiento:
-                        print(item)
-                        incidencia_folio = item.get('accion_correctiva_incidencia','')
-                        incidencia_comentario = item.get('incidencia_comentario_solucion','')
-                        incidencia_foto_evidencia = item.get('incidencia_evidencia_solucion','')
-                        incidencia_documento = item.get('incidencia_documento_solucion','')
-                        incidencia_inicio_incidencia = item.get('fechaInicioIncidenciaCompleta','')
-                        incidencia_fin_incidencia = item.get('fechaFinIncidenciaCompleta','')
+                        print("itemmm", item)
+                        accion_correctiva_incidencia = item['accion_correctiva_incidencia'] if 'accion_correctiva_incidencia' in item else ''
+                        incidencia_personas_involucradas= item.get('incidencia_personas_involucradas',"")
+                        fecha_inicio_seg = item.get('fecha_inicio_seg',"")
+                        tiempo_transcurrido= item.get('tiempo_transcurrido',"")
+                        incidencia_documento_solucion = item.get('incidencia_documento_solucion')
+                        incidencia_evidencia_solucion = item.get('incidencia_evidencia_solucion')
+
+                        # incidencia_folio = item.get('accion_correctiva_incidencia','')
+                        # incidencia_comentario = item.get('incidencia_comentario_solucion','')
+                        # incidencia_foto_evidencia = item.get('incidencia_evidencia_solucion','')
+                        # incidencia_documento = item.get('incidencia_documento_solucion','')
+                        # incidencia_inicio_incidencia = item.get('fechaInicioIncidenciaCompleta','')
+                        # incidencia_fin_incidencia = item.get('fechaFinIncidenciaCompleta','')
                         list_incidencias_seguimiento.append({
-                            self.incidence_fields['accion_correctiva_incidencia']:incidencia_folio,
-                            self.incidence_fields['comentario_accion_correctiva_incidencia']:incidencia_comentario,
-                            self.incidence_fields['evidencia_accion_correctiva_incidencia']:incidencia_foto_evidencia,
-                            self.incidence_fields['documento_accion_correctiva_incidencia']:incidencia_documento,
-                            self.incidence_fields['fecha_inicio_seg']:incidencia_inicio_incidencia,
-                            self.incidence_fields['fecha_fin_accion_correctiva_incidencia']:incidencia_fin_incidencia,
+                            self.incidence_fields['accion_correctiva_incidencia']:accion_correctiva_incidencia,
+                            self.incidence_fields['incidencia_personas_involucradas']:incidencia_personas_involucradas,
+                            self.incidence_fields['fecha_inicio_seg']:fecha_inicio_seg,
+                            self.incidence_fields['tiempo_transcurrido']:tiempo_transcurrido,
+                            self.incidence_fields['incidencia_documento_solucion']:incidencia_documento_solucion,
+                            self.incidence_fields['incidencia_evidencia_solucion']:incidencia_evidencia_solucion
                         })
+                        print("LISTA", list_incidencias_seguimiento)
                     incidencia_nuevo_grupo_con_ids.append(list_incidencias_seguimiento[0])
-                    answers[self.incidence_fields['grupo_seguimiento_incidencia']] = incidencia_nuevo_grupo_con_ids
+                    answers[self.incidence_fields['seguimientos_incidencia']] = incidencia_nuevo_grupo_con_ids
+                    print("SEGUIMIENTOS",answers[self.incidence_fields['seguimientos_incidencia']])
+
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
 
@@ -5819,6 +5831,27 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 return res
         else:
             self.LKFException('No se mandarón parametros para actualizar') 
+
+    def update_seg(self, folio, seguimientos ):
+        # incidence_selected = self.get_list_incidences(location, area, folio=folio)
+        answers={}
+        print("SEGUIMIENTOS", seguimientos, folio)
+        if seguimientos:
+            seg_list={}
+            seg_list.update({
+                    self.incidence_fields['accion_correctiva_incidencia']:seguimientos.get('accion_correctiva_incidencia',""),
+                    self.incidence_fields['incidencia_personas_involucradas'] :seguimientos.get('incidencia_personas_involucradas',""),
+                    self.incidence_fields['fecha_inicio_seg'] :seguimientos.get('fecha_inicio_seg',""),
+                    self.incidence_fields['tiempo_transcurrido'] : seguimientos.get('tiempo_transcurrido',""),
+                    self.incidence_fields['incidencia_documento_solucion'] :seguimientos.get('incidencia_documento_solucion'),
+                    self.incidence_fields['incidencia_evidencia_solucion'] :seguimientos.get('incidencia_evidencia_solucion')
+                })
+            # answers.update({self.incidence_fields['seguimientos_incidencia']:seg_list})
+            answers[self.incidence_fields['seguimientos_incidencia']][-1]=seg_list
+        print("answers",simplejson.dumps(answers, indent=4))
+        res = self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_INCIDENCIAS, record_id=['68ad4fe042ca0aff7cadfd0e'])
+        print("response",res)
+        return res
 
     def update_incidence(self, data_incidences, folio):
         '''

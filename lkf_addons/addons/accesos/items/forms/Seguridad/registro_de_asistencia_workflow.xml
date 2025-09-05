@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.registro_de_asistencia.id }}</form_id>
-    <id>68b0f1d43d79d3911e5af3f9</id>
+    <id>68b85bc5ddf99ed51c9ab21d</id>
     <workflows>
         <item>
             <actions>
                 <item>
-                    <_id>68b0f1f8e66d2063219529fe</_id>
+                    <_id>68b85bc5ddf99ed51c9ab216</_id>
                     <action_id>7</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
@@ -26,8 +26,8 @@
                     <name>Se ejecuta el script</name>
                 </item>
             </actions>
-            <id>68b0f1f8e66d206321952a00</id>
-            <name>Check in manual</name>
+            <id>68b85bc5ddf99ed51c9ab217</id>
+            <name>None</name>
             <rules>
                 <metadata>
                     <connection>[]</connection>
@@ -38,9 +38,9 @@
                             <year>2014</year>
                         </period>
                         <range>
-                            <end>2025-08-29T06:00:00.000Z</end>
+                            <end>2025-09-04T06:00:00.000Z</end>
                             <selected>False</selected>
-                            <start>2025-08-29T00:17:27.736Z</start>
+                            <start>2025-09-03T15:15:49.725Z</start>
                         </range>
                     </date>
                     <grading>{}</grading>
@@ -52,58 +52,6 @@
                     <edited>True</edited>
                     <run_multiple_times>True</run_multiple_times>
                     <runtime>before</runtime>
-                </record>
-                <wf_fields>
-                    <operator>all</operator>
-                    <triggers>[]</triggers>
-                </wf_fields>
-            </rules>
-        </item>
-        <item>
-            <actions>
-                <item>
-                    <_id>68b0f1f8e66d2063219529ff</_id>
-                    <action_id>4</action_id>
-                    <action_settings>{}</action_settings>
-                    <configuration>
-                        <assignTo>
-                            <item>
-                                <field_id>RECORD_USER</field_id>
-                                <label>Usuario que contesta</label>
-                                <push_notification>True</push_notification>
-                                <send_mail>False</send_mail>
-                            </item>
-                        </assignTo>
-                    </configuration>
-                    <name>Se asigna a usuario</name>
-                </item>
-            </actions>
-            <id>68b0f1f8e66d206321952a03</id>
-            <name>Envio de notificacion</name>
-            <rules>
-                <metadata>
-                    <connection>[]</connection>
-                    <date>
-                        <period>
-                            <month>1</month>
-                            <selected>False</selected>
-                            <year>2014</year>
-                        </period>
-                        <range>
-                            <end>2025-08-29T06:00:00.000Z</end>
-                            <selected>False</selected>
-                            <start>2025-08-29T00:17:27.736Z</start>
-                        </range>
-                    </date>
-                    <grading>{}</grading>
-                    <user>[]</user>
-                </metadata>
-                <record>
-                    <created>True</created>
-                    <deleted>False</deleted>
-                    <edited>False</edited>
-                    <run_multiple_times>False</run_multiple_times>
-                    <runtime>after</runtime>
                 </record>
                 <wf_fields>
                     <operator>all</operator>
