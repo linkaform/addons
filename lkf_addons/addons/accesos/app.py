@@ -485,7 +485,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'cantidad':'66ec67e42bcc75c3a458778e',
             'tags':'6834e4e8b0ed467efade7972',
             'tag':'688abce60cf2954b12f7bbe9',
-            'grupo_seguimiento_incidencia': '683de3cfcf4a5d248ffbaf89',
+            # 'grupo_seguimiento_incidencia': '683de3cfcf4a5d248ffbaf89',
             # 'accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed7',
             # 'comentario_accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed8',
             # 'fecha_inicio_accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed9',
