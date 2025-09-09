@@ -5699,6 +5699,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "categoria": incidence_selected.get("categoria", ''),
             "sub_categoria": incidence_selected.get("sub_categoria", ''),
             "incidente": incidence_selected.get("incidente", ''),
+            "estatus":"abierto",
         }
 
         answers = {}
@@ -5870,6 +5871,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
         '''
         answers = {}
+        answers[self.incidence_fields['estatus']]="abierto"
         for key, value in data_incidences.items():
             if key == 'categoria':
                 answers[self.incidence_fields['incidencia_catalog']].update({
