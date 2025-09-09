@@ -2655,11 +2655,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for r in data:
             row = {}
+            print("row", row)
             row['nombre_completo'] = r.get(self.incidence_fields['nombre_completo'],'')
             row['rol'] = (r.get(self.incidence_fields['rol']) or '').capitalize().replace("_", " ")
-            row['sexo'] = (r.get(self.incidence_fields['sexo']) or '').capitalize().replace("_"," "),
-            row['grupo_etario'] = (r.get(self.incidence_fields['grupo_etario'],'')or '').capitalize().replace("_"," "),
-            row['atencion_medica'] = r.get(self.incidence_fields['atencion_medica'],''),
+            row['sexo'] = (r.get(self.incidence_fields['sexo']) or '').capitalize().replace("_"," ")
+            row['grupo_etario'] = (r.get(self.incidence_fields['grupo_etario'])or '').capitalize().replace("_"," ")
+            row['atencion_medica'] = r.get(self.incidence_fields['atencion_medica'],'')
             row['retenido'] = r.get(self.incidence_fields['retenido'],'')
             row['comentarios'] = r.get(self.incidence_fields['comentarios'],'')
             res.append(row)
@@ -5893,7 +5894,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['nombre_completo']:c.get('nombre_completo',""),
                                 self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
-                                self.incidence_fields['sexo'] :c.get('sexo',""),
+                                self.incidence_fields['sexo'] :c.get('sexo',"").lower(),
                                 self.incidence_fields['grupo_etario'] :c.get('grupo_etario',"").lower().replace(" ","_"),
                                 self.incidence_fields['atencion_medica'] :c.get('atencion_medica',""),
                                 self.incidence_fields['retenido'] :c.get('retenido',""),
