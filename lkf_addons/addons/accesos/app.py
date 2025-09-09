@@ -2656,9 +2656,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for r in data:
             row = {}
             row['nombre_completo'] = r.get(self.incidence_fields['nombre_completo'],'')
-            row['rol'] = r.get(self.incidence_fields['rol'],'').capitalize().replace("_"," "),
-            row['sexo'] = r.get(self.incidence_fields['sexo'],'').capitalize().replace("_"," "),
-            row['grupo_etario'] = r.get(self.incidence_fields['grupo_etario'],'').capitalize().replace("_"," "),
+            row['rol'] = (r.get(self.incidence_fields['rol']) or '').capitalize().replace("_", " ")
+            row['sexo'] = (r.get(self.incidence_fields['sexo']) or '').capitalize().replace("_"," "),
+            row['grupo_etario'] = (r.get(self.incidence_fields['grupo_etario'],'')or '').capitalize().replace("_"," "),
             row['atencion_medica'] = r.get(self.incidence_fields['atencion_medica'],''),
             row['retenido'] = r.get(self.incidence_fields['retenido'],'')
             row['comentarios'] = r.get(self.incidence_fields['comentarios'],'')
