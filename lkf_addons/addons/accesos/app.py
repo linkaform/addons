@@ -4298,7 +4298,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'telefono': f"$answers.{self.incidence_fields['telefono']}",
                 'info_coincide_con_videos': f"$answers.{self.incidence_fields['info_coincide_con_videos']}",
                 'responsable_que_entrega': f"$answers.{self.incidence_fields['responsable_que_entrega']}",
-                'responsable_que_recibe':f"$answers.{self.incidence_fields['responsable_que_recibe']}",
+                # 'responsable_que_recibe':f"$answers.{self.incidence_fields['responsable_que_recibe']}",
                 #Robo de cableado
                 'valor_estimado': f"$answers.{self.incidence_fields['valor_estimado']}",
                 'pertenencias_sustraidas': f"$answers.{self.incidence_fields['pertenencias_sustraidas']}",
@@ -4332,6 +4332,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['seguimientos_incidencia'] = self.format_seguimiento_incidencias(r.get('seguimientos_incidencia',[]))
             r['tags'] = self.format_tags_incidencias(r.get('tags',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
+            r['color_piel'] = r.get('color_piel',"").capitalize().replace("_", " ")
         # print("resultados", simplejson.dumps(result, indent=4))
         return result
 
