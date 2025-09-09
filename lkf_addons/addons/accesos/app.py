@@ -508,8 +508,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'num_doc_identidad': '684c3e026d974f9625e1130b',
             'telefono': '684c3e026d974f9625e1130c',
             'info_coincide_con_videos': '684c3e026d974f9625e1130d',
-            'responsable_que_entrega': '684c3e026d974f9625e1130e',
-            'responsable_que_recibe': '684c3e026d974f9625e1130f',
+            'responsable_que_entrega': '688bb6ca2f094c5555b2097b',
+            # 'responsable_que_recibe': '684c3e026d974f9625e1130f',
             #Robo de cableado
             'valor_estimado': '684c3e6821796d7880117f22',
             'pertenencias_sustraidas': '684c3e6821796d7880117f23',
@@ -2136,6 +2136,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',"")
                             }
                         )
+                        print("LISTA",ap_list)
                     answers.update({self.incidence_fields['afectacion_patrimonial_incidencia']:ap_list})
             elif key == 'datos_deposito_incidencia':
                 depositos = data_incidences.get('datos_deposito_incidencia',[])
@@ -2163,6 +2164,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     answers.update({self.incidence_fields['tags']:tag_list})
             elif key == 'prioridad_incidencia':
                 answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
+            elif key == 'color_piel':
+                answers[self.incidence_fields['color_piel']] = value
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         print("RESPUESTAS", simplejson.dumps(answers, indent=4))
@@ -2691,6 +2694,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for r in data:
             row = {}
+            print("que tenemos", r)
             row['tipo_afectacion'] = r.get(self.incidence_fields['tipo_afectacion'],'').capitalize().replace("_"," ")
             row['descripcion_afectacion'] = r.get(self.incidence_fields['descripcion_afectacion'],'')
             row['monto_estimado'] = r.get(self.incidence_fields['monto_estimado'],'')
