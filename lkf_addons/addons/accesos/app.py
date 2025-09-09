@@ -485,6 +485,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'cantidad':'66ec67e42bcc75c3a458778e',
             'tags':'6834e4e8b0ed467efade7972',
             'tag':'688abce60cf2954b12f7bbe9',
+            'estatus': '68c04a6b213e28722aec0610',
             # 'grupo_seguimiento_incidencia': '683de3cfcf4a5d248ffbaf89',
             # 'accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed7',
             # 'comentario_accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed8',
@@ -2051,6 +2052,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #---Define Answers
         answers = {}
         answers[self.incidence_fields['incidencia_catalog']]={}
+        answers[self.incidence_fields['estatus']]="abierto"
         for key, value in data_incidences.items():
             if key == 'categoria':
                 answers[self.incidence_fields['incidencia_catalog']].update({
@@ -2168,7 +2170,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.incidence_fields['color_piel']] =  f"{value}".lower().replace(" ", "_")
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
-        print("RESPUESTAS", simplejson.dumps(answers, indent=4))
+        # print("RESPUESTAS", simplejson.dumps(answers, indent=4))
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
@@ -4285,6 +4287,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'datos_deposito_incidencia':f"$answers.{self.incidence_fields['datos_deposito_incidencia']}",
                 
                 'tags':f"$answers.{self.incidence_fields['tags']}",
+                
+                'estatus':f"$answers.{self.incidence_fields['estatus']}",
 
                 'nombre_completo_persona_extraviada':f"$answers.{self.incidence_fields['nombre_completo_persona_extraviada']}",
                 'edad':f"$answers.{self.incidence_fields['edad']}",
@@ -4333,7 +4337,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['tags'] = self.format_tags_incidencias(r.get('tags',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
             r['color_piel'] = r.get('color_piel',"").capitalize().replace("_", " ")
-        # print("resultados", simplejson.dumps(result, indent=4))
+            r['estatus'] = r.get('estatus',"").capitalize()
+        print("resultados", simplejson.dumps(result, indent=4))
         return result
 
     def get_list_notes(self, location, area, status=None, limit=10, offset=0, dateFrom="", dateTo=""):
