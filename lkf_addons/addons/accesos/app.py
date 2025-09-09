@@ -493,8 +493,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             # 'evidencia_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edb',
             # 'documento_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edc',
 
-            'categoria':'686807d46e41614d708f6fc9',
-            'sub_categoria': '686807a7ee7705c5c8eb181a',
+            'categoria':'6848893f4f18021ab10c6a12',
+            'sub_categoria': '68488a6c5cf05798e09f3eec',
             'incidente':'663973809fa65cafa759eb97',
             #Persona extraviada
             'nombre_completo_persona_extraviada':'684c3e026d974f9625e11303',
