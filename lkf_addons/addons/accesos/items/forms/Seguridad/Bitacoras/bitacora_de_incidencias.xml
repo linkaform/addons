@@ -5799,7 +5799,21 @@
         <name />
         <unify_ids>False</unify_ids>
     </template_conf>
-    <templates>[]</templates>
+    <templates>
+        <item>
+            <_type>single_record</_type>
+            <default>True</default>
+            <description>Plantilla para incidencia individual o seguimiento de incidente</description>
+            <id>592</id>
+            <name>Grupo Afal - Seguimiento de Incidente</name>
+            <owner>/api/infosync/user/17780/</owner>
+            <paginate>False</paginate>
+            <pdfName>{% raw %} Seguimiento_de_Incidente_{{record.folio}} {% endraw %} </pdfName>
+            <properties>{}</properties>
+            <resource_uri>/api/infosync/templates/592/</resource_uri>
+            <script>{}</script>
+        </item>
+    </templates>
     <timer_config>
         <active>False</active>
         <clicks_to_expire>None</clicks_to_expire>
