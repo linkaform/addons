@@ -2086,8 +2086,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
                                 self.incidence_fields['sexo'] :c.get('sexo',"").lower().replace(" ","_"),
                                 self.incidence_fields['grupo_etario'] :c.get("grupo_etario").lower().replace(" ","_"),
-                                self.incidence_fields['atencion_medica'] :c.get('atencion_medica',""),
-                                self.incidence_fields['retenido'] :c.get('retenido',""),
+                                self.incidence_fields['atencion_medica'] :c.get('atencion_medica',"").lower(),
+                                self.incidence_fields['retenido'] :c.get('retenido',"").lower(),
                                 self.incidence_fields['comentarios'] :c.get('comentarios',"")
                             }
                         )
@@ -2101,7 +2101,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['acciones_tomadas']:c.get('acciones_tomadas',""),
                                 self.incidence_fields['llamo_a_policia'] :c.get('llamo_a_policia',""),
-                                self.incidence_fields['autoridad'] :c.get('autoridad','').lower(),
+                                self.incidence_fields['autoridad'] :c.get('autoridad','').lower().replace(" ", "_"),
                                 self.incidence_fields['numero_folio_referencia'] :c.get('numero_folio_referencia',""),
                                 self.incidence_fields['responsable'] :c.get('responsable',""),
                             }
@@ -2656,11 +2656,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for r in data:
             row = {}
             row['nombre_completo'] = r.get(self.incidence_fields['nombre_completo'],'')
-            row['rol'] = r.get(self.incidence_fields['rol'],'')
-            row['sexo'] = r.get(self.incidence_fields['sexo'],'')
-            row['grupo_etario'] = r.get(self.incidence_fields['grupo_etario'],'')
-            row['atencion_medica'] = r.get(self.incidence_fields['atencion_medica'],'')
+            row['rol'] = r.get(self.incidence_fields['rol'],'').capitalize().replace("_"," "),
+            row['sexo'] = r.get(self.incidence_fields['sexo'],'').capitalize().replace("_"," "),
+            row['grupo_etario'] = r.get(self.incidence_fields['grupo_etario'],'').capitalize().replace("_"," "),
+            row['atencion_medica'] = r.get(self.incidence_fields['atencion_medica'],''),
             row['retenido'] = r.get(self.incidence_fields['retenido'],'')
+            row['comentarios'] = r.get(self.incidence_fields['comentarios'],'')
             res.append(row)
         return res
 
@@ -2690,6 +2691,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for r in data:
             row = {}
             row['tipo_afectacion'] = r.get(self.incidence_fields['tipo_afectacion'],'').capitalize().replace("_"," ")
+            row['descripcion_afectacion'] = r.get(self.incidence_fields['descripcion_afectacion'],'')
             row['monto_estimado'] = r.get(self.incidence_fields['monto_estimado'],'')
             row['duracion_estimada'] = r.get(self.incidence_fields['duracion_estimada'],'')
             res.append(row)
@@ -4322,7 +4324,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
             r['afectacion_patrimonial_incidencia'] = self.format_afectacion_patrimonial(r.get('afectacion_patrimonial_incidencia',[]))
             r['datos_deposito_incidencia'] = self.format_datos_deposito(r.get('datos_deposito_incidencia',[]))
-            print("seguimientos",r.get('seguimientos_incidencia',[]))
             r['seguimientos_incidencia'] = self.format_seguimiento_incidencias(r.get('seguimientos_incidencia',[]))
             r['tags'] = self.format_tags_incidencias(r.get('tags',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
