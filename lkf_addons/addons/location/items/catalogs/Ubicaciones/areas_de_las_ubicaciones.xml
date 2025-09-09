@@ -7,16 +7,443 @@
         <button_message>Mandar respuestas</button_message>
     </confirmation>
     <description />
-    <_rev>4-50de6d1cc263f4f79684861bb5b96fb7</_rev>
-    <updated_at>2025-04-28T14:23:43.416989+00:00Z</updated_at>
+    <_rev>42-f708a6225b115ff2897b45cedd941e99</_rev>
+    <updated_at>2024-07-30T00:57:27.325369+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
     </sync>
-    <filters>{}</filters>
+    <filters>
+        <Monterrey>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>Planta Monterrey</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+            </amp_and>
+        </Monterrey>
+        <HabitacionesHieGalerias>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>HIE GALERIAS</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesHieGalerias>
+        <HabitacionesIstayMonterreyHistorico>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>ISTAY MONTERREY HISTORICO</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesIstayMonterreyHistorico>
+        <HabitacionesIstayCiudadJuarez>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>ISTAY CIUDAD JUAREZ</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesIstayCiudadJuarez>
+        <HabitacionCrowneMTY>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>CROWNE PLAZA MTY</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionCrowneMTY>
+        <MSMilenium>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>MS MILENIUM</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </MSMilenium>
+        <HabitacionesIstayVictoria>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>ISTAY VICTORIA</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesIstayVictoria>
+        <HabitacionesHieTecnologico>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>HIE TECNOLOGICO</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesHieTecnologico>
+        <HabitacionesHgiSilao>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>HGI SILAO</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesHgiSilao>
+        <HabitacionesMsMilenium>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>MS MILENIUM</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesMsMilenium>
+        <HabitacionesMcAllen>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>MCALLEN</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesMcAllen>
+        <HabitacionesHiTijuanaZonaRio>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>HI TIJUANA ZONA RIO</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesHiTijuanaZonaRio>
+        <HabitacionesCrownePlazaMty>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>CROWNE PLAZA MTY</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesCrownePlazaMty>
+        <JosePatricio>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>Jose Patricio</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+            </amp_and>
+        </JosePatricio>
+        <HabitacionesHieTorreon>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>HIE TORREON</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesHieTorreon>
+        <HabitacionesHiGalerias>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>HIE GALERIAS</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesHiGalerias>
+        <HabitacionesHieSilao>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>HIE SILAO</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesHieSilao>
+        <HabitacionesHieGuanajuato>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>HIE GUANAJUATO</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesHieGuanajuato>
+        <Pruebas>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>Pruebas Karina</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+            </amp_and>
+        </Pruebas>
+        <HabitacionesTravo>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>TRAVO</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesTravo>
+        <habitaciones>
+            <amp_and>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </habitaciones>
+        <HabitacionesHiParqueFundidora>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>HI PARQUE FUNDIDORA</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesHiParqueFundidora>
+        <TravoYiStay>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>ISTAY MONTERREY HISTORICO</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>TRAVO</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Inactiva</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+            </amp_and>
+        </TravoYiStay>
+        <HabitacionesCrownePlazaTorreon>
+            <amp_and>
+                <item>
+                    <num_663e5c57f5b8a7ce8211ed0b>
+                        <amp_eq>CROWNE PLAZA TORREON</amp_eq>
+                    </num_663e5c57f5b8a7ce8211ed0b>
+                </item>
+                <item>
+                    <num_663e5e68f5b8a7ce8211ed18>
+                        <amp_eq>Habitación</amp_eq>
+                    </num_663e5e68f5b8a7ce8211ed18>
+                </item>
+                <item>
+                    <num_663e5e4bf5b8a7ce8211ed14>
+                        <amp_eq>Activa</amp_eq>
+                    </num_663e5e4bf5b8a7ce8211ed14>
+                </item>
+            </amp_and>
+        </HabitacionesCrownePlazaTorreon>
+    </filters>
     <name>Areas de las Ubicaciones</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2025-04-28T14:23:43.416989+00:00Z</created_at>
+    <created_at>2024-07-30T00:57:27.325369+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -30,522 +457,384 @@
             <page_fields>
                 <item>
                     <field_type>text</field_type>
-                    <properties>
-                        <send_email>False</send_email>
-                        <custom>None</custom>
-                        <size>complete</size>
-                    </properties>
-                    <key>True</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
-                    <required>True</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>True</required>
+                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Nombre de Area</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>geolocation</field_type>
-                    <required>False</required>
-                    <field_id>688bac1ecfdcf8b16eb209b5</field_id>
-                    <properties>{}</properties>
-                    <label>Geolocalizacion de Area</label>
-                </item>
-                <item>
-                    <field_type>catalog</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>{{ catalog.tipo_de_areas.obj_id }}</field_id>
-                    <required>False</required>
-                    <fav>None</fav>
                     <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Tipo de Area</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <filters>None</filters>
-                        <view_index>0</view_index>
-                        <couch_id>{{ catalog.tipo_de_areas.obj_id }}</couch_id>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.tipo_de_areas.id }}</catalog_id>
-                        <view_fields>
-                            <item>663e5e68f5b8a7ce8211ed18</item>
-                        </view_fields>
-                        <name>{{ catalog.tipo_de_areas.name }}</name>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
                     <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog-select</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>663e5e68f5b8a7ce8211ed18</field_id>
-                    <required>False</required>
-                    <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Tipo de Area</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <last>False</last>
-                        <filters>None</filters>
-                        <field_type>text</field_type>
-                        <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.tipo_de_areas.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.tipo_de_areas.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
-                    </catalog>
                     <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
+                    <key>True</key>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>
-                        <item>663a7ca6e48382c5b12308fa</item>
-                        <item>663a7dd6e48382c5b12308ff</item>
+                        <item>663e5c57f5b8a7ce8211ed0b</item>
                         <item>663a7e0fe48382c5b1230902</item>
                         <item>663a7f79e48382c5b123090a</item>
+                        <item>663a7ee1e48382c5b1230907</item>
                     </catalog_fields>
-                    <field_id>{{ catalog.ubicaciones.obj_id }}</field_id>
-                    <required>False</required>
                     <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Ubicación</label>
+                    <required>False</required>
+                    <field_id>{{ catalog.ubicaciones.obj_id }}</field_id>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <view_fields>
-                            <item>663e5c57f5b8a7ce8211ed0b</item>
-                        </view_fields>
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <couch_id>{{ catalog.ubicaciones.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
-                        <filters>None</filters>
+                        <view_fields>
+                            <item>663e5c57f5b8a7ce8211ed0b</item>
+                        </view_fields>
                         <name>{{ catalog.ubicaciones.name }}</name>
                     </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <relation_type>None</relation_type>
+                    <label>Ubicación</label>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-select</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
-                    <required>False</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Ubicación</label>
+                    <required>False</required>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>True</last>
-                        <view_fields>[]</view_fields>
+                        <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
-                        <filters>None</filters>
+                        <view_fields>[]</view_fields>
                     </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>
-                        <item>667468e3e577b8b98c852aaa</item>
-                    </catalog_fields>
-                    <field_id>{{ catalog.clientes.obj_id }}</field_id>
-                    <required>False</required>
-                    <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
-                    <label>Cliente</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <view_fields>
-                            <item>667468e3e577b8b98c852aaa</item>
-                        </view_fields>
-                        <view_index>0</view_index>
-                        <couch_id>{{ catalog.clientes.obj_id }}</couch_id>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.clientes.id }}</catalog_id>
-                        <filters>None</filters>
-                        <related_catalog>{}</related_catalog>
-                        <name>{{ catalog.clientes.name }}</name>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <label>Ubicación</label>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
-                    <field_type>catalog-select</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
+                    <field_type>catalog-detail</field_type>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>667468e3e577b8b98c852aaa</field_id>
+                    <fav>None</fav>
                     <required>False</required>
-                    <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Nombre Comercial</label>
+                    <field_id>663a7e0fe48382c5b1230902</field_id>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <last>False</last>
-                        <view_fields>[]</view_fields>
-                        <field_type>text</field_type>
-                        <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.clientes.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.clientes.id }}</catalog_id>
                         <filters>None</filters>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
                     </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog</field_type>
-                    <properties>
-                        <help_text>True</help_text>
-                    </properties>
-                    <key>None</key>
-                    <catalog_fields>
-                        <item>663a7e0fe48382c5b1230901</item>
-                        <item>663a7ee1e48382c5b1230906</item>
-                        <item>663e5c8cf5b8a7ce8211ed0c</item>
-                        <item>663a7dd6e48382c5b12308ff</item>
-                        <item>663a7ca6e48382c5b12308fa</item>
-                        <item>663a7ee1e48382c5b1230905</item>
-                        <item>6654187fc85ce22aaf8bb070</item>
-                        <item>663a7f79e48382c5b123090a</item>
-                        <item>663a7e0fe48382c5b1230902</item>
-                        <item>663a7ee1e48382c5b1230907</item>
-                    </catalog_fields>
-                    <field_id>{{ catalog.contacto.obj_id }}</field_id>
-                    <required>False</required>
-                    <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
                     <label>Direccion</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <view_fields>
-                            <item>663a7e0fe48382c5b1230901</item>
-                        </view_fields>
-                        <view_index>0</view_index>
-                        <couch_id>{{ catalog.contacto.obj_id }}</couch_id>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters>None</filters>
-                        <related_catalog>{}</related_catalog>
-                        <name>{{ catalog.contacto.name }}</name>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog-select</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>663a7e0fe48382c5b1230901</field_id>
-                    <required>False</required>
-                    <fav>True</fav>
                     <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Nombre de Dirección</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <last>True</last>
-                        <view_fields>[]</view_fields>
-                        <field_type>text</field_type>
-                        <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters>None</filters>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>663a7ee1e48382c5b1230906</field_id>
-                    <required>False</required>
                     <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Telefono</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <last>True</last>
-                        <view_fields>[]</view_fields>
-                        <field_type>integer</field_type>
-                        <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters>None</filters>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>663e5c8cf5b8a7ce8211ed0c</field_id>
                     <required>False</required>
-                    <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Geolocalizacion</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <last>False</last>
-                        <view_fields>[]</view_fields>
-                        <field_type>geolocation</field_type>
-                        <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters>None</filters>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>663a7dd6e48382c5b12308ff</field_id>
-                    <required>False</required>
-                    <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Nombre Estado</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <last>False</last>
-                        <view_fields>[]</view_fields>
-                        <field_type>text</field_type>
-                        <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters>None</filters>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>663a7ca6e48382c5b12308fa</field_id>
-                    <required>False</required>
-                    <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Pais</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <last>False</last>
-                        <view_fields>[]</view_fields>
-                        <field_type>text</field_type>
-                        <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters>None</filters>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>663a7ee1e48382c5b1230905</field_id>
-                    <required>False</required>
-                    <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Codigo Postal</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <last>False</last>
-                        <view_fields>[]</view_fields>
-                        <field_type>text</field_type>
-                        <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters>None</filters>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>6654187fc85ce22aaf8bb070</field_id>
-                    <required>False</required>
-                    <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Ciudad</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <last>False</last>
-                        <view_fields>[]</view_fields>
-                        <field_type>text</field_type>
-                        <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters>None</filters>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
                     <field_id>663a7f79e48382c5b123090a</field_id>
-                    <required>False</required>
-                    <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters>None</filters>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
                     <relation_type>None</relation_type>
                     <label>Colonia</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <last>False</last>
-                        <view_fields>[]</view_fields>
-                        <field_type>text</field_type>
-                        <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters>None</filters>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog-detail</field_type>
-                    <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>663a7e0fe48382c5b1230902</field_id>
-                    <required>False</required>
-                    <fav>None</fav>
                     <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>Direccion</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <last>False</last>
-                        <view_fields>[]</view_fields>
-                        <field_type>text</field_type>
-                        <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
-                        <filters>None</filters>
-                    </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>catalog-detail</field_type>
                     <properties>{}</properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
+                    <required>False</required>
                     <field_id>663a7ee1e48382c5b1230907</field_id>
-                    <required>False</required>
-                    <fav>None</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
                     <label>Email</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <view_fields>[]</view_fields>
                         <field_type>email</field_type>
                         <view_index>0</view_index>
-                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.ubicaciones.id }}</catalog_id>
+                        <filters />
+                    </catalog>
+                    <options>[]</options>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>None</fav>
+                    <required>False</required>
+                    <field_id>{{ catalog.tipo_de_areas.obj_id }}</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <view_fields>
+                            <item>663e5e68f5b8a7ce8211ed18</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.tipo_de_areas.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_areas.id }}</catalog_id>
+                        <filters>None</filters>
+                        <name>{{ catalog.tipo_de_areas.name }}</name>
+                    </catalog>
+                    <relation_type>None</relation_type>
+                    <label>Tipo de Area</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>True</fav>
+                    <required>False</required>
+                    <field_id>663e5e68f5b8a7ce8211ed18</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <view_fields>[]</view_fields>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.tipo_de_areas.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_areas.id }}</catalog_id>
                         <filters>None</filters>
                     </catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <relation_type>None</relation_type>
+                    <label>Tipo de Area</label>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <required>False</required>
+                    <field_id>680977786d022b9bff6e3645</field_id>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
+                    <label>Número de Habitación</label>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <required>False</required>
+                    <field_id>680977786d022b9bff6e3646</field_id>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
+                    <label>Piso</label>
+                </item>
+                <item>
+                    <field_type>catalog</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>
+                        <item>663a7e0fe48382c5b1230901</item>
+                        <item>663a7ee1e48382c5b1230906</item>
+                        <item>663e5c8cf5b8a7ce8211ed0c</item>
+                        <item>6654187fc85ce22aaf8bb070</item>
+                        <item>663a7f79e48382c5b123090a</item>
+                        <item>663a7e0fe48382c5b1230902</item>
+                        <item>663a7ee1e48382c5b1230907</item>
+                    </catalog_fields>
+                    <fav>None</fav>
+                    <required>False</required>
+                    <field_id>{{ catalog.contacto.obj_id }}</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters>None</filters>
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.contacto.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <view_fields>
+                            <item>663a7e0fe48382c5b1230901</item>
+                        </view_fields>
+                        <name>{{ catalog.contacto.name }}</name>
+                    </catalog>
+                    <relation_type>None</relation_type>
+                    <label>Direccion</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <help_text>True</help_text>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>True</fav>
+                    <required>False</required>
+                    <field_id>663a7e0fe48382c5b1230901</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <filters>None</filters>
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <relation_type>None</relation_type>
+                    <label>Nombre de Dirección</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>None</fav>
+                    <required>False</required>
+                    <field_id>663a7ee1e48382c5b1230906</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>True</last>
+                        <filters>None</filters>
+                        <field_type>integer</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <relation_type>None</relation_type>
+                    <label>Telefono</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>None</fav>
+                    <required>True</required>
+                    <field_id>663e5c8cf5b8a7ce8211ed0c</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters>None</filters>
+                        <field_type>geolocation</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <relation_type>None</relation_type>
+                    <label>Geolocalizacion</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-detail</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>None</fav>
+                    <required>False</required>
+                    <field_id>6654187fc85ce22aaf8bb070</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters>None</filters>
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.contacto.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.contacto.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <relation_type>None</relation_type>
+                    <label>Ciudad</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>select</field_type>
-                    <properties>
-                        <selected>0</selected>
-                        <openChoice>False</openChoice>
-                        <orientation>vertical</orientation>
-                        <custom>None</custom>
-                    </properties>
-                    <key>None</key>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>663e5e4bf5b8a7ce8211ed15</field_id>
-                    <required>True</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>True</required>
+                    <field_id>663e5e4bf5b8a7ce8211ed15</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Estatus de Area</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>
                         <item>
                             <points>None</points>
@@ -584,27 +873,27 @@
                             <label>Ocupada</label>
                         </item>
                     </options>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>select</field_type>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
                     <properties>
                         <selected>0</selected>
                         <openChoice>False</openChoice>
                         <orientation>vertical</orientation>
                         <custom>None</custom>
                     </properties>
-                    <key>None</key>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>select</field_type>
+                    <view_fields>[]</view_fields>
                     <catalog_fields>[]</catalog_fields>
-                    <field_id>663e5e4bf5b8a7ce8211ed14</field_id>
-                    <required>True</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <required>True</required>
+                    <field_id>663e5e4bf5b8a7ce8211ed14</field_id>
+                    <catalog>{}</catalog>
                     <relation_type>None</relation_type>
                     <label>Estatus</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
+                    <related_catalog_key>[]</related_catalog_key>
                     <options>
                         <item>
                             <points>None</points>
@@ -619,35 +908,47 @@
                             <label>Inactiva</label>
                         </item>
                     </options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
-                    <field_type>text</field_type>
-                    <required>False</required>
-                    <field_id>6762f7b0922cc2a2f57d4044</field_id>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <label>TagId</label>
-                </item>
-                <item>
                     <field_type>images</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>False</fav>
+                    <required>False</required>
+                    <field_id>663e5e4bf5b8a7ce8211ed13</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>QR Area</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
                     <properties>
                         <date_format>None</date_format>
+                        <multi_selection>True</multi_selection>
+                        <file_name>None</file_name>
+                        <max_images_count>10</max_images_count>
+                        <data_format>[]</data_format>
+                        <location_decimals>None</location_decimals>
+                        <fieldId>[]</fieldId>
+                        <file_name_array>[]</file_name_array>
+                        <watermark_enable>False</watermark_enable>
+                        <metadata>[]</metadata>
                         <image_origin>
                             <from_draw>True</from_draw>
                             <from_camera>True</from_camera>
                             <from_gallery>True</from_gallery>
                         </image_origin>
-                        <multi_selection>True</multi_selection>
-                        <file_name>None</file_name>
-                        <max_images_count>10</max_images_count>
-                        <data_format>[]</data_format>
                         <min_images_count>0</min_images_count>
-                        <file_name_array>[]</file_name_array>
-                        <watermark_enable>False</watermark_enable>
                         <watermark_config>
                             <color>None</color>
                             <text_data>None</text_data>
@@ -655,23 +956,20 @@
                             <text_data_array>[]</text_data_array>
                             <position>None</position>
                         </watermark_config>
-                        <fieldId>[]</fieldId>
-                        <location_decimals>None</location_decimals>
-                        <metadata>[]</metadata>
                     </properties>
-                    <key>None</key>
-                    <catalog_fields>[]</catalog_fields>
-                    <field_id>663e5e4bf5b8a7ce8211ed13</field_id>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>6762f7b0922cc2a2f57d4044</field_id>
                     <required>False</required>
                     <fav>True</fav>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <relation_type>None</relation_type>
-                    <label>QR Area</label>
-                    <catalog>{}</catalog>
-                    <catalog_id>None</catalog_id>
-                    <view_fields>[]</view_fields>
-                    <options>[]</options>
-                    <related_catalog>None</related_catalog>
+                    <label>TagId</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
                 </item>
                 <item>
                     <field_type>images</field_type>
@@ -706,12 +1004,12 @@
                     </properties>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
     <sync_last_update>None</sync_last_update>
-    <_id>680f8f6f3aae12aabc6c3996</_id>
+    <_id>66a83a77cfed7f342775c161</_id>
     <public>False</public>
-    <catalog_id>131890</catalog_id>
+    <catalog_id>121674</catalog_id>
 </lkf>
