@@ -475,11 +475,21 @@ class Items(LKFException):
     def merge_addons_modules(self, list1, list2):
         return self.merge_nested_lists( list1+list2 )
 
+    def flatten(self, items, prefix=""):
+        for item in items:
+            if isinstance(item, str):
+                yield f"{prefix}{item}"
+            elif isinstance(item, dict):
+                for folder, children in item.items():
+                    # Recurse into subfolder(s)
+                    yield from self.flatten(children, prefix=f"{prefix}{folder}/")  
+
     def get_anddons_and_modules_items(self, itype, sub_dir=None):
         res_addons = self.get_all_items_json(itype, sub_dir=sub_dir, path=ADDONS_PATH)
         res_modules = self.get_all_items_json(itype, sub_dir=sub_dir, path=MODULES_PATH)
         addons_modules = self.merge_addons_modules(res_addons,res_modules)
-        print('addons_modules', addons_modules)
+        print('Module Items: ')
+        print(" ".join(self.flatten(addons_modules)))
         return addons_modules
 
     def get_all_items_json(self, itype, sub_dir=None, path=MODULES_PATH):
