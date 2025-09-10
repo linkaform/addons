@@ -89,8 +89,8 @@ def do_load_modules(load_modules, **kwargs):
     kwargs.update({'depends_on': get_module_dependencies(module, depends_on)})
     if kwargs.get('dependencies'):
         depend_modules = kwargs['depends_on']
-        print('Installing Denpendencies: ', depend_modules)
         depend_modules += load_modules
+        print('Installing Dependencies: ', depend_modules)
     else:
         depend_modules = load_modules
     for module in depend_modules:
@@ -351,13 +351,14 @@ if __name__ == '__main__':
 
         print('Running on:', '== {} =='.format(settings.ENV) * 10)
         print('With User:', '== {} =='.format(settings.config['USERNAME']))
+        print('Account id:', '== {} =='.format(settings.config['ACCOUNT_ID']))
         environment = get_items_2_load(commands)
         if not environment or environment == 'prod' or settings.ENV == 'prod':
             environment =  set_value(input(f"We are running on {settings.ENV} Enviroment, are you sure [y/n] (default n):"))
         if settings.ENV  == 'prod':
             sure = set_value(input(f"REALLY SURE to set enviornment to  {settings.ENV} [y/n] (default n):"))
             if sure:
-                print('ok doing installation')
+                print('Ok Running Installation on:', '== {} =='.format(settings.ENV))
             else:
                 raise('Stoping installation')
         if not environment:
