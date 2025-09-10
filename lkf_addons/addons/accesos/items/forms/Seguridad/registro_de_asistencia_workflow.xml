@@ -59,5 +59,57 @@
                 </wf_fields>
             </rules>
         </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68bf1e1a90bc42e5cc453870</_id>
+                    <action_id>4</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <assignTo>
+                            <item>
+                                <field_id>RECORD_USER</field_id>
+                                <label>Usuario que contesta</label>
+                                <push_notification>False</push_notification>
+                                <send_mail>False</send_mail>
+                            </item>
+                        </assignTo>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>68bf1e1a90bc42e5cc453874</id>
+            <name>Asignar Checking</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-09-09T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-09-08T18:17:07.670Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>False</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
     </workflows>
 </lkf>

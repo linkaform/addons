@@ -485,6 +485,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'cantidad':'66ec67e42bcc75c3a458778e',
             'tags':'6834e4e8b0ed467efade7972',
             'tag':'688abce60cf2954b12f7bbe9',
+            'estatus': '68c04a6b213e28722aec0610',
             # 'grupo_seguimiento_incidencia': '683de3cfcf4a5d248ffbaf89',
             # 'accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed7',
             # 'comentario_accion_correctiva_incidencia': '683de45ddcf6fcee78e61ed8',
@@ -493,8 +494,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             # 'evidencia_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edb',
             # 'documento_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edc',
 
-            'categoria':'686807d46e41614d708f6fc9',
-            'sub_categoria': '686807a7ee7705c5c8eb181a',
+            'categoria':'6848893f4f18021ab10c6a12',
+            'sub_categoria': '68488a6c5cf05798e09f3eec',
             'incidente':'663973809fa65cafa759eb97',
             #Persona extraviada
             'nombre_completo_persona_extraviada':'684c3e026d974f9625e11303',
@@ -508,8 +509,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'num_doc_identidad': '684c3e026d974f9625e1130b',
             'telefono': '684c3e026d974f9625e1130c',
             'info_coincide_con_videos': '684c3e026d974f9625e1130d',
-            'responsable_que_entrega': '684c3e026d974f9625e1130e',
-            'responsable_que_recibe': '684c3e026d974f9625e1130f',
+            'responsable_que_entrega': '688bb6ca2f094c5555b2097b',
+            # 'responsable_que_recibe': '684c3e026d974f9625e1130f',
             #Robo de cableado
             'valor_estimado': '684c3e6821796d7880117f22',
             'pertenencias_sustraidas': '684c3e6821796d7880117f23',
@@ -2051,6 +2052,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #---Define Answers
         answers = {}
         answers[self.incidence_fields['incidencia_catalog']]={}
+        answers[self.incidence_fields['estatus']]="abierto"
         for key, value in data_incidences.items():
             if key == 'categoria':
                 answers[self.incidence_fields['incidencia_catalog']].update({
@@ -2086,8 +2088,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
                                 self.incidence_fields['sexo'] :c.get('sexo',"").lower().replace(" ","_"),
                                 self.incidence_fields['grupo_etario'] :c.get("grupo_etario").lower().replace(" ","_"),
-                                self.incidence_fields['atencion_medica'] :c.get('atencion_medica',""),
-                                self.incidence_fields['retenido'] :c.get('retenido',""),
+                                self.incidence_fields['atencion_medica'] :c.get('atencion_medica',"").lower(),
+                                self.incidence_fields['retenido'] :c.get('retenido',"").lower(),
                                 self.incidence_fields['comentarios'] :c.get('comentarios',"")
                             }
                         )
@@ -2101,7 +2103,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['acciones_tomadas']:c.get('acciones_tomadas',""),
                                 self.incidence_fields['llamo_a_policia'] :c.get('llamo_a_policia',""),
-                                self.incidence_fields['autoridad'] :c.get('autoridad','').lower(),
+                                self.incidence_fields['autoridad'] :c.get('autoridad','').lower().replace(" ", "_"),
                                 self.incidence_fields['numero_folio_referencia'] :c.get('numero_folio_referencia',""),
                                 self.incidence_fields['responsable'] :c.get('responsable',""),
                             }
@@ -2136,6 +2138,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',"")
                             }
                         )
+                        print("LISTA",ap_list)
                     answers.update({self.incidence_fields['afectacion_patrimonial_incidencia']:ap_list})
             elif key == 'datos_deposito_incidencia':
                 depositos = data_incidences.get('datos_deposito_incidencia',[])
@@ -2163,9 +2166,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     answers.update({self.incidence_fields['tags']:tag_list})
             elif key == 'prioridad_incidencia':
                 answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
+            elif key == 'color_piel':
+                answers[self.incidence_fields['color_piel']] =  f"{value}".lower().replace(" ", "_")
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
-        print("RESPUESTAS", simplejson.dumps(answers, indent=4))
+        # print("RESPUESTAS", simplejson.dumps(answers, indent=4))
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
@@ -2655,12 +2660,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for r in data:
             row = {}
+            print("row", row)
             row['nombre_completo'] = r.get(self.incidence_fields['nombre_completo'],'')
-            row['rol'] = r.get(self.incidence_fields['rol'],'')
-            row['sexo'] = r.get(self.incidence_fields['sexo'],'')
-            row['grupo_etario'] = r.get(self.incidence_fields['grupo_etario'],'')
+            row['rol'] = (r.get(self.incidence_fields['rol']) or '').capitalize().replace("_", " ")
+            row['sexo'] = (r.get(self.incidence_fields['sexo']) or '').capitalize().replace("_"," ")
+            row['grupo_etario'] = (r.get(self.incidence_fields['grupo_etario'])or '').capitalize().replace("_"," ")
             row['atencion_medica'] = r.get(self.incidence_fields['atencion_medica'],'')
             row['retenido'] = r.get(self.incidence_fields['retenido'],'')
+            row['comentarios'] = r.get(self.incidence_fields['comentarios'],'')
             res.append(row)
         return res
 
@@ -2689,7 +2696,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = []
         for r in data:
             row = {}
+            print("que tenemos", r)
             row['tipo_afectacion'] = r.get(self.incidence_fields['tipo_afectacion'],'').capitalize().replace("_"," ")
+            row['descripcion_afectacion'] = r.get(self.incidence_fields['descripcion_afectacion'],'')
             row['monto_estimado'] = r.get(self.incidence_fields['monto_estimado'],'')
             row['duracion_estimada'] = r.get(self.incidence_fields['duracion_estimada'],'')
             res.append(row)
@@ -4278,6 +4287,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'datos_deposito_incidencia':f"$answers.{self.incidence_fields['datos_deposito_incidencia']}",
                 
                 'tags':f"$answers.{self.incidence_fields['tags']}",
+                
+                'estatus':f"$answers.{self.incidence_fields['estatus']}",
 
                 'nombre_completo_persona_extraviada':f"$answers.{self.incidence_fields['nombre_completo_persona_extraviada']}",
                 'edad':f"$answers.{self.incidence_fields['edad']}",
@@ -4291,7 +4302,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'telefono': f"$answers.{self.incidence_fields['telefono']}",
                 'info_coincide_con_videos': f"$answers.{self.incidence_fields['info_coincide_con_videos']}",
                 'responsable_que_entrega': f"$answers.{self.incidence_fields['responsable_que_entrega']}",
-                'responsable_que_recibe':f"$answers.{self.incidence_fields['responsable_que_recibe']}",
+                # 'responsable_que_recibe':f"$answers.{self.incidence_fields['responsable_que_recibe']}",
                 #Robo de cableado
                 'valor_estimado': f"$answers.{self.incidence_fields['valor_estimado']}",
                 'pertenencias_sustraidas': f"$answers.{self.incidence_fields['pertenencias_sustraidas']}",
@@ -4322,11 +4333,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
             r['afectacion_patrimonial_incidencia'] = self.format_afectacion_patrimonial(r.get('afectacion_patrimonial_incidencia',[]))
             r['datos_deposito_incidencia'] = self.format_datos_deposito(r.get('datos_deposito_incidencia',[]))
-            print("seguimientos",r.get('seguimientos_incidencia',[]))
             r['seguimientos_incidencia'] = self.format_seguimiento_incidencias(r.get('seguimientos_incidencia',[]))
             r['tags'] = self.format_tags_incidencias(r.get('tags',[]))
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
-        # print("resultados", simplejson.dumps(result, indent=4))
+            r['color_piel'] = r.get('color_piel',"").capitalize().replace("_", " ")
+            r['estatus'] = r.get('estatus',"").capitalize()
+        print("resultados", simplejson.dumps(result, indent=4))
         return result
 
     def get_list_notes(self, location, area, status=None, limit=10, offset=0, dateFrom="", dateTo=""):
@@ -5687,6 +5699,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "categoria": incidence_selected.get("categoria", ''),
             "sub_categoria": incidence_selected.get("sub_categoria", ''),
             "incidente": incidence_selected.get("incidente", ''),
+            "estatus":"abierto",
         }
 
         answers = {}
@@ -5858,6 +5871,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
         '''
         answers = {}
+        answers[self.incidence_fields['estatus']]="abierto"
         for key, value in data_incidences.items():
             if key == 'categoria':
                 answers[self.incidence_fields['incidencia_catalog']].update({
@@ -5892,7 +5906,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['nombre_completo']:c.get('nombre_completo',""),
                                 self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
-                                self.incidence_fields['sexo'] :c.get('sexo',""),
+                                self.incidence_fields['sexo'] :c.get('sexo',"").lower(),
                                 self.incidence_fields['grupo_etario'] :c.get('grupo_etario',"").lower().replace(" ","_"),
                                 self.incidence_fields['atencion_medica'] :c.get('atencion_medica',""),
                                 self.incidence_fields['retenido'] :c.get('retenido',""),
@@ -5971,6 +5985,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     answers.update({self.incidence_fields['tags']:tag_list})
             elif key == 'prioridad_incidencia':
                 answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
+            elif key == 'color_piel':
+                answers[self.incidence_fields['color_piel']] = f"{value}".lower().replace(" ", "_")
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         # print("incidencias answers", simplejson.dumps(answers, indent=4) )

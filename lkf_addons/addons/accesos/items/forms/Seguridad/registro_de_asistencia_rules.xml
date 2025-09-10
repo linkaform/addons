@@ -1,8 +1,62 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.registro_de_asistencia.id }}</form_id>
-    <id>68b7279e57d217587cabdff5</id>
+    <id>68b9eee7986cfd6caa9ab22f</id>
     <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>663bffc28d00553254f274e0</field_id>
+                        <group_id>None</group_id>
+                        <id>663bffc28d00553254f274e0</id>
+                        <label>Estatus</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>663bffc28d00553254f274e0</field_id>
+                        <group_id>None</group_id>
+                        <id>663bffc28d00553254f274e0</id>
+                        <label>Estatus</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6879828d0234f02649cad391</field_id>
+                    <group_id>None</group_id>
+                    <id>6879828d0234f02649cad391</id>
+                    <label>Fecha y Hora de Cierre de Turno</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6879828d0234f02649cad390</field_id>
+                    <group_id>None</group_id>
+                    <id>6879828d0234f02649cad390</id>
+                    <label>Fecha y Hora de Inicio de Turno</label>
+                    <type>datetime</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>or</operator>
+            <rule_id>6fb20691b17724</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
         <item>
             <conditions>
                 <item>
@@ -39,9 +93,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Regla 1</name>
+            <name>Regla 2</name>
             <operator>and</operator>
-            <rule_id>74d256617cd2411</rule_id>
+            <rule_id>114d22d31c83c24</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -81,64 +135,10 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Regla 2</name>
-            <operator>and</operator>
-            <rule_id>15981d54190a1405</rule_id>
-            <rule_type>show</rule_type>
-            <user_conditions>{}</user_conditions>
-        </item>
-        <item>
-            <conditions>
-                <item>
-                    <condition>not__empty=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>663bffc28d00553254f274e0</field_id>
-                        <group_id>None</group_id>
-                        <id>663bffc28d00553254f274e0</id>
-                        <label>Estatus</label>
-                        <type>radio</type>
-                    </field>
-                    <value> </value>
-                </item>
-                <item>
-                    <condition>is__empty=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>663bffc28d00553254f274e0</field_id>
-                        <group_id>None</group_id>
-                        <id>663bffc28d00553254f274e0</id>
-                        <label>Estatus</label>
-                        <type>radio</type>
-                    </field>
-                    <value> </value>
-                </item>
-            </conditions>
-            <element_ids>[]</element_ids>
-            <empty>False</empty>
-            <fields_ruled>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>6879828d0234f02649cad391</field_id>
-                    <group_id>None</group_id>
-                    <id>6879828d0234f02649cad391</id>
-                    <label>Fecha y Hora de Cierre de Turno</label>
-                    <type>datetime</type>
-                </item>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>6879828d0234f02649cad390</field_id>
-                    <group_id>None</group_id>
-                    <id>6879828d0234f02649cad390</id>
-                    <label>Fecha y Hora de Inicio de Turno</label>
-                    <type>datetime</type>
-                </item>
-            </fields_ruled>
-            <group_conditions>{}</group_conditions>
             <name>Regla 3</name>
-            <operator>or</operator>
-            <rule_id>132c1e0b1cec13cd</rule_id>
-            <rule_type>invisible</rule_type>
+            <operator>and</operator>
+            <rule_id>14c688569d1dd2</rule_id>
+            <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
         <item>
@@ -171,7 +171,7 @@
             <group_conditions>{}</group_conditions>
             <name>Regla 4</name>
             <operator>and</operator>
-            <rule_id>522169211e2b82</rule_id>
+            <rule_id>adc161ead112e4</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -205,7 +205,7 @@
             <group_conditions>{}</group_conditions>
             <name>Regla 5</name>
             <operator>and</operator>
-            <rule_id>6da71aaaa1188</rule_id>
+            <rule_id>5d8611cd319e0</rule_id>
             <rule_type>required</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
