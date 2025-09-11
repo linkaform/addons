@@ -5997,6 +5997,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.incidence_fields['prioridad_incidencia']] = f"{value}".lower()
             elif key == 'color_piel':
                 answers[self.incidence_fields['color_piel']] = f"{value}".lower().replace(" ", "_")
+            elif key == 'estatus':
+                answers[self.incidence_fields['estatus']] = f"{value}".lower().replace(" ", "_")
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         # print("incidencias answers", simplejson.dumps(answers, indent=4) )
