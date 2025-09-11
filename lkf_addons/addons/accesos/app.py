@@ -2408,7 +2408,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers.update({self.pase_entrada_fields['grupo_areas_acceso']:areas_list})
         #Visita A
         answers[self.mf['grupo_visitados']] = []
-        visita_a = access_pass.get('visita_a')
+        nombre_visita_a = access_pass.get('visita_a') if not nombre_visita_a else nombre_visita_a
         visita_set = {
             self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
                 self.mf['nombre_empleado'] : nombre_visita_a,
@@ -6342,13 +6342,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         print("ans", simplejson.dumps(answers, indent=4))
         # print(ans)
-       
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         print("empleado", employee)
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
-                if employee.get('usuario_id', [])[0] == 7742:
+                if self.user.get('parent_id') == 7742:
                     pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 553, name_pdf='Pase de Entrada', send_url=True)
                 else:
                     pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
