@@ -95,6 +95,12 @@ class Oracle(Base):
             return self.LKFException(f"Error code: {error.code} - {error.message}")
 
     def query_view(self, view_name, query=False, date_format=False):
+        """
+        Query a view in Oracle
+        view_name: Name of the view
+        query: Query to execute
+        date_format: Boolean to format the date
+        """
         result = []
         columns = []
         try:
