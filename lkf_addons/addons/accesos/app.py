@@ -1976,7 +1976,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res_update
 
     def create_enviar_correo(self, folio=None, envio=[]):
-        access_pass={"enviar_correo": envio}
+        access_pass={"enviar_correo_pre_registro": envio}
         res_update= self.update_pass(access_pass=access_pass, folio=folio)
         return res_update
      
