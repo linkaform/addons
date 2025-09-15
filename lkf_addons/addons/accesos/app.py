@@ -2555,7 +2555,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
 
                 id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
-                pdf = self.lkf_api.get_pdf_record(qrcode_to_google_pass, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
+                pdf = self.lkf_api.get_pdf_record(qrcode_to_google_pass, template_id = 584, name_pdf='Pase de Entrada', send_url=True)
                 pdf_url = pdf.get('json', {}).get('download_url')
 
                 google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
@@ -4774,7 +4774,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "records_on_page": len(records)
         }
 
-    def get_pdf(self, qr_code, template_id=491, name_pdf='Pase de Entrada'):
+    def get_pdf(self, qr_code, template_id=584, name_pdf='Pase de Entrada'):
         return self.lkf_api.get_pdf_record(qr_code, template_id = template_id, name_pdf =name_pdf, send_url=True)
 
     def get_pass_custom(self,qr_code):
