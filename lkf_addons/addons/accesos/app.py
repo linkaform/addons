@@ -4789,7 +4789,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                key == 'fecha_de_expedicion' or \
                key == 'fecha_de_caducidad' or \
                key == "qr_pase" or \
-               key =="_id" or \
+               key == "pdf_to_img" or \
+               key == "_id" or \
                key == "estatus" or \
                key == "foto" or \
                key == "identificacion" or \
