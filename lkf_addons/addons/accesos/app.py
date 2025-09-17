@@ -2306,6 +2306,30 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             result[meeting["id"]] = cal.serialize().encode('utf-8')
 
         return result
+    
+    def get_locations_address(self, list_locations=[]):
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.UBICACIONES,
+            f"answers.{self.mf['ubicacion']}": {"$in": list_locations}
+        }
+        query = [                   
+            {'$match': match_query},
+            {'$project': {
+                "_id": 0,
+                "ubicacion": f"$answers.{self.mf['ubicacion']}",
+                "direccion": f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_name']}",
+                "geolocalizacion": f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_geolocation']}",
+            }},
+        ]
+        res = self.format_cr(self.cr.aggregate(query))
+        format_res = {}
+        for item in res:
+            format_res[item.get('ubicacion','')] = {
+                'address': item.get('direccion', ''),
+                'geolocation': item.get('geolocalizacion') or []
+            }
+        return format_res
 
     def create_access_pass(self, location, access_pass):
         #---Define Metadata
@@ -2371,12 +2395,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         
         if access_pass.get('ubicaciones'):
             ubicaciones = access_pass.get('ubicaciones',[])
+            address_list = self.get_locations_address(list_locations=ubicaciones)
             if ubicaciones:
                 ubicaciones_list = []
                 for ubi in ubicaciones:
                     ubicaciones_list.append(
                         {
-                            self.pase_entrada_fields['ubicacion_cat']:{ self.mf["ubicacion"] : ubi}
+                            self.pase_entrada_fields['ubicacion_cat']: { 
+                                self.mf["ubicacion"]: ubi,
+                                self.mf["direccion"]: [address_list.get(ubi, {}).get('address', '')],
+                                self.f["address_geolocation"]: address_list.get(ubi, {}).get('geolocation', [])
+                            }
                         }
                     )
                 answers.update({self.pase_entrada_fields['ubicaciones']:ubicaciones_list})
