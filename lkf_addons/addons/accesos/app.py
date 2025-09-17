@@ -6361,8 +6361,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print("empleado", employee)
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
+            pdf_to_img = None
             if answers.get(self.pase_entrada_fields['status_pase'], '') == 'activo':
-                self.update_pass_img(qr_code)
+                pdf_to_img = self.update_pass_img(qr_code)
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
                 if self.user.get('parent_id') == 7742:
                     pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 553, name_pdf='Pase de Entrada', send_url=True)
@@ -6378,7 +6379,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
                 res['json'].update({'asunto':pass_selected.get('tema_cita')})
                 res['json'].update({'descripcion':pass_selected.get('descripcion')})
-                res['json'].update({'pdf_to_img': pass_selected.get('pdf_to_img')})
+                res['json'].update({'pdf_to_img': pdf_to_img if pdf_to_img else pass_selected.get('pdf_to_img')})
                 res['json'].update({'pdf': pdf})
                 return res
             else: 
@@ -6402,6 +6403,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         res = self.lkf_api.patch_multi_record(answers=answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
         print('pass_img_response', res)
+        return [{'file_name': pass_img_file_name, 'file_url': pass_img_file_url}]
 
     def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
         answers = {}
