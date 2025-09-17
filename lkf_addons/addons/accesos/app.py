@@ -5645,7 +5645,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
-    def update_incidence_seguimiento(self, folio, incidencia_grupo_seguimiento, location=None, area=None):
+    def update_incidence_seguimiento(self, folio, incidencia_grupo_seguimiento,estatus, location=None, area=None):
         """
         Actualiza el seguimiento de una incidencia existente.
         folio: Folio de la incidencia a actualizar.
@@ -5700,10 +5700,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "categoria": incidence_selected.get("categoria", ''),
             "sub_categoria": incidence_selected.get("sub_categoria", ''),
             "incidente": incidence_selected.get("incidente", ''),
-            "estatus": incidence_selected.get("estatus", ''),
+            "estatus": estatus or incidence_selected.get("estatus", '')
         }
-        print("GURPO SEG EXISTENTE", simplejson.dumps(incidencia_seg, indent=4))
-
         answers = {}
       
         for key, value in incidencia_seg.items():
@@ -5881,7 +5879,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
         '''
         answers = {}
-        answers[self.incidence_fields['estatus']]="abierto"
+        # answers[self.incidence_fields['estatus']]="abierto"
         for key, value in data_incidences.items():
             if key == 'categoria':
                 answers[self.incidence_fields['incidencia_catalog']].update({
@@ -5999,6 +5997,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[self.incidence_fields['color_piel']] = f"{value}".lower().replace(" ", "_")
             elif key == 'estatus':
                 answers[self.incidence_fields['estatus']] = f"{value}".lower().replace(" ", "_")
+
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         # print("incidencias answers", simplejson.dumps(answers, indent=4) )
