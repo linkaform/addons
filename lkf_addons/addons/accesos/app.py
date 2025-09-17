@@ -1976,7 +1976,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res_update
 
     def create_enviar_correo(self, folio=None, envio=[]):
-        access_pass={"enviar_correo": envio}
+        access_pass={"enviar_correo_pre_registro": envio}
         res_update= self.update_pass(access_pass=access_pass, folio=folio)
         return res_update
      
@@ -2408,7 +2408,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers.update({self.pase_entrada_fields['grupo_areas_acceso']:areas_list})
         #Visita A
         answers[self.mf['grupo_visitados']] = []
-        visita_a = access_pass.get('visita_a')
+        nombre_visita_a = access_pass.get('visita_a') if not nombre_visita_a else nombre_visita_a
         visita_set = {
             self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
                 self.mf['nombre_empleado'] : nombre_visita_a,
@@ -2555,7 +2555,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
 
                 id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
-                pdf = self.lkf_api.get_pdf_record(qrcode_to_google_pass, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
+                pdf = self.lkf_api.get_pdf_record(qrcode_to_google_pass, template_id = 584, name_pdf='Pase de Entrada', send_url=True)
                 pdf_url = pdf.get('json', {}).get('download_url')
 
                 google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
@@ -4774,7 +4774,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "records_on_page": len(records)
         }
 
-    def get_pdf(self, qr_code, template_id=491, name_pdf='Pase de Entrada'):
+    def get_pdf(self, qr_code, template_id=584, name_pdf='Pase de Entrada'):
         return self.lkf_api.get_pdf_record(qr_code, template_id = template_id, name_pdf =name_pdf, send_url=True)
 
     def get_pass_custom(self,qr_code):
@@ -4789,7 +4789,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                key == 'fecha_de_expedicion' or \
                key == 'fecha_de_caducidad' or \
                key == "qr_pase" or \
-               key =="_id" or \
+               key == "pdf_to_img" or \
+               key == "_id" or \
                key == "estatus" or \
                key == "foto" or \
                key == "identificacion" or \
@@ -6341,16 +6342,15 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         print("ans", simplejson.dumps(answers, indent=4))
         # print(ans)
-       
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         print("empleado", employee)
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
-                if employee.get('usuario_id', [])[0] == 7742:
+                if self.user.get('parent_id') == 7742:
                     pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 553, name_pdf='Pase de Entrada', send_url=True)
                 else:
-                    pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 491, name_pdf='Pase de Entrada', send_url=True)
+                    pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 584, name_pdf='Pase de Entrada', send_url=True)
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
