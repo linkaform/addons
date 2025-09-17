@@ -1183,13 +1183,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException({'msg':msg,"title":'Accion Requerida!!!'})
 
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        if not employee:
+            msg = f"Ningun empleado encontrado con email: {self.user.get('email')}"
+            self.LKFException(msg)
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         employee['timezone'] = user_data.get('timezone','America/Monterrey')
         employee['name'] = employee['worker_name']
         employee['position'] = self.chife_guard
-        if not employee:
-            msg = f"Ningun empleado encontrado con email: {self.user.get('email')}"
-            self.LKFException(msg)
         timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         now_datetime =self.today_str(timezone, date_format='datetime')
