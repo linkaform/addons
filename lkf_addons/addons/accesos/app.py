@@ -7109,7 +7109,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         format_ubicacion = self.format_ubicaciones_to_google_pass(ubicaciones_list)
         address = data.get('address', '')
         visita_a = data.get('visita_a', '')
-        empresa = data.get('empresa', '')
+        empresa = data.get('all_data', {}).get('empresa', '')
         num_accesos = data.get('all_data', {}).get('config_limitar_acceso', 1)
         fecha_desde = data.get('all_data', {}).get('fecha_desde_visita', '')
         fecha_hasta = data.get('all_data', {}).get('fecha_hasta_visita', '')
@@ -7141,7 +7141,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             },
             "logo": {
                 "sourceUri": {
-                    "uri": "https://f001.backblazeb2.com/file/app-linkaform/public-client-126/68600/6076166dfd84fa7ea446b917/2025-05-12T08:19:51.png"
+                    "uri": "https://f001.backblazeb2.com/file/app-linkaform/public-client-126/68600/6076166dfd84fa7ea446b917/2025-04-28T11:11:42.png"
                 }
             },
             "hexBackgroundColor": "#FFFFFF",
@@ -7157,12 +7157,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 },
                 {
                     "id": "fecha_entrada",
-                    "header": "FECHA ENTRADA",
+                    "header": "FECHA DESDE",
                     "body": fecha_desde
                 },
                 {
                     "id": "fecha_salida",
-                    "header": "FECHA SALIDA",
+                    "header": "FECHA HASTA",
                     "body": fecha_hasta
                 },
                 {
@@ -7172,13 +7172,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 },
                 {
                     "id": "vehiculos",
-                    "header": "VEHICULOS",
-                    "body": "1"
+                    "header": "",
+                    "body": ""
                 },
                 {
                     "id": "equipos",
-                    "header": "EQUIPOS",
-                    "body": "1"
+                    "header": "",
+                    "body": ""
                 }
             ],
             "barcode": {
