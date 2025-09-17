@@ -2583,23 +2583,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "all_data": access_pass
                 }
 
-                id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
-                pdf = self.lkf_api.get_pdf_record(qrcode_to_google_pass, template_id = 584, name_pdf='Pase de Entrada', send_url=True)
-                pdf_url = pdf.get('json', {}).get('download_url')
-
                 google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
-                pass_img_url = self.upload_pdf_as_image(id_forma, id_campo_pdf_to_img, pdf_url)
-                pass_img_file_name = pass_img_url.get('file_name')
-                pass_img_file_url = pass_img_url.get('file_url')
-                
                 access_pass_custom.update({
                     "google_wallet_pass_url": google_wallet_pass_url,
-                    "pdf_to_img": [
-                        {
-                            "file_name": pass_img_file_name,
-                            "file_url": pass_img_file_url
-                        }
-                    ]
                 })
                 
                 self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
@@ -6375,6 +6361,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print("empleado", employee)
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
+            if answers.get(self.pase_entrada_fields['status_pase'], '') == 'activo':
+                self.update_pass_img(qr_code)
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
                 if self.user.get('parent_id') == 7742:
                     pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 553, name_pdf='Pase de Entrada', send_url=True)
@@ -6397,6 +6385,23 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 return res
         else:
             self.LKFException('No se mandarón parametros para actualizar')
+
+    def update_pass_img(self, qr_code=None):
+        pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 584, name_pdf='Pase de Entrada', send_url=True)
+        pdf_url = pdf.get('json', {}).get('download_url')
+        id_forma = self.PASE_ENTRADA
+        id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
+        pass_img_url = self.upload_pdf_as_image(id_forma, id_campo_pdf_to_img, pdf_url)
+        pass_img_file_name = pass_img_url.get('file_name')
+        pass_img_file_url = pass_img_url.get('file_url')
+        answers = {
+            self.pase_entrada_fields['pdf_to_img']: [{
+                'file_name': pass_img_file_name,
+                'file_url': pass_img_file_url
+            }]
+        }
+        res = self.lkf_api.patch_multi_record(answers=answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
+        print('pass_img_response', res)
 
     def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
         answers = {}
