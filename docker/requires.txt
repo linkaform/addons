@@ -32,6 +32,7 @@ requests
 twilio==9.3.6
 typing==3.7.4.3
 twilio
+vonage
 vobject==0.9.8
 wget
 #urllib2
