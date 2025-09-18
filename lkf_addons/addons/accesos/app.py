@@ -6283,14 +6283,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for key, value in access_pass.items():
             if key == 'grupo_vehiculos':
                 answers[self.mf['grupo_vehiculos']]={}
-                index=1
                 for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
-                    tipo = item.get('tipo','')
-                    marca = item.get('marca','')
-                    modelo = item.get('modelo','')
-                    estado = item.get('estado','')
-                    placas = item.get('placas','')
-                    color = item.get('color','')
+                    tipo = item.get('tipo',item.get('tipo_vehiculo',''))
+                    marca = item.get('marca',item.get('marca_vehiculo',''))
+                    modelo = item.get('modelo',item.get('modelo_vehiculo',''))
+                    estado = item.get('estado',item.get('nombre_estado',''))
+                    placas = item.get('placas',item.get('placas_vehiculo',''))
+                    color = item.get('color',item.get('color_vehiculo',''))
                     obj={
                         self.TIPO_DE_VEHICULO_OBJ_ID:{
                             self.mf['tipo_vehiculo']:tipo,
@@ -6303,17 +6302,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         self.mf['placas_vehiculo']:placas,
                         self.mf['color_vehiculo']:color,
                     }
-                    answers[self.mf['grupo_vehiculos']][-index]=obj
+                    answers[self.mf['grupo_vehiculos']][(index+1)*-1]=obj
             elif key == 'grupo_equipos':
                 answers[self.mf['grupo_equipos']]={}
-                index=1
-                for index, item in enumerate(access_pass.get('grupo_equipos',[])):
-                    nombre = item.get('nombre','')
-                    marca = item.get('marca','')
-                    color = item.get('color','')
-                    tipo = item.get('tipo','')
-                    serie = item.get('serie','')
-                    modelo = item.get('modelo','')
+                for index, item in enumerate(value):
+                    nombre = item.get('nombre',item.get('nombre_articulo',''))
+                    marca = item.get('marca',item.get('marca_articulo',''))
+                    color = item.get('color',item.get('color_articulo',''))
+                    tipo = item.get('tipo',item.get('tipo_equipo',''))
+                    serie = item.get('serie',item.get('numero_serie',''))
+                    modelo = item.get('modelo',item.get('modelo_articulo',''))
                     obj={
                         self.mf['tipo_equipo']:tipo.lower(),
                         self.mf['nombre_articulo']:nombre,
@@ -6322,7 +6320,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         self.mf['color_articulo']:color,
                         self.mf['modelo_articulo']:modelo,
                     }
-                    answers[self.mf['grupo_equipos']][-index]=obj
+                    answers[self.mf['grupo_equipos']][(index+1)*-1]=obj
             elif key == 'status_pase':
                 answers.update({f"{self.pase_entrada_fields[key]}":value.lower()})
             elif key == 'archivo_invitacion':
@@ -6340,7 +6338,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
 
-        print("ans", simplejson.dumps(answers, indent=4))
+        print("1ans", simplejson.dumps(answers, indent=4))
         # print(ans)
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         print("empleado", employee)
