@@ -551,6 +551,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'descripcion_afectacion':'688a9d52c1ce871f545b3b9d',
             'monto_estimado': '688a9d52c1ce871f545b3b99',
             'duracion_estimada': '688a9d52c1ce871f545b3b9c',
+            'evidencia':'68c305c624e99970e536dc44',
+            'documento':'68c305c624e99970e536dc45'
         }
         #- Para creación , edición y lista de gafetes y lockers
         self.gafetes_fields = {
@@ -2135,7 +2137,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                                 self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion',"").lower().replace(" ","_"),
                                 self.incidence_fields['descripcion_afectacion']:c.get('descripcion_afectacion',""),
                                 self.incidence_fields['monto_estimado'] :c.get('monto_estimado',""),
-                                self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',"")
+                                self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',""),
+                                self.incidence_fields['evidencia'] :c.get('evidencia'),
+                                self.incidence_fields['documento'] :c.get('documento')
                             }
                         )
                         print("LISTA",ap_list)
@@ -2701,6 +2705,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row['descripcion_afectacion'] = r.get(self.incidence_fields['descripcion_afectacion'],'')
             row['monto_estimado'] = r.get(self.incidence_fields['monto_estimado'],'')
             row['duracion_estimada'] = r.get(self.incidence_fields['duracion_estimada'],'')
+            row['evidencia'] = r.get(self.incidence_fields['evidencia'],[])
+            row['documento'] = r.get(self.incidence_fields['documento'],[])
             res.append(row)
         return res
 
@@ -3550,6 +3556,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "form_id": self.PASE_ENTRADA,
             "_id":ObjectId(qr_code),
         }
+        print("QR", qr_code)
         query = [
             {'$match': match_query },
             {'$project': 
@@ -5790,7 +5797,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion',"").lower().replace(" ","_"),
                                 self.incidence_fields['monto_estimado'] :c.get('monto_estimado',""),
-                                self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',"")
+                                self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',""),
+                                self.incidence_fields['evidencia'] :c.get('evidencia'),
+                                self.incidence_fields['documento'] :c.get('documento')
                             }
                         )
                     answers.update({self.incidence_fields['afectacion_patrimonial_incidencia']:ap_list})
@@ -5963,7 +5972,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion',"").lower().replace(" ","_"),
                                 self.incidence_fields['monto_estimado'] :c.get('monto_estimado',""),
-                                self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',"")
+                                self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',""),
+                                self.incidence_fields['evidencia'] :c.get('evidencia'),
+                                self.incidence_fields['documento'] :c.get('documento')
                             }
                         )
                     answers.update({self.incidence_fields['afectacion_patrimonial_incidencia']:ap_list})
