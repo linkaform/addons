@@ -1185,13 +1185,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException({'msg':msg,"title":'Accion Requerida!!!'})
 
         employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        if not employee:
+            msg = f"Ningun empleado encontrado con email: {self.user.get('email')}"
+            self.LKFException(msg)
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         employee['timezone'] = user_data.get('timezone','America/Monterrey')
         employee['name'] = employee['worker_name']
         employee['position'] = self.chife_guard
-        if not employee:
-            msg = f"Ningun empleado encontrado con email: {self.user.get('email')}"
-            self.LKFException(msg)
         timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         now_datetime =self.today_str(timezone, date_format='datetime')
@@ -2310,6 +2310,30 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             result[meeting["id"]] = cal.serialize().encode('utf-8')
 
         return result
+    
+    def get_locations_address(self, list_locations=[]):
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.UBICACIONES,
+            f"answers.{self.mf['ubicacion']}": {"$in": list_locations}
+        }
+        query = [                   
+            {'$match': match_query},
+            {'$project': {
+                "_id": 0,
+                "ubicacion": f"$answers.{self.mf['ubicacion']}",
+                "direccion": f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_name']}",
+                "geolocalizacion": f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_geolocation']}",
+            }},
+        ]
+        res = self.format_cr(self.cr.aggregate(query))
+        format_res = {}
+        for item in res:
+            format_res[item.get('ubicacion','')] = {
+                'address': item.get('direccion', ''),
+                'geolocation': item.get('geolocalizacion') or []
+            }
+        return format_res
 
     def create_access_pass(self, location, access_pass):
         #---Define Metadata
@@ -2375,12 +2399,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         
         if access_pass.get('ubicaciones'):
             ubicaciones = access_pass.get('ubicaciones',[])
+            address_list = self.get_locations_address(list_locations=ubicaciones)
             if ubicaciones:
                 ubicaciones_list = []
                 for ubi in ubicaciones:
                     ubicaciones_list.append(
                         {
-                            self.pase_entrada_fields['ubicacion_cat']:{ self.mf["ubicacion"] : ubi}
+                            self.pase_entrada_fields['ubicacion_cat']: { 
+                                self.mf["ubicacion"]: ubi,
+                                self.mf["direccion"]: [address_list.get(ubi, {}).get('address', '')],
+                                self.f["address_geolocation"]: address_list.get(ubi, {}).get('geolocation', [])
+                            }
                         }
                     )
                 answers.update({self.pase_entrada_fields['ubicaciones']:ubicaciones_list})
@@ -2558,23 +2587,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "all_data": access_pass
                 }
 
-                id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
-                pdf = self.lkf_api.get_pdf_record(qrcode_to_google_pass, template_id = 584, name_pdf='Pase de Entrada', send_url=True)
-                pdf_url = pdf.get('json', {}).get('download_url')
-
                 google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
-                pass_img_url = self.upload_pdf_as_image(id_forma, id_campo_pdf_to_img, pdf_url)
-                pass_img_file_name = pass_img_url.get('file_name')
-                pass_img_file_url = pass_img_url.get('file_url')
-                
                 access_pass_custom.update({
                     "google_wallet_pass_url": google_wallet_pass_url,
-                    "pdf_to_img": [
-                        {
-                            "file_name": pass_img_file_name,
-                            "file_url": pass_img_file_url
-                        }
-                    ]
                 })
                 
                 self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
@@ -6357,6 +6372,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         print("empleado", employee)
         if answers:
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
+            pdf_to_img = None
+            if answers.get(self.pase_entrada_fields['status_pase'], '') == 'activo':
+                pdf_to_img = self.update_pass_img(qr_code)
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
                 if self.user.get('parent_id') == 7742:
                     pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 553, name_pdf='Pase de Entrada', send_url=True)
@@ -6372,13 +6390,31 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
                 res['json'].update({'asunto':pass_selected.get('tema_cita')})
                 res['json'].update({'descripcion':pass_selected.get('descripcion')})
-                res['json'].update({'pdf_to_img': pass_selected.get('pdf_to_img')})
+                res['json'].update({'pdf_to_img': pdf_to_img if pdf_to_img else pass_selected.get('pdf_to_img')})
                 res['json'].update({'pdf': pdf})
                 return res
             else: 
                 return res
         else:
             self.LKFException('No se mandarón parametros para actualizar')
+
+    def update_pass_img(self, qr_code=None):
+        pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 584, name_pdf='Pase de Entrada', send_url=True)
+        pdf_url = pdf.get('json', {}).get('download_url')
+        id_forma = self.PASE_ENTRADA
+        id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
+        pass_img_url = self.upload_pdf_as_image(id_forma, id_campo_pdf_to_img, pdf_url)
+        pass_img_file_name = pass_img_url.get('file_name')
+        pass_img_file_url = pass_img_url.get('file_url')
+        answers = {
+            self.pase_entrada_fields['pdf_to_img']: [{
+                'file_name': pass_img_file_name,
+                'file_url': pass_img_file_url
+            }]
+        }
+        res = self.lkf_api.patch_multi_record(answers=answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
+        print('pass_img_response', res)
+        return [{'file_name': pass_img_file_name, 'file_url': pass_img_file_url}]
 
     def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
         answers = {}
@@ -7086,7 +7122,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         format_ubicacion = self.format_ubicaciones_to_google_pass(ubicaciones_list)
         address = data.get('address', '')
         visita_a = data.get('visita_a', '')
-        empresa = data.get('empresa', '')
+        empresa = data.get('all_data', {}).get('empresa', '')
         num_accesos = data.get('all_data', {}).get('config_limitar_acceso', 1)
         fecha_desde = data.get('all_data', {}).get('fecha_desde_visita', '')
         fecha_hasta = data.get('all_data', {}).get('fecha_hasta_visita', '')
@@ -7118,7 +7154,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             },
             "logo": {
                 "sourceUri": {
-                    "uri": "https://f001.backblazeb2.com/file/app-linkaform/public-client-126/68600/6076166dfd84fa7ea446b917/2025-05-12T08:19:51.png"
+                    "uri": "https://f001.backblazeb2.com/file/app-linkaform/public-client-126/68600/6076166dfd84fa7ea446b917/2025-04-28T11:11:42.png"
                 }
             },
             "hexBackgroundColor": "#FFFFFF",
@@ -7134,12 +7170,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 },
                 {
                     "id": "fecha_entrada",
-                    "header": "FECHA ENTRADA",
+                    "header": "FECHA DESDE",
                     "body": fecha_desde
                 },
                 {
                     "id": "fecha_salida",
-                    "header": "FECHA SALIDA",
+                    "header": "FECHA HASTA",
                     "body": fecha_hasta
                 },
                 {
@@ -7149,13 +7185,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 },
                 {
                     "id": "vehiculos",
-                    "header": "VEHICULOS",
-                    "body": "1"
+                    "header": "",
+                    "body": ""
                 },
                 {
                     "id": "equipos",
-                    "header": "EQUIPOS",
-                    "body": "1"
+                    "header": "",
+                    "body": ""
                 }
             ],
             "barcode": {
