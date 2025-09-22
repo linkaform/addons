@@ -1118,8 +1118,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         fecha_obj_caducidad = datetime.strptime(fecha_caducidad, "%Y-%m-%d %H:%M:%S")
         fecha_caducidad = timezone.localize(fecha_obj_caducidad)
 
-        # Se agregan 15 minutos como margen de tolerancia
-        fecha_caducidad_con_margen = fecha_caducidad + timedelta(minutes=15)
+        # Se agregan 4 horas como margen de tolerancia
+        fecha_caducidad_con_margen = fecha_caducidad + timedelta(hours=4)
 
         if fecha_caducidad_con_margen < fecha_actual:
             self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
@@ -7124,6 +7124,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         format_ubicacion = self.format_ubicaciones_to_google_pass(ubicaciones_list)
         address = data.get('address', '')
         visita_a = data.get('visita_a', '')
+        company = data.get('empresa', '')
         empresa = data.get('all_data', {}).get('empresa', '')
         num_accesos = data.get('all_data', {}).get('config_limitar_acceso', 1)
         fecha_desde = data.get('all_data', {}).get('fecha_desde_visita', '')
@@ -7139,19 +7140,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "cardTitle": {
                 "defaultValue": {
                     "language": "es-MX",
-                    "value": empresa
+                    "value": company
                 }
             },
             "subheader": {
                 "defaultValue": {
                     "language": "es-MX",
-                    "value": 'Pase de Entrada'
+                    "value": f'Visita a: {visita_a}'
                 }
             },
             "header": {
                 "defaultValue": {
                     "language": "es-MX",
-                    "value": f'Visita a: {visita_a}'
+                    "value": nombre
                 }
             },
             "logo": {
