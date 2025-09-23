@@ -2925,7 +2925,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res_disp = {}
             for pos, user in res.items():
                 for x in user:
-                    if x['user_id'] in disponibles:
+                    if x['user_id'] == self.user.get('user_id'):
+                        continue
+                    elif x['user_id'] in disponibles:
                         res_disp[pos] = res_disp.get(pos,[])
                         res_disp[pos].append(x)
                     elif x['user_id'] not in uids:
