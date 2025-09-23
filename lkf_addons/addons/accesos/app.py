@@ -5107,6 +5107,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "status_code":400, 
                     "msg":f"Usuario {self.user['user_id']} no confgurado como guardia, favor de revisar su configuracion."}) 
         location_employees = self.set_employee_pic(location_employees)
+        support_guards = location_employees.get('guardia_de_apoyo', [])
+        user_id = self.user.get('user_id')
+        for idx, guard in enumerate(support_guards):
+            if guard.get('user_id') == user_id:
+                support_guards.pop(idx)
+                break
+        location_employees['guardia_de_apoyo'] = support_guards
         booth_address = self.get_area_address(booth_location, booth_area)
         notes = self.get_list_notes(booth_location, booth_area, status='abierto')
         load_shift_json["location"] = {
