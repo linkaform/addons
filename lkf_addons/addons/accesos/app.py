@@ -1149,7 +1149,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = self._do_access(access_pass, location, area, data)
         return res
 
-    def do_checkin(self, location, area, employee_list=[], check_in_manual={}, fotografia=[]):
+    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={}):
         # Realiza el check-in en una ubicación y área específica.
 
         if not self.is_boot_available(location, area):
@@ -5153,6 +5153,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         load_shift_json["user_booths"] = user_booths
         load_shift_json['config_accesos_user']=config_accesos_user
         # load_shift_json["guards_online"] = guards_online
+        print(simplejson.dumps(load_shift_json, indent=4))
         return load_shift_json
 
     def get_user_last_checkin(self, user_id=False):
