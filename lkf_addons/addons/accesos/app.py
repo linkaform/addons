@@ -400,6 +400,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'cat_location': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['location']}",
             'cat_area': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['area']}",
             'cat_employee_b': f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
+            'fotografia_inicio_turno':'68d384ef55840a75f2cb7e28',
+            'fotografia_cierre_turno':'68d384ef55840a75f2cb7e29'
         }
         #- Para salida de bitacora  de articulos consecionados y lista
         self.consecionados_fields = {
@@ -494,8 +496,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             # 'evidencia_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edb',
             # 'documento_accion_correctiva_incidencia': '683de45ddcf6fcee78e61edc',
 
-            'categoria':'6848893f4f18021ab10c6a12',
-            'sub_categoria': '68488a6c5cf05798e09f3eec',
+            'categoria':'686807d46e41614d708f6fc9',
+            'sub_categoria': '686807a7ee7705c5c8eb181a',
             'incidente':'663973809fa65cafa759eb97',
             #Persona extraviada
             'nombre_completo_persona_extraviada':'684c3e026d974f9625e11303',
@@ -1118,8 +1120,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         fecha_obj_caducidad = datetime.strptime(fecha_caducidad, "%Y-%m-%d %H:%M:%S")
         fecha_caducidad = timezone.localize(fecha_obj_caducidad)
 
-        # Se agregan 4 horas como margen de tolerancia
-        fecha_caducidad_con_margen = fecha_caducidad + timedelta(hours=4)
+        # Se agregan 15 minutos como margen de tolerancia
+        fecha_caducidad_con_margen = fecha_caducidad + timedelta(minutes=15)
 
         if fecha_caducidad_con_margen < fecha_actual:
             self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
@@ -1147,7 +1149,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = self._do_access(access_pass, location, area, data)
         return res
 
-    def do_checkin(self, location, area, employee_list=[], check_in_manual={}):
+    def do_checkin(self, location, area, employee_list=[], check_in_manual={}, fotografia=[]):
         # Realiza el check-in en una ubicación y área específica.
 
         if not self.is_boot_available(location, area):
@@ -1198,6 +1200,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         checkin = self.checkin_data(employee, location, area, 'in', now_datetime)
         employee_list.insert(0,employee)
         checkin = self.check_in_out_employees('in', now_datetime, checkin=checkin, employee_list=employee_list)
+
+
         data.update({
                 'properties': {
                     "device_properties":{
@@ -1214,6 +1218,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 self.checkin_fields['checkin_image']: check_in_manual.get('image', []),
                 self.checkin_fields['commentario_checkin_caseta']: check_in_manual.get('comment', '')
             })
+        if fotografia:
+            checkin.update({
+                self.checkin_fields['fotografia_inicio_turno']: fotografia
+            })
+
         resp_create = self.lkf_api.post_forms_answers(data)
         #TODO agregar nombre del Guardia Quien hizo el checkin
         if resp_create.get('status_code') == 201:
@@ -1251,7 +1260,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         response = self.lkf_api.patch_record(data=data, record_id=checkin_id)
         return response
 
-    def do_checkout(self, checkin_id=None, location=None, area=None, guards=[], forzar=False, comments=False):
+    def do_checkout(self, checkin_id=None, location=None, area=None, guards=[], forzar=False, comments=False, fotografia=[]):
         # self.get_answer(keys)
         employee =  self.get_employee_data(email=self.user.get('email'), get_one=True)
         timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
@@ -1298,6 +1307,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         checkin_answers = self.check_in_out_employees('out', now_datetime, checkin=checkin_answers, employee_list=guards)
         # response = self.lkf_api.patch_multi_record( answers=checkin, form_id=self.CHECKIN_CASETAS, folios=[folio,])
         data['answers'] = checkin_answers
+
+        if fotografia:
+            checkin_answers.update({
+                self.checkin_fields['fotografia_cierre_turno']: fotografia
+            })
 
         #Verificar si el guardia es un guardia de apoyo para hacer su checkout correctamente
         check_aux_guard = self.check_in_aux_guard()
@@ -2941,7 +2955,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "guard_on_dutty":'',
             "user_id":'',
             "stated_at":'',
+            "fotografia_inicio_turno":[],
+            "fotografia_cierre_turno":[]
             }
+     
         if last_chekin.get('checkin_type') in ['entrada','apertura']:
             #todo
             #user_id 
@@ -2949,6 +2966,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             booth_status['guard_on_dutty'] = last_chekin.get('employee') 
             booth_status['stated_at'] = last_chekin.get('boot_checkin_date')
             booth_status['checkin_id'] = last_chekin['_id']
+            booth_status['fotografia_inicio_turno'] = last_chekin.get('fotografia_inicio_turno') 
+            booth_status['fotografia_cierre_turno'] = last_chekin.get('fotografia_cierre_turno') 
+
         return booth_status
 
     def get_booth_stats(self, booth_area, location):
@@ -7131,7 +7151,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         format_ubicacion = self.format_ubicaciones_to_google_pass(ubicaciones_list)
         address = data.get('address', '')
         visita_a = data.get('visita_a', '')
-        company = data.get('empresa', '')
         empresa = data.get('all_data', {}).get('empresa', '')
         num_accesos = data.get('all_data', {}).get('config_limitar_acceso', 1)
         fecha_desde = data.get('all_data', {}).get('fecha_desde_visita', '')
@@ -7147,19 +7166,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "cardTitle": {
                 "defaultValue": {
                     "language": "es-MX",
-                    "value": company
+                    "value": empresa
                 }
             },
             "subheader": {
                 "defaultValue": {
                     "language": "es-MX",
-                    "value": f'Visita a: {visita_a}'
+                    "value": 'Pase de Entrada'
                 }
             },
             "header": {
                 "defaultValue": {
                     "language": "es-MX",
-                    "value": nombre
+                    "value": f'Visita a: {visita_a}'
                 }
             },
             "logo": {
