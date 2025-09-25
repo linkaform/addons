@@ -551,6 +551,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             #Campos en grupo repetitivo afectacion patrimonial:
             'tipo_afectacion': '688a9d52c1ce871f545b3b98',
             'descripcion_afectacion':'688a9d52c1ce871f545b3b9d',
+            'estatus_afectacion':'68d4bba7c6e9e28b9e30e133',
             'monto_estimado': '688a9d52c1ce871f545b3b99',
             'duracion_estimada': '688a9d52c1ce871f545b3b9c',
             'evidencia':'68c305c624e99970e536dc44',
@@ -2154,6 +2155,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion',"").lower().replace(" ","_"),
                                 self.incidence_fields['descripcion_afectacion']:c.get('descripcion_afectacion',""),
+                                self.incidence_fields['estatus_afectacion']:c.get('estatus_afectacion',"").lower().replace(" ", "_"),
                                 self.incidence_fields['monto_estimado'] :c.get('monto_estimado',""),
                                 self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',""),
                                 self.incidence_fields['evidencia'] :c.get('evidencia'),
@@ -2737,6 +2739,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row['tipo_afectacion'] = r.get(self.incidence_fields['tipo_afectacion'],'').capitalize().replace("_"," ")
             row['descripcion_afectacion'] = r.get(self.incidence_fields['descripcion_afectacion'],'')
             row['monto_estimado'] = r.get(self.incidence_fields['monto_estimado'],'')
+            row['estatus_afectacion'] = r.get(self.incidence_fields['estatus_afectacion'],'').capitalize().replace("_"," ")
             row['duracion_estimada'] = r.get(self.incidence_fields['duracion_estimada'],'')
             row['evidencia'] = r.get(self.incidence_fields['evidencia'],[])
             row['documento'] = r.get(self.incidence_fields['documento'],[])
@@ -2966,8 +2969,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             booth_status['guard_on_dutty'] = last_chekin.get('employee') 
             booth_status['stated_at'] = last_chekin.get('boot_checkin_date')
             booth_status['checkin_id'] = last_chekin['_id']
-            booth_status['fotografia_inicio_turno'] = last_chekin.get('fotografia_inicio_turno') 
-            booth_status['fotografia_cierre_turno'] = last_chekin.get('fotografia_cierre_turno') 
+            booth_status['fotografia_inicio_turno'] = last_chekin.get('fotografia_inicio_turno',[]) 
+            booth_status['fotografia_cierre_turno'] = last_chekin.get('fotografia_cierre_turno',[]) 
 
         return booth_status
 
@@ -5844,6 +5847,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion',"").lower().replace(" ","_"),
                                 self.incidence_fields['monto_estimado'] :c.get('monto_estimado',""),
+                                self.incidence_fields['estatus_afectacion']:c.get('estatus_afectacion',"").lower().replace(" ", "_"),
                                 self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',""),
                                 self.incidence_fields['evidencia'] :c.get('evidencia'),
                                 self.incidence_fields['documento'] :c.get('documento')
@@ -6019,6 +6023,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion',"").lower().replace(" ","_"),
                                 self.incidence_fields['monto_estimado'] :c.get('monto_estimado',""),
+                                self.incidence_fields['estatus_afectacion']:c.get('estatus_afectacion',"").lower().replace(" ", "_"),
                                 self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',""),
                                 self.incidence_fields['evidencia'] :c.get('evidencia'),
                                 self.incidence_fields['documento'] :c.get('documento')
