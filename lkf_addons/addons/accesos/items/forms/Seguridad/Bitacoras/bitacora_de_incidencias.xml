@@ -2632,7 +2632,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -5680,13 +5680,13 @@
                             <value>perdido</value>
                         </item>
                         <item>
-                            <label>Recuperación Parcial</label>
+                            <label>Recuperación parcial</label>
                             <points>None</points>
                             <selected>False</selected>
                             <value>recuperación_parcial</value>
                         </item>
                         <item>
-                            <label>Recuperación Total</label>
+                            <label>Recuperación total</label>
                             <points>None</points>
                             <selected>False</selected>
                             <value>recuperación_total</value>
@@ -6394,5 +6394,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1758772136.0</updated_at>
+    <updated_at>1758775061.0</updated_at>
 </lkf>
