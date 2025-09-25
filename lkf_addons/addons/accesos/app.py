@@ -5761,7 +5761,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "estatus": estatus or incidence_selected.get("estatus", '')
         }
         answers = {}
-      
         for key, value in incidencia_seg.items():
             if key == 'categoria':
                 answers[self.incidence_fields['incidencia_catalog']].update({
@@ -5847,6 +5846,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion',"").lower().replace(" ","_"),
                                 self.incidence_fields['monto_estimado'] :c.get('monto_estimado',""),
+                                self.incidence_fields['descripcion_afectacion']:c.get('descripcion_afectacion',""),
                                 self.incidence_fields['estatus_afectacion']:c.get('estatus_afectacion',"").lower().replace(" ", "_"),
                                 self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',""),
                                 self.incidence_fields['evidencia'] :c.get('evidencia'),
@@ -6023,6 +6023,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             {
                                 self.incidence_fields['tipo_afectacion']:c.get('tipo_afectacion',"").lower().replace(" ","_"),
                                 self.incidence_fields['monto_estimado'] :c.get('monto_estimado',""),
+                                self.incidence_fields['descripcion_afectacion']:c.get('descripcion_afectacion',""),
                                 self.incidence_fields['estatus_afectacion']:c.get('estatus_afectacion',"").lower().replace(" ", "_"),
                                 self.incidence_fields['duracion_estimada'] :c.get('duracion_estimada',""),
                                 self.incidence_fields['evidencia'] :c.get('evidencia'),
