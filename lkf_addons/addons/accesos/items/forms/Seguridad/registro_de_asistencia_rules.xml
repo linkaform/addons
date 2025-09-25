@@ -35,6 +35,14 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
+                    <field_id>6879828d0234f02649cad390</field_id>
+                    <group_id>None</group_id>
+                    <id>6879828d0234f02649cad390</id>
+                    <label>Fecha y Hora de Inicio de Turno</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
                     <field_id>6879828d0234f02649cad391</field_id>
                     <group_id>None</group_id>
                     <id>6879828d0234f02649cad391</id>
@@ -43,11 +51,51 @@
                 </item>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>6879828d0234f02649cad390</field_id>
+                    <field_id>68bb20095035e61c5745de05</field_id>
                     <group_id>None</group_id>
-                    <id>6879828d0234f02649cad390</id>
-                    <label>Fecha y Hora de Inicio de Turno</label>
-                    <type>datetime</type>
+                    <id>68bb20095035e61c5745de05</id>
+                    <label>Dias Libres</label>
+                    <type>checkbox</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68b6427cc8f94827ebfed695</field_id>
+                    <group_id>None</group_id>
+                    <id>68b6427cc8f94827ebfed695</id>
+                    <label>Nombre Horario</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68b6427cc8f94827ebfed696</field_id>
+                    <group_id>None</group_id>
+                    <id>68b6427cc8f94827ebfed696</id>
+                    <label>Hora Entrada</label>
+                    <type>time</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68b6427cc8f94827ebfed697</field_id>
+                    <group_id>None</group_id>
+                    <id>68b6427cc8f94827ebfed697</id>
+                    <label>Hora Salida</label>
+                    <type>time</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68b6427cc8f94827ebfed698</field_id>
+                    <group_id>None</group_id>
+                    <id>68b6427cc8f94827ebfed698</id>
+                    <label>Tolerancia Retardo</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68b642e2bc17e2713cabe019</field_id>
+                    <group_id>None</group_id>
+                    <id>68b642e2bc17e2713cabe019</id>
+                    <label>Retardo Maximo</label>
+                    <type>integer</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
@@ -207,6 +255,72 @@
             <operator>and</operator>
             <rule_id>5d8611cd319e0</rule_id>
             <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>663bffc28d00553254f274e0</field_id>
+                        <group_id>None</group_id>
+                        <id>663bffc28d00553254f274e0</id>
+                        <label>Estatus</label>
+                        <type>radio</type>
+                    </field>
+                    <value>cerrar_turno</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.configuracion_areas_y_empleados.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>66a83ab5ca3453e21ea08d19</id>
+                    <label>Datos</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <group_id>None</group_id>
+                    <id>663e5c57f5b8a7ce8211ed0b</id>
+                    <label>Ubicación</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <group_id>None</group_id>
+                    <id>663e5d44f5b8a7ce8211ed0f</id>
+                    <label>Caseta</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68acee270f2af5e173b7f92e</field_id>
+                    <group_id>None</group_id>
+                    <id>68acee270f2af5e173b7f92e</id>
+                    <label>Guardia</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68acb67685a044b5fdd869b2</field_id>
+                    <group_id>None</group_id>
+                    <id>68acb67685a044b5fdd869b2</id>
+                    <label>Nombre Completo - Guardia Suplente</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 6</name>
+            <operator>and</operator>
+            <rule_id>135610331f6d4ad</rule_id>
+            <rule_type>disabled</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
     </rules>
