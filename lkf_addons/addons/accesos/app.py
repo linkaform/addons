@@ -536,6 +536,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'tiempo_transcurrido': '688d1b7ad3268f1968d5ddf0',
             #Campos en grupo repetitivo personas involucradas:
             'nombre_completo': '66ec69239938c882f8222036',
+            'puesto':'68d6efb0a209c0144d6c3761',
             'rol':'66ec6936fc1f0f3f111d818f',
             'sexo':'688a9a59244b64c3c374c9e6',
             'grupo_etario':'688a9b96ccfd13dc0c12b188',
@@ -2106,6 +2107,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         personas_list.append(
                             {
                                 self.incidence_fields['nombre_completo']:c.get('nombre_completo',""),
+                                self.incidence_fields['puesto']:c.get('puesto',""),
                                 self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
                                 self.incidence_fields['sexo'] :c.get('sexo',"").lower().replace(" ","_"),
                                 self.incidence_fields['grupo_etario'] :c.get("grupo_etario").lower().replace(" ","_"),
@@ -2701,6 +2703,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row = {}
             print("row", row)
             row['nombre_completo'] = r.get(self.incidence_fields['nombre_completo'],'')
+            row['puesto'] = r.get(self.incidence_fields['puesto'],'')
             row['rol'] = (r.get(self.incidence_fields['rol']) or '').capitalize().replace("_", " ")
             row['sexo'] = (r.get(self.incidence_fields['sexo']) or '').capitalize().replace("_"," ")
             row['grupo_etario'] = (r.get(self.incidence_fields['grupo_etario'])or '').capitalize().replace("_"," ")
@@ -5794,6 +5797,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         personas_list.append(
                             {
                                 self.incidence_fields['nombre_completo']:c.get('nombre_completo',""),
+                                self.incidence_fields['puesto']:c.get('puesto',""),
                                 self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
                                 self.incidence_fields['sexo'] :c.get('sexo',"").lower(),
                                 self.incidence_fields['grupo_etario'] :c.get('grupo_etario',"").lower().replace(" ","_"),
@@ -5974,6 +5978,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         personas_list.append(
                             {
                                 self.incidence_fields['nombre_completo']:c.get('nombre_completo',""),
+                                self.incidence_fields['puesto']:c.get('puesto',""),
                                 self.incidence_fields['rol'] :c.get('rol',"").lower().replace(" ","_"),
                                 self.incidence_fields['sexo'] :c.get('sexo',"").lower(),
                                 self.incidence_fields['grupo_etario'] :c.get('grupo_etario',"").lower().replace(" ","_"),
