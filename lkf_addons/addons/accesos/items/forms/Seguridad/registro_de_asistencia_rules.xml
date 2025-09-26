@@ -12,7 +12,7 @@
                         <field_id>663bffc28d00553254f274e0</field_id>
                         <group_id>None</group_id>
                         <id>663bffc28d00553254f274e0</id>
-                        <label>Estatus</label>
+                        <label>Accion</label>
                         <type>radio</type>
                     </field>
                     <value> </value>
@@ -24,7 +24,7 @@
                         <field_id>663bffc28d00553254f274e0</field_id>
                         <group_id>None</group_id>
                         <id>663bffc28d00553254f274e0</id>
-                        <label>Estatus</label>
+                        <label>Accion</label>
                         <type>radio</type>
                     </field>
                     <value> </value>
@@ -97,6 +97,22 @@
                     <label>Retardo Maximo</label>
                     <type>integer</type>
                 </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68d5bbb57691dec5a7640358</field_id>
+                    <group_id>None</group_id>
+                    <id>68d5bbb57691dec5a7640358</id>
+                    <label>Status</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>68d6b0d5f7865907a86c37d7</field_id>
+                    <group_id>None</group_id>
+                    <id>68d6b0d5f7865907a86c37d7</id>
+                    <label>Horas Trabajadas</label>
+                    <type>decimal</type>
+                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
             <name>Regla 1</name>
@@ -114,7 +130,7 @@
                         <field_id>663bffc28d00553254f274e0</field_id>
                         <group_id>None</group_id>
                         <id>663bffc28d00553254f274e0</id>
-                        <label>Estatus</label>
+                        <label>Accion</label>
                         <type>radio</type>
                     </field>
                     <value>iniciar_turno</value>
@@ -156,7 +172,7 @@
                         <field_id>663bffc28d00553254f274e0</field_id>
                         <group_id>None</group_id>
                         <id>663bffc28d00553254f274e0</id>
-                        <label>Estatus</label>
+                        <label>Accion</label>
                         <type>radio</type>
                     </field>
                     <value>cerrar_turno</value>
@@ -266,7 +282,7 @@
                         <field_id>663bffc28d00553254f274e0</field_id>
                         <group_id>None</group_id>
                         <id>663bffc28d00553254f274e0</id>
-                        <label>Estatus</label>
+                        <label>Accion</label>
                         <type>radio</type>
                     </field>
                     <value>cerrar_turno</value>
