@@ -2070,7 +2070,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
             },
         })
-        # print( "Entrando a crear" ,simplejson.dumps(data_incidences, indent=4))
         #---Define Answers
         answers = {}
         answers[self.incidence_fields['incidencia_catalog']]={}
@@ -4354,7 +4353,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'telefono': f"$answers.{self.incidence_fields['telefono']}",
                 'info_coincide_con_videos': f"$answers.{self.incidence_fields['info_coincide_con_videos']}",
                 'responsable_que_entrega': f"$answers.{self.incidence_fields['responsable_que_entrega']}",
-                # 'responsable_que_recibe':f"$answers.{self.incidence_fields['responsable_que_recibe']}",
+                #'responsable_que_recibe':f"$answers.{self.incidence_fields['responsable_que_recibe']}",
+                
                 #Robo de cableado
                 'valor_estimado': f"$answers.{self.incidence_fields['valor_estimado']}",
                 'pertenencias_sustraidas': f"$answers.{self.incidence_fields['pertenencias_sustraidas']}",
