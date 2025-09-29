@@ -51,6 +51,9 @@ class Calidad(Base):
         # self.load(module='Product', **self.kwargs)
         # self.load(module='Product', module_class='Warehouse', import_as='WH', **self.kwargs)
         
+        # Configuraciones específicas del módulo
+        os.environ['MPLCONFIGDIR'] = '/tmp/matplotlib'
+        
         # FORMS
         self.REPORTE_GRAFICO = self.lkm.form_id('reporte_grfico', 'id')
         self.INSPECCION_CALIDAD = self.lkm.form_id('inspeccion', 'id')
