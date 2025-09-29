@@ -14,13 +14,13 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1624644304.0</created_at>
+    <created_at>1759159826.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
     <email_configuration>
-        <body />
+        <body>None</body>
         <email_fields>[]</email_fields>
         <emails>[]</emails>
         <embed_company_picture>False</embed_company_picture>
@@ -31,7 +31,7 @@
         <send_attachments>False</send_attachments>
         <send_pdf>False</send_pdf>
         <sender>None</sender>
-        <subject />
+        <subject>None</subject>
         <template_html>None</template_html>
         <templates>[]</templates>
         <timer_config>None</timer_config>
@@ -47,80 +47,11 @@
                 <item>
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
-                    <catalog>None</catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>True</default>
-                    <default_value>71925</default_value>
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>eeeee257ce6e5eaa48ad0265</field_id>
-                    <field_type>integer</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>None</group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>ID forma de Inspección</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>False</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>1</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>True</required>
-                    <rules>
-                        <item>1a3cade77121b7</item>
-                    </rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.productos.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>
                             <distance>0</distance>
                             <field_id>None</field_id>
@@ -207,7 +138,7 @@
                         <catalog_field_id>{{ catalog.productos.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.productos.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>
                             <distance>0</distance>
                             <field_id>None</field_id>
@@ -290,7 +221,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.procesos_y_maquinas_relacionadas.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>
                             <distance>0</distance>
                             <field_id>None</field_id>
@@ -379,7 +310,7 @@
                         <catalog_field_id>{{ catalog.procesos_y_maquinas_relacionadas.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.procesos_y_maquinas_relacionadas.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>
                             <distance>0</distance>
                             <field_id>None</field_id>
@@ -462,7 +393,7 @@
                         <catalog_field_id>{{ catalog.procesos_y_maquinas_relacionadas.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.procesos_y_maquinas_relacionadas.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>
                             <distance>0</distance>
                             <field_id>None</field_id>
@@ -2274,7 +2205,10 @@
                         <watermark_enable>False</watermark_enable>
                     </properties>
                     <required>False</required>
-                    <rules>[]</rules>
+                    <rules>
+                        <item>1a3cade77121b7</item>
+                        <item>1a3cade77121b7</item>
+                    </rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
                     <visible>True</visible>
@@ -2367,13 +2301,13 @@
                     <options>
                         <item>
                             <label>Sí</label>
-                            <points>None</points>
+                            <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
                         </item>
                         <item>
                             <label>No</label>
-                            <points>None</points>
+                            <option>None</option>
                             <selected>False</selected>
                             <value>no</value>
                         </item>
@@ -2443,7 +2377,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/72220/</resource_uri>
+    <resource_uri>/api/infosync/form/141021/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -2476,5 +2410,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1635283884.0</updated_at>
+    <updated_at>1759175235.0</updated_at>
 </lkf>

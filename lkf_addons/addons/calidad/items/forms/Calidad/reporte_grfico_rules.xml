@@ -9,11 +9,23 @@
                     <condition>not__empty=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
-                        <field_id>eeeee257ce6e5eaa48ad0265</field_id>
+                        <field_id>a00000000000000000000003</field_id>
                         <group_id>None</group_id>
-                        <id>eeeee257ce6e5eaa48ad0265</id>
-                        <label>ID forma de Inspección</label>
-                        <type>integer</type>
+                        <id>a00000000000000000000003</id>
+                        <label>Status Reporte</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>a00000000000000000000003</field_id>
+                        <group_id>None</group_id>
+                        <id>a00000000000000000000003</id>
+                        <label>Status Reporte</label>
+                        <type>select</type>
                     </field>
                     <value> </value>
                 </item>
@@ -56,7 +68,7 @@
             </fields_ruled>
             <group_conditions>{}</group_conditions>
             <name>Ocultar gráficos generados</name>
-            <operator>and</operator>
+            <operator>or</operator>
             <rule_id>1a3cade77121b7</rule_id>
             <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
