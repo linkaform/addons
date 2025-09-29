@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.reporte_grfico.id }}</form_id>
+    <id>60da2403e1af000e0add1e67</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>eeeee257ce6e5eaa48ad0265</field_id>
+                        <group_id>None</group_id>
+                        <id>eeeee257ce6e5eaa48ad0265</id>
+                        <label>ID forma de Inspección</label>
+                        <type>integer</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>fffff0d04bf021682a2de86a</field_id>
+                    <group_id>None</group_id>
+                    <id>fffff0d04bf021682a2de86a</id>
+                    <label>Gráficos generados</label>
+                    <type>group</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>d000000000000000000000b0</field_id>
+                    <group_id>None</group_id>
+                    <id>d000000000000000000000b0</id>
+                    <label>Datos</label>
+                    <type>group</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>a00000000000000000000005</field_id>
+                    <group_id>None</group_id>
+                    <id>a00000000000000000000005</id>
+                    <label>Cantidad Producida</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>a00000000000000000000006</field_id>
+                    <group_id>None</group_id>
+                    <id>a00000000000000000000006</id>
+                    <label>Fallas</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar gráficos generados</name>
+            <operator>and</operator>
+            <rule_id>1a3cade77121b7</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
