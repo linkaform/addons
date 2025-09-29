@@ -7,7 +7,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>39-7714fd0cce1537d41722be65758635ec</_rev>
+    <_rev>41-af106ff599554488147ae96c88c5ed4d</_rev>
     <updated_at>2021-06-10T16:07:08.097534+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -77,24 +77,6 @@
                     <view_fields>[]</view_fields>
                     <options>[]</options>
                     <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>catalog</field_type>
-                    <catalog_fields>[]</catalog_fields>
-                    <required>False</required>
-                    <field_id>{{ catalog.procesos_y_maquinas_relacionadas.obj_id }}</field_id>
-                    <label>Procesos</label>
-                    <catalog>
-                        <catalog_fields>[]</catalog_fields>
-                        <filters />
-                        <view_index>0</view_index>
-                        <couch_id>{{ catalog.procesos_y_maquinas_relacionadas.obj_id }}</couch_id>
-                        <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.procesos_y_maquinas_relacionadas.id }}</catalog_id>
-                        <view_fields>[]</view_fields>
-                        <name>{{ catalog.procesos_y_maquinas_relacionadas.name }}</name>
-                    </catalog>
-                    <properties>{}</properties>
                 </item>
             </page_fields>
             <page_name>Datos</page_name>
