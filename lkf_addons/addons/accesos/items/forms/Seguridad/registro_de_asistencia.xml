@@ -1050,7 +1050,7 @@
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
-                    <default_value>Esta pagina se rellenara con la informacion de los dias libres del guardia y el turno correspondiente a su hora de inicio.</default_value>
+                    <default_value>Esta pagina se rellenara automaticamente con la informacion de los dias libres del guardia y el turno correspondiente a su hora de inicio.</default_value>
                     <descriptor>None</descriptor>
                     <fav>False</fav>
                     <field_id>68d5b5eb0859295d733bf763</field_id>
@@ -1803,5 +1803,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1758902882.0</updated_at>
+    <updated_at>1759278508.0</updated_at>
 </lkf>
