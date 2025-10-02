@@ -708,7 +708,7 @@
         <max_points>0</max_points>
     </grading>
     <has_voucher>False</has_voucher>
-    <name>INSPECCION DIARIA</name>
+    <name>INSPECCION DIARIA LUBRICACIÓN MOLINOS</name>
     <notification>
         <active>False</active>
     </notification>
@@ -746,5 +746,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1759432605.0</updated_at>
+    <updated_at>1759433723.0</updated_at>
 </lkf>
