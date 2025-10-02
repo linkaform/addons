@@ -341,7 +341,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.tipos_de_vehiculo.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>66a83abdde752e12018fbc4c</id>
+                    <id>680f8f913aa0f348a96c3986</id>
                     <label>Datos del Vehículo</label>
                     <type>catalog</type>
                 </item>
@@ -415,7 +415,7 @@
                     <catalog_id>None</catalog_id>
                     <field_id>{{ catalog.tipos_de_vehiculo.obj_id}}</field_id>
                     <group_id>None</group_id>
-                    <id>66a83abdde752e12018fbc4c</id>
+                    <id>680f8f913aa0f348a96c3986</id>
                     <label>Datos del Vehículo</label>
                     <type>catalog</type>
                 </item>
