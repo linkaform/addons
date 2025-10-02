@@ -1,21 +1,21 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.checkin_checkout_casetas.id }}</form_id>
-    <id>663c00579e0fe2c750f27499</id>
+    <id>6855945317b0462f54a64370</id>
     <rules>
         <item>
             <conditions>
                 <item>
-                    <condition>in=</condition>
+                    <condition>nin=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>663bffc28d00553254f274e0</field_id>
                         <group_id>None</group_id>
                         <id>663bffc28d00553254f274e0</id>
-                        <label>Estatus</label>
+                        <label>Estatus de Caseta</label>
                         <type>radio</type>
                     </field>
-                    <value>salida</value>
+                    <value>cierre</value>
                 </item>
             </conditions>
             <element_ids>[]</element_ids>
@@ -26,15 +26,125 @@
                     <field_id>663bffc28d00553254f274e2</field_id>
                     <group_id>None</group_id>
                     <id>663bffc28d00553254f274e2</id>
-                    <label>Fecha y hora Checkout</label>
+                    <label>Fecha y hora de Cierre de Caseta</label>
+                    <type>datetime</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66a5b9bed0c44910177eb723</field_id>
+                    <group_id>None</group_id>
+                    <id>66a5b9bed0c44910177eb723</id>
+                    <label>Tipo de Cierre</label>
+                    <type>radio</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Checkout</name>
+            <operator>and</operator>
+            <rule_id>1064176e1a18120c</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>nin=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>663bffc28d00553254f274e0</field_id>
+                        <group_id>None</group_id>
+                        <id>663bffc28d00553254f274e0</id>
+                        <label>Estatus de Caseta</label>
+                        <type>radio</type>
+                    </field>
+                    <value>apertura</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>663bffc28d00553254f274e1</field_id>
+                    <group_id>None</group_id>
+                    <id>663bffc28d00553254f274e1</id>
+                    <label>Fecha y hora Apertura de Caseta</label>
                     <type>datetime</type>
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Mostrar fecha checkout</name>
+            <name>Checkin</name>
             <operator>and</operator>
-            <rule_id>15cb1ef12030231c</rule_id>
-            <rule_type>show</rule_type>
+            <rule_id>133315fc11381160</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>66a28f3ca6b0f085b1518ca8</field_id>
+                        <group_id>663fae53fa005c70de59eb95</group_id>
+                        <id>66a28f3ca6b0f085b1518ca8</id>
+                        <label>Status</label>
+                        <type>select</type>
+                    </field>
+                    <value>salida</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66a28f3ca6b0f085b1518caa</field_id>
+                    <group_id>None</group_id>
+                    <id>66a28f3ca6b0f085b1518caa</id>
+                    <label>Fecha Entrada</label>
+                    <type>datetime</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Apoyo Checkout</name>
+            <operator>and</operator>
+            <rule_id>4f21adb2533112c</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>66a28f3ca6b0f085b1518ca8</field_id>
+                        <group_id>663fae53fa005c70de59eb95</group_id>
+                        <id>66a28f3ca6b0f085b1518ca8</id>
+                        <label>Status</label>
+                        <type>select</type>
+                    </field>
+                    <value>entrada</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66a28f3ca6b0f085b1518cab</field_id>
+                    <group_id>663fae53fa005c70de59eb95</group_id>
+                    <id>66a28f3ca6b0f085b1518cab</id>
+                    <label>Fecha Salida</label>
+                    <type>datetime</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Apoyo Checkin</name>
+            <operator>and</operator>
+            <rule_id>2151cf29b6731</rule_id>
+            <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
     </rules>
