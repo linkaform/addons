@@ -9,7 +9,7 @@ install_order = [
                     'subconceptos_fallas',
                     'lista_de_fallas',
                     'categora_incidentes',
-                    'subcategoras_incidentes'
+                    'subcategoras_incidentes',
                     'lista_de_incidentes',
                     'lockers',
                     'definicion_de_examenes',
