@@ -4354,7 +4354,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'info_coincide_con_videos': f"$answers.{self.incidence_fields['info_coincide_con_videos']}",
                 'responsable_que_entrega': f"$answers.{self.incidence_fields['responsable_que_entrega']}",
                 #'responsable_que_recibe':f"$answers.{self.incidence_fields['responsable_que_recibe']}",
-                
+
                 #Robo de cableado
                 'valor_estimado': f"$answers.{self.incidence_fields['valor_estimado']}",
                 'pertenencias_sustraidas': f"$answers.{self.incidence_fields['pertenencias_sustraidas']}",
@@ -4630,9 +4630,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query = {
             'form_id':self.PASE_ENTRADA,
             'deleted_at':{'$exists':False},
-            f"answers.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.pase_entrada_fields['autorizado_por']}":employee.get('worker_name'),
+            f"answers.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.pase_entrada_fields['autorizado_por']}":employee.get('worker_name') or '',
         }
-
         if tab_status == "Favoritos":
             match_query.update({f"answers.{self.pase_entrada_fields['favoritos']}":'si'})
         elif tab_status == "Activos":
@@ -4640,6 +4639,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         elif tab_status == "Vencidos":
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'vencido'})
 
+        print("SEARCHA", search_name)
         if search_name:
             match_query.update({
                 f"$or": [
@@ -4727,7 +4727,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'link':f"$answers.{self.pase_entrada_fields['link']}",
                     'perfil_pase': f"$answers.{self.mf['nombre_perfil']}",
                     'status_pase': f"$answers.{self.pase_entrada_fields['status_pase']}",
-                    'pdf_to_img': f"$answers.{self.pase_entrada_fields['pdf_to_img']}"
+                    'pdf_to_img': f"$answers.{self.pase_entrada_fields['pdf_to_img']}",
+                    'autorizado_por':f"$answers.{self.pase_entrada_fields['autorizado_por']}"
                 }
             },
             {'$sort':{'_id':-1}},
@@ -4735,7 +4736,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         query.append({'$skip': skip})
         query.append({'$limit': limit})
         records = self.format_cr(self.cr.aggregate(query))
-
+        # print("RECORDS",  simplejson.dumps(records, indent=4))
         for x in records:
             qr_code = x.get('_id')
             total_entradas = self.get_count_ingresos(qr_code)
@@ -4770,7 +4771,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 x['telefono'] = x.get('telefono', [""]) if x.get('telefono') else ""
                 # x['pdf'] = self.lkf_api.get_pdf_record(x['_id'], template_id = 447, name_pdf='Pase de Entrada', send_url=True)
             else:
-                print("empresa email telefono",  x.get('empresa'))
+                
                 x['visita_a'] = visita_a
                 x['favoritos'] = x.get('favoritos') or ""
                 x['motivo_visita'] =x.get('motivo_visita') or ""
@@ -4794,6 +4795,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
             visitas = x.get('visita_a', [])
             x['status_pase'] = x.get('estatus', "")
+            x['autorizado_por'] = x.get('autorizado_por', "")
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
 
