@@ -25,6 +25,8 @@ pytz==2023.4
 pyexcel-ods3==0.6.1
 pyexcel-odsr==0.6.0
 pyexcel-ods==0.6.0
+matplotlib
+numpy
 qrcode==7.3.1
 simplejson==3.16.0
 #sha-py

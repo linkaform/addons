@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.reporte_grfico.id }}</form_id>
+    <id>60edc0a765b93eac06acae80</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>60edc0a765b93eac06acae79</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <arguments>{}</arguments>
+                        <script>
+                            <created_at>2021-07-13T16:32:57.284792</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.procesa_grafico.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.procesa_grafico.name }}</name>
+                            <start_date>2021-07-13T16:32:57.282458</start_date>
+                            <updated_at>2021-07-13T16:32:57.738735</updated_at>
+                        </script>
+                        <user>RECORD_USER</user>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>60edc0a765b93eac06acae7a</id>
+            <name>Generar gráfico</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2021-07-14T05:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2021-07-13T16:33:53.017Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>a00000000000000000000003</field_id>
+                                <group>{}</group>
+                                <label>Status Reporte</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>generar_graficos</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>61088a4d3fb76d1be7675fc0</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Encuentra anexo el reporte de calidad para el producto:&lt;br&gt;
+&lt;b&gt;Producto:&lt;/b&gt; {{record.answers.60c238ac1d17c02907171593.00000ffff717042907171594}} &lt;br&gt;
+&lt;b&gt;Maquina:&lt;/b&gt; {{record.answers.60cb736c1accdf6e57ca85eb.00002ffff719346e57ca85ec}} &lt;br&gt;
+&lt;b&gt;Proceso:&lt;/b&gt; {{record.answers.60cb736c1accdf6e57ca85eb.00001ffff719346e57ca85ed}} &lt;br&gt;
+&lt;b&gt;Dia Inical:&lt;/b&gt; {{record.answers.f00000000000000000000001}} &lt;br&gt;
+&lt;b&gt;Dia Final:&lt;/b&gt; {{record.answers.f00000000000000000000002}} &lt;br&gt;
+&lt;br&gt; {% endraw %}</body>
+                        <email_fields>[]</email_fields>
+                        <emails>
+                            <item>paco@linkaform.com</item>
+                        </emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Reporte producto {{record.answers.60c238ac1d17c02907171593.00000ffff717042907171594}} dias {{record.answers.f00000000000000000000001}} al {{record.answers.f00000000000000000000002}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>61088a4d3fb76d1be7675fc4</id>
+            <name>Notificar</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2021-08-03T05:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2021-08-02T23:47:11.324Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>False</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>iexact=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>a000000000000000000000a1</field_id>
+                                <group>{}</group>
+                                <label>Notificar</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>sí</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>a00000000000000000000003</field_id>
+                                <group>{}</group>
+                                <label>Status Reporte</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>realizado</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
