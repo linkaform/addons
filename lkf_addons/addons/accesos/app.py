@@ -98,6 +98,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
         self.CONF_MODULO_SEGURIDAD = self.lkm.form_id('configuracion_modulo_seguridad','id')
         self.PAQUETERIA = self.lkm.form_id('paqueteria','id')
+        self.BITACORA_RONDINES = self.lkm.form_id('bitacora_rondines','id')
 
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
@@ -198,6 +199,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'articulo':'66ce2441d63bb7a3871adeaf',
             'areas_grupo':'663cf9d77500019d1359eb9f',
             'archivo_invitacion': '673773741b2adb2d05d99d63',
+            'estatus_del_recorrido': '6639b2744bb44059fc59eb62',
+            
             #LOS CATALOGOS NO SE CCLASIFICAN COMO CAMPOS            
             'catalog_area_pase':'664fc5f3bbbef12ae61b15e9',
             'catalog_caseta':'66566d60d4619218b880cf04',
@@ -212,6 +215,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'catalogo_persona_involucrada': '66ec6936fc1f0f3f111d818f',
             "catalogo_departamentos": "66a83a7fca3453e21ea08d16",
             "catalogo_puestos": "66a83a7dee0b950748489ca1",
+            'nombre_del_recorrido': '6645050d873fc2d733961eba',
             ##### REVISAR Y BORRAR ######
 
             'fecha_salida':'662c51eb194f1cb7a91e5af0',

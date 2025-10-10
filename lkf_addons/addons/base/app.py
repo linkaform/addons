@@ -1420,7 +1420,7 @@ class Schedule(Base):
     def convert_usr_id_to_dict(self, user_ids):
         user_info = []
         for user_id in user_ids:
-            user_data = lkf_api.get_user_by_id(user_id)
+            user_data = self.lkf_api.get_user_by_id(user_id)
             if user_data:
                 user_info.append({
                     'account_id': user_data.get('parent_info',{}).get('id'), 
