@@ -1,0 +1,509 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.revisin_de_habitaciones_hie_torren.id }}</form_id>
+    <id>68129fdd9c36cc47f150a9af</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>68129fdd9c36cc47f150a9a8</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} &lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8" /&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"/&gt;
+  &lt;style&gt;
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 0;
+      border-radius: 12px;
+      border: 1px solid #e1e1e1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .header {
+      background-color: #f1f1f1;
+      padding: 20px 30px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+    }
+    .header img {
+      max-height: 50px;
+      margin-right: 15px;
+    }
+    .header-title {
+      flex-grow: 1;
+      text-align: center;
+      font-size: 20px;
+      color: #333;
+      font-weight: bold;
+    }
+    .content {
+      padding: 30px;
+      text-align: center;
+    }
+    .content h2 {
+      color: #0b2545;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    .content p {
+      color: #333;
+      font-size: 16px;
+      line-height: 1.6;
+      text-align: left;
+    }
+    .alert {
+      padding: 15px;
+      border-left: 5px solid;
+      border-radius: 4px;
+      color: #fff;
+      margin: 20px 0;
+      text-align: left;
+      font-weight: bold;
+    }
+    .alert-blue {
+      background-color: #007bffd8;
+      border-color: #0056b3;
+    }
+    .alert-red {
+      background-color: #dc3546d8;
+      border-color: #dc3545;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #0b2545;
+      color: #ffffff !important;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+    .footer {
+      background-color: #021d49;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #ffdd57;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  &lt;/style&gt;  
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="container"&gt;
+    &lt;!-- Encabezado con logo y título --&gt;
+    &lt;div class="header"&gt;
+      &lt;img src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/67f8595237973f9bb473fe2d.png" alt="Soter Logo" /&gt;
+    &lt;/div&gt;
+  
+    &lt;!-- Cuerpo del correo aquí --&gt;
+    &lt;div class="content"&gt;
+      &lt;h2&gt;Resultado de Auditoría de Habitación&lt;/h2&gt;
+
+      {% load PrintFields %}
+      {% load set_var %}
+      {% load custom_tags %}
+
+      &lt;div style="display:none"&gt;
+        {% set temp = 0 %}
+        {% arithmetic 'temp' record.points '/' 389 %}
+        {% set resultado = 0 %}
+        {% arithmetic 'resultado' temp '*' 100 %}
+      &lt;/div&gt;
+
+      {% if resultado == 100 %}
+        &lt;div class="alert alert-blue"&gt;
+          ✅ ¡La auditoría de la {{record.answers.67450f11d18ae4ae9094dcf1.663e5d44f5b8a7ce8211ed0f}} del hotel {{record.answers.67450f11d18ae4ae9094dcf1.663e5c57f5b8a7ce8211ed0b}} ha sido completada con éxito! La habitación ha alcanzado el 100% de cumplimiento.
+        &lt;/div&gt;
+      {% else %}
+        &lt;div class="alert alert-red"&gt;
+          &amp;#9888; ¡La auditoría de la {{record.answers.67450f11d18ae4ae9094dcf1.663e5d44f5b8a7ce8211ed0f}} del hotel {{record.answers.67450f11d18ae4ae9094dcf1.663e5c57f5b8a7ce8211ed0b}} ha sido completada! La puntuación obtenida es del {{ resultado|floatformat:2 }}%.
+          Hemos detectado algunos puntos que requieren atención. En el archivo PDF adjunto encontrarás el listado completo de los conceptos.
+        &lt;/div&gt;
+      {% endif %}
+      
+      &lt;div style="margin-top: 2em; text-align: left;"&gt;
+        &lt;strong&gt;c.c.p.:&lt;/strong&gt;
+        &lt;ul style="list-style: none; padding-left: 0;"&gt;
+          &lt;li&gt;Lucia Enciso&lt;/li&gt;
+          &lt;li&gt;Berenice Espinosa&lt;/li&gt;
+          &lt;li&gt;Archivo&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+
+    &lt;/div&gt;
+  
+    &lt;!-- Pie de página --&gt;
+    &lt;div class="footer"&gt;
+      &lt;p&gt;&amp;copy; 2024 &lt;a href="https://www.soter.mx/" target="_blank"&gt;Soter&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt; {% endraw %}</body>
+                        <email_fields>[]</email_fields>
+                        <emails>
+                            <item>lucia.enciso@hotelesmilenium.com</item>
+                            <item>berenice.espinosa@hotelesmilenium.com</item>
+                            <item>elizabeth.pascual@hotelesmilenium.com</item>
+                            <item>ama.hietor@hotelesmilenium.com</item>
+                            <item>omar.reyes@hotelesmilenium.com</item>
+                        </emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Plantilla para Inspección de Habitaciones</description>
+                            <id>559</id>
+                            <name>Milenium - Inspección de Habitaciones</name>
+                            <owner>/api/infosync/user/7742/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/559/</resource_uri>
+                        </pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Resultado de auditoría:{{record.answers.67450f11d18ae4ae9094dcf1.663e5d44f5b8a7ce8211ed0f}} con Folio: {{record.folio}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>Correo auditoria</name>
+                </item>
+            </actions>
+            <id>68129fdd9c36cc47f150a9a9</id>
+            <name>Email</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-05-01T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-04-30T21:55:50.120Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters />
+                                    <geofence>None</geofence>
+                                    <last>False</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                                <group>{}</group>
+                                <label>Hotel</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value> </value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>681cf34f1a7f2972a1b42758</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <arguments>
+                            <option>after</option>
+                        </arguments>
+                        <integration>None</integration>
+                        <script>
+                            <created_at>2025-05-06T01:02:17.034830</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.actualiza_status_inspeccion.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.actualiza_status_inspeccion.name }}</name>
+                            <start_date>2025-05-06T01:02:17.032487</start_date>
+                            <updated_at>2025-05-06T05:06:16.250443</updated_at>
+                        </script>
+                        <scriptArguments>
+                            <item>
+                                <label>option</label>
+                                <value>after</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
+                        <user>SCRIPT_OWNER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
+                            </item>
+                            <item>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
+                            </item>
+                            <item>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
+                            </item>
+                            <item>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
+                            </item>
+                        </userOptions>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>681cf34f1a7f2972a1b4275c</id>
+            <name>Crear registro en inspeccion hoteleria</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-05-09T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-05-08T17:59:09.983Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>6866d4206eb2ff096a2e9d4f</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <arguments>
+                            <option>before</option>
+                        </arguments>
+                        <integration>None</integration>
+                        <script>
+                            <created_at>2025-05-06T01:02:17.034830</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.actualiza_status_inspeccion.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.actualiza_status_inspeccion.name }}</name>
+                            <start_date>2025-05-06T01:02:17.032487</start_date>
+                            <updated_at>2025-07-03T18:48:51.757050</updated_at>
+                        </script>
+                        <scriptArguments>
+                            <item>
+                                <label>option</label>
+                                <value>before</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
+                        <user>SCRIPT_OWNER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
+                            </item>
+                            <item>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
+                            </item>
+                            <item>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
+                            </item>
+                            <item>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
+                            </item>
+                        </userOptions>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>6866d4206eb2ff096a2e9d56</id>
+            <name>Actualiza Status</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-07-04T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-07-03T19:03:17.452Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>before</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68ed78decbbc5dc0ee6ffd82</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <arguments>
+                            <option>create_acciones_correctivas</option>
+                        </arguments>
+                        <integration>None</integration>
+                        <script>
+                            <created_at>2025-10-09T19:44:01.753334</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.acciones_correctivas.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.acciones_correctivas.name }}</name>
+                            <start_date>2025-10-09T19:44:01.750384</start_date>
+                            <updated_at>2025-10-13T21:56:33.569133</updated_at>
+                        </script>
+                        <scriptArguments>
+                            <item>
+                                <label>option</label>
+                                <value>create_acciones_correctivas</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
+                        <user>SCRIPT_OWNER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
+                            </item>
+                            <item>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
+                            </item>
+                            <item>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
+                            </item>
+                            <item>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
+                            </item>
+                        </userOptions>
+                    </configuration>
+                    <name>Se ejecuta el script</name>
+                </item>
+            </actions>
+            <id>68ed78dfcbbc5dc0ee6ffd8c</id>
+            <name>Creacion de acciones correctivas</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-10-14T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-10-13T22:02:51.856Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

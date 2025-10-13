@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <redirect_url>default</redirect_url>
+        <button_message>Mandar respuestas</button_message>
+    </confirmation>
+    <description />
+    <_rev>5-3c6d05d0cef9ac506d14a26d03522748</_rev>
+    <updated_at>2025-10-08T22:17:17.389640+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Acciones Correctivas</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2025-10-08T22:17:17.389640+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <config>False</config>
+            <required>False</required>
+            <manual>False</manual>
+        </folio>
+    </advanced_options>
+    <catalog_id>141320</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>68e6e2ed68928c80a3297485</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>catalog</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>
+                        <item>663e5c57f5b8a7ce8211ed0b</item>
+                        <item>663e5d44f5b8a7ce8211ed0f</item>
+                    </catalog_fields>
+                    <fav>None</fav>
+                    <required>False</required>
+                    <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</field_id>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <filters />
+                        <view_index>0</view_index>
+                        <couch_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</couch_id>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <view_fields>
+                            <item>663e5c57f5b8a7ce8211ed0b</item>
+                            <item>663e5d44f5b8a7ce8211ed0f</item>
+                        </view_fields>
+                        <name>{{ catalog.areas_de_las_ubicaciones.name }}</name>
+                    </catalog>
+                    <relation_type>None</relation_type>
+                    <label>Area</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>[]</options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>{}</properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Ubicación</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>1</view_index>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>catalog-select</field_type>
+                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <label>Nombre de Area</label>
+                    <catalog>
+                        <catalog_fields>[]</catalog_fields>
+                        <last>False</last>
+                        <filters />
+                        <field_type>text</field_type>
+                        <view_index>2</view_index>
+                        <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                        <view_fields>[]</view_fields>
+                    </catalog>
+                    <options>[]</options>
+                    <properties>{}</properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <field_id>68e6e30b5224da81e53a7156</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <label>Desviacion</label>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>68e80711c6c1f1375e4b8b51</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Question ref</label>
+                </item>
+            </page_fields>
+            <page_description>None</page_description>
+            <page_name>Página 1</page_name>
+        </item>
+    </catalog_pages>
+</lkf>
