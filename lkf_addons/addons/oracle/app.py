@@ -103,11 +103,12 @@ class Oracle(Base):
         """
         result = []
         columns = []
+        cursor = None
         try:
             cursor = self.orcale_connection.cursor()
             # Query to fetch data from the view
             if not query:
-                query = f"SELECT * FROM {view_name} WHERE ROWNUM <= 100"
+                query = f"SELECT * FROM {view_name}"
             if date_format:
                 cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'DD/MM/RR'")
                 cursor.execute("ALTER SESSION SET NLS_DATE_LANGUAGE = 'SPANISH'")
@@ -120,7 +121,10 @@ class Oracle(Base):
             error, = e.args
             print(f"Error querying view: {error.code} - {error.message}")
         finally:
-            cursor.close()
+            if cursor:
+                cursor.close()
+            else:
+                self.LKFException('No cursor')
         return columns, result
 
     def search_views(self):
