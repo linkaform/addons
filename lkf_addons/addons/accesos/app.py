@@ -161,9 +161,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.LISTA_INCIDENCIAS_CAT_ID = self.LISTA_INCIDENCIAS_CAT.get('id')
         self.LISTA_INCIDENCIAS_CAT_OBJ_ID = self.LISTA_INCIDENCIAS_CAT.get('obj_id')
 
-        self.LISTA_INCIDENCIAS_CAT = self.lkm.catalog_id('lista_de_incidentes')
-        self.LISTA_INCIDENCIAS_CAT_ID = self.LISTA_INCIDENCIAS_CAT.get('id')
-        self.LISTA_INCIDENCIAS_CAT_OBJ_ID = self.LISTA_INCIDENCIAS_CAT.get('obj_id')
+        self.CATEGORIAS_INCIDENCIAS = self.lkm.catalog_id('categora_incidentes')
+        self.CATEGORIAS_INCIDENCIAS_ID = self.CATEGORIAS_INCIDENCIAS.get('id')
+        self.CATEGORIAS_INCIDENCIAS_OBJ_ID = self.CATEGORIAS_INCIDENCIAS.get('obj_id')
+
+        self.SUB_CATEGORIAS_INCIDENCIAS = self.lkm.catalog_id('subcategoras_incidentes')
+        self.SUB_CATEGORIAS_INCIDENCIAS_ID = self.SUB_CATEGORIAS_INCIDENCIAS.get('id')
+        self.SUB_CATEGORIAS_INCIDENCIAS_OBJ_ID = self.SUB_CATEGORIAS_INCIDENCIAS.get('obj_id')
 
         self.LISTA_FALLAS_CAT = self.lkm.catalog_id('lista_de_fallas')
         self.LISTA_FALLAS_CAT_ID = self.LISTA_FALLAS_CAT.get('id')
