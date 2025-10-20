@@ -14,17 +14,6 @@ config = {
     'USER_ID' : '',
     'JWT_KEY': False,
     'USE_JWT': True,
-    'COUCH_ENV':'prod',
-    'COUCH_PROTOCOL':'http',
-    'COUCH_USER':'',
-    'COUCH_PASSWORD':'',
-    'COUCH_HOST':'',
-    'COUCH_PORT':'',
-    'COUCH_DEV_PROTOCOL':'http',
-    'COUCH_DEV_USER':'',
-    'COUCH_DEV_PASSWORD':'',
-    'COUCH_DEV_HOST':'',
-    'COUCH_DEV_PORT':'',
 }
 
 

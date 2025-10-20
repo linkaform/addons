@@ -1,10 +1,10 @@
 # coding: utf-8
 from settings import config
 
-# ENV = 'preprod' 
-# ENV = 'local' 
 ENV = 'prod' 
- 
+#ENV = 'preprod' 
+#ENV = 'local' 
+
 # print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
 mongo_hosts = config.get('mongo_hosts')
 PROTOCOL = config.get('PROTOCOL')
