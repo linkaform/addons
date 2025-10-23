@@ -2,7 +2,7 @@
 
 #Utils for using LinkaFrom modules...
 from linkaform_api import utils, lkf_models
-import settings 
+# from lkf_addons.config import settings 
 
 
 def update_settings(settings):
@@ -17,7 +17,7 @@ def update_settings(settings):
     settings.config["MONGODB_USER"] = 'account_{}'.format(account_id)
     return settings
 
-def get_lkf_api():
+def get_lkf_api(settings):
     lkf_api = utils.Cache(settings)
     user = lkf_api.get_jwt(api_key=settings.config['APIKEY'], get_user=True)
     if not user:
@@ -28,7 +28,7 @@ def get_lkf_api():
     lkf_api = utils.Cache(settings)
     return lkf_api
 
-def get_lkf_module():
+def get_lkf_module(settings):
     lkf_api = get_lkf_api()
     settings = lkf_api.settings
     lkf_modules = lkf_models.LKFModules(settings)

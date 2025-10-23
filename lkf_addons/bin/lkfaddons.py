@@ -14,8 +14,11 @@ from download_module import ADDONS_PATH, MODULES_PATH
 # sys.path.append('/srv/scripts/addons/config/')
 # sys.path.append('/srv/scripts/addons/modules')
 
-import settings
+# from  settings import get_settings
+from settings import get_settings
 from uts import get_lkf_api
+
+settings = get_settings()
 
 commands = sys.argv
 commands.pop(0)
@@ -41,7 +44,7 @@ load_modules += base_modules
 # install = {'all':False, 'stock_move':False, 'test':True}
 
 # load_data = True
-lkf_api = get_lkf_api()
+lkf_api = get_lkf_api(settings)
 
 ask_4_items = True
 load_data = False

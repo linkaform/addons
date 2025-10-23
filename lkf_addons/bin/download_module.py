@@ -19,8 +19,10 @@ if '/srv/scripts/addons/modules' not in sys.path:
     sys.path.append('/srv/scripts/addons/modules')
 
 
-import settings
+from settings import get_settings
 from uts import get_lkf_api, get_lkf_module
+
+settings = get_settings()
 
 
 
@@ -84,9 +86,9 @@ def download_modules(modules, options, items_ids={}, download_related=False, **k
         items = items_ids
         modules = list(items.keys())
     else:
-        lkf_modules = get_lkf_module()
+        lkf_modules = get_lkf_module(settings)
         set_module_items(modules)
-    lkf_api = get_lkf_api()
+    lkf_api = get_lkf_api(settings)
     for module_name in modules:
         if 'forms' in options or 'form' in options:
             print('Download Related Forms : ', download_related)
