@@ -775,6 +775,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'fecha_inicio_rondin':'6818ea068a7f3446f1bae3b3',
             'grupo_areas_visitadas':'66462aa5d4a4af2eea07e0d1',
             'evidencia_incidencia':'66ec6846028e5550cbf012e0',
+            'area_foto': '6763096aa99cee046ba766ad',
+            'area_tag_id': '6762f7b0922cc2a2f57d4044',
+            'tipo_de_area': '663e5e68f5b8a7ce8211ed18',
         })
 
     '''
