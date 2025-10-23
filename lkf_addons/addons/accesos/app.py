@@ -774,6 +774,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'fecha_programacion':'6760a8e68cef14ecd7f8b6fe',
             'fecha_inicio_rondin':'6818ea068a7f3446f1bae3b3',
             'grupo_areas_visitadas':'66462aa5d4a4af2eea07e0d1',
+            'evidencia_incidencia':'66ec6846028e5550cbf012e0',
         })
 
     '''
@@ -2078,6 +2079,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
             },
         })
+        if data_incidences.get('record_id'):
+            metadata.update({
+                "id": data_incidences.pop('record_id')
+            })
         #---Define Answers
         answers = {}
         answers[self.incidence_fields['incidencia_catalog']]={}
@@ -7112,6 +7117,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         message_status = 'Mensaje: No se realizo la peticion.'
         if phone_to:
+            #TODO: Cambiar a nuevo proveedor de envio de sms
             sms_response = self.lkf_api.send_sms(phone_to, mensaje, use_api_key=True)
             if hasattr(sms_response, "status") and sms_response.status in ["queued", "sent", "delivered"]:
                 message_status = 'Mensaje: Enviado correctamente'
