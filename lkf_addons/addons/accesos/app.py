@@ -99,6 +99,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.CONF_MODULO_SEGURIDAD = self.lkm.form_id('configuracion_modulo_seguridad','id')
         self.PAQUETERIA = self.lkm.form_id('paqueteria','id')
         self.BITACORA_RONDINES = self.lkm.form_id('bitacora_rondines','id')
+        self.CHECK_UBICACIONES = self.lkm.form_id('check_ubicaciones','id')
 
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
@@ -778,6 +779,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'area_foto': '6763096aa99cee046ba766ad',
             'area_tag_id': '6762f7b0922cc2a2f57d4044',
             'tipo_de_area': '663e5e68f5b8a7ce8211ed18',
+            'foto_evidencia_area': '681144fb0d423e25b42818d2',
+            'grupo_incidencias_check': '681144fb0d423e25b42818d3',
+            'comentario_check_area': '681144fb0d423e25b42818d4',
+            'check_status': '681fa6a8d916c74b691e174b',
+            'status_check_ubicacion': '68e41c904da05123bf9326ee'
         })
 
     '''
