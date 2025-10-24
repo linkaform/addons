@@ -783,7 +783,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'grupo_incidencias_check': '681144fb0d423e25b42818d3',
             'comentario_check_area': '681144fb0d423e25b42818d4',
             'check_status': '681fa6a8d916c74b691e174b',
-            'status_check_ubicacion': '68e41c904da05123bf9326ee'
+            'status_check_ubicacion': '68e41c904da05123bf9326ee',
+            'incidente':'663973809fa65cafa759eb97',
+            'categoria':'686807d46e41614d708f6fc9',
+            'sub_categoria': '686807a7ee7705c5c8eb181a',
+            'incidente_open': '6811455664dc22ecae83f75b',
+            'incidente_comentario': '681145323d9b5fa2e16e35cb',
+            'incidente_accion': '681145323d9b5fa2e16e35cc',
+            'incidente_evidencia': '681145323d9b5fa2e16e35cd',
+            'incidente_documento': '685063ba36910b2da9952697',
+            'bitacora_rondin_incidencias': '686468a637d014b9e0ab5090',
         })
 
     '''
