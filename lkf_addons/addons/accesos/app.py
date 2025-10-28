@@ -793,6 +793,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'incidente_evidencia': '681145323d9b5fa2e16e35cd',
             'incidente_documento': '685063ba36910b2da9952697',
             'bitacora_rondin_incidencias': '686468a637d014b9e0ab5090',
+            'fecha_hora_incidente_bitacora': '69000e4c43078234e5e08390',
+            'area_incidente_bitacora': '69000e4c43078234e5e0838f',
+            'comentario_incidente_bitacora': '681145323d9b5fa2e16e35cb',
         })
 
     '''
