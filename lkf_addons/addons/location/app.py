@@ -104,17 +104,57 @@ class Location(Base):
                     'area': f"$answers.{self.f['area']}",
                     'location': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                     'address_name': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_name']}",
-                    'address': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address']}"},
-                    'address2': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address2']}"},
-                    'address_type': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_type']}"},
-                    'address_geolocation': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_geolocation']}"},
-                    'state': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['state']}"},
-                    'city': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['new_city']}"},
-                    'zip_code': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['zip_code']}"},
-                    'country': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['country']}"},
-                    'phone': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['phone']}"},
-                    'email': {'$first':f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['email']}"},
-                    }
+                    'address': {'$cond': [
+                        {'$isArray': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address']}"},
+                        {'$first':  f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address']}"},
+                        f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address']}"
+                    ]},
+                    'address2': {'$cond': [
+                        {'$isArray': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address2']}"},
+                        {'$first':  f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address2']}"},
+                        f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address2']}"
+                    ]},
+                    'address_type': {'$cond': [
+                        {'$isArray': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_type']}"},
+                        {'$first':  f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_type']}"},
+                        f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_type']}"
+                    ]},
+                    'address_geolocation': {'$cond': [
+                        {'$isArray': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_geolocation']}"},
+                        {'$first':  f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_geolocation']}"},
+                        f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_geolocation']}"
+                    ]},
+                    'state': {'$cond': [
+                        {'$isArray': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['state']}"},
+                        {'$first':  f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['state']}"},
+                        f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['state']}"
+                    ]},
+                    'city': {'$cond': [
+                        {'$isArray': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['new_city']}"},
+                        {'$first':  f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['new_city']}"},
+                        f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['new_city']}"
+                    ]},
+                    'zip_code': {'$cond': [
+                        {'$isArray': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['zip_code']}"},
+                        {'$first':  f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['zip_code']}"},
+                        f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['zip_code']}"
+                    ]},
+                    'country': {'$cond': [
+                        {'$isArray': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['country']}"},
+                        {'$first':  f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['country']}"},
+                        f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['country']}"
+                    ]},
+                    'phone': {'$cond': [
+                        {'$isArray': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['phone']}"},
+                        {'$first':  f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['phone']}"},
+                        f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['phone']}"
+                    ]},
+                    'email': {'$cond': [
+                        {'$isArray': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['email']}"},
+                        {'$first':  f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['email']}"},
+                        f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['email']}"
+                    ]},
+                }
             }
             ]
         import simplejson
