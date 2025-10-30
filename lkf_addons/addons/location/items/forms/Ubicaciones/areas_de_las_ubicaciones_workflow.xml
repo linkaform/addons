@@ -233,14 +233,29 @@
                 </record>
                 <wf_fields>
                     <operator>all</operator>
-                    <triggers>[]</triggers>
+                    <triggers>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>663e5e4bf5b8a7ce8211ed13</field_id>
+                                <group>{}</group>
+                                <label>QR Area</label>
+                                <type>images</type>
+                            </trigger_field>
+                            <value>null</value>
+                        </item>
+                    </triggers>
                 </wf_fields>
             </rules>
         </item>
         <item>
             <actions>
                 <item>
-                    <_id>68d5d1d119e1bdcfeb3190c2</_id>
+                    <_id>67490c7f51bded01604872af</_id>
                     <action_id>7</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
@@ -249,15 +264,15 @@
                         </arguments>
                         <integration>None</integration>
                         <script>
-                            <created_at>2024-10-09T22:27:55.051243</created_at>
+                            <created_at>2024-11-25T23:58:02.531286</created_at>
                             <deleted_at>None</deleted_at>
                             <end_date>None</end_date>
                             <id>{{ script.area_acceso_qr_code.id }}</id>
                             <is_fileShared>False</is_fileShared>
                             <itype>script</itype>
                             <name>{{ script.area_acceso_qr_code.name }}</name>
-                            <start_date>2024-10-09T22:27:55.049279</start_date>
-                            <updated_at>2024-10-09T23:07:28.614541</updated_at>
+                            <start_date>2024-11-25T23:58:02.528771</start_date>
+                            <updated_at>2024-11-25T23:58:02.766191</updated_at>
                         </script>
                         <scriptArguments>
                             <item>
@@ -290,7 +305,7 @@
                     <name>None</name>
                 </item>
             </actions>
-            <id>68d5d1d119e1bdcfeb3190c9</id>
+            <id>67490c7f51bded01604872b6</id>
             <name>QR</name>
             <rules>
                 <metadata>
@@ -302,16 +317,16 @@
                             <year>2014</year>
                         </period>
                         <range>
-                            <end>2025-09-26T06:00:00.000Z</end>
+                            <end>2024-11-29T06:00:00.000Z</end>
                             <selected>False</selected>
-                            <start>2025-09-25T23:34:43.539Z</start>
+                            <start>2024-11-29T00:34:41.728Z</start>
                         </range>
                     </date>
                     <grading>{}</grading>
                     <user>[]</user>
                 </metadata>
                 <record>
-                    <created>True</created>
+                    <created>False</created>
                     <deleted>False</deleted>
                     <edited>False</edited>
                     <run_multiple_times>False</run_multiple_times>
@@ -319,7 +334,22 @@
                 </record>
                 <wf_fields>
                     <operator>all</operator>
-                    <triggers>[]</triggers>
+                    <triggers>
+                        <item>
+                            <condition>is__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>663e5e4bf5b8a7ce8211ed13</field_id>
+                                <group>{}</group>
+                                <label>QR Area</label>
+                                <type>images</type>
+                            </trigger_field>
+                            <value>null</value>
+                        </item>
+                    </triggers>
                 </wf_fields>
             </rules>
         </item>

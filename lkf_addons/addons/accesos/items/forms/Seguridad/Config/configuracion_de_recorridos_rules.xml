@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.configuracion_de_recorridos.id }}</form_id>
-    <id>68ed2e4c189d871bf1ee4676</id>
+    <id>68ee62d9025820e8f16ffe46</id>
     <rules>
         <item>
             <conditions>
@@ -79,9 +79,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Principo del periodo</name>
+            <name>Regla 1</name>
             <operator>or</operator>
-            <rule_id>21a4168525631a9e</rule_id>
+            <rule_id>125920f5a4e2378</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -113,9 +113,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>configurable</name>
+            <name>Regla 2</name>
             <operator>and</operator>
-            <rule_id>27091128263f18b2</rule_id>
+            <rule_id>10e31e231de51991</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -139,25 +139,25 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>abcde0001000000000010010</field_id>
-                    <group_id>None</group_id>
-                    <id>abcde0001000000000010010</id>
-                    <label>En que Minuto sucede?</label>
-                    <type>integer</type>
-                </item>
-                <item>
-                    <catalog_id>None</catalog_id>
                     <field_id>abcde0001000000000010011</field_id>
                     <group_id>None</group_id>
                     <id>abcde0001000000000010011</id>
                     <label>Cada cuantos minutos se repite?</label>
                     <type>integer</type>
                 </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>abcde0001000000000010010</field_id>
+                    <group_id>None</group_id>
+                    <id>abcde0001000000000010010</id>
+                    <label>En que Minuto sucede?</label>
+                    <type>integer</type>
+                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Mintuo</name>
+            <name>Regla 3</name>
             <operator>and</operator>
-            <rule_id>2280e4fcb4c30</rule_id>
+            <rule_id>19a61eb9261d1600</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -197,9 +197,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Hora</name>
+            <name>Regla 4</name>
             <operator>and</operator>
-            <rule_id>c781eac133c468</rule_id>
+            <rule_id>16a314921ed7bc0</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -231,9 +231,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>dia de la semana</name>
+            <name>Regla 5</name>
             <operator>and</operator>
-            <rule_id>53b1023859644</rule_id>
+            <rule_id>1c4f15afab3151a</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -273,9 +273,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Dia del mes</name>
+            <name>Regla 6</name>
             <operator>and</operator>
-            <rule_id>168a1d6916341759</rule_id>
+            <rule_id>21c7106c21cb1b5b</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -315,9 +315,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>mes</name>
+            <name>Regla 7</name>
             <operator>and</operator>
-            <rule_id>174bb2711dc1d53</rule_id>
+            <rule_id>b15155a891be1</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -349,16 +349,16 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>recurrencia</name>
+            <name>Regla 8</name>
             <operator>and</operator>
-            <rule_id>712ff01539f1e</rule_id>
+            <rule_id>1786dfc21581f97</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
         <item>
             <conditions>
                 <item>
-                    <condition>not__empty=</condition>
+                    <condition>is__empty=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>6645050d873fc2d733961eba</field_id>
@@ -370,7 +370,7 @@
                     <value> </value>
                 </item>
                 <item>
-                    <condition>is__empty=</condition>
+                    <condition>not__empty=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>6645050d873fc2d733961eba</field_id>
@@ -395,16 +395,16 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>deshabilitar Cron Metadata</name>
+            <name>Regla 9</name>
             <operator>or</operator>
-            <rule_id>1f6911e6aa1189d</rule_id>
+            <rule_id>c8a24d914c6fba</rule_id>
             <rule_type>disabled</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
         <item>
             <conditions>
                 <item>
-                    <condition>not__empty=</condition>
+                    <condition>is__empty=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>6645050d873fc2d733961eba</field_id>
@@ -416,7 +416,7 @@
                     <value> </value>
                 </item>
                 <item>
-                    <condition>is__empty=</condition>
+                    <condition>not__empty=</condition>
                     <field>
                         <catalog_id>None</catalog_id>
                         <field_id>6645050d873fc2d733961eba</field_id>
@@ -439,19 +439,11 @@
                     <label>Cron_id</label>
                     <type>text</type>
                 </item>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>abcde00010000000a0000000</field_id>
-                    <group_id>None</group_id>
-                    <id>abcde00010000000a0000000</id>
-                    <label>Status</label>
-                    <type>select</type>
-                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Ocultar Campos</name>
+            <name>Regla 10</name>
             <operator>or</operator>
-            <rule_id>928f0c443223a</rule_id>
+            <rule_id>f362707e8d21ad</rule_id>
             <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -483,9 +475,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Requerir Configruacion de Recurrencia</name>
+            <name>Regla 11</name>
             <operator>and</operator>
-            <rule_id>20641c1e12511adf</rule_id>
+            <rule_id>90c24b21a9721d4</rule_id>
             <rule_type>required</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -517,9 +509,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Fin de Recurrencia?</name>
+            <name>Regla 12</name>
             <operator>and</operator>
-            <rule_id>547a3511651efe</rule_id>
+            <rule_id>bf06875851a9f</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -551,9 +543,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Fecha Fin de Recurrencia</name>
+            <name>Regla 13</name>
             <operator>and</operator>
-            <rule_id>6fa246163f2010</rule_id>
+            <rule_id>1fff12ee13d2210a</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -593,9 +585,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Programar con Anticipacion</name>
+            <name>Regla 14</name>
             <operator>and</operator>
-            <rule_id>cfd155511ec1cbb</rule_id>
+            <rule_id>1f82da78d3141f</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -635,9 +627,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Requerir Antipacion</name>
+            <name>Regla 15</name>
             <operator>and</operator>
-            <rule_id>1fc3c0d133420ef</rule_id>
+            <rule_id>24f8a8b25f413d9</rule_id>
             <rule_type>required</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
