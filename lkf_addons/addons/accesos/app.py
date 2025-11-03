@@ -801,7 +801,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'status_cron': 'abcde00010000000a0000000',
             'fecha_primer_evento':'abcde0001000000000010001',
             'fecha_final_recurrencia': 'abcde0001000000000010099',
-            'geolocalizacion_area_ubicacion': '688bac1ecfdcf8b16eb209b5'
+            'geolocalizacion_area_ubicacion': '688bac1ecfdcf8b16eb209b5',
+            'grupo_de_areas_recorrido': '6645052ef8bc829a5ccafaf5',
         })
 
     '''
