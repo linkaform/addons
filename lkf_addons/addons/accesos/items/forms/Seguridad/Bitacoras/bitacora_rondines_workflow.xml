@@ -168,170 +168,149 @@
                     <configuration>
                         <body>{% raw %} &lt;!DOCTYPE html&gt;
 &lt;html lang="es"&gt;
-
 &lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;title&gt;Resumen de Rondín&lt;/title&gt;
-    &lt;style&gt;
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: auto;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .logo img {
-            max-width: 180px;
-        }
-
-        .message {
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .highlight {
-            color: #016189;
-            font-weight: bold;
-        }
-
-        .incidencias-section {
-            margin-top: 30px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-            font-size: 14px;
-        }
-
-        th {
-            background-color: #000000;
-            color: white;
-            text-align: left;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f5fafd;
-        }
-
-        .footer {
-            text-align: center;
-            font-size: 12px;
-            color: #888;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-            margin-top: 30px;
-        }
-    &lt;/style&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Resumen de Rondín - Grupo AFAL&lt;/title&gt;
+  &lt;style&gt;
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo img {
+      max-width: 180px;
+    }
+    .message {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .highlight {
+      color: #016189;
+      font-weight: bold;
+    }
+    .incidencias-section {
+      margin-top: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      font-size: 14px;
+    }
+    th {
+      background-color: #000000;
+      color: white;
+      text-align: left;
+    }
+    tr:nth-child(even) {
+      background-color: #f5fafd;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+      margin-top: 30px;
+    }
+  &lt;/style&gt;
 &lt;/head&gt;
-
 &lt;body&gt;
-    &lt;div class="container"&gt;
-        &lt;!-- Logo --&gt;
-        &lt;div class="logo"&gt;
-            &lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_10.thumbnail"
-                alt="Logo Soter"&gt;
-        &lt;/div&gt;
+  &lt;div class="container"&gt;
+    &lt;!-- Logo --&gt;
+    &lt;div class="logo"&gt;
+      &lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_17780.thumbnail" alt="Logo Grupo AFAL"&gt;
+    &lt;/div&gt;
 
-        &lt;!-- Mensaje principal --&gt;
-        &lt;div class="message"&gt;
-            Estimado Supervisor,
-            &lt;br&gt;&lt;br&gt;
-            Le informamos que se ha realizado satisfactoriamente un rondín de inspección en &lt;span
-                class="highlight"&gt;{{record.answers.680f90707ae52a33a76e3609.663e5c57f5b8a7ce8211ed0b}}&lt;/span&gt;.
-            &lt;br&gt;&lt;br&gt;
-            &lt;strong&gt;Detalles del recorrido:&lt;/strong&gt;&lt;br&gt;
-            &lt;ul&gt;
-                &lt;li&gt;&lt;strong&gt;Recorrido:&lt;/strong&gt; {{record.answers.680f90707ae52a33a76e3609.6645050d873fc2d733961eba}}
-                &lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Hora de inicio:&lt;/strong&gt; {{record.answers.6818ea068a7f3446f1bae3b3}}&lt;/li&gt;
-
-                {% if record.answers.6760a8e68cef14ecd7f8b6ff %}
-                &lt;li&gt;&lt;strong&gt;Hora de fin:&lt;/strong&gt; {{record.answers.6760a8e68cef14ecd7f8b6ff}}&lt;/li&gt;
-                {% endif %}
-
-                {% if record.answers.6639b47565d8e5c06fe97cf3 %}
-                &lt;li&gt;&lt;strong&gt;Duración:&lt;/strong&gt; {{record.answers.6639b47565d8e5c06fe97cf3}}&lt;/li&gt;
-                {% endif %}
-
-                {% if record.answers.689a7ecfbf2b4be31039388e %}
-                &lt;li&gt;&lt;strong&gt;Porcentaje de Areas Inspeccionadas:&lt;/strong&gt; {{record.answers.689a7ecfbf2b4be31039388e}}
-                &lt;/li&gt;
-                {% endif %}
-
-                &lt;li&gt;&lt;strong&gt;Realizado por:&lt;/strong&gt; {{record.user.name}}&lt;/li&gt;
-            &lt;/ul&gt;
-        &lt;/div&gt;
-
-        &lt;!-- Sección dinámica de incidencias --&gt;
-        {% if record.answers.686468a637d014b9e0ab5090|length &gt; 0 %}
-        &lt;div class="incidencias-section"&gt;
-            &lt;p class="message"&gt;
-                Durante el recorrido se detectaron las siguientes &lt;strong&gt;incidencias&lt;/strong&gt; que requieren
-                seguimiento:
-            &lt;/p&gt;
-            &lt;table&gt;
-                &lt;thead&gt;
-                    &lt;tr&gt;
-                        &lt;th&gt;Incidente&lt;/th&gt;
-                        &lt;th&gt;Comentario&lt;/th&gt;
-                    &lt;/tr&gt;
-                &lt;/thead&gt;
-                &lt;tbody&gt;
-                    {% for item in record.answers.686468a637d014b9e0ab5090 %}
-                    &lt;tr&gt;
-                        &lt;td&gt;{{ item.680f906b2b29c49a817ba9a5.663973809fa65cafa759eb97 }}&lt;/td&gt;
-                        &lt;td&gt;{{ item.681145323d9b5fa2e16e35cb }}&lt;/td&gt;
-                    &lt;/tr&gt;
-                    {% endfor %}
-                &lt;/tbody&gt;
-            &lt;/table&gt;
-        &lt;/div&gt;
-        {% else %}
-        &lt;div class="message"&gt;
-            No se registraron incidencias durante este recorrido 🎉.
-        &lt;/div&gt;
+    &lt;!-- Mensaje principal --&gt;
+    &lt;div class="message"&gt;
+      Estimado Supervisor,
+      &lt;br&gt;&lt;br&gt;
+      Le informamos que se ha realizado satisfactoriamente un rondín de inspección en &lt;span class="highlight"&gt;{{record.answers.680f90707ae52a33a76e3609.663e5c57f5b8a7ce8211ed0b}}&lt;/span&gt;.
+      &lt;br&gt;&lt;br&gt;
+      &lt;strong&gt;Detalles del recorrido:&lt;/strong&gt;&lt;br&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;strong&gt;Recorrido:&lt;/strong&gt; {{record.answers.680f90707ae52a33a76e3609.6645050d873fc2d733961eba}}&lt;/li&gt;
+        &lt;li&gt;&lt;strong&gt;Hora de inicio:&lt;/strong&gt; {{record.answers.6818ea068a7f3446f1bae3b3}}&lt;/li&gt;
+      
+        {% if record.answers.6760a8e68cef14ecd7f8b6ff %}
+          &lt;li&gt;&lt;strong&gt;Hora de fin:&lt;/strong&gt; {{record.answers.6760a8e68cef14ecd7f8b6ff}}&lt;/li&gt;
+        {% endif %}
+      
+        {% if record.answers.6639b47565d8e5c06fe97cf3 %}
+          &lt;li&gt;&lt;strong&gt;Duración:&lt;/strong&gt; {{record.answers.6639b47565d8e5c06fe97cf3}}&lt;/li&gt;
         {% endif %}
 
-        &lt;!-- Footer --&gt;
-        &lt;div class="footer"&gt;
-            &lt;p&gt;&amp;copy; 2025 &lt;strong&gt;Soter&lt;/strong&gt;. Todos los derechos reservados.&lt;/p&gt;
-            &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
-                &lt;img alt=""
-                    src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png"
-                    width="150px"&gt;
-            &lt;/a&gt;
-        &lt;/div&gt;
+        {% if record.answers.689a7ecfbf2b4be31039388e %}
+          &lt;li&gt;&lt;strong&gt;Porcentaje de Areas Inspeccionadas:&lt;/strong&gt; {{record.answers.689a7ecfbf2b4be31039388e}}&lt;/li&gt;
+        {% endif %}
+      
+        &lt;li&gt;&lt;strong&gt;Realizado por:&lt;/strong&gt; {{record.user.name}}&lt;/li&gt;
+      &lt;/ul&gt;      
     &lt;/div&gt;
-&lt;/body&gt;
 
+    &lt;!-- Sección dinámica de incidencias --&gt;
+    {% if record.answers.686468a637d014b9e0ab5090|length &gt; 0 %}
+    &lt;div class="incidencias-section"&gt;
+      &lt;p class="message"&gt;
+        Durante el recorrido se detectaron las siguientes &lt;strong&gt;incidencias&lt;/strong&gt; que requieren seguimiento:
+      &lt;/p&gt;
+      &lt;table&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;Incidente&lt;/th&gt;
+            &lt;th&gt;Comentario&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {% for item in record.answers.686468a637d014b9e0ab5090 %}
+          &lt;tr&gt;
+            &lt;td&gt;{{ item.680f906b2b29c49a817ba9a5.663973809fa65cafa759eb97 }}&lt;/td&gt;
+            &lt;td&gt;{{ item.681145323d9b5fa2e16e35cb }}&lt;/td&gt;
+          &lt;/tr&gt;
+          {% endfor %}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+    {% else %}
+    &lt;div class="message"&gt;
+      No se registraron incidencias durante este recorrido 🎉.
+    &lt;/div&gt;
+    {% endif %}
+
+    &lt;!-- Footer --&gt;
+    &lt;div class="footer"&gt;
+        &lt;p&gt;&amp;copy; 2025 &lt;strong&gt;Grupo AFAL&lt;/strong&gt;. Todos los derechos reservados.&lt;/p&gt;
+        &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
+            &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" width="150px"&gt;
+        &lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>[]</email_fields>
                         <emails>
-                            <item>josepato@linkaform.com</item>
-                            <item>paco@linkaform.com</item>
+                            <item>segpatrimonial@afal.mx</item>
+                            <item>vorozco@afal.mx</item>
+                            <item>pgonzalez@afal.mx</item>
                         </emails>
                         <embed_company_picture>True</embed_company_picture>
                         <fields_attached>[]</fields_attached>
@@ -340,7 +319,7 @@
                         <send_attachments>False</send_attachments>
                         <send_pdf>True</send_pdf>
                         <sender>OWNER_EMAIL</sender>
-                        <subject>{% raw %} Rondin Realizado en: {{record.answers.680f90707ae52a33a76e3609.663e5c57f5b8a7ce8211ed0b}} el: {{record.answers.6818ea068a7f3446f1bae3b3}} {% endraw %}</subject>
+                        <subject>{% raw %} Rondin Realizado en: {{record.answers.680f90707ae52a33a76e3609.663e5c57f5b8a7ce8211ed0b}} el: {{record.answers.6818ea068a7f3446f1bae3b3}} inspeccionado al: {{record.answers.689a7ecfbf2b4be31039388e}} {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
@@ -372,7 +351,7 @@
                     <created>True</created>
                     <deleted>False</deleted>
                     <edited>True</edited>
-                    <run_multiple_times>True</run_multiple_times>
+                    <run_multiple_times>False</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
@@ -405,6 +384,77 @@
                                 <type>radio</type>
                             </trigger_field>
                             <value>cerrado</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68e813b1f6da61dc4ef9bb4c</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2025-10-09T19:53:12.183058</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.assigne_bitacora.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.assigne_bitacora.name }}</name>
+                            <start_date>2025-10-09T19:53:12.181476</start_date>
+                            <updated_at>2025-10-09T19:53:12.194141</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>assigna bitacora</name>
+                </item>
+            </actions>
+            <id>68e813b1f6da61dc4ef9bb56</id>
+            <name>assigna bitacora</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-10-10T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-10-09T18:39:37.267Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6639b2744bb44059fc59eb62</field_id>
+                                <group>{}</group>
+                                <label>Estatus del recorrido</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>programado</value>
                         </item>
                     </triggers>
                 </wf_fields>
