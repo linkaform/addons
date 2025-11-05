@@ -29,7 +29,7 @@ def get_lkf_api(settings):
     return lkf_api
 
 def get_lkf_module(settings):
-    lkf_api = get_lkf_api()
+    lkf_api = get_lkf_api(settings=settings)
     settings = lkf_api.settings
     lkf_modules = lkf_models.LKFModules(settings)
     user = lkf_api.get_jwt(api_key=settings.config['APIKEY'], get_user=True)
