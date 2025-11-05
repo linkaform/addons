@@ -666,7 +666,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
             'acepto_aviso_datos_personales': '6827488724317731cb288117',
             'conservar_datos_por': '6827488724317731cb288118',
-            'ubicaciones':'6834e34fa6242006acedda0f'
+            'ubicaciones':'6834e34fa6242006acedda0f',
+            'todas_las_areas':'68f9fdfbd9bf5cb7fd3caece'
         }
         self.pase_grupo_visitados:{
         }
@@ -2489,6 +2490,20 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     )
                 answers.update({self.pase_entrada_fields['grupo_instrucciones_pase']:comm_list})
 
+        if access_pass.get('todas_las_areas'):
+            answers[self.pase_entrada_fields['todas_las_areas']]='sí'
+            todas_areas = [] 
+            for location in access_pass.get('ubicaciones', []):
+                areas = self.get_areas_by_location(location)
+                if isinstance(areas, list):
+                    for area in areas:
+                        todas_areas.append({
+                            "nombre_area": area,
+                            "commentario_area": "" 
+                        })
+            print(f"Todas las áreas hasta ahora: {todas_areas}")
+            access_pass["areas"] = todas_areas
+
         if access_pass.get('areas'):
             areas = access_pass.get('areas',[])
             if areas:
@@ -2501,6 +2516,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         }
                     )
                 answers.update({self.pase_entrada_fields['grupo_areas_acceso']:areas_list})
+
+        print(access_pass.get('areas'))
+
         #Visita A
         answers[self.mf['grupo_visitados']] = []
         nombre_visita_a = access_pass.get('visita_a') if not nombre_visita_a else nombre_visita_a
@@ -4680,7 +4698,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         elif tab_status == "Vencidos":
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'vencido'})
 
-        print("SEARCHA", search_name)
         if search_name:
             match_query.update({
                 f"$or": [
