@@ -101,6 +101,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.BITACORA_RONDINES = self.lkm.form_id('bitacora_rondines','id')
         self.CHECK_UBICACIONES = self.lkm.form_id('check_ubicaciones','id')
         self.REGISTRO_ASISTENCIA = self.lkm.form_id('registro_de_asistencia','id')
+        self.CONFIGURACION_RECORRIDOS_FORM = self.lkm.form_id('configuracion_de_recorridos','id')
 
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
