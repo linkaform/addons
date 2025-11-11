@@ -1603,7 +1603,8 @@ class Schedule(Base):
                         frecuency.pop('every_week_day')
                 if 'dia_del_mes' in happens_every and day_of_month:
                     frecuency['every_day'] = day_of_month
-                    frecuency['every_other_day'] = repeats_eveyr_xday
+                    if repeats_eveyr_xday:
+                        frecuency['every_other_day'] = repeats_eveyr_xday
 
                 if 'mes' in happens_every:
                     if on_month:
@@ -1614,7 +1615,8 @@ class Schedule(Base):
                     else:
                         month = datetime.strptime(first_date, '%Y-%m-%d %H:%M:%S').month
                         frecuency['every_month'] = month
-                    frecuency['every_other_month'] = repeats_eveyr_xmonth
+                    if repeats_eveyr_xmonth:
+                        frecuency['every_other_month'] = repeats_eveyr_xmonth
             else:
                 if repeat_every == 'hora':
                     frecuency['hourly'] = True
