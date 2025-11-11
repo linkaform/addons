@@ -43,6 +43,20 @@ from datetime import timedelta
 
 from linkaform_api import base
 
+month_dict = {
+    'enero':1,
+    'febrero':2,
+    'marzo':3,
+    'abril':4,
+    'mayo':5,
+    'junio':6,
+    'julio':7,
+    'agosto':8,
+    'septiembre':9,
+    'octubre':10,
+    'noviembre':11,
+    'diciembre':12,
+}
 
 class Base(base.LKF_Base):
 
@@ -1593,8 +1607,10 @@ class Schedule(Base):
 
                 if 'mes' in happens_every:
                     if on_month:
-                        frecuency['every_month'] = month_dict[on_month]
-                        print(frecuency)
+                        if isinstance(on_month, list):
+                            frecuency['every_month'] = ','.join(map(str, [month_dict[month] for month in on_month]))
+                        else:
+                            frecuency['every_month'] = month_dict[on_month]
                     else:
                         month = datetime.strptime(first_date, '%Y-%m-%d %H:%M:%S').month
                         frecuency['every_month'] = month
