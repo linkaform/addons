@@ -1608,7 +1608,7 @@ class Schedule(Base):
                 if 'mes' in happens_every:
                     if on_month:
                         if isinstance(on_month, list):
-                            frecuency['every_month'] = ','.join(map(str, [month_dict[month] for month in on_month]))
+                            frecuency['every_month'] = [month_dict[month] for month in on_month]
                         else:
                             frecuency['every_month'] = month_dict[on_month]
                     else:
