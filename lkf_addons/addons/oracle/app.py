@@ -69,10 +69,8 @@ class Oracle(Base):
         print('=== Establishing Connection to Oracle ===')
         try:
             if self.ORACLE_SERVICE_NAME:
-                print('Service Name:', self.ORACLE_SERVICE_NAME)
-                dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME) 
+                dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME)
             elif self.ORACLE_SID:
-                print('ORACLE_SID:', self.ORACLE_SID)
                 dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, sid=self.ORACLE_SID) 
             else:
                 self.LKFException("No se proporciono un service_name o sid")
@@ -124,7 +122,7 @@ class Oracle(Base):
             if cursor:
                 cursor.close()
             else:
-                self.LKFException('No cursor')
+                self.LKFException('No cursor', e)
         return columns, result
 
     def search_views(self):

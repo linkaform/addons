@@ -41,7 +41,6 @@ except Exception as e:
     print('Envioroment: ', ENV)
     print('===='*40)
 
-
 settings.ENV = ENV
 
 def get_settings():
