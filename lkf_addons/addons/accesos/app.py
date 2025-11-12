@@ -100,6 +100,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.PAQUETERIA = self.lkm.form_id('paqueteria','id')
         self.BITACORA_RONDINES = self.lkm.form_id('bitacora_rondines','id')
         self.CHECK_UBICACIONES = self.lkm.form_id('check_ubicaciones','id')
+        self.REGISTRO_ASISTENCIA = self.lkm.form_id('registro_de_asistencia','id')
+        self.CONFIGURACION_RECORRIDOS_FORM = self.lkm.form_id('configuracion_de_recorridos','id')
 
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
@@ -804,6 +806,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'fecha_final_recurrencia': 'abcde0001000000000010099',
             'geolocalizacion_area_ubicacion': '688bac1ecfdcf8b16eb209b5',
             'grupo_de_areas_recorrido': '6645052ef8bc829a5ccafaf5',
+            'tipo_guardia': '68acee270f2af5e173b7f92e',
+            'image_checkin': '6855e761adab5d93274da7d7',
+            'foto_cierre_turno': '6879823d856f580aa0e05a3b',
+            'fecha_cierre_turno': '6879828d0234f02649cad391',
         })
 
     '''
@@ -1267,6 +1273,33 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #TODO agregar nombre del Guardia Quien hizo el checkin
         if resp_create.get('status_code') == 201:
             resp_create['json'].update({'boot_status':{'guard_on_duty':user_data['name']}})
+            asistencia_answers = {
+                self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
+                    self.Location.f['location']: location,
+                    self.Location.f['area']: area
+                },
+                self.f['tipo_guardia']: 'guardia_regular',
+                self.checkin_fields['checkin_type']: 'iniciar_turno',
+                self.f['image_checkin']: fotografia
+            }
+            metadata = self.lkf_api.get_metadata(form_id=self.REGISTRO_ASISTENCIA)
+            metadata.update({
+                "properties": {
+                    "device_properties":{
+                        "System": "Script",
+                        "Module": 'Accesos',
+                        "Process": 'Inicio de turno',
+                        "Action": 'asistencia',
+                        "File": 'accesos/app.py',
+                    }
+                },
+            })
+            metadata.update({'answers':asistencia_answers})
+            response = self.lkf_api.post_forms_answers(metadata)
+            if response.get('status_code') in [200, 201, 202]:
+                resp_create.update({'registro_de_asistencia': 'Correcto'})
+            else:
+                resp_create.update({'registro_de_asistencia': 'Error'})
         return resp_create
 
     def do_checkout_aux_guard(self, checkin_id=None, location=None, area=None, guards=[], forzar=False, comments=False):
@@ -1362,11 +1395,44 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     return resp
 
         response = self.lkf_api.patch_record( data=data, record_id=checkin_id)
-        if response.get('status_code') == 401:
+        if response.get('status_code') in [200, 201, 202]:
+            if employee:
+                record_id = self.search_guard_asistance(location, area, self.unlist(employee.get('usuario_id')))
+                asistencia_answers = {
+                    self.f['foto_cierre_turno']: fotografia,
+                    self.checkin_fields['checkin_type']: 'cerrar_turno',
+                }
+                res = self.lkf_api.patch_multi_record(answers=asistencia_answers, form_id=self.REGISTRO_ASISTENCIA, record_id=record_id)
+                if res.get('status_code') in [200, 201, 202]:
+                    response.update({'registro_de_asistencia': 'Correcto'})
+                else:
+                    response.update({'registro_de_asistencia': 'Error'})
+        elif response.get('status_code') == 401:
             return self.LKFException({
                 "title":"Error de Configuracion",
                 "msg":"El guardia NO tiene permisos sobre el formulario de cierre de casetas"})
         return response
+
+    def search_guard_asistance(self, location, area, guard):
+        query = [
+            {"$match": {
+                "deleted_at":{"$exists":False},
+                "form_id": self.REGISTRO_ASISTENCIA,
+                f"answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['location']}": location,
+                f"answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['area']}": area,
+                f"answers.{self.f['fecha_cierre_turno']}": {"$exists": False},
+                "created_by_id": guard,
+            }},
+            {"$sort": {"created_at": -1}},
+            {"$project": {
+                "_id": 1,
+            }}
+        ]
+        resp = self.format_cr(self.cr.aggregate(query))
+        format_resp = []
+        if resp:
+            format_resp = [r['_id'] for r in resp]
+        return format_resp
 
     def do_out(self, qr, location, area, gafete_id=None):
         '''

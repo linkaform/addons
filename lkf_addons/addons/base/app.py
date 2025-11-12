@@ -43,6 +43,20 @@ from datetime import timedelta
 
 from linkaform_api import base
 
+month_dict = {
+    'enero':1,
+    'febrero':2,
+    'marzo':3,
+    'abril':4,
+    'mayo':5,
+    'junio':6,
+    'julio':7,
+    'agosto':8,
+    'septiembre':9,
+    'octubre':10,
+    'noviembre':11,
+    'diciembre':12,
+}
 
 class Base(base.LKF_Base):
 
@@ -1588,16 +1602,20 @@ class Schedule(Base):
                         frecuency.pop('every_week_day')
                 if 'dia_del_mes' in happens_every and day_of_month:
                     frecuency['every_day'] = day_of_month
-                    frecuency['every_other_day'] = repeats_eveyr_xday
+                    if repeats_eveyr_xday:
+                        frecuency['every_other_day'] = repeats_eveyr_xday
 
                 if 'mes' in happens_every:
                     if on_month:
-                        frecuency['every_month'] = month_dict[on_month]
-                        print(frecuency)
+                        if isinstance(on_month, list):
+                            frecuency['every_month'] = [month_dict[month] for month in on_month]
+                        else:
+                            frecuency['every_month'] = month_dict[on_month]
                     else:
                         month = datetime.strptime(first_date, '%Y-%m-%d %H:%M:%S').month
                         frecuency['every_month'] = month
-                    frecuency['every_other_month'] = repeats_eveyr_xmonth
+                    if repeats_eveyr_xmonth:
+                        frecuency['every_other_month'] = repeats_eveyr_xmonth
             else:
                 if repeat_every == 'hora':
                     frecuency['hourly'] = True
