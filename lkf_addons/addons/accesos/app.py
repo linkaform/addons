@@ -1196,7 +1196,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = self._do_access(access_pass, location, area, data)
         return res
 
-    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={}, nombre_suplente=""):
+    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={},nombre_suplente=""):
         # Realiza el check-in en una ubicación y área específica.
 
         if not self.is_boot_available(location, area):
