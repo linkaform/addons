@@ -433,9 +433,9 @@
                     <user>[]</user>
                 </metadata>
                 <record>
-                    <created>True</created>
+                    <created>False</created>
                     <deleted>False</deleted>
-                    <edited>True</edited>
+                    <edited>False</edited>
                     <run_multiple_times>False</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
@@ -455,6 +455,131 @@
                                 <type>radio</type>
                             </trigger_field>
                             <value>programado</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>690a4feed04ba523bcbba1c3</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <arguments>
+                            <option>assign_user_inbox</option>
+                        </arguments>
+                        <integration>None</integration>
+                        <script>
+                            <created_at>2025-10-20T15:55:10.003415</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.offline_services.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.offline_services.name }}</name>
+                            <start_date>2025-10-20T15:55:09.998995</start_date>
+                            <updated_at>2025-10-31T15:10:53.808629</updated_at>
+                        </script>
+                        <scriptArguments>
+                            <item>
+                                <label>option</label>
+                                <value>assign_user_inbox</value>
+                            </item>
+                        </scriptArguments>
+                        <scriptQuery>None</scriptQuery>
+                        <selectedUser>None</selectedUser>
+                        <user>SCRIPT_OWNER</user>
+                        <userOptions>
+                            <item>
+                                <id>SCRIPT_OWNER</id>
+                                <name>Dueño del script</name>
+                            </item>
+                            <item>
+                                <id>FORM_OWNER</id>
+                                <name>Dueño de la forma</name>
+                            </item>
+                            <item>
+                                <id>OWNER_ACCOUNT_EMAIL</id>
+                                <name>Dueño de la cuenta</name>
+                            </item>
+                            <item>
+                                <id>RECORD_USER</id>
+                                <name>Usuario que contesta</name>
+                            </item>
+                        </userOptions>
+                    </configuration>
+                    <name>Se ejecuta el script</name>
+                </item>
+            </actions>
+            <id>690a4feed04ba523bcbba1d0</id>
+            <name>Asignacion de inbox Couch</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-11-05T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-11-04T19:09:33.667Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6639b2744bb44059fc59eb62</field_id>
+                                <group>{}</group>
+                                <label>Estatus del recorrido</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>programado</value>
+                        </item>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.usuarios.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.usuarios.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters>None</filters>
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>638a9a7767c332f5d459fc81</field_id>
+                                <group>{}</group>
+                                <label>Nombre</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value> </value>
                         </item>
                     </triggers>
                 </wf_fields>
