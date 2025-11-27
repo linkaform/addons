@@ -412,7 +412,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'cat_area': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['area']}",
             'cat_employee_b': f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
             'fotografia_inicio_turno':'68d384ef55840a75f2cb7e28',
-            'fotografia_cierre_turno':'68d384ef55840a75f2cb7e29'
+            'fotografia_cierre_turno':'68d384ef55840a75f2cb7e29',
+            'nombre_suplente':'6927a1176c60848998a157a2'
         }
         #- Para salida de bitacora  de articulos consecionados y lista
         self.consecionados_fields = {
@@ -1195,7 +1196,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = self._do_access(access_pass, location, area, data)
         return res
 
-    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={}):
+    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={}, nombre_suplente=""):
         # Realiza el check-in en una ubicación y área específica.
 
         if not self.is_boot_available(location, area):
@@ -1246,8 +1247,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         checkin = self.checkin_data(employee, location, area, 'in', now_datetime)
         employee_list.insert(0,employee)
         checkin = self.check_in_out_employees('in', now_datetime, checkin=checkin, employee_list=employee_list)
+        if nombre_suplente:
+            checkin.update({
+                self.checkin_fields['nombre_suplente']: nombre_suplente
+            })
 
-
+        # print("DATA", simplejson.dumps(checkin, indent=4))
+        # print(stop)
         data.update({
                 'properties': {
                     "device_properties":{
@@ -3086,7 +3092,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "user_id":'',
             "stated_at":'',
             "fotografia_inicio_turno":[],
-            "fotografia_cierre_turno":[]
+            "fotografia_cierre_turno":[],
+            "nombre_suplente":''
             }
      
         if last_chekin.get('checkin_type') in ['entrada','apertura']:
@@ -3098,6 +3105,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             booth_status['checkin_id'] = last_chekin['_id']
             booth_status['fotografia_inicio_turno'] = last_chekin.get('fotografia_inicio_turno',[]) 
             booth_status['fotografia_cierre_turno'] = last_chekin.get('fotografia_cierre_turno',[]) 
+            booth_status['nombre_suplente'] = last_chekin.get('nombre_suplente','')
 
         return booth_status
 
@@ -3909,7 +3917,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'checkout_date':{'$last':'$checkout_date'},
                 'checkin_status':{'$last':'$checkin_status'},
                 'checkin_position':{'$last':'$checkin_position'},
-
+                'folio':{'$last':'$folio'},
+                'id_register':{'$last':'$_id'}
             }},
             {'$project':{
                 '_id':0,
@@ -3921,7 +3930,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'checkout_date':'$checkout_date',
                 'checkin_status': {'$cond': [ {'$eq':['$checkin_status','entrada']},'in','out']}, 
                 'checkin_position':'$checkin_position',
-
+                'folio':'$folio',
+                'id_register':'$id_register'
             }}
             ]
         data = self.format_cr(self.cr.aggregate(query))
@@ -3931,6 +3941,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             res[int(rec.get('user_id',0))] = {
                 'status':status, 
                 'name': rec.get('name'), 
+                'folio': rec.get('folio'),
+                '_id':rec.get('id_register'),
                 'user_id': rec.get('user_id'), 
                 'location':rec.get('location'),
                 'area':rec.get('area'),
@@ -5278,6 +5290,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # guards_online = self.get_guards_booths(booth_location, booth_area)
         load_shift_json["booth_stats"] = self.get_page_stats( booth_area, booth_location, "Turnos")
         load_shift_json["booth_status"] = self.get_booth_status(booth_area, booth_location)
+        print("BOOT STATUS", load_shift_json["booth_status"])
         # load_shift_json["support_guards"] = location_employees[self.support_guard]
         load_shift_json["support_guards"] = location_employees.get(self.support_guard, "")
         load_shift_json["guard"] = self.update_guard_status(guard, this_user)
@@ -6330,6 +6343,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             return self.lkf_api.patch_multi_record( answers = answers, form_id=self.ACCESOS_NOTAS, folios=[folio])
         else:
             self.LKFException('No se mandarón parametros para actualizar')
+
+    def update_delete_suplente(self, nombre_suplente=""):
+        answers = {}
+        user_id = self.user.get('user_id')
+        user_status = self.get_employee_checkin_status(user_id, as_shift=True,  available=False)
+        if nombre_suplente:
+            answers[self.checkin_fields['nombre_suplente']] = nombre_suplente
+        folio = user_status.get(user_id, {}).get('folio')
+        if answers or folio:
+            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.CHECKIN_CASETAS, folios=[folio])
 
     def update_bitacora_entrada(self, data, record_id=None, folio=None):
         '''
