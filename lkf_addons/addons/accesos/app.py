@@ -3942,7 +3942,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'status':status, 
                 'name': rec.get('name'), 
                 'folio': rec.get('folio'),
-                '_id':rec.get('id_register'),
+                '_id': str(rec.get('id_register')),
                 'user_id': rec.get('user_id'), 
                 'location':rec.get('location'),
                 'area':rec.get('area'),
