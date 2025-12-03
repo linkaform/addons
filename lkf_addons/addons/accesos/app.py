@@ -1249,14 +1249,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         checkin = self.checkin_data(employee, location, area, 'in', now_datetime)
         employee_list.insert(0,employee)
         checkin = self.check_in_out_employees('in', now_datetime, checkin=checkin, employee_list=employee_list)
-        # print("nombre_suplente",nombre_suplente)
-        # if nombre_suplente:
-        #     checkin.update({
-        #         self.checkin_fields['nombre_suplente']: nombre_suplente
-        #     })
-
-        # print("DATA", simplejson.dumps(checkin, indent=4))
-        # print(stop)
         data.update({
                 'properties': {
                     "device_properties":{
@@ -1751,6 +1743,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         guard[self.checkin_fields[date_id]] = check_datetime
         elif employee_list:
             for idx, guard in enumerate(employee_list):
+                print("guard", guard)
                 empl_cat = {}
                 empl_cat[self.f['worker_name_b']] = guard.get('name')
                 if isinstance(guard.get('usuario_id'), list):
@@ -3097,7 +3090,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "stated_at":'',
             "fotografia_inicio_turno":[],
             "fotografia_cierre_turno":[],
-            "nombre_suplente":''
             }
         if last_chekin.get('checkin_type') in ['entrada','apertura']:
             #todo
@@ -3108,7 +3100,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             booth_status['checkin_id'] = last_chekin['_id']
             booth_status['fotografia_inicio_turno'] = last_chekin.get('fotografia_inicio_turno',[]) 
             booth_status['fotografia_cierre_turno'] = last_chekin.get('fotografia_cierre_turno',[]) 
-            booth_status['nombre_suplente'] = last_chekin.get('nombre_suplente','')
 
         return booth_status
 
@@ -3906,6 +3897,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     'checkout_date': f"$answers.{self.f['guard_group']}.{self.f['checkout_date']}",
                     'checkin_status': f"$answers.{self.f['guard_group']}.{self.f['checkin_status']}",
                     'checkin_position': f"$answers.{self.f['guard_group']}.{self.f['checkin_position']}",
+                    'nombre_suplente': f"$answers.{self.f['guard_group']}.{self.checkin_fields['nombre_suplente']}",
                     }
             },
             {'$sort':{'updated_at':-1}},
@@ -3921,7 +3913,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'checkin_status':{'$last':'$checkin_status'},
                 'checkin_position':{'$last':'$checkin_position'},
                 'folio':{'$last':'$folio'},
-                'id_register':{'$last':'$_id'}
+                'id_register':{'$last':'$_id'},
+                'nombre_suplente':{'$last':'$nombre_suplente'}
             }},
             {'$project':{
                 '_id':0,
@@ -3934,7 +3927,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'checkin_status': {'$cond': [ {'$eq':['$checkin_status','entrada']},'in','out']}, 
                 'checkin_position':'$checkin_position',
                 'folio':'$folio',
-                'id_register':'$id_register'
+                'id_register':'$id_register',
+                'nombre_suplente':'$nombre_suplente'
             }}
             ]
         data = self.format_cr(self.cr.aggregate(query))
@@ -3951,7 +3945,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'area':rec.get('area'),
                 'checkin_date':rec.get('checkin_date'),
                 'checkout_date':rec.get('checkout_date'),
-                'checkin_position':rec.get('checkin_position')
+                'checkin_position':rec.get('checkin_position'),
+                'nombre_suplente':rec.get('nombre_suplente',"")
                 }
         return res
 
