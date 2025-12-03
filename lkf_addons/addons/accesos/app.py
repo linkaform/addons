@@ -1196,7 +1196,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         res = self._do_access(access_pass, location, area, data)
         return res
 
-    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={},nombre_suplente=""):
+    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={}, nombre_suplente=""):
         # Realiza el check-in en una ubicación y área específica.
 
         if not self.is_boot_available(location, area):
@@ -1210,7 +1210,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         boot_config = self.get_users_by_location_area(
             location_name=location, 
             area_name=area, 
-            user_id=user_id)
+            user_id=user_id
+            )
         if not boot_config:
             msg = f"User can not login to this area : {area} at location: {location} ."
             msg += f"Please check your configuration."
@@ -1241,16 +1242,18 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         employee['timezone'] = user_data.get('timezone','America/Monterrey')
         employee['name'] = employee['worker_name']
         employee['position'] = self.chife_guard
+
         timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         now_datetime =self.today_str(timezone, date_format='datetime')
         checkin = self.checkin_data(employee, location, area, 'in', now_datetime)
         employee_list.insert(0,employee)
         checkin = self.check_in_out_employees('in', now_datetime, checkin=checkin, employee_list=employee_list)
-        if nombre_suplente:
-            checkin.update({
-                self.checkin_fields['nombre_suplente']: nombre_suplente
-            })
+        # print("nombre_suplente",nombre_suplente)
+        # if nombre_suplente:
+        #     checkin.update({
+        #         self.checkin_fields['nombre_suplente']: nombre_suplente
+        #     })
 
         # print("DATA", simplejson.dumps(checkin, indent=4))
         # print(stop)
@@ -1286,7 +1289,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 },
                 self.f['tipo_guardia']: 'guardia_regular',
                 self.checkin_fields['checkin_type']: 'iniciar_turno',
-                self.f['image_checkin']: fotografia
+                self.f['image_checkin']: fotografia,
             }
             metadata = self.lkf_api.get_metadata(form_id=self.REGISTRO_ASISTENCIA)
             metadata.update({
@@ -1756,9 +1759,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     empl_cat[self.f['user_id_b']] = [guard.get('user_id'),]
                 guard_data = {
                         self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID : empl_cat,
-                        self.checkin_fields['checkin_position']:'guardiad_de_apoyo',
+                        self.checkin_fields['checkin_position']:'guardia_de_apoyo',
                         self.checkin_fields['checkin_status']:checkin_status,
                         self.checkin_fields[date_id]:check_datetime,
+                        self.checkin_fields['nombre_suplente']:guard.get("nombre_suplente",''),
                        }
                 if kwargs.get('employee_type'):
                     guard_data.update({self.checkin_fields['checkin_position']: kwargs['employee_type'] })
@@ -3095,7 +3099,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "fotografia_cierre_turno":[],
             "nombre_suplente":''
             }
-     
         if last_chekin.get('checkin_type') in ['entrada','apertura']:
             #todo
             #user_id 
@@ -5290,7 +5293,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # guards_online = self.get_guards_booths(booth_location, booth_area)
         load_shift_json["booth_stats"] = self.get_page_stats( booth_area, booth_location, "Turnos")
         load_shift_json["booth_status"] = self.get_booth_status(booth_area, booth_location)
-        print("BOOT STATUS", load_shift_json["booth_status"])
         # load_shift_json["support_guards"] = location_employees[self.support_guard]
         load_shift_json["support_guards"] = location_employees.get(self.support_guard, "")
         load_shift_json["guard"] = self.update_guard_status(guard, this_user)
