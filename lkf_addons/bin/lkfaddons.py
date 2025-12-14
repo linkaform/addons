@@ -307,28 +307,36 @@ if __name__ == '__main__':
         preload_item = get_items_2_load(commands)
 
         if 'script' in commands or 'scripts' in commands:
+            print('Loading scripts.........')
             load_script = True
             ask_script = False
         if 'report' in commands or 'reports' in commands:
+            print('Loading reports.........')
             load_reports = True
             ask_reports = False
         if 'catalog' in commands or 'catalogs' in commands:
+            print('Loading catalogs.........')
             load_catalog = True
             ask_catalog = False
         if 'form' in commands or 'forms' in commands:
+            print('Loading forms.........')
             load_form = True
             ask_form = False
         if 'demo' in commands:
+            print('Loading demo.........')
             load_demo = True
             ask_demo = False
         if 'data' in commands:
+            print('Loading data.........')
             load_data = True
             ask_data = False
         if 'report' in commands:
+            print('Loading reports.........')
             load_reports = True
             ask_reports = False
 
         if '-f' in commands:
+            print('Unsing the FORCE!!!.........')
             kwargs.update({'force':True})
         if '-id' in commands:
             item_ids = commands[(commands.index('-id') + 1 )].split(',')
@@ -356,6 +364,7 @@ if __name__ == '__main__':
         print('With User:', '== {} =='.format(settings.config['USERNAME']))
         print('Account id:', '== {} =='.format(settings.config['ACCOUNT_ID']))
         environment = get_items_2_load(commands)
+        print('---commands', commands)
         if not environment or environment == 'prod' or settings.ENV == 'prod':
             environment =  set_value(input(f"We are running on {settings.ENV} Enviroment, are you sure [y/n] (default n):"))
         if settings.ENV  == 'prod':
@@ -370,6 +379,7 @@ if __name__ == '__main__':
             if commands[0] == 'uninstall':
                 uninstall_modules(install)
             elif commands[0] == 'install':
+                print('### Doing Instalations ###')
                 if ask_4_items:
                     if ask_form:    
                         load_form = set_value(input("Load Forms [y/n] (default n):"))

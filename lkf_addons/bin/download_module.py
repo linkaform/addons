@@ -96,6 +96,7 @@ def download_modules(modules, options, items_ids={}, download_related=False, **k
         if 'catalogs' in options or 'catalog' in options:
             get_catalogs(force_items['catalogs'], download_related=download_related)
         if 'scripts' in options or 'script' in options:
+            print('Download Related Scripts : ', download_related)
             get_scripts(force_items['scripts'])
 
 def drop_hashKey(catalog_json):
@@ -260,6 +261,7 @@ def get_item_name(item_type, item_id=None, element=None, attribute='name', item_
     return item_name
 
 def get_scripts(download_scritps={}):
+    print('Downloading Scripts : ',download_scritps)
     global items
     account_id = settings.config["ACCOUNT_ID"]
     global module_name

@@ -55,7 +55,6 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         self.GREENHOUSE_GRADING_ID = self.lkm.form_id('green_house_grading','id')
         self.GREENHOUSE_ALLOCATION_ID = self.lkm.form_id('greenhouse_inventory_allocation','id')
 
-
         self.FORM_CATALOG_DIR = {
             self.FORM_INVENTORY_ID:self.CATALOG_INVENTORY_ID, #Inventory Flow (greenHouse)
             }
@@ -1121,6 +1120,13 @@ class Stock(Employee, Warehouse, Product, base.LKF_Base):
         year = yearWeek[:4]
         week = yearWeek[4:]
         recipes = self.get_plant_recipe( [plant_code,], stage=[4, 'Ln72'] )
+        if not recipes.get(plant_code):
+            msg_error_app = {
+                       "msg": "Recipe for product {} not found".format(plant_code),
+                        "label": "Recipe for product {} not found".format(plant_code),
+                        "error":[]
+                    }
+            self.LKFException(msg_error_app)
         recipe = self.select_S4_recipe(recipes[plant_code], week)
         grow_weeks = recipe.get('S4_growth_weeks')
         ready_date = self.answers.get(self.f['product_lot'])

@@ -122,7 +122,7 @@ class Oracle(Base):
             if cursor:
                 cursor.close()
             else:
-                self.LKFException('No cursor', e)
+                self.LKFException('No cursor')
         return columns, result
 
     def search_views(self):
