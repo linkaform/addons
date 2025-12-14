@@ -82,7 +82,7 @@ RUN ldconfig
 
 ### END ORACLE ###
 
-# USER nonroot
+USER nonroot
 
 WORKDIR /srv/scripts/addons/modules
 
