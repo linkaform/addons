@@ -9,14 +9,15 @@ MAINTAINER Linkaform
 
 RUN apt-get update && \
     apt-get -y install \
-    python3-psycopg2 \
-    poppler-utils \
-    libpq-dev \
-    libffi-dev \
+    curl \
     gcc \
     gpg \
-    curl \
-    git \
+    git \.
+    libpq-dev \
+    libffi-dev \
+    poppler-utils \
+    python3-psycopg2 \
+    time \
     vim
 
 #mongo 5.0 tools
@@ -81,7 +82,7 @@ RUN ldconfig
 
 ### END ORACLE ###
 
-USER nonroot
+# USER nonroot
 
 WORKDIR /srv/scripts/addons/modules
 
@@ -89,8 +90,6 @@ WORKDIR /srv/scripts/addons/modules
 # Image for prodcution             #
 ####################################
 FROM develop as prod
-
-MAINTAINER Linkaform
 
 
 USER root
