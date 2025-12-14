@@ -3133,6 +3133,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 {'$project': {
                     '_id': 1,
                     'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
+                    'equipos': {"$ifNull": [f"$answers.{self.mf['grupo_equipos']}", []]},
                     'id_gafete': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
                     'status_gafete': f"$answers.{self.mf['status_gafete']}"
                 }},
@@ -3140,6 +3141,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     '_id': None,
                     'total_visitas_dentro': {'$sum': 1},
                     'total_vehiculos_dentro': {'$sum': {'$size': '$vehiculos'}},
+                    'total_equipos_dentro': {'$sum': {'$size': '$vehiculos'}}, 
                     'gafetes_info': {
                         '$push': {
                             'id_gafete':'$id_gafete',
@@ -3151,6 +3153,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
             resultado = self.format_cr(self.cr.aggregate(query_visitas))
             total_vehiculos_dentro = resultado[0]['total_vehiculos_dentro'] if resultado else 0
+            total_equipos_dentro = resultado[0]['total_equipos_dentro'] if resultado else 0
             total_visitas_dentro = resultado[0]['total_visitas_dentro'] if resultado else 0
             gafetes_info = resultado[0]['gafetes_info'] if resultado else []
             gafetes_pendientes = sum(1
@@ -3159,6 +3162,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             )
             
             res['total_vehiculos_dentro'] = total_vehiculos_dentro
+            res['total_equipos_dentro'] = total_equipos_dentro
             res['in_invitees'] = total_visitas_dentro
             res['gafetes_pendientes'] = gafetes_pendientes
 
