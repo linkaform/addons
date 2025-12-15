@@ -735,6 +735,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'grupo_requisitos':"676975321df93a68a609f9ce",
             'datos_requeridos':"6769756fc728a0b63b8431ea",
             'envio_por':"6810180169eeaca9517baa5b",
+            'grupo_tipo_de_pase': '694055a57d064b380f010d7f'
         }
 
         self.paquetes_fields = {
@@ -3654,6 +3655,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
         requerimientos = set()
         envios = set()
+        tipos = set()
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": self.CONF_MODULO_SEGURIDAD,
@@ -3667,7 +3669,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }},
         ]
     
-        raw_result = self.format_cr_result(self.cr.aggregate(query))
+        raw_result = self.format_cr(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
                 #TODO Verficiar el cambio de key
@@ -3679,15 +3681,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     envs = grupo.get(self.conf_modulo_seguridad['envio_por'], [])
                     if isinstance(envs, list):
                         envios.update(envs)
-                    if requerimientos == {"identificacion", "fotografia"} and envios == {"correo", "sms"}:
-                        break
-            if requerimientos == {"identificacion", "fotografia"} and envios == {"correo", "sms"}:
-                break
-    
+                    tips = grupo.get(self.conf_modulo_seguridad['grupo_tipo_de_pase'], [])
+                    if isinstance(tips, list):
+                        tipos.update(tips)
         return {
             "ubicaciones": ubicaciones,
             "requerimientos": list(requerimientos),
-            "envios": list(envios)
+            "envios": list(envios),
+            "tipos": list(tipos)
         }
 
     def get_count_ingresos(self, qr_code):
