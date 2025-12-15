@@ -2630,21 +2630,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers[self.CONFIG_PERFILES_OBJ_ID] = {
             self.mf['nombre_perfil'] : perfil_pase,
         }
-        options = {
-              "group_level": 2,
-              "startkey": [perfil_pase],
-              "endkey": [f"{perfil_pase}\n",{}],
-            }
-        cat_perfil = self.catalogo_view(self.CONFIG_PERFILES_ID, self.PASE_ENTRADA, options)
-        if len(cat_perfil) > 0:
-            # SE AGREGO ESTA PARTE DEL IF PARA CUANDO SE CREAN PASES DE ENTRADA DESDE SOTER, ya que se ocupa que motivo sea un array
-            # CUSTOM == TRUE significa que el pase fue creado desde soter en la pantalla pase.html
-            if access_pass.get('custom') == True :
-                cat_perfil[0][self.mf['motivo']]= [cat_perfil[0].get(self.mf['motivo'])]
-            else:
-                cat_perfil[0][self.mf['motivo']]= ["Reunión"]
-            cat_perfil = cat_perfil[0]
-        answers[self.CONFIG_PERFILES_OBJ_ID].update(cat_perfil)
         if answers[self.CONFIG_PERFILES_OBJ_ID].get(self.mf['nombre_permiso']) and \
            type(answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']]) == str:
             answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']] = [answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']],]
