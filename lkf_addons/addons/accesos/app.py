@@ -3655,7 +3655,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
         requerimientos = set()
         envios = set()
-        tipos = set()
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": self.CONF_MODULO_SEGURIDAD,
@@ -3681,15 +3680,63 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     envs = grupo.get(self.conf_modulo_seguridad['envio_por'], [])
                     if isinstance(envs, list):
                         envios.update(envs)
-                    tips = grupo.get(self.conf_modulo_seguridad['grupo_tipo_de_pase'], [])
-                    if isinstance(tips, list):
-                        tipos.update(tips)
+
+        tipos = self.get_tipos_de_pase(ubicaciones)
+
         return {
             "ubicaciones": ubicaciones,
             "requerimientos": list(requerimientos),
             "envios": list(envios),
-            "tipos": list(tipos)
+            "tipos": tipos
         }
+
+    def get_tipos_de_pase(self, ubicaciones=[]):
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.CONF_PERFILES,
+            }},
+            {'$project': {
+                "ubicacion": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                "tipo": f"$answers.{self.PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}",
+            }},
+            {'$group': {
+                "_id": {"$ifNull": ["$ubicacion", "General"]},
+                "tipos": {"$addToSet": "$tipo"}
+            }},
+            {'$project': {
+                "_id": 0,
+                "ubicacion": "$_id",
+                "tipos": 1
+            }}
+        ]
+        data = self.format_cr(self.cr.aggregate(query))
+        if not data:
+            return []
+
+        mapped = {
+            item.get("ubicacion", "General"): set(item.get("tipos", []))
+            for item in data
+        }
+
+        tipos_generales = mapped.get("General", set())
+
+        if not ubicaciones:
+            return sorted(tipos_generales)
+
+        tipos_por_ubicacion = []
+
+        for u in ubicaciones:
+            tipos_especificos = mapped.get(u, set())
+            tipos_reales = tipos_especificos | tipos_generales
+            tipos_por_ubicacion.append(tipos_reales)
+
+        tipos_comunes = tipos_por_ubicacion[0].copy()
+
+        for t in tipos_por_ubicacion[1:]:
+            tipos_comunes &= t
+
+        return sorted(tipos_comunes)
 
     def get_count_ingresos(self, qr_code):
         total_entradas=""
