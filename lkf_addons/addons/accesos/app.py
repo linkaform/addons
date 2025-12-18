@@ -735,6 +735,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'grupo_requisitos':"676975321df93a68a609f9ce",
             'datos_requeridos':"6769756fc728a0b63b8431ea",
             'envio_por':"6810180169eeaca9517baa5b",
+            'grupo_tipo_de_pase': '694055a57d064b380f010d7f'
         }
 
         self.paquetes_fields = {
@@ -2630,21 +2631,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers[self.CONFIG_PERFILES_OBJ_ID] = {
             self.mf['nombre_perfil'] : perfil_pase,
         }
-        options = {
-              "group_level": 2,
-              "startkey": [perfil_pase],
-              "endkey": [f"{perfil_pase}\n",{}],
-            }
-        cat_perfil = self.catalogo_view(self.CONFIG_PERFILES_ID, self.PASE_ENTRADA, options)
-        if len(cat_perfil) > 0:
-            # SE AGREGO ESTA PARTE DEL IF PARA CUANDO SE CREAN PASES DE ENTRADA DESDE SOTER, ya que se ocupa que motivo sea un array
-            # CUSTOM == TRUE significa que el pase fue creado desde soter en la pantalla pase.html
-            if access_pass.get('custom') == True :
-                cat_perfil[0][self.mf['motivo']]= [cat_perfil[0].get(self.mf['motivo'])]
-            else:
-                cat_perfil[0][self.mf['motivo']]= ["Reunión"]
-            cat_perfil = cat_perfil[0]
-        answers[self.CONFIG_PERFILES_OBJ_ID].update(cat_perfil)
         if answers[self.CONFIG_PERFILES_OBJ_ID].get(self.mf['nombre_permiso']) and \
            type(answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']]) == str:
             answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']] = [answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']],]
@@ -3682,7 +3668,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }},
         ]
     
-        raw_result = self.format_cr_result(self.cr.aggregate(query))
+        raw_result = self.format_cr(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
                 #TODO Verficiar el cambio de key
@@ -3694,16 +3680,63 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     envs = grupo.get(self.conf_modulo_seguridad['envio_por'], [])
                     if isinstance(envs, list):
                         envios.update(envs)
-                    if requerimientos == {"identificacion", "fotografia"} and envios == {"correo", "sms"}:
-                        break
-            if requerimientos == {"identificacion", "fotografia"} and envios == {"correo", "sms"}:
-                break
-    
+
+        tipos = self.get_tipos_de_pase(ubicaciones)
+
         return {
             "ubicaciones": ubicaciones,
             "requerimientos": list(requerimientos),
-            "envios": list(envios)
+            "envios": list(envios),
+            "tipos": tipos
         }
+
+    def get_tipos_de_pase(self, ubicaciones=[]):
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.CONF_PERFILES,
+            }},
+            {'$project': {
+                "ubicacion": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                "tipo": f"$answers.{self.PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}",
+            }},
+            {'$group': {
+                "_id": {"$ifNull": ["$ubicacion", "General"]},
+                "tipos": {"$addToSet": "$tipo"}
+            }},
+            {'$project': {
+                "_id": 0,
+                "ubicacion": "$_id",
+                "tipos": 1
+            }}
+        ]
+        data = self.format_cr(self.cr.aggregate(query))
+        if not data:
+            return []
+
+        mapped = {
+            item.get("ubicacion", "General"): set(item.get("tipos", []))
+            for item in data
+        }
+
+        tipos_generales = mapped.get("General", set())
+
+        if not ubicaciones:
+            return sorted(tipos_generales)
+
+        tipos_por_ubicacion = []
+
+        for u in ubicaciones:
+            tipos_especificos = mapped.get(u, set())
+            tipos_reales = tipos_especificos | tipos_generales
+            tipos_por_ubicacion.append(tipos_reales)
+
+        tipos_comunes = tipos_por_ubicacion[0].copy()
+
+        for t in tipos_por_ubicacion[1:]:
+            tipos_comunes &= t
+
+        return sorted(tipos_comunes)
 
     def get_count_ingresos(self, qr_code):
         total_entradas=""

@@ -442,20 +442,6 @@
                             </trigger_field>
                             <value>enviar_correo_pre_registro</value>
                         </item>
-                        <item>
-                            <condition>not__empty=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>{}</catalog>
-                                <field_id>673773741b2adb2d05d99d63</field_id>
-                                <group>{}</group>
-                                <label>Archivo de invitacion</label>
-                                <type>files</type>
-                            </trigger_field>
-                            <value>null</value>
-                        </item>
                     </triggers>
                 </wf_fields>
             </rules>

@@ -199,6 +199,7 @@
                         <sender>donotreply@soter.mx</sender>
                         <subject>{% raw %} 📢 ¡Bienvenido! Empieza a usar Soter hoy mismo. {% endraw %}</subject>
                         <timer_config>
+                            <expiration>{}</expiration>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
                     </configuration>
@@ -228,8 +229,8 @@
                 <record>
                     <created>True</created>
                     <deleted>False</deleted>
-                    <edited>True</edited>
-                    <run_multiple_times>True</run_multiple_times>
+                    <edited>False</edited>
+                    <run_multiple_times>False</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
