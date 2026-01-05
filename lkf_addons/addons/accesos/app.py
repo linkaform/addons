@@ -3695,6 +3695,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$match': {
                 "deleted_at": {"$exists": False},
                 "form_id": self.CONF_PERFILES,
+                f"answers.{self.PERFILES_OBJ_ID}.{self.mf['walkin']}": "Si"
             }},
             {'$project': {
                 "ubicacion": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
