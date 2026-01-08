@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.activos_fijos.id }}</form_id>
+    <id>66eb3a717df15914781d8119</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>istartswith=</condition>
+                    <field>
+                        <catalog_id>66e35defcfe9c4be08b54bf4</catalog_id>
+                        <field_id>66ce23efc5c4d148311adf86</field_id>
+                        <group_id>None</group_id>
+                        <id>66ce23efc5c4d148311adf86</id>
+                        <label>Categoría del Objeto</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value>Vehículo</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.tipos_de_vehiculo.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>66a83abdde752e12018fbc4c</id>
+                    <label>Tipo-Marca-Modelo</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>66a83abdde752e12018fbc4c</catalog_id>
+                    <field_id>65f22098d1dc5e0b9529e89a</field_id>
+                    <group_id>None</group_id>
+                    <id>65f22098d1dc5e0b9529e89a</id>
+                    <label>Tipo de vehículo</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>66a83abdde752e12018fbc4c</catalog_id>
+                    <field_id>65f22098d1dc5e0b9529e89b</field_id>
+                    <group_id>None</group_id>
+                    <id>65f22098d1dc5e0b9529e89b</id>
+                    <label>Marca</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>66a83abdde752e12018fbc4c</catalog_id>
+                    <field_id>65f22098d1dc5e0b9529e89c</field_id>
+                    <group_id>None</group_id>
+                    <id>65f22098d1dc5e0b9529e89c</id>
+                    <label>Modelo</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6646393c3fa8b818265d0325</field_id>
+                    <group_id>None</group_id>
+                    <id>6646393c3fa8b818265d0325</id>
+                    <label>Número de serie - Chasis</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66c174ec89463aa27fc1816c</field_id>
+                    <group_id>None</group_id>
+                    <id>66c174ec89463aa27fc1816c</id>
+                    <label>Número de serie - Motor 1</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66c174ec89463aa27fc1816d</field_id>
+                    <group_id>None</group_id>
+                    <id>66c174ec89463aa27fc1816d</id>
+                    <label>Número de serie - Motor 2</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66c189f689463aa27fc18188</field_id>
+                    <group_id>None</group_id>
+                    <id>66c189f689463aa27fc18188</id>
+                    <label>Ultimo Kilometraje Motor 1</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66c189f689463aa27fc18189</field_id>
+                    <group_id>None</group_id>
+                    <id>66c189f689463aa27fc18189</id>
+                    <label>Fecha Kilometraje Motor 1</label>
+                    <type>date</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66c1758989463aa27fc18171</field_id>
+                    <group_id>None</group_id>
+                    <id>66c1758989463aa27fc18171</id>
+                    <label>Ultimo Kilometraje Motor 2</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66c176dc89463aa27fc18175</field_id>
+                    <group_id>None</group_id>
+                    <id>66c176dc89463aa27fc18175</id>
+                    <label>Fecha Kilometraje Motor 2</label>
+                    <type>date</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66c1758989463aa27fc1816e</field_id>
+                    <group_id>None</group_id>
+                    <id>66c1758989463aa27fc1816e</id>
+                    <label>Ultimo Horometro Motor 1</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66c176ac89463aa27fc18172</field_id>
+                    <group_id>None</group_id>
+                    <id>66c176ac89463aa27fc18172</id>
+                    <label>Fecha Horometro Motor 1</label>
+                    <type>date</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66c1758989463aa27fc1816f</field_id>
+                    <group_id>None</group_id>
+                    <id>66c1758989463aa27fc1816f</id>
+                    <label>Ultimo Horometro Motor 2</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66c176ac89463aa27fc18173</field_id>
+                    <group_id>None</group_id>
+                    <id>66c176ac89463aa27fc18173</id>
+                    <label>Fecha Horometro Motor 2</label>
+                    <type>date</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Campos para vehículo</name>
+            <operator>and</operator>
+            <rule_id>16b99801ca915b8</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>istartswith=</condition>
+                    <field>
+                        <catalog_id>66e35defcfe9c4be08b54bf4</catalog_id>
+                        <field_id>66ce23efc5c4d148311adf86</field_id>
+                        <group_id>None</group_id>
+                        <id>66ce23efc5c4d148311adf86</id>
+                        <label>Categoría del Objeto</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value>Vehículo</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6646393c3fa8b818265d0323</field_id>
+                    <group_id>None</group_id>
+                    <id>6646393c3fa8b818265d0323</id>
+                    <label>Marca</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6646393c3fa8b818265d0324</field_id>
+                    <group_id>None</group_id>
+                    <id>6646393c3fa8b818265d0324</id>
+                    <label>Modelo</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar campos para vehículos</name>
+            <operator>and</operator>
+            <rule_id>e1719731b8713c4</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
