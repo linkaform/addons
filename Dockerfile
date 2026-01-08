@@ -12,7 +12,7 @@ RUN apt-get update && \
     curl \
     gcc \
     gpg \
-    git \.
+    git \
     libpq-dev \
     libffi-dev \
     poppler-utils \
@@ -34,6 +34,8 @@ RUN apt-get update && \
 
 COPY ./secrets/lkf_jwt_key.pub /etc/ssl/certs/lkf_jwt_key.pub
 COPY ./lkfpwd.py /usr/local/lib/python3.10
+COPY ./docker/main_entrypoint.sh /docker/
+RUN chmod +x /docker/main_entrypoint.sh
 
 
 WORKDIR /srv/scripts/addons/modules
