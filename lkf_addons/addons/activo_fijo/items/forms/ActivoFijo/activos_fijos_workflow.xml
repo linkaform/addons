@@ -12,8 +12,8 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>66451450284cb860eaf2e04c</couch_id>
-                                <id>118764</id>
+                                <couch_id>{{ catalog.activos_fijos.obj_id }}</couch_id>
+                                <id>{{ catalog.activos_fijos.id }}</id>
                                 <name>Activos Fijos</name>
                             </item>
                         </synched_catalogs>
