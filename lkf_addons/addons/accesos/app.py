@@ -812,6 +812,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'image_checkin': '6855e761adab5d93274da7d7',
             'foto_cierre_turno': '6879823d856f580aa0e05a3b',
             'fecha_cierre_turno': '6879828d0234f02649cad391',
+            'personalizacion_pases': '695d2e1f6be562c3da95c4a7',
+            'pases': '695d31b503ccc7766ac28507',
+            'grupo_alertas': '695d35b618a37ea04899524f',
+            'nombre_alerta': '695d36605f78faab793f497b',
+            'accion_alerta': '695d36605f78faab793f497c',
+            'llamar_num_alerta': '695d36605f78faab793f497d',
+            'email_alerta': '695d36605f78faab793f497e'
         })
 
     '''
@@ -925,9 +932,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
 
         comment = data.get('comentario_acceso',[])
-        if comment:
+        comments_pase = data.get('comentario_pase',[])
+        if comment or comments_pase:
             comment_list = []
             for c in comment:
+                comment_list.append(
+                    {
+                        self.bitacora_fields['comentario']:c.get('comentario_pase'),
+                        self.bitacora_fields['tipo_comentario'] :c.get('tipo_de_comentario').lower().replace(' ', '_')
+                    }
+                )
+            for c in comments_pase:
                 comment_list.append(
                     {
                         self.bitacora_fields['comentario']:c.get('comentario_pase'),
@@ -2592,6 +2607,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         #Visita A
         answers[self.mf['grupo_visitados']] = []
         nombre_visita_a = access_pass.get('visita_a') if not nombre_visita_a else nombre_visita_a
+        if access_pass.get('selected_visita_a'):
+            nombre_visita_a = access_pass.get('selected_visita_a')
         visita_set = {
             self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
                 self.mf['nombre_empleado'] : nombre_visita_a,
@@ -3646,8 +3663,56 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "menus": f"$answers.{self.conf_accesos_fields['menus']}",
             }},
             {'$limit':1},
+            {'$lookup': {
+                'from': 'form_answer',
+                'pipeline': [
+                    {'$match': {
+                        'deleted_at': {'$exists': False},
+                        'form_id': self.CONF_MODULO_SEGURIDAD,
+                    }},
+                    {'$project': {
+                        "_id": 0,
+                        "excluir": f"$answers.{self.f['personalizacion_pases']}",
+                        "alertas": f"$answers.{self.f['grupo_alertas']}",
+                    }}
+                ],
+                'as': 'personalizaciones'
+            }},
+            {'$unwind': '$personalizaciones'},
+            {'$project': {
+                "usuario":1,
+                "grupos":1,
+                "menus":1,
+                "exclude_inputs": "$personalizaciones.excluir",
+                "alertas": "$personalizaciones.alertas",
+            }}
         ]
-        return self.format_cr_result(self.cr.aggregate(query),  get_one=True)
+        data = self.format_cr_result(self.cr.aggregate(query),  get_one=True)
+        format_data = {}
+
+        if data:
+            exclude_inputs = data.get('exclude_inputs', [])
+            format_exclude_inputs = self.unlist([i for i in exclude_inputs])
+
+            alertas = data.get('alertas', [])
+            format_alerts = []
+            for i in alertas:
+                new_item = {}
+                new_item[i.get('nombre_alerta')] = {
+                    'accion': i.get('accion_alerta', '') if len(i.get('accion_alerta', [])) > 1 else self.unlist(i.get('accion_alerta', [])),
+                }
+                if 'llamar' in i.get('accion_alerta') or 'sms' in i.get('accion_alerta'):
+                    new_item[i.get('nombre_alerta')]['number'] = i.get('llamar_num_alerta', 0000000000)
+                if 'email' in i.get('accion_alerta'):
+                    new_item[i.get('nombre_alerta')]['email'] = i.get('email_alerta', '')
+                format_alerts.append(new_item)
+
+            data.update({
+                'exclude_inputs': format_exclude_inputs,
+                'alertas': format_alerts,
+            })
+
+        return data
 
     def get_config_modulo_seguridad(self, ubicaciones=[]):
         #TODO Verificar por que se envia asi la lista
@@ -5200,7 +5265,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'folio': "$folio",
                 'created_at': "$created_at",
                 'name': f"$answers.{self.f['guard_group']}.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_jefes']}",
-                'user_id': {"$first": f"$answers.{self.f['guard_group']}.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['user_id_jefes']}"},
+                'user_id': {"$first": f"$answers.{self.f['guard_group']}.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.mf['id_usuario']}"},
                 'location': f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['ubicacion']}",
                 'area': f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_area']}",
                 'checkin_date': f"$answers.{self.f['guard_group']}.{self.f['checkin_date']}",
@@ -6728,7 +6793,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     answers.update({self.pase_entrada_fields['grupo_areas_acceso']:acciones_list})
             elif key == 'autorizado_por':
                 answers[self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID] = {
-                    self.mf['nombre_guardia_apoyo'] : access_pass.get('autorizado_por', ''),
+                    self.mf['nombre_guardia_apoyo'] : access_pass.get('visita_a', ''),
                 }
             elif key == 'link':
                 link_info=access_pass.get('link', '')
