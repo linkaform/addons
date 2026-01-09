@@ -146,7 +146,7 @@ class Employee(Base):
         if name:
             match_query.update(self._get_match_q(self.f['worker_name'], name))
         if user_id:
-            match_query.update(self._get_match_q(self.employee_fields['user_id_id'], user_id))
+            match_query.update(self._get_match_q(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
         if username:
             match_query.update(self._get_match_q(self.f['username'], username))
         if email:
