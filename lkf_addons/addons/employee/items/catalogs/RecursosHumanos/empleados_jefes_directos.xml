@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>15-f78c73cc001a5e524369be03ea38c418</_rev>
-    <updated_at>2024-11-25T23:58:27.210996+00:00Z</updated_at>
+    <_rev>2-c28220223fec94a5163ad0c74947ce88</_rev>
+    <updated_at>2025-08-25T14:17:02.832497+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Empleados Jefes Directos</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2024-11-25T23:58:27.210996+00:00Z</created_at>
+    <created_at>2025-08-25T14:17:02.832497+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,10 +25,6 @@
             <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>126490</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>67450f230939c30127a21269</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -1784,7 +1780,7 @@
                     <label>Usuario</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
-                        <filters />
+                        <filters>None</filters>
                         <view_index>0</view_index>
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.usuarios.id }}</catalog_id>
@@ -1810,7 +1806,7 @@
                         <view_index>1</view_index>
                         <catalog_field_id>{{ catalog.usuarios.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.usuarios.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -1828,7 +1824,7 @@
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.usuarios.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.usuarios.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -1846,7 +1842,7 @@
                         <view_index>2</view_index>
                         <catalog_field_id>{{ catalog.usuarios.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.usuarios.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -1863,7 +1859,7 @@
                         <view_index>0</view_index>
                         <catalog_field_id>{{ catalog.usuarios.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.usuarios.id }}</catalog_id>
-                        <filters />
+                        <filters>None</filters>
                     </catalog>
                     <options>[]</options>
                 </item>
@@ -1872,4 +1868,8 @@
             <page_name>Link</page_name>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>68ac705e11e08306f3b7fa51</_id>
+    <public>False</public>
+    <catalog_id>139530</catalog_id>
 </lkf>
