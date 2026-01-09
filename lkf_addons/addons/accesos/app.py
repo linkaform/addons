@@ -982,7 +982,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'Perfiles': self.get_pefiles_walkin(location),
         }
         return res
-
     def assing_gafete(self, data_gafete, id_bitacora, tipo_movimiento):
         answers={}
         answers_return={}
