@@ -170,7 +170,7 @@
 &lt;html lang="es"&gt;
 &lt;head&gt;
   &lt;meta charset="UTF-8"&gt;
-  &lt;title&gt;Resumen de Rondín - Grupo AFAL&lt;/title&gt;
+  &lt;title&gt;Resumen de Rondín - Empresa&lt;/title&gt;
   &lt;style&gt;
     body {
       font-family: 'Arial', sans-serif;
@@ -237,7 +237,7 @@
   &lt;div class="container"&gt;
     &lt;!-- Logo --&gt;
     &lt;div class="logo"&gt;
-      &lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_17780.thumbnail" alt="Logo Grupo AFAL"&gt;
+      &lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_126.thumbnail" alt="Logo Empresa"&gt;
     &lt;/div&gt;
 
     &lt;!-- Mensaje principal --&gt;
@@ -298,7 +298,7 @@
 
     &lt;!-- Footer --&gt;
     &lt;div class="footer"&gt;
-        &lt;p&gt;&amp;copy; 2025 &lt;strong&gt;Grupo AFAL&lt;/strong&gt;. Todos los derechos reservados.&lt;/p&gt;
+        &lt;p&gt;&amp;copy; 2025 &lt;strong&gt;Empresa&lt;/strong&gt;. Todos los derechos reservados.&lt;/p&gt;
         &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
             &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" width="150px"&gt;
         &lt;/a&gt;
@@ -308,9 +308,9 @@
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>[]</email_fields>
                         <emails>
-                            <item>segpatrimonial@afal.mx</item>
-                            <item>vorozco@afal.mx</item>
-                            <item>pgonzalez@afal.mx</item>
+                            <item>correo1@dominio.com</item>
+                            <item>correo2@dominio.com</item>
+                            <item>correo3@dominio.com</item>
                         </emails>
                         <embed_company_picture>True</embed_company_picture>
                         <fields_attached>[]</fields_attached>
