@@ -3805,7 +3805,7 @@
                         <catalog_field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
                         <field_type>integer</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -4045,7 +4045,7 @@
                         <catalog_field_id>{{ catalog.configuracion_areas_y_empleados.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.configuracion_areas_y_empleados.id }}</catalog_id>
                         <field_type>email</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -4911,6 +4911,12 @@
                             <selected>False</selected>
                             <value>salida</value>
                         </item>
+                        <item>
+                            <label>Pase</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>pase</value>
+                        </item>
                     </options>
                     <properties>
                         <body_payload>[]</body_payload>
@@ -4998,5 +5004,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1745340820.0</updated_at>
+    <updated_at>1768331681.0</updated_at>
 </lkf>
