@@ -3740,10 +3740,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         raw_result = self.format_cr(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
+                print("REQE",grupo)
+
                 #TODO Verficiar el cambio de key
                 ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
                 if ubicacion in ubicaciones:
-                    reqs = grupo.get(self.conf_modulo_seguridad['datos_requeridos'], [])
+                    clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
+                    reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
                     if isinstance(reqs, list):
                         requerimientos.update(reqs)
                     envs = grupo.get(self.conf_modulo_seguridad['envio_por'], [])
