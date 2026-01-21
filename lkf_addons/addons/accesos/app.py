@@ -432,6 +432,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'equipo_concesion':'6646373dda020fe797cafa20',
             'observacion_concesion':'66469f47c0580e5ead07e39a',
             'fecha_devolucion_concesion':'66469f47c0580e5ead07e39b',
+            'evidencia':'6970914a3059168605ce10c8',
+            'persona_text':'6970914a3059168605ce10c7'
         }
         #- Para creación , edición y lista de fallas
         self.fallas_fields = {
@@ -1856,9 +1858,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             elif  key == 'ubicacion_concesion':
                 answers[self.consecionados_fields['ubicacion_catalog_concesion']] = { self.mf['ubicacion']: value}
             elif  key == 'area_concesion':
-                answers[self.consecionados_fields['equipo_catalog_concesion']] =   { self.consecionados_fields['area_concesion']: value}
+                answers[self.consecionados_fields['equipo_catalog_concesion']] = { self.consecionados_fields['area_concesion']: value}
             elif  key == 'equipo_concesion':
-                answers[self.consecionados_fields['equipo_catalog_concesion']] =   { self.consecionados_fields['equipo_concesion']: value}
+                answers[self.consecionados_fields['equipo_catalog_concesion']] = { self.consecionados_fields['equipo_concesion']: value}
+            elif  key == 'evidencia':
+                answers[self.consecionados_fields['evidencia']] = value
             else:
                 answers.update({f"{self.consecionados_fields[key]}":value})
 
@@ -3712,6 +3716,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             })
 
         return data
+
 
     def get_config_modulo_seguridad(self, ubicaciones=[]):
         #TODO Verificar por que se envia asi la lista
@@ -5705,6 +5710,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
                 dic_prev[self.consecionados_fields['equipo_concesion']] = value 
                 answers[self.consecionados_fields['equipo_catalog_concesion']] = dic_prev
+            elif  key == 'evidencia':
+                 answers[self.consecionados_fields['evidencia']] = value
             else:
                 answers.update({f"{self.consecionados_fields[key]}":value})
         if answers or folio:
