@@ -154,6 +154,7 @@ class Base(base.LKF_Base):
             'city':'6654187fc85ce22aaf8bb070',
             'email':'663a7ee1e48382c5b1230907',
             'email_contacto':'66bfd647cd15883ed163e9b5',
+            'field_id_status':'5e32fbb498849f475cfbdca2',
             'group_name':'638a9ab3616398d2e392a9fa',
             'group_id':'639b65dfaf316bacfc551ba2',
             'nombre_comercial':'667468e3e577b8b98c852aaa',
@@ -383,9 +384,9 @@ class Base(base.LKF_Base):
         record_ids:  Opcional, lista de registros a acutalizar
         form_id: Opcional, pero obligatoria si se envia reocrd_ids
         """
-        self.current_record['answers'][self.field_id_status] = status
+        self.current_record['answers'][self.f['field_id_status']] = status
         if msg_comentarios:
-            self.current_record['answers'][self.field_id_comentarios] = msg_comentarios
+            self.current_record['answers'][self.f['field_id_comentarios']] = msg_comentarios
         if record_ids:
             if not form_id:
                 self.LKFException('Necesitas proporcionar un Form Id para hacer la actualizacion')
