@@ -7321,7 +7321,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return self.catalogo_view(catalog_id, form_id, options, detail=True)
     
-
     def send_email_and_sms(self, data):
         answers = {}
         phone_to = data['phone_to']
