@@ -155,7 +155,8 @@ def do_load_modules(load_modules, **kwargs):
                     install_order = forms.install_order
                 except:
                     install_order = []
-                form_dict = form_resource.instalable_forms(install_order)
+                print('Install Order: ', install_order)
+                form_dict = form_resource.instalable_forms(install_order, **kwargs)
                 ###forms
                 response += form_resource.install_forms(form_dict, **kwargs)
 
@@ -370,7 +371,7 @@ if __name__ == '__main__':
         if settings.ENV  == 'prod':
             sure = set_value(input(f"REALLY SURE to set enviornment to  {settings.ENV} [y/n] (default n):"))
             if sure:
-                print('Ok Running Installation on:', '== {} =='.format(settings.ENV))
+                print('Ok Running Commands on:', '== {} =='.format(settings.ENV))
             else:
                 raise('Stoping installation')
         if not environment:
