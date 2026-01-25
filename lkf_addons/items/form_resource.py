@@ -53,14 +53,12 @@ class FormResource(items.Items):
         print('Install Order: ', install_order)
 
         # install_order = ['green_house_inventory_move']
-
         for form_name in install_order:
             detail = instalable_forms[form_name]
             if detail.get('path'):
                 this_path = '{}/{}'.format(self.path, detail['path'])
             else:
                 this_path = self.path
-            print('Installing Form: ' ,form_name)
             form_model = self.load_module_template_file(this_path, form_name)
             item_info = {
                 # 'created_by' : user,
@@ -70,6 +68,12 @@ class FormResource(items.Items):
                 'item_name':form_name,
             }
             item = self.lkf.serach_module_item(item_info)
+
+            if kwargs.get('item_ids'):
+                if item['item_id'] not in [int(x) for x in kwargs.get('item_ids',[])]:
+                    # print('Skipping Form: ' ,form_name, 'item_id: ', item['item_id'])
+                    continue    
+            print('Installing Form: ' ,form_name)
             res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'))
             response.append(
                     {
@@ -125,7 +129,7 @@ class FormResource(items.Items):
                     form_file[item][file_type].append('{}.{}'.format(file_name, file_ext[1]))
         return form_file
 
-    def instalable_forms(self, install_order=None):
+    def instalable_forms(self, install_order=None, **kwargs):
         items_json = self.get_anddons_and_modules_items('forms')
         forms_data = self.get_form_modules(items_json)
         if install_order:
