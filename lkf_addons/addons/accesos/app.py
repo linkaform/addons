@@ -989,8 +989,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }
         areas = self.lkf_api.catalog_view(catalog_id, form_id, options) 
         ### Aquien Visita
+        
         catalog_id = self.CONF_AREA_EMPLEADOS_CAT_ID
         visita_a = self.lkf_api.catalog_view(catalog_id, form_id, options) 
+        print("visita_a", visita_a)
         # visita_a = [r.get('key')[group_level-1] for r in visita_a]
         ### Pases de accesos
         res = {
@@ -3740,8 +3742,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         raw_result = self.format_cr(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
-                print("REQE",grupo)
-
+                print("GRUPO", grupo)
                 #TODO Verficiar el cambio de key
                 ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
                 if ubicacion in ubicaciones:
@@ -3749,12 +3750,17 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
                     if isinstance(reqs, list):
                         requerimientos.update(reqs)
-                    envs = grupo.get(self.conf_modulo_seguridad['envio_por'], [])
-                    if isinstance(envs, list):
-                        envios.update(envs)
+                    envios = set()
+                    envio_por_list = self.conf_modulo_seguridad.get('envio_por', [])
+                    for item in envio_por_list if isinstance(envio_por_list, list) else [envio_por_list]:
+                        envs = grupo.get(item) or grupo.get('envio_por', [])
+                        if envs:
+                            if isinstance(envs, list):
+                                envios.update(envs)
+                            else:
+                                envios.add(envs)
 
         tipos = self.get_tipos_de_pase(ubicaciones)
-
         return {
             "ubicaciones": ubicaciones,
             "requerimientos": list(requerimientos),
