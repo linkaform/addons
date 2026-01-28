@@ -68,10 +68,8 @@ class FormResource(items.Items):
                 'item_name':form_name,
             }
             item = self.lkf.serach_module_item(item_info)
-
             if kwargs.get('item_ids'):
-                if item['item_id'] not in [int(x) for x in kwargs.get('item_ids',[])]:
-                    # print('Skipping Form: ' ,form_name, 'item_id: ', item['item_id'])
+                if item and item['item_id'] not in [int(x) for x in kwargs.get('item_ids',[])]:
                     continue    
             print('Installing Form: ' ,form_name)
             res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'))
