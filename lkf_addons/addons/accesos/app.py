@@ -120,6 +120,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         En `lkm` están todas las funciones generales de módulos).
         '''
 
+        self.ACTIVOS_FIJOS_CAT = self.lkm.catalog_id('activos_fijos')
+        self.ACTIVOS_FIJOS_CAT_ID = self.ACTIVOS_FIJOS_CAT.get('id')
+        self.ACTIVOS_FIJOS_CAT_OBJ_ID = self.ACTIVOS_FIJOS_CAT.get('obj_id')
+
         self.CONFIGURACION_GAFETES_LOCKERS = self.lkm.catalog_id('configuracion_de_gafetes_y_lockers')
         self.CONFIGURACION_GAFETES_LOCKERS_ID = self.CONFIGURACION_GAFETES_LOCKERS.get('id')
         self.CONFIGURACION_GAFETES_LOCKERS_OBJ_ID = self.CONFIGURACION_GAFETES_LOCKERS.get('obj_id')
@@ -191,9 +195,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         # self.CONF_PERFIL_OBJ_ID = self.CONF_PERFIL.get('obj_id')
 
 
-        # self.AREAS_DE_LAS_UBICACIONES_CAT = self.lkm.catalog_id('areas_de_las_ubicaciones')
-        # self.AREAS_DE_LAS_UBICACIONES_CAT_ID = self.AREAS_DE_LAS_UBICACIONES_CAT.get('id')
-        # self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID = self.AREAS_DE_LAS_UBICACIONES_CAT.get('obj_id')
+        self.AREAS_DE_LAS_UBICACIONES_CAT = self.lkm.catalog_id('areas_de_las_ubicaciones')
+        self.AREAS_DE_LAS_UBICACIONES_CAT_ID = self.AREAS_DE_LAS_UBICACIONES_CAT.get('id')
+        self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID = self.AREAS_DE_LAS_UBICACIONES_CAT.get('obj_id')
         #----Dic Fields Forms
 
         ## Module Fields ##
@@ -392,6 +396,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "catalogo_pase_entrada": "66a83ad652d2643c97489d31",
             "gafete_catalog": "66a83ace56d1e741159ce114",
         }
+        
         self.checkin_fields = {
             'boot_checkin_date':'663bffc28d00553254f274e1',
             'boot_checkout_date':'663bffc28d00553254f274e2',
@@ -416,24 +421,65 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'nombre_suplente':'6927a1176c60848998a157a2'
         }
         #- Para salida de bitacora  de articulos consecionados y lista
-        self.consecionados_fields = {
-            'status_concesion':'66469e193e6a703350f2e029',
-            'ubicacion_catalog_concesion': f"{self.UBICACIONES_CAT_OBJ_ID}",
-            'ubicacion_concesion':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
-            'solicita_concesion':'66469e5a3e6a703350f2e03a',
-            'persona_catalog_concesion':f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}",
-            'persona_nombre_concesion':f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.mf['nombre_guardia_apoyo']}",
-            'area_catalog_concesion':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
-            'caseta_concesion':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
-            'fecha_concesion':'66469ef8c9d58517f85d035f',
-            'equipo_catalog_concesion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}",
-            'equipo_imagen_concesion':'6646393c3fa8b818265d0326',
-            'area_concesion':'663e5d44f5b8a7ce8211ed0f',
-            'equipo_concesion':'6646373dda020fe797cafa20',
-            'observacion_concesion':'66469f47c0580e5ead07e39a',
-            'fecha_devolucion_concesion':'66469f47c0580e5ead07e39b',
-            'evidencia':'6970914a3059168605ce10c8',
-            'persona_text':'6970914a3059168605ce10c7'
+        self.cons_f = {
+            'area_catalog_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
+            'area_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.663e5d44f5b8a7ce8211ed0f",
+            '_area_concesion': "663e5d44f5b8a7ce8211ed0f",
+            'categoria_equipo_concesion': '66ce23efc5c4d148311adf86',
+            'cantidad_equipo_concesion': '69799523aa75e6a4c99c4d3f',
+            'cantidad_equipo_devuelto': '6979962e6eac7e391dbb244e',
+            
+            'caseta_concesion':  f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.663e5d44f5b8a7ce8211ed0f",
+            '_caseta_concesion':  "663e5d44f5b8a7ce8211ed0f",
+            
+            'comentario_entrega': '69799523aa75e6a4c99c4d41',
+            
+            'costo_equipo_concesion': f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.697991fffd83f49bb9fe074e",
+            '_costo_equipo_concesion': "697991fffd83f49bb9fe074e",
+            
+            'entregado_por': '6979962e6eac7e391dbb2450',
+            'equipo_catalog_concesion': f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}",
+            'equipo_imagen_concesion': '6646393c3fa8b818265d0326',
+            'estatus_equipo': '6979962e6eac7e391dbb244f',
+            'evidencia': '6970914a3059168605ce10c8',
+            'evidencia_entrega': '6979962e6eac7e391dbb2453',
+            'evidencia_devolucion': '6979962e6eac7e391dbb2444',
+            'fecha_concesion': '66469ef8c9d58517f85d035f',
+            'fecha_devolucion_concesion': '66469f47c0580e5ead07e39b',
+            'firma': '6979b0b4a2a5a141dfef9cc5',
+            'grupo_equipos': '697991cb4298cbe60db6b883',
+            'marca_equipo_concesion': '65f22098d1dc5e0b9529e89b',
+            
+            'nombre_equipo': f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.66c192ef89463aa27fc1818b",
+            '_nombre_equipo': "66c192ef89463aa27fc1818b",
+            
+            'identificacion_entrega': '6979962e6eac7e391dbb2452',
+            'imagen_equipo_concesion': f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.6646393c3fa8b818265d0326",
+            '_imagen_equipo_concesion': "6646393c3fa8b818265d0326",
+            
+            'observacion_concesion': '66469f47c0580e5ead07e39a',
+            'persona_catalog_concesion': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}",
+            
+            'persona_nombre_concesion': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
+            '_persona_nombre_concesion': self.mf['nombre_empleado'],
+            
+            'persona_email_concesion': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['email_visita_a']}",
+            '_persona_email_concesion': self.mf['email_visita_a'],
+            
+            'persona_id_concesion': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['id_usuario']}",
+            '_persona_id_concesion': self.mf['id_usuario'],
+            
+            'persona_email_otro': '697991ad1cfb3b3210269901',
+            'persona_nombre_otro': '696fd2291527668d067cdb85',
+            'persona_identificacion_otro': '697991ad1cfb3b3210269902',
+            'quien_entrega': '6979962e6eac7e391dbb2451',
+            'tipo_persona_solicita': '66469e5a3e6a703350f2e03a',
+            'status_concesion': '66469e193e6a703350f2e029',
+            'status_concesion_equipo': '66469e193e6a703350f2e299',
+            'subotal_concesion_equipo': '69799523aa75e6a4c99c4d40',
+            'ubicacion_catalog_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
+            'ubicacion_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+            '_ubicacion_concesion': self.mf['ubicacion'],
         }
         #- Para creación , edición y lista de fallas
         self.fallas_fields = {
@@ -469,6 +515,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'falla_evidencia_solucion':'66f2dfb2c80d24e5e82332b5',
 
         }
+        
         #- Para creación , edición y lista de incidencias
         self.incidence_fields = {
             'reporta_incidencia_catalog': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}", 
@@ -572,6 +619,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'evidencia':'68c305c624e99970e536dc44',
             'documento':'68c305c624e99970e536dc45'
         }
+        
         #- Para creación , edición y lista de gafetes y lockers
         self.gafetes_fields = {
             'caseta_gafete':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
@@ -581,6 +629,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'ubicacion_gafete':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             'visita_gafete':f"{self.mf['catalog_visita']}.{self.mf['nombre_visita']}",
         }
+        
         self.lockers_fields = {
             'locker_id':'66480101786e8cdb66e70124',
             'tipo_locker':'66ccfec6acaa16b31e5593a3',
@@ -603,6 +652,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'note_comments_group':'6647fb1874c1a87eb02a9037',
             'note_comments':'6647fb38da07bf430e273ea2',
         }
+        
         self.notes_project_fields = {
             'location': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
             'area': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
@@ -610,6 +660,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'closed_by': f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
             'support_guard':f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
         }
+        
         self.pase_entrada_fields = {
             'area':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
             'grupo_areas_acceso':'663fed6cb8262fd454326cb3',
@@ -674,17 +725,21 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'ubicaciones':'6834e34fa6242006acedda0f',
             'todas_las_areas':'68f9fdfbd9bf5cb7fd3caece'
         }
+        
         self.pase_grupo_visitados:{
         }
+        
         # self.pase_entrada_fields.update(self.pase_grupo_visitados)
         self.pase_grupo_areas:{
             'nombre_perfil':     f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
         }
+        
         # self.pase_entrada_fields.update(self.pase_grupo_areas)
         self.pase_grupo_vehiculos:{
             'nombre_perfil':     f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
             'tipo_vehiuclo':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",        
         }
+        
         # self.pase_entrada_fields.update(self.pase_grupo_vehiculos)
         self.pase_entrada_fields.update({
             'ubicacion_cat': f"{self.UBICACIONES_CAT_OBJ_ID}",
@@ -757,6 +812,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
 
         self.notes_project_fields.update(self.notes_fields)
+        
         self.bitacora_acceos = {}
         ## Fields ##
         '''
@@ -1001,6 +1057,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'Perfiles': self.get_pefiles_walkin(location),
         }
         return res
+    
     def assing_gafete(self, data_gafete, id_bitacora, tipo_movimiento):
         answers={}
         answers_return={}
@@ -1833,7 +1890,56 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return self.format_cr_result(self.cr.aggregate(query))
 
     def create_article_concessioned(self, data_articles):
+        """
+        Servicio para crear articulos concesionados
+
+        """
         #---Define Metadata
+        answers = {
+            self.cons_f['status_concesion']:"abierto"
+        }
+        # Mapeo de campos (JSON -> ID mapping key)
+
+        if data_articles.get('equipos'):
+            equipos = data_articles.pop('equipos')
+        else:
+            self.LKFException("Se requiere enviar lista de equipos concesionados")
+        
+        # Procesar campos principales
+        for key, value in data_articles.items():
+            if '.' in self.cons_f[key]:
+                catalog_id, field_id = self.cons_f[key].split('.')
+                answers[catalog_id] = answers.get(catalog_id,{})
+                if key in ['persona_email_concesion', 'persona_id_concesion'] and type(value) in (str, int, float ) :
+                    answers[catalog_id][field_id] = [value,]
+                else:
+                    answers[catalog_id][field_id] = value
+            else:
+                answers[self.cons_f[key]] = value
+
+        if self.cons_f['persona_nombre_concesion'] in answers:
+            answers[self.cons_f['tipo_persona_solicita']] = 'empleado'
+        else:
+            answers[self.cons_f['tipo_persona_solicita']] = 'otro'
+
+        answers[self.cons_f['grupo_equipos']] = []
+        # Equipo
+        for equipo in equipos:
+            eq = {
+                self.cons_f['status_concesion_equipo']:"abierto"
+            }
+            for key, value in equipo.items():
+                if '.' in self.cons_f[key]:
+                    catalog_id, field_id = self.cons_f[key].split('.')
+                    eq[catalog_id] = eq.get(catalog_id,{})
+                    if key in ['imagen_equipo_concesion','costo_equipo_concesion'] and type(value) in (str, int, float ):
+                        eq[catalog_id][field_id] = [value,]
+                    else:
+                        eq[catalog_id][field_id] = value
+                else:
+                    eq[self.cons_f[key]] = value
+            answers[self.cons_f['grupo_equipos']].append(eq)
+        
         metadata = self.lkf_api.get_metadata(form_id=self.CONCESSIONED_ARTICULOS)
         metadata.update({
             "properties": {
@@ -1846,28 +1952,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 }
             },
         })
-        #---Define Answers
-        answers = {}
-        for key, value in data_articles.items():
-            if  key =='status_concesion':
-                answers[self.consecionados_fields['status_concesion']] = value
-            if  key == 'solicita_concesion':
-                answers[self.consecionados_fields['solicita_concesion']] = value
-            elif  key == 'persona_nombre_concesion':
-                answers[self.consecionados_fields['persona_catalog_concesion']] = { self.mf['nombre_guardia_apoyo'] : value}
-            elif  key == 'caseta_concesion':
-                answers[self.consecionados_fields['area_catalog_concesion']] = { self.mf['nombre_area_salida']: value}
-            elif  key == 'ubicacion_concesion':
-                answers[self.consecionados_fields['ubicacion_catalog_concesion']] = { self.mf['ubicacion']: value}
-            elif  key == 'area_concesion':
-                answers[self.consecionados_fields['equipo_catalog_concesion']] = { self.consecionados_fields['area_concesion']: value}
-            elif  key == 'equipo_concesion':
-                answers[self.consecionados_fields['equipo_catalog_concesion']] = { self.consecionados_fields['equipo_concesion']: value}
-            elif  key == 'evidencia':
-                answers[self.consecionados_fields['evidencia']] = value
-            else:
-                answers.update({f"{self.consecionados_fields[key]}":value})
-
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
@@ -3516,7 +3600,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "deleted_at": {"$exists": False},
                     "form_id": self.CONCESSIONED_ARTICULOS,
                     f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
-                    f"answers.{self.consecionados_fields['status_concesion']}": "abierto",
+                    f"answers.{self.cons_f['status_concesion']}": "abierto",
                 }},
                 {'$project': {
                     '_id': 1,
@@ -3718,7 +3802,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             })
 
         return data
-
 
     def get_config_modulo_seguridad(self, ubicaciones=[]):
         #TODO Verificar por que se envia asi la lista
@@ -4231,7 +4314,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         pr= self.format_cr_result(self.cr.aggregate(query))
         return self.format_cr_result(self.cr.aggregate(query))
 
-    def get_list_article_concessioned(self, location="", area="", status="", dateFrom="", dateTo="", filterDate=""):
+    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate=""):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
@@ -4241,51 +4324,48 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         if area:
              match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
         if status:
-             match_query[f"answers.{self.consecionados_fields['status_concesion']}"] = status
+             match_query[f"answers.{self.cons_f['status_concesion']}"] = status
 
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         zona = user_data.get('timezone','America/Monterrey')
 
         if filterDate != "range":
             dateFrom, dateTo = self.get_range_dates(filterDate,zona)
-
             if dateFrom:
                 dateFrom = str(dateFrom)
             if dateTo:
                 dateTo = str(dateTo)
         if dateFrom and dateTo:
             match_query.update({
-                f"answers.{self.consecionados_fields['fecha_concesion']}": {"$gte": dateFrom,"$lte": dateTo},
+                f"answers.{self.cons_f['fecha_concesion']}": {"$gte": dateFrom,"$lte": dateTo},
             })
         elif dateFrom:
             match_query.update({
-                f"answers.{self.consecionados_fields['fecha_concesion']}": {"$gte": dateFrom}
+                f"answers.{self.cons_f['fecha_concesion']}": {"$gte": dateFrom}
             })
         elif dateTo:
             match_query.update({
-                f"answers.{self.consecionados_fields['fecha_concesion']}": {"$lte": dateTo}
+                f"answers.{self.cons_f['fecha_concesion']}": {"$lte": dateTo}
             })
 
         query = [
             {'$match': match_query },
+            # {'$unwind':f"$answers.{self.cons_f['grupo_equipos']}"},
             {'$project': {
                 "_id" : "$_id",
                 "folio": "$folio",
-                'status_concesion':f"$answers.{self.consecionados_fields['status_concesion']}",
-                'ubicacion_concesion':f"$answers.{self.consecionados_fields['ubicacion_concesion']}",
-                'solicita_concesion':f"$answers.{self.consecionados_fields['solicita_concesion']}",
-                'persona_nombre_concesion':f"$answers.{self.consecionados_fields['persona_nombre_concesion']}",
-                'caseta_concesion':f"$answers.{self.consecionados_fields['caseta_concesion']}",
-                'fecha_concesion':f"$answers.{self.consecionados_fields['fecha_concesion']}",
-                'equipo_imagen_concesion':f"$answers.{self.consecionados_fields['equipo_imagen_concesion']}",
-                'area_concesion':f"$answers.{self.consecionados_fields['area_concesion']}",
-                'equipo_concesion':f"$answers.{self.consecionados_fields['equipo_concesion']}",
-                'observacion_concesion':f"$answers.{self.consecionados_fields['observacion_concesion']}",
-                'fecha_devolucion_concesion':f"$answers.{self.consecionados_fields['fecha_devolucion_concesion']}",
+                "answers":"$answers",
             }},
             {'$sort':{'folio':-1}},
         ]
-        return self.format_cr_result(self.cr.aggregate(query))
+        result = self.format_cr_result(self.cr.aggregate(query), ids_label_dct=self.cons_f)
+        for item in result:
+            item['firma'] = {}
+            if item.get('file_url'):
+                item['firma']['file_url'] = item.pop('file_url')
+            if item.get('file_name'):
+                item['firma']['file_name'] = item.pop('file_name')
+        return result
 
     def get_gafetes(self, status='Disponible', location=None, area=None, gafete_id=None, limit=1000, skip=0):
         selector = {}
@@ -5701,28 +5781,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         for key, value in data_articles.items():
             if  key == 'ubicacion_concesion' or key == 'area_concesion':
                 if data_articles['ubicacion_concesion'] and not data_articles['area_concesion']:
-                    answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion']}
+                    answers[self.cons_f['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion']}
                 elif data_articles['area_concesion'] and not data_articles['ubicacion_concesion']:
-                    answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['nombre_area_salida']:data_articles['area_concesion']}
+                    answers[self.cons_f['ubicacion_catalog_concesion']] = {self.mf['nombre_area_salida']:data_articles['area_concesion']}
                 elif data_articles['area_concesion'] and data_articles['ubicacion_concesion']: 
-                    answers[self.consecionados_fields['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion'],
+                    answers[self.cons_f['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion'],
                     self.mf['nombre_area_salida']:data_articles['area_concesion']}
             elif  key == 'persona_nombre_concesion':
-                answers[self.consecionados_fields['persona_catalog_concesion']] = { self.mf['nombre_guardia_apoyo'] : value}
+                answers[self.cons_f['persona_catalog_concesion']] = { self.mf['nombre_guardia_apoyo'] : value}
             elif  key == 'caseta_concesion':
-                answers[self.consecionados_fields['area_catalog_concesion']] = { self.mf['nombre_area_salida']: value}
+                answers[self.cons_f['area_catalog_concesion']] = { self.mf['nombre_area_salida']: value}
             elif  key == 'area_concesion':
-                dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
-                dic_prev[self.consecionados_fields['area_concesion']] = value 
-                answers[self.consecionados_fields['equipo_catalog_concesion']] = dic_prev
+                dic_prev = answers.get(self.cons_f['equipo_catalog_concesion'],{})
+                dic_prev[self.cons_f['area_concesion']] = value 
+                answers[self.cons_f['equipo_catalog_concesion']] = dic_prev
             elif  key == 'equipo_concesion':
-                dic_prev = answers.get(self.consecionados_fields['equipo_catalog_concesion'],{})
-                dic_prev[self.consecionados_fields['equipo_concesion']] = value 
-                answers[self.consecionados_fields['equipo_catalog_concesion']] = dic_prev
+                dic_prev = answers.get(self.cons_f['equipo_catalog_concesion'],{})
+                dic_prev[self.cons_f['equipo_concesion']] = value 
+                answers[self.cons_f['equipo_catalog_concesion']] = dic_prev
             elif  key == 'evidencia':
-                 answers[self.consecionados_fields['evidencia']] = value
+                 answers[self.cons_f['evidencia']] = value
             else:
-                answers.update({f"{self.consecionados_fields[key]}":value})
+                answers.update({f"{self.cons_f[key]}":value})
         if answers or folio:
             return self.lkf_api.patch_multi_record( answers = answers, form_id=self.CONCESSIONED_ARTICULOS, folios=[folio])
         else:
@@ -7254,9 +7334,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers = {}
         for key, value in data_paquete_actualizar.items():
             if  key == 'area_paqueteria':
-                answers[self.consecionados_fields['area_paqueteria']] = value
+                answers[self.cons_f['area_paqueteria']] = value
             elif key == 'ubicacion_paqueteria':
-                answers[self.consecionados_fields['ubicacion_paqueteria']] = value
+                answers[self.cons_f['ubicacion_paqueteria']] = value
             elif key == 'quien_recibe_paqueteria':
                 answers[self.paquetes_fields['quien_recibe_catalogo']] = {self.paquetes_fields['quien_recibe_paqueteria']:value}
             else:
