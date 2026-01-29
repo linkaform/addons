@@ -5776,37 +5776,81 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     employee_ids.append(x['user_id'])
         return employees
 
-    def update_article_concessioned(self, data_articles, folio):
+    def update_article_concessioned(self, record_id, status, state=None, equipos=[], evidencia={}, comentario=""):
+        """
+            Funcion que devuelve o actualiza estado de los articulos concesionados
+            Si recive el status 'return', va a comparar con los datos que se estan enviando.
+            Y despues de consultar el folio, va a poner todos los equipos como devueltos, con la condicion general.
+            Donde status puedes ser "total" o "parcial"
+            Args:
+                folio "str": _id del registro
+                status "str": "total" o "parcial" o "cancelar" es el estado general del pedido
+                state "str": "completo", "pedido", "dañado" es el estado del equipo global. Sirve en caso de que sea
+                una devolucion global
+                equipos: "list[json]": Lista de jsons con los valores de los equipos a devolver
+
+            return:
+                folio: folio acutalizado
+                update_date:
+                error:
+        """
         answers = {}
-        for key, value in data_articles.items():
-            if  key == 'ubicacion_concesion' or key == 'area_concesion':
-                if data_articles['ubicacion_concesion'] and not data_articles['area_concesion']:
-                    answers[self.cons_f['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion']}
-                elif data_articles['area_concesion'] and not data_articles['ubicacion_concesion']:
-                    answers[self.cons_f['ubicacion_catalog_concesion']] = {self.mf['nombre_area_salida']:data_articles['area_concesion']}
-                elif data_articles['area_concesion'] and data_articles['ubicacion_concesion']: 
-                    answers[self.cons_f['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion'],
-                    self.mf['nombre_area_salida']:data_articles['area_concesion']}
-            elif  key == 'persona_nombre_concesion':
-                answers[self.cons_f['persona_catalog_concesion']] = { self.mf['nombre_guardia_apoyo'] : value}
-            elif  key == 'caseta_concesion':
-                answers[self.cons_f['area_catalog_concesion']] = { self.mf['nombre_area_salida']: value}
-            elif  key == 'area_concesion':
-                dic_prev = answers.get(self.cons_f['equipo_catalog_concesion'],{})
-                dic_prev[self.cons_f['area_concesion']] = value 
-                answers[self.cons_f['equipo_catalog_concesion']] = dic_prev
-            elif  key == 'equipo_concesion':
-                dic_prev = answers.get(self.cons_f['equipo_catalog_concesion'],{})
-                dic_prev[self.cons_f['equipo_concesion']] = value 
-                answers[self.cons_f['equipo_catalog_concesion']] = dic_prev
-            elif  key == 'evidencia':
-                 answers[self.cons_f['evidencia']] = value
-            else:
-                answers.update({f"{self.cons_f[key]}":value})
-        if answers or folio:
-            return self.lkf_api.patch_multi_record( answers = answers, form_id=self.CONCESSIONED_ARTICULOS, folios=[folio])
-        else:
-            self.LKFException('No se mandarón parametros para actualizar')
+        print("record_id", record_id)
+        record = self.get_record_by_id(record_id)
+        rec = self.format_cr([self.get_record_by_id(record_id),], get_one=True, ids_label_dct=self.cons_f)
+        print('record', record)
+        if rec['status_concesion'] == "cancelado":
+            self.LKFException(f"No es posible devolver o modifcar una concesion  {rec['folio']}")
+        if rec['status_concesion'] == "devuelto":
+            self.LKFException(f"La Conecsion con folio: {rec['folio']} ya se encuentra devuelta.")
+
+        if status == "total":
+            if not state:
+                self.LKFException(f"Para poder realizar una devolucion total hay que indicar el Estado de la devolucion.")
+            status = "devuelto"
+            record['answers'][self.cons_f["fecha_devolucion_concesion"]] = self.today_str(tz_name=self.user.get('timezone'),date_format='datetime')
+            for eq in record['answers'].get(self.cons_f['grupo_equipos'],[]):
+                eq[self.cons_f['status_concesion_equipo']] = "devuelto"
+                eq[self.cons_f['cantidad_equipo_devuelto']]  = eq[self.cons_f['cantidad_equipo_concesion']]
+                eq[self.cons_f['estatus_equipo']]  = state
+                eq[self.cons_f['evidencia_entrega']] =  eq.get(self.cons_f['evidencia_entrega'],evidencia)
+                eq[self.cons_f['comentario_entrega']] = eq.get(self.cons_f['comentario_entrega'], comentario)
+        
+
+        # # status "se debe de calular que estatus tendra, ya sea abierta, parcial o total"
+        record['answers'][self.cons_f["status_concesion"]] = status
+        print('answers', simplejson.dumps(record['answers'], indent=3))
+        return self.lkf_api.patch_record(record)
+
+        # for key, value in data_articles.items():
+        #     if  key == 'ubicacion_concesion' or key == 'area_concesion':
+        #         if data_articles['ubicacion_concesion'] and not data_articles['area_concesion']:
+        #             answers[self.cons_f['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion']}
+        #         elif data_articles['area_concesion'] and not data_articles['ubicacion_concesion']:
+        #             answers[self.cons_f['ubicacion_catalog_concesion']] = {self.mf['nombre_area_salida']:data_articles['area_concesion']}
+        #         elif data_articles['area_concesion'] and data_articles['ubicacion_concesion']: 
+        #             answers[self.cons_f['ubicacion_catalog_concesion']] = {self.mf['ubicacion']:data_articles['ubicacion_concesion'],
+        #             self.mf['nombre_area_salida']:data_articles['area_concesion']}
+        #     elif  key == 'persona_nombre_concesion':
+        #         answers[self.cons_f['persona_catalog_concesion']] = { self.mf['nombre_guardia_apoyo'] : value}
+        #     elif  key == 'caseta_concesion':
+        #         answers[self.cons_f['area_catalog_concesion']] = { self.mf['nombre_area_salida']: value}
+        #     elif  key == 'area_concesion':
+        #         dic_prev = answers.get(self.cons_f['equipo_catalog_concesion'],{})
+        #         dic_prev[self.cons_f['area_concesion']] = value 
+        #         answers[self.cons_f['equipo_catalog_concesion']] = dic_prev
+        #     elif  key == 'equipo_concesion':
+        #         dic_prev = answers.get(self.cons_f['equipo_catalog_concesion'],{})
+        #         dic_prev[self.cons_f['equipo_concesion']] = value 
+        #         answers[self.cons_f['equipo_catalog_concesion']] = dic_prev
+        #     elif  key == 'evidencia':
+        #          answers[self.cons_f['evidencia']] = value
+        #     else:
+        #         answers.update({f"{self.cons_f[key]}":value})
+        # if answers or folio:
+        #     return self.lkf_api.patch_multi_record( answers = answers, form_id=self.CONCESSIONED_ARTICULOS, folios=[folio])
+        # else:
+        #     self.LKFException('No se mandarón parametros para actualizar')
 
     def update_article_lost(self, data_articles, folio):
         answers = {}
