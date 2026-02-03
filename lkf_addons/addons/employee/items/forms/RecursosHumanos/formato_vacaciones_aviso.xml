@@ -14,7 +14,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1435007870.0</created_at>
+    <created_at>1770146606.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -42,7 +42,7 @@ https://app.linkaform.com/#/records/filter/4208/</body>
             <clicks_to_expire>None</clicks_to_expire>
             <goodbye_text>None</goodbye_text>
             <minutes>None</minutes>
-            <seconds_to_expire>0.0</seconds_to_expire>
+            <seconds_to_expire>None</seconds_to_expire>
             <welcome_text>None</welcome_text>
         </timer_config>
     </email_configuration>
@@ -193,27 +193,27 @@ https://app.linkaform.com/#/records/filter/4208/</body>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.empleados_linkaform.id }}</catalog_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>
-                            <item>632b7ae42515d3882f721836</item>
+                            <item>638a9a7767c332f5d459fc81</item>
                         </view_fields>
                         <view_index>0</view_index>
                     </catalog>
                     <catalog_fields>
-                        <item>632476c6cfc410da8bdecacd</item>
-                        <item>632b7ae42515d3882f721836</item>
+                        <item>638a9a7767c332f5d459fc82</item>
+                        <item>638a9a7767c332f5d459fc81</item>
                     </catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>{{ catalog.empleados_linkaform.obj_id }}</field_id>
+                    <field_id>{{ catalog.empleados.obj_id }}</field_id>
                     <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -274,9 +274,9 @@ https://app.linkaform.com/#/records/filter/4208/</body>
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.empleados_linkaform.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.empleados_linkaform.id }}</catalog_id>
-                        <field_type>select</field_type>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
+                        <field_type>text</field_type>
                         <filters />
                         <geofence>None</geofence>
                         <last>True</last>
@@ -290,7 +290,7 @@ https://app.linkaform.com/#/records/filter/4208/</body>
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>632b7ae42515d3882f721836</field_id>
+                    <field_id>638a9a7767c332f5d459fc81</field_id>
                     <field_type>catalog-select</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -342,10 +342,7 @@ https://app.linkaform.com/#/records/filter/4208/</body>
                         <watermark_enable>False</watermark_enable>
                     </properties>
                     <required>True</required>
-                    <rules>
-                        <item>d7c175e17d17eb</item>
-                        <item>d7c175e17d17eb</item>
-                    </rules>
+                    <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
                     <visible>True</visible>
@@ -354,8 +351,8 @@ https://app.linkaform.com/#/records/filter/4208/</body>
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.empleados_linkaform.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.empleados_linkaform.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <field_type>email</field_type>
                         <filters />
                         <geofence>None</geofence>
@@ -370,7 +367,7 @@ https://app.linkaform.com/#/records/filter/4208/</body>
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>632476c6cfc410da8bdecacd</field_id>
+                    <field_id>638a9a7767c332f5d459fc82</field_id>
                     <field_type>catalog-detail</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -1811,10 +1808,18 @@ Esperamos que recuperes al 100% pronto!!!.</default_value>
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/3378/</resource_uri>
+    <resource_uri>/api/infosync/form/146377/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
-    <template_conf>None</template_conf>
+    <template_conf>
+        <account_id>None</account_id>
+        <configuration>{}</configuration>
+        <is_master>True</is_master>
+        <is_public>False</is_public>
+        <master_id>None</master_id>
+        <name />
+        <unify_ids>False</unify_ids>
+    </template_conf>
     <templates>[]</templates>
     <timer_config>
         <active>False</active>
@@ -1824,5 +1829,5 @@ Esperamos que recuperes al 100% pronto!!!.</default_value>
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1763078828.0</updated_at>
+    <updated_at>1770147171.0</updated_at>
 </lkf>
