@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.formato_vacaciones_aviso.id }}</form_id>
+    <id>567ace5023d3fd205aa2a6e7</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>60799f01e616ba486c529869</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Hola a TODOS, nuestro compañero de equipo {{record.answers.632476c6cfc410da8bdecaca.632b7ae42515d3882f721836}}, estara fuera de la oficina del {{record.answers.55887b7e01a4de2ea71c5ab4}} al {{record.answers.55887b7e01a4de2ea71c5ab5}}.&lt;br&gt;&lt;br&gt;
+
+Al pendiente todos para apoyar a nuestro compaño... &lt;br&gt;&lt;br&gt;
+
+{{record.answers.66351972d2eeb4285459ebb6}}
+
+&lt;br&gt;
+Saludos... {% endraw %}</body>
+                        <email_fields>[]</email_fields>
+                        <emails>
+                            <item>everyone@linkaform.com</item>
+                        </emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} {{record.answers.632476c6cfc410da8bdecaca.632b7ae42515d3882f721836}} estará ausente {{record.answers.55887b7e01a4de2ea71c5ab4}} al {{record.answers.55887b7e01a4de2ea71c5ab5}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>60799f01e616ba486c52986f</id>
+            <name>Permiso Autorizado</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2021-04-17T05:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2021-04-16T14:26:10.113Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>55887b7e01a4de2ea71c5ab8</field_id>
+                                <group>{}</group>
+                                <label>Status de Solicitud</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>autorizado</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>61af804fabe2a4adb92b6309</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Hola todes, {{record.answers.632476c6cfc410da8bdecaca.632b7ae42515d3882f721836}} estara fuera de la oficina el dia {{record.answers.55887b7e01a4de2ea71c5ab4}} de las {{record.answers.61af7e19b7b4b6d6731ffddc}} a las {{record.answers.61af7e19b7b4b6d6731ffddd}}. Para que porfavor esten al pendiente de apoyar a nuestro compañere !!! &lt;br&gt;&lt;br&gt;
+
+Cualquier cosa, buscar por Slack o WhatsApp!!! &lt;br&gt;&lt;br&gt;
+
+Saludos&lt;br&gt;
+RH LinkaForm {% endraw %}</body>
+                        <email_fields>[]</email_fields>
+                        <emails>
+                            <item>everyone@linkaform.com</item>
+                        </emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>RECORD_USER</sender>
+                        <subject>{% raw %} {{record.answers.632476c6cfc410da8bdecaca.632b7ae42515d3882f721836}} estara fuera de la oficina el {{record.answers.55887b7e01a4de2ea71c5ab4}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>61af804fabe2a4adb92b6312</id>
+            <name>Fuera de la oficina</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2021-12-08T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2021-12-07T15:33:30.211Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>55887b7e01a4de2ea71c5ab2</field_id>
+                                <group>{}</group>
+                                <label>Solicitud de:</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>vuelta_personal</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>55887b7e01a4de2ea71c5ab8</field_id>
+                                <group>{}</group>
+                                <label>Status de Solicitud</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>autorizado</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

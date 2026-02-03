@@ -1,0 +1,427 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.formato_vacaciones_aviso.id }}</form_id>
+    <id>5a555213b43fdd228d6be6f4</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>55887b7e01a4de2ea71c5ab2</field_id>
+                        <group_id>None</group_id>
+                        <id>55887b7e01a4de2ea71c5ab2</id>
+                        <label>Solicitud de:</label>
+                        <type>radio</type>
+                    </field>
+                    <value>vacaciones</value>
+                </item>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>55887b7e01a4de2ea71c5ab2</field_id>
+                        <group_id>None</group_id>
+                        <id>55887b7e01a4de2ea71c5ab2</id>
+                        <label>Solicitud de:</label>
+                        <type>radio</type>
+                    </field>
+                    <value>días_personales</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>55887b7e01a4de2ea71c5ab3</field_id>
+                    <group_id>None</group_id>
+                    <id>55887b7e01a4de2ea71c5ab3</id>
+                    <label>En caso de vacación. Destino de vacación.</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>55887b7e01a4de2ea71c5ab6</field_id>
+                    <group_id>None</group_id>
+                    <id>55887b7e01a4de2ea71c5ab6</id>
+                    <label>Días solicitados</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>55887b7e01a4de2ea71c5aba</field_id>
+                    <group_id>None</group_id>
+                    <id>55887b7e01a4de2ea71c5aba</id>
+                    <label>En caso de vacaciones.</label>
+                    <type>description</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>55887b7e01a4de2ea71c5abb</field_id>
+                    <group_id>None</group_id>
+                    <id>55887b7e01a4de2ea71c5abb</id>
+                    <label>Foto de la vacación:</label>
+                    <type>image</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 1</name>
+            <operator>or</operator>
+            <rule_id>8ea23aa1c3e2258</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>55887b7e01a4de2ea71c5ab2</field_id>
+                        <group_id>None</group_id>
+                        <id>55887b7e01a4de2ea71c5ab2</id>
+                        <label>Solicitud de:</label>
+                        <type>radio</type>
+                    </field>
+                    <value>vacaciones</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>55887b7e01a4de2ea71c5ab6</field_id>
+                    <group_id>None</group_id>
+                    <id>55887b7e01a4de2ea71c5ab6</id>
+                    <label>Días solicitados</label>
+                    <type>integer</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>55887b7e01a4de2ea71c5ab5</field_id>
+                    <group_id>None</group_id>
+                    <id>55887b7e01a4de2ea71c5ab5</id>
+                    <label>Fecha de regreso</label>
+                    <type>date</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 2</name>
+            <operator>or</operator>
+            <rule_id>7838741c901c98</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>55887b7e01a4de2ea71c5ab2</field_id>
+                        <group_id>None</group_id>
+                        <id>55887b7e01a4de2ea71c5ab2</id>
+                        <label>Solicitud de:</label>
+                        <type>radio</type>
+                    </field>
+                    <value>enfermedad</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5bd0bebef851c267b9691225</field_id>
+                    <group_id>None</group_id>
+                    <id>5bd0bebef851c267b9691225</id>
+                    <label>Aviso Enfermedad</label>
+                    <type>description</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>55887b7e01a4de2ea71c5ab6</field_id>
+                    <group_id>None</group_id>
+                    <id>55887b7e01a4de2ea71c5ab6</id>
+                    <label>Días solicitados</label>
+                    <type>integer</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Enfermedad</name>
+            <operator>and</operator>
+            <rule_id>229625c270d244a</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>55887b7e01a4de2ea71c5ab8</field_id>
+                        <group_id>None</group_id>
+                        <id>55887b7e01a4de2ea71c5ab8</id>
+                        <label>Status de Solicitud</label>
+                        <type>select</type>
+                    </field>
+                    <value>por_autorizar</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f3d38ee3df9cfae134ab872</field_id>
+                    <group_id>None</group_id>
+                    <id>5f3d38ee3df9cfae134ab872</id>
+                    <label>Autorizar</label>
+                    <type>button</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>autorizar</name>
+            <operator>or</operator>
+            <rule_id>1f671b7b109b1418</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>55887b7e01a4de2ea71c5ab2</field_id>
+                        <group_id>None</group_id>
+                        <id>55887b7e01a4de2ea71c5ab2</id>
+                        <label>Solicitud de:</label>
+                        <type>radio</type>
+                    </field>
+                    <value>vuelta_personal</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>61af7e19b7b4b6d6731ffddc</field_id>
+                    <group_id>None</group_id>
+                    <id>61af7e19b7b4b6d6731ffddc</id>
+                    <label>Hora salida aprox</label>
+                    <type>time</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>61af7e19b7b4b6d6731ffddd</field_id>
+                    <group_id>None</group_id>
+                    <id>61af7e19b7b4b6d6731ffddd</id>
+                    <label>Hora regreso aprox</label>
+                    <type>time</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Horas de Salida</name>
+            <operator>and</operator>
+            <rule_id>2192261e879b18</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>55887b7e01a4de2ea71c5ab2</field_id>
+                        <group_id>None</group_id>
+                        <id>55887b7e01a4de2ea71c5ab2</id>
+                        <label>Solicitud de:</label>
+                        <type>radio</type>
+                    </field>
+                    <value>vuelta_personal</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>61af7e19b7b4b6d6731ffddc</field_id>
+                    <group_id>None</group_id>
+                    <id>61af7e19b7b4b6d6731ffddc</id>
+                    <label>Hora salida aprox</label>
+                    <type>time</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>61af7e19b7b4b6d6731ffddd</field_id>
+                    <group_id>None</group_id>
+                    <id>61af7e19b7b4b6d6731ffddd</id>
+                    <label>Hora regreso aprox</label>
+                    <type>time</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requeri Horas de permiso</name>
+            <operator>and</operator>
+            <rule_id>1a7c4011a0e5a8</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>632476c6cfc410da8bdecaca</catalog_id>
+                        <field_id>632b7ae42515d3882f721836</field_id>
+                        <group_id>None</group_id>
+                        <id>632b7ae42515d3882f721836</id>
+                        <label>Nombre</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>632476c6cfc410da8bdecaca</catalog_id>
+                        <field_id>632b7ae42515d3882f721836</field_id>
+                        <group_id>None</group_id>
+                        <id>632b7ae42515d3882f721836</id>
+                        <label>Nombre</label>
+                        <type>catalog-select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>55887b7e01a4de2ea71c5ab8</field_id>
+                    <group_id>None</group_id>
+                    <id>55887b7e01a4de2ea71c5ab8</id>
+                    <label>Status de Solicitud</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f3d38ee3df9cfae134ab872</field_id>
+                    <group_id>None</group_id>
+                    <id>5f3d38ee3df9cfae134ab872</id>
+                    <label>Autorizar</label>
+                    <type>button</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66351972d2eeb4285459ebb6</field_id>
+                    <group_id>None</group_id>
+                    <id>66351972d2eeb4285459ebb6</id>
+                    <label>Comentario Autorizador</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Deshabilitar</name>
+            <operator>or</operator>
+            <rule_id>d7c175e17d17eb</rule_id>
+            <rule_type>disabled</rule_type>
+            <user_conditions>
+                <condition>exclude</condition>
+                <users>
+                    <item>
+                        <user_id>126</user_id>
+                        <user_name>Jose Patricio Villarreal</user_name>
+                    </item>
+                    <item>
+                        <user_id>16783</user_id>
+                        <user_name>Jose Pato</user_name>
+                    </item>
+                    <item>
+                        <user_id>17424</user_id>
+                        <user_name>Abel</user_name>
+                    </item>
+                </users>
+            </user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>55887b7e01a4de2ea71c5ab2</field_id>
+                        <group_id>None</group_id>
+                        <id>55887b7e01a4de2ea71c5ab2</id>
+                        <label>Solicitud de:</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>55887b7e01a4de2ea71c5ab2</field_id>
+                        <group_id>None</group_id>
+                        <id>55887b7e01a4de2ea71c5ab2</id>
+                        <label>Solicitud de:</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>55887b7e01a4de2ea71c5ab8</field_id>
+                    <group_id>None</group_id>
+                    <id>55887b7e01a4de2ea71c5ab8</id>
+                    <label>Status de Solicitud</label>
+                    <type>select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>5f3d38ee3df9cfae134ab872</field_id>
+                    <group_id>None</group_id>
+                    <id>5f3d38ee3df9cfae134ab872</id>
+                    <label>Autorizar</label>
+                    <type>button</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Status</name>
+            <operator>or</operator>
+            <rule_id>9e812061d0810d5</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>
+                <condition>exclude</condition>
+                <users>
+                    <item>
+                        <user_id>126</user_id>
+                        <user_name>Jose Patricio Villarreal</user_name>
+                    </item>
+                    <item>
+                        <user_id>16783</user_id>
+                        <user_name>Jose Pato</user_name>
+                    </item>
+                    <item>
+                        <user_id>133</user_id>
+                        <user_name>Omar Vázquez - Linkaform</user_name>
+                    </item>
+                </users>
+            </user_conditions>
+        </item>
+    </rules>
+</lkf>
