@@ -102,6 +102,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.CHECK_UBICACIONES = self.lkm.form_id('check_ubicaciones','id')
         self.REGISTRO_ASISTENCIA = self.lkm.form_id('registro_de_asistencia','id')
         self.CONFIGURACION_RECORRIDOS_FORM = self.lkm.form_id('configuracion_de_recorridos','id')
+        self.FORMATO_VACACIONES = self.lkm.form_id('formato_vacaciones_aviso','id')
 
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
