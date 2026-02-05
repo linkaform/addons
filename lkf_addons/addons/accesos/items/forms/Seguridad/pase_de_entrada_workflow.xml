@@ -410,30 +410,6 @@
                             <other_value>None</other_value>
                             <prefix>answer</prefix>
                             <trigger_field>
-                                <catalog>
-                                    <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
-                                    <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
-                                    <field_type>text</field_type>
-                                    <filters>None</filters>
-                                    <geofence>None</geofence>
-                                    <last>True</last>
-                                    <related_catalog>{}</related_catalog>
-                                    <view_fields>[]</view_fields>
-                                    <view_index>1</view_index>
-                                </catalog>
-                                <field_id>661dc67e901906b7e9b73bac</field_id>
-                                <group>{}</group>
-                                <label>Nombre del perfil</label>
-                                <type>catalog-select</type>
-                            </trigger_field>
-                            <value>Visita General</value>
-                        </item>
-                        <item>
-                            <condition>in=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
                                 <catalog>{}</catalog>
                                 <field_id>6734c6d5254e9a61df8e7f51</field_id>
                                 <group>{}</group>
@@ -700,30 +676,6 @@
                                 <type>checkbox</type>
                             </trigger_field>
                             <value>enviar_correo</value>
-                        </item>
-                        <item>
-                            <condition>in=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>
-                                    <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
-                                    <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
-                                    <field_type>text</field_type>
-                                    <filters>None</filters>
-                                    <geofence>None</geofence>
-                                    <last>True</last>
-                                    <related_catalog>{}</related_catalog>
-                                    <view_fields>[]</view_fields>
-                                    <view_index>1</view_index>
-                                </catalog>
-                                <field_id>661dc67e901906b7e9b73bac</field_id>
-                                <group>{}</group>
-                                <label>Nombre del perfil</label>
-                                <type>catalog-select</type>
-                            </trigger_field>
-                            <value>Visita General</value>
                         </item>
                         <item>
                             <condition>not__empty=</condition>
