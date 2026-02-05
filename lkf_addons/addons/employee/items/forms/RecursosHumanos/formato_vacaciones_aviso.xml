@@ -19,33 +19,7 @@
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
-    <email_configuration>
-        <body>Has contestado el formulario Formato Vacaciones - Permiso &lt;br&gt;
-El usario {{record.user.name}} esta solicitando {{record.answers.55887b7e01a4de2ea71c5ab6}} días de {{record.answers.55887b7e01a4de2ea71c5ab2}}.&lt;br&gt;&lt;br&gt;
-Para ver el detalle entrara a :&lt;br&gt;
-https://app.linkaform.com/#/records/filter/4208/</body>
-        <email_fields>[]</email_fields>
-        <emails>[]</emails>
-        <embed_company_picture>True</embed_company_picture>
-        <embed_fields>[]</embed_fields>
-        <pdf_template>{}</pdf_template>
-        <reply_to>None</reply_to>
-        <resend>RESEND</resend>
-        <send_attachments>False</send_attachments>
-        <send_pdf>True</send_pdf>
-        <sender>vacaciones@linkaform.com</sender>
-        <subject>Vacaciones de: {{record.user.name}}</subject>
-        <template_html>None</template_html>
-        <templates>[]</templates>
-        <timer_config>
-            <active>False</active>
-            <clicks_to_expire>None</clicks_to_expire>
-            <goodbye_text>None</goodbye_text>
-            <minutes>None</minutes>
-            <seconds_to_expire>None</seconds_to_expire>
-            <welcome_text>None</welcome_text>
-        </timer_config>
-    </email_configuration>
+    <email_configuration>None</email_configuration>
     <emails>[]</emails>
     <enable_geolocation>False</enable_geolocation>
     <enable_versions>True</enable_versions>
