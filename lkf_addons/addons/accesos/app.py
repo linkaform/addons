@@ -1749,27 +1749,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         form_id= self.BITACORA_FALLAS
         return self.lkf_api.catalog_view(catalog_id, form_id) 
 
-    def catalogo_tipo_concesion(self,location="", tipo=""):
-        catalog_id = self.ACTIVOS_FIJOS_CAT_ID
-        form_id= self.CONCESSIONED_ARTICULOS
-        options={}
-        if location and tipo:
-            options = {
-                "group_level": 3,
-                "startkey": [location,tipo],
-                "endkey": [location, f"{tipo}\n"]
-            }
-        else:
-            if location and not tipo:
-                options = {
-                    "group_level": 2,
-                    "startkey": [location],
-                    "endkey": [f"{location}\n"]
-                }
-            elif tipo and not location:
-                self.LKFException('Location es requerido')
-        response= self.catalogo_view(catalog_id, form_id, options)
-        return response
+    
 
     def catalogo_falla(self, tipo=""):
         options={}
