@@ -163,137 +163,60 @@
                     <action_settings>{}</action_settings>
                     <configuration>
                         <body>{% raw %} &lt;!DOCTYPE html&gt;
-&lt;html&gt;
+&lt;html lang="es"&gt;
 &lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;Notificación de Visita&lt;/title&gt;
-    &lt;style&gt;
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .header {
-            background-color: #021d49;
-            color: #ffffff;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-        }
-        .header img {
-            max-width: 100px;
-            margin-right: 20px;
-        }
-        .content {
-            padding: 20px;
-            color: #333333;
-        }
-        .content h3 {
-            color: #021d49;
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .button {
-            display: inline-block;
-            background-color: #005bb5; 
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: bold;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            border: 1px solid #004a99;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .button:hover {
-            background-color: #004a99;
-            transform: scale(1.05);
-        }
-        .button:active {
-            background-color: #003d80;
-            transform: scale(0.95);
-        }
-        .footer {
-            background-color: #f4f4f4;
-            text-align: center;
-            color: #666666;
-            padding: 10px;
-            font-size: 12px;
-        }
-        .footer a {
-            color: #021d49;
-            text-decoration: none;
-        }
-    &lt;/style&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Pase de Entrada&lt;/title&gt;
 &lt;/head&gt;
-&lt;body&gt;
-    &lt;div class="email-container"&gt;
-        &lt;!-- Header --&gt;
-        &lt;div class="header"&gt;
-            &lt;img alt="logo" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66b4093ed409d27d4ff620ea.png"&gt;
-        &lt;/div&gt;
+&lt;body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f7f9fb; color:#333;"&gt;
 
-        &lt;!-- Content --&gt;
-        &lt;div class="content"&gt;
+  &lt;!-- Contenedor principal --&gt;
+  &lt;div style="max-width:600px; margin:0 auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.08);"&gt;
 
-            &lt;p&gt;Hola &lt;strong&gt;{{record.answers.662c2937108836dec6d92580}}&lt;/strong&gt;,&lt;/p&gt;
-
-            &lt;p&gt;&lt;strong&gt;{{record.answers.66a83ab5c3a77af505489ca2.663bd36eb19b7fb7d9e97ccb}}&lt;/strong&gt; te ha invitado a visitarlo. Se ha creado un pre-registro y ahora está pendiente de su asignación. Por favor, presione el botón a continuación para completar su registro: &lt;/p&gt;
-                
-            &lt;div class="button-container" style="text-align: center; margin-top: 20px;"&gt;
-                &lt;a href="{{record.answers.6732aa1189fc6b0ae27e3824}}" class="button" target="_blank"
-                    style="
-                    font-family: Arial, sans-serif;
-                    font-size: 16px;
-                    color: #ffffff;
-                    text-decoration: none;
-                    background-color: #021d49;
-                    padding: 10px 20px;
-                    border-radius: 5px;
-                    display: inline-block;"&gt;
-                Completar Pase
-                &lt;/a&gt;
-            &lt;/div&gt;
-
-            &lt;p&gt;A continuación, te proporcionamos los detalles de tu visita:&lt;/p&gt;
-
-            &lt;ul&gt;
-                &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{record.answers.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{record.answers.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}&lt;/li&gt;
-
-                {% if record.answers.662c304fad7432d296d92581 == "Rango de fechas" %}
-                    &lt;p&gt;&lt;strong&gt;Disponibilidad de fechas:&lt;/strong&gt;&lt;/p&gt;
-                    &lt;li&gt;&lt;strong&gt;Desde: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/li&gt;
-                    &lt;li&gt;&lt;strong&gt;Hasta: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92583}}&lt;/li&gt; 
-                {% else %}
-                    &lt;li&gt;&lt;strong&gt;Fecha: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/li&gt;
-                {% endif %}
-            &lt;/ul&gt;
-
-            &lt;p&gt;Si tienes alguna duda, no dudes en contactarnos.&lt;/p&gt;
-        &lt;/div&gt;
-
-        &lt;!-- Footer --&gt;
-        &lt;div class="footer"&gt;
-            &lt;p&gt;&amp;copy; 2024 &lt;a href="https://soter-app.webflow.io/" target="_blank"&gt;Soter&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
-            &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
-                &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" width="150px"&gt;
-            &lt;/a&gt;
-        &lt;/div&gt;
+    &lt;!-- Header con logo --&gt;
+    &lt;div style="text-align:center; padding:25px 20px; background:#f1f4f8;"&gt;
+        &lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_10.thumbnail" alt="Logo" style="max-height:120px;"&gt;
     &lt;/div&gt;
+
+    &lt;!-- Mensaje principal --&gt;
+    &lt;div style="padding:30px 25px; text-align:center;"&gt;
+      &lt;h2 style="margin:0; font-size:22px; color:#021d49;"&gt;Hola {{record.answers.662c2937108836dec6d92580}},&lt;/h2&gt;
+      {% for item in record.answers.663d4ba61b14fab90559ebb0 %}
+        &lt;p style="margin:20px 0; font-size:16px; line-height:1.5; color:#555;"&gt;
+          {{item.66a83ab5ca3453e21ea08d19.62c5ff407febce07043024dd}} te ha invitado a visitarlo(a).
+
+          Se ha creado un pre-registro y está pendiente de asignación.  
+          Por favor, completa tu pase dando clic en el botón:
+        &lt;/p&gt;
+      {% endfor %}
+    &lt;/div&gt;
+
+    &lt;!-- Detalles de la visita --&gt;
+    &lt;div style="padding:20px 25px; background:#f9fbfd; border-top:1px solid #e6e9ef;"&gt;
+      &lt;ul style="list-style:none; padding:0; margin:15px 0; color:#444; font-size:15px;"&gt;
+        &lt;li&gt;&lt;strong&gt;Tema de la cita: &lt;/strong&gt;{{record.answers.67329875978e6460083c5648}}&lt;/li&gt;
+      &lt;/ul&gt;
+
+      &lt;!-- Botón --&gt;
+      &lt;div style="margin-top:20px; text-align:center;"&gt;
+        &lt;a href="{{record.answers.6732aa1189fc6b0ae27e3824}}" target="_blank" 
+          style="background:#021d49; color:#fff; text-decoration:none; font-size:16px; padding:12px 28px; border-radius:6px; display:inline-block;"&gt;
+          Completar Pase
+        &lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Footer --&gt;
+    &lt;div style="text-align:center; padding:20px; font-size:12px; color:#777; background:#f1f4f8;"&gt;
+      &lt;p style="margin:0;"&gt;&amp;copy; 2026 &lt;a href="https://soter-app.webflow.io/" target="_blank" style="color:#021d49; text-decoration:none;"&gt;Clave 10&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
+      &lt;div style="margin-top:10px;"&gt;
+        &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
+          &lt;img src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" width="120px" alt="Linkaform"&gt;
+        &lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+  &lt;/div&gt;
 &lt;/body&gt;
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>
@@ -430,141 +353,110 @@
                     <action_settings>{}</action_settings>
                     <configuration>
                         <body>{% raw %} &lt;!DOCTYPE html&gt;
-&lt;html&gt;
+&lt;html lang="es"&gt;
 &lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;Confirmación de Pase de Entrada&lt;/title&gt;
-    &lt;style&gt;
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .header {
-            background-color: #021d49;
-            color: #ffffff;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-        }
-        .header img {
-            max-width: 100px;
-            margin-right: 20px;
-        }
-        .content {
-            padding: 20px;
-            color: #333333;
-        }
-        .content h3 {
-            color: #021d49;
-        }
-        .table-container {
-            margin-top: 20px;
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        table th {
-            background-color: #666666;
-            color: #ffffff;
-            text-align: left;
-            padding: 10px;
-        }
-        table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        .footer {
-            background-color: #f4f4f4;
-            text-align: center;
-            color: #666666;
-            padding: 10px;
-            font-size: 12px;
-        }
-        .footer a {
-            color: #021d49;
-            text-decoration: none;
-        }
-    &lt;/style&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Confirmación Pase de Entrada&lt;/title&gt;
 &lt;/head&gt;
-&lt;body&gt;
-    &lt;div class="email-container"&gt;
-        &lt;!-- Header --&gt;
-        &lt;div class="header"&gt;
-            &lt;img alt="logo" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/66b4093ed409d27d4ff620ea.png"&gt;
-        &lt;/div&gt;
+&lt;body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f7f9fb; color:#333;"&gt;
 
-        &lt;!-- Content --&gt;
-        &lt;div class="content"&gt;
-            {% if record.answers.662c262cace163ca3ed3bb3a == "Alta de Nuevo Visitante" %}
-                &lt;p&gt;Hola &lt;strong&gt;{{ record.answers.662c2937108836dec6d92580 }}&lt;/strong&gt;,&lt;/p&gt;
-                &lt;p&gt;¡Tu pase de entrada ha sido generado exitosamente! El proceso de registro está completo y ahora estás listo/a para tu visita. A continuación, te proporcionamos los detalles de tu visita:&lt;/p&gt;
+  &lt;!-- Contenedor principal --&gt;
+  &lt;div style="max-width:600px; margin:0 auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.08);"&gt;
 
-            {% elif record.answers.662c262cace163ca3ed3bb3a == "Buscar visitantes registrados" %}
-                &lt;p&gt;Hola &lt;strong&gt;{{ record.answers.66a83ad456d1e741159ce118.5ea0693a0c12d5a8e43d37df }}&lt;/strong&gt;,&lt;/p&gt;
-                &lt;p&gt;¡Tu pase de tipo &lt;strong&gt;{{ record.answers.66a83ad3edd8174f986630ef.661dc67e901906b7e9b73bac }}&lt;/strong&gt; ha sido generado exitosamente! Por favor, asegúrate de presentar este pase y los siguientes documentos al momento de tu llegada.&lt;/p&gt;
-                &lt;div class="table-container"&gt;
-                    &lt;table&gt;
-                        &lt;thead&gt;
-                            &lt;tr&gt;
-                                &lt;th&gt;Documentos Requeridos&lt;/th&gt;
-                            &lt;/tr&gt;
-                        &lt;/thead&gt;
-                        &lt;tbody&gt;
-                            {% if record.answers.66a83ad3edd8174f986630ef|length &gt; 0 %}
-                                &lt;tr&gt;
-                                    {{ record.answers.66a83ad3edd8174f986630ef.662962bb203407ab90c886e4 }}
-                                &lt;/tr&gt;
-                            {% else %}
-                                &lt;tr&gt;
-                                    &lt;td colspan="2" style="text-align: center; color: red;"&gt;
-                                        No hay documentos requeridos.
-                                    &lt;/td&gt;
-                                &lt;/tr&gt;
-                            {% endif %}
-                        &lt;/tbody&gt;
-                    &lt;/table&gt;
-                &lt;/div&gt;
-            {% else %}
-                &lt;p&gt;Hola &lt;strong&gt;Visitante&lt;/strong&gt;,&lt;/p&gt;
-            {% endif %}
-
-            &lt;ul&gt;
-                &lt;li&gt;&lt;strong&gt;Ubicación: &lt;/strong&gt;{{ record.answers.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b }}&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Dirección: &lt;/strong&gt;{{ record.answers.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902 }}&lt;/li&gt;
-                {% if record.answers.662c304fad7432d296d92581 == "Rango de fechas" %}
-                    &lt;p&gt;&lt;strong&gt;Disponibilidad de fechas:&lt;/strong&gt;&lt;/p&gt;
-                    &lt;li&gt;&lt;strong&gt;Desde: &lt;/strong&gt;{{ record.answers.662c304fad7432d296d92582 }}&lt;/li&gt;
-                    &lt;li&gt;&lt;strong&gt;Hasta: &lt;/strong&gt;{{ record.answers.662c304fad7432d296d92583 }}&lt;/li&gt; 
-                {% else %}
-                    &lt;li&gt;&lt;strong&gt;Fecha: &lt;/strong&gt;{{ record.answers.662c304fad7432d296d92582 }}&lt;/li&gt;
-                {% endif %}
-            &lt;/ul&gt;
-
-        &lt;/div&gt;
-
-        &lt;!-- Footer --&gt;
-        &lt;div class="footer"&gt;
-            &lt;p&gt;&amp;copy; 2024 &lt;a href="https://soter-app.webflow.io/" target="_blank"&gt;Soter&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
-            &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
-                &lt;img alt="" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" width="150px"&gt;
-            &lt;/a&gt;
-        &lt;/div&gt;
+    &lt;!-- Header con logo --&gt;
+    &lt;div style="text-align:center; padding:25px 20px; background:#f1f4f8;"&gt;
+        &lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_10.thumbnail" alt="Logo" style="max-height:120px;"&gt;
     &lt;/div&gt;
+
+    &lt;!-- Mensaje principal --&gt;
+    &lt;div style="padding:30px 25px; text-align:center;"&gt;
+      &lt;h2 style="margin:0; font-size:22px; color:#021d49;"&gt;{{record.answers.662c2937108836dec6d92580}}, tu pase de entrada ha sido generado correctamente. ✅&lt;/h2&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Detalles de la visita --&gt;
+    &lt;div style="padding:20px 25px; background:#f9fbfd; border-top:1px solid #e6e9ef;"&gt;
+      &lt;h2 style="margin-top:0; font-size:18px; color:#021d49;"&gt;Detalles de tu visita&lt;/h2&gt;
+    
+      &lt;!-- Fechas --&gt;
+      &lt;ul style="list-style:none; padding:0; margin:15px 0; color:#444; font-size:15px;"&gt;
+        {% if record.answers.662c304fad7432d296d92581 == "Rango de fechas" %}
+          &lt;li&gt;&lt;strong&gt;Desde: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/li&gt;
+          &lt;li&gt;&lt;strong&gt;Hasta: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92583}}&lt;/li&gt;
+        {% else %}
+          &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/li&gt;
+        {% endif %}
+
+        &lt;li&gt;&lt;strong&gt;Límite de accesos: &lt;/strong&gt;{{record.answers.6635380dc9b3e7db4d59eb49}}&lt;/li&gt;
+        
+        {% if record.answers.662c304fad7432d296d92584 == "Limitar días de acceso" %}
+          &lt;li&gt;&lt;strong&gt;Días de acceso:&lt;/strong&gt; 
+            {% for dia in record.answers.662c304fad7432d296d92585 %}
+              {{ dia }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          &lt;/li&gt;          
+          &lt;!-- &lt;li&gt;&lt;strong&gt;Días de acceso: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92585}}&lt;/li&gt; --&gt;
+        {% endif %}
+        &lt;li&gt;&lt;strong&gt;Tema de la cita: &lt;/strong&gt;{{record.answers.67329875978e6460083c5648}}&lt;/li&gt;
+      &lt;/ul&gt;
+
+      &lt;!-- Ubicaciones --&gt;
+      {% if record.answers.6834e34fa6242006acedda0f|length == 1 %}
+      &lt;!-- SOLO UNA UBICACIÓN --&gt;
+      {% for item in record.answers.6834e34fa6242006acedda0f %}
+        &lt;div style="background:#fff; border:1px solid #e0e4eb; border-radius:8px; padding:12px 15px; margin-bottom:12px; text-align:left;"&gt;
+          &lt;p style="margin:0; font-size:15px; color:#021d49;"&gt;
+            &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}
+          &lt;/p&gt;
+          &lt;p style="margin:4px 0 0; font-size:14px; color:#555;"&gt;
+            &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}
+          &lt;/p&gt;
+          &lt;p style="margin:4px 0 0; font-size:14px; color:#016189;"&gt;
+            &lt;a href="https://www.google.com/maps?q={{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
+              target="_blank" 
+              style="color:#016189; text-decoration:none;"&gt;
+              📍 Ver en Google Maps
+            &lt;/a&gt;
+            &lt;!-- &lt;p&gt;{{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c}}&lt;/p&gt; --&gt;
+            &lt;/a&gt;
+          &lt;/p&gt;
+        &lt;/div&gt;
+      {% endfor %}
+      {% elif record.answers.6834e34fa6242006acedda0f|length &gt; 1 %}
+      &lt;!-- VARIAS UBICACIONES --&gt;
+      &lt;div style="margin-top:20px;"&gt;
+        &lt;h3 style="font-size:16px; color:#021d49; margin-bottom:10px;"&gt;Ubicaciones asignadas&lt;/h3&gt;
+      
+        {% for item in record.answers.6834e34fa6242006acedda0f %}
+          &lt;div style="background:#fff; border:1px solid #e0e4eb; border-radius:8px; padding:12px 15px; margin-bottom:12px; text-align:left;"&gt;
+            &lt;p style="margin:0; font-size:15px; color:#021d49;"&gt;
+              &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}
+            &lt;/p&gt;
+            &lt;p style="margin:4px 0 0; font-size:14px; color:#555;"&gt;
+              &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}
+            &lt;/p&gt;
+            &lt;p style="margin:4px 0 0; font-size:14px; color:#016189;"&gt;
+              &lt;a href="https://www.google.com/maps?q={{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
+                target="_blank" 
+                style="color:#016189; text-decoration:none;"&gt;
+                📍 Ver en Google Maps
+              &lt;/a&gt;
+            &lt;/p&gt;
+          &lt;/div&gt;
+        {% endfor %}
+      &lt;/div&gt;
+      {% endif %}
+    &lt;/div&gt;
+
+    &lt;!-- Footer --&gt;
+    &lt;div style="text-align:center; padding:20px; font-size:12px; color:#777; background:#f1f4f8;"&gt;
+      &lt;p style="margin:0;"&gt;&amp;copy; 2026 &lt;a href="https://soter-app.webflow.io/" target="_blank" style="color:#021d49; text-decoration:none;"&gt;Clave 10&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
+      &lt;div style="margin-top:10px;"&gt;
+        &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
+          &lt;img src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" width="120px" alt="Linkaform"&gt;
+        &lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
 &lt;/body&gt;
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>
