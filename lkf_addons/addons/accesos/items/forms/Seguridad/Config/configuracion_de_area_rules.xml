@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.configuracion_de_area.id }}</form_id>
-    <id>68935e755af7ef5c445fa2ec</id>
+    <id>68912dd9cb5b26eb6616eb6a</id>
     <rules>
         <item>
             <conditions>
@@ -23,22 +23,6 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>{{ catalog.areas_de_las_ubicaciones.obj_id}}</field_id>
-                    <group_id>None</group_id>
-                    <id>680f8f6f3aae12aabc6c3996</id>
-                    <label>Área</label>
-                    <type>catalog</type>
-                </item>
-                <item>
-                    <catalog_id>680f8f6f3aae12aabc6c3996</catalog_id>
-                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
-                    <group_id>None</group_id>
-                    <id>663e5c57f5b8a7ce8211ed0b</id>
-                    <label>Ubicación</label>
-                    <type>catalog-select</type>
-                </item>
-                <item>
-                    <catalog_id>None</catalog_id>
                     <field_id>688a33d9e61fcd2c299ff39f</field_id>
                     <group_id>None</group_id>
                     <id>688a33d9e61fcd2c299ff39f</id>
@@ -47,43 +31,9 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Regla 1</name>
+            <name>Mostrar Nueva Areas</name>
             <operator>and</operator>
-            <rule_id>22811701174faf6</rule_id>
-            <rule_type>required</rule_type>
-            <user_conditions>{}</user_conditions>
-        </item>
-        <item>
-            <conditions>
-                <item>
-                    <condition>in=</condition>
-                    <field>
-                        <catalog_id>None</catalog_id>
-                        <field_id>688a33d9e61fcd2c299ff39e</field_id>
-                        <group_id>None</group_id>
-                        <id>688a33d9e61fcd2c299ff39e</id>
-                        <label>¿Existe el area que buscabas en el catalogo?</label>
-                        <type>select</type>
-                    </field>
-                    <value>no</value>
-                </item>
-            </conditions>
-            <element_ids>[]</element_ids>
-            <empty>False</empty>
-            <fields_ruled>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>688a33d9e61fcd2c299ff39f</field_id>
-                    <group_id>None</group_id>
-                    <id>688a33d9e61fcd2c299ff39f</id>
-                    <label>Nombre del area a crear</label>
-                    <type>text</type>
-                </item>
-            </fields_ruled>
-            <group_conditions>{}</group_conditions>
-            <name>Regla 2</name>
-            <operator>and</operator>
-            <rule_id>a0316c614b413fd</rule_id>
+            <rule_id>1aac24927dc1293</rule_id>
             <rule_type>show</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
@@ -135,9 +85,85 @@
                 </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
-            <name>Regla 3</name>
+            <name>Ocultar Campos de Cotrol</name>
             <operator>or</operator>
-            <rule_id>18ad1d282480171f</rule_id>
+            <rule_id>fd61130a7f1f5f</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>688a33d9e61fcd2c299ff39e</field_id>
+                        <group_id>None</group_id>
+                        <id>688a33d9e61fcd2c299ff39e</id>
+                        <label>¿Existe el area que buscabas en el catalogo?</label>
+                        <type>select</type>
+                    </field>
+                    <value>no</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>688a33d9e61fcd2c299ff39f</field_id>
+                    <group_id>None</group_id>
+                    <id>688a33d9e61fcd2c299ff39f</id>
+                    <label>Nombre del area a crear</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>680ffa2c87c49a88ab7ba9b6</catalog_id>
+                    <field_id>663e5c57f5b8a7ce8211ed0b</field_id>
+                    <group_id>None</group_id>
+                    <id>663e5c57f5b8a7ce8211ed0b</id>
+                    <label>Ubicación</label>
+                    <type>catalog-select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requerir Nueva Area</name>
+            <operator>and</operator>
+            <rule_id>21e665215da2312</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>688a33d9e61fcd2c299ff39e</field_id>
+                        <group_id>None</group_id>
+                        <id>688a33d9e61fcd2c299ff39e</id>
+                        <label>¿Existe el area que buscabas en el catalogo?</label>
+                        <type>select</type>
+                    </field>
+                    <value>no</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>680ffa2c87c49a88ab7ba9b6</catalog_id>
+                    <field_id>663e5d44f5b8a7ce8211ed0f</field_id>
+                    <group_id>None</group_id>
+                    <id>663e5d44f5b8a7ce8211ed0f</id>
+                    <label>Nombre de Area</label>
+                    <type>catalog-select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocutal catalogo areas</name>
+            <operator>and</operator>
+            <rule_id>24ece3f17ef1085</rule_id>
             <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
