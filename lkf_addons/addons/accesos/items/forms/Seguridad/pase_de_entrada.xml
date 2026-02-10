@@ -7,11 +7,11 @@
             <config>True</config>
             <inc_by>1</inc_by>
             <manual>False</manual>
-            <next>1521</next>
+            <next>1881</next>
             <padding_zeros>3</padding_zeros>
             <prefix>PE/%y%m/</prefix>
             <required>False</required>
-            <suffix>None</suffix>
+            <suffix />
         </folio>
     </advanced_options>
     <allow_page_navigation>True</allow_page_navigation>
@@ -1294,7 +1294,11 @@
                         <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
-                        <related_catalog>{}</related_catalog>
+                        <related_catalog>
+                            <childs>
+                                <item>66a83a77cfed7f342775c161</item>
+                            </childs>
+                        </related_catalog>
                         <view_fields>
                             <item>661dc67e901906b7e9b73bac</item>
                         </view_fields>
@@ -2964,9 +2968,10 @@
                         <last>False</last>
                         <related_catalog>
                             <catalog_id>121671</catalog_id>
-                            <related_fields>
-                                <item>663e5c57f5b8a7ce8211ed0b</item>
-                            </related_fields>
+                            <childs>
+                                <item>66a83a77cfed7f342775c161</item>
+                            </childs>
+                            <related_fields>[]</related_fields>
                         </related_catalog>
                         <view_fields>
                             <item>663bd36eb19b7fb7d9e97ccb</item>
@@ -3779,12 +3784,7 @@
                         <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
-                        <related_catalog>
-                            <catalog_id>121671</catalog_id>
-                            <related_fields>
-                                <item>663e5c57f5b8a7ce8211ed0b</item>
-                            </related_fields>
-                        </related_catalog>
+                        <related_catalog>{}</related_catalog>
                         <view_fields>
                             <item>663e5d44f5b8a7ce8211ed0f</item>
                         </view_fields>
@@ -6940,6 +6940,98 @@
                     <validations>{}</validations>
                     <visible>True</visible>
                 </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>698b6f3d13a551df2b2ecfcb</field_id>
+                    <field_type>radio</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Creado desde</label>
+                    <number_type>None</number_type>
+                    <options>
+                        <item>
+                            <label>Nueva Visita</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>nueva_visita</value>
+                        </item>
+                        <item>
+                            <label>Auto Registro</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>auto_registro</value>
+                        </item>
+                        <item>
+                            <label>Pase de Entrada Web</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>pase_de_entrada_web</value>
+                        </item>
+                        <item>
+                            <label>Pase de Entrada App</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>pase_de_entrada_app</value>
+                        </item>
+                    </options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
             </page_fields>
             <page_name>Página 1</page_name>
             <page_type>fields</page_type>
@@ -7007,6 +7099,18 @@
             <resource_uri>/api/infosync/templates/584/</resource_uri>
             <script>{}</script>
         </item>
+        <item>
+            <_type>single_record</_type>
+            <description>Template de seguridad Gafete de entrada para 3b</description>
+            <id>619</id>
+            <name>Seguridad - Gafete de Entrada</name>
+            <owner>/api/infosync/user/10/</owner>
+            <paginate>True</paginate>
+            <pdfName>Pase de Entrada 3B</pdfName>
+            <properties>{}</properties>
+            <resource_uri>/api/infosync/templates/619/</resource_uri>
+            <script>{}</script>
+        </item>
     </templates>
     <timer_config>
         <active>False</active>
@@ -7016,5 +7120,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1768885515.0</updated_at>
+    <updated_at>1770745700.0</updated_at>
 </lkf>
