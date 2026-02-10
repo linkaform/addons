@@ -319,6 +319,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'tipo_vehiculo': '65f22098d1dc5e0b9529e89a',
             'tipo_visita_pase': '662c304fad7432d296d92581',
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
+            'username': '6759e4a7a9a6e13c7b26da33',
             'user_id_empleado': '663bd32d7fb8869bbc4d7f7b',
             'vigencia_certificado':'662962bb203407ab90c886e6',
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
