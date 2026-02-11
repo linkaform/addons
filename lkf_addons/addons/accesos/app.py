@@ -670,6 +670,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'commentario_area':"66af1a77d703592958dca5eb",
             'catalog_area_pase':'664fc5f3bbbef12ae61b15e9',
             'catalogo_visitante_registrado': '66a83ad456d1e741159ce118',
+            'creado_desde':'698b6f3d13a551df2b2ecfcb',
             'curp_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['curp']}",
             'nombre_permiso':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e4",
             'email_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['email_vista']}",
@@ -918,7 +919,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     f"{self.mf['empresa']}":[access_pass.get('empresa'),],
                     f"{self.pase_entrada_fields['perfil_pase_id']}": [access_pass['tipo_de_pase'],],
                     # f"{self.pase_entrada_fields['status_pase']}":[access_pass['estatus'],],
-                    f"{self.pase_entrada_fields['status_pase']}":['Activo',],
+                    f"{self.pase_entrada_fields['status_pase']}":['activo',],
                     f"{self.pase_entrada_fields['foto_pase_id']}": access_pass.get("foto",[]), #[access_pass['foto'],], #.get('foto','')
                     f"{self.pase_entrada_fields['identificacion_pase_id']}": access_pass.get("identificacion",[]) #[access_pass['identificacion'],], #.get('identificacion','')
                     }
@@ -1628,10 +1629,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res
 
     def catalagos_pase_no_jwt(self, qr_code):
-        cat_vehiculos= self.catalogo_vehiculos({})
-        cat_estados= self.catalogo_estados({})
+        # se quito porque ya no se edita el pase
+        # cat_vehiculos= self.catalogo_vehiculos({})
+        # cat_estados= self.catalogo_estados({})
         pass_selected= self.get_pass_custom(qr_code)
-        res={"cat_vehiculos":cat_vehiculos, "cat_estados":cat_estados, "pass_selected":pass_selected}
+        res={"pass_selected":pass_selected}
         return res
 
     def catalogo_categoria(self, options={}):
@@ -2127,7 +2129,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         match_query_visitas = {
             "deleted_at": {"$exists": False},
             "form_id": self.BITACORA_ACCESOS,
-            f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+            f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["activo"]},
             f"answers.{self.bitacora_fields['status_visita']}": "entrada",
         }
 
@@ -2554,7 +2556,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             }
         return format_res
 
-    def create_access_pass(self, location, access_pass):
+    def create_access_pass(self, access_pass):
         #---Define Metadata
         metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
         metadata.update({
@@ -3199,7 +3201,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     "deleted_at": {"$exists": False},
                     "form_id": self.BITACORA_ACCESOS,
                     f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["activo"]},
                     f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                     f"answers.{self.bitacora_fields['ubicacion']}": location,
                     f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
@@ -3313,14 +3315,14 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             match_query_one = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["activo"]},
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
             }
 
             match_query_two = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["activo"]},
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
                 f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
             }
@@ -6794,6 +6796,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
+                #TODO pregutnar a Paco porque aqui usa el nombre del empeado con el user.get('email')
+                #en vez de la persona seleccionada como vista....
                 res['json'].update({'enviar_de':employee.get('worker_name')})
                 res['json'].update({'enviar_de_correo':employee.get('email')})
                 res['json'].update({'ubicacion':pass_selected.get('ubicacion')})
@@ -7565,7 +7569,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             },
             "logo": {
                 "sourceUri": {
-                    "uri": "https://f001.backblazeb2.com/file/app-linkaform/public-client-126/68600/6076166dfd84fa7ea446b917/2025-04-28T11:11:42.png"
+                    "uri": "https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/698ac1135d6fad2b3d15bf84.png"
                 }
             },
             "hexBackgroundColor": "#FFFFFF",
