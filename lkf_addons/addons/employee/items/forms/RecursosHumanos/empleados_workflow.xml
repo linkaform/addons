@@ -899,7 +899,7 @@
                 </metadata>
                 <record>
                     <created>True</created>
-                    <deleted>False</deleted>
+                    <deleted>True</deleted>
                     <edited>True</edited>
                     <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
