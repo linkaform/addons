@@ -4066,7 +4066,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}"                
                 },
             },
-            {'$sort':{'folio':-1}},
+            {'$sort':{'created_at':-1}},
         ]
         res = self.cr.aggregate(query)
         x = {}
@@ -4373,7 +4373,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'date_entrega_perdido':f"$answers.{self.perdidos_fields['date_entrega_perdido']}",
                 'locker_perdido':f"$answers.{self.perdidos_fields['locker_catalog']}.{self.perdidos_fields['locker_perdido']}" 
             }},
-            {'$sort':{'folio':-1}},
+            {'$sort':{'created_at':-1}},
         ]
         if not filterDate:
             query.append(
@@ -4424,7 +4424,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "folio": "$folio",
                 "answers":"$answers",
             }},
-            {'$sort':{'folio':-1}},
+            {'$sort':{'created_at':-1}},
         ]
         result = self.format_cr_result(self.cr.aggregate(query), ids_label_dct=self.cons_f)
         for item in result:
@@ -4560,11 +4560,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         ]
         if dateFrom:
             query.append(
-                {'$sort':{'folio':1}},
+                {'$sort':{'created_at':1}},
             )
         else:
             query.append(
-                {'$sort':{'folio':-1}},
+                {'$sort':{'created_at':-1}},
             )
 
         query.append({'$skip': offset})
@@ -4668,7 +4668,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 # 'falla_fecha_hora_solucion':f"$answers.{self.fallas_fields['falla_fecha_hora_solucion']}",
                 'falla_grupo_seguimiento':f"$answers.{self.fallas_fields['falla_grupo_seguimiento']}",
             }},
-            {'$sort':{'folio':-1}},
+            {'$sort':{'created_at':-1}},
         ]
         result = self.format_cr_result(self.cr.aggregate(query))
         for r in result:
@@ -4853,7 +4853,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "note_pic": f"$answers.{self.notes_fields['note_pic']}",
                 "note_comments": f"$answers.{self.notes_fields['note_comments_group']}",
             }},
-            {'$sort':{'folio':-1}},
+            {'$sort':{'created_at':-1}},
         ]
         
         query.append({'$skip': offset})
@@ -5305,7 +5305,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 'entregado_a_paqueteria': f"$answers.{self.paquetes_fields['entregado_a_paqueteria']}",
                 'proveedor': f"$answers.{self.paquetes_fields['proveedor_cat']}.{self.paquetes_fields['proveedor']}",
             }},
-            {'$sort':{'folio':-1}},
+            {'$sort':{'created_at':-1}},
         ]
         if not filterDate:
             query.append(
@@ -5608,7 +5608,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "folio": "$folio",
                 "name": f"$answers.{self.mf['guard_group']}.{self.mf['catalog_guard_close']}.{self.mf['nombre_guardia_apoyo']}",
             }},
-            {'$sort':{'folio':-1}},
+            {'$sort':{'created_at':-1}},
             {'$limit':1},
         ]
         #return self.format_cr_result(self.format_cr_result(self.cr.aggregate(query)))
