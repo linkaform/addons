@@ -1030,7 +1030,69 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         metadata.update({'answers':answers})
         response_create = self.lkf_api.post_forms_answers(metadata)
         return response_create
-     
+   
+    def access_pass_set_status(self, answers):
+        """
+        Evalua criterios del pase y regresa el status del pase
+        Proceso
+        Activo
+        Vencido
+        args:
+            answers (json): Objeto de answers
+        return:
+            status (str): String con status
+        """
+
+        foto_ok = False
+        id_vista = False
+        fecha_ok = False
+        vista_a_ok = False
+        autorizado_ok = False
+        status = 'proceso'
+        foto  = answers[self.pase_entrada_fields['walkin_fotografia']]
+        if isinstance(foto, list) and len(foto) > 0:
+            foto = foto[0]
+
+        if isinstance(foto, dict):
+            if 'file_url' in foto.keys() and foto['file_url']:
+                foto_ok = self.valid_url(foto['file_url'])
+        #TODO revisar configuracion
+        id_vista  = answers[self.pase_entrada_fields['walkin_identificacion']]
+        if isinstance(id_vista, list) and len(id_vista) > 0:
+            id_vista = id_vista[0]
+
+        if isinstance(id_vista, dict):
+            if 'file_url' in id_vista.keys() and id_vista['file_url']:
+                id_vista = self.valid_url(id_vista['file_url'])
+        id_vista = True
+        today = self.get_today_format()
+        try:
+            fecha_desde_visita = self.valid_date(answers[self.pase_entrada_fields['fecha_desde_visita']]) 
+        except:
+            fecha_desde_visita = None
+        try:
+            fecha_desde_hasta = self.valid_date(answers[self.pase_entrada_fields['fecha_desde_hasta']])
+        except:
+            fecha_desde_hasta = None
+        if fecha_desde_visita and fecha_desde_hasta and fecha_desde_visita >= today and fecha_desde_hasta >= today: 
+            fecha_ok = True
+        
+        grupo_visitados = answers[self.mf['grupo_visitados']]
+        for vista_a in grupo_visitados:
+            if vista_a.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID,{}).get(self.mf['nombre_empleado']):
+                vista_a_ok = True
+
+            if answers.get(self.pase_entrada_fields['catalago_autorizado_por'],{}).get(self.pase_entrada_fields['autorizado_por']):
+                autorizado_ok = True
+
+        if foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
+            status = 'activo'
+        elif foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
+            status = 'por_autorizar'
+        elif not fecha_ok:
+            status = 'vencido'
+        return status
+
     def assets_access_pass(self, location):
         ### Areas
         catalog_id = self.AREAS_DE_LAS_UBICACIONES_CAT_ID
@@ -1693,7 +1755,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 search="incidence"
 
         res = self.lkf_api.catalog_view(catalog_id, form_id, options)
-        print("CATALGOO", catalog_id, form_id,res)
         formatted= {
             "selected":cat, 
             "data":res, 
@@ -1704,7 +1765,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             formatted["selected"] = cat
             formatted["data"] = res_obj["data"] 
             formatted["type"] = "incidence"
-        print("formatedo", simplejson.dumps(formatted, indent=4))
         return formatted
 
     def catalogo_vehiculos(self, options={}):
@@ -1722,6 +1782,28 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 res = self._labels(res[0])
                 res = {k:v[0] for k,v in res.items() if len(v)>0}
         return res
+
+    def catalog_visita_a_pases(self, visita_a):
+        if visita_a == 'Usuario Actual':
+            user_id = self.user['user_id']
+            employee = self.Employee.get_employee_data(user_id=self.user['user_id'], get_one=True)
+            self.employee = employee
+            visita_a = employee.get('worker_name')
+        visita_set = {
+            self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
+                self.mf['nombre_empleado'] : visita_a,
+                }
+            }
+        options_vistia = {
+              "group_level": 2,
+              "startkey": [visita_a],
+              "endkey": [f"{visita_a}\n",{}],
+            }
+        cat_visita = self.catalogo_view(self.CONF_AREA_EMPLEADOS_CAT_ID, self.PASE_ENTRADA, options_vistia)
+        if len(cat_visita) > 0:
+            cat_visita =  {key: [value,] for key, value in cat_visita[0].items() if value}
+        visita_set[self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID].update(cat_visita)
+        return visita_set
 
     def catalogo_config_area_empleado(self, bitacora, location=''):
         #TODO Verificar si objetos perdidos tambien necesita solo los empleados de una location
@@ -1752,8 +1834,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         catalog_id = self.CONF_AREA_EMPLEADOS_AP_CAT_ID
         form_id= self.BITACORA_FALLAS
         return self.lkf_api.catalog_view(catalog_id, form_id) 
-
-    
 
     def catalogo_falla(self, tipo=""):
         options={}
@@ -2937,6 +3017,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             row['responsable'] = r.get(self.incidence_fields['responsable'],'')
             res.append(row)
         return res
+    
     def format_afectacion_patrimonial(self, data):
         res = []
         for r in data:
@@ -5142,7 +5223,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "records_on_page": len(records)
         }
 
-    def get_pdf(self, qr_code, template_id=584, name_pdf='Pase de Entrada'):
+    def get_pdf(self, qr_code, template_id, name_pdf):
         return self.lkf_api.get_pdf_record(qr_code, template_id = template_id, name_pdf =name_pdf, send_url=True)
 
     def get_pass_custom(self,qr_code):
@@ -6717,11 +6798,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return res
 
     def update_pass(self, access_pass,folio=None):
-        pass_selected= self.get_detail_access_pass(qr_code=folio)
+        pass_selected= self.get_detail_access_pass(qr_code=folio, get_answers=True)
         qr_code= folio
         _folio= pass_selected.get("folio")
         answers={}
         for key, value in access_pass.items():
+            if not self.pase_entrada_fields.get(key):
+                continue
             if key == 'grupo_vehiculos':
                 answers[self.mf['grupo_vehiculos']]={}
                 for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
@@ -6762,6 +6845,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                         self.mf['modelo_articulo']:modelo,
                     }
                     answers[self.mf['grupo_equipos']][(index+1)*-1]=obj
+            elif key == 'visita_a':
+                for index, item in enumerate(access_pass.get('visita_a',[])):
+                    answers[self.mf['grupo_visitados']] = answers.get(self.mf['grupo_visitados'],{})
+                    answers[self.mf['grupo_visitados']][(index+1)*-1] =self.catalog_visita_a_pases(item)
             elif key == 'status_pase':
                 answers.update({f"{self.pase_entrada_fields[key]}":value.lower()})
             elif key == 'archivo_invitacion':
@@ -6779,20 +6866,20 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
 
-        print("1ans", simplejson.dumps(answers, indent=4))
-        # print(ans)
-        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
-        print("empleado", employee)
+  
+        employee = getattr(self,'employee',self.get_employee_data(email=self.user.get('email'), get_one=True))
         if answers:
+            pdf_to_img = self.update_pass_img(qr_code)
+            if pdf_to_img:
+                answers.update({self.pase_entrada_fields['pdf_to_img']: pdf_to_img})
+
+            new_answers = deepcopy(pass_selected['answers'])
+            new_answers.update(answers)
+            status = self.access_pass_set_status(new_answers)
+            answers[self.pase_entrada_fields['status_pase']] = status
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
-            pdf_to_img = None
-            if answers.get(self.pase_entrada_fields['status_pase'], '') == 'activo':
-                pdf_to_img = self.update_pass_img(qr_code)
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
-                if self.user.get('parent_id') == 7742:
-                    pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 553, name_pdf='Pase de Entrada', send_url=True)
-                else:
-                    pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 584, name_pdf='Pase de Entrada', send_url=True)
+                pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
                 res['json'].update({'enviar_a':pass_selected.get("nombre")})
@@ -6814,21 +6901,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             self.LKFException('No se mandarón parametros para actualizar')
 
     def update_pass_img(self, qr_code=None):
-        pdf = self.lkf_api.get_pdf_record(qr_code, template_id = 584, name_pdf='Pase de Entrada', send_url=True)
-        pdf_url = pdf.get('json', {}).get('download_url')
+        self.pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
+        pdf_url = self.pdf.get('json', {}).get('download_url')
         id_forma = self.PASE_ENTRADA
         id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
         pass_img_url = self.upload_pdf_as_image(id_forma, id_campo_pdf_to_img, pdf_url)
         pass_img_file_name = pass_img_url.get('file_name')
         pass_img_file_url = pass_img_url.get('file_url')
-        answers = {
-            self.pase_entrada_fields['pdf_to_img']: [{
-                'file_name': pass_img_file_name,
-                'file_url': pass_img_file_url
-            }]
-        }
-        res = self.lkf_api.patch_multi_record(answers=answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
-        print('pass_img_response', res)
         return [{'file_name': pass_img_file_name, 'file_url': pass_img_file_url}]
 
     def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
