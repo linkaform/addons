@@ -2,9 +2,6 @@ b2==1.4.2
 CouchDB-Linkaform
 -e git+https://github.com/linkaform/backblaze_utils.git#egg=backblaze_utils
 
-#facturapi
-#sha-py
-#urllib2
 cx-Oracle==8.3.0
 google-auth==2.39.0
 googlemaps==4.5.3

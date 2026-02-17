@@ -25,6 +25,7 @@ services:
       - ../lkf_addons/bin/download_module.py:/usr/local/bin/download_module.py
       - ../lkf_addons/bin/json_xml.py:/usr/local/bin/json_xml.py
       - ../lkf_addons/bin/xml_2_json.py:/usr/local/bin/xml_2_json.py
+      - ../secrets/lkf_jwt_key.pub:/etc/ssl/certs/lkf_jwt_key.pub
       - ../config:/srv/scripts/addons/config
       - ../modules:/srv/scripts/addons/modules
       - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/ 
