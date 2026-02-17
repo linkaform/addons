@@ -6867,7 +6867,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             elif key == 'conservar_datos_por':
                 answers.update({f"{self.pase_entrada_fields[key]}": value.replace(" ", "_")})      
             else:
-                answers.update({f"{self.pase_entrada_fields[key]}":value})
+                if value:
+                    answers.update({f"{self.pase_entrada_fields[key]}":value})
 
   
         employee = getattr(self,'employee',self.get_employee_data(email=self.user.get('email'), get_one=True))
