@@ -12,7 +12,7 @@ Se permite la redistribución y el uso en formas de código fuente y binario, co
 
 '''
 
-import sys, simplejson
+import sys, simplejson, re
 
 from linkaform_api import settings
 from lkf_addons.addons.base.app import Base
@@ -104,6 +104,7 @@ class Employee(Base):
             'username': '6653f3709c6d89925dc04b2e',
             'usuario': self.USUARIOS_OBJ_ID,
             'usuario_email': f"{self.USUARIOS_OBJ_ID}.638a9a7767c332f5d459fc82",
+            'usuario_telefono': f"{self.USUARIOS_OBJ_ID}.67be0c43a31e5161c47f2bba",
             'usuario_id': f"{self.USUARIOS_OBJ_ID}.638a9a99616398d2e392a9f5",
             'worker_code': '670f585bf844ff7bc357b1dc',
             'worker_code_jefes': '671a8fbae68fe659567224b0',
@@ -143,7 +144,7 @@ class Employee(Base):
             res  = {f"answers.{field_id}": value}
         return res
 
-    def get_employee_data(self, name=None, user_id=None, username=None, email=None,  get_one=False):
+    def get_employee_data(self, name=None, user_id=None, username=None, email=None, phone=None, get_one=False):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.EMPLEADOS,
@@ -155,7 +156,19 @@ class Employee(Base):
         if username:
             match_query.update(self._get_match_q(self.f['username'], username))
         if email:
-            match_query.update(self._get_match_q(self.employee_fields['usuario_email'], email)) 
+            match_query.update(self._get_match_q(self.employee_fields['usuario_email'], email))
+        if phone:
+            phone = re.sub(r'\D', '', phone)
+            phone = phone[-10:]
+            match_query.update(
+                {
+                "$or": [
+                    {f"answers.{self.employee_fields['telefono1']}": {"$regex": phone}},
+                    {f"answers.{self.employee_fields['telefono2']}": {"$regex": phone}},
+                    {f"answers.{self.employee_fields['usuario_telefono']}": {"$regex": phone}},
+                    ]
+                }
+                )
         query = [
             {'$match': match_query },    
             {'$project': self.project_format(self.employee_fields)},
