@@ -1042,7 +1042,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         return:
             status (str): String con status
         """
-
         foto_ok = False
         id_vista = False
         fecha_ok = False
@@ -1078,7 +1077,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             fecha_ok = True
         
         grupo_visitados = answers[self.mf['grupo_visitados']]
-        for vista_a in grupo_visitados:
+        for vista in grupo_visitados:
+            if isinstance(vista, int):
+                vista_a = grupo_visitados[vista]
+            else:
+                vista_a = vista
             if vista_a.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID,{}).get(self.mf['nombre_empleado']):
                 vista_a_ok = True
 
