@@ -5,6 +5,7 @@ services:
     container_name: lkf-test
     image: linkaform/lkf_test:develop
     volumes:
+      - ../secrets/lkf_jwt_key.pub:/etc/ssl/certs/lkf_jwt_key.pub
       - ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/
       - ../../lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons/
       - ../../modules:/usr/local/lib/python3.10/site-packages/lkf_modules/

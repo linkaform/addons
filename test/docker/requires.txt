@@ -6,44 +6,46 @@ pytest==7.2.2
 pytest-dependency==0.5.1
 
 ####################
-# Addoss Requires
+# Addons Requires
 ####################
 b2==1.4.2
 CouchDB-Linkaform
--e git+https://github.com/linkaform/backbalze_utils.git#egg=backblaze_utils
+-e git+https://github.com/linkaform/backblaze_utils.git#egg=backblaze_utils
+
 cx-Oracle==8.3.0
-httplib2==0.12.1
-#facturapi
-googlemaps==4.5.3
 google-auth==2.39.0
+googlemaps==4.5.3
 haversine==2.5.1
+httplib2==0.12.1
 Jinja2==3.1.2
+matplotlib
+numpy
 openpyxl==3.0.10
-pandas==2.2.3
+opencv-python-headless==4.13.0.90
 pdf2image
 pdf2pptx
-PyJWT==2.6.0
-pydantic==1.10.2
-python-jwt
-pyexcel==0.7.0
-pyexcel-xlsx==0.6.0
-pyexcel-xlsxw==0.6.1
-pyexcel-ods==0.6.0
 psycopg2==2.9.3
-pymongo==3.13
-pytz==2023.4
+pydantic==1.10.2
+pyexcel==0.7.0
+pyexcel-ods==0.6.0
+pyexcel-ods==0.6.0
 pyexcel-ods3==0.6.1
 pyexcel-odsr==0.6.0
-pyexcel-ods==0.6.0
-pytest-mock
+pyexcel-xlsx==0.6.0
+pyexcel-xlsxw==0.6.1
+PyJWT==2.6.0
+pymongo==3.13
+pytesseract==0.3.13
+python-jwt
+pytz==2023.4
 qrcode==7.3.1
-simplejson==3.16.0
-#sha-py
 requests
+simplejson==3.16.0
+twilio
 twilio==9.3.6
 typing==3.7.4.3
-twilio
 vobject==0.9.8
+vonage
 wget
-#urllib2
 xlrd==2.0.1
+
