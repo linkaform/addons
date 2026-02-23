@@ -91,8 +91,10 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.CARGA_PERMISOS_VISITANTES = self.lkm.form_id('carga_de_permisos_de_visitantes','id')
         self.CHECKIN_CASETAS = self.lkm.form_id('checkin_checkout_casetas','id')
         self.CONCESSIONED_ARTICULOS = self.lkm.form_id('concesion_de_activos_unico','id')
+        self.CONFIGURACION_RECORRIDOS_FORM = self.lkm.form_id('configuracion_de_recorridos','id')
         self.CONF_PERFILES = self.lkm.form_id('configuracion_de_perfiles','id')
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
+        self.PROGRAMAR_TAREAS = self.lkm.form_id('programar_tareas', 'id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
         self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
@@ -101,7 +103,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.BITACORA_RONDINES = self.lkm.form_id('bitacora_rondines','id')
         self.CHECK_UBICACIONES = self.lkm.form_id('check_ubicaciones','id')
         self.REGISTRO_ASISTENCIA = self.lkm.form_id('registro_de_asistencia','id')
-        self.CONFIGURACION_RECORRIDOS_FORM = self.lkm.form_id('configuracion_de_recorridos','id')
         self.FORMATO_VACACIONES = self.lkm.form_id('formato_vacaciones_aviso','id')
 
         self.last_check_in = []
