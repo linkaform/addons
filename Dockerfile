@@ -17,8 +17,10 @@ RUN apt-get update && \
     libffi-dev \
     poppler-utils \
     python3-psycopg2 \
+    tesseract-ocr \
+    tesseract-ocr-spa \
     time \
-    vim
+    vim 
 
 #mongo 5.0 tools
 RUN curl -fsSL https://pgp.mongodb.com/server-5.0.asc | gpg -o /usr/share/keyrings/mongodb-server-5.0.gpg --dearmor

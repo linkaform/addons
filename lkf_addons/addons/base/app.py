@@ -808,7 +808,6 @@ class CargaUniversal(Base):
                         },
                         "limit":20,"skip":0}
                     row_catalog = self.lkf_api.search_catalog( catalog_id, mango_query )
-                    #print("+++++ row_catalog:",row_catalog)
                     if row_catalog:
                         catalog_fields = cont_cat.get('catalog_fields',[])
                         view_fields = cont_cat.get('catalog',{}).get('view_fields',[])
