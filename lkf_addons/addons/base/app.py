@@ -83,6 +83,7 @@ class Base(base.LKF_Base):
         self.CLIENTE = self.lkm.form_id('clientes', 'id')
         self.CONFIGURACIONES = self.lkm.form_id('configuraciones', 'id')
         self.ENVIO_DE_CORREOS = self.lkm.form_id('envio_de_correos', 'id')
+        self.USUARIOS_FORM = self.lkm.form_id('usuarios', 'id')
         ### Catálogos ###
         '''
         `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos. 
