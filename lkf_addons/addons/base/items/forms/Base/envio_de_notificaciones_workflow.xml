@@ -1,0 +1,282 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.envio_de_notificaciones.id }}</form_id>
+    <id>67bf83eccc585c13f70f7c1d</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>699f3bf3b92fd3ce377e90c1</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2025-12-17T21:32:40.399275</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.send_sms.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.send_sms.name }}</name>
+                            <start_date>2025-12-17T21:32:40.395858</start_date>
+                            <updated_at>2026-01-07T17:01:04.939431</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>Se ejecuta el script</name>
+                </item>
+            </actions>
+            <id>699f3bf3b92fd3ce377e90c3</id>
+            <name>Envio de Notificacion por SMS</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2026-02-26T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2026-02-25T14:50:39.808Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>699dfe3b82be0dbe0319d38c</field_id>
+                                <group>{}</group>
+                                <label>Tipo de Notificacion</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>null</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>699f3bf3b92fd3ce377e90c2</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} &lt;!DOCTYPE html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Notificación de Sistema&lt;/title&gt;
+    &lt;style&gt;
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border: 1px solid #eeeeee;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            background-color: #021d49;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header img {
+            max-width: 130px;
+            height: auto;
+        }
+
+        .content {
+            padding: 40px 30px;
+            color: #444444;
+            line-height: 1.6;
+        }
+
+        .content p {
+            margin: 0 0 15px;
+            font-size: 16px;
+            
+        }
+
+        .highlighted-message {
+            background-color: #f9f9f9;
+            border-left: 4px solid #021d49;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .label {
+            color: #888888;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .value {
+            color: #021d49;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .footer {
+            background-color: #fafafa;
+            text-align: center;
+            color: #999999;
+            padding: 10px;
+            font-size: 12px;
+            border-top: 1px solid #eeeeee;
+        }
+
+        .footer a {
+            color: #021d49;
+            text-decoration: none;
+        }
+
+        .footer img {
+            filter: none;
+            opacity: 1;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class="email-container"&gt;
+        &lt;div class="header"&gt;
+            &lt;img alt="logo" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/69457fa7593f4a5b767be3c1.png"&gt;
+        &lt;/div&gt;
+
+        &lt;div class="content" style="padding-bottom: 20px !important;"&gt;
+            &lt;p&gt;Hola,&lt;/p&gt;
+            &lt;p&gt;Se ha registrado una nueva actividad en el sistema con la siguiente información:&lt;/p&gt;
+
+            &lt;div&gt;
+                &lt;span class="label"&gt;Motivo / Asunto&lt;/span&gt;
+                &lt;span class="value"&gt;{{record.answers.67169f72c736cc47794404f9}}&lt;/span&gt;
+            &lt;/div&gt;
+
+            &lt;div class="highlighted-message"&gt;
+                &lt;span class="label"&gt;Mensaje detallado&lt;/span&gt;
+                &lt;p style="color: #333;"&gt;"{{record.answers.670d2d9d0337e410e4353550}}"&lt;/p&gt;
+            &lt;/div&gt;
+
+            &lt;p style="font-size: 14px; color: #777;"&gt;Este es un mensaje automático, por favor no responda a este correo.&lt;/p&gt;
+        &lt;/div&gt;
+
+        &lt;div class="footer"&gt;
+            &lt;p&gt;&amp;copy; 2026 &lt;a href="https://www.clave10.com/" target="_blank"&gt;Clave10&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
+            &lt;a href="https://www.linkaform.com/" target="_blank"&gt;
+                &lt;img alt="Powered by Linkaform" src="https://f001.backblazeb2.com/file/app-linkaform/public-client-126/107023/64dd1bd4fd200a3308ec2141/663517c3caae08b8adf27472.png" width="150px"&gt;
+            &lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+
+&lt;/html&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>670d2e32756833542954716c</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Para</label>
+                            </item>
+                        </email_fields>
+                        <emails>[]</emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>False</send_pdf>
+                        <sender>envios@linkaform.com.mx</sender>
+                        <subject>{% raw %} 📢 {{record.answers.67169f72c736cc47794404f9}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>Se envia el correo</name>
+                </item>
+            </actions>
+            <id>699f3bf3b92fd3ce377e90c6</id>
+            <name>Envio de Notificacion por Correo</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2026-02-26T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2026-02-25T14:50:39.808Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>699dfe3b82be0dbe0319d38c</field_id>
+                                <group>{}</group>
+                                <label>Tipo de Notificacion</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>null</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
