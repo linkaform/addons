@@ -68,7 +68,7 @@
                                 <label>Tipo de Notificacion</label>
                                 <type>radio</type>
                             </trigger_field>
-                            <value>null</value>
+                            <value>sms</value>
                         </item>
                     </triggers>
                 </wf_fields>
@@ -272,7 +272,7 @@
                                 <label>Tipo de Notificacion</label>
                                 <type>radio</type>
                             </trigger_field>
-                            <value>null</value>
+                            <value>email</value>
                         </item>
                     </triggers>
                 </wf_fields>
