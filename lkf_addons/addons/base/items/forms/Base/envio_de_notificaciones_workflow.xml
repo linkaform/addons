@@ -221,7 +221,7 @@
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>False</send_pdf>
-                        <sender>{{record.answers.67169f72c736cc47794404f8}}</sender>
+                        <sender>{% raw %} {{record.answers.67169f72c736cc47794404f8}} {% endraw %}</sender>
                         <subject>{% raw %} 📢 {{record.answers.67169f72c736cc47794404f9}} {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
