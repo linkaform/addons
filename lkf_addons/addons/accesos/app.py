@@ -33,32 +33,26 @@ Si tienes más de una aplicación, puedes:
     b. Guardar los archivos a nivel raíz.
     c. Nombrar los archivos por conveniencia o estándar: `app_utils.py`, `utils.py`, `xxx_utils.py`.
 '''
-from tkinter import NO
-import pytz
-import logging
-import tempfile
-import os
-import uuid
-import simplejson, time
+import pytz, logging, tempfile, os, uuid, simplejson
+import requests, jwt, arrow
+import urllib.parse
+import time as time_module
+
+from copy import deepcopy
 from bson import ObjectId
 from datetime import datetime, timedelta, time, date
-import time as time_module
-from copy import deepcopy
-from math import ceil
-import urllib.parse
 from google.oauth2 import service_account
 from google.auth.transport.requests import Request
-import requests
-import jwt
+from math import ceil
+from pdf2image import convert_from_bytes
+from tkinter import NO
+from zipfile import ZipFile
 
 from linkaform_api import base
 from lkf_addons.addons.employee.app import Employee
 from lkf_addons.addons.activo_fijo.app import Vehiculo
 from lkf_addons.addons.location.app import Location
-import arrow
 
-from pdf2image import convert_from_bytes
-from zipfile import ZipFile
 ### Objeto o Clase de Módulo ###
 '''
 Cada módulo puede tener múltiples objetos, configurados en clases.
@@ -428,9 +422,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'area_catalog_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
             'area_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.663e5d44f5b8a7ce8211ed0f",
             '_area_concesion': "663e5d44f5b8a7ce8211ed0f",
-            'categoria_equipo_concesion': '66ce23efc5c4d148311adf86',
+            'categoria_equipo_concesion':  f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.66ce23efc5c4d148311adf86",
+            '_categoria_equipo_concesion': '66ce23efc5c4d148311adf86',
+            'cantidad_devolucion': '699fec1e0f178e858bbf1b92',
             'cantidad_equipo_concesion': '69799523aa75e6a4c99c4d3f',
             'cantidad_equipo_devuelto': '6979962e6eac7e391dbb244e',
+            'cantidad_equipo_pendiente': '699fe2e679aaab897b504c65',
             
             'caseta_concesion':  f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.663e5d44f5b8a7ce8211ed0f",
             '_caseta_concesion':  "663e5d44f5b8a7ce8211ed0f",
@@ -448,9 +445,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'evidencia_entrega': '6979962e6eac7e391dbb2453',
             'evidencia_devolucion': '6979962e6eac7e391dbb2444',
             'fecha_concesion': '66469ef8c9d58517f85d035f',
-            'fecha_devolucion_concesion': '66469f47c0580e5ead07e39b',
+            'fecha_cierre_concesion': '66469f47c0580e5ead07e39b',
+            'fecha_devolucion_concesion': '699fed207a15d39b937d805c',
             'firma': '6979b0b4a2a5a141dfef9cc5',
             'grupo_equipos': '697991cb4298cbe60db6b883',
+            'grupo_equipos_devolucion': '699fe58a0f178e858bbf1b91',
+            'id_movimiento':'697b055eb9a8d97bb5614ee0',
+            'id_movimiento_devolucion':'699fe63679aaab897b504c71',
             'marca_equipo_concesion': '65f22098d1dc5e0b9529e89b',
             
             'nombre_equipo': f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.66c192ef89463aa27fc1818b",
@@ -476,6 +477,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'persona_nombre_otro': '696fd2291527668d067cdb85',
             'persona_identificacion_otro': '697991ad1cfb3b3210269902',
             'quien_entrega': '6979962e6eac7e391dbb2451',
+            'quien_entrega_company': '699feaa2a0e52f55fd5589a5',
             'tipo_persona_solicita': '66469e5a3e6a703350f2e03a',
             'status_concesion': '66469e193e6a703350f2e029',
             'status_concesion_equipo': '66469e193e6a703350f2e299',
@@ -483,6 +485,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'ubicacion_catalog_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
             'ubicacion_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             '_ubicacion_concesion': self.mf['ubicacion'],
+        }
+        
+        self.status_equipo_dict = {
+            'complete':'completo',
+            'lost':'perdido',
+            'damage':'dañado'
         }
         #- Para creación , edición y lista de fallas
         self.fallas_fields = {
@@ -1993,8 +2001,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers[self.cons_f['grupo_equipos']] = []
         # Equipo
         for equipo in equipos:
+            if equipo.get('id_movimiento') and ObjectId.is_valid(equipo['id_movimiento']):
+                move_id = equipo['id_movimiento']
+            else:
+                move_id = str(ObjectId())
             eq = {
-                self.cons_f['status_concesion_equipo']:"abierto"
+                self.cons_f['status_concesion_equipo']:"abierto",
+                self.cons_f['id_movimiento'] : str(ObjectId())
             }
             for key, value in equipo.items():
                 if '.' in self.cons_f[key]:
@@ -2007,7 +2020,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 else:
                     eq[self.cons_f[key]] = value
             answers[self.cons_f['grupo_equipos']].append(eq)
-        
         metadata = self.lkf_api.get_metadata(form_id=self.CONCESSIONED_ARTICULOS)
         metadata.update({
             "properties": {
@@ -4000,6 +4012,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$match': match_query },
             {'$project': 
                 {'_id':1,
+                'created_at':'$created_at',
                 'folio': f"$folio",
                 'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                 'nombre': {"$ifNull":[
@@ -4353,6 +4366,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             #{'$project': self.proyect_format(self.perdidos_fields)},
             {'$project': {
                 "folio":"$folio",
+                'created_at':'$created_at',
                 'estatus_perdido':f"$answers.{self.perdidos_fields['estatus_perdido']}",
                 'date_hallazgo_perdido':f"$answers.{self.perdidos_fields['date_hallazgo_perdido']}",
                 'ubicacion_perdido':f"$answers.{self.perdidos_fields['ubicacion_catalog']}.{self.perdidos_fields['ubicacion_perdido']}",
@@ -4389,9 +4403,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             "form_id": self.CONCESSIONED_ARTICULOS,
         }
         if location:
-             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}"] = location
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}"] = location
         if area:
-             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
         if status:
              match_query[f"answers.{self.cons_f['status_concesion']}"] = status
 
@@ -4422,7 +4436,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             # {'$unwind':f"$answers.{self.cons_f['grupo_equipos']}"},
             {'$project': {
                 "_id" : "$_id",
+                'created_at':'$created_at',
                 "folio": "$folio",
+                "created_at":"$created_at",
                 "answers":"$answers",
             }},
             {'$sort':{'created_at':-1}},
@@ -4547,6 +4563,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 },
                 {'$project':{
                     "_id":0, 
+                    'created_at':'$created_at',
                     'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
                     'grupo_areas_acceso': f"$answers.{self.mf['grupo_areas_acceso']}",                    
                     }
@@ -4649,6 +4666,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$match': match_query },
             {'$project': {
                 "folio": "$folio",
+                'created_at':'$created_at',
                 'falla_estatus': f"$answers.{self.fallas_fields['falla_estatus']}",
                 'falla_fecha_hora': f"$answers.{self.fallas_fields['falla_fecha_hora']}",
                 'falla_reporta_nombre': f"$answers.{self.fallas_fields['falla_reporta_catalog']}.{self.fallas_fields['falla_reporta_nombre']}",
@@ -4840,6 +4858,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$match': match_query },
             {'$project': {
                 "folio":"$folio",
+                'created_at':'$created_at',
                 "created_by_name": f"$created_by_name",
                 "created_by_id": f"$created_by_id",
                 "created_by_email": f"$created_by_email",
@@ -5294,6 +5313,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$project': {
                 "folio":"$folio",
                 "_id":"$_id",
+                'created_at':'$created_at',
                 'ubicacion_paqueteria':f"$answers.{self.paquetes_fields['ubicacion_paqueteria']}",
                 'area_paqueteria': f"$answers.{self.paquetes_fields['area_paqueteria']}",
                 'fotografia_paqueteria':f"$answers.{self.paquetes_fields['fotografia_paqueteria']}",
@@ -5606,6 +5626,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             {'$match': match_query },
             {'$project': {
                 "_id": 1,
+                'created_at':'$created_at',
                 "folio": "$folio",
                 "name": f"$answers.{self.mf['guard_group']}.{self.mf['catalog_guard_close']}.{self.mf['nombre_guardia_apoyo']}",
             }},
@@ -5845,19 +5866,54 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     employee_ids.append(x['user_id'])
         return employees
 
-    def update_article_concessioned(self, record_id, status, state=None, equipos=[], evidencia={}, comentario=""):
+    def get_cantidad_pendiente(self, record, move, status):
+        devluciones = record.get('grupo_equipos_devolucion',[])
+        moves_by_ids = {e['id_movimiento']:e for e in record['grupo_equipos']}
+        totals = {}
+        move_id = move['id_movimiento']
+        for dev in devluciones:
+            t_move_id = dev['id_movimiento_devolucion']
+            cant = dev['cantidad_devolucion']
+            totals[t_move_id] = totals.get(t_move_id, 0) + cant
+
+        cant_concesion = moves_by_ids[move_id]['cantidad_equipo_concesion']
+        nombre_equipo = moves_by_ids[move_id]['nombre_equipo']
+        ya_devuelto = totals.get(move_id,0)
+
+        if status == 'total':
+            esta_devolucion = cant_concesion - totals.get(move_id,0)
+        else:
+            esta_devolucion = move['cantidad_devuelta']
+        
+        pendiente = cant_concesion - esta_devolucion - totals.get(move_id,0)
+        if pendiente < 0:
+            breakpoint()
+            msg = f"Se concesionaron {cant_concesion} del equipo {nombre_equipo}. "
+            msg += f"Estas tratando de regresar: {esta_devolucion}. " 
+            msg += f"Ya habias devuelto: {totals.get(move_id,0)}. "
+            msg += f"Esto te pondria en una devoluicion negativa de: {pendiente}. "
+            msg += "Revisa bien la cantidad colega."
+            self.LKFException(msg)
+
+        return pendiente
+
+    def update_article_concessioned(self, data, record_id):
         """
             Funcion que devuelve o actualiza estado de los articulos concesionados
             Si recive el status 'return', va a comparar con los datos que se estan enviando.
             Y despues de consultar el folio, va a poner todos los equipos como devueltos, con la condicion general.
             Donde status puedes ser "total" o "parcial"
             Args:
-                folio "str": _id del registro
-                status "str": "total" o "parcial" o "cancelar" es el estado general del pedido
-                state "str": "completo", "pedido", "dañado" es el estado del equipo global. Sirve en caso de que sea
-                una devolucion global
-                equipos: "list[json]": Lista de jsons con los valores de los equipos a devolver
-
+                record_id "str": _id del registro
+                data "json": json con la informacin de la devolucion
+                data.status (str) :
+                data.state (str) : "complete"|"lost"|"damage" es el estado del equipo global. Sirve en caso de que sea
+                data.quien_entrega (str) : Nombre de quien entrega,
+                data.identificacion_entrega (list) : lista de documentos de indtificaiocn tipo archivo 
+                data.evidencia(list) : lista de fotos de envidencia de entrega 
+                ** opcional
+                data.company (str) : Nombre Empresa en caso de no se ermpleado  
+                data.comentarios (str) : Comentario de la entrega 
             return:
                 folio: folio acutalizado
                 update_date:
@@ -5866,29 +5922,99 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         answers = {}
         print("record_id", record_id)
         record = self.get_record_by_id(record_id)
-        rec = self.format_cr([self.get_record_by_id(record_id),], get_one=True, ids_label_dct=self.cons_f)
+        rec = self.format_cr([record,], get_one=True, ids_label_dct=self.cons_f)
         print('record', record)
+        print('rec', simplejson.dumps(rec, indent=4))
+        fecha = self.today_str(tz_name=self.user.get('timezone'),date_format='datetime')
+        status = data.get('status')
         if rec['status_concesion'] == "cancelado":
             self.LKFException(f"No es posible devolver o modifcar una concesion  {rec['folio']}")
         if rec['status_concesion'] == "devuelto":
             self.LKFException(f"La Conecsion con folio: {rec['folio']} ya se encuentra devuelta.")
+        if not status:
+            self.LKFException(f"Status de devolucion de proporcionada.")
+
+        # Inicializamos lista de devlucion de equipos
+        record['answers'][self.cons_f['grupo_equipos_devolucion']] = record['answers'].get(self.cons_f['grupo_equipos_devolucion'],[])
 
         if status == "total":
-            if not state:
+            if not data.get('state'):
                 self.LKFException(f"Para poder realizar una devolucion total hay que indicar el Estado de la devolucion.")
-            status = "devuelto"
-            record['answers'][self.cons_f["fecha_devolucion_concesion"]] = self.today_str(tz_name=self.user.get('timezone'),date_format='datetime')
+            record['answers'][self.cons_f["fecha_cierre_concesion"]] = fecha
+
+
             for eq in record['answers'].get(self.cons_f['grupo_equipos'],[]):
+                dev = {}
                 eq[self.cons_f['status_concesion_equipo']] = "devuelto"
                 eq[self.cons_f['cantidad_equipo_devuelto']]  = eq[self.cons_f['cantidad_equipo_concesion']]
-                eq[self.cons_f['estatus_equipo']]  = state
-                eq[self.cons_f['evidencia_entrega']] =  eq.get(self.cons_f['evidencia_entrega'],evidencia)
-                eq[self.cons_f['comentario_entrega']] = eq.get(self.cons_f['comentario_entrega'], comentario)
-        
+                eq[self.cons_f['cantidad_equipo_pendiente']]  = 0
+                
+                #devolucion de equipos
+                dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
+                dev[self.cons_f['id_movimiento_devolucion']]  = eq[self.cons_f['id_movimiento']]
+                dev[self.cons_f['cantidad_devolucion']]  = self.get_cantidad_pendiente(rec, self.format_cr([eq],get_one=True, ids_label_dct=self.cons_f), status)
+                dev[self.cons_f['estatus_equipo']]  = self.status_equipo_dict[data.get('state')]
+                dev[self.cons_f['quien_entrega']] =  data.get('quien_entrega')
+                dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company')
+                dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
+                dev[self.cons_f['evidencia_entrega']] =  data.get('evidencia')
+                dev[self.cons_f['comentario_entrega']] = data.get('comentarios')
+            
+                record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
+        else:
+            if not data.get('equipos'):
+                self.LKFException(f"No se detecto información de equipos a devolver. Devolucion vacia!!!")
+            
+            moves_by_ids = {e['id_movimiento']:e for e in rec['grupo_equipos']}
+            
+            for eq in data['equipos']:
+                dev = {}
+                if not eq['id_movimiento'] in list(moves_by_ids.keys()):
+                    self.LKFException(f"ID de Movimiento {eq['id_movimiento']}, no encontrado o previamente devuelto")
+                
+                cantidad_pendiente = self.get_cantidad_pendiente(rec, eq, status)
+                if cantidad_pendiente == 0:
+                    #Ya se devolvieron todos los productos, marcar como devuelto en el grupo de equipos
+                    for gq in record['answers'].get(self.cons_f['grupo_equipos'],[]):
+                        if gq[self.cons_f['id_movimiento']] == eq['id_movimiento']:
+                            #busca el registro del move_id en cuestion.
+                            gq[self.cons_f['status_concesion_equipo']] = "devuelto"
+                            gq[self.cons_f['cantidad_equipo_devuelto']]  = gq[self.cons_f['cantidad_equipo_concesion']]
+                            gq[self.cons_f['cantidad_equipo_pendiente']]  = 0
+
+                cantidad_devuelta = eq['cantidad_devuelta']
+                
+                dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
+                dev[self.cons_f['id_movimiento_devolucion']]  = eq['id_movimiento']
+                dev[self.cons_f['cantidad_devolucion']]  = cantidad_devuelta
+                dev[self.cons_f['estatus_equipo']]  = self.status_equipo_dict[eq['state']]
+                dev[self.cons_f['quien_entrega']] =  data.get('quien_entrega')
+                dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company')
+                dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
+                dev[self.cons_f['evidencia_entrega']] =  data.get('evidencia')
+                dev[self.cons_f['comentario_entrega']] = data.get('comentarios')
+                record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
+
+
+
+
+
+
+
 
         # # status "se debe de calular que estatus tendra, ya sea abierta, parcial o total"
-        record['answers'][self.cons_f["status_concesion"]] = status
-        print('answers', simplejson.dumps(record['answers'], indent=3))
+        status_concesion = 'abierto'
+        for q in record['answers'].get(self.cons_f['grupo_equipos'],[]):
+            if q[self.cons_f['status_concesion_equipo']] != 'devuelto':
+                status_concesion = 'abierto'
+                break
+            status_concesion = 'devuelto'
+        if status_concesion == 'abierto':
+            if record['answers'].get(self.cons_f['grupo_equipos_devolucion']) and \
+                len(record['answers'][self.cons_f['grupo_equipos_devolucion']]) > 0:
+                status_concesion = 'parcial'
+
+        record['answers'][self.cons_f["status_concesion"]] = status_concesion
         return self.lkf_api.patch_record(record)
 
         # for key, value in data_articles.items():
