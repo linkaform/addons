@@ -4492,6 +4492,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return self.format_lockers(self.lkf_api.search_catalog( self.LOCKERS_CAT_ID, mango_query))
 
+<<<<<<< HEAD
     def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', limit=10, offset=0):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -4624,6 +4625,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         }
         return bitacora
 
+=======
+>>>>>>> a021603766da958ab692e2a0613925aba9f4bdc6
     def get_list_fallas(self, location=None, area=None,status=None, folio=None, dateFrom="", dateTo="", filterDate=""):
         match_query = {
             "deleted_at":{"$exists":False},
