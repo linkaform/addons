@@ -5920,11 +5920,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 error:
         """
         answers = {}
-        print("record_id", record_id)
         record = self.get_record_by_id(record_id)
         rec = self.format_cr([record,], get_one=True, ids_label_dct=self.cons_f)
-        print('record', record)
-        print('rec', simplejson.dumps(rec, indent=4))
         fecha = self.today_str(tz_name=self.user.get('timezone'),date_format='datetime')
         status = data.get('status')
         if rec['status_concesion'] == "cancelado":
@@ -5936,6 +5933,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         # Inicializamos lista de devlucion de equipos
         record['answers'][self.cons_f['grupo_equipos_devolucion']] = record['answers'].get(self.cons_f['grupo_equipos_devolucion'],[])
+        pendiente_by_move_id = {}
 
         if status == "total":
             if not data.get('state'):
@@ -5966,12 +5964,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 self.LKFException(f"No se detecto información de equipos a devolver. Devolucion vacia!!!")
             
             moves_by_ids = {e['id_movimiento']:e for e in rec['grupo_equipos']}
-            
+            return_by_move_id = {}
             for eq in data['equipos']:
                 dev = {}
                 if not eq['id_movimiento'] in list(moves_by_ids.keys()):
                     self.LKFException(f"ID de Movimiento {eq['id_movimiento']}, no encontrado o previamente devuelto")
-                
                 cantidad_pendiente = self.get_cantidad_pendiente(rec, eq, status)
                 if cantidad_pendiente == 0:
                     #Ya se devolvieron todos los productos, marcar como devuelto en el grupo de equipos
@@ -5982,7 +5979,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                             gq[self.cons_f['cantidad_equipo_devuelto']]  = gq[self.cons_f['cantidad_equipo_concesion']]
                             gq[self.cons_f['cantidad_equipo_pendiente']]  = 0
 
-                cantidad_devuelta = eq['cantidad_devuelta']
+                pendiente_by_move_id[eq['id_movimiento']] = pendiente_by_move_id.get(eq['id_movimiento'],0)
+                cantidad_devuelta = eq['cantidad_devuelta'] 
+                pendiente_by_move_id[eq['id_movimiento']] += cantidad_pendiente 
                 
                 dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
                 dev[self.cons_f['id_movimiento_devolucion']]  = eq['id_movimiento']
@@ -6004,8 +6003,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         # # status "se debe de calular que estatus tendra, ya sea abierta, parcial o total"
         status_concesion = 'abierto'
-        for q in record['answers'].get(self.cons_f['grupo_equipos'],[]):
-            if q[self.cons_f['status_concesion_equipo']] != 'devuelto':
+        # print('pendiente_by_move_id=',pendiente_by_move_id)
+        for x in record['answers'].get(self.cons_f['grupo_equipos'],[]):
+            move_id = x[self.cons_f['id_movimiento']]
+            pendiente = pendiente_by_move_id.get(move_id)
+            if pendiente:
+                x[self.cons_f['cantidad_equipo_devuelto']]  = x[self.cons_f['cantidad_equipo_concesion']] - pendiente
+                x[self.cons_f['cantidad_equipo_pendiente']]  = pendiente
+
+        for x in record['answers'].get(self.cons_f['grupo_equipos'],[]):
+            if x[self.cons_f['status_concesion_equipo']] != 'devuelto':
                 status_concesion = 'abierto'
                 break
             status_concesion = 'devuelto'
