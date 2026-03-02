@@ -321,6 +321,28 @@ class Employee(Base):
                     'marcada_como': f"$answers.{self.f['areas_group']}.{self.f['area_default']}",
                     'position': {"$first":f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.f['worker_position']}"},
                     }
-                }
+                },
+            {"$group": {
+                "_id": "$name",
+                "id":           {"$first": "$_id"},
+                "folio":        {"$first": "$folio"},
+                "created_at":   {"$first": "$created_at"},
+                "area":         {"$first": "$area"},
+                "location":     {"$first": "$location"},
+                "user_id":      {"$first": "$user_id"},
+                "marcada_como": {"$first": "$marcada_como"},
+                "position":     {"$first": "$position"}
+            }},
+            {"$project": {
+                "_id": "$id",
+                "folio": 1,
+                "created_at": 1,
+                "area": 1,
+                "location": 1,
+                "name": "$_id",
+                "user_id": 1,
+                "marcada_como": 1,
+                "position": 1
+            }}
             ]
         return self.format_cr_result(self.cr.aggregate(query))
