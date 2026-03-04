@@ -844,6 +844,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         self.f.update(self.notes_fields)
         self.f.update(self.checkin_fields)
         self.f.update({
+            'areas_del_rondin': '66462aa5d4a4af2eea07e0d1',
             'duracion_rondin':'6639b47565d8e5c06fe97cf3',
             'duracion_traslado_area':'6760a9581e31b10a38a22f1f',
             'fecha_inspeccion_area':'6760a908a43b1b0e41abad6b',
@@ -5755,13 +5756,13 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         
         pendiente = cant_concesion - esta_devolucion - totals.get(move_id,0)
         if pendiente < 0:
-            breakpoint()
             msg = f"Se concesionaron {cant_concesion} del equipo {nombre_equipo}. "
             msg += f"Estas tratando de regresar: {esta_devolucion}. " 
             msg += f"Ya habias devuelto: {totals.get(move_id,0)}. "
             msg += f"Esto te pondria en una devoluicion negativa de: {pendiente}. "
             msg += "Revisa bien la cantidad colega."
-            self.LKFException(msg)
+            self.LKFException({'msg':msg,"title":'Advertencia'})
+
 
         return pendiente
 
@@ -5789,6 +5790,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         """
         answers = {}
         record = self.get_record_by_id(record_id)
+
         rec = self.format_cr([record,], get_one=True, ids_label_dct=self.cons_f)
         fecha = self.today_str(tz_name=self.user.get('timezone'),date_format='datetime')
         status = data.get('status')
