@@ -327,7 +327,7 @@ class Employee(Base):
                 "id":           {"$first": "$_id"},
                 "folio":        {"$first": "$folio"},
                 "created_at":   {"$first": "$created_at"},
-                "area":         {"$first": "$area"},
+                "area":         {"$addToSet": "$area"},
                 "location":     {"$first": "$location"},
                 "user_id":      {"$first": "$user_id"},
                 "marcada_como": {"$first": "$marcada_como"},
