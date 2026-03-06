@@ -66,15 +66,17 @@ while getopts ':iar:ir:c:p:h' opt; do
       ;;
     r)
       echo "Relaoding..."
+      echo "imagen " $IMAGE_NAME
       SHIFT=-1
       if [ "$IMAGE_NAME" != "0" ]; then
         CONTAINER_NAME=$3
       else  
-        CONTAINER_NAME=$2
+        CONTAINER_NAME=$3
         SHIFT=-2
       fi
+      echo "CONTAINER_NAME " $CONTAINER_NAME
       if [[ $CONTAINER_NAME == 'test' ]]; then
-        docker stop lkf_test && docker rm lkf_test
+        docker stop lkf-test && docker rm lkf-test
       else
         docker stop lkf-addons && docker rm lkf-addons
       fi
@@ -139,7 +141,9 @@ _start_addons(){
   case $1 in
     test)
       cd test/docker
+      echo starting testr5...
       containerID=$(docker ps | grep lkf-test | awk '{print $1}')
+      echo container... $containerID
       if [ -z "$containerID" ]; then
         echo "creating new TEST container" 
         docker stop lkf-test && docker rm lkf-test
@@ -277,11 +281,14 @@ _restart(){
 }
 
 _update(){
-  echo 'Running update...'
+  echo 'Running update for image... ' $IMAGE_NAME
   case $Enviorment in
     prod)
-      echo '--------------', $IMAGE_NAME
-      env -i ssh -i $HOME/.ssh/keys/$Account_id _lkf_docker_remote@ansible.linkaform.com prod $IMAGE_NAME
+      for ip in 70 71 72; do
+        ssh -i ~/.ssh/keys/lkf lkf@10.128.10.$ip stop_container $Account_id $IMAGE_NAME &
+      done
+      wait
+      # env -i ssh -i $HOME/.ssh/keys/$Account_id _lkf_docker_remote@ansible.linkaform.com prod $IMAGE_NAME
     ;;
     preprod)
       echo 'Running Account_id...' $Account_id
