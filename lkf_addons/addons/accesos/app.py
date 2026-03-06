@@ -1083,7 +1083,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             fecha_desde_hasta = self.valid_date(answers[self.pase_entrada_fields['fecha_desde_hasta']])
         except:
             fecha_desde_hasta = None
-        if fecha_desde_visita and fecha_desde_hasta and fecha_desde_visita >= today and fecha_desde_hasta >= today: 
+        if fecha_desde_visita and fecha_desde_hasta and fecha_desde_visita <= today <= fecha_desde_hasta: 
             fecha_ok = True
         
         grupo_visitados = answers[self.mf['grupo_visitados']]
