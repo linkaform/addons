@@ -3954,10 +3954,11 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 "tipos": 1
             }}
         ]
+        if isinstance(ubicaciones, str):
+            ubicaciones = [ubicaciones,]
         data = self.format_cr(self.cr.aggregate(query))
         if not data:
             return []
-
         mapped = {
             item.get("ubicacion", "General"): set(item.get("tipos", []))
             for item in data
@@ -3979,7 +3980,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
 
         for t in tipos_por_ubicacion[1:]:
             tipos_comunes &= t
-
         return sorted(tipos_comunes)
 
     def get_count_ingresos(self, qr_code):
@@ -5449,7 +5449,6 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         load_shift_json["user_booths"] = user_booths
         load_shift_json['config_accesos_user']=config_accesos_user
         # load_shift_json["guards_online"] = guards_online
-        print(simplejson.dumps(load_shift_json, indent=4))
         return load_shift_json
 
     def get_user_last_checkin(self, user_id=False):
@@ -5825,9 +5824,9 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 dev[self.cons_f['quien_entrega']] =  data.get('quien_entrega')
                 dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company')
                 dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
-                dev[self.cons_f['evidencia_entrega']] =  data.get('evidencia')
-                dev[self.cons_f['comentario_entrega']] = data.get('comentarios')
-            
+                dev[self.cons_f['evidencia_entrega']] =  eq.get('evidencia',  eq.get('evidencia_entrega'))
+                dev[self.cons_f['comentario_entrega']] = data.get('comenario_entrega',data.get('comentarios'))
+                dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
         else:
             if not data.get('equipos'):
@@ -5852,24 +5851,19 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 pendiente_by_move_id[eq['id_movimiento']] = pendiente_by_move_id.get(eq['id_movimiento'],0)
                 cantidad_devuelta = eq['cantidad_devuelta'] 
                 pendiente_by_move_id[eq['id_movimiento']] += cantidad_pendiente 
-                
+                if not cantidad_devuelta:
+                    self.LKFException(f"Debes de regresar al menos 1 porducto del equipo: {eq['id_movimiento']}. ")
                 dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
                 dev[self.cons_f['id_movimiento_devolucion']]  = eq['id_movimiento']
+                dev[self.cons_f['evidencia_entrega']] =  eq.get('evidencia',  eq.get('evidencia_entrega'))
+                dev[self.cons_f['comentario_entrega']] = eq.get('comenario_entrega',data.get('comentarios'))
                 dev[self.cons_f['cantidad_devolucion']]  = cantidad_devuelta
                 dev[self.cons_f['estatus_equipo']]  = self.status_equipo_dict[eq['state']]
                 dev[self.cons_f['quien_entrega']] =  data.get('quien_entrega')
                 dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company')
                 dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
-                dev[self.cons_f['evidencia_entrega']] =  data.get('evidencia')
-                dev[self.cons_f['comentario_entrega']] = data.get('comentarios')
+                dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
-
-
-
-
-
-
-
 
         # # status "se debe de calular que estatus tendra, ya sea abierta, parcial o total"
         status_concesion = 'abierto'
