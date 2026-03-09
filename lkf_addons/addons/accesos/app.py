@@ -4446,12 +4446,36 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         ]
         result = self.format_cr_result(self.cr.aggregate(query), ids_label_dct=self.cons_f)
         for item in result:
+            item = self.procesar_devoluciones_item(item)
+
             item['firma'] = {}
             if item.get('file_url'):
                 item['firma']['file_url'] = item.pop('file_url')
             if item.get('file_name'):
                 item['firma']['file_name'] = item.pop('file_name')
         return result
+
+    def procesar_devoluciones_item(self, item):
+        # Extraemos las listas para trabajar más fácilmente
+        equipos = item.get('grupo_equipos', [])
+        devoluciones_totales = item.get('grupo_equipos_devolucion', [])
+
+        for equipo in equipos:
+            # Obtenemos el ID que identifica el movimiento del equipo
+            id_mov = equipo.get('id_movimiento')
+            
+            # Filtramos las devoluciones que correspondan a este id_movimiento
+            # Usamos una lista porque mencionas que puede haber múltiples devoluciones parciales
+            devoluciones_equipo = [
+                dev for dev in devoluciones_totales 
+                if dev.get('id_movimiento_devolucion') == id_mov
+            ]
+            
+            # Agregamos la nueva llave con la lista de sus devoluciones
+            equipo['devoluciones'] = devoluciones_equipo
+
+        return item
+
 
     def get_gafetes(self, status='Disponible', location=None, area=None, gafete_id=None, limit=1000, skip=0):
         selector = {}
@@ -5832,7 +5856,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             if not data.get('equipos'):
                 self.LKFException(f"No se detecto información de equipos a devolver. Devolucion vacia!!!")
             
-            moves_by_ids = {e['id_movimiento']:e for e in rec['grupo_equipos']}
+            moves_by_ids = {e['id_movimiento']:e for e in rec['grupo_equipos'] if e.get('id_movimiento')}
             return_by_move_id = {}
             for eq in data['equipos']:
                 dev = {}
