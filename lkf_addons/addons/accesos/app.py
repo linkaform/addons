@@ -1075,16 +1075,45 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 id_vista = self.valid_url(id_vista['file_url'])
         id_vista = True
         today = self.get_today_format()
+        if isinstance(today, datetime):
+            today = today.strftime('%Y-%m-%d')
+        elif today and isinstance(today, str) and len(today) > 10:
+            today = today[:10]
+
         try:
-            fecha_desde_visita = self.valid_date(answers[self.pase_entrada_fields['fecha_desde_visita']]) 
-        except:
+            val_visita = answers[self.pase_entrada_fields['fecha_desde_visita']]
+            if isinstance(val_visita, datetime):
+                fecha_desde_visita = val_visita.strftime('%Y-%m-%d')
+            else:
+                fecha_desde_visita = self.valid_date(val_visita)
+                if fecha_desde_visita:
+                    if isinstance(fecha_desde_visita, datetime):
+                        fecha_desde_visita = fecha_desde_visita.strftime('%Y-%m-%d')
+                    elif isinstance(fecha_desde_visita, str) and len(fecha_desde_visita) > 10:
+                        fecha_desde_visita = fecha_desde_visita[:10]
+        except Exception as e:
+            print(f"DEBUG DESDE ERROR: {e}")
             fecha_desde_visita = None
+
         try:
-            fecha_desde_hasta = self.valid_date(answers[self.pase_entrada_fields['fecha_desde_hasta']])
-        except:
+            val_hasta = answers[self.pase_entrada_fields['fecha_desde_hasta']]
+            if isinstance(val_hasta, datetime):
+                fecha_desde_hasta = val_hasta.strftime('%Y-%m-%d')
+            else:
+                fecha_desde_hasta = self.valid_date(val_hasta)
+                if fecha_desde_hasta:
+                    if isinstance(fecha_desde_hasta, datetime):
+                        fecha_desde_hasta = fecha_desde_hasta.strftime('%Y-%m-%d')
+                    elif isinstance(fecha_desde_hasta, str) and len(fecha_desde_hasta) > 10:
+                        fecha_desde_hasta = fecha_desde_hasta[:10]
+        except Exception as e:
+            print(f"DEBUG HASTA ERROR: {e}")
             fecha_desde_hasta = None
-        if fecha_desde_visita and fecha_desde_hasta and fecha_desde_visita <= today <= fecha_desde_hasta: 
+            
+        if fecha_desde_hasta and today <= fecha_desde_hasta: 
             fecha_ok = True
+        else:
+            print(f"DEBUG FECHA_OK FALSE: today={today}, desde={fecha_desde_visita}, hasta={fecha_desde_hasta}")
         
         grupo_visitados = answers[self.mf['grupo_visitados']]
         for vista in grupo_visitados:
