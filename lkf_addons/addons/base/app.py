@@ -992,8 +992,8 @@ class CargaUniversal(Base):
             else:
                 id_forma_seleccionada = form_id_to_load
             form_fields = self.lkf_api.get_form_id_fields(id_forma_seleccionada)
-            print('field_forma=',field_forma)
-            print('form_fields=',form_fields)
+            # print('field_forma=',field_forma)
+            # print('form_fields=',form_fields)
             if not form_fields:
                 return self.update_status_record( 'error', msg_comentarios='No se encontró la forma %s'%(str(id_forma_seleccionada)))
             else:
