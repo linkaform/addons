@@ -525,7 +525,7 @@
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
-                    <fav>False</fav>
+                    <fav>True</fav>
                     <field_id>6722472f162366c38ebe1c64</field_id>
                     <field_type>checkbox</field_type>
                     <grading_criteria>{}</grading_criteria>
@@ -676,5 +676,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1770162331.0</updated_at>
+    <updated_at>1773097015.0</updated_at>
 </lkf>
