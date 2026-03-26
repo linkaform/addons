@@ -4511,6 +4511,8 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     match_query[f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}"] = {"$in": item.get('value')}
                 elif item.get('key') == 'visita_a':
                     match_query[f"answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}"] = {"$in": item.get('value')}
+                elif item.get('key') == 'ubicacion':
+                    match_query.update({f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": {"$in": item.get('value')}})
                 else:
                     continue
                 
