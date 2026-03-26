@@ -48,7 +48,8 @@ from pdf2image import convert_from_bytes
 from tkinter import NO
 from zipfile import ZipFile
 
-from linkaform_api import base
+# from linkaform_api import base
+from lkf_addons.addons.base.app import Base
 from lkf_addons.addons.employee.app import Employee
 from lkf_addons.addons.activo_fijo.app import Vehiculo
 from lkf_addons.addons.location.app import Location
@@ -62,7 +63,7 @@ Al utilizar `super()` en el método `__init__()`, heredamos las variables de con
 Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
 '''
 
-class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
+class Accesos(Employee, Location, Vehiculo, Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         #--Variables
@@ -825,6 +826,46 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'entregado_a_paqueteria':'67e4652619b4be1c5a76a489',
             'proveedor_cat':f"{self.PROVEEDORES_CAT_OBJ_ID}",
             'proveedor':'667468e3e577b8b98c852aaa',
+        }
+
+        self.rondin_keys = {
+            'accion_recurrencia': 'abcde00010000000a0000001',
+            'areas': '6645052ef8bc829a5ccafaf5',
+            'cada_cuantas_horas_se_repite': 'abcde0001000000000010013',
+            'cada_cuantos_dias_se_repite': 'abcde0001000000000010017',
+            'cada_cuantos_meses_se_repite': 'abcde0001000000000010019',
+            'cada_cuantos_minutos_se_repite': 'abcde0001000000000010011',
+            'cron_id':'abcde0001000000000011111',
+            'cuanto_tiempo_de_anticipacion': 'abcde0002000000000010004',
+            'cuanto_tiempo_de_anticipacion_expresado_en': 'abcde0002000000000010005',
+            'duracion_estimada': '6854459836ea891d9d2be7d9',
+            'en_que_hora_sucede': 'abcde0001000000000010012',
+            'en_que_mes': 'abcde0001000000000010018',
+            'en_que_minuto_sucede': 'abcde0001000000000010010',
+            'en_que_semana_sucede': 'abcde0001000000000010015',
+            'fecha1':'abcde000100000000000f000',
+            'fecha2':'abcde000100000000000f001',
+            'fecha_final_recurrencia': 'abcde0001000000000010099',
+            'fecha_hora_programada': 'abcde0001000000000010001',
+            'grupo_areas':'66462aa5d4a4af2eea07e0d1',
+            'grupo_asignado': '638a9ab3616398d2e392a9fa',
+            'grupo_asignado_rondin':'671055aaa487da57ba57b294',
+            'id_grupo':'639b65dfaf316bacfc551ba2',
+            'la_recurrencia_cuenta_con_fecha_final': '64374e47a208e5c0ff95e9bd',
+            'la_tarea_es_de': 'abcde0001000000000010006',
+            "link":'6927eb61d92ecf923b60a0de',
+            'nombre_rondin': '6645050d873fc2d733961eba',
+            'programar_anticipacion': 'abcde0002000000000010001',
+            'que_dia_del_mes': 'abcde0001000000000010016',
+            'que_dias_de_la_semana': 'abcde0001000000000010014',
+            'se_repite_cada': 'abcde0001000000000010007',
+            'status':'abcde00010000000a0000000',
+            'sucede_cada': 'abcde0001000000000010008',
+            'sucede_recurrencia': 'abcde0001000000000010009',
+            'tiempo_para_ejecutar_tarea': 'abcde0001000000000010004',
+            'tiempo_para_ejecutar_tarea_expresado_en': 'abcde0001000000000010005',
+            'tipo_rondin':'69b9b98d2a02f4a0dd35f5c1',
+            'ubicacion': '663e5c57f5b8a7ce8211ed0b',
         }
 
         self.notes_project_fields.update(self.notes_fields)
