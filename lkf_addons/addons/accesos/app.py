@@ -825,6 +825,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
             'entregado_a_paqueteria':'67e4652619b4be1c5a76a489',
             'proveedor_cat':f"{self.PROVEEDORES_CAT_OBJ_ID}",
             'proveedor':'667468e3e577b8b98c852aaa',
+            'quien_recibe_otro':"69c47a1ce96590f9dbf494b0"
         }
 
         self.notes_project_fields.update(self.notes_fields)
@@ -2702,11 +2703,16 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
         })
 
         #---Define Answers
+
+        ubicaciones = access_pass.get('ubicaciones')
+        location = ubicaciones[0] if isinstance(ubicaciones, list) and ubicaciones else None
+        
         answers = {}
         perfil_pase = access_pass.get('perfil_pase')
         location_name = access_pass.get('ubicacion')
         if not location:
             location = location_name
+
         address = self.get_location_address(location_name=location_name)
         access_pass['direccion'] = [address.get('address', '')]
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
@@ -2805,11 +2811,12 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                     )
                 answers.update({self.pase_entrada_fields['grupo_areas_acceso']:areas_list})
 
-        print(access_pass.get('areas'))
 
         #Visita A
         answers[self.mf['grupo_visitados']] = []
         nombre_visita_a = access_pass.get('visita_a') if not nombre_visita_a else nombre_visita_a
+
+
         if access_pass.get('selected_visita_a'):
             nombre_visita_a = access_pass.get('selected_visita_a')
         visita_set = {
@@ -2817,6 +2824,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 self.mf['nombre_empleado'] : nombre_visita_a,
                 }
             }
+        print("ENTRADA")
         options_vistia = {
               "group_level": 3,
               "startkey": [location, nombre_visita_a],
@@ -5343,72 +5351,7 @@ class Accesos(Employee, Location, Vehiculo, base.LKF_Base):
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
         return answers
-
-    def get_paquetes(self, location= "", area="", status="", dateFrom="", dateTo="", filterDate=""):
-        match_query = {
-            "deleted_at":{"$exists":False},
-            "form_id": self.PAQUETERIA,
-        }
-        if location:
-             match_query[f"answers.{self.paquetes_fields['ubicacion_paqueteria']}"] = location
-        if area:
-             match_query[f"answers.{self.paquetes_fields['area_paqueteria']}"] = area
-        if status:
-             match_query[f"answers.{self.paquetes_fields['estatus_paqueteria']}"] = status
-
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
-
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
-
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$gte": dateFrom, "$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-           match_query.update({
-                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$lte": dateTo}
-            })
-
-        query = [
-            {'$match': match_query },
-            {'$project': {
-                "folio":"$folio",
-                "_id":"$_id",
-                'created_at':'$created_at',
-                'ubicacion_paqueteria':f"$answers.{self.paquetes_fields['ubicacion_paqueteria']}",
-                'area_paqueteria': f"$answers.{self.paquetes_fields['area_paqueteria']}",
-                'fotografia_paqueteria':f"$answers.{self.paquetes_fields['fotografia_paqueteria']}",
-                'descripcion_paqueteria':f"$answers.{self.paquetes_fields['descripcion_paqueteria']}",
-                'quien_recibe_paqueteria':f"$answers.{self.paquetes_fields['quien_recibe_cat']}.{self.paquetes_fields['quien_recibe_paqueteria']}",
-                'guardado_en_paqueteria': f"$answers.{self.paquetes_fields['guardado_en_paqueteria']}",
-                'fecha_recibido_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
-                'fecha_entregado_paqueteria': f"$answers.{self.paquetes_fields['fecha_entregado_paqueteria']}",
-                'estatus_paqueteria': f"$answers.{self.paquetes_fields['estatus_paqueteria']}",
-                'entregado_a_paqueteria': f"$answers.{self.paquetes_fields['entregado_a_paqueteria']}",
-                'proveedor': f"$answers.{self.paquetes_fields['proveedor_cat']}.{self.paquetes_fields['proveedor']}",
-            }},
-            {'$sort':{'created_at':-1}},
-        ]
-        if not filterDate:
-            query.append(
-                {"$limit":25}
-            )
-        pr= self.format_cr_result(self.cr.aggregate(query))
-        for x in pr:
-            status = x.get('estatus_paqueteria', [])
-            x['estatus_paqueteria'] = status.pop() if status else ""
-        return pr
-    
+ 
     def get_range_dates(self, period, zona):
         now = arrow.now(zona) 
         start_date = None
