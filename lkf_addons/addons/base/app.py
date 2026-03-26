@@ -40,6 +40,7 @@ import simplejson, importlib
 import re, os, zipfile, wget, random, shutil, datetime
 from bson.objectid import ObjectId
 from datetime import timedelta
+from couchdb.http import ResourceNotFound
 
 from linkaform_api import base
 
@@ -231,6 +232,26 @@ class Base(base.LKF_Base):
 
         response = self.lkf_api.create_user(body_request)
         return response
+
+    def get_couch_user_db(self, db_name):
+        """
+        Retorna la instancia de la DB. Si no existe, 
+        crea la base de datos en CouchDB si no existe.
+        """
+        try:
+            # Intentar acceder a la DB (si existe, regresa la instancia)
+            db = self.lkf_api.couch.set_db(db_name)
+        except ResourceNotFound:
+            # La DB no existe, crearla
+            try:
+                self.lkf_api.couch.cdb.create(db_name)
+                db = self.lkf_api.couch.set_db(db_name)
+            except Exception as e:
+                self.LKFException(f'Error al crear la base de datos {db_name}: {str(e)}')
+        except Exception as e:
+            self.LKFException(f'Error inesperado al acceder a la base de datos {db_name}: {str(e)}')
+
+        return db
     
     def get_user_by_username(self, username):
         #TODO Checar por que el form id de Usuarios no trae el id correcto
