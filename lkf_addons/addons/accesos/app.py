@@ -86,6 +86,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
         self.CARGA_PERMISOS_VISITANTES = self.lkm.form_id('carga_de_permisos_de_visitantes','id')
         self.CHECKIN_CASETAS = self.lkm.form_id('checkin_checkout_casetas','id')
         self.CONCESSIONED_ARTICULOS = self.lkm.form_id('concesion_de_activos_unico','id')
+        self.CONFIGURACION_AREA_FORM = self.lkm.form_id('configuracion_de_area','id')
         self.CONFIGURACION_RECORRIDOS_FORM = self.lkm.form_id('configuracion_de_recorridos','id')
         self.CONF_PERFILES = self.lkm.form_id('configuracion_de_perfiles','id')
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
