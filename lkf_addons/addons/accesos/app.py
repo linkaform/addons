@@ -3092,6 +3092,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
             row['nombre_articulo'] = r.get(self.mf['nombre_articulo'],'')
             row['tipo_equipo'] = r.get(self.mf['tipo_equipo'],'Computo').title()
             row['color_articulo'] = r.get(self.mf['color_articulo'],'').title()
+            row['foto_equipo'] = r.get(self.mf['foto_equipo'],[]) or []
             res.append(row)
         return res
 
@@ -3149,6 +3150,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
             row['marca_vehiculo'] = v.get(self.mf['marca_vehiculo'],'')
             row['modelo_vehiculo'] = v.get(self.mf['modelo_vehiculo'],'')
             row['nombre_estado'] = v.get('state','')
+            row['foto_vehiculo'] = v.get('foto_vehiculo','') or []
             res.append(row)
         return res
 
@@ -3162,6 +3164,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
             row['marca'] = v.get('marca_vehiculo','') or v.get(self.mf['marca_vehiculo'],'') or ''
             row['modelo'] = v.get('modelo_vehiculo','') or v.get(self.mf['modelo_vehiculo'],'') or ''
             row['estado'] = v.get('nombre_estado','')or v.get('state','') or v.get(self.mf['nombre_estado'],'') or ''
+            row['foto_vehiculo'] = v.get('foto_vehiculo','') or []
             res.append(row)
         return res
 
@@ -3175,6 +3178,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
             row['nombre'] = r.get('nombre_articulo','') or r.get(self.mf['nombre_articulo'],'') or ''
             row['tipo'] = r.get('tipo_equipo','').title() or r.get(self.mf['tipo_equipo'],'') or ''
             row['color'] = r.get('color_articulo','').title() or r.get(self.mf['color_articulo'],'') or ''
+            row['foto_equipo'] = r.get('foto_equipo','') or []
             res.append(row)
         return res
 
