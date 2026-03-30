@@ -329,7 +329,9 @@ class Accesos(Employee, Location, Vehiculo, Base):
             'telefono_visita_a': '67be0c43a31e5161c47f2bba',
             'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
             'acepto_aviso_datos_personales': '6827488724317731cb288117',
-            'conservar_datos_por': '6827488724317731cb288118'
+            'conservar_datos_por': '6827488724317731cb288118',
+            'foto_vehiculo': '698ca60575c268aadf768c57',
+            'foto_equipo': '698ca59f8797d7e10e57617d',
         }
         self.mf = mf
         ## Form Fields ##
