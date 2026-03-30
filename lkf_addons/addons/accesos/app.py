@@ -980,7 +980,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
                     f"{self.mf['empresa']}":[access_pass.get('empresa'),],
                     f"{self.pase_entrada_fields['perfil_pase_id']}": [access_pass['tipo_de_pase'],],
                     # f"{self.pase_entrada_fields['status_pase']}":[access_pass['estatus'],],
-                    f"{self.pase_entrada_fields['status_pase']}":['activo',],
+                    f"{self.pase_entrada_fields['status_pase']}":['Activo',],
                     f"{self.pase_entrada_fields['foto_pase_id']}": access_pass.get("foto",[]), #[access_pass['foto'],], #.get('foto','')
                     f"{self.pase_entrada_fields['identificacion_pase_id']}": access_pass.get("identificacion",[]) #[access_pass['identificacion'],], #.get('identificacion','')
                     }
@@ -1019,6 +1019,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
                         },
                         self.mf['placas_vehiculo']:placas,
                         self.mf['color_vehiculo']:color,
+                        self.mf['foto_vehiculo']:item.get('foto_vehiculo',[])
                     })
             answers[self.mf['grupo_vehiculos']] = list_vehiculos  
 
@@ -1040,6 +1041,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
                     self.mf['modelo_articulo']:modelo,
                     self.mf['color_articulo']:color,
                     self.mf['numero_serie']:serie,
+                    self.mf['foto_equipo']:item.get('foto_equipo',[])
                 })
             answers[self.mf['grupo_equipos']] = list_equipos
 
@@ -1058,20 +1060,23 @@ class Accesos(Employee, Location, Vehiculo, Base):
         if comment or comments_pase:
             comment_list = []
             for c in comment:
-                comment_list.append(
-                    {
-                        self.bitacora_fields['comentario']:c.get('comentario_pase'),
-                        self.bitacora_fields['tipo_comentario'] :c.get('tipo_de_comentario').lower().replace(' ', '_')
-                    }
-                )
+                if c.get('comentario_pase'):
+                    comment_list.append(
+                        {
+                            self.bitacora_fields['comentario']: c.get('comentario_pase'),
+                            self.bitacora_fields['tipo_comentario'] :c.get('tipo_de_comentario').lower().replace(' ', '_')
+                        }
+                    )
             for c in comments_pase:
-                comment_list.append(
-                    {
-                        self.bitacora_fields['comentario']:c.get('comentario_pase'),
-                        self.bitacora_fields['tipo_comentario'] :c.get('tipo_de_comentario').lower().replace(' ', '_')
-                    }
-                )
-            answers.update({self.bitacora_fields['grupo_comentario']:comment_list})
+                if c.get('comentario_pase'):
+                    comment_list.append(
+                        {
+                            self.bitacora_fields['comentario']:c.get('comentario_pase'),
+                            self.bitacora_fields['tipo_comentario'] :c.get('tipo_de_comentario').lower().replace(' ', '_')
+                        }
+                    )
+            if comment_list:
+                answers.update({self.bitacora_fields['grupo_comentario']:comment_list})
 
         visit_list = data.get('visita_a',[])
         if visit_list:
@@ -1401,11 +1406,19 @@ class Accesos(Employee, Location, Vehiculo, Base):
         fecha_obj_caducidad = datetime.strptime(fecha_caducidad, "%Y-%m-%d %H:%M:%S")
         fecha_caducidad = timezone.localize(fecha_obj_caducidad)
 
-        # Se agregan 15 minutos como margen de tolerancia
-        fecha_caducidad_con_margen = fecha_caducidad + timedelta(minutes=15)
+        # Se agrega 1 hora como margen de tolerancia
+        fecha_caducidad_con_margen = fecha_caducidad + timedelta(hours=1)
 
         if fecha_caducidad_con_margen < fecha_actual:
             self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
+        
+        fecha_visita = access_pass.get('fecha_de_expedicion')
+        if fecha_visita:
+            fecha_obj_visita = datetime.strptime(fecha_visita, "%Y-%m-%d %H:%M:%S")
+            fecha_visita_tz = timezone.localize(fecha_obj_visita)
+            
+            if fecha_actual < fecha_visita_tz - timedelta(minutes=30):
+                self.LKFException({'msg': f"Aún no es hora de entrada. Tu acceso comienza a las {fecha_visita}", "title": 'Aviso'})
         
         if location not in access_pass.get("ubicacion",[]):
             msg = f"La ubicación {location}, no se encuentra en el pase. Pase valido para las siguientes ubicaciones: {access_pass.get('ubicacion',[])}."
@@ -3092,7 +3105,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
             row['nombre_articulo'] = r.get(self.mf['nombre_articulo'],'')
             row['tipo_equipo'] = r.get(self.mf['tipo_equipo'],'Computo').title()
             row['color_articulo'] = r.get(self.mf['color_articulo'],'').title()
-            row['foto_equipo'] = r.get(self.mf['foto_equipo'],[]) or []
+            row['foto_equipo'] = r.get('foto_equipo', r.get(self.mf['foto_equipo'],[])) or []
             res.append(row)
         return res
 
