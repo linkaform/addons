@@ -936,7 +936,9 @@ class Accesos(Employee, Location, Vehiculo, Base):
             'nombre_alerta': '695d36605f78faab793f497b',
             'accion_alerta': '695d36605f78faab793f497c',
             'llamar_num_alerta': '695d36605f78faab793f497d',
-            'email_alerta': '695d36605f78faab793f497e'
+            'email_alerta': '695d36605f78faab793f497e',
+            'foto_vehiculo': '698ca60575c268aadf768c57',
+            'foto_equipo': '698ca59f8797d7e10e57617d',
         })
 
     '''
@@ -4021,20 +4023,19 @@ class Accesos(Employee, Location, Vehiculo, Base):
             total_entradas = total_entradas.pop()
         return total_entradas
 
-    def get_detail_access_pass(self, qr_code):
+    def get_detail_access_pass(self, qr_code, get_answers=False):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.PASE_ENTRADA,
             "_id":ObjectId(qr_code),
         }
-        print("QR", qr_code)
         query = [
             {'$match': match_query },
             {'$project': 
                 {'_id':1,
-                'created_at':'$created_at',
                 'folio': f"$folio",
-                'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                'answers':'$answers',
+                'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}",
                 'nombre': {"$ifNull":[
                     f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
                     f"$answers.{self.mf['nombre_pase']}"]},
@@ -4105,6 +4106,8 @@ class Accesos(Employee, Location, Vehiculo, Base):
         res = self.cr.aggregate(query)
         x = {}
         for x in res:
+            if get_answers:
+                x['answers'] = x.get('answers',{})
             visita_a =[]
             x['_id'] = str(x.pop('_id'))
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
@@ -4144,12 +4147,30 @@ class Accesos(Employee, Location, Vehiculo, Base):
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
-            x['ubicacion'] = x.get('ubicacion', [])
+            ubicaciones_full_info = x.get('ubicaciones', [])
+            x['ubicacion'] = [x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.Location.f['location']) for x in ubicaciones_full_info]
             ubicaciones = x.get('ubicaciones', [])
             ubicaciones_format = []
             for ubicacion in ubicaciones:
                 ubicaciones_format.append(ubicacion.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.mf['ubicacion'], ''))
             x['ubicaciones'] = ubicaciones_format
+            x['ubicaciones_geolocation'] = {
+                x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.Location.f['location']): self.unlist(x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.f['address_geolocation']))
+                for x in ubicaciones_full_info
+            }
+            grupo_visita = x.get('answers', {}).get(self.mf['grupo_visitados'], [])
+            if grupo_visita:
+                visita_list = []
+                for idx, visita in enumerate(grupo_visita):
+                    item = {
+                        'id': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['id_usuario'], '')) or idx,
+                        'username': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['username'], '')) or '',
+                        'name': visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['nombre_empleado'], '') or '',
+                        'telefono': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['telefono_visita_a'], '')) or '',
+                        'email': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['email_visita_a'], '')) or '',
+                    }
+                    visita_list.append(item)
+                x['visita_a_details'] = visita_list
         if not x:
             self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
         return x
@@ -6940,6 +6961,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
                     estado = item.get('estado',item.get('nombre_estado',''))
                     placas = item.get('placas',item.get('placas_vehiculo',''))
                     color = item.get('color',item.get('color_vehiculo',''))
+                    foto_vehiculo = item.get('foto_vehiculo','')
                     obj={
                         self.TIPO_DE_VEHICULO_OBJ_ID:{
                             self.mf['tipo_vehiculo']:tipo,
@@ -6951,6 +6973,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
                         },
                         self.mf['placas_vehiculo']:placas,
                         self.mf['color_vehiculo']:color,
+                        self.f['foto_vehiculo']:foto_vehiculo,
                     }
                     answers[self.mf['grupo_vehiculos']][(index+1)*-1]=obj
             elif key == 'grupo_equipos':
@@ -6962,6 +6985,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
                     tipo = item.get('tipo',item.get('tipo_equipo',''))
                     serie = item.get('serie',item.get('numero_serie',''))
                     modelo = item.get('modelo',item.get('modelo_articulo',''))
+                    foto_equipo = item.get('foto_equipo','')
                     obj={
                         self.mf['tipo_equipo']:tipo.lower(),
                         self.mf['nombre_articulo']:nombre,
@@ -6969,6 +6993,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
                         self.mf['numero_serie']:serie,
                         self.mf['color_articulo']:color,
                         self.mf['modelo_articulo']:modelo,
+                        self.f['foto_equipo']:foto_equipo,
                     }
                     answers[self.mf['grupo_equipos']][(index+1)*-1]=obj
             elif key == 'visita_a':
@@ -6993,13 +7018,8 @@ class Accesos(Employee, Location, Vehiculo, Base):
                 if value:
                     answers.update({f"{self.pase_entrada_fields[key]}":value})
 
-  
         employee = getattr(self,'employee',self.get_employee_data(email=self.user.get('email'), get_one=True))
         if answers:
-            pdf_to_img = self.update_pass_img(qr_code)
-            if pdf_to_img:
-                answers.update({self.pase_entrada_fields['pdf_to_img']: pdf_to_img})
-
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
             status = self.access_pass_set_status(new_answers)
@@ -7019,7 +7039,6 @@ class Accesos(Employee, Location, Vehiculo, Base):
                 res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
                 res['json'].update({'asunto':pass_selected.get('tema_cita')})
                 res['json'].update({'descripcion':pass_selected.get('descripcion')})
-                res['json'].update({'pdf_to_img': pdf_to_img if pdf_to_img else pass_selected.get('pdf_to_img')})
                 res['json'].update({'pdf': pdf})
                 return res
             else: 
