@@ -5238,22 +5238,31 @@ class Accesos(Employee, Location, Vehiculo, Base):
         return res
     
     def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None):
-        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        employee['timezone'] = user_data.get('timezone','America/Monterrey')
-        fecha_hoy = datetime.now(pytz.timezone(employee.get('timezone'))).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
+        employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
+        fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
         match_query = {
             'form_id':self.PASE_ENTRADA,
             'deleted_at':{'$exists':False},
-            f"answers.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.pase_entrada_fields['autorizado_por']}":employee.get('worker_name') or '',
+                '$or': [
+            {
+                f"answers.{self.pase_entrada_fields['visita_a']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}": employee.get('worker_name')
+            },
+            {
+                'created_by_id': self.user.get('user_id')
+            }
+        ]
         }
-        if tab_status == "Favoritos":
+        if tab_status.strip().lower() == "favoritos":
             match_query.update({f"answers.{self.pase_entrada_fields['favoritos']}":'si'})
-        elif tab_status == "Activos":
+        elif tab_status.strip().lower() == "activos":
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'activo'})
-        elif tab_status == "Vencidos":
+        elif tab_status.strip().lower() == "vencidos":
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'vencido'})
+        elif tab_status.strip().lower() == "por_autorizar":
+            match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'por_autorizar'})
+        elif tab_status.strip().lower() == "en_proceso":
+            match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'proceso'})
 
         if search_name:
             match_query.update({
@@ -5368,14 +5377,10 @@ class Accesos(Employee, Location, Vehiculo, Base):
 
             for idx, nombre in enumerate(v):
                 emp = {'nombre':nombre}
-                if d:
-                    emp.update({'departamento':d[idx].pop(0) if d[idx] else ""})
-                if p:
-                    emp.update({'puesto':p[idx].pop(0) if p[idx] else ""})
-                if e:
-                    emp.update({'user_id':e[idx].pop(0) if e[idx] else ""})
-                if u:
-                    emp.update({'email': u[idx].pop(0) if u[idx] else ""})
+                emp['departamento'] = d[idx] if idx < len(d) and d[idx] else [""]
+                emp['puesto'] = p[idx] if idx < len(p) and p[idx] else [""]
+                emp['user_id'] = e[idx] if idx < len(e) and e[idx] else [""]
+                emp['email'] = u[idx] if idx < len(u) and u[idx] else [""]
                 visita_a.append(emp)
             if x['tipo_de_pase'] == 'Visita General' or x['tipo_de_pase'] == 'visita general':
                 x['visita_a'] = visita_a
@@ -5434,7 +5439,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
             x.pop('visita_a_puesto', None)
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
-        print("data", simplejson.dumps(records, indent=4))
+        # print("data", simplejson.dumps(records, indent=4))
         return  {
             "records": records,
             "total_records": total_count,
