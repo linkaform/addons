@@ -4893,7 +4893,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
                 r.pop('falla_grupo_seguimiento', None)
         return result
 
-    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None):
+    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None, status=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_INCIDENCIAS,
@@ -4906,6 +4906,8 @@ class Accesos(Employee, Location, Vehiculo, Base):
             match_query[f"answers.{self.incidence_fields['prioridad_incidencia']}"] = {"$in": prioridades}
         if folio:
             match_query.update({"folio":folio})
+        if status:
+            match_query.update({f"answers.{self.incidence_fields['estatus']}": status})
        
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         zona = user_data.get('timezone','America/Monterrey')
