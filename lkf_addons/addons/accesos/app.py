@@ -3734,7 +3734,7 @@ class Accesos(Employee, Location, Vehiculo, Base):
 
             if location:
                 match_query_concesionados.update({
-                    f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
                 })
 
             query_concesionados = [
