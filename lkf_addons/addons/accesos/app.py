@@ -48,11 +48,8 @@ from pdf2image import convert_from_bytes
 from tkinter import NO
 from zipfile import ZipFile
 
-# from linkaform_api import base
-# from lkf_addons.addons.base.app import Base
-# from lkf_addons.addons.employee.app import Employee
-# from lkf_addons.addons.activo_fijo.app import Vehiculo
-# from lkf_addons.addons.location.app import Location
+from linkaform_api import generar_qr
+
 from .model import AccesosModel
 
 ### Objeto o Clase de Módulo ###
@@ -70,7 +67,6 @@ class Accesos(AccesosModel):
         #--Variables
         # Module Globals#
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
-      
 
     '''
     funciones internas: son funciones que solo se pueden mandar llamar dentro de este archivo. Si se hereda la clase
@@ -109,7 +105,7 @@ class Accesos(AccesosModel):
                     f"{self.mf['empresa']}":[access_pass.get('empresa'),],
                     f"{self.pase_entrada_fields['perfil_pase_id']}": [access_pass['tipo_de_pase'],],
                     # f"{self.pase_entrada_fields['status_pase']}":[access_pass['estatus'],],
-                    f"{self.pase_entrada_fields['status_pase']}":['activo',],
+                    f"{self.pase_entrada_fields['status_pase']}":['Activo',],
                     f"{self.pase_entrada_fields['foto_pase_id']}": access_pass.get("foto",[]), #[access_pass['foto'],], #.get('foto','')
                     f"{self.pase_entrada_fields['identificacion_pase_id']}": access_pass.get("identificacion",[]) #[access_pass['identificacion'],], #.get('identificacion','')
                     }
@@ -148,6 +144,7 @@ class Accesos(AccesosModel):
                         },
                         self.mf['placas_vehiculo']:placas,
                         self.mf['color_vehiculo']:color,
+                        self.mf['foto_vehiculo']:item.get('foto_vehiculo',[])
                     })
             answers[self.mf['grupo_vehiculos']] = list_vehiculos  
 
@@ -169,6 +166,7 @@ class Accesos(AccesosModel):
                     self.mf['modelo_articulo']:modelo,
                     self.mf['color_articulo']:color,
                     self.mf['numero_serie']:serie,
+                    self.mf['foto_equipo']:item.get('foto_equipo',[])
                 })
             answers[self.mf['grupo_equipos']] = list_equipos
 
@@ -187,20 +185,23 @@ class Accesos(AccesosModel):
         if comment or comments_pase:
             comment_list = []
             for c in comment:
-                comment_list.append(
-                    {
-                        self.bitacora_fields['comentario']:c.get('comentario_pase'),
-                        self.bitacora_fields['tipo_comentario'] :c.get('tipo_de_comentario').lower().replace(' ', '_')
-                    }
-                )
+                if c.get('comentario_pase'):
+                    comment_list.append(
+                        {
+                            self.bitacora_fields['comentario']: c.get('comentario_pase'),
+                            self.bitacora_fields['tipo_comentario'] :c.get('tipo_de_comentario').lower().replace(' ', '_')
+                        }
+                    )
             for c in comments_pase:
-                comment_list.append(
-                    {
-                        self.bitacora_fields['comentario']:c.get('comentario_pase'),
-                        self.bitacora_fields['tipo_comentario'] :c.get('tipo_de_comentario').lower().replace(' ', '_')
-                    }
-                )
-            answers.update({self.bitacora_fields['grupo_comentario']:comment_list})
+                if c.get('comentario_pase'):
+                    comment_list.append(
+                        {
+                            self.bitacora_fields['comentario']:c.get('comentario_pase'),
+                            self.bitacora_fields['tipo_comentario'] :c.get('tipo_de_comentario').lower().replace(' ', '_')
+                        }
+                    )
+            if comment_list:
+                answers.update({self.bitacora_fields['grupo_comentario']:comment_list})
 
         visit_list = data.get('visita_a',[])
         if visit_list:
@@ -530,11 +531,19 @@ class Accesos(AccesosModel):
         fecha_obj_caducidad = datetime.strptime(fecha_caducidad, "%Y-%m-%d %H:%M:%S")
         fecha_caducidad = timezone.localize(fecha_obj_caducidad)
 
-        # Se agregan 15 minutos como margen de tolerancia
-        fecha_caducidad_con_margen = fecha_caducidad + timedelta(minutes=15)
+        # Se agrega 1 hora como margen de tolerancia
+        fecha_caducidad_con_margen = fecha_caducidad + timedelta(hours=1)
 
         if fecha_caducidad_con_margen < fecha_actual:
             self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
+        
+        fecha_visita = access_pass.get('fecha_de_expedicion')
+        if fecha_visita:
+            fecha_obj_visita = datetime.strptime(fecha_visita, "%Y-%m-%d %H:%M:%S")
+            fecha_visita_tz = timezone.localize(fecha_obj_visita)
+            
+            if fecha_actual < fecha_visita_tz - timedelta(minutes=30):
+                self.LKFException({'msg': f"Aún no es hora de entrada. Tu acceso comienza a las {fecha_visita}", "title": 'Aviso'})
         
         if location not in access_pass.get("ubicacion",[]):
             msg = f"La ubicación {location}, no se encuentra en el pase. Pase valido para las siguientes ubicaciones: {access_pass.get('ubicacion',[])}."
@@ -1863,9 +1872,21 @@ class Accesos(AccesosModel):
         return format_res
 
     def create_access_pass(self, access_pass):
+        """
+        Crea pase de acceso 
+
+        args:
+        location (str): Ubicacion de donde se crea el paso
+        access_pass (json): json con datos completos para generar el pase
+
+        return:
+
+        """
         #---Define Metadata
         metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
+        self.autorizado_por = ""
         metadata.update({
+            "id":self.object_id(),
             "properties": {
                 "device_properties":{
                     "System": "Script",
@@ -1876,50 +1897,83 @@ class Accesos(AccesosModel):
                 }
             },
         })
-
-        #---Define Answers
-
-        ubicaciones = access_pass.get('ubicaciones')
-        location = ubicaciones[0] if isinstance(ubicaciones, list) and ubicaciones else None
-        
         answers = {}
-        perfil_pase = access_pass.get('perfil_pase')
-        location_name = access_pass.get('ubicacion')
-        if not location:
-            location = location_name
+        ics_invitation = False
 
-        address = self.get_location_address(location_name=location_name)
-        access_pass['direccion'] = [address.get('address', '')]
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
+        record_id = metadata['id']
+
+        link_info = access_pass.get('link', "")
+        docs=""
+        
+        if link_info:
+            for index, d in enumerate(link_info["docs"]): 
+                if(d == "agregarIdentificacion"):
+                    docs+="iden"
+                elif(d == "agregarFoto"):
+                    docs+="foto"
+                if index==0 :
+                    docs+="-"
+            link_pass= f"{link_info['link']}?id={record_id}&user={self.user.get('parent_id')}&docs={docs}"
+            answers[self.pase_entrada_fields['link']] = link_pass
+        lkf_qr = generar_qr.LKF_QR(self.settings)
+       
+        qr_generado = lkf_qr.procesa_qr( 
+            record_id, 
+            f"qr_{record_id}", 
+            self.PASE_ENTRADA, 
+            img_field_id=self.pase_entrada_fields['qr_pase'] )
+
+        answers[self.pase_entrada_fields['qr_pase']] = qr_generado
+        # 
+        #---Define Answers
+        perfil_pase = access_pass.get('perfil_pase', 'Visita General')
+        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id', self.user.get('id')))
+        
+        #TODO el timezone debiera de ser de quien crea el registro o de a quien se vista.
+        #creo que se debe de poner una opcion advanzada para ajustar el tiemzone
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
-        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
-        company = employee.get('company', 'Soter')
-        nombre_visita_a = employee.get('worker_name')
+        now_datetime_out = self.get_date_str(self.date_operation(now_datetime, '+', 8, 'hours'))
 
-        if(access_pass.get('site', '') == 'accesos'):
-            nombre_visita_a = access_pass.get('visita_a')
-            access_pass['ubicaciones'] = [location]
+        # Setea personas vistadas
+        answers[self.mf['grupo_visitados']] = []
+        answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
+        
+        ubicaciones = access_pass.get('ubicaciones')
+        location = ubicaciones[0] if isinstance(ubicaciones, list) and ubicaciones else None
 
         answers[self.UBICACIONES_CAT_OBJ_ID] = {}
-        # answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
-        if access_pass.get('custom') == True :
-            answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase',"")
-            answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',"")
-            answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',"")
-            answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
-            answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
-            answers[self.pase_entrada_fields['catalago_autorizado_por']] =  {self.pase_entrada_fields['autorizado_por']:nombre_visita_a}
-            answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
-            answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
-            # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion'], self.mf['direccion']:access_pass.get('direccion',"")}
-            answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',"") 
-            answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"") 
-            answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',"") 
 
-        else:
-            answers[self.mf['fecha_desde_visita']] = now_datetime
-            answers[self.mf['tipo_visita_pase']] = 'fecha_fija'
+        ### Setting defaults
+        access_pass['tipo_visita_pase'] = access_pass.get('tipo_visita_pase', 'fecha_fija')
+
+        if not  access_pass.get('fecha_desde_visita') or access_pass['fecha_desde_visita'] == "":
+            access_pass['fecha_desde_visita'] =  now_datetime
+        
+        if not access_pass.get('fecha_desde_hasta') or access_pass['fecha_desde_hasta'] == "":
+            if access_pass.get('tipo_visita_pase') == 'fecha_fija':
+                fecha_limite = access_pass.get('fecha_desde_visita', now_datetime)
+                if isinstance(fecha_limite, datetime):
+                    fecha_limite = fecha_limite.strftime('%Y-%m-%d')
+                
+                access_pass['fecha_desde_hasta'] = f"{fecha_limite[:10]} 23:59:59"
+            else:
+                ics_invitation = True
+                access_pass['fecha_desde_hasta'] = now_datetime_out
+        
+        if not  access_pass.get('config_limitar_acceso') or access_pass['config_dia_de_acceso'] == "":
+            access_pass['config_limitar_acceso'] =  1
+
+        answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase','fecha_fija')
+        answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',now_datetime)
+        answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',now_datetime_out)
+        answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
+        answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
+        answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
+        answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
+        answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',access_pass.get('motivo',"") ) 
+        answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"") 
+        answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',1) 
         answers[self.pase_entrada_fields['tipo_visita']] = 'alta_de_nuevo_visitante'
         answers[self.pase_entrada_fields['walkin_nombre']] = access_pass.get('nombre')
         answers[self.pase_entrada_fields['walkin_email']] = access_pass.get('email', '')
@@ -1927,11 +1981,27 @@ class Accesos(AccesosModel):
         answers[self.pase_entrada_fields['walkin_fotografia']] = access_pass.get('foto')
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
-        answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
-        
-        
+        answers[self.pase_entrada_fields['enviar_correo_pre_registro']] = access_pass.get("enviar_correo_pre_registro",[])
+
+        created_from = access_pass.get('created_from')
+        if created_from == 'app':
+            created_from = 'pase_de_entrada_app'
+        elif created_from == 'web':
+            created_from = 'pase_de_entrada_web'
+        elif created_from == 'nueva_visita':
+            created_from = 'nueva_visita'
+        elif created_from == 'auto_registro':
+            created_from = 'auto_registro'
+        else:
+            created_from = 'nueva_visita'
+
+        if created_from:
+            answers[self.pase_entrada_fields['creado_desde']] = created_from
+
         if access_pass.get('ubicaciones'):
             ubicaciones = access_pass.get('ubicaciones',[])
+            if isinstance(ubicaciones, str):
+                ubicaciones = [ubicaciones, ]
             address_list = self.get_locations_address(list_locations=ubicaciones)
             if ubicaciones:
                 ubicaciones_list = []
@@ -1945,8 +2015,10 @@ class Accesos(AccesosModel):
                             }
                         }
                     )
+                    if not access_pass.get('address'):
+                        access_pass['address'] = address_list.get(ubi, {})
                 answers.update({self.pase_entrada_fields['ubicaciones']:ubicaciones_list})
-                
+        
         if access_pass.get('comentarios'):
             comm = access_pass.get('comentarios',[])
             if comm:
@@ -1987,161 +2059,30 @@ class Accesos(AccesosModel):
                     )
                 answers.update({self.pase_entrada_fields['grupo_areas_acceso']:areas_list})
 
-
-        #Visita A
-        answers[self.mf['grupo_visitados']] = []
-        nombre_visita_a = access_pass.get('visita_a') if not nombre_visita_a else nombre_visita_a
-
-
-        if access_pass.get('selected_visita_a'):
-            nombre_visita_a = access_pass.get('selected_visita_a')
-        visita_set = {
-            self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
-                self.mf['nombre_empleado'] : nombre_visita_a,
-                }
-            }
-        print("ENTRADA")
-        options_vistia = {
-              "group_level": 3,
-              "startkey": [location, nombre_visita_a],
-              "endkey": [location, f"{nombre_visita_a}\n",{}],
-            }
-        cat_visita = self.catalogo_view(self.CONF_AREA_EMPLEADOS_CAT_ID, self.PASE_ENTRADA, options_vistia)
-        if len(cat_visita) > 0:
-            cat_visita =  {key: [value,] for key, value in cat_visita[0].items() if value}
-        else:
-            selector = {}
-            selector.update({f"answers.{self.mf['nombre_empleado']}": nombre_visita_a})
-            fields = ["_id", f"answers.{self.mf['nombre_empleado']}", f"answers.{self.mf['email_visita_a']}", f"answers.{self.mf['id_usuario']}"]
-
-            mango_query = {
-                "selector": selector,
-                "fields": fields,
-                "limit": 1
-            }
-
-            row_catalog = self.lkf_api.search_catalog(self.CONF_AREA_EMPLEADOS_CAT_ID, mango_query)
-            if row_catalog:
-                visita_set[self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID].update({
-                    self.mf['nombre_empleado']: nombre_visita_a,
-                    self.mf['email_visita_a']: [row_catalog[0].get(self.mf['email_visita_a'], "")],
-                    self.mf['id_usuario']: [row_catalog[0].get(self.mf['id_usuario'], "")],
-                })
-
-        visita_set[self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID].update(cat_visita)
-        answers[self.mf['grupo_visitados']].append(visita_set)
-
         # Perfil de Pase
         answers[self.CONFIG_PERFILES_OBJ_ID] = {
-            self.mf['nombre_perfil'] : perfil_pase,
+            self.mf['nombre_perfil'] : perfil_pase
         }
         if answers[self.CONFIG_PERFILES_OBJ_ID].get(self.mf['nombre_permiso']) and \
            type(answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']]) == str:
             answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']] = [answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']],]
 
-
         # Revisa si el pase contiene un grupo o forma parte de un grupo.
         miembros_grupo = access_pass.get('miembros_grupo',"")
         for miembros in miembros_grupo:
-            print('mimbros')
-
-
-
+            print('mimbros WIP', miembros)
 
         #---Valor
+        # Crea invitacion de calendario
+        if created_from in ('pase_de_entrada_app', 'pase_de_entrada_web') or True:
+            #TODO FLUJO DE AUTORIZACION DE PASES
+            answers.update(self.access_pass_create_ics(access_pass, answers, ics_invitation))
+            answers[self.pase_entrada_fields['catalago_autorizado_por']] = self.autorizar_pase_acceso(answers)
+
+
+        answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(answers)
         metadata.update({'answers':answers})
         res = self.lkf_api.post_forms_answers(metadata)
-        qrcode_to_google_pass = ''
-        id_forma = ''
-        if res.get("status_code") ==200 or res.get("status_code")==201:
-            qrcode_to_google_pass = res.get('json', {}).get('id', '')
-            link_info=access_pass.get('link', "")
-            docs=""
-            
-            if link_info:
-                for index, d in enumerate(link_info["docs"]): 
-                    if(d == "agregarIdentificacion"):
-                        docs+="iden"
-                    elif(d == "agregarFoto"):
-                        docs+="foto"
-                    if index==0 :
-                        docs+="-"
-                link_pass= f"{link_info['link']}?id={res.get('json')['id']}&user={link_info['creado_por_id']}&docs={docs}"
-                id_forma = self.PASE_ENTRADA
-                id_campo = self.pase_entrada_fields['archivo_invitacion']
-
-                tema_cita = access_pass.get("tema_cita")
-                descripcion = access_pass.get("descripcion")
-                fecha_desde_visita = access_pass.get("fecha_desde_visita")
-                fecha_desde_hasta = access_pass.get("fecha_desde_hasta")
-                creado_por_email = access_pass.get("link", {}).get("creado_por_email")
-                ubicacion = access_pass.get("ubicacion")
-                nombre = access_pass.get("nombre")
-                visita_a = access_pass.get("visita_a")
-                email = access_pass.get("email")
-
-                start_datetime = datetime.strptime(fecha_desde_visita, "%Y-%m-%d %H:%M:%S")
-
-                if not fecha_desde_hasta:
-                    stop_datetime = start_datetime + timedelta(hours=1)
-                    meeting = [
-                        {
-                            "id": 1,
-                            "start": start_datetime,
-                            "stop": stop_datetime,
-                            "name": tema_cita,
-                            "description": descripcion,
-                            "location": ubicacion,
-                            "allday": False,
-                            "rrule": None,
-                            "alarm_ids": [{"interval": "minutes", "duration": 10, "name": "Reminder"}],
-                            'organizer_name': visita_a,
-                            'organizer_email': creado_por_email,
-                            "attendee_ids": [{"email": email, "nombre": nombre}, {"email": creado_por_email, "nombre": visita_a}],
-                        }
-                    ]
-
-                    try:
-                        respuesta_ics = self.upload_ics(id_forma, id_campo, meetings=meeting)
-                    except Exception as e:
-                        print(f"Error al generar o subir el archivo ICS: {e}")
-                        respuesta_ics = {}
-
-                    file_name = respuesta_ics.get('file_name', '')
-                    file_url = respuesta_ics.get('file_url', '')
-
-                    access_pass_custom={
-                        "link":link_pass,
-                        "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[]),
-                        "archivo_invitacion": [
-                            {
-                                "file_name": f"{file_name}",
-                                "file_url": f"{file_url}"
-                            }
-                        ]
-                    }
-                else:
-                    access_pass_custom={
-                        "link":link_pass,
-                        "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])
-                    }
-
-                data_to_google_pass = {
-                    "nombre": access_pass.get("nombre"),
-                    "visita_a": access_pass.get("visita_a"),
-                    "ubicacion": access_pass.get("ubicaciones"),
-                    "address": address.get('address'),
-                    "empresa": company,
-                    "all_data": access_pass
-                }
-
-                google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
-                access_pass_custom.update({
-                    "google_wallet_pass_url": google_wallet_pass_url,
-                })
-                
-                self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
-            
         return res
     
     def create_visita_autorizada(self, visita_autorizada_obj, pase_obj={}):
@@ -2295,6 +2236,7 @@ class Accesos(AccesosModel):
             row['nombre_articulo'] = r.get(self.mf['nombre_articulo'],'')
             row['tipo_equipo'] = r.get(self.mf['tipo_equipo'],'Computo').title()
             row['color_articulo'] = r.get(self.mf['color_articulo'],'').title()
+            row['foto_equipo'] = r.get('foto_equipo', r.get(self.mf['foto_equipo'],[])) or []
             res.append(row)
         return res
 
@@ -2352,6 +2294,7 @@ class Accesos(AccesosModel):
             row['marca_vehiculo'] = v.get(self.mf['marca_vehiculo'],'')
             row['modelo_vehiculo'] = v.get(self.mf['modelo_vehiculo'],'')
             row['nombre_estado'] = v.get('state','')
+            row['foto_vehiculo'] = v.get('foto_vehiculo','') or []
             res.append(row)
         return res
 
@@ -2365,6 +2308,7 @@ class Accesos(AccesosModel):
             row['marca'] = v.get('marca_vehiculo','') or v.get(self.mf['marca_vehiculo'],'') or ''
             row['modelo'] = v.get('modelo_vehiculo','') or v.get(self.mf['modelo_vehiculo'],'') or ''
             row['estado'] = v.get('nombre_estado','')or v.get('state','') or v.get(self.mf['nombre_estado'],'') or ''
+            row['foto_vehiculo'] = v.get('foto_vehiculo','') or []
             res.append(row)
         return res
 
@@ -2378,6 +2322,7 @@ class Accesos(AccesosModel):
             row['nombre'] = r.get('nombre_articulo','') or r.get(self.mf['nombre_articulo'],'') or ''
             row['tipo'] = r.get('tipo_equipo','').title() or r.get(self.mf['tipo_equipo'],'') or ''
             row['color'] = r.get('color_articulo','').title() or r.get(self.mf['color_articulo'],'') or ''
+            row['foto_equipo'] = r.get('foto_equipo','') or []
             res.append(row)
         return res
 
@@ -2513,11 +2458,10 @@ class Accesos(AccesosModel):
             }
         return res
     
-    def get_page_stats(self, booth_area, location, page=''):
+    def get_page_stats(self, booth_area, location, page='', month=None, year=None):
         timezone = pytz.timezone('America/Mexico_City')
         today = datetime.now(timezone).strftime("%Y-%m-%d")        
         res={}
-
         if page == 'Turnos':
             #Visitas dentro, Gafetes pendientes y Vehiculos estacionados
             query_visitas = [
@@ -2525,23 +2469,32 @@ class Accesos(AccesosModel):
                     "deleted_at": {"$exists": False},
                     "form_id": self.BITACORA_ACCESOS,
                     f"answers.{self.bitacora_fields['status_visita']}": "entrada",
-                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["activo"]},
+                    f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                     f"answers.{self.bitacora_fields['caseta_entrada']}": booth_area,
                     f"answers.{self.bitacora_fields['ubicacion']}": location,
-                    f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
+                    # f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
                 }},
                 {'$project': {
                     '_id': 1,
                     'vehiculos': {"$ifNull": [f"$answers.{self.mf['grupo_vehiculos']}", []]},
                     'equipos': {"$ifNull": [f"$answers.{self.mf['grupo_equipos']}", []]},
+                    'status_visita': f"$answers.{self.bitacora_fields['status_visita']}",
                     'id_gafete': f"$answers.{self.GAFETES_CAT_OBJ_ID}.{self.gafetes_fields['gafete_id']}",
                     'status_gafete': f"$answers.{self.mf['status_gafete']}"
                 }},
                 {'$group': {
                     '_id': None,
                     'total_visitas_dentro': {'$sum': 1},
+                    'total_equipos_dentro': {
+                        '$sum': {
+                            '$cond': {
+                                'if': {'$eq': ['$status_visita', 'entrada']},
+                                'then': {'$size': '$equipos'},
+                                'else': 0
+                            }
+                        }
+                    },
                     'total_vehiculos_dentro': {'$sum': {'$size': '$vehiculos'}},
-                    'total_equipos_dentro': {'$sum': {'$size': '$vehiculos'}}, 
                     'gafetes_info': {
                         '$push': {
                             'id_gafete':'$id_gafete',
@@ -2553,8 +2506,8 @@ class Accesos(AccesosModel):
 
             resultado = self.format_cr(self.cr.aggregate(query_visitas))
             total_vehiculos_dentro = resultado[0]['total_vehiculos_dentro'] if resultado else 0
-            total_equipos_dentro = resultado[0]['total_equipos_dentro'] if resultado else 0
             total_visitas_dentro = resultado[0]['total_visitas_dentro'] if resultado else 0
+            total_equipos_dentro = resultado[0]['total_equipos_dentro'] if resultado else 0
             gafetes_info = resultado[0]['gafetes_info'] if resultado else []
             gafetes_pendientes = sum(1
                 for gafete in gafetes_info
@@ -2562,8 +2515,8 @@ class Accesos(AccesosModel):
             )
             
             res['total_vehiculos_dentro'] = total_vehiculos_dentro
-            res['total_equipos_dentro'] = total_equipos_dentro
             res['in_invitees'] = total_visitas_dentro
+            res['total_equipos_dentro'] = total_equipos_dentro
             res['gafetes_pendientes'] = gafetes_pendientes
 
             #Articulos concesionados
@@ -2593,15 +2546,15 @@ class Accesos(AccesosModel):
                     "deleted_at": {"$exists": False},
                     "form_id": self.BITACORA_INCIDENCIAS,
                     f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['area_incidencia']}": booth_area,
-                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.incidence_fields['ubicacion_incidencia']}": location,
+                    f"answers.{self.incidence_fields['estatus']}": 'abierto'
                 }},
                 {'$project': {
                     '_id': 1,
-                    'acciones_tomadas_incidencia': f"$answers.{self.incidence_fields['acciones_tomadas_incidencia']}",
                 }},
                 {'$group': {
                     '_id': None,
-                    'incidentes_pendientes': {'$sum': {'$cond': [{'$or': [{'$eq': [{'$size': {'$ifNull': ['$acciones_tomadas_incidencia', []]}}, 0]},{'$eq': ['$acciones_tomadas_incidencia', None]}]}, 1, 0]}}
+                    'incidentes_pendientes': {'$sum': 1}
                 }}
             ]
 
@@ -2639,14 +2592,14 @@ class Accesos(AccesosModel):
             match_query_one = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["activo"]},
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
             }
 
             match_query_two = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["activo"]},
+                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
                 f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
             }
@@ -2901,28 +2854,43 @@ class Accesos(AccesosModel):
             fallas_pendientes = resultado[0]['fallas_pendientes'] if resultado else 0
 
             res['fallas_pendientes'] = fallas_pendientes
+
         elif page == 'Articulos':
             #Articulos concesionados pendientes
+            match_query_concesionados = {
+                "deleted_at": {"$exists": False},
+                "form_id": self.CONCESSIONED_ARTICULOS,
+                f"answers.{self.cons_f['status_concesion']}": {"$in": ['abierto', 'parcial', 'devuelto']},
+            }
+
+            if location:
+                match_query_concesionados.update({
+                    f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
+                })
+
             query_concesionados = [
-                {'$match': {
-                    "deleted_at": {"$exists": False},
-                    "form_id": self.CONCESSIONED_ARTICULOS,
-                    f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}": location,
-                    f"answers.{self.cons_f['status_concesion']}": "abierto",
-                }},
+                {'$match': match_query_concesionados},
                 {'$project': {
-                    '_id': 1,
+                    '_id': f"$answers.{self.cons_f['status_concesion']}",
                 }},
                 {'$group': {
-                    '_id': None,
-                    'articulos_concesionados_pendientes': {'$sum': 1}
+                    '_id': '$_id',
+                    'total': {'$sum': 1}
                 }}
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_concesionados))
-            articulos_concesionados_pendientes = resultado[0]['articulos_concesionados_pendientes'] if resultado else 0
+            format_resultado = {
+                'abierto': 0,
+                'parcial': 0,
+                'devuelto': 0
+            }
+            if resultado:
+                format_resultado = {item['_id']: item['total'] for item in resultado}
             
-            res['articulos_concesionados_pendientes'] = articulos_concesionados_pendientes
+            res['articulos_concesionados_abierto'] = format_resultado.get('abierto', 0)
+            res['articulos_concesionados_parcial'] = format_resultado.get('parcial', 0)
+            res['articulos_concesionados_devuelto'] = format_resultado.get('devuelto', 0)
 
             #Articulos perdidos
             query_perdidos = [
@@ -3022,12 +2990,87 @@ class Accesos(AccesosModel):
                 if(nota.get('fecha_apertura') >= f"{today} 00:00:00" and nota.get('fecha_apertura') <= f"{today} 23:59:59"):
                     notas_del_dia += 1
                 if(nota.get('fecha_cierre') and nota.get('nota_status') == 'cerrado'):
-                   notas_cerradas += 1
+                    notas_cerradas += 1
 
             res['notas_abiertas'] = notas_abiertas
             res['notas_del_dia'] = notas_del_dia
             res['notas_cerradas'] = notas_cerradas
 
+        elif page == 'PasesHistorial':
+            employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
+            query_pases = [
+                {"$match": {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.PASE_ENTRADA,
+                    '$or': [
+                    {
+                        f"answers.{self.pase_entrada_fields['visita_a']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}": employee.get('worker_name')
+                    },
+                    {
+                        'created_by_id': self.user.get('user_id')
+                    }
+                        ]
+                    }
+                },
+                {
+                    "$group": {
+                        "_id": f"$answers.{self.pase_entrada_fields['status_pase']}",
+                        "total": {"$sum": 1}
+                    }
+                }
+            ]
+            pases = self.format_cr(self.cr.aggregate(query_pases))
+            if pases:
+                for item in pases:
+                    if item.get('_id') == 'activo':
+                        res['pases_activos'] = item.get('total')
+                    if item.get('_id') == 'proceso':
+                        res['pases_proceso'] = item.get('total')
+
+        elif page == 'Asistencias':
+            year_str = str(year).zfill(4)
+            month_str = str(month).zfill(2)
+            query_asistencias = [
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.REGISTRO_ASISTENCIA,
+                    f"answers.{self.f['status_turn']}": {"$exists": True},
+                    f"answers.{self.f['fecha_inicio_turno']}": {
+                        "$gte": f"{year_str}-{month_str}-01 00:00:00",
+                        "$lte": f"{year_str}-{month_str}-31 23:59:59"
+                    }
+                }},
+                {'$project': {
+                    '_id': 1,
+                    'status_turn': f"$answers.{self.f['status_turn']}",
+                }},
+                {'$group': {
+                    '_id': None,
+                    'total_asistencias': {
+                        '$sum': {
+                            '$cond': {
+                                'if': {'$eq': ['$status_turn', 'presente']},
+                                'then': 1,
+                                'else': 0
+                            }
+                        }
+                    },
+                    'total_retardos': {
+                        '$sum': {
+                            '$cond': {
+                                'if': {'$in': ['$status_turn', ['retardo', 'falta_por_retardo']]},
+                                'then': 1,
+                                'else': 0
+                            }
+                        }
+                    },
+                }}
+            ]
+            data = self.format_cr(self.cr.aggregate(query_asistencias))
+            if data:
+                data = self.unlist(data)
+                res['total_asistencias'] = data.get('total_asistencias', 0)
+                res['total_retardos'] = data.get('total_retardos', 0)
         return res
 
     def get_certificacion(self, certificacion, id_user, empresa=None):
@@ -3228,20 +3271,19 @@ class Accesos(AccesosModel):
             total_entradas = total_entradas.pop()
         return total_entradas
 
-    def get_detail_access_pass(self, qr_code):
+    def get_detail_access_pass(self, qr_code, get_answers=False):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.PASE_ENTRADA,
             "_id":ObjectId(qr_code),
         }
-        print("QR", qr_code)
         query = [
             {'$match': match_query },
             {'$project': 
                 {'_id':1,
-                'created_at':'$created_at',
                 'folio': f"$folio",
-                'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                'answers':'$answers',
+                'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}",
                 'nombre': {"$ifNull":[
                     f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
                     f"$answers.{self.mf['nombre_pase']}"]},
@@ -3312,6 +3354,8 @@ class Accesos(AccesosModel):
         res = self.cr.aggregate(query)
         x = {}
         for x in res:
+            if get_answers:
+                x['answers'] = x.get('answers',{})
             visita_a =[]
             x['_id'] = str(x.pop('_id'))
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
@@ -3351,12 +3395,30 @@ class Accesos(AccesosModel):
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
-            x['ubicacion'] = x.get('ubicacion', [])
+            ubicaciones_full_info = x.get('ubicaciones', [])
+            x['ubicacion'] = [x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.Location.f['location']) for x in ubicaciones_full_info]
             ubicaciones = x.get('ubicaciones', [])
             ubicaciones_format = []
             for ubicacion in ubicaciones:
                 ubicaciones_format.append(ubicacion.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.mf['ubicacion'], ''))
             x['ubicaciones'] = ubicaciones_format
+            x['ubicaciones_geolocation'] = {
+                x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.Location.f['location']): self.unlist(x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.f['address_geolocation']))
+                for x in ubicaciones_full_info
+            }
+            grupo_visita = x.get('answers', {}).get(self.mf['grupo_visitados'], [])
+            if grupo_visita:
+                visita_list = []
+                for idx, visita in enumerate(grupo_visita):
+                    item = {
+                        'id': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['id_usuario'], '')) or idx,
+                        'username': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['username'], '')) or '',
+                        'name': visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['nombre_empleado'], '') or '',
+                        'telefono': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['telefono_visita_a'], '')) or '',
+                        'email': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['email_visita_a'], '')) or '',
+                    }
+                    visita_list.append(item)
+                x['visita_a_details'] = visita_list
         if not x:
             self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
         return x
@@ -3962,7 +4024,7 @@ class Accesos(AccesosModel):
                 r.pop('falla_grupo_seguimiento', None)
         return result
 
-    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None):
+    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None, status=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_INCIDENCIAS,
@@ -3975,6 +4037,8 @@ class Accesos(AccesosModel):
             match_query[f"answers.{self.incidence_fields['prioridad_incidencia']}"] = {"$in": prioridades}
         if folio:
             match_query.update({"folio":folio})
+        if status:
+            match_query.update({f"answers.{self.incidence_fields['estatus']}": status})
        
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         zona = user_data.get('timezone','America/Monterrey')
@@ -4307,22 +4371,31 @@ class Accesos(AccesosModel):
         return res
     
     def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None):
-        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        employee['timezone'] = user_data.get('timezone','America/Monterrey')
-        fecha_hoy = datetime.now(pytz.timezone(employee.get('timezone'))).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
+        employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
+        fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
         match_query = {
             'form_id':self.PASE_ENTRADA,
             'deleted_at':{'$exists':False},
-            f"answers.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.pase_entrada_fields['autorizado_por']}":employee.get('worker_name') or '',
+                '$or': [
+            {
+                f"answers.{self.pase_entrada_fields['visita_a']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}": employee.get('worker_name')
+            },
+            {
+                'created_by_id': self.user.get('user_id')
+            }
+        ]
         }
-        if tab_status == "Favoritos":
+        if tab_status.strip().lower() == "favoritos":
             match_query.update({f"answers.{self.pase_entrada_fields['favoritos']}":'si'})
-        elif tab_status == "Activos":
+        elif tab_status.strip().lower() == "activos":
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'activo'})
-        elif tab_status == "Vencidos":
+        elif tab_status.strip().lower() == "vencidos":
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'vencido'})
+        elif tab_status.strip().lower() == "por_autorizar":
+            match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'por_autorizar'})
+        elif tab_status.strip().lower() == "en_proceso":
+            match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'proceso'})
 
         if search_name:
             match_query.update({
@@ -4437,14 +4510,10 @@ class Accesos(AccesosModel):
 
             for idx, nombre in enumerate(v):
                 emp = {'nombre':nombre}
-                if d:
-                    emp.update({'departamento':d[idx].pop(0) if d[idx] else ""})
-                if p:
-                    emp.update({'puesto':p[idx].pop(0) if p[idx] else ""})
-                if e:
-                    emp.update({'user_id':e[idx].pop(0) if e[idx] else ""})
-                if u:
-                    emp.update({'email': u[idx].pop(0) if u[idx] else ""})
+                emp['departamento'] = d[idx] if idx < len(d) and d[idx] else [""]
+                emp['puesto'] = p[idx] if idx < len(p) and p[idx] else [""]
+                emp['user_id'] = e[idx] if idx < len(e) and e[idx] else [""]
+                emp['email'] = u[idx] if idx < len(u) and u[idx] else [""]
                 visita_a.append(emp)
             if x['tipo_de_pase'] == 'Visita General' or x['tipo_de_pase'] == 'visita general':
                 x['visita_a'] = visita_a
@@ -4503,7 +4572,7 @@ class Accesos(AccesosModel):
             x.pop('visita_a_puesto', None)
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
-        print("data", simplejson.dumps(records, indent=4))
+        # print("data", simplejson.dumps(records, indent=4))
         return  {
             "records": records,
             "total_records": total_count,
@@ -6147,6 +6216,7 @@ class Accesos(AccesosModel):
                     estado = item.get('estado',item.get('nombre_estado',''))
                     placas = item.get('placas',item.get('placas_vehiculo',''))
                     color = item.get('color',item.get('color_vehiculo',''))
+                    foto_vehiculo = item.get('foto_vehiculo','')
                     obj={
                         self.TIPO_DE_VEHICULO_OBJ_ID:{
                             self.mf['tipo_vehiculo']:tipo,
@@ -6158,6 +6228,7 @@ class Accesos(AccesosModel):
                         },
                         self.mf['placas_vehiculo']:placas,
                         self.mf['color_vehiculo']:color,
+                        self.f['foto_vehiculo']:foto_vehiculo,
                     }
                     answers[self.mf['grupo_vehiculos']][(index+1)*-1]=obj
             elif key == 'grupo_equipos':
@@ -6169,6 +6240,7 @@ class Accesos(AccesosModel):
                     tipo = item.get('tipo',item.get('tipo_equipo',''))
                     serie = item.get('serie',item.get('numero_serie',''))
                     modelo = item.get('modelo',item.get('modelo_articulo',''))
+                    foto_equipo = item.get('foto_equipo','')
                     obj={
                         self.mf['tipo_equipo']:tipo.lower(),
                         self.mf['nombre_articulo']:nombre,
@@ -6176,6 +6248,7 @@ class Accesos(AccesosModel):
                         self.mf['numero_serie']:serie,
                         self.mf['color_articulo']:color,
                         self.mf['modelo_articulo']:modelo,
+                        self.f['foto_equipo']:foto_equipo,
                     }
                     answers[self.mf['grupo_equipos']][(index+1)*-1]=obj
             elif key == 'visita_a':
@@ -6200,13 +6273,8 @@ class Accesos(AccesosModel):
                 if value:
                     answers.update({f"{self.pase_entrada_fields[key]}":value})
 
-  
         employee = getattr(self,'employee',self.get_employee_data(email=self.user.get('email'), get_one=True))
         if answers:
-            pdf_to_img = self.update_pass_img(qr_code)
-            if pdf_to_img:
-                answers.update({self.pase_entrada_fields['pdf_to_img']: pdf_to_img})
-
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
             status = self.access_pass_set_status(new_answers)
@@ -6226,7 +6294,6 @@ class Accesos(AccesosModel):
                 res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
                 res['json'].update({'asunto':pass_selected.get('tema_cita')})
                 res['json'].update({'descripcion':pass_selected.get('descripcion')})
-                res['json'].update({'pdf_to_img': pdf_to_img if pdf_to_img else pass_selected.get('pdf_to_img')})
                 res['json'].update({'pdf': pdf})
                 return res
             else: 

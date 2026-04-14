@@ -1879,11 +1879,15 @@ class Schedule(Base):
                         all_user_ids += self.update_users(all_user_ids, group_users)
                 elif gset.get(self.f['asignar_a']) == 'usuario':
                     udata = gset.get(self.USUARIOS_OBJ_ID,{})
+                    udata_name = udata.get('638a9a7767c332f5d459fc81')
+                    udata_email = self.unlist(udata.get('638a9a7767c332f5d459fc82',[]))
+                    udata_username = self.unlist(udata.get('638a9a7767c332f5d459fc82',[]))
+                    udata_user_id = self.unlist(udata.get('638a9a99616398d2e392a9f5',[]))
                     data = {
-                        "name":udata.get('638a9a7767c332f5d459fc81'),
-                        "email":udata.get('638a9a7767c332f5d459fc82',[])[0],
-                        "username":udata.get('638a9a7767c332f5d459fc82',[])[0],
-                        "user_id":udata.get('638a9a99616398d2e392a9f5',[])[0],
+                        "name": udata_name,
+                        "email": udata_email,
+                        "username": udata_username,
+                        "user_id": udata_user_id,
                         "account_id":self.account_id,
                         "resource_kind":"user"
                     }
