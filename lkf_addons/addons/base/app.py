@@ -252,6 +252,22 @@ class Base(base.LKF_Base):
             self.LKFException(f'Error inesperado al acceder a la base de datos {db_name}: {str(e)}')
 
         return db
+
+
+    def get_epoch(self, value):
+        # si ya es epoch (int o float), lo regresa igual
+        if isinstance(value, (int, float)):
+            return int(value)
+
+        # si es string tipo datetime, lo convierte
+        if isinstance(value, str):
+            try:
+                dt = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+                return int(dt.timestamp())
+            except:
+                return None
+
+        return None
     
     def get_user_by_username(self, username):
         #TODO Checar por que el form id de Usuarios no trae el id correcto
