@@ -178,6 +178,15 @@ class Employee(Base):
         return res 
 
     def get_user_booth(self, search_default=True, turn_areas=True, **kwargs):
+        """
+        Obtiene las casetas del usuario, por ubicacion
+        Busca en la forma de configuracion de areas y empeladsos
+        Si la ubicacion no tiene areas regresa todas las areas de la ubicacion
+        Returns:
+        caseta (dict) :Diccionarion con llaves {'locaiont', 'area'}
+        user_booths (list): lista con diccionario [ {'locaiont', 'area'}]
+        """
+        print('entra a get_user_booths')
         if kwargs.get('user_id'):
             user_id = kwargs['user_id']
         else:
@@ -210,40 +219,22 @@ class Employee(Base):
         res = self.format_cr(self.cr.aggregate(query))
         caseta = None
         user_booths = []
+        location_areas = {}
         for x in res:
-            if not x.get('area') and not turn_areas:
-                selector = {}
-                selector.update({f"answers.{self.f['ubicacion']}": x.get('location')})
-
-                if not selector:
-                    selector = {"_id": {"$gt": None}}
-
-                fields = ["_id", f"answers.{self.f['nombre_area']}"]
-
-                mango_query = {
-                    "selector": selector,
-                    "fields": fields,
-                    "limit": 1000
-                }
-
-                row_catalog = self.lkf_api.search_catalog(self.Location.AREAS_DE_LAS_UBICACIONES_CAT_ID, mango_query)
-                if row_catalog:
-                    for r in row_catalog:
-                        res.append({
-                            'area': r.get(self.f['nombre_area']),
-                            'location': x.get('location'),
-                            'employee': x.get('employee'),
-                            'marcada_como': 'normal',
-                        })
+            location_areas[x['location']] = location_areas.get(x['location'], [])
+            if x.get('area'):
+                #agrupa las areas de las ubicacion, si la ubicacion no tiene area va regresar todas la areas de la ubicacion
+                location_areas[x['location']].append(x['area'])
             if x['marcada_como'] == 'default' and not caseta:
                 caseta = x
             else:
                 user_booths.append(x)
-        if not caseta and search_default:
-            caseta, user_booths_tmp = self.get_user_booth(search_default=False)
-        if not search_default and not caseta:
-            if user_booths:
-                caseta = user_booths[0]
+        for ubicacion, areas in location_areas.items():
+            if not areas:
+                location_areas =  self.Location.get_areas_by_location(ubicacion)
+                if not caseta and location_areas:
+                    caseta = {'_id':None, 'location': ubicacion, 'area':location_areas[0]}
+                user_booths +=  [{'_id':None,'location': ubicacion, 'area': area} for area in location_areas]
         if not caseta:
             msg = f'No existe caseta configurada para usuario id: {user_id}'
             self.LKFException(msg)
