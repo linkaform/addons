@@ -1011,6 +1011,7 @@ class Stock(Base):
         stock['move_in'] = self.stock_one_many_one( 'in', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         stock['move_out'] = self.stock_one_many_one( 'out', product_code=product_code, sku=sku, warehouse=warehouse, location=location, lot_number=lot_number, date_from=date_from, date_to=date_to, status='done', **kwargs)
         # print('--------------------stock', stock['move_out'])
+
         # if stock['adjustments']:
         #     #date_from = stock['adjustments'][product_code]['date']
         #     stock['adjustments'] = stock['adjustments'][product_code]['total']
@@ -2460,7 +2461,6 @@ class Stock(Base):
             {'$sort': {'product_code': 1}}
             ]
         res = self.cr.aggregate(query)
-        # print('query=',dumps(query, indent=3))
         result = {}
         for r in res:
             pcode = r.get('product_code')
