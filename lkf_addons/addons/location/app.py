@@ -178,13 +178,8 @@ class Location(Base):
             match_query[f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}"] = {"$in": location_name}
 
         area_path = f"answers.{self.f['area']}"
-
-        cursor = (
-            self.cr.find(match_query, {area_path: 1})
-            .sort(area_path, 1)
-        )
-        data = self.format_cr(cursor)
-        return [x.get('incidente_area') for x in data if x.get('incidente_area')]
+        data = self.format_cr(self.cr.find(match_query, {area_path: 1}).sort(area_path, 1))
+        return [x.get('area') for x in data if x.get('area')]
 
     def get_areas_by_location_salidas(self, location_name):
         options={}
@@ -206,7 +201,6 @@ class Location(Base):
         response = self.format_cr(self.cr.find(match_query, {f"answers.{self.f['area_status']}":1}), get_one=True)
         res = response.get('area_status', 'No Configurada')
         return res.title()
-
 
     def get_area_record_by_name(self, name, select_cols=[], get_one=True):
         """ Busca area por nombre y regresa registros que cumplan con el nombre. 
