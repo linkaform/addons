@@ -579,7 +579,7 @@
                                 <label>Nombre</label>
                                 <type>catalog-select</type>
                             </trigger_field>
-                            <value> </value>
+                            <value>None</value>
                         </item>
                     </triggers>
                 </wf_fields>

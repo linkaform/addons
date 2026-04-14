@@ -1,32 +1,118 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <form_id>{{ form.check_ubicaciones.id }}</form_id>
-    <id>6848b3a2b5607df89f0c6a13</id>
+    <id>682cc0c3b2f0ed428e7d439c</id>
     <workflows>
         <item>
             <actions>
                 <item>
-                    <_id>6848b3a2b5607df89f0c6a0c</_id>
+                    <_id>682cc0c3b2f0ed428e7d4395</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Se realizó un nuevo rondín en{{record.answers.680ffa2c87c49a88ab7ba9b6.68101945f4996c72247baac4}} {% endraw %}</body>
+                        <email_fields>[]</email_fields>
+                        <emails>
+                            <item>alejandro.veloz@advansgroup.mx</item>
+                            <item>victot.mendoza@linkaform.com</item>
+                        </emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Nuevo Rondín del usuario{{record.user.name}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>682cc0c3b2f0ed428e7d4396</id>
+            <name>Envia Aviso de Recoriido</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-05-21T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-05-20T17:47:13.997Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.areas_de_las_ubicaciones.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.areas_de_las_ubicaciones.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters>None</filters>
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>68101945f4996c72247baac4</field_id>
+                                <group>{}</group>
+                                <label>Id de Ubicacion</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>null</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>682cfe2092078888c5ae0e0d</_id>
                     <action_id>7</action_id>
                     <action_settings>{}</action_settings>
                     <configuration>
                         <script>
-                            <created_at>2025-08-21T21:52:17.329757</created_at>
+                            <created_at>2025-09-03T00:09:51.071999</created_at>
                             <deleted_at>None</deleted_at>
                             <end_date>None</end_date>
                             <id>{{ script.rondines_cache.id }}</id>
                             <is_fileShared>False</is_fileShared>
                             <itype>script</itype>
                             <name>{{ script.rondines_cache.name }}</name>
-                            <start_date>2025-08-21T21:52:17.328130</start_date>
-                            <updated_at>2025-08-21T21:52:17.336637</updated_at>
+                            <start_date>2025-09-03T00:09:51.069534</start_date>
+                            <updated_at>2025-09-03T00:09:51.082987</updated_at>
                         </script>
                         <user>SCRIPT_OWNER</user>
                     </configuration>
                     <name>Se ejecuta script</name>
                 </item>
             </actions>
-            <id>6848b3a2b5607df89f0c6a0d</id>
+            <id>682cfe2092078888c5ae0e11</id>
             <name>Ejecuta script de check ubicaciones</name>
             <rules>
                 <metadata>
@@ -38,9 +124,9 @@
                             <year>2014</year>
                         </period>
                         <range>
-                            <end>2025-06-11T06:00:00.000Z</end>
+                            <end>2025-05-21T06:00:00.000Z</end>
                             <selected>False</selected>
-                            <start>2025-06-10T22:36:53.360Z</start>
+                            <start>2025-05-20T22:10:41.911Z</start>
                         </range>
                     </date>
                     <grading>{}</grading>
