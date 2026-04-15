@@ -219,6 +219,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'fecha_salida':'662c51eb194f1cb7a91e5af0',
             'field_note':'6647fadc96f80017ac388648',
             'foto':'5ea35de83ab7dad56c66e045',
+            'foto_equipo':'698ca59f8797d7e10e57617d',
+            'foto_vehiculo':'698ca60575c268aadf768c57',
             'grupo_areas_acceso':'663fed6cb8262fd454326cb3',
             'grupo_equipos':'663e446cadf967542759ebbb',
             'grupo_instrucciones_pase':'65e0a68a06799422eded24aa',
@@ -244,7 +246,6 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'nombre_estado': '663a7dd6e48382c5b12308ff',
             'nombre_grupo':'638a9ab3616398d2e392a9fa',
             'nombre_guardia_apoyo': '663bd36eb19b7fb7d9e97ccb',
-            'nombre_pase':'662c2937108836dec6d92580',
             'nombre_pase':'662c2937108836dec6d92580',
             'nombre_perfil': '661dc67e901906b7e9b73bac',
             'nombre_permiso':'662962bb203407ab90c886e4',
@@ -479,8 +480,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'accion_correctiva_incidencia':'683de45ddcf6fcee78e61ed7',
             'acciones_tomadas':'66ec69a914bf1142b6a024e3',
             #Campos en grupo repetitivo acciones tomadas:
-            'acciones_tomadas': '66ec69a914bf1142b6a024e3',
-            'acciones_tomadas_incidencia':'66ec6987f251a9c2cef0126f',
+            # 'acciones_tomadas_incidencia':'66ec6987f251a9c2cef0126f',
             'acciones_tomadas_incidencia':'688bbd509b98fd9afaf2c401',
             'afectacion_patrimonial_incidencia':'688a9cbda7b2dd2b599ff381',
             'area_incidencia': '663e5d44f5b8a7ce8211ed0f',
@@ -534,7 +534,6 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'parentesco': '684c3e026d974f9625e1130a',
             'personas_involucradas_incidencia':'66ec69144a27bb6151a0255b',
             #Grupos Repetitivos
-            'personas_involucradas_incidencia':'66ec69144a27bb6151a0255b',
             'pertenencias_sustraidas': '684c3e6821796d7880117f23',
             #Robo de vehiculo
             'placas': '684c3eaa04aaab135d7dfbb3',
@@ -627,7 +626,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'email':'662c2937108836dec6d92581',
             'email_catalog_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['email_vista']}",
             'email_pase':'662c2937108836dec6d92581',
-            'empresa_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['empresa']}",
+            'empresa_pase_catalog':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['empresa']}",
             'empresa_pase':'66357d5e4f00f9018ce97ce9',
             'favoritos':'674642e2d53ce9476994dd89',  
             'fecha_hasta_pase':'662c304fad7432d296d92583',
@@ -663,7 +662,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
             'ubicaciones':'6834e34fa6242006acedda0f',
             'vigencia_expresa_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e7",
-            'vigencia_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.'662962bb203407ab90c886e6",
+            'vigencia_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e6",
             'visita_a':'663d4ba61b14fab90559ebb0',
             'walkin_email':'662c2937108836dec6d92581',
             'walkin_empresa':'66357d5e4f00f9018ce97ce9',
@@ -675,16 +674,16 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",    
         }
         
-        self.pase_grupo_visitados:{
+        self.pase_grupo_visitados ={
         }
         
         # self.pase_entrada_fields.update(self.pase_grupo_visitados)
-        self.pase_grupo_areas:{
+        self.pase_grupo_areas = {
             'nombre_perfil':     f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
         }
         
         # self.pase_entrada_fields.update(self.pase_grupo_areas)
-        self.pase_grupo_vehiculos:{
+        self.pase_grupo_vehiculos = {
             'nombre_perfil':     f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
             'tipo_vehiuclo':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",        
         }
@@ -839,6 +838,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'area_tag_id': '6762f7b0922cc2a2f57d4044',
             'tipo_de_area': '663e5e68f5b8a7ce8211ed18',
             'foto_evidencia_area': '681144fb0d423e25b42818d2',
+            'foto_equipo':'698ca59f8797d7e10e57617d',
+            'foto_vehiculo':'698ca60575c268aadf768c57',
             'grupo_incidencias_check': '681144fb0d423e25b42818d3',
             'comentario_check_area': '681144fb0d423e25b42818d4',
             'check_status': '681fa6a8d916c74b691e174b',
