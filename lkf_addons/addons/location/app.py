@@ -157,7 +157,6 @@ class Location(Base):
                 }
             }
             ]
-        import simplejson
         # print('query=', simplejson.dumps(query, indent=4))
         res = self.cr.aggregate(query)
         area_address = {}
@@ -168,6 +167,11 @@ class Location(Base):
         return area_address
         
     def get_areas_by_location(self, location_name):
+        """
+        Obtiene todas las areas de una ubicacion
+        return:
+        lista de areas
+        """
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": self.AREAS_DE_LAS_UBICACIONES,
@@ -178,7 +182,9 @@ class Location(Base):
             match_query[f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}"] = {"$in": location_name}
 
         area_path = f"answers.{self.f['area']}"
-        data = self.format_cr(self.cr.find(match_query, {area_path: 1}).sort(area_path, 1))
+        # ids_label_dct={'area':self.f['area']} fuerza a obtener el diccionarion con esos nombres 
+        # paso un error que daba otro label
+        data = self.format_cr(self.cr.find(match_query, {area_path: 1}).sort(area_path, 1),  ids_label_dct={'area':self.f['area']})
         return [x.get('area') for x in data if x.get('area')]
 
     def get_areas_by_location_salidas(self, location_name):
