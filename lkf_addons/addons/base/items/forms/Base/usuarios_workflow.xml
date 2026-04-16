@@ -199,7 +199,6 @@
                         <sender>donotreply@soter.mx</sender>
                         <subject>{% raw %} 📢 ¡Bienvenido! Empieza a usar Soter hoy mismo. {% endraw %}</subject>
                         <timer_config>
-                            <expiration>{}</expiration>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
                     </configuration>
@@ -229,8 +228,8 @@
                 <record>
                     <created>True</created>
                     <deleted>False</deleted>
-                    <edited>False</edited>
-                    <run_multiple_times>False</run_multiple_times>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
@@ -322,6 +321,134 @@
                             <value>crear</value>
                         </item>
                     </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>69df1959e444f58bb32f9170</_id>
+                    <action_id>9</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <catalog>
+                            <couch_id>{{ catalog.usuarios_invitados.obj_id }}</couch_id>
+                            <created_at>1776228591</created_at>
+                            <created_by_id>17779</created_by_id>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <file_shared_id>None</file_shared_id>
+                            <form_id>150684</form_id>
+                            <group_id>None</group_id>
+                            <id>{{ catalog.usuarios_invitados.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <is_shared>False</is_shared>
+                            <is_shared_from_connection>False</is_shared_from_connection>
+                            <is_shared_root>False</is_shared_root>
+                            <itype>catalog</itype>
+                            <leaf_node>True</leaf_node>
+                            <name>{{ catalog.usuarios_invitados.name }}</name>
+                            <owner_id>17779</owner_id>
+                            <parent_id>None</parent_id>
+                            <perm>can_manage_item</perm>
+                            <resource_uri>/api/infosync/get_catalogs/{{ catalog.usuarios_invitados.id }}/</resource_uri>
+                            <shared_id>None</shared_id>
+                            <start_date>2026-04-15T04:49:51.668405+00:00</start_date>
+                            <updated_at>1776228591</updated_at>
+                            <updated_by_id>None</updated_by_id>
+                        </catalog>
+                        <mapping>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>integer</field_type>
+                                    <id>638a9a99616398d2e392a9f5</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>69df18efff8ef345609750fe</id>
+                                </output>
+                            </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>text</field_type>
+                                    <id>638a9a7767c332f5d459fc81</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>69df18efff8ef345609750ff</id>
+                                </output>
+                            </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>text</field_type>
+                                    <id>6759e4a7a9a6e13c7b26da33</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>69df18efff8ef34560975100</id>
+                                </output>
+                            </item>
+                            <item>
+                                <etl>
+                                    <conditions>[]</conditions>
+                                </etl>
+                                <input>
+                                    <field_type>email</field_type>
+                                    <id>638a9a7767c332f5d459fc82</id>
+                                    <type>field_to_field</type>
+                                    <value>None</value>
+                                </input>
+                                <output>
+                                    <id>69df18efff8ef34560975101</id>
+                                </output>
+                            </item>
+                        </mapping>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>69df1959e444f58bb32f917a</id>
+            <name>Syncroniza Usuarios Invitados</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2026-04-15T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2026-04-15T04:47:25.203Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
                 </wf_fields>
             </rules>
         </item>

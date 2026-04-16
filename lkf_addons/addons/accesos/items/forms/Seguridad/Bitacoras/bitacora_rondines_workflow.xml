@@ -321,6 +321,7 @@
                         <sender>OWNER_EMAIL</sender>
                         <subject>{% raw %} Rondin Realizado en: {{record.answers.680f90707ae52a33a76e3609.663e5c57f5b8a7ce8211ed0b}} el: {{record.answers.6818ea068a7f3446f1bae3b3}} inspeccionado al: {{record.answers.689a7ecfbf2b4be31039388e}} {% endraw %}</subject>
                         <timer_config>
+                            <expiration>{}</expiration>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
                     </configuration>
@@ -348,9 +349,9 @@
                     <user>[]</user>
                 </metadata>
                 <record>
-                    <created>True</created>
+                    <created>False</created>
                     <deleted>False</deleted>
-                    <edited>True</edited>
+                    <edited>False</edited>
                     <run_multiple_times>False</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
@@ -579,7 +580,7 @@
                                 <label>Nombre</label>
                                 <type>catalog-select</type>
                             </trigger_field>
-                            <value>None</value>
+                            <value>null</value>
                         </item>
                     </triggers>
                 </wf_fields>
