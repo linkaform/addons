@@ -235,16 +235,27 @@ class Warehouse(Base ,base.LKF_Base):
         return self.get_warehouse(warehouse_type='Stock')
 
     def get_warehouse(self, warehouse_type=None):
-        mango_query = {
-            "selector":match_query,
-            "limit":1000,
-            "skip":0
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.FORM_WAREHOUSE_ID,
             }
         if warehouse_type:
-            mango_query['selector'] = {'answers':{self.f['warehouse_type']: warehouse_type}}
-        res = self.lkf_api.search_catalog( self.WAREHOUSE_ID, mango_query)
-        warehouse = [r[self.f['warehouse']] for r in res]
+            match_query.update({f"answers.{self.f['warehouse_type']}":warehouse_type.lower().replace(' ','_')})  
+        res = self.cr.find(match_query,{f"answers":1})
+        # res = self.lkf_api.search_catalog( self.WAREHOUSE_ID, mango_query)
+        warehouse = [r['answers'][self.f['warehouse']] for r in res]
         return warehouse
+
+    def get_warehouse_locations(self, warehouse):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.FORM_WAREHOUSE_LOCATION_ID,
+            f"answers.{self.WAREHOUSE_OBJ_ID}.{self.f['warehouse']}":warehouse,
+            }
+        res = self.cr.find(match_query,{f"answers":1})
+        # res = self.lkf_api.search_catalog( self.WAREHOUSE_ID, mango_query)
+        locations = [r['answers'][self.f['warehouse_location']] for r in res]
+        return locations
 
     def get_warehouse_config(self, warehouse, location_type=None):
         if location_type:
