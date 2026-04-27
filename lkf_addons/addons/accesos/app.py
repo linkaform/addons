@@ -1598,9 +1598,9 @@ class Accesos(AccesosModel):
                 answers[self.incidence_fields['incidencia_catalog']].update({
                     self.incidence_fields['sub_categoria']: data_incidences['sub_categoria']
                 })
-            elif key == 'incidente':
+            elif key == 'incidencia':
                 answers[self.incidence_fields['incidencia_catalog']].update({
-                    self.incidence_fields['incidente']: data_incidences['incidente']
+                    self.incidence_fields['incidencia']: data_incidences.get('incidencia', data_incidences.get('incidente'))
                 })
 
             elif key == 'ubicacion_incidencia' or key == 'area_incidencia':
@@ -4115,7 +4115,7 @@ class Accesos(AccesosModel):
 
                 'categoria':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['categoria']}",
                 'sub_categoria':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['sub_categoria']}",
-                'incidente':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['incidente']}",
+                'incidencia':f"$answers.{self.incidence_fields['incidencia_catalog']}.{self.incidence_fields['incidencia']}",
 
                 #Grupos repetitivos
                 'personas_involucradas_incidencia':f"$answers.{self.incidence_fields['personas_involucradas_incidencia']}",
@@ -5605,7 +5605,7 @@ class Accesos(AccesosModel):
             "seguimientos_incidencia_nuevo": [incidencia_grupo_seguimiento],
             "categoria": incidence_selected.get("categoria", ''),
             "sub_categoria": incidence_selected.get("sub_categoria", ''),
-            "incidente": incidence_selected.get("incidente", ''),
+            "incidencia": incidence_selected.get("incidencia", ''),
             "estatus": estatus or incidence_selected.get("estatus", '')
         }
         answers = {}
@@ -5618,9 +5618,9 @@ class Accesos(AccesosModel):
                 answers[self.incidence_fields['incidencia_catalog']].update({
                     self.incidence_fields['sub_categoria']: value
                 })
-            if key == 'incidente':
+            if key == 'incidencia':
                 answers[self.incidence_fields['incidencia_catalog']].update({
-                    self.incidence_fields['incidente']: incidencia_seg['incidencia']
+                    self.incidence_fields['incidencia']: incidencia_seg['incidencia']
                 })
             if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
                 if incidencia_seg['ubicacion_incidencia'] and not incidencia_seg['area_incidencia']:
@@ -5786,7 +5786,7 @@ class Accesos(AccesosModel):
 
     def update_incidence(self, data_incidences, folio):
         '''
-            Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
+        Realiza una actualización sobre cualquier nota, actualizando imagenes, status etc
         '''
         answers = {}
         # answers[self.incidence_fields['estatus']]="abierto"
@@ -5799,9 +5799,9 @@ class Accesos(AccesosModel):
                 answers[self.incidence_fields['incidencia_catalog']].update({
                     self.incidence_fields['sub_categoria']: data_incidences['sub_categoria']
                 })
-            if key == 'incidente':
+            if key == 'incidencia':
                 answers[self.incidence_fields['incidencia_catalog']].update({
-                    self.incidence_fields['incidente']: data_incidences['incidente']
+                    self.incidence_fields['incidencia']: data_incidences['incidencia']
                 })
             if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
                 if data_incidences['ubicacion_incidencia'] and not data_incidences['area_incidencia']:
