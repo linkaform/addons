@@ -4370,7 +4370,7 @@ class Accesos(AccesosModel):
                         res.append(r['perfil'])
         return res
     
-    def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None):
+    def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None, location=None):
         employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
         fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
@@ -4404,6 +4404,8 @@ class Accesos(AccesosModel):
                     {f"answers.{self.mf['nombre_pase']}": {"$regex": search_name, "$options": "i"}}
                 ]
             })
+        if location:
+            match_query.update({f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": location})
         # Conteo total de registros
         count_query = [
             {"$match": match_query},
