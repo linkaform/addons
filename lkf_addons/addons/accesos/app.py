@@ -2254,6 +2254,8 @@ class Accesos(AccesosModel):
 
     def format_lockers(self, data):
         res = []
+        if not data:
+            return res
         for r in data:
             row = {}
             row['_id'] = r.get('_id')
