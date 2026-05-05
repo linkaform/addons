@@ -4378,7 +4378,7 @@ class Accesos(AccesosModel):
                         res.append(r['perfil'])
         return res
     
-    def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None, location=None):
+    def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate=""):
         employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
         fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
@@ -4414,6 +4414,38 @@ class Accesos(AccesosModel):
             })
         if location:
             match_query.update({f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": location})
+        if dynamic_filters:
+            for item in dynamic_filters:
+                if item.get('key') == 'status':
+                    match_query[f"answers.{self.pase_entrada_fields['status_pase']}"] = {"$in": item.get('value')}
+                elif item.get('key') == 'perfil_visita':
+                    match_query[f"answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}"] = {"$in": item.get('value')}
+                elif item.get('key') == 'visita_a':
+                    match_query[f"answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}"] = {"$in": item.get('value')}
+                else:
+                    continue
+
+        zona = self.user.get('timezone','America/Monterrey')
+        if filterDate != "range":
+            dateFrom, dateTo = self.get_range_dates(filterDate, zona)
+            if dateFrom:
+                dateFrom = str(dateFrom)
+            if dateTo:
+                dateTo = str(dateTo)
+
+        if dateFrom and dateTo:
+           match_query.update({
+                f"answers.{self.mf['fecha_desde_visita']}": {"$gte": dateFrom, "$lte": dateTo},
+            })
+        elif dateFrom:
+            match_query.update({
+                f"answers.{self.mf['fecha_desde_visita']}": {"$gte": dateFrom}
+            })
+        elif dateTo:
+            match_query.update({
+                f"answers.{self.mf['fecha_desde_visita']}": {"$lte": dateTo}
+            })
+        
         # Conteo total de registros
         count_query = [
             {"$match": match_query},
