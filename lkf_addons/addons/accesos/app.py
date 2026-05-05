@@ -3097,12 +3097,13 @@ class Accesos(AccesosModel):
         }
         query = [
             {'$match': match_query },
+            {"$sort": {"created_at": -1}},
+            {'$limit':1},
             {'$project': {
                 "usuario":f"$answers.{self.conf_accesos_fields['usuario_cat']}",
                 "grupos":f"$answers.{self.conf_accesos_fields['grupos']}",
                 "menus": f"$answers.{self.conf_accesos_fields['menus']}",
             }},
-            {'$limit':1},
             {'$lookup': {
                 'from': 'form_answer',
                 'pipeline': [
@@ -3113,6 +3114,7 @@ class Accesos(AccesosModel):
                     {'$project': {
                         "_id": 0,
                         "excluir": f"$answers.{self.f['personalizacion_pases']}",
+                        "incluir": f"$answers.{self.f['grupo_incluir']}",
                         "alertas": f"$answers.{self.f['grupo_alertas']}",
                     }}
                 ],
@@ -3124,15 +3126,18 @@ class Accesos(AccesosModel):
                 "grupos":1,
                 "menus":1,
                 "exclude_inputs": "$personalizaciones.excluir",
+                "include_inputs": "$personalizaciones.incluir",
                 "alertas": "$personalizaciones.alertas",
             }}
         ]
         data = self.format_cr_result(self.cr.aggregate(query),  get_one=True)
         format_data = {}
-
         if data:
             exclude_inputs = data.get('exclude_inputs', [])
             format_exclude_inputs = self.unlist([i for i in exclude_inputs])
+
+            include_inputs = data.get('include_inputs', [])
+            format_include_inputs = self.unlist([i for i in include_inputs])
 
             alertas = data.get('alertas', [])
             format_alerts = []
@@ -3149,6 +3154,7 @@ class Accesos(AccesosModel):
 
             data.update({
                 'exclude_inputs': format_exclude_inputs,
+                'include_inputs': format_include_inputs,
                 'alertas': format_alerts,
             })
 
