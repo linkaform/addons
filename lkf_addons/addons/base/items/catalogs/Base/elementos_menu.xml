@@ -3,11 +3,11 @@
     <templates>[]</templates>
     <confirmation>
         <message>¡Su información fue capturada!</message>
-        <redirect_url>default</redirect_url>
         <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>3-fde56c472ac32ae0bb0a3af10da2d726</_rev>
+    <_rev>8-170dfef8e63072fbf704ea2a4a4ed161</_rev>
     <updated_at>2026-04-27T22:42:46.391039+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
@@ -20,134 +20,291 @@
     <advanced_options>
         <active>True</active>
         <folio>
-            <config>False</config>
-            <required>False</required>
             <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
         </folio>
     </advanced_options>
-    <catalog_id>151450</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>69efe666c494ddc5599527ab</_id>
-    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
                 <item>
                     <field_type>text</field_type>
-                    <view_fields>[]</view_fields>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <key>False</key>
                     <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
+                    <field_id>69f28216c76fd3bed14949a2</field_id>
                     <required>True</required>
-                    <field_id>69efaf883bcb25ed1458465d</field_id>
+                    <fav>False</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Menu Key</label>
                     <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <key>False</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>69efaf883bcb25ed1458465d</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
                     <label>Menu</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
+                    <catalog>{}</catalog>
                     <catalog_id>None</catalog_id>
-                    <key>False</key>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <required>True</required>
+                    <field_id>69f27e8cdf4d7acc80f2e9a8</field_id>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
+                    <label>Menu Order</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
                     <properties>
                         <send_email>False</send_email>
-                        <size>complete</size>
                         <custom>None</custom>
+                        <size>complete</size>
                     </properties>
+                    <key>False</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>69f27e8cdf4d7acc80f2e9a9</field_id>
+                    <required>False</required>
+                    <fav>False</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Menu Icon</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <required>True</required>
+                    <field_id>69f27e8cdf4d7acc80f2e9aa</field_id>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
+                    <label>Menu Columns</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <key>False</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>69f28216c76fd3bed14949a3</field_id>
+                    <required>True</required>
+                    <fav>False</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Seccion Key</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>text</field_type>
-                    <view_fields>[]</view_fields>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <key>False</key>
                     <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
-                    <required>True</required>
                     <field_id>69efaf883bcb25ed1458465e</field_id>
-                    <catalog>{}</catalog>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
                     <label>Seccion</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
+                    <catalog>{}</catalog>
                     <catalog_id>None</catalog_id>
-                    <key>False</key>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <required>True</required>
+                    <field_id>69f27e8cdf4d7acc80f2e9ab</field_id>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
+                    <label>Seccion Order</label>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <required>True</required>
+                    <field_id>69f27e8cdf4d7acc80f2e9ac</field_id>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
+                    <label>Seccion Column</label>
+                </item>
+                <item>
+                    <field_type>text</field_type>
                     <properties>
                         <send_email>False</send_email>
-                        <size>complete</size>
                         <custom>None</custom>
+                        <size>complete</size>
                     </properties>
+                    <key>False</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>6a036ef020c6e62e1c3fdee6</field_id>
+                    <required>False</required>
+                    <fav>False</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Seccion Href</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>text</field_type>
-                    <view_fields>[]</view_fields>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <key>False</key>
                     <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
+                    <field_id>69f27e8cdf4d7acc80f2e9ad</field_id>
                     <required>False</required>
-                    <field_id>69efaf883bcb25ed1458465f</field_id>
+                    <fav>False</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Seccion Icon</label>
                     <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <key>False</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>69f27e8cdf4d7acc80f2e9ae</field_id>
+                    <required>False</required>
+                    <fav>False</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Seccion Icon Color</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <key>True</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>69efaf883bcb25ed1458465f</field_id>
+                    <required>True</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
                     <label>Elemento</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
+                    <catalog>{}</catalog>
                     <catalog_id>None</catalog_id>
-                    <key>True</key>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>text</field_type>
-                    <view_fields>[]</view_fields>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <key>True</key>
                     <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
-                    <required>True</required>
                     <field_id>69efb57c4a59aa2591074f4e</field_id>
-                    <catalog>{}</catalog>
-                    <relation_type>None</relation_type>
-                    <label>key</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
-                    <catalog_id>None</catalog_id>
-                    <key>True</key>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>text</field_type>
-                    <view_fields>[]</view_fields>
-                    <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
                     <required>True</required>
-                    <field_id>69efb3dcfc8545da78179bf8</field_id>
-                    <catalog>{}</catalog>
-                    <relation_type>None</relation_type>
-                    <label>href</label>
+                    <fav>True</fav>
                     <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
+                    <relation_type>None</relation_type>
+                    <label>Key</label>
+                    <catalog>{}</catalog>
                     <catalog_id>None</catalog_id>
-                    <key>True</key>
-                    <properties>
-                        <send_email>False</send_email>
-                        <size>complete</size>
-                        <custom>None</custom>
-                    </properties>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
                     <field_type>radio</field_type>
-                    <view_fields>[]</view_fields>
+                    <properties>
+                        <selected>None</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <key>None</key>
                     <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
-                    <required>True</required>
                     <field_id>69efb3dcfc8545da78179bf9</field_id>
-                    <catalog>{}</catalog>
+                    <required>True</required>
+                    <fav>False</fav>
+                    <related_catalog_key>[]</related_catalog_key>
                     <relation_type>None</relation_type>
                     <label>Type</label>
-                    <related_catalog_key>[]</related_catalog_key>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
                     <options>
                         <item>
                             <points>None</points>
@@ -180,63 +337,102 @@
                             <label>link</label>
                         </item>
                     </options>
-                    <catalog_id>None</catalog_id>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <custom>None</custom>
+                        <step>1</step>
+                        <size>small</size>
+                    </properties>
                     <key>None</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>69efb3dcfc8545da78179bfa</field_id>
+                    <required>True</required>
+                    <fav>False</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Item Order</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <key>True</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>69efb3dcfc8545da78179bf8</field_id>
+                    <required>False</required>
+                    <fav>False</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Href Web</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
+                    <field_type>text</field_type>
+                    <required>False</required>
+                    <field_id>69f27e8cdf4d7acc80f2e9af</field_id>
+                    <properties>
+                        <send_email>False</send_email>
+                        <custom>None</custom>
+                        <size>complete</size>
+                    </properties>
+                    <label>Route Mobile</label>
+                </item>
+                <item>
+                    <field_type>radio</field_type>
                     <properties>
                         <selected>None</selected>
                         <openChoice>False</openChoice>
                         <orientation>vertical</orientation>
                         <custom>None</custom>
                     </properties>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>integer</field_type>
-                    <view_fields>[]</view_fields>
-                    <catalog_fields>[]</catalog_fields>
-                    <fav>True</fav>
+                    <field_id>69f27e8cdf4d7acc80f2e9b0</field_id>
                     <required>True</required>
-                    <field_id>69efb3dcfc8545da78179bfa</field_id>
-                    <catalog>{}</catalog>
-                    <relation_type>None</relation_type>
-                    <label>Order</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
-                    <catalog_id>None</catalog_id>
-                    <key>None</key>
-                    <properties>
-                        <number_of_decimals>2</number_of_decimals>
-                        <size>small</size>
-                        <step>1</step>
-                        <custom>None</custom>
-                    </properties>
-                    <related_catalog>None</related_catalog>
-                </item>
-                <item>
-                    <field_type>integer</field_type>
-                    <view_fields>[]</view_fields>
-                    <catalog_fields>[]</catalog_fields>
                     <fav>True</fav>
-                    <required>True</required>
-                    <field_id>69efb3dcfc8545da78179bfb</field_id>
-                    <catalog>{}</catalog>
-                    <relation_type>None</relation_type>
-                    <label>Column</label>
-                    <related_catalog_key>[]</related_catalog_key>
-                    <options>[]</options>
-                    <catalog_id>None</catalog_id>
-                    <key>None</key>
-                    <properties>
-                        <number_of_decimals>2</number_of_decimals>
-                        <size>small</size>
-                        <step>1</step>
-                        <custom>None</custom>
-                    </properties>
-                    <related_catalog>None</related_catalog>
+                    <label>Platforms</label>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>web</value>
+                            <label>Web</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>mobile</value>
+                            <label>Mobile</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>both</value>
+                            <label>Both</label>
+                        </item>
+                    </options>
                 </item>
             </page_fields>
-            <page_description>None</page_description>
             <page_name>Página 1</page_name>
+            <page_description>None</page_description>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>69efe666c494ddc5599527ab</_id>
+    <public>False</public>
+    <catalog_id>151450</catalog_id>
 </lkf>
