@@ -185,7 +185,9 @@ class Location(Base):
         # ids_label_dct={'area':self.f['area']} fuerza a obtener el diccionarion con esos nombres 
         # paso un error que daba otro label
         data = self.format_cr(self.cr.find(match_query, {area_path: 1}).sort(area_path, 1),  ids_label_dct={'area':self.f['area']})
-        return [x.get('area') for x in data if x.get('area')]
+        result = set(x.get('area') for x in data if x.get('area'))
+        result = list(result)
+        return result
 
     def get_areas_by_location_salidas(self, location_name):
         options={}
