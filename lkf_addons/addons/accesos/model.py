@@ -895,3 +895,5 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'llamar_num_alerta': '695d36605f78faab793f497d',
             'email_alerta': '695d36605f78faab793f497e'
         })
+
+        self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']

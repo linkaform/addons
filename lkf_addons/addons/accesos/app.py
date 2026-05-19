@@ -8963,16 +8963,30 @@ class Accesos(AccesosModel):
 
         questions = []
         for field in fields:
+            field_type = field.get('field_type')
+            if field_type not in self.INSPECTION_ACCEPTED_TYPES:
+                continue
+
+            question_schema = {}
             options = field.get('options', [])
-            question_schema = {
+            if field_type == 'integer':
+                field_properties = field.get('properties', {})
+                field_min = field_properties.get('min')
+                field_max = field_properties.get('max')
+                if field_min or field_max:
+                    field_type = 'slider'
+                    question_schema['min'] = field_min or 0
+                    question_schema['max'] = field_max or field_min + 100
+
+            question_schema.update({
                 'pregunta': field.get('label', ''),
-                'tipo': field.get('field_type',''),
+                'tipo': field_type,
                 'opciones': [opt.get('label') for opt in options if opt.get('label')],
                 'required': field.get('required', False),
-                'valor':"",
-                'comentario':"",
-                'foto':None,
-            }
+                'valor': "",
+                'comentario': "",
+                'foto': None,
+            })
             questions.append(question_schema)
 
         return questions
