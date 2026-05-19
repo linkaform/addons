@@ -158,12 +158,35 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID = self.AREAS_DE_LAS_UBICACIONES_SALIDA.get('obj_id')
         #----Dic Fields Forms
 
+        ### Lista de catalogos requeridos para el uso offline de la aplicacion.
+        self.clave10_catalogs = [
+            self.LISTA_INCIDENCIAS_CAT_ID,
+            self.SUB_CATEGORIAS_INCIDENCIAS_ID,
+            self.CATEGORIAS_INCIDENCIAS_ID,
+            self.AREAS_DE_LAS_UBICACIONES_CAT_ID,
+            self.UBICACIONES_CAT_ID,
+            self.CONFIGURACION_RECORRIDOS_ID,
+            self.USUARIOS_ID,
+            self.CONF_AREA_EMPLEADOS_CAT_ID,
+            self.TIPO_DE_EQUIPO_ID,
+            self.LISTA_FALLAS_CAT_ID,
+            self.CONF_AREA_EMPLEADOS_AP_CAT_ID,
+            self.VISITA_AUTORIZADA_CAT_ID,
+            self.ESTADO_ID,
+            self.PROVEEDORES_CAT_ID,
+            self.LOCKERS_CAT_ID,
+            self.TIPO_ARTICULOS_PERDIDOS_CAT_ID,
+            self.PASE_ENTRADA_ID,
+            self.ACTIVOS_FIJOS_CAT_ID,
+        ]
+
         ## Module Fields ##
         ''' 
         self.mf : Estos son los campos que deseas mantener solo dentro de este modulo.
         Asegúrese de utilizar `llave` y el `id` del campo ej.
         'nombre_campo': "1f2h3j4j5d6f7h8j9j1a",
         '''
+
         mf = {
             'acepto_aviso_datos_personales': '6827488724317731cb288117',
             'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',

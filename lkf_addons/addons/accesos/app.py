@@ -8968,7 +8968,10 @@ class Accesos(AccesosModel):
                 'pregunta': field.get('label', ''),
                 'tipo': field.get('field_type',''),
                 'opciones': [opt.get('label') for opt in options if opt.get('label')],
-                'required': field.get('required', False)
+                'required': field.get('required', False),
+                'valor':"",
+                'comentario':"",
+                'foto':None,
             }
             questions.append(question_schema)
 
@@ -9008,7 +9011,7 @@ class Accesos(AccesosModel):
         if len(self.geolocation) > 1:
             lat = self.geolocation[0]
             long = self.geolocation[1]
-        epoc_today = int(time.time())
+        epoc_today = int(time_module.time())
         #obtiene las areas bien formateadas
         format_check_areas = self.get_area_images(data.get(self.f['areas_del_rondin'], []))
         inpections_by_area = self.build_area_inspection_map(data.get(self.f['areas_del_rondin'], []))
@@ -10496,7 +10499,7 @@ class Accesos(AccesosModel):
 
     def delete_old_synced_areas(self, days=3):
         import time
-        cutoff = time.time() - (days * 86400)
+        cutoff = time_module.time() - (days * 86400)
         deleted = 0
         for record in self.cr_db:
             if record.get('status') != 'synced':
