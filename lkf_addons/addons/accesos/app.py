@@ -8980,12 +8980,10 @@ class Accesos(AccesosModel):
 
             question_schema.update({
                 'pregunta': field.get('label', ''),
+                'field_id': field.get('field_id', ''),
                 'tipo': field_type,
                 'opciones': [opt.get('label') for opt in options if opt.get('label')],
                 'required': field.get('required', False),
-                'valor': "",
-                'comentario': "",
-                'foto': None,
             })
             questions.append(question_schema)
 
@@ -9033,6 +9031,7 @@ class Accesos(AccesosModel):
         for i in format_check_areas:
             form_id = inpections_by_area['areas'].get(i['area'])
             i['inspeccion'] = inpections_by_area['inspection_ids'].get(form_id, {})
+            i['inspeccion_form_id'] = form_id
             i['checked'] = False
             i['checked_at'] = ''
             i['check_area_id'] = ''
