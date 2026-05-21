@@ -495,7 +495,7 @@ class Accesos(OcrMixin, AccesosModel):
         vista_a_ok = False
         autorizado_ok = False
         status = 'proceso'
-        foto  = answers[self.pase_entrada_fields['walkin_fotografia']]
+        foto = answers.get(self.pase_entrada_fields['walkin_fotografia'])
         if isinstance(foto, list) and len(foto) > 0:
             foto = foto[0]
 
