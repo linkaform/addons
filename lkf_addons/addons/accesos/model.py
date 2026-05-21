@@ -893,7 +893,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'nombre_alerta': '695d36605f78faab793f497b',
             'accion_alerta': '695d36605f78faab793f497c',
             'llamar_num_alerta': '695d36605f78faab793f497d',
-            'email_alerta': '695d36605f78faab793f497e'
+            'email_alerta': '695d36605f78faab793f497e',
+            'url_inspeccion': '6a0c8ab354a0b8de897c62cc'
         })
 
         self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']
