@@ -51,6 +51,7 @@ from zipfile import ZipFile
 from linkaform_api import base, generar_qr
 
 from .model import AccesosModel
+from lkf_addons.tools.OcrMixin import OcrMixin
 
 ### Objeto o Clase de Módulo ###
 '''
@@ -61,7 +62,7 @@ Al utilizar `super()` en el método `__init__()`, heredamos las variables de con
 Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
 '''
 
-class Accesos(AccesosModel):
+class Accesos(OcrMixin, AccesosModel):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         #--Variables
