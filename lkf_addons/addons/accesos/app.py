@@ -8881,7 +8881,7 @@ class Accesos(AccesosModel):
             else:
                 print(f'===> Revisión aún no propagada (Intento {attempt + 1}/{max_retries})')
                 if attempt < max_retries - 1:
-                    time.sleep(wait_time)
+                    time_module.sleep(wait_time)
                 else:
                     return {'status_code': 462, 'type': 'error', 'msg': 'Revision not yet propagated', 'data': {}}
 
@@ -9124,6 +9124,12 @@ class Accesos(AccesosModel):
         #         'record_id': record_id,
         #         'rondin_id': rondin_id
         #     })
+        inspeccion = record.get('inspeccion', {})
+        inspeccion_form_id = record.get('inspeccion_form_id', '')
+        if inspeccion_form_id and inspeccion:
+            response_inspeccion = self.create_inspeccion(complete_record, inspeccion_form_id)
+            inspeccion_id = response_inspeccion.get('json', {}).get('id', '')
+            complete_record['record']['inspeccion_record_id'] = inspeccion_id
         response = self.create_check_area(complete_record)
         print('response del check de area', response)
         if response.get('status_code') in [200, 201, 202, 208,]:
@@ -9749,6 +9755,9 @@ class Accesos(AccesosModel):
             rondin_id = data.get('rondin_id')
             answers[self.f['bitacora_rondin_url']] = f"https://app.linkaform.com/#/records/detail/{rondin_id}"
 
+        if record.get('inspeccion_record_id'):
+            answers[self.f['url_inspeccion']] = f"https://app.linkaform.com/#/records/detail/{record.get('inspeccion_record_id', '')}"
+
         if data.get('rondin_name'):
             rondin_name = data.get('rondin_name')
             answers[self.CONFIGURACION_RECORRIDOS_OBJ_ID] = {
@@ -9800,7 +9809,54 @@ class Accesos(AccesosModel):
             else:
                 continue
             
-        
+        metadata.update({'answers':answers})
+        res = self.lkf_api.post_forms_answers(metadata)
+        return res
+
+    def create_inspeccion(self, data, form_id):
+        record = data.get('record',{})
+        answers = {}
+        metadata = self.lkf_api.get_metadata(form_id=form_id)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Script",
+                    "Module": "Accesos",
+                    "Process": "Creación de Inspeccion",
+                    "Action": "create_inspeccion",
+                    "File": "accesos/app.py"
+                }
+            },
+        })
+        if isinstance(data.get('geolocation'), dict):
+            metadata.update({'geolocation': [data.get('geolocation').get('long'), data.get('geolocation').get('lat')]})
+
+        metadata['start_date'] = record.get('checked_at', data.get('created_at', metadata['start_timestamp']))
+        metadata['start_timestamp'] = self.get_epoch(metadata['start_date'] )
+        metadata['end_timestamp'] = self.get_epoch(data.get('updated_at', metadata['end_timestamp']))
+        metadata['timezone'] = data.get('timezone') or  metadata.get('timezone') or self.user.get('timezone')
+
+        ubicacion = record.get('ubicacion', '')
+        area = record.get('area', '')
+        inspeccion = record.get('inspeccion', '')
+
+        answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID] = {
+            self.mf['ubicacion']: ubicacion,
+            self.mf['nombre_area']: area
+        }
+
+
+        for item in inspeccion:
+            field_id = item.get('field_id')
+            value = item.get('valor', '')
+            field_type = item.get('tipo', '')
+            if field_type == 'checkbox':
+                for idx, item in enumerate(value) if isinstance(value, list) else []:
+                    value[idx] = item.lower().replace(' ', '_')
+            elif field_type == 'radio':
+                value = value.lower().replace(' ', '_')
+            answers[field_id] = value
+
         metadata.update({'answers':answers})
         res = self.lkf_api.post_forms_answers(metadata)
         return res
@@ -10223,7 +10279,7 @@ class Accesos(AccesosModel):
             wait = .1 
             print('cambiar TODO BORRAR EL WAIT.1')
             print(f'Esperando {wait:.1f}s antes del intento {attempt + 1}/{max_retries}...')
-            time.sleep(wait)
+            time_module.sleep(wait)
 
             response = self.update_bitacora(bitacora_in_lkf, data, incidencia_for_rondin, checks_for_rondin)
 
