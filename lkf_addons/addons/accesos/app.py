@@ -495,7 +495,7 @@ class Accesos(OcrMixin, AccesosModel):
         vista_a_ok = False
         autorizado_ok = False
         status = 'proceso'
-        foto  = answers[self.pase_entrada_fields['walkin_fotografia']]
+        foto = answers.get(self.pase_entrada_fields['walkin_fotografia'])
         if isinstance(foto, list) and len(foto) > 0:
             foto = foto[0]
 
@@ -9131,6 +9131,8 @@ class Accesos(OcrMixin, AccesosModel):
             response_inspeccion = self.create_inspeccion(complete_record, inspeccion_form_id)
             inspeccion_id = response_inspeccion.get('json', {}).get('id', '')
             complete_record['record']['inspeccion_record_id'] = inspeccion_id
+            #TODO: EN CASO DE ERROR QUE SUCEDE?
+            self.insert_images_and_comments_into_inspeccion(complete_record, inspeccion_form_id, inspeccion_id)
         response = self.create_check_area(complete_record)
         print('response del check de area', response)
         if response.get('status_code') in [200, 201, 202, 208,]:
@@ -9861,6 +9863,45 @@ class Accesos(OcrMixin, AccesosModel):
         metadata.update({'answers':answers})
         res = self.lkf_api.post_forms_answers(metadata)
         return res
+
+    def insert_images_and_comments_into_inspeccion(self, record, form_id, record_id):
+        """
+        Insert images and comments into inspeccion
+        """
+        images = {}
+        comments = {}
+        data = record.get('record', {})
+        inspection = data.get('inspeccion', [])
+        for question in inspection:
+            if question.get('field_id'):
+                if question.get('foto'):
+                    images.update({
+                        question.get('field_id'): question.get('foto')
+                    })
+                if question.get('comentario'):
+                    comments.update({
+                        question.get('field_id'): question.get('comentario')
+                    })
+
+        if not images and not comments:
+            return False
+            
+        update_fields = {
+            "images": images,
+            "comments": comments
+        }
+        update_db = self.cr.update_one({
+            '_id': ObjectId(record_id),
+            'form_id': form_id,
+            'deleted_at': {'$exists': False}
+        },{'$set':update_fields})
+
+        db_res = update_db.raw_result
+        print('db_res_inspeccion=',db_res)
+        update_ok = db_res.get('updatedExisting')
+        if update_ok:
+            return True
+        return False
     
     def delete_rondines(self, records):
         status = {}
