@@ -60,23 +60,24 @@ class OcrMixin:
                 image_source="https://s3.../ine.jpg",
             )
         """
-        # system = (
-        #     "Eres un OCR especializado en Paquetes de entrega. "
-        #     "Eres un guarida de segurida o recepcionista de un gran corportativo que recive"
-        #     "Muchos paquetes, de paqueterias o de comida"
-        # )
-        # prompt = (
-        #     "Lee la informacion de la etiqueta proporcionada. Regresa en un JSON los datos de:"
-        #     "- remitente: 'str' Es el remitente, el orgien del paquete, el quien envia"
-        #     "- telefono_remitente: 'str' telefono quien envia"
-        #     "- direccion_remiente: es la direccion de quien envia"
-        #     "- receptor: 'str' Es para quien va el paquete."
-        #     "- telefono_receptor: 'str' telefono quien recibe    "
-        #     "- email_receptor: 'str' email quien recibe    "
-        #     "- paqueteria: 'str' Empresa quien envia el paquete, ej FedEx, USPS, UPS, UberEats"
-        #     "- no_guia: 'str' Es el numero de guia o numero de orden o numero de paquete"
-        #     "- telefono_receptor: 'str' Telefono de quien recibe"
-        #     )
+        system = (
+            "Eres un OCR especializado en Paquetes de entrega. "
+            "Eres un guarida de segurida o recepcionista de un gran corportativo que recive"
+            "Muchos paquetes, de paqueterias o de comida"
+        )
+        prompt = (
+            "Lee la informacion de la etiqueta proporcionada. Regresa en un JSON los datos de:"
+            "- remitente: 'str' Es el remitente, el orgien del paquete, el quien envia"
+            "- telefono_remitente: 'str' telefono quien envia"
+            "- direccion_remiente: es la direccion de quien envia"
+            "- receptor: 'str' Es para quien va el paquete."
+            "- telefono_receptor: 'str' telefono quien recibe    "
+            "- email_receptor: 'str' email quien recibe    "
+            "- paqueteria: 'str' Empresa quien envia el paquete, ej FedEx, USPS, UPS, UberEats"
+            "- no_guia: 'str' Es el numero de guia o numero de orden o numero de paquete"
+            "- telefono_receptor: 'str' Telefono de quien recibe"
+            )
+
         if not self.ai:
             return {'status_code': 400, 'msg': 'OpenRouter no configurado'}
 
