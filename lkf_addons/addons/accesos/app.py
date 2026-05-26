@@ -1201,13 +1201,13 @@ class Accesos(OcrMixin, AccesosModel):
             format_resp = [r.get('_id', r.get('id', '')) for r in resp]
         return format_resp
 
-    def do_out(self, qr, location, area, gafete_id=None):
+    def do_out(self, qr, location, area, gafete_id=None, record_id=None):
         '''
             Realiza el cambio de estatus de la forma de bitacora, relacionada a la salida, como parametro
             es necesesario enviar el nombre del visitante que es el unico dato qu se encuentra en la forma
         '''
         response = False
-        last_check_out = self.get_last_user_move(qr, location)
+        last_check_out = self.get_last_user_move(qr, location, record_id)
         print("last", last_check_out)
         if last_check_out.get('status_gafete') and last_check_out.get('status_gafete')!= "entregado":
             self.LKFException({"status_code":400, "msg":f"Se necesita liberar el gafete antes de regitrar la salida"})
@@ -4318,12 +4318,14 @@ class Accesos(OcrMixin, AccesosModel):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_last_user_move(self, qr, location):
+    def get_last_user_move(self, qr, location, record_id=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ACCESOS,
             f"answers.{self.mf['codigo_qr']}":qr,
         }
+        if record_id:
+            match_query["_id"] = ObjectId(record_id)
         res = self.cr.find(
             match_query, 
             {
