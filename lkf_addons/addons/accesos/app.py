@@ -9194,8 +9194,11 @@ class Accesos(OcrMixin, AccesosModel):
         """
         _id = rec.get('_id')
         rondin_id = rec.get('rondin_id') or rec.get('record', {}).get('rondin_id', '')
+        area_name = rec.get('record', {}).get('area') or rec.get('record', {}).get('incidente_area', '?')
+        print(f"  [check] _id={_id} area={area_name} rondin_id={rondin_id}")
 
         res = self.sync_check_area_to_lkf(complete_record=rec)
+        print(f"  [check] resultado sync → status_code={res.get('status_code')} msg={res.get('msg','')}")
 
         check_info = {
             "check_id": _id,
@@ -9207,8 +9210,10 @@ class Accesos(OcrMixin, AccesosModel):
         }
 
         if not rondin_id:
+            print(f"  [check] rondin_id no encontrado en rec, buscando en rondines...")
             check_data = self.find_check_area_in_rondines(_id)
-            rondin_id = check_data.get('rondin_id')
+            rondin_id = check_data.get('rondin_id') if check_data else None
+            print(f"  [check] rondin_id encontrado: {rondin_id}")
         return {
             "rondin_id": rondin_id,
             "check": check_info,
@@ -9254,6 +9259,9 @@ class Accesos(OcrMixin, AccesosModel):
                             })
 
                 except Exception as e:
+                    import traceback
+                    print(f"  [check ERROR] _id={rec.get('_id')} error={e}")
+                    print(traceback.format_exc())
                     with self.results_lock:
                         self.results["failed"] += 1
                         self.results["errors"].append({
@@ -9446,9 +9454,11 @@ class Accesos(OcrMixin, AccesosModel):
         Return 
             status (json): json el la respueta del servidor
         """
+        print(f"\n  [sync_rondin] rondin_id={rondin_id}")
         status = {}
         bitacora_in_lkf = self.get_bitacora_by_id(rondin_id)
         if not bitacora_in_lkf:
+            print(f"  [sync_rondin] ERROR: bitácora no encontrada en LKF para rondin_id={rondin_id}")
             rondin_record['status'] = 'not_found'
             rondin_record['last_error'] = 'Rondin record not found on users database.'
             self.cr_db.save(rondin_record)
@@ -9458,10 +9468,27 @@ class Accesos(OcrMixin, AccesosModel):
                 'msg': f'No se encontró bitácora en LKF para rondin_id={rondin_id}',
                 'data': {}
             }
+        print(f"  [sync_rondin] bitácora encontrada folio={bitacora_in_lkf.get('folio')}")
 
         incidencia_for_rondin = []
         # Obtiene los checks que se han contestado del rondin de Mongodb
         checks_for_rondin = self.get_rondin_checks(rondin_id)
+
+        # Enriquecer checks con checked_at del doc CouchDB (que tiene la hora local real por área)
+        couch_dates = {
+            ca.get('area'): ca.get('checked_at')
+            for ca in (rondin_record or {}).get('record', {}).get('check_areas', [])
+            if ca.get('checked_at')
+        }
+        for area_name, check in checks_for_rondin.items():
+            if couch_dates.get(area_name) and not (check.get('fecha_hora_inspeccion_area') or check.get('fecha_inspeccion_area')):
+                check['fecha_hora_inspeccion_area'] = couch_dates[area_name]
+                print(f"    [enrich] {area_name!r} → checked_at={couch_dates[area_name]!r}")
+
+        print(f"  [sync_rondin] checks_for_rondin ({len(checks_for_rondin)}): {list(checks_for_rondin.keys())}")
+        for area, chk in checks_for_rondin.items():
+            fecha = chk.get('fecha_hora_inspeccion_area') or chk.get('fecha_inspeccion_area') or chk.get('created_at', '')
+            print(f"    área={area!r}  fecha_inspeccion={chk.get('fecha_hora_inspeccion_area')!r}  created_at={chk.get('created_at')!r}  → usará={fecha!r}")
         incidencia_for_rondin = self.get_incidencias_from_checks(checks_for_rondin)
         data = rondin_record or {
             '_id': rondin_id,
@@ -9564,14 +9591,14 @@ class Accesos(OcrMixin, AccesosModel):
         #     self.sync_rondin_to_lkf(rondin_id, checks, None)
         # print(stop)
         if hasattr(self, 'test') and self.test:
-            for rondin_id, checks in checks_by_rondin.items():
-                results.append(self.sync_rondin_to_lkf(rondin_id, checks))
+            for rondin_id in checks_by_rondin:
+                results.append(self.sync_rondin_to_lkf(rondin_id))
         else:
 
             with ThreadPoolExecutor(max_workers=10) as executor:
                 futures = {
-                    executor.submit(self.sync_rondin_to_lkf, rondin_id, checks): rondin_id
-                    for rondin_id, checks in checks_by_rondin.items()
+                    executor.submit(self.sync_rondin_to_lkf, rondin_id): rondin_id
+                    for rondin_id in checks_by_rondin
                 }
 
                 for future in as_completed(futures):
@@ -9700,29 +9727,33 @@ class Accesos(OcrMixin, AccesosModel):
         Return 
             res (json): El json con ids de cada set del grupo repetitivo del rondin
         """
-        start_date = bitacora.get('fecha_inicio_rondin', [])
-        ts = check.get('created_at', check.get('checked_at', check.get('fecha_hora_inspeccion_area')))
+        area_name = self.unlist(check.get('incidente_area', '?'))
         timezone_str = check.get('timezone') or self.user.get('timezone')
-        fecha_str = ""
-        if ts:
-            try:
-                target_tz = pytz.timezone(timezone_str)
-                if isinstance(ts, str):
-                    dt_aware = target_tz.localize(datetime.strptime(ts, "%Y-%m-%d %H:%M:%S"))
-                else:
-                    dt_aware = datetime.fromtimestamp(ts, tz=target_tz)
-                fecha_str = dt_aware.strftime("%Y-%m-%d %H:%M:%S")
-            except (pytz.exceptions.UnknownTimeZoneError, Exception):
-                fecha_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+        fecha = (check.get('fecha_hora_inspeccion_area')
+                 or check.get('fecha_inspeccion_area'))
+        fecha_source = 'fecha_hora_inspeccion_area' if check.get('fecha_hora_inspeccion_area') else (
+                       'fecha_inspeccion_area' if check.get('fecha_inspeccion_area') else None)
+        if not fecha:
+            raw_ts = check.get('created_at')
+            if raw_ts:
+                try:
+                    target_tz = pytz.timezone(timezone_str)
+                    dt_utc = datetime.strptime(raw_ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+                    fecha = dt_utc.astimezone(target_tz).strftime("%Y-%m-%d %H:%M:%S")
+                    fecha_source = f'created_at(UTC→{timezone_str})'
+                except Exception as e:
+                    fecha = raw_ts
+                    fecha_source = f'created_at(raw, tz_error={e})'
+        print(f"    [set_area_fmt] área={area_name!r}  fecha={fecha!r}  fuente={fecha_source}")
         res = self._lables_to_ids(check)
         res ={  self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID: {
                     self.mf['nombre_area']: self.unlist(check.get('incidente_area', '')),
                     },
-                self.f['fecha_inspeccion_area']: check.get('fecha_hora_inspeccion_area', check.get('created_at')),
+                self.f['fecha_inspeccion_area']: fecha,
                 self.f['foto_evidencia_area_rondin']: check.get('foto_evidencia_area', []),
                 self.f['comentario_area_rondin']: check.get('comentario_check_area', check.get('comentario_area_rondin', '')),
                 self.f['url_registro_rondin']: f"https://app.linkaform.com/#/records/detail/{check.get('_id')}",
-                self.f['duracion_traslado_area']: self.date_difference_minutes(start_date, ts),
+                self.f['duracion_traslado_area']: 0,
                 }
         return res
 
@@ -10143,7 +10174,7 @@ class Accesos(OcrMixin, AccesosModel):
             check_area_id = check_area.get('check_area_id')
             nombre = check_area.get('area', '')
 
-            if status_user == 'completed' and check_area_id not in check_area_id:
+            if status_user == 'completed' and check_area_id not in check_area_ids:
                 check_area['status'] = 'not_found'
             elif check_area_id in list(check_areas_status.keys()):
                 check_area['status'] = check_areas_status[check_area_id]
@@ -10158,6 +10189,18 @@ class Accesos(OcrMixin, AccesosModel):
                         "fields": ["_id","status"]
                 })
         return {x['_id']:x.get('status') for x in records_rondin }
+
+    def _ensure_date_str(self, value):
+        """Convierte un valor a string de fecha 'YYYY-MM-DD HH:MM:SS'.
+        Acepta: string ya formateado, epoch int/float, o None/vacío."""
+        if not value:
+            return ''
+        if isinstance(value, (int, float)):
+            try:
+                return datetime.fromtimestamp(value).strftime('%Y-%m-%d %H:%M:%S')
+            except Exception:
+                return ''
+        return str(value)
 
     def update_bitacora(self, bitacora_in_lkf, data, incidencia_for_rondin, checks_for_rondin):
         """
@@ -10212,11 +10255,12 @@ class Accesos(OcrMixin, AccesosModel):
                     self.f['new_user_email']: [self.user['email']]
                 }
             elif key == 'fecha_programacion':
-                answers[self.f['fecha_programacion']] = value
+                answers[self.f['fecha_programacion']] = self._ensure_date_str(value)
             elif key == 'fecha_inicio_rondin':
-                answers[self.f['fecha_inicio_rondin']] = value
+                answers[self.f['fecha_inicio_rondin']] = self._ensure_date_str(value)
+                print(f"    [update_bitacora] fecha_inicio_rondin raw={value!r} → '{answers[self.f['fecha_inicio_rondin']]!r}'")
             elif key == 'fecha_fin_rondin':
-                answers[self.f['fecha_fin_rondin']] = value
+                answers[self.f['fecha_fin_rondin']] = self._ensure_date_str(value)
             elif key == 'estatus_del_recorrido' and value:
                 answers[self.f['estatus_del_recorrido']] = value
             elif key == 'incidente_location':
@@ -10685,9 +10729,11 @@ class Accesos(OcrMixin, AccesosModel):
 
     def sync_records(self, app_records=[]):
         """
-        Obtiene todos los registros de cocuhdb que esten con "status_user": "completed" y los 
+        Obtiene todos los registros de cocuhdb que esten con "status_user": "completed" y los
         procesa segun sea el tipo.
         """
+        print("\n" + "="*60)
+        print("[sync_records] INICIO")
         record_list = []
         records = self.cr_db.find({
             "selector": {
@@ -10741,8 +10787,9 @@ class Accesos(OcrMixin, AccesosModel):
         for rec in record_list:
             unique_records[rec.get('_id')] = rec
         record_list = list(unique_records.values())
+        print(f"[sync_records] Total registros a procesar (deduplicados): {len(record_list)}")
         if not record_list:
-            print("No records to sync")
+            print("[sync_records] No hay registros pendientes de sync")
             return
 
         self.results = {
@@ -10754,33 +10801,46 @@ class Accesos(OcrMixin, AccesosModel):
         self.results_lock = threading.Lock()
 
         grouped_records = self.group_records_by_type(record_list)
+        print(f"[sync_records] Tipos agrupados: { {k: len(v) for k, v in grouped_records.items()} }")
+
         area_results = self.process_stage_in_parallel(
             grouped_records.get('area', []),
             self.process_area_record,
             max_workers=10
         )
+        print(f"[sync_records] Areas procesadas: {len(area_results)}")
 
         #todo
-        if  grouped_records.get('incidencia'):
+        if grouped_records.get('incidencia'):
             response = acceso_obj.sync_incidence_to_lkf(record=record)
 
         # 1. primero checks
-        print('va a hacer los check de area')
-        checks_by_rondin = self.process_check_area_stage(
-            grouped_records.get('check_area', [])
-        )
-        print('ya hizo los checks')
-        # checks_by_rondin = independent_results.get('check_area')
-        # 2. luego rondines explícitos
-        print('rondines/....' )
-        rondin_results = self.process_rondin_stage(
-            grouped_records.get('rondin', [])
-        )
+        check_records = grouped_records.get('check_area', [])
+        print(f"\n[sync_records] --- STAGE 1: check_area ({len(check_records)} registros) ---")
+        checks_by_rondin = self.process_check_area_stage(check_records)
+        print(f"[sync_records] checks_by_rondin keys: {list(checks_by_rondin.keys())}")
+        for rid, cks in checks_by_rondin.items():
+            ok = [c for c in cks if c.get('ok')]
+            fail = [c for c in cks if not c.get('ok')]
+            print(f"  rondin_id={rid}: {len(cks)} checks ({len(ok)} ok, {len(fail)} failed)")
 
-        # 3. lo que sobró en checks_by_rondin son rondines que no venían como registro
-        missing_rondin_results = self.update_rondines_from_checks(
-            checks_by_rondin
-        )
+        # 2. luego rondines explícitos
+        rondin_records = grouped_records.get('rondin', [])
+        print(f"\n[sync_records] --- STAGE 2: rondin ({len(rondin_records)} registros) ---")
+        rondin_results = self.process_rondin_stage(rondin_records)
+        print(f"[sync_records] rondin_results: {rondin_results}")
+
+        # 3. rondines derivados de checks que NO tenían registro rondin explícito en Stage 2
+        already_synced = {r.get('_id') for r in rondin_records}
+        pending_checks_by_rondin = {rid: cks for rid, cks in checks_by_rondin.items() if rid not in already_synced}
+        print(f"\n[sync_records] --- STAGE 3: update_rondines_from_checks ({len(pending_checks_by_rondin)} rondines pendientes, {len(checks_by_rondin) - len(pending_checks_by_rondin)} ya procesados en Stage 2) ---")
+        missing_rondin_results = self.update_rondines_from_checks(pending_checks_by_rondin)
+        print(f"[sync_records] missing_rondin_results: {missing_rondin_results}")
+
+        print(f"\n[sync_records] FIN — success={self.results['success']} failed={self.results['failed']}")
+        if self.results['errors']:
+            print(f"[sync_records] Errores: {self.results['errors']}")
+        print("="*60 + "\n")
 
         return {
             "results": self.results,
