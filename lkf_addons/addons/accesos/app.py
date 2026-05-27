@@ -78,6 +78,26 @@ class Accesos(OcrMixin, AccesosModel):
         weak “internal use” indicator. E.g. from M import * does not import objects whose names start with an underscore.
     '''
 
+    def get_mongo_string_list(func):
+        def wrapper(self, *args, **kwargs):
+            config = func(self, *args, **kwargs)
+            match_query_custom = config.get('query', {})
+            form_id = config.get('form_id')
+            project_fields = config.get('project', {})
+            match_query = {"deleted_at": {"$exists": False}}
+            if form_id:
+                match_query["form_id"] = form_id
+            match_query.update(match_query_custom)
+            query = [{"$match": match_query}, {"$project": {"_id": 0, **project_fields}}]
+            data = self.format_cr(self.cr.aggregate(query))
+            format_data = []
+            if data:
+                for item in data:
+                    format_data.append(item.get("value"))
+                format_data = list(set(format_data))
+            return format_data
+        return wrapper
+
     def _do_access(self, access_pass, location, area, data):
         '''
         Registra el acceso del pase de entrada a ubicación.
@@ -4122,6 +4142,15 @@ class Accesos(OcrMixin, AccesosModel):
     def get_ids_labels(self, data):
         return data
 
+    @get_mongo_string_list
+    def get_employees_names(self):
+        return {
+            "form_id": self.EMPLEADOS,
+            "project": {
+                "value": f"$answers.{self.mf['nombre_empleado']}"
+            }
+        } 
+
     def get_employees_data(self, names=None, user_id=None, username=None, email=None,  get_one=False):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -5230,6 +5259,22 @@ class Accesos(OcrMixin, AccesosModel):
                     if r['perfil'] not in res:
                         res.append(r['perfil'])
         return res
+
+    def get_proveedores_paqueteria(self):
+        """
+        Obtiene los proveedores de paquetería del catalogo de PROVEEDORES DE PAQUETERIA.
+        """
+        selector = {}
+        mango_query = {
+            "selector": selector,
+            "limit": 10000,
+        }
+        data = self.lkf_api.search_catalog(self.PROVEEDORES_DE_PAQUETERIA_CAT_ID, mango_query)
+        format_data = []
+        if data:
+            format_data = {i.get(self.f['proveedor_de_paqueteria']) for i in data}
+            format_data = list(format_data)
+        return format_data
     
     def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
         employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
@@ -8430,6 +8475,16 @@ class Accesos(OcrMixin, AccesosModel):
         metadata.update({'answers': answers})
         sms_response = self.lkf_api.post_forms_answers(metadata)
         return sms_response
+
+    def create_proveedor_de_paqueteria(self, proveedor):
+        answers = {}
+        catalogo_metadata = self.lkf_api.get_catalog_metadata(catalog_id=self.PROVEEDORES_DE_PAQUETERIA_CAT_ID)
+        answers[self.f['proveedor_de_paqueteria']] = proveedor
+        catalogo_metadata.update({'answers': answers})
+        res = self.lkf_api.post_catalog_answers(catalogo_metadata)
+        if res.get('status_code') not in [200, 201, 202]:
+            self.LKFException({"title": "Error en crear proveedor de paqueteria", "msg": "No se pudo crear correctamente el registro."})
+        return res
 
     def create_class_google_wallet(self, data, qr_code):
         ISSUER_ID = '3388000000022924601'

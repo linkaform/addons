@@ -98,6 +98,22 @@ class OcrMixin:
 
         datos = self._ocr_normalizar(datos)
 
+        # Se asigna nombre del remitente
+        nombre_remitente = datos.get('remitente', '')
+        empleados = self.get_employees_names()
+        match_empleado = self._match_label(nombre_remitente, empleados)
+        if match_empleado.get('label'):
+            datos['remitente'] = match_empleado['label']
+
+        # Se asigna nombre del proveedor de paqueteria
+        proveedores = self.get_proveedores_paqueteria()
+        proveedor = datos.get('paqueteria')
+        match_proveedor = self._match_label(proveedor, proveedores)
+        if not match_proveedor.get('label'):
+            self.create_proveedor_de_paqueteria(proveedor)
+        else:
+            datos['paqueteria'] = match_proveedor['label']
+
         # 3. Validar
         errores = self._ocr_validar_id(datos)
         if errores:
@@ -324,6 +340,40 @@ class OcrMixin:
     # ──────────────────────────────────────────────────────────
     # HELPERS PRIVADOS
     # ──────────────────────────────────────────────────────────
+
+    def _match_label(self, nombre: str, empleados: list, umbral: int = 75) -> dict:
+        """
+        Busca el empleado más parecido a `nombre` usando difflib.
+        Normaliza tildes y orden de palabras antes de comparar.
+
+        Returns:
+            {'empleado': str, 'score': int}  si supera el umbral
+            {'empleado': None, 'score': int}  si ninguno supera el umbral
+        """
+        import unicodedata
+        from difflib import SequenceMatcher
+
+        def normalizar(s):
+            s = unicodedata.normalize('NFD', s)
+            s = ''.join(c for c in s if unicodedata.category(c) != 'Mn')
+            return ' '.join(sorted(s.lower().split()))
+
+        nombre_norm = normalizar(nombre)
+        nombre_words = set(nombre_norm.split())
+        mejor, mejor_score = None, 0
+
+        for emp in empleados:
+            emp_norm = normalizar(emp)
+            emp_words = set(emp_norm.split())
+            seq_score = int(SequenceMatcher(None, nombre_norm, emp_norm).ratio() * 100)
+            word_score = int(len(nombre_words & emp_words) / len(nombre_words) * 100) if nombre_words else 0
+            score = max(seq_score, word_score)
+            if score > mejor_score:
+                mejor, mejor_score = emp, score
+
+        if mejor_score >= umbral:
+            return {'label': mejor, 'score': mejor_score}
+        return {'label': None, 'score': mejor_score}
 
     def _ocr_normalizar(self, datos: dict) -> dict:
         """Normaliza los datos extraídos. Código puro, sin LLM."""
