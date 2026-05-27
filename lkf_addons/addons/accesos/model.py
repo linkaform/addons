@@ -144,8 +144,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.PROVEEDORES_CAT_OBJ_ID = self.PROVEEDORES_CAT.get('obj_id')
 
         self.PROVEEDORES_DE_PAQUETERIA_CAT = self.lkm.catalog_id('proveedores_de_paqueteria')
-        self.PROVEEDORES_DE_PAQUETERIA_CAT_ID = self.PROVEEDORES_CAT.get('id')
-        self.PROVEEDORES_DE_PAQUETERIA_CAT_OBJ_ID = self.PROVEEDORES_CAT.get('obj_id')
+        self.PROVEEDORES_DE_PAQUETERIA_CAT_ID = self.PROVEEDORES_DE_PAQUETERIA_CAT.get('id')
+        self.PROVEEDORES_DE_PAQUETERIA_CAT_OBJ_ID = self.PROVEEDORES_DE_PAQUETERIA_CAT.get('obj_id')
 
         self.load(module='Employee', **self.kwargs)
 
