@@ -30,7 +30,62 @@ class OcrMixin:
     # OCR DE IDENTIFICACIÓN
     # ──────────────────────────────────────────────────────────
 
+    def ocr_articulo_perdido(self, image_source: list,
+                            model: str = 'google/gemini-2.5-flash-lite') -> dict:
+        """
+        Analiza la foto de un artículo perdido y extrae los campos visibles.
 
+        Args:
+            image_source: URL remota o ruta local de la imagen.
+            model:        Modelo OpenRouter a usar.
+
+        Returns:
+            dict con:
+                - status_code: 200/400/500
+                - data: campos extraídos (nombre, tipo_articulo, color, marca, modelo,
+                        descripcion, caracteristicas)
+                - msg: mensaje de resultado
+
+        Campos NO extraíbles de la foto (se llenan manualmente en el form):
+            ubicacion, area, fecha_hallazgo, area_resguardo, quien_entrega
+        """
+        system = (
+            "Eres un asistente de seguridad de un corporativo encargado de registrar "
+            "artículos perdidos o encontrados. Analizas fotos de objetos para describir "
+            "sus características de forma precisa y objetiva."
+        )
+        prompt = (
+            "Analiza la foto del artículo y regresa un JSON con los siguientes campos "
+            "(usa null si no puedes determinarlo con certeza):\n"
+            "- nombre: 'str' Nombre descriptivo breve del objeto (ej. 'Mochila', 'Audífonos', 'Llave USB')\n"
+            "- tipo_articulo: 'str' Categoría del objeto. Elige uno de: "
+            "Bolsa, Mochila, Cartera, Electrónico, Ropa, Calzado, Llave, Joyería, Documento, Otro\n"
+            "- color: 'str' Color principal del artículo\n"
+            "- marca: 'str' Marca si es legible en el objeto (ej. Nike, Apple, Samsung), null si no aplica\n"
+            "- modelo: 'str' Modelo si es legible (ej. iPhone 14, Galaxy S23), null si no aplica\n"
+            "- descripcion: 'str' Descripción general de lo que se ve en la foto\n"
+            "- caracteristicas: 'str' Detalles distintivos visibles: stickers, daños, inscripciones, "
+            "número de serie, estado de conservación, etc. null si no hay nada relevante"
+        )
+
+
+        if not self.ai:
+            return {'status_code': 400, 'msg': 'OpenRouter no configurado'}
+
+        try:
+            raw_text = self.ai.ocr_general(image_source, system, prompt, model=model, agent='Clave10: ObjPerdido')
+        except ValueError as e:
+            return self.LKFException({'status_code': 500, 'msg': f'Error OCR: {e}'})
+        except Exception as e:
+            return self.LKFException({'status_code': 500, 'msg': f'Error inesperado: {e}'})
+
+        datos = {}
+        if raw_text.get('choices'):
+            if isinstance(raw_text['choices'], list) and len(raw_text['choices']) > 0:
+                if raw_text['choices'][0].get('message', {}).get('content'):
+                    datos = raw_text['choices'][0]['message']['content']
+
+        return {'status_code': 200, 'msg': 'OK', 'data': datos}
 
     def ocr_paquete(self, image_source: list, fields: dict = {},
                            extra_instructions: str = None,
