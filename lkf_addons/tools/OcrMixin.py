@@ -199,7 +199,8 @@ class OcrMixin:
                     'data': datos,
                 }
 
-        return {'status_code': datos.get('status_code', 200), 'msg': 'OK', 'data': datos}
+        status = 200 if isinstance(datos, list) else datos.get('status_code', 200)
+        return {'status_code': status, 'msg': 'OK', 'data': datos}
 
     # ──────────────────────────────────────────────────────────
     # OCR GENÉRICO
@@ -375,8 +376,10 @@ class OcrMixin:
             return {'label': mejor, 'score': mejor_score}
         return {'label': None, 'score': mejor_score}
 
-    def _ocr_normalizar(self, datos: dict) -> dict:
+    def _ocr_normalizar(self, datos):
         """Normaliza los datos extraídos. Código puro, sin LLM."""
+        if isinstance(datos, list):
+            return [self._ocr_normalizar(d) for d in datos]
         datos['nombre_completo'] = ""
         if datos.get('curp'):
             datos['curp'] = datos['curp'].upper().strip()
@@ -395,11 +398,13 @@ class OcrMixin:
             datos.pop('nombre_completo')
         return datos
 
-    def _ocr_validar_id(self, datos: dict) -> list:
+    def _ocr_validar_id(self, datos) -> list:
         """
         Validaciones deterministas de una ID. Código puro, sin LLM.
         Retorna lista de warnings (vacía = todo OK).
         """
+        if isinstance(datos, list):
+            return [w for d in datos for w in self._ocr_validar_id(d)]
         import re
         warnings = []
 
