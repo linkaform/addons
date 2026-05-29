@@ -76,6 +76,7 @@ class OcrMixin:
             "- paqueteria: 'str' Empresa quien envia el paquete, ej FedEx, USPS, UPS, UberEats"
             "- no_guia: 'str' Es el numero de guia o numero de orden o numero de paquete"
             "- telefono_receptor: 'str' Telefono de quien recibe"
+            "- descripcion: 'str' una descripcion breve, 1 a 3 palabras del tipo de paquete, ya sea caja, bolsa, tubo, etc."
             )
 
         if not self.ai:
