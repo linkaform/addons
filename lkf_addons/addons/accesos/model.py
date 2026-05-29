@@ -57,6 +57,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CHECK_UBICACIONES = self.lkm.form_id('check_ubicaciones','id')
         self.REGISTRO_ASISTENCIA = self.lkm.form_id('registro_de_asistencia','id')
         self.FORMATO_VACACIONES = self.lkm.form_id('formato_vacaciones_aviso','id')
+        self.PROVEEDORES_FORM = self.lkm.form_id('proveedores','id')
 
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
@@ -899,7 +900,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'llamar_num_alerta': '695d36605f78faab793f497d',
             'email_alerta': '695d36605f78faab793f497e',
             'url_inspeccion': '6a0c8ab354a0b8de897c62cc',
-            'proveedor_de_paqueteria': '6a1764be5451b26d5de3152b'
+            'proveedor_de_paqueteria': '6a1764be5451b26d5de3152b',
+            'tipo_de_proveedor': '6a18e4086423e82150aa527c'
         })
 
         self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']
