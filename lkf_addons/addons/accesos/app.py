@@ -5262,17 +5262,23 @@ class Accesos(OcrMixin, AccesosModel):
 
     def get_proveedores_paqueteria(self):
         """
-        Obtiene los proveedores de paquetería del catalogo de PROVEEDORES DE PAQUETERIA.
+        Obtiene los proveedores de paquetería de la FORMA de PROVEEDORES.
         """
-        selector = {}
-        mango_query = {
-            "selector": selector,
-            "limit": 10000,
-        }
-        data = self.lkf_api.search_catalog(self.PROVEEDORES_DE_PAQUETERIA_CAT_ID, mango_query)
+        query = [
+            {"$match": {
+                "deleted_at": {"$exists": False},
+                "form_id": self.PROVEEDORES_FORM,
+                f"answers.{self.f['tipo_de_proveedor']}": "paqueteria"
+            }},
+            {"$project": {
+                "_id": 0,
+                "nombre_proveedor": f"$answers.{self.f['nombre_comercial']}"
+            }}
+        ]
+        data = self.format_cr(self.cr.aggregate(query))
         format_data = []
         if data:
-            format_data = {i.get(self.f['proveedor_de_paqueteria']) for i in data}
+            format_data = {i.get('nombre_proveedor') for i in data}
             format_data = list(format_data)
         return format_data
     
@@ -8477,11 +8483,24 @@ class Accesos(OcrMixin, AccesosModel):
         return sms_response
 
     def create_proveedor_de_paqueteria(self, proveedor):
-        answers = {}
-        catalogo_metadata = self.lkf_api.get_catalog_metadata(catalog_id=self.PROVEEDORES_DE_PAQUETERIA_CAT_ID)
-        answers[self.f['proveedor_de_paqueteria']] = proveedor
-        catalogo_metadata.update({'answers': answers})
-        res = self.lkf_api.post_catalog_answers(catalogo_metadata)
+        metadata = self.lkf_api.get_metadata(form_id=self.PROVEEDORES_FORM)
+        metadata.update({
+            'properties': {
+                'device_properties': {
+                    'System': 'Script',
+                    'Module': 'Accesos',
+                    'Process': 'OCR Paqueteria',
+                    'Action': 'create_proveedor_de_paqueteria',
+                    'File': 'lkf_addons/addons/accesos/app.py',
+                }
+            },
+            'answers': {
+                self.f['nombre_comercial']: proveedor,
+                self.f['razon_social']: proveedor,
+                self.f['tipo_de_proveedor']: 'paqueteria',
+            }
+        })
+        res = self.lkf_api.post_forms_answers(metadata)
         if res.get('status_code') not in [200, 201, 202]:
             self.LKFException({"title": "Error en crear proveedor de paqueteria", "msg": "No se pudo crear correctamente el registro."})
         return res
