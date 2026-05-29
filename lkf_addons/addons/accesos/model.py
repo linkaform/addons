@@ -143,6 +143,10 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.PROVEEDORES_CAT_ID = self.PROVEEDORES_CAT.get('id')
         self.PROVEEDORES_CAT_OBJ_ID = self.PROVEEDORES_CAT.get('obj_id')
 
+        self.PROVEEDORES_DE_PAQUETERIA_CAT = self.lkm.catalog_id('proveedores_de_paqueteria')
+        self.PROVEEDORES_DE_PAQUETERIA_CAT_ID = self.PROVEEDORES_DE_PAQUETERIA_CAT.get('id')
+        self.PROVEEDORES_DE_PAQUETERIA_CAT_OBJ_ID = self.PROVEEDORES_DE_PAQUETERIA_CAT.get('obj_id')
+
         self.load(module='Employee', **self.kwargs)
 
         # self.CONF_PERFIL = self.lkm.catalog_id('configuracion_de_perfiles','id')
@@ -894,7 +898,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'accion_alerta': '695d36605f78faab793f497c',
             'llamar_num_alerta': '695d36605f78faab793f497d',
             'email_alerta': '695d36605f78faab793f497e',
-            'url_inspeccion': '6a0c8ab354a0b8de897c62cc'
+            'url_inspeccion': '6a0c8ab354a0b8de897c62cc',
+            'proveedor_de_paqueteria': '6a1764be5451b26d5de3152b'
         })
 
         self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']
