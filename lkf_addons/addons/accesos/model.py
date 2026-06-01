@@ -58,6 +58,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.REGISTRO_ASISTENCIA = self.lkm.form_id('registro_de_asistencia','id')
         self.FORMATO_VACACIONES = self.lkm.form_id('formato_vacaciones_aviso','id')
         self.PROVEEDORES_FORM = self.lkm.form_id('proveedores','id')
+        self.MENUS_FORM = self.lkm.form_id('configuracion_menus','id')
 
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
@@ -161,6 +162,11 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.AREAS_DE_LAS_UBICACIONES_SALIDA = self.lkm.catalog_id('areas_de_las_ubicaciones_salidas')
         self.AREAS_DE_LAS_UBICACIONES_SALIDA_ID = self.AREAS_DE_LAS_UBICACIONES_SALIDA.get('id')
         self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID = self.AREAS_DE_LAS_UBICACIONES_SALIDA.get('obj_id')
+
+        self.MENUS_CATALOG = self.lkm.catalog_id('elementos_menu')
+        self.MENUS_CATALOG_ID = self.MENUS_CATALOG.get('id')
+        self.MENUS_CATALOG_OBJ_ID = self.MENUS_CATALOG.get('obj_id')
+
         #----Dic Fields Forms
 
         ### Lista de catalogos requeridos para el uso offline de la aplicacion.
