@@ -47,6 +47,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CONFIGURACION_RECORRIDOS_FORM = self.lkm.form_id('configuracion_de_recorridos','id')
         self.CONF_PERFILES = self.lkm.form_id('configuracion_de_perfiles','id')
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
+        self.PASE_ENTRADA_TRANSPORTISTA = self.lkm.form_id('pase_de_entrada_transportista','id')
         self.PROGRAMAR_TAREAS = self.lkm.form_id('programar_tareas', 'id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
