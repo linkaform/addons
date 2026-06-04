@@ -324,6 +324,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tipo_articulo_perdido':f"{self.mf['tipo_de_articulo_perdido']}",
             'ubicacion_catalog':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
             'ubicacion_perdido':f"{self.mf['ubicacion']}",
+            "nombre_articulo_perdido":"66ce2441d63bb7a3871adeaf"
         }
 
         #- Para salida de bitacora y lista
@@ -744,6 +745,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'grupo_requisitos':"676975321df93a68a609f9ce",
             'grupo_tipo_de_pase': '694055a57d064b380f010d7f',
             'ubicacion':"663e5c57f5b8a7ce8211ed0b",
+            'tolerancia_de_entrada':"6a1fe4b6fda2876bf3981af5",
             'ubicacion_cat':  f"{self.UBICACIONES_CAT_OBJ_ID}",
         }
 

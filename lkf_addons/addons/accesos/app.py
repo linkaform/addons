@@ -4065,17 +4065,17 @@ class Accesos(AccesosModel):
             x['curp'] = self.unlist(x.get('curp',''))
             x['motivo_visita'] = self.unlist(x.get('motivo_visita',''))
             for idx, nombre in enumerate(v):
-                emp = {'nombre':nombre}
+                emp = {'nombre': nombre}
                 if d:
-                    emp.update({'departamento':d[idx].pop(0) if d[idx] else ""})
+                    emp.update({'departamento': d[idx].pop(0) if idx < len(d) and d[idx] else ""})
                 if p:
-                    emp.update({'puesto':p[idx].pop(0) if p[idx] else ""})
+                    emp.update({'puesto': p[idx].pop(0) if idx < len(p) and p[idx] else ""})
                 if e:
-                    emp.update({'user_id':e[idx].pop(0) if e[idx] else ""})
+                    emp.update({'user_id': e[idx].pop(0) if idx < len(e) and e[idx] else ""})
                 if u:
-                    emp.update({'email': u[idx].pop(0) if u[idx] else ""})
+                    emp.update({'email': u[idx].pop(0) if idx < len(u) and u[idx] else ""})
                 if f:
-                    emp.update({'telefono': f[idx].pop(0) if f[idx] else ""})
+                    emp.update({'telefono': f[idx].pop(0) if idx < len(f) and f[idx] else ""})
                 visita_a.append(emp)
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
@@ -7649,8 +7649,33 @@ class Accesos(AccesosModel):
         if answers:
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
-            status = self.access_pass_set_status(new_answers)
-            answers[self.pase_entrada_fields['status_pase']] = status
+            # Si viene con estatus cancelado se salta la funcion de asignar estatus
+            status_field = self.pase_entrada_fields['status_pase']
+            if answers.get(status_field) == 'cancelado':
+                status = 'cancelado'
+            else:
+                status = self.access_pass_set_status(new_answers)
+            answers[status_field] = status
+            
+            res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
+            if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
+                pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
+                res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
+                res['json'].update({'telefono':pass_selected.get("telefono")})
+                res['json'].update({'enviar_a':pass_selected.get("nombre")})
+                #TODO pregutnar a Paco porque aqui usa el nombre del empeado con el user.get('email')
+                #en vez de la persona seleccionada como vista....
+                res['json'].update({'enviar_de':employee.get('worker_name')})
+                res['json'].update({'enviar_de_correo':employee.get('email')})
+                res['json'].update({'ubicacion':pass_selected.get('ubicacion')})
+                res['json'].update({'fecha_desde':pass_selected.get('fecha_de_expedicion')})
+                res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
+                res['json'].update({'asunto':pass_selected.get('tema_cita')})
+                res['json'].update({'descripcion':pass_selected.get('descripcion')})
+                res['json'].update({'pdf': pdf})
+                return res
+            else: 
+                return res
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
                 pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
