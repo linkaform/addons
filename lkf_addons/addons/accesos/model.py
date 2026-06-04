@@ -707,6 +707,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'walkin_telefono':'662c2937108836dec6d92582',
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",    
+            'habilitar_vehiculo':'6a218bf63b5cf6f0c1c55f29'
         }
         
         self.pase_grupo_visitados ={
@@ -780,9 +781,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'grupo_requisitos':"676975321df93a68a609f9ce",
             'grupo_tipo_de_pase': '694055a57d064b380f010d7f',
             'ubicacion':"663e5c57f5b8a7ce8211ed0b",
-            'tolerancia_de_entrada':"6a1fe4b6fda2876bf3981af5",
             'ubicacion_cat':  f"{self.UBICACIONES_CAT_OBJ_ID}",
-            'prefijo_telefonico':'6a1ff297a1071f084c7ecffd'
+            'prefijo_telefonico':'6a1ff297a1071f084c7ecffd',
+            'tolerancia_de_entrada':"6a1fe4b6fda2876bf3981af5",
         }
 
         self.paquetes_fields = {

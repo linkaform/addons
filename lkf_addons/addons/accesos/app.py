@@ -2546,6 +2546,8 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
         answers[self.pase_entrada_fields['enviar_correo_pre_registro']] = access_pass.get("enviar_correo_pre_registro",[])
+        habilitar_vehiculo = "sí" if access_pass.get('habilitar_vehiculo', False) else "no"
+        answers[self.pase_entrada_fields['habilitar_vehiculo']]= habilitar_vehiculo
 
         created_from = access_pass.get('created_from')
         if created_from == 'app':
@@ -4082,7 +4084,8 @@ class Accesos(OcrMixin, AccesosModel):
                 'acepto_aviso_privacidad': f"$answers.{self.pase_entrada_fields['acepto_aviso_privacidad']}",
                 'acepto_aviso_datos_personales': f"$answers.{self.pase_entrada_fields['acepto_aviso_datos_personales']}",
                 'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
-                'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}"                
+                'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}",    
+                'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}"         
                 },
             },
             {'$sort':{'created_at':-1}},
@@ -4105,6 +4108,7 @@ class Accesos(OcrMixin, AccesosModel):
             x['telefono'] = self.unlist(x.get('telefono',''))
             x['curp'] = self.unlist(x.get('curp',''))
             x['motivo_visita'] = self.unlist(x.get('motivo_visita',''))
+            x['habilitar_vehiculo']=x.get('habilitar_vehiculo',False)
             for idx, nombre in enumerate(v):
                 emp = {'nombre': nombre}
                 if d:
@@ -4155,6 +4159,7 @@ class Accesos(OcrMixin, AccesosModel):
                     }
                     visita_list.append(item)
                 x['visita_a_details'] = visita_list
+        print(simplejson.dumps(x, indent=4))
         if not x:
             self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
         return x
@@ -5682,6 +5687,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "limite_de_acceso" or \
                key == "empresa" or \
                key == "ubicaciones_geolocation" or \
+               key == "habilitar_vehiculo" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
