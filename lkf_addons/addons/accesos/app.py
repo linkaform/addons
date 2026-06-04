@@ -807,6 +807,7 @@ class Accesos(OcrMixin, AccesosModel):
         Valida pase de entrada y crea registro de entrada al pase
         '''
         access_pass = self.get_detail_access_pass(qr_code)
+        print("INFO DEL PASE", simplejson.dumps(access_pass, indent=4))
         if not qr_code and not location and not area:
             return False
         total_entradas = self.get_count_ingresos(qr_code)
@@ -817,8 +818,9 @@ class Accesos(OcrMixin, AccesosModel):
         hoy = datetime.now(tz)
         dia_semana = hoy.weekday()
         nombre_dia = dias_semana[dia_semana]
-
-        if access_pass.get('estatus',"") == 'vencido':
+        if access_pass.get('estatus',"") == 'cancelado':
+            self.LKFException({'msg':"El pase esta cancelado, edita la información o genera uno nuevo.","title":'Revisa la Configuración'})
+        elif access_pass.get('estatus',"") == 'vencido':
             self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Revisa la Configuración'})
         elif access_pass.get('estatus', '') == 'proceso':
             self.LKFException({'msg':"El pase no se ha sido completado aun, informa al usuario que debe completarlo primero.","title":'Requisitos faltantes'})
@@ -3826,6 +3828,8 @@ class Accesos(OcrMixin, AccesosModel):
                         "excluir": f"$answers.{self.f['personalizacion_pases']}",
                         "incluir": f"$answers.{self.f['grupo_incluir']}",
                         "alertas": f"$answers.{self.f['grupo_alertas']}",
+                        "tolerancia_de_entrada": f"$answers.{self.conf_modulo_seguridad['tolerancia_de_entrada']}",
+                        "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
                     }}
                 ],
                 'as': 'personalizaciones'
@@ -3838,6 +3842,8 @@ class Accesos(OcrMixin, AccesosModel):
                 "exclude_inputs": "$personalizaciones.excluir",
                 "include_inputs": "$personalizaciones.incluir",
                 "alertas": "$personalizaciones.alertas",
+                "tolerancia_de_entrada": "$personalizaciones.tolerancia_de_entrada",
+                "grupo_requisitos": "$personalizaciones.grupo_requisitos",
             }}
         ]
         data = self.format_cr_result(self.cr.aggregate(query),  get_one=True)
@@ -3861,13 +3867,27 @@ class Accesos(OcrMixin, AccesosModel):
                 if 'email' in i.get('accion_alerta'):
                     new_item[i.get('nombre_alerta')]['email'] = i.get('email_alerta', '')
                 format_alerts.append(new_item)
+            
+            tolerancia_de_entrada = data.get('tolerancia_de_entrada')
+            grupo_requisitos = data.get('grupo_requisitos', [])
+
+            format_grupo_requisitos = []
+            for req in grupo_requisitos:
+                format_grupo_requisitos.append({
+                    'envio_por': req.get('envio_por',[]) ,
+                    'datos_requeridos': req.get('datos_requeridos',[]) ,
+                    'ubicacion': self.unlist(req.get('incidente_location') or []),
+                    'prefijo_telefonico': req.get('prefijo_telefonico', ''),
+                })
 
             data.update({
                 'exclude_inputs': format_exclude_inputs,
                 'include_inputs': format_include_inputs,
                 'alertas': format_alerts,
+                'tolerancia_de_entrada': tolerancia_de_entrada,
+                'grupo_requisitos': format_grupo_requisitos,
             })
-
+        print(simplejson.dumps(data, indent=4))
         return data
 
     def get_config_modulo_seguridad(self, ubicaciones=[]):

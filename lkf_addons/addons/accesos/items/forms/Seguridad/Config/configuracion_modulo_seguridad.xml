@@ -439,8 +439,8 @@
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
                     <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
+                    <default>True</default>
+                    <default_value>15</default_value>
                     <descriptor>None</descriptor>
                     <fav>False</fav>
                     <field_id>6a1fe4b6fda2876bf3981af5</field_id>
@@ -538,5 +538,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1780505706.0</updated_at>
+    <updated_at>1780538323.0</updated_at>
 </lkf>
