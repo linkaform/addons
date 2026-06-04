@@ -51,6 +51,7 @@ from zipfile import ZipFile
 from linkaform_api import base, generar_qr
 
 from .model import AccesosModel
+from lkf_addons.tools.OcrMixin import OcrMixin
 
 ### Objeto o Clase de Módulo ###
 '''
@@ -61,7 +62,7 @@ Al utilizar `super()` en el método `__init__()`, heredamos las variables de con
 Además, se pueden heredar funciones de cualquier clase antecesora usando el método `super()`.
 '''
 
-class Accesos(AccesosModel):
+class Accesos(OcrMixin, AccesosModel):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
         #--Variables
@@ -76,6 +77,26 @@ class Accesos(AccesosModel):
         _single_leading_underscore: 
         weak “internal use” indicator. E.g. from M import * does not import objects whose names start with an underscore.
     '''
+
+    def get_mongo_string_list(func):
+        def wrapper(self, *args, **kwargs):
+            config = func(self, *args, **kwargs)
+            match_query_custom = config.get('query', {})
+            form_id = config.get('form_id')
+            project_fields = config.get('project', {})
+            match_query = {"deleted_at": {"$exists": False}}
+            if form_id:
+                match_query["form_id"] = form_id
+            match_query.update(match_query_custom)
+            query = [{"$match": match_query}, {"$project": {"_id": 0, **project_fields}}]
+            data = self.format_cr(self.cr.aggregate(query))
+            format_data = []
+            if data:
+                for item in data:
+                    format_data.append(item.get("value"))
+                format_data = list(set(format_data))
+            return format_data
+        return wrapper
 
     def _do_access(self, access_pass, location, area, data):
         '''
@@ -494,7 +515,7 @@ class Accesos(AccesosModel):
         vista_a_ok = False
         autorizado_ok = False
         status = 'proceso'
-        foto  = answers[self.pase_entrada_fields['walkin_fotografia']]
+        foto = answers.get(self.pase_entrada_fields['walkin_fotografia'])
         if isinstance(foto, list) and len(foto) > 0:
             foto = foto[0]
 
@@ -1200,13 +1221,13 @@ class Accesos(AccesosModel):
             format_resp = [r.get('_id', r.get('id', '')) for r in resp]
         return format_resp
 
-    def do_out(self, qr, location, area, gafete_id=None):
+    def do_out(self, qr, location, area, gafete_id=None, record_id=None):
         '''
             Realiza el cambio de estatus de la forma de bitacora, relacionada a la salida, como parametro
             es necesesario enviar el nombre del visitante que es el unico dato qu se encuentra en la forma
         '''
         response = False
-        last_check_out = self.get_last_user_move(qr, location)
+        last_check_out = self.get_last_user_move(qr, location, record_id)
         print("last", last_check_out)
         if last_check_out.get('status_gafete') and last_check_out.get('status_gafete')!= "entregado":
             self.LKFException({"status_code":400, "msg":f"Se necesita liberar el gafete antes de regitrar la salida"})
@@ -4121,6 +4142,15 @@ class Accesos(AccesosModel):
     def get_ids_labels(self, data):
         return data
 
+    @get_mongo_string_list
+    def get_employees_names(self):
+        return {
+            "form_id": self.EMPLEADOS,
+            "project": {
+                "value": f"$answers.{self.mf['nombre_empleado']}"
+            }
+        } 
+
     def get_employees_data(self, names=None, user_id=None, username=None, email=None,  get_one=False):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -4317,12 +4347,14 @@ class Accesos(AccesosModel):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_last_user_move(self, qr, location):
+    def get_last_user_move(self, qr, location, record_id=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ACCESOS,
             f"answers.{self.mf['codigo_qr']}":qr,
         }
+        if record_id:
+            match_query["_id"] = ObjectId(record_id)
         res = self.cr.find(
             match_query, 
             {
@@ -5227,6 +5259,28 @@ class Accesos(AccesosModel):
                     if r['perfil'] not in res:
                         res.append(r['perfil'])
         return res
+
+    def get_proveedores_paqueteria(self):
+        """
+        Obtiene los proveedores de paquetería de la FORMA de PROVEEDORES.
+        """
+        query = [
+            {"$match": {
+                "deleted_at": {"$exists": False},
+                "form_id": self.PROVEEDORES_FORM,
+                f"answers.{self.f['tipo_de_proveedor']}": "paqueteria"
+            }},
+            {"$project": {
+                "_id": 0,
+                "nombre_proveedor": f"$answers.{self.f['nombre_comercial']}"
+            }}
+        ]
+        data = self.format_cr(self.cr.aggregate(query))
+        format_data = []
+        if data:
+            format_data = {i.get('nombre_proveedor') for i in data}
+            format_data = list(format_data)
+        return format_data
     
     def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
         employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
@@ -8453,6 +8507,29 @@ class Accesos(AccesosModel):
         sms_response = self.lkf_api.post_forms_answers(metadata)
         return sms_response
 
+    def create_proveedor_de_paqueteria(self, proveedor):
+        metadata = self.lkf_api.get_metadata(form_id=self.PROVEEDORES_FORM)
+        metadata.update({
+            'properties': {
+                'device_properties': {
+                    'System': 'Script',
+                    'Module': 'Accesos',
+                    'Process': 'OCR Paqueteria',
+                    'Action': 'create_proveedor_de_paqueteria',
+                    'File': 'lkf_addons/addons/accesos/app.py',
+                }
+            },
+            'answers': {
+                self.f['nombre_comercial']: proveedor,
+                self.f['razon_social']: proveedor,
+                self.f['tipo_de_proveedor']: 'paqueteria',
+            }
+        })
+        res = self.lkf_api.post_forms_answers(metadata)
+        if res.get('status_code') not in [200, 201, 202]:
+            self.LKFException({"title": "Error en crear proveedor de paqueteria", "msg": "No se pudo crear correctamente el registro."})
+        return res
+
     def create_class_google_wallet(self, data, qr_code):
         ISSUER_ID = '3388000000022924601'
         CLASS_ID = f'{ISSUER_ID}.ProdPassClass'
@@ -8906,7 +8983,7 @@ class Accesos(AccesosModel):
             else:
                 print(f'===> Revisión aún no propagada (Intento {attempt + 1}/{max_retries})')
                 if attempt < max_retries - 1:
-                    time.sleep(wait_time)
+                    time_module.sleep(wait_time)
                 else:
                     return {'status_code': 462, 'type': 'error', 'msg': 'Revision not yet propagated', 'data': {}}
 
@@ -8988,13 +9065,28 @@ class Accesos(AccesosModel):
 
         questions = []
         for field in fields:
+            field_type = field.get('field_type')
+            if field_type not in self.INSPECTION_ACCEPTED_TYPES:
+                continue
+
+            question_schema = {}
             options = field.get('options', [])
-            question_schema = {
+            if field_type == 'integer':
+                field_properties = field.get('properties', {})
+                field_min = field_properties.get('min')
+                field_max = field_properties.get('max')
+                if field_min or field_max:
+                    field_type = 'slider'
+                    question_schema['min'] = field_min or 0
+                    question_schema['max'] = field_max or field_min + 100
+
+            question_schema.update({
                 'pregunta': field.get('label', ''),
-                'tipo': field.get('field_type',''),
+                'field_id': field.get('field_id', ''),
+                'tipo': field_type,
                 'opciones': [opt.get('label') for opt in options if opt.get('label')],
-                'required': field.get('required', False)
-            }
+                'required': field.get('required', False),
+            })
             questions.append(question_schema)
 
         return questions
@@ -9033,7 +9125,7 @@ class Accesos(AccesosModel):
         if len(self.geolocation) > 1:
             lat = self.geolocation[0]
             long = self.geolocation[1]
-        epoc_today = int(time.time())
+        epoc_today = int(time_module.time())
         #obtiene las areas bien formateadas
         format_check_areas = self.get_area_images(data.get(self.f['areas_del_rondin'], []))
         inpections_by_area = self.build_area_inspection_map(data.get(self.f['areas_del_rondin'], []))
@@ -9041,6 +9133,7 @@ class Accesos(AccesosModel):
         for i in format_check_areas:
             form_id = inpections_by_area['areas'].get(i['area'])
             i['inspeccion'] = inpections_by_area['inspection_ids'].get(form_id, {})
+            i['inspeccion_form_id'] = form_id
             i['checked'] = False
             i['checked_at'] = ''
             i['check_area_id'] = ''
@@ -9133,6 +9226,14 @@ class Accesos(AccesosModel):
         #         'record_id': record_id,
         #         'rondin_id': rondin_id
         #     })
+        inspeccion = record.get('inspeccion', {})
+        inspeccion_form_id = record.get('inspeccion_form_id', '')
+        if inspeccion_form_id and inspeccion:
+            response_inspeccion = self.create_inspeccion(complete_record, inspeccion_form_id)
+            inspeccion_id = response_inspeccion.get('json', {}).get('id', '')
+            complete_record['record']['inspeccion_record_id'] = inspeccion_id
+            #TODO: EN CASO DE ERROR QUE SUCEDE?
+            self.insert_images_and_comments_into_inspeccion(complete_record, inspeccion_form_id, inspeccion_id)
         response = self.create_check_area(complete_record)
         print('response del check de area', response)
         if response.get('status_code') in [200, 201, 202, 208,]:
@@ -9194,8 +9295,11 @@ class Accesos(AccesosModel):
         """
         _id = rec.get('_id')
         rondin_id = rec.get('rondin_id') or rec.get('record', {}).get('rondin_id', '')
+        area_name = rec.get('record', {}).get('area') or rec.get('record', {}).get('incidente_area', '?')
+        print(f"  [check] _id={_id} area={area_name} rondin_id={rondin_id}")
 
         res = self.sync_check_area_to_lkf(complete_record=rec)
+        print(f"  [check] resultado sync → status_code={res.get('status_code')} msg={res.get('msg','')}")
 
         check_info = {
             "check_id": _id,
@@ -9207,8 +9311,10 @@ class Accesos(AccesosModel):
         }
 
         if not rondin_id:
+            print(f"  [check] rondin_id no encontrado en rec, buscando en rondines...")
             check_data = self.find_check_area_in_rondines(_id)
-            rondin_id = check_data.get('rondin_id')
+            rondin_id = check_data.get('rondin_id') if check_data else None
+            print(f"  [check] rondin_id encontrado: {rondin_id}")
         return {
             "rondin_id": rondin_id,
             "check": check_info,
@@ -9254,6 +9360,9 @@ class Accesos(AccesosModel):
                             })
 
                 except Exception as e:
+                    import traceback
+                    print(f"  [check ERROR] _id={rec.get('_id')} error={e}")
+                    print(traceback.format_exc())
                     with self.results_lock:
                         self.results["failed"] += 1
                         self.results["errors"].append({
@@ -9446,9 +9555,11 @@ class Accesos(AccesosModel):
         Return 
             status (json): json el la respueta del servidor
         """
+        print(f"\n  [sync_rondin] rondin_id={rondin_id}")
         status = {}
         bitacora_in_lkf = self.get_bitacora_by_id(rondin_id)
         if not bitacora_in_lkf:
+            print(f"  [sync_rondin] ERROR: bitácora no encontrada en LKF para rondin_id={rondin_id}")
             rondin_record['status'] = 'not_found'
             rondin_record['last_error'] = 'Rondin record not found on users database.'
             self.cr_db.save(rondin_record)
@@ -9458,10 +9569,27 @@ class Accesos(AccesosModel):
                 'msg': f'No se encontró bitácora en LKF para rondin_id={rondin_id}',
                 'data': {}
             }
+        print(f"  [sync_rondin] bitácora encontrada folio={bitacora_in_lkf.get('folio')}")
 
         incidencia_for_rondin = []
         # Obtiene los checks que se han contestado del rondin de Mongodb
         checks_for_rondin = self.get_rondin_checks(rondin_id)
+
+        # Enriquecer checks con checked_at del doc CouchDB (que tiene la hora local real por área)
+        couch_dates = {
+            ca.get('area'): ca.get('checked_at')
+            for ca in (rondin_record or {}).get('record', {}).get('check_areas', [])
+            if ca.get('checked_at')
+        }
+        for area_name, check in checks_for_rondin.items():
+            if couch_dates.get(area_name) and not (check.get('fecha_hora_inspeccion_area') or check.get('fecha_inspeccion_area')):
+                check['fecha_hora_inspeccion_area'] = couch_dates[area_name]
+                print(f"    [enrich] {area_name!r} → checked_at={couch_dates[area_name]!r}")
+
+        print(f"  [sync_rondin] checks_for_rondin ({len(checks_for_rondin)}): {list(checks_for_rondin.keys())}")
+        for area, chk in checks_for_rondin.items():
+            fecha = chk.get('fecha_hora_inspeccion_area') or chk.get('fecha_inspeccion_area') or chk.get('created_at', '')
+            print(f"    área={area!r}  fecha_inspeccion={chk.get('fecha_hora_inspeccion_area')!r}  created_at={chk.get('created_at')!r}  → usará={fecha!r}")
         incidencia_for_rondin = self.get_incidencias_from_checks(checks_for_rondin)
         data = rondin_record or {
             '_id': rondin_id,
@@ -9564,14 +9692,14 @@ class Accesos(AccesosModel):
         #     self.sync_rondin_to_lkf(rondin_id, checks, None)
         # print(stop)
         if hasattr(self, 'test') and self.test:
-            for rondin_id, checks in checks_by_rondin.items():
-                results.append(self.sync_rondin_to_lkf(rondin_id, checks))
+            for rondin_id in checks_by_rondin:
+                results.append(self.sync_rondin_to_lkf(rondin_id))
         else:
 
             with ThreadPoolExecutor(max_workers=10) as executor:
                 futures = {
-                    executor.submit(self.sync_rondin_to_lkf, rondin_id, checks): rondin_id
-                    for rondin_id, checks in checks_by_rondin.items()
+                    executor.submit(self.sync_rondin_to_lkf, rondin_id): rondin_id
+                    for rondin_id in checks_by_rondin
                 }
 
                 for future in as_completed(futures):
@@ -9700,29 +9828,33 @@ class Accesos(AccesosModel):
         Return 
             res (json): El json con ids de cada set del grupo repetitivo del rondin
         """
-        start_date = bitacora.get('fecha_inicio_rondin', [])
-        ts = check.get('created_at', check.get('checked_at', check.get('fecha_hora_inspeccion_area')))
+        area_name = self.unlist(check.get('incidente_area', '?'))
         timezone_str = check.get('timezone') or self.user.get('timezone')
-        fecha_str = ""
-        if ts:
-            try:
-                target_tz = pytz.timezone(timezone_str)
-                if isinstance(ts, str):
-                    dt_aware = target_tz.localize(datetime.strptime(ts, "%Y-%m-%d %H:%M:%S"))
-                else:
-                    dt_aware = datetime.fromtimestamp(ts, tz=target_tz)
-                fecha_str = dt_aware.strftime("%Y-%m-%d %H:%M:%S")
-            except (pytz.exceptions.UnknownTimeZoneError, Exception):
-                fecha_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+        fecha = (check.get('fecha_hora_inspeccion_area')
+                 or check.get('fecha_inspeccion_area'))
+        fecha_source = 'fecha_hora_inspeccion_area' if check.get('fecha_hora_inspeccion_area') else (
+                       'fecha_inspeccion_area' if check.get('fecha_inspeccion_area') else None)
+        if not fecha:
+            raw_ts = check.get('created_at')
+            if raw_ts:
+                try:
+                    target_tz = pytz.timezone(timezone_str)
+                    dt_utc = datetime.strptime(raw_ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.utc)
+                    fecha = dt_utc.astimezone(target_tz).strftime("%Y-%m-%d %H:%M:%S")
+                    fecha_source = f'created_at(UTC→{timezone_str})'
+                except Exception as e:
+                    fecha = raw_ts
+                    fecha_source = f'created_at(raw, tz_error={e})'
+        print(f"    [set_area_fmt] área={area_name!r}  fecha={fecha!r}  fuente={fecha_source}")
         res = self._lables_to_ids(check)
         res ={  self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID: {
                     self.mf['nombre_area']: self.unlist(check.get('incidente_area', '')),
                     },
-                self.f['fecha_inspeccion_area']: check.get('fecha_hora_inspeccion_area', check.get('created_at')),
+                self.f['fecha_inspeccion_area']: fecha,
                 self.f['foto_evidencia_area_rondin']: check.get('foto_evidencia_area', []),
                 self.f['comentario_area_rondin']: check.get('comentario_check_area', check.get('comentario_area_rondin', '')),
                 self.f['url_registro_rondin']: f"https://app.linkaform.com/#/records/detail/{check.get('_id')}",
-                self.f['duracion_traslado_area']: self.date_difference_minutes(start_date, ts),
+                self.f['duracion_traslado_area']: 0,
                 }
         return res
 
@@ -9757,6 +9889,9 @@ class Accesos(AccesosModel):
         if data.get('rondin_id'):
             rondin_id = data.get('rondin_id')
             answers[self.f['bitacora_rondin_url']] = f"https://app.linkaform.com/#/records/detail/{rondin_id}"
+
+        if record.get('inspeccion_record_id'):
+            answers[self.f['url_inspeccion']] = f"https://app.linkaform.com/#/records/detail/{record.get('inspeccion_record_id', '')}"
 
         if data.get('rondin_name'):
             rondin_name = data.get('rondin_name')
@@ -9809,10 +9944,96 @@ class Accesos(AccesosModel):
             else:
                 continue
             
-        
         metadata.update({'answers':answers})
         res = self.lkf_api.post_forms_answers(metadata)
         return res
+
+    def create_inspeccion(self, data, form_id):
+        record = data.get('record',{})
+        answers = {}
+        metadata = self.lkf_api.get_metadata(form_id=form_id)
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Script",
+                    "Module": "Accesos",
+                    "Process": "Creación de Inspeccion",
+                    "Action": "create_inspeccion",
+                    "File": "accesos/app.py"
+                }
+            },
+        })
+        if isinstance(data.get('geolocation'), dict):
+            metadata.update({'geolocation': [data.get('geolocation').get('long'), data.get('geolocation').get('lat')]})
+
+        metadata['start_date'] = record.get('checked_at', data.get('created_at', metadata['start_timestamp']))
+        metadata['start_timestamp'] = self.get_epoch(metadata['start_date'] )
+        metadata['end_timestamp'] = self.get_epoch(data.get('updated_at', metadata['end_timestamp']))
+        metadata['timezone'] = data.get('timezone') or  metadata.get('timezone') or self.user.get('timezone')
+
+        ubicacion = record.get('ubicacion', '')
+        area = record.get('area', '')
+        inspeccion = record.get('inspeccion', '')
+
+        answers[self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID] = {
+            self.mf['ubicacion']: ubicacion,
+            self.mf['nombre_area']: area
+        }
+
+
+        for item in inspeccion:
+            field_id = item.get('field_id')
+            value = item.get('valor', '')
+            field_type = item.get('tipo', '')
+            if field_type == 'checkbox':
+                for idx, item in enumerate(value) if isinstance(value, list) else []:
+                    value[idx] = item.lower().replace(' ', '_')
+            elif field_type == 'radio':
+                value = value.lower().replace(' ', '_')
+            answers[field_id] = value
+
+        metadata.update({'answers':answers})
+        res = self.lkf_api.post_forms_answers(metadata)
+        return res
+
+    def insert_images_and_comments_into_inspeccion(self, record, form_id, record_id):
+        """
+        Insert images and comments into inspeccion
+        """
+        images = {}
+        comments = {}
+        data = record.get('record', {})
+        inspection = data.get('inspeccion', [])
+        for question in inspection:
+            if question.get('field_id'):
+                if question.get('foto'):
+                    images.update({
+                        question.get('field_id'): question.get('foto')
+                    })
+                if question.get('comentario'):
+                    comments.update({
+                        question.get('field_id'): question.get('comentario')
+                    })
+
+        if not images and not comments:
+            return False
+            
+        update_fields = {
+            "images": images,
+            "comments": comments
+        }
+        update_db = self.cr.update_one({
+            '_id': ObjectId(record_id),
+            'form_id': form_id,
+            'deleted_at': {'$exists': False}
+        },{'$set':update_fields})
+
+        db_res = update_db.raw_result
+        print('db_res_inspeccion=',db_res)
+        update_ok = db_res.get('updatedExisting')
+        if update_ok:
+            return True
+        return False
     
     def delete_rondines(self, records):
         status = {}
@@ -10054,7 +10275,7 @@ class Accesos(AccesosModel):
             check_area_id = check_area.get('check_area_id')
             nombre = check_area.get('area', '')
 
-            if status_user == 'completed' and check_area_id not in check_area_id:
+            if status_user == 'completed' and check_area_id not in check_area_ids:
                 check_area['status'] = 'not_found'
             elif check_area_id in list(check_areas_status.keys()):
                 check_area['status'] = check_areas_status[check_area_id]
@@ -10069,6 +10290,18 @@ class Accesos(AccesosModel):
                         "fields": ["_id","status"]
                 })
         return {x['_id']:x.get('status') for x in records_rondin }
+
+    def _ensure_date_str(self, value):
+        """Convierte un valor a string de fecha 'YYYY-MM-DD HH:MM:SS'.
+        Acepta: string ya formateado, epoch int/float, o None/vacío."""
+        if not value:
+            return ''
+        if isinstance(value, (int, float)):
+            try:
+                return datetime.fromtimestamp(value).strftime('%Y-%m-%d %H:%M:%S')
+            except Exception:
+                return ''
+        return str(value)
 
     def update_bitacora(self, bitacora_in_lkf, data, incidencia_for_rondin, checks_for_rondin):
         """
@@ -10123,11 +10356,12 @@ class Accesos(AccesosModel):
                     self.f['new_user_email']: [self.user['email']]
                 }
             elif key == 'fecha_programacion':
-                answers[self.f['fecha_programacion']] = value
+                answers[self.f['fecha_programacion']] = self._ensure_date_str(value)
             elif key == 'fecha_inicio_rondin':
-                answers[self.f['fecha_inicio_rondin']] = value
+                answers[self.f['fecha_inicio_rondin']] = self._ensure_date_str(value)
+                print(f"    [update_bitacora] fecha_inicio_rondin raw={value!r} → '{answers[self.f['fecha_inicio_rondin']]!r}'")
             elif key == 'fecha_fin_rondin':
-                answers[self.f['fecha_fin_rondin']] = value
+                answers[self.f['fecha_fin_rondin']] = self._ensure_date_str(value)
             elif key == 'estatus_del_recorrido' and value:
                 answers[self.f['estatus_del_recorrido']] = value
             elif key == 'incidente_location':
@@ -10232,7 +10466,7 @@ class Accesos(AccesosModel):
             wait = .1 
             print('cambiar TODO BORRAR EL WAIT.1')
             print(f'Esperando {wait:.1f}s antes del intento {attempt + 1}/{max_retries}...')
-            time.sleep(wait)
+            time_module.sleep(wait)
 
             response = self.update_bitacora(bitacora_in_lkf, data, incidencia_for_rondin, checks_for_rondin)
 
@@ -10521,7 +10755,7 @@ class Accesos(AccesosModel):
 
     def delete_old_synced_areas(self, days=3):
         import time
-        cutoff = time.time() - (days * 86400)
+        cutoff = time_module.time() - (days * 86400)
         deleted = 0
         for record in self.cr_db:
             if record.get('status') != 'synced':
@@ -10596,9 +10830,11 @@ class Accesos(AccesosModel):
 
     def sync_records(self, app_records=[]):
         """
-        Obtiene todos los registros de cocuhdb que esten con "status_user": "completed" y los 
+        Obtiene todos los registros de cocuhdb que esten con "status_user": "completed" y los
         procesa segun sea el tipo.
         """
+        print("\n" + "="*60)
+        print("[sync_records] INICIO")
         record_list = []
         records = self.cr_db.find({
             "selector": {
@@ -10652,8 +10888,9 @@ class Accesos(AccesosModel):
         for rec in record_list:
             unique_records[rec.get('_id')] = rec
         record_list = list(unique_records.values())
+        print(f"[sync_records] Total registros a procesar (deduplicados): {len(record_list)}")
         if not record_list:
-            print("No records to sync")
+            print("[sync_records] No hay registros pendientes de sync")
             return
 
         self.results = {
@@ -10665,33 +10902,46 @@ class Accesos(AccesosModel):
         self.results_lock = threading.Lock()
 
         grouped_records = self.group_records_by_type(record_list)
+        print(f"[sync_records] Tipos agrupados: { {k: len(v) for k, v in grouped_records.items()} }")
+
         area_results = self.process_stage_in_parallel(
             grouped_records.get('area', []),
             self.process_area_record,
             max_workers=10
         )
+        print(f"[sync_records] Areas procesadas: {len(area_results)}")
 
         #todo
-        if  grouped_records.get('incidencia'):
+        if grouped_records.get('incidencia'):
             response = acceso_obj.sync_incidence_to_lkf(record=record)
 
         # 1. primero checks
-        print('va a hacer los check de area')
-        checks_by_rondin = self.process_check_area_stage(
-            grouped_records.get('check_area', [])
-        )
-        print('ya hizo los checks')
-        # checks_by_rondin = independent_results.get('check_area')
-        # 2. luego rondines explícitos
-        print('rondines/....' )
-        rondin_results = self.process_rondin_stage(
-            grouped_records.get('rondin', [])
-        )
+        check_records = grouped_records.get('check_area', [])
+        print(f"\n[sync_records] --- STAGE 1: check_area ({len(check_records)} registros) ---")
+        checks_by_rondin = self.process_check_area_stage(check_records)
+        print(f"[sync_records] checks_by_rondin keys: {list(checks_by_rondin.keys())}")
+        for rid, cks in checks_by_rondin.items():
+            ok = [c for c in cks if c.get('ok')]
+            fail = [c for c in cks if not c.get('ok')]
+            print(f"  rondin_id={rid}: {len(cks)} checks ({len(ok)} ok, {len(fail)} failed)")
 
-        # 3. lo que sobró en checks_by_rondin son rondines que no venían como registro
-        missing_rondin_results = self.update_rondines_from_checks(
-            checks_by_rondin
-        )
+        # 2. luego rondines explícitos
+        rondin_records = grouped_records.get('rondin', [])
+        print(f"\n[sync_records] --- STAGE 2: rondin ({len(rondin_records)} registros) ---")
+        rondin_results = self.process_rondin_stage(rondin_records)
+        print(f"[sync_records] rondin_results: {rondin_results}")
+
+        # 3. rondines derivados de checks que NO tenían registro rondin explícito en Stage 2
+        already_synced = {r.get('_id') for r in rondin_records}
+        pending_checks_by_rondin = {rid: cks for rid, cks in checks_by_rondin.items() if rid not in already_synced}
+        print(f"\n[sync_records] --- STAGE 3: update_rondines_from_checks ({len(pending_checks_by_rondin)} rondines pendientes, {len(checks_by_rondin) - len(pending_checks_by_rondin)} ya procesados en Stage 2) ---")
+        missing_rondin_results = self.update_rondines_from_checks(pending_checks_by_rondin)
+        print(f"[sync_records] missing_rondin_results: {missing_rondin_results}")
+
+        print(f"\n[sync_records] FIN — success={self.results['success']} failed={self.results['failed']}")
+        if self.results['errors']:
+            print(f"[sync_records] Errores: {self.results['errors']}")
+        print("="*60 + "\n")
 
         return {
             "results": self.results,

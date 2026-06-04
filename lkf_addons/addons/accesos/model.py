@@ -47,6 +47,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CONFIGURACION_RECORRIDOS_FORM = self.lkm.form_id('configuracion_de_recorridos','id')
         self.CONF_PERFILES = self.lkm.form_id('configuracion_de_perfiles','id')
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
+        self.PASE_ENTRADA_TRANSPORTISTA = self.lkm.form_id('pase_de_entrada_transportista','id')
         self.PROGRAMAR_TAREAS = self.lkm.form_id('programar_tareas', 'id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
@@ -57,6 +58,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CHECK_UBICACIONES = self.lkm.form_id('check_ubicaciones','id')
         self.REGISTRO_ASISTENCIA = self.lkm.form_id('registro_de_asistencia','id')
         self.FORMATO_VACACIONES = self.lkm.form_id('formato_vacaciones_aviso','id')
+        self.PROVEEDORES_FORM = self.lkm.form_id('proveedores','id')
+        self.MENUS_FORM = self.lkm.form_id('configuracion_menus','id')
 
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
@@ -143,6 +146,10 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.PROVEEDORES_CAT_ID = self.PROVEEDORES_CAT.get('id')
         self.PROVEEDORES_CAT_OBJ_ID = self.PROVEEDORES_CAT.get('obj_id')
 
+        self.PROVEEDORES_DE_PAQUETERIA_CAT = self.lkm.catalog_id('proveedores_de_paqueteria')
+        self.PROVEEDORES_DE_PAQUETERIA_CAT_ID = self.PROVEEDORES_DE_PAQUETERIA_CAT.get('id')
+        self.PROVEEDORES_DE_PAQUETERIA_CAT_OBJ_ID = self.PROVEEDORES_DE_PAQUETERIA_CAT.get('obj_id')
+
         self.load(module='Employee', **self.kwargs)
 
         # self.CONF_PERFIL = self.lkm.catalog_id('configuracion_de_perfiles','id')
@@ -156,7 +163,34 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.AREAS_DE_LAS_UBICACIONES_SALIDA = self.lkm.catalog_id('areas_de_las_ubicaciones_salidas')
         self.AREAS_DE_LAS_UBICACIONES_SALIDA_ID = self.AREAS_DE_LAS_UBICACIONES_SALIDA.get('id')
         self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID = self.AREAS_DE_LAS_UBICACIONES_SALIDA.get('obj_id')
+
+        self.MENUS_CATALOG = self.lkm.catalog_id('elementos_menu')
+        self.MENUS_CATALOG_ID = self.MENUS_CATALOG.get('id')
+        self.MENUS_CATALOG_OBJ_ID = self.MENUS_CATALOG.get('obj_id')
+
         #----Dic Fields Forms
+
+        ### Lista de catalogos requeridos para el uso offline de la aplicacion.
+        self.clave10_catalogs = [
+            self.LISTA_INCIDENCIAS_CAT_ID,
+            self.SUB_CATEGORIAS_INCIDENCIAS_ID,
+            self.CATEGORIAS_INCIDENCIAS_ID,
+            self.AREAS_DE_LAS_UBICACIONES_CAT_ID,
+            self.UBICACIONES_CAT_ID,
+            self.CONFIGURACION_RECORRIDOS_ID,
+            self.USUARIOS_ID,
+            self.CONF_AREA_EMPLEADOS_CAT_ID,
+            self.TIPO_DE_EQUIPO_ID,
+            self.LISTA_FALLAS_CAT_ID,
+            self.CONF_AREA_EMPLEADOS_AP_CAT_ID,
+            self.VISITA_AUTORIZADA_CAT_ID,
+            self.ESTADO_ID,
+            self.PROVEEDORES_CAT_ID,
+            self.LOCKERS_CAT_ID,
+            self.TIPO_ARTICULOS_PERDIDOS_CAT_ID,
+            self.PASE_ENTRADA_ID,
+            self.ACTIVOS_FIJOS_CAT_ID,
+        ]
 
         ## Module Fields ##
         ''' 
@@ -164,6 +198,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         Asegúrese de utilizar `llave` y el `id` del campo ej.
         'nombre_campo': "1f2h3j4j5d6f7h8j9j1a",
         '''
+
         mf = {
             'acepto_aviso_datos_personales': '6827488724317731cb288117',
             'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
@@ -872,5 +907,10 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'nombre_alerta': '695d36605f78faab793f497b',
             'accion_alerta': '695d36605f78faab793f497c',
             'llamar_num_alerta': '695d36605f78faab793f497d',
-            'email_alerta': '695d36605f78faab793f497e'
+            'email_alerta': '695d36605f78faab793f497e',
+            'url_inspeccion': '6a0c8ab354a0b8de897c62cc',
+            'proveedor_de_paqueteria': '6a1764be5451b26d5de3152b',
+            'tipo_de_proveedor': '6a18e4086423e82150aa527c'
         })
+
+        self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']
