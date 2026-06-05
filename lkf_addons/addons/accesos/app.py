@@ -3826,6 +3826,56 @@ class Accesos(OcrMixin, AccesosModel):
         result  = self._labels(result, self.mf)
         return result
 
+  
+
+    def get_config_modulo_seguridad(self, ubicaciones=[]):
+        #TODO Verificar por que se envia asi la lista
+        if isinstance(ubicaciones, list) and ubicaciones and isinstance(ubicaciones[0], dict):
+            ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
+        requerimientos = set()
+        envios = set()
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.CONF_MODULO_SEGURIDAD,
+        }
+        query = [
+            {'$match': match_query},
+            {'$sort': {'updated_at': -1}},
+            {'$limit': 1},
+            {'$project': {
+                "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
+            }},
+        ]
+    
+        raw_result = self.format_cr(self.cr.aggregate(query))
+        for raw in raw_result:
+            for grupo in raw.get('grupo_requisitos', []):
+                print("GRUPO", grupo)
+                #TODO Verficiar el cambio de key
+                ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
+                if ubicacion in ubicaciones:
+                    clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
+                    reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
+                    if isinstance(reqs, list):
+                        requerimientos.update(reqs)
+                    envios = set()
+                    envio_por_list = self.conf_modulo_seguridad.get('envio_por', [])
+                    for item in envio_por_list if isinstance(envio_por_list, list) else [envio_por_list]:
+                        envs = grupo.get(item) or grupo.get('envio_por', [])
+                        if envs:
+                            if isinstance(envs, list):
+                                envios.update(envs)
+                            else:
+                                envios.add(envs)
+
+        tipos = self.get_tipos_de_pase(ubicaciones)
+        return {
+            "ubicaciones": ubicaciones,
+            "requerimientos": list(requerimientos),
+            "envios": list(envios),
+            "tipos": tipos
+        }
+
     def get_config_accesos(self):
         response = []
         match_query = {
@@ -3912,55 +3962,7 @@ class Accesos(OcrMixin, AccesosModel):
             })
         print(simplejson.dumps(data, indent=4))
         return data
-
-    def get_config_modulo_seguridad(self, ubicaciones=[]):
-        #TODO Verificar por que se envia asi la lista
-        if isinstance(ubicaciones, list) and ubicaciones and isinstance(ubicaciones[0], dict):
-            ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
-        requerimientos = set()
-        envios = set()
-        match_query = {
-            "deleted_at": {"$exists": False},
-            "form_id": self.CONF_MODULO_SEGURIDAD,
-        }
-        query = [
-            {'$match': match_query},
-            {'$sort': {'updated_at': -1}},
-            {'$limit': 1},
-            {'$project': {
-                "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
-            }},
-        ]
-    
-        raw_result = self.format_cr(self.cr.aggregate(query))
-        for raw in raw_result:
-            for grupo in raw.get('grupo_requisitos', []):
-                print("GRUPO", grupo)
-                #TODO Verficiar el cambio de key
-                ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
-                if ubicacion in ubicaciones:
-                    clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
-                    reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
-                    if isinstance(reqs, list):
-                        requerimientos.update(reqs)
-                    envios = set()
-                    envio_por_list = self.conf_modulo_seguridad.get('envio_por', [])
-                    for item in envio_por_list if isinstance(envio_por_list, list) else [envio_por_list]:
-                        envs = grupo.get(item) or grupo.get('envio_por', [])
-                        if envs:
-                            if isinstance(envs, list):
-                                envios.update(envs)
-                            else:
-                                envios.add(envs)
-
-        tipos = self.get_tipos_de_pase(ubicaciones)
-        return {
-            "ubicaciones": ubicaciones,
-            "requerimientos": list(requerimientos),
-            "envios": list(envios),
-            "tipos": tipos
-        }
-
+        
     def get_tipos_de_pase(self, ubicaciones=[]):
         query = [
             {'$match': {
