@@ -817,8 +817,9 @@ class Accesos(OcrMixin, AccesosModel):
         hoy = datetime.now(tz)
         dia_semana = hoy.weekday()
         nombre_dia = dias_semana[dia_semana]
-
-        if access_pass.get('estatus',"") == 'vencido':
+        if access_pass.get('estatus',"") == 'cancelado':
+            self.LKFException({'msg':"El pase esta cancelado, edita la información o genera uno nuevo.","title":'Revisa la Configuración'})
+        elif access_pass.get('estatus',"") == 'vencido':
             self.LKFException({'msg':"El pase esta vencido, edita la información o genera uno nuevo.","title":'Revisa la Configuración'})
         elif access_pass.get('estatus', '') == 'proceso':
             self.LKFException({'msg':"El pase no se ha sido completado aun, informa al usuario que debe completarlo primero.","title":'Requisitos faltantes'})
@@ -854,14 +855,40 @@ class Accesos(OcrMixin, AccesosModel):
         if fecha_caducidad_con_margen < fecha_actual:
             self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
         
+        # Validación de tolerancia de entrada para pases de fecha fija
         fecha_visita = access_pass.get('fecha_de_expedicion')
         if fecha_visita:
-            fecha_obj_visita = datetime.strptime(fecha_visita, "%Y-%m-%d %H:%M:%S")
-            fecha_visita_tz = timezone.localize(fecha_obj_visita)
-            
-            if fecha_actual < fecha_visita_tz - timedelta(minutes=30):
-                self.LKFException({'msg': f"Aún no es hora de entrada. Tu acceso comienza a las {fecha_visita}", "title": 'Aviso'})
-        
+            tipo_visita = access_pass.get('tipo_visita_pase', '')
+            if tipo_visita == 'fecha_fija':
+                config_accesos = self.get_config_accesos()
+                grupo_requisitos = config_accesos.get('requisitos', [])
+                
+                tolerancia_minutos = None
+                for req in grupo_requisitos:
+                    if req.get('ubicacion') == location:
+                        tolerancia_minutos = req.get('tolerancia_de_entrada')
+                        break
+                
+                DEFAULT_TOLERANCIA = 15
+                usar_default = tolerancia_minutos is None
+                tolerancia_minutos = int(tolerancia_minutos) if tolerancia_minutos is not None else DEFAULT_TOLERANCIA
+
+                fecha_obj_visita = datetime.strptime(fecha_visita, "%Y-%m-%d %H:%M:%S")
+                fecha_visita_tz = timezone.localize(fecha_obj_visita)
+                fecha_inicio = fecha_visita_tz - timedelta(minutes=tolerancia_minutos)
+                fecha_fin = fecha_visita_tz + timedelta(minutes=tolerancia_minutos)
+
+                if fecha_actual < fecha_inicio:
+                    self.LKFException({
+                        'msg': f"Aún no es hora de entrada. Tu acceso estará disponible a partir de las {fecha_inicio.strftime('%Y-%m-%d %H:%M:%S')} ({tolerancia_minutos} minutos antes de tu cita{', tiempo por defecto' if usar_default else ''}).",
+                        "title": 'Aviso'
+                    })
+                if fecha_actual > fecha_fin:
+                    self.LKFException({
+                        'msg': f"El tiempo de tolerancia ha expirado. Tu cita era a las {fecha_visita} con una tolerancia de {tolerancia_minutos} minutos{' (tiempo por defecto)' if usar_default else ''}.",
+                        "title": 'Acceso Denegado'
+                    })
+
         if location not in access_pass.get("ubicacion",[]):
             msg = f"La ubicación {location}, no se encuentra en el pase. Pase valido para las siguientes ubicaciones: {access_pass.get('ubicacion',[])}."
             self.LKFException({'msg':msg,"title":'Revisa la Configuración'})
@@ -2544,6 +2571,7 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
         answers[self.pase_entrada_fields['enviar_correo_pre_registro']] = access_pass.get("enviar_correo_pre_registro",[])
+        answers[self.pase_entrada_fields['habilitar_vehiculo']]= habilitar_vehiculo
 
         created_from = access_pass.get('created_from')
         if created_from == 'app':
@@ -3826,6 +3854,7 @@ class Accesos(OcrMixin, AccesosModel):
                         "excluir": f"$answers.{self.f['personalizacion_pases']}",
                         "incluir": f"$answers.{self.f['grupo_incluir']}",
                         "alertas": f"$answers.{self.f['grupo_alertas']}",
+                        "requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
                     }}
                 ],
                 'as': 'personalizaciones'
@@ -3838,8 +3867,10 @@ class Accesos(OcrMixin, AccesosModel):
                 "exclude_inputs": "$personalizaciones.excluir",
                 "include_inputs": "$personalizaciones.incluir",
                 "alertas": "$personalizaciones.alertas",
+                "requisitos": "$personalizaciones.requisitos",
             }}
         ]
+
         data = self.format_cr_result(self.cr.aggregate(query),  get_one=True)
         format_data = {}
         if data:
@@ -3861,13 +3892,25 @@ class Accesos(OcrMixin, AccesosModel):
                 if 'email' in i.get('accion_alerta'):
                     new_item[i.get('nombre_alerta')]['email'] = i.get('email_alerta', '')
                 format_alerts.append(new_item)
+            
+            grupo_requisitos = data.get('requisitos', [])
 
+            format_grupo_requisitos = []
+            for req in grupo_requisitos:
+                format_grupo_requisitos.append({
+                    'envio_por': req.get('envio_por',[]) ,
+                    'datos_requeridos': req.get('datos_requeridos',[]) ,
+                    'ubicacion': self.unlist(req.get('incidente_location') or []),
+                    'prefijo_telefonico': req.get('prefijo_telefonico', ""),
+                    'tolerancia_de_entrada': req.get('tolerancia_de_entrada', ""),
+                })
             data.update({
                 'exclude_inputs': format_exclude_inputs,
                 'include_inputs': format_include_inputs,
                 'alertas': format_alerts,
+                'requisitos': format_grupo_requisitos,
             })
-
+        print(simplejson.dumps(data, indent=4))
         return data
 
     def get_config_modulo_seguridad(self, ubicaciones=[]):
@@ -4062,7 +4105,9 @@ class Accesos(OcrMixin, AccesosModel):
                 'acepto_aviso_privacidad': f"$answers.{self.pase_entrada_fields['acepto_aviso_privacidad']}",
                 'acepto_aviso_datos_personales': f"$answers.{self.pase_entrada_fields['acepto_aviso_datos_personales']}",
                 'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
-                'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}"                
+                'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}",    
+                'habilitar_vehiculo': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}", True]},
+                'tipo_visita_pase': f"$answers.{self.mf['tipo_visita_pase']}",       
                 },
             },
             {'$sort':{'created_at':-1}},
@@ -4085,18 +4130,20 @@ class Accesos(OcrMixin, AccesosModel):
             x['telefono'] = self.unlist(x.get('telefono',''))
             x['curp'] = self.unlist(x.get('curp',''))
             x['motivo_visita'] = self.unlist(x.get('motivo_visita',''))
+            x['habilitar_vehiculo']=x.get('habilitar_vehiculo',False)
+            x['tipo_visita_pase']= x.get('tipo_visita_pase')
             for idx, nombre in enumerate(v):
-                emp = {'nombre':nombre}
+                emp = {'nombre': nombre}
                 if d:
-                    emp.update({'departamento':d[idx].pop(0) if d[idx] else ""})
+                    emp.update({'departamento': d[idx].pop(0) if idx < len(d) and d[idx] else ""})
                 if p:
-                    emp.update({'puesto':p[idx].pop(0) if p[idx] else ""})
+                    emp.update({'puesto': p[idx].pop(0) if idx < len(p) and p[idx] else ""})
                 if e:
-                    emp.update({'user_id':e[idx].pop(0) if e[idx] else ""})
+                    emp.update({'user_id': e[idx].pop(0) if idx < len(e) and e[idx] else ""})
                 if u:
-                    emp.update({'email': u[idx].pop(0) if u[idx] else ""})
+                    emp.update({'email': u[idx].pop(0) if idx < len(u) and u[idx] else ""})
                 if f:
-                    emp.update({'telefono': f[idx].pop(0) if f[idx] else ""})
+                    emp.update({'telefono': f[idx].pop(0) if idx < len(f) and f[idx] else ""})
                 visita_a.append(emp)
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
@@ -4135,6 +4182,7 @@ class Accesos(OcrMixin, AccesosModel):
                     }
                     visita_list.append(item)
                 x['visita_a_details'] = visita_list
+        print(simplejson.dumps(x, indent=4))
         if not x:
             self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
         return x
@@ -5662,6 +5710,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "limite_de_acceso" or \
                key == "empresa" or \
                key == "ubicaciones_geolocation" or \
+               key == "habilitar_vehiculo" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
@@ -7703,8 +7752,33 @@ class Accesos(OcrMixin, AccesosModel):
         if answers:
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
-            status = self.access_pass_set_status(new_answers)
-            answers[self.pase_entrada_fields['status_pase']] = status
+            # Si viene con estatus cancelado se salta la funcion de asignar estatus
+            status_field = self.pase_entrada_fields['status_pase']
+            if answers.get(status_field) == 'cancelado':
+                status = 'cancelado'
+            else:
+                status = self.access_pass_set_status(new_answers)
+            answers[status_field] = status
+            
+            res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
+            if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
+                pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
+                res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
+                res['json'].update({'telefono':pass_selected.get("telefono")})
+                res['json'].update({'enviar_a':pass_selected.get("nombre")})
+                #TODO pregutnar a Paco porque aqui usa el nombre del empeado con el user.get('email')
+                #en vez de la persona seleccionada como vista....
+                res['json'].update({'enviar_de':employee.get('worker_name')})
+                res['json'].update({'enviar_de_correo':employee.get('email')})
+                res['json'].update({'ubicacion':pass_selected.get('ubicacion')})
+                res['json'].update({'fecha_desde':pass_selected.get('fecha_de_expedicion')})
+                res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
+                res['json'].update({'asunto':pass_selected.get('tema_cita')})
+                res['json'].update({'descripcion':pass_selected.get('descripcion')})
+                res['json'].update({'pdf': pdf})
+                return res
+            else: 
+                return res
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
                 pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))

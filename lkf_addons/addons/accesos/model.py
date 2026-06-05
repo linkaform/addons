@@ -47,6 +47,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CONFIGURACION_RECORRIDOS_FORM = self.lkm.form_id('configuracion_de_recorridos','id')
         self.CONF_PERFILES = self.lkm.form_id('configuracion_de_perfiles','id')
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
+        self.PASE_ENTRADA_TRANSPORTISTA = self.lkm.form_id('pase_de_entrada_transportista','id')
         self.PROGRAMAR_TAREAS = self.lkm.form_id('programar_tareas', 'id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
@@ -358,6 +359,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tipo_articulo_perdido':f"{self.mf['tipo_de_articulo_perdido']}",
             'ubicacion_catalog':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
             'ubicacion_perdido':f"{self.mf['ubicacion']}",
+            "nombre_articulo_perdido":"66ce2441d63bb7a3871adeaf"
         }
 
         #- Para salida de bitacora y lista
@@ -705,6 +707,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'walkin_telefono':'662c2937108836dec6d92582',
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",    
+            'habilitar_vehiculo':'6a218bf63b5cf6f0c1c55f29'
         }
         
         self.pase_grupo_visitados ={
@@ -779,6 +782,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'grupo_tipo_de_pase': '694055a57d064b380f010d7f',
             'ubicacion':"663e5c57f5b8a7ce8211ed0b",
             'ubicacion_cat':  f"{self.UBICACIONES_CAT_OBJ_ID}",
+            'prefijo_telefonico':'6a221532db633d0cf4faf12f',
+            'tolerancia_de_entrada':"6a22155492b193f057990682",
         }
 
         self.paquetes_fields = {
