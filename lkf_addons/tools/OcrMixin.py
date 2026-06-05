@@ -122,16 +122,17 @@ class OcrMixin:
         )
         prompt = (
             "Lee la informacion de la etiqueta proporcionada. Regresa en un JSON los datos de:"
-            "- remitente: 'str' Es el remitente, el orgien del paquete, el quien envia"
+            "- remitente: 'str' Es el remitente, el orgien del paquete, el quien envia. Normalmente esta en letra mas pequeña"
             "- telefono_remitente: 'str' telefono quien envia"
             "- direccion_remiente: es la direccion de quien envia"
-            "- receptor: 'str' Es para quien va el paquete."
+            "- destinatario: 'str' Es para quien va el paquete, el receptor. Normalmente esta en lerta mas grande, y es el nombre de una persona"
             "- telefono_receptor: 'str' telefono quien recibe    "
             "- email_receptor: 'str' email quien recibe    "
             "- paqueteria: 'str' Empresa quien envia el paquete, ej FedEx, USPS, UPS, UberEats"
             "- no_guia: 'str' Es el numero de guia o numero de orden o numero de paquete"
             "- telefono_receptor: 'str' Telefono de quien recibe"
-            "- descripcion: 'str' una descripcion breve, 1 a 3 palabras del tipo de paquete, ya sea caja, bolsa, tubo, etc."
+            "- tipo_paquete: 'str' indica el tipo de paquete 1 a 3 palabras del tipo de paquete, ya sea caja, bolsa, tubo, etc."
+            "- descripcion: 'str' descripcion breve del paquete, con informacion relevante"
             )
 
         if not self.ai:
@@ -166,7 +167,10 @@ class OcrMixin:
         proveedor = datos.get('paqueteria')
         match_proveedor = self._match_label(proveedor, proveedores)
         if not match_proveedor.get('label'):
-            self.create_proveedor_de_paqueteria(proveedor)
+            try:
+                self.create_proveedor_de_paqueteria(proveedor)
+            except:
+                datos['paqueteria'] = proveedor
         else:
             datos['paqueteria'] = match_proveedor['label']
 
