@@ -3877,10 +3877,9 @@ class Accesos(OcrMixin, AccesosModel):
                     'envio_por': req.get('envio_por',[]) ,
                     'datos_requeridos': req.get('datos_requeridos',[]) ,
                     'ubicacion': self.unlist(req.get('incidente_location') or []),
-                    'prefijo_telefonico': req.get('prefijo_telefonico', '52'),
-                    'tolerancia_de_entrada': req.get('tolerancia_de_entrada', 15),
+                    'prefijo_telefonico': req.get('prefijo_telefonico', ""),
+                    'tolerancia_de_entrada': req.get('tolerancia_de_entrada', ""),
                 })
-
             data.update({
                 'exclude_inputs': format_exclude_inputs,
                 'include_inputs': format_include_inputs,
