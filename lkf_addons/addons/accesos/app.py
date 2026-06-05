@@ -807,7 +807,6 @@ class Accesos(OcrMixin, AccesosModel):
         Valida pase de entrada y crea registro de entrada al pase
         '''
         access_pass = self.get_detail_access_pass(qr_code)
-        print("INFO DEL PASE", simplejson.dumps(access_pass, indent=4))
         if not qr_code and not location and not area:
             return False
         total_entradas = self.get_count_ingresos(qr_code)
@@ -856,14 +855,40 @@ class Accesos(OcrMixin, AccesosModel):
         if fecha_caducidad_con_margen < fecha_actual:
             self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
         
+        # Validación de tolerancia de entrada para pases de fecha fija
         fecha_visita = access_pass.get('fecha_de_expedicion')
         if fecha_visita:
-            fecha_obj_visita = datetime.strptime(fecha_visita, "%Y-%m-%d %H:%M:%S")
-            fecha_visita_tz = timezone.localize(fecha_obj_visita)
-            
-            if fecha_actual < fecha_visita_tz - timedelta(minutes=30):
-                self.LKFException({'msg': f"Aún no es hora de entrada. Tu acceso comienza a las {fecha_visita}", "title": 'Aviso'})
-        
+            tipo_visita = access_pass.get('tipo_visita_pase', '')
+            if tipo_visita == 'fecha_fija':
+                config_accesos = self.get_config_accesos()
+                grupo_requisitos = config_accesos.get('requisitos', [])
+                
+                tolerancia_minutos = None
+                for req in grupo_requisitos:
+                    if req.get('ubicacion') == location:
+                        tolerancia_minutos = req.get('tolerancia_de_entrada')
+                        break
+                
+                DEFAULT_TOLERANCIA = 15
+                usar_default = tolerancia_minutos is None
+                tolerancia_minutos = int(tolerancia_minutos) if tolerancia_minutos is not None else DEFAULT_TOLERANCIA
+
+                fecha_obj_visita = datetime.strptime(fecha_visita, "%Y-%m-%d %H:%M:%S")
+                fecha_visita_tz = timezone.localize(fecha_obj_visita)
+                fecha_inicio = fecha_visita_tz - timedelta(minutes=tolerancia_minutos)
+                fecha_fin = fecha_visita_tz + timedelta(minutes=tolerancia_minutos)
+
+                if fecha_actual < fecha_inicio:
+                    self.LKFException({
+                        'msg': f"Aún no es hora de entrada. Tu acceso estará disponible a partir de las {fecha_inicio.strftime('%Y-%m-%d %H:%M:%S')} ({tolerancia_minutos} minutos antes de tu cita{', tiempo por defecto' if usar_default else ''}).",
+                        "title": 'Aviso'
+                    })
+                if fecha_actual > fecha_fin:
+                    self.LKFException({
+                        'msg': f"El tiempo de tolerancia ha expirado. Tu cita era a las {fecha_visita} con una tolerancia de {tolerancia_minutos} minutos{' (tiempo por defecto)' if usar_default else ''}.",
+                        "title": 'Acceso Denegado'
+                    })
+
         if location not in access_pass.get("ubicacion",[]):
             msg = f"La ubicación {location}, no se encuentra en el pase. Pase valido para las siguientes ubicaciones: {access_pass.get('ubicacion',[])}."
             self.LKFException({'msg':msg,"title":'Revisa la Configuración'})
@@ -2546,7 +2571,6 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
         answers[self.pase_entrada_fields['enviar_correo_pre_registro']] = access_pass.get("enviar_correo_pre_registro",[])
-        habilitar_vehiculo = "sí" if access_pass.get('habilitar_vehiculo', False) else "no"
         answers[self.pase_entrada_fields['habilitar_vehiculo']]= habilitar_vehiculo
 
         created_from = access_pass.get('created_from')
@@ -4082,7 +4106,8 @@ class Accesos(OcrMixin, AccesosModel):
                 'acepto_aviso_datos_personales': f"$answers.{self.pase_entrada_fields['acepto_aviso_datos_personales']}",
                 'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
                 'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}",    
-                'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}"         
+                'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}",
+                'tipo_visita_pase': f"$answers.{self.mf['tipo_visita_pase']}",       
                 },
             },
             {'$sort':{'created_at':-1}},
@@ -4106,6 +4131,7 @@ class Accesos(OcrMixin, AccesosModel):
             x['curp'] = self.unlist(x.get('curp',''))
             x['motivo_visita'] = self.unlist(x.get('motivo_visita',''))
             x['habilitar_vehiculo']=x.get('habilitar_vehiculo',False)
+            x['tipo_visita_pase']= x.get('tipo_visita_pase')
             for idx, nombre in enumerate(v):
                 emp = {'nombre': nombre}
                 if d:
