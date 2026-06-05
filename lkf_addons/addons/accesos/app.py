@@ -4106,7 +4106,7 @@ class Accesos(OcrMixin, AccesosModel):
                 'acepto_aviso_datos_personales': f"$answers.{self.pase_entrada_fields['acepto_aviso_datos_personales']}",
                 'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
                 'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}",    
-                'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}",
+                'habilitar_vehiculo': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}", True]},
                 'tipo_visita_pase': f"$answers.{self.mf['tipo_visita_pase']}",       
                 },
             },
