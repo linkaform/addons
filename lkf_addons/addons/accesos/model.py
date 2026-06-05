@@ -782,8 +782,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'grupo_tipo_de_pase': '694055a57d064b380f010d7f',
             'ubicacion':"663e5c57f5b8a7ce8211ed0b",
             'ubicacion_cat':  f"{self.UBICACIONES_CAT_OBJ_ID}",
-            'prefijo_telefonico':'6a1ff297a1071f084c7ecffd',
-            'tolerancia_de_entrada':"6a1fe4b6fda2876bf3981af5",
+            'prefijo_telefonico':'6a221532db633d0cf4faf12f',
+            'tolerancia_de_entrada':"6a22155492b193f057990682",
         }
 
         self.paquetes_fields = {
