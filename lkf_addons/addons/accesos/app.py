@@ -871,7 +871,7 @@ class Accesos(OcrMixin, AccesosModel):
                 
                 DEFAULT_TOLERANCIA = 15
                 usar_default = tolerancia_minutos is None
-                tolerancia_minutos = int(tolerancia_minutos) if tolerancia_minutos is not None else DEFAULT_TOLERANCIA
+                tolerancia_minutos = int(tolerancia_minutos) if tolerancia_minutos not in (None, '', 'None') else DEFAULT_TOLERANCIA
 
                 fecha_obj_visita = datetime.strptime(fecha_visita, "%Y-%m-%d %H:%M:%S")
                 fecha_visita_tz = timezone.localize(fecha_obj_visita)
@@ -3901,8 +3901,8 @@ class Accesos(OcrMixin, AccesosModel):
                     'envio_por': req.get('envio_por',[]) ,
                     'datos_requeridos': req.get('datos_requeridos',[]) ,
                     'ubicacion': self.unlist(req.get('incidente_location') or []),
-                    'prefijo_telefonico': req.get('prefijo_telefonico', ""),
-                    'tolerancia_de_entrada': req.get('tolerancia_de_entrada', ""),
+                    'prefijo_telefonico': req.get('prefijo_telefonico'),
+                    'tolerancia_de_entrada': req.get('tolerancia_de_entrada'),
                 })
             data.update({
                 'exclude_inputs': format_exclude_inputs,
