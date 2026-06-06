@@ -2,7 +2,7 @@
 
 Small repo that lets you load complete modules to LinkaForm platform.
 
-Addons by default are runned on the docker container with the image `linkaform/python3_lkf:latest`. Every script inside the addons are run on their specified container, we do recommend running them on the same container
+Addons by default are runned on the docker container with the image `linkaform/addons:latest`. Every script inside the addons are run on their specified container, we do recommend running them on the same container
 
 
 ### Downloding LinkaForm Addons
