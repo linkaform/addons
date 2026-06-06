@@ -871,7 +871,7 @@ class Accesos(OcrMixin, AccesosModel):
                 
                 DEFAULT_TOLERANCIA = 15
                 usar_default = tolerancia_minutos is None
-                tolerancia_minutos = int(tolerancia_minutos) if tolerancia_minutos is not None else DEFAULT_TOLERANCIA
+                tolerancia_minutos = int(tolerancia_minutos) if tolerancia_minutos not in (None, '', 'None') else DEFAULT_TOLERANCIA
 
                 fecha_obj_visita = datetime.strptime(fecha_visita, "%Y-%m-%d %H:%M:%S")
                 fecha_visita_tz = timezone.localize(fecha_obj_visita)
@@ -3826,6 +3826,56 @@ class Accesos(OcrMixin, AccesosModel):
         result  = self._labels(result, self.mf)
         return result
 
+  
+
+    def get_config_modulo_seguridad(self, ubicaciones=[]):
+        #TODO Verificar por que se envia asi la lista
+        if isinstance(ubicaciones, list) and ubicaciones and isinstance(ubicaciones[0], dict):
+            ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
+        requerimientos = set()
+        envios = set()
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.CONF_MODULO_SEGURIDAD,
+        }
+        query = [
+            {'$match': match_query},
+            {'$sort': {'updated_at': -1}},
+            {'$limit': 1},
+            {'$project': {
+                "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
+            }},
+        ]
+    
+        raw_result = self.format_cr(self.cr.aggregate(query))
+        for raw in raw_result:
+            for grupo in raw.get('grupo_requisitos', []):
+                print("GRUPO", grupo)
+                #TODO Verficiar el cambio de key
+                ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
+                if ubicacion in ubicaciones:
+                    clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
+                    reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
+                    if isinstance(reqs, list):
+                        requerimientos.update(reqs)
+                    envios = set()
+                    envio_por_list = self.conf_modulo_seguridad.get('envio_por', [])
+                    for item in envio_por_list if isinstance(envio_por_list, list) else [envio_por_list]:
+                        envs = grupo.get(item) or grupo.get('envio_por', [])
+                        if envs:
+                            if isinstance(envs, list):
+                                envios.update(envs)
+                            else:
+                                envios.add(envs)
+
+        tipos = self.get_tipos_de_pase(ubicaciones)
+        return {
+            "ubicaciones": ubicaciones,
+            "requerimientos": list(requerimientos),
+            "envios": list(envios),
+            "tipos": tipos
+        }
+
     def get_config_accesos(self):
         response = []
         match_query = {
@@ -3901,8 +3951,8 @@ class Accesos(OcrMixin, AccesosModel):
                     'envio_por': req.get('envio_por',[]) ,
                     'datos_requeridos': req.get('datos_requeridos',[]) ,
                     'ubicacion': self.unlist(req.get('incidente_location') or []),
-                    'prefijo_telefonico': req.get('prefijo_telefonico', ""),
-                    'tolerancia_de_entrada': req.get('tolerancia_de_entrada', ""),
+                    'prefijo_telefonico': req.get('prefijo_telefonico'),
+                    'tolerancia_de_entrada': req.get('tolerancia_de_entrada'),
                 })
             data.update({
                 'exclude_inputs': format_exclude_inputs,
@@ -3912,55 +3962,7 @@ class Accesos(OcrMixin, AccesosModel):
             })
         print(simplejson.dumps(data, indent=4))
         return data
-
-    def get_config_modulo_seguridad(self, ubicaciones=[]):
-        #TODO Verificar por que se envia asi la lista
-        if isinstance(ubicaciones, list) and ubicaciones and isinstance(ubicaciones[0], dict):
-            ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
-        requerimientos = set()
-        envios = set()
-        match_query = {
-            "deleted_at": {"$exists": False},
-            "form_id": self.CONF_MODULO_SEGURIDAD,
-        }
-        query = [
-            {'$match': match_query},
-            {'$sort': {'updated_at': -1}},
-            {'$limit': 1},
-            {'$project': {
-                "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
-            }},
-        ]
-    
-        raw_result = self.format_cr(self.cr.aggregate(query))
-        for raw in raw_result:
-            for grupo in raw.get('grupo_requisitos', []):
-                print("GRUPO", grupo)
-                #TODO Verficiar el cambio de key
-                ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
-                if ubicacion in ubicaciones:
-                    clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
-                    reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
-                    if isinstance(reqs, list):
-                        requerimientos.update(reqs)
-                    envios = set()
-                    envio_por_list = self.conf_modulo_seguridad.get('envio_por', [])
-                    for item in envio_por_list if isinstance(envio_por_list, list) else [envio_por_list]:
-                        envs = grupo.get(item) or grupo.get('envio_por', [])
-                        if envs:
-                            if isinstance(envs, list):
-                                envios.update(envs)
-                            else:
-                                envios.add(envs)
-
-        tipos = self.get_tipos_de_pase(ubicaciones)
-        return {
-            "ubicaciones": ubicaciones,
-            "requerimientos": list(requerimientos),
-            "envios": list(envios),
-            "tipos": tipos
-        }
-
+        
     def get_tipos_de_pase(self, ubicaciones=[]):
         query = [
             {'$match': {
