@@ -2571,7 +2571,7 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
         answers[self.pase_entrada_fields['enviar_correo_pre_registro']] = access_pass.get("enviar_correo_pre_registro",[])
-        answers[self.pase_entrada_fields['habilitar_vehiculo']]= habilitar_vehiculo
+        answers[self.pase_entrada_fields['habilitar_vehiculo']]= access_pass.get('habilitar_vehiculo', 'no')
 
         created_from = access_pass.get('created_from')
         if created_from == 'app':
