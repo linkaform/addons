@@ -783,7 +783,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'ubicacion':"663e5c57f5b8a7ce8211ed0b",
             'ubicacion_cat':  f"{self.UBICACIONES_CAT_OBJ_ID}",
             'prefijo_telefonico':'6a221532db633d0cf4faf12f',
-            'tolerancia_de_entrada':"6a22155492b193f057990682",
+            'tolerancia_de_entrada_previa':"6a2835444172819eb764943b",
+            'tolerancia_de_entrada_posterior':"6a22155492b193f057990682",
         }
 
         self.paquetes_fields = {
@@ -912,7 +913,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'email_alerta': '695d36605f78faab793f497e',
             'url_inspeccion': '6a0c8ab354a0b8de897c62cc',
             'proveedor_de_paqueteria': '6a1764be5451b26d5de3152b',
-            'tipo_de_proveedor': '6a18e4086423e82150aa527c'
+            'tipo_de_proveedor': '6a18e4086423e82150aa527c',
+            'tolerancia_de_entrada_previa':"6a2835444172819eb764943b",
+            'tolerancia_de_entrada_posterior':"6a22155492b193f057990682",
         })
 
         self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']
