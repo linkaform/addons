@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 ### Linkaform Modules / Archivo de Módulo ###
 '''
-Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades, 
+Este archivo proporciona las funcionalidades modulares de LinkaForm. Con estas funcionalidades,
 podrás utilizar la plataforma LinkaForm de manera modular, como un Backend as a Service (BaaS).
 
 Licencia BSD
-Copyright (c) 2024 Infosync / LinkaForm.  
+Copyright (c) 2024 Infosync / LinkaForm.
 Todos los derechos reservados.
 
 Se permite la redistribución y el uso en formas de código fuente y binario, con o sin modificaciones, siempre que se cumplan las siguientes condiciones:
@@ -16,7 +16,7 @@ Se permite la redistribución y el uso en formas de código fuente y binario, co
 
 
 Propósito
-El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización 
+El propósito de este archivo es ser auto documentable y adaptable, facilitando la reutilización
 de gran parte del código en otros módulos simplemente copiando y pegando las secciones necesarias.
 
 Instrucciones
@@ -27,7 +27,7 @@ Instrucciones
 
 ### Archivo de Modulo ###
 '''
-Este archivo define las funciones generales del módulo. Por conveniencia, se nombra `app.py`. 
+Este archivo define las funciones generales del módulo. Por conveniencia, se nombra `app.py`.
 
 Si tienes más de una aplicación, puedes:
     a. Crear una carpeta llamada `app`.
@@ -73,10 +73,10 @@ class Base(base.LKF_Base):
             self.mf = mf
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
         #use self.lkm.catalog_id() to get catalog id
-       #--Variables 
+       #--Variables
         ### Forms ###
         '''
-        `self.FORM_NAME = self.lkm.form_id('form_name',id)` ---> Aquí deberás guardar los `ID` de los formularios. 
+        `self.FORM_NAME = self.lkm.form_id('form_name',id)` ---> Aquí deberás guardar los `ID` de los formularios.
         Para ello deberás llamar el método `lkm.form_id` del objeto `lkm` (linkaform modules, por sus siglas).
         En `lkm` están todas las funciones generales de módulos.
         '''
@@ -87,7 +87,7 @@ class Base(base.LKF_Base):
         self.USUARIOS_FORM = self.lkm.form_id('usuarios', 'id')
         ### Catálogos ###
         '''
-        `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos. 
+        `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos.
         Para ello deberás llamar el método `lkm.catalog_id` del objeto `lkm`(linkaform modules, por sus siglas).
         En `lkm` están todas las funciones generales de módulos).
         '''
@@ -134,8 +134,8 @@ class Base(base.LKF_Base):
 
 
         ### Global Variables
-        
-        
+
+
         self.f.update( {
             'address_name':'663a7e0fe48382c5b1230901',
             'address_code':'ccca7e0fe48382c5b1230901',
@@ -208,7 +208,7 @@ class Base(base.LKF_Base):
     def create_user_account(self, user_data):
         if user_data.get(self.f['new_user_status']) == 'Creado':
             return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
-        
+
         complete_name = user_data.get(self.f['new_user_complete_name'])
         email = user_data.get(self.f['new_user_email'])
         username = user_data.get(self.f['new_user_username'])
@@ -235,7 +235,7 @@ class Base(base.LKF_Base):
 
     def get_couch_user_db(self, db_name):
         """
-        Retorna la instancia de la DB. Si no existe, 
+        Retorna la instancia de la DB. Si no existe,
         crea la base de datos en CouchDB si no existe.
         """
         try:
@@ -268,7 +268,7 @@ class Base(base.LKF_Base):
                 return None
 
         return None
-    
+
     def get_user_by_username(self, username):
         #TODO Checar por que el form id de Usuarios no trae el id correcto
         match_query = {
@@ -287,9 +287,9 @@ class Base(base.LKF_Base):
             return resultado[0]
         else:
             return self.LKFException({
-                "status_code": 400, 
+                "status_code": 400,
                 "msg": f"El username: {username} no se encuentra registrado."
-            }) 
+            })
 
     def update_user_register(self, username, userId):
         actual_user = self.get_user_by_username(username=username)
@@ -309,10 +309,10 @@ class Base(base.LKF_Base):
     def get_config(self, *args, **kwargs):
         if not self.GET_CONFIG:
             # print(dddd)
-            match_query ={ 
-                 'form_id': self.CONFIGURACIONES,  
+            match_query ={
+                 'form_id': self.CONFIGURACIONES,
                  'deleted_at' : {'$exists':False},
-            } 
+            }
             if 'query' in kwargs:
                 match_query.update(kwargs['query'])
             project_ids = self._project_format(self.config_fields)
@@ -346,7 +346,7 @@ class Base(base.LKF_Base):
             setattr(self, import_as, AddonsClass(self.settings, sys_argv=self.sys_argv, use_api=self.use_api, **self.kwargs))
             if module not in self.kwargs['MODULES']:
                 self.kwargs['MODULES'].append(module)
-    
+
     def send_email_by_form_answers(self, data):
         answers = {}
         if isinstance(data.get('email_to'), list):
@@ -402,9 +402,9 @@ class Base(base.LKF_Base):
         res = self.cr_wkf.find({'workflow_record_id':ObjectId(self.record_id)})
         response = []
         for x in res:
-            response.append(self.lkf_api.patch_multi_record( 
-                answers = answers, 
-                form_id=self.PARENT_FORM_ID, 
+            response.append(self.lkf_api.patch_multi_record(
+                answers = answers,
+                form_id=self.PARENT_FORM_ID,
                 record_id=[str(x.get('record_id'))]
             ))
             print('response',response)
@@ -416,7 +416,7 @@ class Base(base.LKF_Base):
         los registros de los record ids
 
         Params:
-        OJO: La funcion se base a self.current_record['answers'], si se va  acutalizar otro registro, 
+        OJO: La funcion se base a self.current_record['answers'], si se va  acutalizar otro registro,
         actualizar el current_record['asnwers'], con los valores deseados
         msg_comentarios: Id de comentarios
         record_ids:  Opcional, lista de registros a acutalizar
@@ -428,9 +428,9 @@ class Base(base.LKF_Base):
         if record_ids:
             if not form_id:
                 self.LKFException('Necesitas proporcionar un Form Id para hacer la actualizacion')
-            res = self.lkf_api.patch_multi_record( 
-                answers = self.current_record['answers'], 
-                form_id = form_id, 
+            res = self.lkf_api.patch_multi_record(
+                answers = self.current_record['answers'],
+                form_id = form_id,
                 record_id = record_ids)
         else:
             res = self.lkf_api.patch_record(self.current_record, self.record_id)
@@ -466,12 +466,12 @@ class CargaUniversal(Base):
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
         self.f.update({
-            'field_id_xls':'5e32fae308a46b2ea5fbde86', 
+            'field_id_xls':'5e32fae308a46b2ea5fbde86',
             'field_id_catalog_form_detail':'5d810a982628de5556500d56',
-            'field_id_zip':'5e32fa34a6d1e315fe80f845', 
-            'field_id_status':'5e32fbb498849f475cfbdca2', 
-            'field_id_error_records':'5e32fbb498849f475cfbdca3', 
-            'field_id_comentarios':'5e32fbb498849f475cfbdca4', 
+            'field_id_zip':'5e32fa34a6d1e315fe80f845',
+            'field_id_status':'5e32fbb498849f475cfbdca2',
+            'field_id_error_records':'5e32fbb498849f475cfbdca3',
+            'field_id_comentarios':'5e32fbb498849f475cfbdca4',
             'fields_no_update':[]
         })
 
@@ -916,7 +916,7 @@ class CargaUniversal(Base):
             proceso = 'error'
         else:
             folio = metadata.get('folio','')
-            
+
             if folio and existing_records.get(folio):
                 info_to_send = existing_records[folio]
 
@@ -1360,12 +1360,11 @@ class Schedule(Base):
 
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
-        
+
 
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
         self.mf.update({
-            'dag_id':'abcde0001000000000000000',
             'fecha_primer_evento':'abcde0001000000000010001',
             }
             )
@@ -1397,7 +1396,7 @@ class Schedule(Base):
         due_epoch = datetime.datetime.strptime(time_offset, '%Y-%m-%d %H:%M:%S')
         seconds = int(due_epoch.strftime('%s'))
         hours = int(seconds / 3600)
-        #TODO que funcione en bloques de minutos, actualmente solo funciona 
+        #TODO que funcione en bloques de minutos, actualmente solo funciona
         # en horas debido al int(second/3600) por lo tanto no soporta un 1.5 o .5
         if hours >= 0 :
           first_date = '{% ' + ' $today + $hours + {}'.format(abs(hours)) + ' %}'
@@ -1432,9 +1431,9 @@ class Schedule(Base):
                 due_date = first_date_dt + timedelta(minutes=timeframe)
         if timeframe_unit in ('horas', 'hours', 'hr'):
             if operator == '-':
-                due_date = first_date_dt - timedelta(hours=timeframe)    
+                due_date = first_date_dt - timedelta(hours=timeframe)
             else:
-                due_date = first_date_dt + timedelta(hours=timeframe)    
+                due_date = first_date_dt + timedelta(hours=timeframe)
         if timeframe_unit in ('dias', 'days', 'dy'):
             if operator == '-':
                 due_date = first_date_dt - timedelta(days=timeframe)
@@ -1474,12 +1473,12 @@ class Schedule(Base):
             user_data = self.lkf_api.get_user_by_id(user_id)
             if user_data:
                 user_info.append({
-                    'account_id': user_data.get('parent_info',{}).get('id'), 
-                    'user_id': user_id, 
+                    'account_id': user_data.get('parent_info',{}).get('id'),
+                    'user_id': user_id,
                     'name': user_data.get('name'),
                     'username': user_data.get('email'),
-                    'email': user_data.get('email'), 
-                    'resource_kind': 'user', 
+                    'email': user_data.get('email'),
+                    'resource_kind': 'user',
                     })
         return user_info
 
@@ -1508,7 +1507,7 @@ class Schedule(Base):
         if first_date:
             answers.update({'fffff0001000000000000001':first_date})
         if due_date:
-            answers.update({'fffff0001000000000000002':due_date})    
+            answers.update({'fffff0001000000000000002':due_date})
         if status:
             answers.update({'abcde0001000000000000020':status.lower().replace(' ', '_')})
         group_answers = group_field_map.get('abcde0001000000000000008',[])
@@ -1521,7 +1520,7 @@ class Schedule(Base):
                 field_type = ans.get('abcde0001000000000000010')
                 if 'contestar_respuesta' in field_type:
                     print('es un Respuesta')
-                    field_ans_map[question] = ans.get('abcde0001000000000000011')    
+                    field_ans_map[question] = ans.get('abcde0001000000000000011')
 
                 if 'subir/descargar_imagen' in field_type:
                     print('es un Imagen')
@@ -1558,7 +1557,7 @@ class Schedule(Base):
                 'abcde000100000000000f000': self.lkf_date(next_run),
                 'abcde000100000000000f001': self.lkf_date(create_after),
             }
-        return res    
+        return res
 
     def get_form_fileshare(self, item_id):
         shared_users = self.lkf_api.get_form_users(item_id)
@@ -1677,23 +1676,23 @@ class Schedule(Base):
 
     def lkf_date(self, date_str):
         global current_record
-        tz_offset = self.current_record.get('tz_offset', -300) 
+        tz_offset = self.current_record.get('tz_offset', -300)
         print('tz_offset', tz_offset)
         lkf_date = datetime.datetime.strptime(date_str[:19], '%Y-%m-%dT%H:%M:%S') + timedelta(minutes=tz_offset)
         print('lkf_date', lkf_date)
         lkf_date = lkf_date.strftime('%Y-%m-%d %H:%M:%S')
         return lkf_date
-   
+
     def schedule_task(self):
         '''
         start_date: es la fecha con la que se va a porgramar la recurrencia del dag
         ojo si esta fecha aun no pasa, las tareas del dag sencillamente no corren
-        por default el start date es igual a la fecha de la primer ejecucion, a menos de que se 
+        por default el start date es igual a la fecha de la primer ejecucion, a menos de que se
         programe con anticipacion.
         '''
         response = {}
         #TODO obtener el huzo horario del usuario y calcular us tzoffset
-        tz_offset = self.current_record.get('tz_offset', -300) 
+        tz_offset = self.current_record.get('tz_offset', -300)
         dag_id = self.answers.get(self.mf['dag_id'])
         action = self.answers.get('abcde00010000000a0000001')
         if not self.answers or  action in ('eliminar', 'delete'):
@@ -1788,7 +1787,7 @@ class Schedule(Base):
             task_type = 'LKFRunScript'
         if not item_id:
             error_msg = 'Es requerido tener una forma seleccionada'
-        
+
         if dag_id:
             body['id'] = dag_id
         body['subscription_id'] = item_id
@@ -1917,7 +1916,7 @@ class Schedule(Base):
                 # th_body['dag_params'].update({'dag_id_suffix': str(assige_usr)})
                 # th_body['tasks'].append(task)
                 # print('th_body=',th_body)
-            
+
             #print('body=', body['dag_params'])
             response.update(self.subscribe_cron(body))
             # print('si nos regresa el res....', response)
