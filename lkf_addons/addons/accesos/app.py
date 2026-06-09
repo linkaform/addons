@@ -863,29 +863,33 @@ class Accesos(OcrMixin, AccesosModel):
                 config_accesos = self.get_config_accesos()
                 grupo_requisitos = config_accesos.get('requisitos', [])
 
-                tolerancia_minutos = None
+                tolerancia_entrada_previa = None
+                tolerancia_entrada_posterior = None
                 for req in grupo_requisitos:
                     if req.get('ubicacion') == location:
-                        tolerancia_minutos = req.get('tolerancia_de_entrada')
+                        tolerancia_entrada_previa = req.get('tolerancia_de_entrada_previa')
+                        tolerancia_entrada_posterior = req.get('tolerancia_de_entrada_posterior')
                         break
 
                 DEFAULT_TOLERANCIA = 15
-                usar_default = tolerancia_minutos is None
-                tolerancia_minutos = int(tolerancia_minutos) if tolerancia_minutos not in (None, '', 'None') else DEFAULT_TOLERANCIA
+                usar_default_previa    = tolerancia_entrada_previa    in (None, '', 'None')
+                usar_default_posterior = tolerancia_entrada_posterior in (None, '', 'None')
+                tolerancia_entrada_previa    = DEFAULT_TOLERANCIA if usar_default_previa    else int(tolerancia_entrada_previa)
+                tolerancia_entrada_posterior = DEFAULT_TOLERANCIA if usar_default_posterior else int(tolerancia_entrada_posterior)
 
                 fecha_obj_visita = datetime.strptime(fecha_visita, "%Y-%m-%d %H:%M:%S")
                 fecha_visita_tz = timezone.localize(fecha_obj_visita)
-                fecha_inicio = fecha_visita_tz - timedelta(minutes=tolerancia_minutos)
-                fecha_fin = fecha_visita_tz + timedelta(minutes=tolerancia_minutos)
+                fecha_inicio = fecha_visita_tz - timedelta(minutes=tolerancia_entrada_previa)
+                fecha_fin    = fecha_visita_tz + timedelta(minutes=tolerancia_entrada_posterior)
 
                 if fecha_actual < fecha_inicio:
                     self.LKFException({
-                        'msg': f"Aún no es hora de entrada. Tu acceso estará disponible a partir de las {fecha_inicio.strftime('%Y-%m-%d %H:%M:%S')} ({tolerancia_minutos} minutos antes de tu cita{', tiempo por defecto' if usar_default else ''}).",
+                        'msg': f"Aún no es hora de entrada. Tu acceso estará disponible a partir de las {fecha_inicio.strftime('%Y-%m-%d %H:%M:%S')} ({tolerancia_entrada_previa} minutos antes de tu cita{', tiempo por defecto' if usar_default_previa else ''}).",
                         "title": 'Aviso'
                     })
                 if fecha_actual > fecha_fin:
                     self.LKFException({
-                        'msg': f"El tiempo de tolerancia ha expirado. Tu cita era a las {fecha_visita} con una tolerancia de {tolerancia_minutos} minutos{' (tiempo por defecto)' if usar_default else ''}.",
+                        'msg': f"El tiempo de tolerancia ha expirado. Tu cita era a las {fecha_visita} con una tolerancia posterior de {tolerancia_entrada_posterior} minutos{' (tiempo por defecto)' if usar_default_posterior else ''}.",
                         "title": 'Acceso Denegado'
                     })
 
@@ -3952,7 +3956,8 @@ class Accesos(OcrMixin, AccesosModel):
                     'datos_requeridos': req.get('datos_requeridos',[]) ,
                     'ubicacion': self.unlist(req.get('incidente_location') or []),
                     'prefijo_telefonico': req.get('prefijo_telefonico'),
-                    'tolerancia_de_entrada': req.get('tolerancia_de_entrada'),
+                    'tolerancia_de_entrada_previa': req.get('tolerancia_de_entrada_previa'),
+                    'tolerancia_de_entrada_posterior': req.get('tolerancia_de_entrada_posterior')
                 })
             data.update({
                 'exclude_inputs': format_exclude_inputs,
