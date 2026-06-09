@@ -1366,6 +1366,7 @@ class Schedule(Base):
 
         self.mf.update({
             'fecha_primer_evento':'abcde0001000000000010001',
+            'dag_id': 'abcde0001000000000000000'
             }
             )
 
