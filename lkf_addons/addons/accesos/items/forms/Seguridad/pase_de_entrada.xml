@@ -1558,83 +1558,6 @@
                         <field_type>text</field_type>
                         <filters>None</filters>
                         <geofence>None</geofence>
-                        <last>True</last>
-                        <related_catalog>{}</related_catalog>
-                        <view_fields>[]</view_fields>
-                        <view_index>2</view_index>
-                    </catalog>
-                    <catalog_fields>[]</catalog_fields>
-                    <catalog_relation>None</catalog_relation>
-                    <default>False</default>
-                    <default_value />
-                    <descriptor>None</descriptor>
-                    <fav>False</fav>
-                    <field_id>6639a9d9d38959539f59eb9f</field_id>
-                    <field_type>catalog-detail</field_type>
-                    <grading_criteria>{}</grading_criteria>
-                    <group>None</group>
-                    <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
-                    <label>Tipo de equipo</label>
-                    <number_type>None</number_type>
-                    <options>[]</options>
-                    <properties>
-                        <body_payload>[]</body_payload>
-                        <color />
-                        <comment />
-                        <custom />
-                        <elements_ids>[]</elements_ids>
-                        <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
-                        <fieldId>[]</fieldId>
-                        <file_name />
-                        <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
-                        <icon>{}</icon>
-                        <image_origin>None</image_origin>
-                        <input_parameter>[]</input_parameter>
-                        <max>None</max>
-                        <max_images_count>5</max_images_count>
-                        <metadata>[]</metadata>
-                        <method />
-                        <mime_types>[]</mime_types>
-                        <min>None</min>
-                        <min_images_count>0</min_images_count>
-                        <multi_selection>False</multi_selection>
-                        <notification>{}</notification>
-                        <number_of_decimals>2</number_of_decimals>
-                        <openChoice>False</openChoice>
-                        <parameters>[]</parameters>
-                        <pfd_print>always</pfd_print>
-                        <pfd_style>Tabla_respuestas</pfd_style>
-                        <selected>None</selected>
-                        <send_email>False</send_email>
-                        <send_record>False</send_record>
-                        <send_to_lkf>False</send_to_lkf>
-                        <service_name />
-                        <update_values>{}</update_values>
-                        <url />
-                        <username>False</username>
-                        <visible_on />
-                        <wait_response>False</wait_response>
-                        <watermark_config>None</watermark_config>
-                        <watermark_enable>False</watermark_enable>
-                    </properties>
-                    <required>False</required>
-                    <rules>[]</rules>
-                    <show_for_rule>True</show_for_rule>
-                    <validations>{}</validations>
-                    <visible>True</visible>
-                </item>
-                <item>
-                    <affecting_rules>[]</affecting_rules>
-                    <buttons_ids>[]</buttons_ids>
-                    <catalog>
-                        <catalog_field_id>{{ catalog.configuracion_de_perfiles.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.configuracion_de_perfiles.id }}</catalog_id>
-                        <field_type>text</field_type>
-                        <filters>None</filters>
-                        <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
                         <view_fields>[]</view_fields>
@@ -3740,7 +3663,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -5010,7 +4933,8 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>663e4730724f688b3059eb38</item>
+                        <item>66c378c02573046d51c486a7</item>
+                        <item>6639a9d9d38959539f59eb9f</item>
                         <item>663e4730724f688b3059eb39</item>
                         <item>663e4730724f688b3059eb3a</item>
                         <item>66b29872aa6b3e6c3c02baa6</item>
@@ -5073,15 +4997,29 @@
                 <item>
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
-                    <catalog>None</catalog>
-                    <catalog_fields>[]</catalog_fields>
+                    <catalog>
+                        <catalog_field_id>None</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_equipos.id }}</catalog_id>
+                        <field_type>None</field_type>
+                        <filters />
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>
+                            <item>6639a9d9d38959539f59eb9f</item>
+                        </view_fields>
+                        <view_index>0</view_index>
+                    </catalog>
+                    <catalog_fields>
+                        <item>6639a9d9d38959539f59eb9f</item>
+                    </catalog_fields>
                     <catalog_relation>None</catalog_relation>
                     <default>False</default>
                     <default_value />
                     <descriptor>None</descriptor>
-                    <fav>True</fav>
-                    <field_id>663e4730724f688b3059eb38</field_id>
-                    <field_type>radio</field_type>
+                    <fav>False</fav>
+                    <field_id>{{ catalog.tipo_de_equipos.obj_id }}</field_id>
+                    <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>
                         <group_id>663e446cadf967542759ebbb</group_id>
@@ -5089,34 +5027,9 @@
                     </group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Tipo de equipo</label>
+                    <label>Tipo</label>
                     <number_type>None</number_type>
-                    <options>
-                        <item>
-                            <label>Herramienta</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>herramienta</value>
-                        </item>
-                        <item>
-                            <label>Computo</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>computo</value>
-                        </item>
-                        <item>
-                            <label>Tablet</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>tablet</value>
-                        </item>
-                        <item>
-                            <label>Otra</label>
-                            <points>None</points>
-                            <selected>False</selected>
-                            <value>otra</value>
-                        </item>
-                    </options>
+                    <options>[]</options>
                     <properties>
                         <body_payload>[]</body_payload>
                         <color />
@@ -5159,7 +5072,87 @@
                         <watermark_config>None</watermark_config>
                         <watermark_enable>False</watermark_enable>
                     </properties>
-                    <required>True</required>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>
+                        <catalog_field_id>{{ catalog.tipo_de_equipos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.tipo_de_equipos.id }}</catalog_id>
+                        <field_type>text</field_type>
+                        <filters />
+                        <geofence>None</geofence>
+                        <last>False</last>
+                        <related_catalog>{}</related_catalog>
+                        <view_fields>[]</view_fields>
+                        <view_index>1</view_index>
+                    </catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>6639a9d9d38959539f59eb9f</field_id>
+                    <field_type>catalog-select</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>
+                        <group_id>663e446cadf967542759ebbb</group_id>
+                        <group_set_id>0</group_set_id>
+                    </group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Tipo de equipo</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
                     <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
@@ -6815,7 +6808,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -6895,7 +6888,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -7231,7 +7224,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -7779,5 +7772,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1780695213.0</updated_at>
+    <updated_at>1781108305.0</updated_at>
 </lkf>
