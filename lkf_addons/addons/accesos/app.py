@@ -1558,7 +1558,13 @@ class Accesos(OcrMixin, AccesosModel):
     def catalogo_vehiculos(self, options={}):
         catalog_id = self.TIPO_DE_VEHICULO_ID
         form_id = self.PASE_ENTRADA
-        res= self.catalogo_view(catalog_id, form_id, options=options)
+        res= self.lkf_api.get(catalog_id, form_id, options=options)
+        return res
+
+    def catalogo_tipo_equipo(self, options={}):
+        catalog_id = self.TIPO_DE_EQUIPO_ID
+        form_id = self.PASE_ENTRADA
+        res= self.lkf_api.catalog_view(catalog_id, form_id, options=options)
         return res
 
     def catalogo_view(self, catalog_id, form_id, options={}, detail=False):
@@ -2572,6 +2578,7 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
         answers[self.pase_entrada_fields['enviar_correo_pre_registro']] = access_pass.get("enviar_correo_pre_registro",[])
         answers[self.pase_entrada_fields['habilitar_vehiculo']]= access_pass.get('habilitar_vehiculo', 'no')
+        answers[self.pase_entrada_fields['acompanantes']]= access_pass.get('acompanantes', 0)
 
         created_from = access_pass.get('created_from')
         if created_from == 'app':
@@ -4109,7 +4116,8 @@ class Accesos(OcrMixin, AccesosModel):
                 'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
                 'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}",    
                 'habilitar_vehiculo': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}", True]},
-                'tipo_visita_pase': f"$answers.{self.mf['tipo_visita_pase']}",       
+                'tipo_visita_pase': f"$answers.{self.mf['tipo_visita_pase']}",     
+                'acompanantes': f"$answers.{self.pase_entrada_fields['acompanantes']}",       
                 },
             },
             {'$sort':{'created_at':-1}},
@@ -4133,6 +4141,7 @@ class Accesos(OcrMixin, AccesosModel):
             x['curp'] = self.unlist(x.get('curp',''))
             x['motivo_visita'] = self.unlist(x.get('motivo_visita',''))
             x['habilitar_vehiculo']=x.get('habilitar_vehiculo',False)
+            x['acompanantes']=x.get('acompanantes',0)
             x['tipo_visita_pase']= x.get('tipo_visita_pase')
             for idx, nombre in enumerate(v):
                 emp = {'nombre': nombre}
@@ -5713,6 +5722,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "empresa" or \
                key == "ubicaciones_geolocation" or \
                key == "habilitar_vehiculo" or \
+               key == "acompanantes" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")

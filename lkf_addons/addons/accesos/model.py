@@ -707,7 +707,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'walkin_telefono':'662c2937108836dec6d92582',
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",    
-            'habilitar_vehiculo':'6a218bf63b5cf6f0c1c55f29'
+            'habilitar_vehiculo':'6a218bf63b5cf6f0c1c55f29',
+            'acompanantes':'6a22f7b7826f8544c6183362'
         }
         
         self.pase_grupo_visitados ={
