@@ -1153,7 +1153,8 @@ class Accesos(OcrMixin, AccesosModel):
             user_id = self.user.get('user_id')
 
         employee =  self.get_employee_data(user_id=user_id, get_one=True)
-        timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
+        user_data = self.lkf_api.get_user_by_id(user_id)
+        timezone = user_data.get('timezone', 'America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
         last_chekin = {}
 
@@ -1206,23 +1207,21 @@ class Accesos(OcrMixin, AccesosModel):
                 self.checkin_fields['fotografia_cierre_turno']: fotografia
             })
 
+        print('user_id usado=', user_id)
+        print('employee timezone=', employee.get('cat_timezone'), employee.get('timezone'))
+        print('timezone final=', timezone)
+        print('now_datetime=', now_datetime)
+
         response = self.lkf_api.patch_record( data=data, record_id=checkin_id)
         if response.get('status_code') in [200, 201, 202]:
-            print('entra aquiiiiiiii')
-            print('employee', employee)
             if employee:
-                print('employee', employee)
-                print('location', location)
-                print('area', area)
                 record_id = self.search_guard_asistance(location, area, self.unlist(employee.get('usuario_id')))
-                print('record_id', record_id)
                 asistencia_answers = {
                     self.f['foto_cierre_turno']: fotografia,
                     self.checkin_fields['checkin_type']: 'cerrar_turno',
                 }
                 print('asistencia_answers', asistencia_answers)
                 res = self.lkf_api.patch_multi_record(answers=asistencia_answers, form_id=self.REGISTRO_ASISTENCIA, record_id=record_id)
-                print('res', res)
                 if res.get('status_code') in [200, 201, 202]:
                     response.update({'registro_de_asistencia': 'Correcto'})
                 else:

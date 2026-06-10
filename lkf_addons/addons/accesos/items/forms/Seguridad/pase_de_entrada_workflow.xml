@@ -471,20 +471,17 @@
                                 <group_id>663d4ba61b14fab90559ebb0</group_id>
                                 <label>email</label>
                             </item>
+                            <item>
+                                <catalog_field_id>66a83ab5ca3453e21ea08d19</catalog_field_id>
+                                <field_id>638a9a7767c332f5d459fc82</field_id>
+                                <group_id>663d4ba61b14fab90559ebb0</group_id>
+                                <label>Email</label>
+                            </item>
                         </email_fields>
                         <emails>[]</emails>
                         <embed_company_picture>True</embed_company_picture>
                         <fields_attached>[]</fields_attached>
-                        <pdf_template>
-                            <_type>single_record</_type>
-                            <description>Plantilla para Gafete a Una Cara</description>
-                            <id>491</id>
-                            <name>Soter - Gafete a Una Cara</name>
-                            <owner>/api/infosync/user/10/</owner>
-                            <paginate>True</paginate>
-                            <properties>{}</properties>
-                            <resource_uri>/api/infosync/templates/491/</resource_uri>
-                        </pdf_template>
+                        <pdf_template>{}</pdf_template>
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>True</send_pdf>
