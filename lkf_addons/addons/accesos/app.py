@@ -7761,10 +7761,23 @@ class Accesos(OcrMixin, AccesosModel):
                 answers.update({f"{self.pase_entrada_fields[key]}": [value]})
             elif key == 'conservar_datos_por':
                 answers.update({f"{self.pase_entrada_fields[key]}": value.replace(" ", "_")})
+            elif key == 'acompanantes':
+                answers[self.pase_entrada_fields['acompanantes_grupo']] = {}
+                for index, item in enumerate(value):
+                    nombre = item.get('nombre', '')
+                    email = item.get('email', '')
+                    telefono = item.get('telefono', '')
+                    foto = item.get('foto', [])
+                    obj = {
+                        self.pase_entrada_fields['nombre_acompanante']: nombre,
+                        self.pase_entrada_fields['email_acompanante']: email,
+                        self.pase_entrada_fields['telefono_acompanante']: telefono,
+                        self.pase_entrada_fields['foto_acompanante']: foto,
+                    }
+                    answers[self.pase_entrada_fields['acompanantes_grupo']][(index + 1) * -1] = obj
             else:
                 if value:
                     answers.update({f"{self.pase_entrada_fields[key]}":value})
-
         employee = getattr(self,'employee',self.get_employee_data(email=self.user.get('email'), get_one=True))
         if answers:
             new_answers = deepcopy(pass_selected['answers'])

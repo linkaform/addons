@@ -707,8 +707,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'walkin_telefono':'662c2937108836dec6d92582',
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'habilitar_vehiculo':'6a218bf63b5cf6f0c1c55f29',
-            'acompanantes':'6a22f7b7826f8544c6183362'
-            'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
+            'acompanantes':'6a22f7b7826f8544c6183362',
+            'worker_position': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
         }
 
         self.pase_grupo_visitados ={
@@ -763,11 +763,11 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'created_by': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'comentario_area_pase':self.mf['commentario_area'],
             'ubicaciones': '6834e34fa6242006acedda0f',
-            'miembros_grupo':'69d3fc307a74fbc034b3e65f',
-            'miembros_grupo_nombre':'662c2937108836dec6d9258b',
-            'miembros_grupo_email':'69d401692bab86e937e57106',
-            'miembros_grupo_telefono':'69d401692bab86e937e57107',
-            'miembros_grupo_pase':'69d401692bab86e937e57108',
+            'nombre_acompanante':'6a23408693202c1f1c149692',
+            'email_acompanante':'6a23408693202c1f1c149693',
+            'telefono_acompanante':'6a23408693202c1f1c149694',
+            'foto_acompanante':'6a23408693202c1f1c149695',
+            'acompanantes_grupo':'6a22fc57c026befc685f4fe3',
         })
 
         self.conf_accesos_fields = {
