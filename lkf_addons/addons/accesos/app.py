@@ -6071,6 +6071,7 @@ class Accesos(OcrMixin, AccesosModel):
             dict: Datos del turno.
         """
         load_shift_json = {}
+        guard = None
         username = self.user.get('username')
         user_id = self.user.get('user_id')
         email = self.user.get('email')
@@ -6084,7 +6085,6 @@ class Accesos(OcrMixin, AccesosModel):
         #! Se obtienen los puestos de guardia configurados.
         user_booths = []
         guards_positions = self.config_get_guards_positions()
-        print('guards_positions',guards_positions)
         if not guards_positions:
             return self.LKFException({'title': 'Advertencia', 'msg': 'No existen puestos de guardias configurados.'})
 
