@@ -118,6 +118,22 @@ class Oracle(Base):
         except cx_Oracle.DatabaseError as e:
             error, = e.args
             print(f"Error querying view: {error.code} - {error.message}")
+            email_to = ['misael@linkaform.com', 'josepato@linkaform.com']
+            titulo = f"Error Sync Oracle: Error al hacer Sync con Oracle en Manuelita"
+            msg = titulo
+            msg += f" Error code: {error.code}"
+            msg += f" Error Mesage: {error.message}"
+            data = {
+                'email_from': 'no-reply@linkaform.com',
+                'titulo': titulo,
+                'nombre': titulo,
+                'mensaje': msg,
+                'enviado_desde': 'Sync Oracle',
+            }
+            for email in email_to:
+                data['email_to'] = email
+                self.send_email_by_form(data)
+
         finally:
             if cursor:
                 cursor.close()
