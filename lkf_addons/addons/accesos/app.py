@@ -970,7 +970,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         #! Si la caseta esta abierta se actualizan los guardias solamente.
         if is_caseta_open:
-            res = self.update_guards_checkin([{'user_id': user_id, 'name': user_name}], checkin_id, location, area, user, nombre_suplente, fotografia)
+            res = self.update_guards_checkin([{'user_id': user_id, 'name': user_name}], self.last_check_in.get('_id',''), location, area, user, nombre_suplente, fotografia)
             format_res = self.unlist(res)
             if format_res.get('status_code') in [200, 201, 202]:
                 return format_res
