@@ -320,6 +320,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'vigencia_certificado':'662962bb203407ab90c886e6',
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
             'walkin':'66c4261351cc14058b020d48',
+            'grupo_asignado_a':'6a309d27b3f21fceb68eeb01'
         }
         self.mf = mf
         ## Form Fields ##
@@ -844,6 +845,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tiempo_para_ejecutar_tarea_expresado_en': 'abcde0001000000000010005',
             'tipo_rondin':'69b9b98d2a02f4a0dd35f5c1',
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
+            'grupo_asignado_a':'6a31d37adeceb005758cd4e2',
+            'area':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
         }
 
         self.notes_project_fields.update(self.notes_fields)

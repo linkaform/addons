@@ -1567,7 +1567,7 @@ class Accesos(OcrMixin, AccesosModel):
     def catalogo_tipo_equipo(self, options={}):
         catalog_id = self.TIPO_DE_EQUIPO_ID
         form_id = self.PASE_ENTRADA
-        res= self.lkf_api.catalog_view(catalog_id, form_id, options=options)
+        res= self.lkf_api.catalog_view(catalog_id, form_id)
         return res
 
     def catalogo_view(self, catalog_id, form_id, options={}, detail=False):
@@ -2532,11 +2532,12 @@ class Accesos(OcrMixin, AccesosModel):
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
         now_datetime_out = self.get_date_str(self.date_operation(now_datetime, '+', 8, 'hours'))
-
+        print("TIMEZONEE",timezone)
         # Setea personas vistadas
         answers[self.mf['grupo_visitados']] = []
-        answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
-
+        # answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
+        print("CREAR PASE DE ACCESO",  self.access_pass_vista_a(access_pass.get('visita_a',[])))
+        # print(kjsabdk)
         ubicaciones = access_pass.get('ubicaciones')
         location = ubicaciones[0] if isinstance(ubicaciones, list) and ubicaciones else None
 
@@ -7230,7 +7231,6 @@ class Accesos(OcrMixin, AccesosModel):
     def update_seg(self, folio, seguimientos ):
         # incidence_selected = self.get_list_incidences(location, area, folio=folio)
         answers={}
-        print("SEGUIMIENTOS", seguimientos, folio)
         if seguimientos:
             seg_list={}
             seg_list.update({
