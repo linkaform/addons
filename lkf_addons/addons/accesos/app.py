@@ -2532,12 +2532,12 @@ class Accesos(OcrMixin, AccesosModel):
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
         now_datetime_out = self.get_date_str(self.date_operation(now_datetime, '+', 8, 'hours'))
-
+        print("TIMEZONEE",timezone)
         # Setea personas vistadas
         answers[self.mf['grupo_visitados']] = []
         # answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
         print("CREAR PASE DE ACCESO",  self.access_pass_vista_a(access_pass.get('visita_a',[])))
-        print(kjsabdk)
+        # print(kjsabdk)
         ubicaciones = access_pass.get('ubicaciones')
         location = ubicaciones[0] if isinstance(ubicaciones, list) and ubicaciones else None
 
