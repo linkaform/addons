@@ -5350,13 +5350,9 @@ class Accesos(OcrMixin, AccesosModel):
     def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
         employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
         fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
-        
-        print(fecha_hoy, self.user['timezone'])
-        print("timezone usuario:", self.user['timezone'])
-        print("fecha_hoy UTC:", fecha_hoy)
-        print("fecha_hoy local:", datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0))
+        fecha_local = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0)
+        fecha_utc = fecha_local.astimezone(pytz.utc).replace(tzinfo=None, microsecond=0)
 
-        print(dfg)
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
         match_query = {
             'form_id':self.PASE_ENTRADA,
