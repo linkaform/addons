@@ -1565,7 +1565,7 @@ class Accesos(OcrMixin, AccesosModel):
         return res
 
     def catalogo_tipo_equipo(self, options={}):
-        catalog_id = self.TIPO_DE_EQUIPO_ID
+        catalog_id = self.TIPO_EQUIPOS_CAT_ID
         form_id = self.PASE_ENTRADA
         res= self.lkf_api.catalog_view(catalog_id, form_id)
         return res
@@ -2532,7 +2532,7 @@ class Accesos(OcrMixin, AccesosModel):
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
         now_datetime_out = self.get_date_str(self.date_operation(now_datetime, '+', 8, 'hours'))
-        print("TIMEZONEE",timezone)
+        print("TIMEZONEE",timezone, now_datetime)
         # Setea personas vistadas
         answers[self.mf['grupo_visitados']] = []
         # answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
@@ -2565,6 +2565,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase','fecha_fija')
         answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',now_datetime)
+        # answers[self.pase_entrada_fields['fecha_fija']] = access_pass.get('fechaFija',now_datetime)
         answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',now_datetime_out)
         answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
         answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
@@ -5349,6 +5350,9 @@ class Accesos(OcrMixin, AccesosModel):
     def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
         employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
         fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
+        fecha_local = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0)
+        fecha_utc = fecha_local.astimezone(pytz.utc).replace(tzinfo=None, microsecond=0)
+
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
         match_query = {
             'form_id':self.PASE_ENTRADA,

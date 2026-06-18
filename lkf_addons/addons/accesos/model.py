@@ -156,6 +156,11 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         # self.CONF_PERFIL_ID = self.CONF_PERFIL.get('id')
         # self.CONF_PERFIL_OBJ_ID = self.CONF_PERFIL.get('obj_id')
 
+
+        self.TIPO_EQUIPOS_CAT = self.lkm.catalog_id('tipo_de_equipos')
+        self.TIPO_EQUIPOS_CAT_ID = self.TIPO_EQUIPOS_CAT.get('id')
+        self.TIPO_EQUIPOS_CAT_OBJ_ID = self.TIPO_EQUIPOS_CAT.get('obj_id')
+
         self.AREAS_DE_LAS_UBICACIONES_CAT = self.lkm.catalog_id('areas_de_las_ubicaciones')
         self.AREAS_DE_LAS_UBICACIONES_CAT_ID = self.AREAS_DE_LAS_UBICACIONES_CAT.get('id')
         self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID = self.AREAS_DE_LAS_UBICACIONES_CAT.get('obj_id')
@@ -180,7 +185,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             self.CONFIGURACION_RECORRIDOS_ID,
             self.USUARIOS_ID,
             self.CONF_AREA_EMPLEADOS_CAT_ID,
-            self.TIPO_DE_EQUIPO_ID,
+            self.TIPO_EQUIPOS_CAT_ID,
             self.LISTA_FALLAS_CAT_ID,
             self.CONF_AREA_EMPLEADOS_AP_CAT_ID,
             self.VISITA_AUTORIZADA_CAT_ID,
