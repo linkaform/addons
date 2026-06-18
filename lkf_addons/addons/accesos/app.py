@@ -1565,7 +1565,7 @@ class Accesos(OcrMixin, AccesosModel):
         return res
 
     def catalogo_tipo_equipo(self, options={}):
-        catalog_id = self.TIPO_DE_EQUIPO_ID
+        catalog_id = self.TIPO_EQUIPOS_CAT_ID
         form_id = self.PASE_ENTRADA
         res= self.lkf_api.catalog_view(catalog_id, form_id)
         return res
