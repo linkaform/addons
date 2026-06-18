@@ -2535,7 +2535,7 @@ class Accesos(OcrMixin, AccesosModel):
         print("TIMEZONEE",timezone, now_datetime)
         # Setea personas vistadas
         answers[self.mf['grupo_visitados']] = []
-        # answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
+        answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
         print("CREAR PASE DE ACCESO",  self.access_pass_vista_a(access_pass.get('visita_a',[])))
         # print(kjsabdk)
         ubicaciones = access_pass.get('ubicaciones')
