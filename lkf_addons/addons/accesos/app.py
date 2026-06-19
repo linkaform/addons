@@ -843,7 +843,7 @@ class Accesos(OcrMixin, AccesosModel):
             if total_entradas['total_records']>= int(limite_acceso) :
                 self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
 
-        timezone = pytz.timezone('America/Mexico_City')
+        timezone = pytz.timezone(self.user.get('timezone', 'America/Mexico_City'))
         fecha_actual = datetime.now(timezone).replace(microsecond=0)
         fecha_caducidad = access_pass.get('fecha_de_caducidad')
         fecha_obj_caducidad = datetime.strptime(fecha_caducidad, "%Y-%m-%d %H:%M:%S")
@@ -881,15 +881,16 @@ class Accesos(OcrMixin, AccesosModel):
                 fecha_visita_tz = timezone.localize(fecha_obj_visita)
                 fecha_inicio = fecha_visita_tz - timedelta(minutes=tolerancia_entrada_previa)
                 fecha_fin    = fecha_visita_tz + timedelta(minutes=tolerancia_entrada_posterior)
+                tz_nombre = fecha_actual.strftime('%Z')
 
                 if fecha_actual < fecha_inicio:
                     self.LKFException({
-                        'msg': f"Aún no es hora de entrada. Tu acceso estará disponible a partir de las {fecha_inicio.strftime('%Y-%m-%d %H:%M:%S')} ({tolerancia_entrada_previa} minutos antes de tu cita{', tiempo por defecto' if usar_default_previa else ''}).",
+                        'msg': f"Aún no es hora de entrada. Tu acceso estará disponible a partir de las {fecha_inicio.strftime('%Y-%m-%d %H:%M:%S')} {tz_nombre} ({tolerancia_entrada_previa} minutos antes de tu cita{', tiempo por defecto' if usar_default_previa else ''}).",
                         "title": 'Aviso'
                     })
                 if fecha_actual > fecha_fin:
                     self.LKFException({
-                        'msg': f"El tiempo de tolerancia ha expirado. Tu cita era a las {fecha_visita} con una tolerancia posterior de {tolerancia_entrada_posterior} minutos{' (tiempo por defecto)' if usar_default_posterior else ''}.",
+                        'msg': f"El tiempo de tolerancia ha expirado. Tu cita era a las {fecha_visita} {tz_nombre} con una tolerancia posterior de {tolerancia_entrada_posterior} minutos{' (tiempo por defecto)' if usar_default_posterior else ''}.",
                         "title": 'Acceso Denegado'
                     })
 
@@ -2535,7 +2536,7 @@ class Accesos(OcrMixin, AccesosModel):
         print("TIMEZONEE",timezone, now_datetime)
         # Setea personas vistadas
         answers[self.mf['grupo_visitados']] = []
-        # answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
+        answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
         print("CREAR PASE DE ACCESO",  self.access_pass_vista_a(access_pass.get('visita_a',[])))
         # print(kjsabdk)
         ubicaciones = access_pass.get('ubicaciones')
@@ -3973,7 +3974,7 @@ class Accesos(OcrMixin, AccesosModel):
                 'alertas': format_alerts,
                 'requisitos': format_grupo_requisitos,
             })
-        print(simplejson.dumps(data, indent=4))
+        # print(simplejson.dumps(data, indent=4))
         return data
 
     def get_tipos_de_pase(self, ubicaciones=[]):
