@@ -852,7 +852,11 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
             'grupo_asignado_a':'6a31d37adeceb005758cd4e2',
             'area':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
-            'tipo_asignacion': '6a344c7a6e574352dcccc7ba'
+            'tipo_asignacion': '6a344c7a6e574352dcccc7ba',
+            'grupo':f"{self.GRUPOS_CAT_OBJ_ID}",
+            'grupo_nombre':'638a9ab3616398d2e392a9fa',
+            'grupo_id':'639b65dfaf316bacfc551ba2',
+            'grupo_asignado_a':'6a31d37adeceb005758cd4e2',
         }
 
         self.notes_project_fields.update(self.notes_fields)
