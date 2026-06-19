@@ -244,7 +244,8 @@ class Base(base.LKF_Base):
         except ResourceNotFound:
             # La DB no existe, crearla
             try:
-                self.lkf_api.couch.cdb.create(db_name)
+                user_id = db_name.split('_')[-1]
+                response = self.lkf_api.create_user_couch_db(user_id, db_name)
                 db = self.lkf_api.couch.set_db(db_name)
             except Exception as e:
                 self.LKFException(f'Error al crear la base de datos {db_name}: {str(e)}')

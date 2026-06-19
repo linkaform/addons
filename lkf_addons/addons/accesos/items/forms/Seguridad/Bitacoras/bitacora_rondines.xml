@@ -6,10 +6,12 @@
             <_id>form_121745</_id>
             <config>True</config>
             <inc_by>1</inc_by>
-            <next>168</next>
+            <manual>False</manual>
+            <next>23</next>
             <padding_zeros>3</padding_zeros>
             <prefix>%y%m%d-</prefix>
-            <suffix>None</suffix>
+            <required>False</required>
+            <suffix />
         </folio>
     </advanced_options>
     <allow_page_navigation>True</allow_page_navigation>
@@ -18,7 +20,7 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1745877744.0</created_at>
+    <created_at>1736446828.0</created_at>
     <description />
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
@@ -276,6 +278,92 @@
                         <pfd_print>always</pfd_print>
                         <pfd_style>Tabla_respuestas</pfd_style>
                         <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>6a344c7a6e574352dcccc7ba</field_id>
+                    <field_type>select</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Tipo de Asinacion</label>
+                    <number_type>None</number_type>
+                    <options>
+                        <item>
+                            <label>Responsable en turno</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>responsable_en_turno</value>
+                        </item>
+                        <item>
+                            <label>Persona especifica</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>persona_especifica</value>
+                        </item>
+                        <item>
+                            <label>Grupo</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>grupo</value>
+                        </item>
+                    </options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>0</selected>
                         <send_email>False</send_email>
                         <send_record>False</send_record>
                         <send_to_lkf>False</send_to_lkf>
@@ -558,6 +646,73 @@
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
                     <label>Email</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>None</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>6a345db8f1b0cf32e9021f93</field_id>
+                    <field_type>text</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Registro Padre</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -1116,16 +1271,22 @@
                             <value>programado</value>
                         </item>
                         <item>
+                            <label>En Proceso</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>en_proceso</value>
+                        </item>
+                        <item>
                             <label>Realizado</label>
                             <points>None</points>
                             <selected>False</selected>
                             <value>realizado</value>
                         </item>
                         <item>
-                            <label>En Proceso</label>
+                            <label>Reclamado</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>en_proceso</value>
+                            <value>reclamado</value>
                         </item>
                         <item>
                             <label>Cancelado</label>
@@ -1183,7 +1344,10 @@
                         <watermark_enable>False</watermark_enable>
                     </properties>
                     <required>True</required>
-                    <rules>[]</rules>
+                    <rules>
+                        <item>a851e2ecefa57</item>
+                        <item>25c21d1b1ba89b1</item>
+                    </rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
                     <visible>True</visible>
@@ -1203,7 +1367,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>680ffa2c87c49a88ab7ba9b6</item>
+                        <item>666718cf50ea4554f2aa1c6d</item>
                         <item>663e5d44f5b8a7ce8211ed0f</item>
                         <item>6760a908a43b1b0e41abad6b</item>
                         <item>66462b9d7124d1540f962087</item>
@@ -1211,7 +1375,7 @@
                         <item>6750adb2936622aecd075607</item>
                         <item>69df158c24393b4604e5171d</item>
                         <item>6760a9581e31b10a38a22f1f</item>
-                        <item>680ffa1487c49a88ab7ba9a2</item>
+                        <item>677ffae5a4818e97bf37f0b4</item>
                         <item>5d810a982628de5556500d55</item>
                         <item>5d810a982628de5556500d56</item>
                     </groups_fields>
@@ -1873,7 +2037,7 @@
                         <catalog_field_id>None</catalog_field_id>
                         <catalog_id>{{ catalog.catalogo_de_formas.id }}</catalog_id>
                         <field_type>None</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -1958,7 +2122,7 @@
                         <catalog_field_id>{{ catalog.catalogo_de_formas.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.catalogo_de_formas.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -2038,7 +2202,7 @@
                         <catalog_field_id>{{ catalog.catalogo_de_formas.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.catalogo_de_formas.id }}</catalog_id>
                         <field_type>integer</field_type>
-                        <filters />
+                        <filters>None</filters>
                         <geofence>None</geofence>
                         <last>False</last>
                         <related_catalog>{}</related_catalog>
@@ -2126,10 +2290,10 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>680ffa2ba27dfcfd112818fe</item>
+                        <item>666718d006245c9c3afb346b</item>
                         <item>663fb45992f2c5afcfe97ca8</item>
                         <item>69000e4c43078234e5e08390</item>
-                        <item>680ffacaa55aea343d51bc21</item>
+                        <item>6780134a6fa4ca2af76d428b</item>
                         <item>686807d46e41614d708f6fc9</item>
                         <item>686807a7ee7705c5c8eb181a</item>
                         <item>663973809fa65cafa759eb97</item>
@@ -3195,7 +3359,14 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>[]</affecting_rules>
+                    <affecting_rules>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>a851e2ecefa57</rule_id>
+                            <rule_index>0</rule_index>
+                            <rule_type>invisible</rule_type>
+                        </item>
+                    </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -3262,7 +3433,14 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>[]</affecting_rules>
+                    <affecting_rules>
+                        <item>
+                            <applied>False</applied>
+                            <rule_id>25c21d1b1ba89b1</rule_id>
+                            <rule_index>1</rule_index>
+                            <rule_type>show</rule_type>
+                        </item>
+                    </affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -3623,7 +3801,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/132167/</resource_uri>
+    <resource_uri>/api/infosync/form/127957/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -3639,14 +3817,14 @@
         <item>
             <_type>single_record</_type>
             <default>True</default>
-            <description>Plantilla para bitacora de rondines</description>
-            <id>590</id>
-            <name>Grupo Afal - Bitacora de Rondines</name>
-            <owner>/api/infosync/user/17780/</owner>
-            <paginate>False</paginate>
-            <pdfName>{% raw %} Bitacora_de_Rondines_{{record.folio}} {% endraw %} </pdfName>
+            <description>Template para Grupo Afal de bitacora de rondines</description>
+            <id>639</id>
+            <name>Grupo Afal v2 - Bitacora de Rondines</name>
+            <owner>/api/infosync/user/126/</owner>
+            <paginate>True</paginate>
+            <pdfName>{% raw %} Bitacora de Rondines - {{record.folio}} {% endraw %} </pdfName>
             <properties>{}</properties>
-            <resource_uri>/api/infosync/templates/590/</resource_uri>
+            <resource_uri>/api/infosync/templates/639/</resource_uri>
             <script>{}</script>
         </item>
     </templates>
@@ -3658,5 +3836,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1776229392.0</updated_at>
+    <updated_at>1781890575.0</updated_at>
 </lkf>
