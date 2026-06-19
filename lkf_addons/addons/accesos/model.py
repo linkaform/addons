@@ -833,7 +833,6 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'fecha_hora_programada': 'abcde0001000000000010001',
             'grupo_areas':'66462aa5d4a4af2eea07e0d1',
             'grupo_asignado': '638a9ab3616398d2e392a9fa',
-            'grupo_asignado_rondin':'671055aaa487da57ba57b294',
             'id_grupo':'639b65dfaf316bacfc551ba2',
             'la_recurrencia_cuenta_con_fecha_final': '64374e47a208e5c0ff95e9bd',
             'la_tarea_es_de': 'abcde0001000000000010006',
@@ -854,11 +853,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
             'grupo_asignado_a':'6a31d37adeceb005758cd4e2',
             'area':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
-            'tipo_asignacion': '6a344c7a6e574352dcccc7ba',
             'grupo':f"{self.GRUPOS_CAT_OBJ_ID}",
-            'grupo_nombre':'638a9ab3616398d2e392a9fa',
             'grupo_id':'639b65dfaf316bacfc551ba2',
-            'grupo_asignado_a':'6a31d37adeceb005758cd4e2',
         }
 
         self.notes_project_fields.update(self.notes_fields)
