@@ -129,6 +129,10 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CATEGORIAS_INCIDENCIAS = self.lkm.catalog_id('categora_incidentes')
         self.CATEGORIAS_INCIDENCIAS_ID = self.CATEGORIAS_INCIDENCIAS.get('id')
         self.CATEGORIAS_INCIDENCIAS_OBJ_ID = self.CATEGORIAS_INCIDENCIAS.get('obj_id')
+    
+        self.CATALOGO_FORMAS = self.lkm.catalog_id('catalogo_de_formas')
+        self.CATALOGO_FORMAS_CAT_ID = self.CATALOGO_FORMAS.get('id')
+        self.CATALOGO_FORMAS_OBJ_ID = self.CATALOGO_FORMAS.get('obj_id')
 
         self.SUB_CATEGORIAS_INCIDENCIAS = self.lkm.catalog_id('subcategoras_incidentes')
         self.SUB_CATEGORIAS_INCIDENCIAS_ID = self.SUB_CATEGORIAS_INCIDENCIAS.get('id')
@@ -161,6 +165,10 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.TIPO_EQUIPOS_CAT_ID = self.TIPO_EQUIPOS_CAT.get('id')
         self.TIPO_EQUIPOS_CAT_OBJ_ID = self.TIPO_EQUIPOS_CAT.get('obj_id')
 
+        self.TIPO_VEHICULOS_CAT = self.lkm.catalog_id('tipos_de_vehiculo')
+        self.TIPO_VEHICULOS_CAT_ID = self.TIPO_VEHICULOS_CAT.get('id')
+        self.TIPO_VEHICULOS_CAT_OBJ_ID = self.TIPO_VEHICULOS_CAT.get('obj_id')
+
         self.AREAS_DE_LAS_UBICACIONES_CAT = self.lkm.catalog_id('areas_de_las_ubicaciones')
         self.AREAS_DE_LAS_UBICACIONES_CAT_ID = self.AREAS_DE_LAS_UBICACIONES_CAT.get('id')
         self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID = self.AREAS_DE_LAS_UBICACIONES_CAT.get('obj_id')
@@ -186,6 +194,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             self.USUARIOS_ID,
             self.CONF_AREA_EMPLEADOS_CAT_ID,
             self.TIPO_EQUIPOS_CAT_ID,
+            self.TIPO_VEHICULOS_CAT_ID,
             self.LISTA_FALLAS_CAT_ID,
             self.CONF_AREA_EMPLEADOS_AP_CAT_ID,
             self.VISITA_AUTORIZADA_CAT_ID,
@@ -325,7 +334,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'vigencia_certificado':'662962bb203407ab90c886e6',
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
             'walkin':'66c4261351cc14058b020d48',
-            'grupo_asignado_a':'6a309d27b3f21fceb68eeb01'
+            'grupo_asignado_a':'6a309d27b3f21fceb68eeb01',
+            'prompt_inspeccion':'6a0ce90fefa8de16875f0541',
+            'nombre_forma': '5d810a982628de5556500d55'
         }
         self.mf = mf
         ## Form Fields ##

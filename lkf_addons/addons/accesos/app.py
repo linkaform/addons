@@ -1559,17 +1559,15 @@ class Accesos(OcrMixin, AccesosModel):
             formatted["type"] = "incidence"
         return formatted
 
-    def catalogo_vehiculos(self, options={}):
-        catalog_id = self.TIPO_DE_VEHICULO_ID
+    def catalogo_vehiculos(self):
+        catalog_id = self.TIPO_VEHICULOS_CAT_ID
         form_id = self.PASE_ENTRADA
-        res= self.lkf_api.get(catalog_id, form_id, options=options)
-        return res
+        return self.catalogo_view(catalog_id, form_id)
 
-    def catalogo_tipo_equipo(self, options={}):
+    def catalogo_tipo_equipo(self):
         catalog_id = self.TIPO_EQUIPOS_CAT_ID
         form_id = self.PASE_ENTRADA
-        res= self.lkf_api.catalog_view(catalog_id, form_id)
-        return res
+        return self.catalogo_view(catalog_id, form_id)
 
     def catalogo_view(self, catalog_id, form_id, options={}, detail=False):
         catalog_id = catalog_id
