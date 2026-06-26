@@ -662,6 +662,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.pase_entrada_fields = {
             'acepto_aviso_datos_personales': '6827488724317731cb288117',
             'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
+            'acompanantes':'6a22f7b7826f8544c6183362',
             'apple_wallet_pass': '682785fbedd82a9104287e25',
             'archivo_invitacion': '673773741b2adb2d05d99d63',
             'area':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
@@ -711,6 +712,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tipo_visita':"662c262cace163ca3ed3bb3a",
             'todas_las_areas':'68f9fdfbd9bf5cb7fd3caece',
             'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
+            'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
+            'url_hijo':"6a3dc2a391c36d239c1453a7",
+            'url_padre':"6a3dc2a391c36d239c1453b7",
             'ubicaciones':'6834e34fa6242006acedda0f',
             'vigencia_expresa_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e7",
             'vigencia_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e6",
@@ -723,7 +727,6 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'walkin_telefono':'662c2937108836dec6d92582',
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'habilitar_vehiculo':'6a218bf63b5cf6f0c1c55f29',
-            'acompanantes':'6a22f7b7826f8544c6183362',
             'worker_position': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
         }
 
