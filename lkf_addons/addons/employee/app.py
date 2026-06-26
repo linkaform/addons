@@ -247,14 +247,16 @@ class Employee(Base):
             }
         match_query.update(self._get_match_q(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
         query = [
-            {'$match': match_query },    
-            {'$project':{ 
-                        '_id':1,
-                        'user_id':f"$answers.{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}",
-                        'pic_url':{"$first":f"$answers.{self.employee_fields['picture']}"}
-                        }
-            }
-            ]
+            {'$match': match_query },
+            {'$match': {
+                f'answers.{self.USUARIOS_OBJ_ID}.{self.employee_fields["user_id_id"]}': {'$exists': True, '$not': {'$in': [None, '', 0, []]}}
+            }},
+            {'$project':{
+                '_id':1,
+                'user_id': {"$ifNull": [f"$answers.{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", None]},
+                'pic_url':{"$first":f"$answers.{self.employee_fields['picture']}"}
+            }}
+        ]
         users = self.format_cr_result(self.cr.aggregate(query))
         res = {}
         for usr in users:
