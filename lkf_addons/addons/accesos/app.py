@@ -263,6 +263,7 @@ class Accesos(OcrMixin, AccesosModel):
             res (json): reponse, con archivo de ics
         """
         res = {}
+        print('creating acces pass ICS')
         if ics_invitation:
             id_forma = self.PASE_ENTRADA
             id_campo = self.pase_entrada_fields['archivo_invitacion']
@@ -2480,6 +2481,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         """
         #---Define Metadata
+        print('-----------------------')
         metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
         self.autorizado_por = ""
         metadata.update({
@@ -2562,17 +2564,21 @@ class Accesos(OcrMixin, AccesosModel):
         if not  access_pass.get('config_limitar_acceso') or access_pass['config_dia_de_acceso'] == "":
             access_pass['config_limitar_acceso'] =  1
 
-        answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase','fecha_fija')
-        answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',now_datetime)
-        # answers[self.pase_entrada_fields['fecha_fija']] = access_pass.get('fechaFija',now_datetime)
-        answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',now_datetime_out)
+        answers[self.pase_entrada_fields['acompanantes']]= access_pass.get('acompanantes', 0)
+        answers[self.pase_entrada_fields['acompanantes_grupo']]= access_pass.get('acompanantes_grupo', 0)
         answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
         answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
-        answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
-        answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
-        answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',access_pass.get('motivo',"") )
-        answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"")
         answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',1)
+        answers[self.pase_entrada_fields['descripcion']] = access_pass.get('descripcion',"")
+        answers[self.pase_entrada_fields['empresa_pase']] = access_pass.get('empresa',"")
+        answers[self.pase_entrada_fields['enviar_correo_pre_registro']] = access_pass.get("enviar_correo_pre_registro",[])
+        answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',now_datetime)
+        answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',now_datetime_out)
+        answers[self.pase_entrada_fields['habilitar_vehiculo']]= access_pass.get('habilitar_vehiculo', 'no')
+        answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase','fecha_fija')
+        # answers[self.pase_entrada_fields['fecha_fija']] = access_pass.get('fechaFija',now_datetime)
+        answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
+        answers[self.pase_entrada_fields['tema_cita']] = access_pass.get('tema_cita',access_pass.get('motivo',"") )
         answers[self.pase_entrada_fields['tipo_visita']] = 'alta_de_nuevo_visitante'
         answers[self.pase_entrada_fields['walkin_nombre']] = access_pass.get('nombre')
         answers[self.pase_entrada_fields['walkin_email']] = access_pass.get('email', '')
@@ -2580,9 +2586,6 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['walkin_fotografia']] = access_pass.get('foto')
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
-        answers[self.pase_entrada_fields['enviar_correo_pre_registro']] = access_pass.get("enviar_correo_pre_registro",[])
-        answers[self.pase_entrada_fields['habilitar_vehiculo']]= access_pass.get('habilitar_vehiculo', 'no')
-        answers[self.pase_entrada_fields['acompanantes']]= access_pass.get('acompanantes', 0)
 
         created_from = access_pass.get('created_from')
         if created_from == 'app':
@@ -2669,9 +2672,6 @@ class Accesos(OcrMixin, AccesosModel):
             answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']] = [answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']],]
 
         # Revisa si el pase contiene un grupo o forma parte de un grupo.
-        miembros_grupo = access_pass.get('miembros_grupo',"")
-        for miembros in miembros_grupo:
-            print('mimbros WIP', miembros)
 
         #---Valor
         # Crea invitacion de calendario
@@ -2682,9 +2682,87 @@ class Accesos(OcrMixin, AccesosModel):
 
 
         answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(answers)
+
+        acompanantes = answers.get(self.pase_entrada_fields['acompanantes'], 0)
+        acompanantes_grupo = answers.get(self.pase_entrada_fields['acompanantes_grupo'], [])
+        if acompanantes_grupo and len(acompanantes_grupo) > int(acompanantes or 0):
+            self.LKFException({
+                'msg': (
+                    f"El número de acompañantes en la lista ({len(acompanantes_grupo)}) "
+                    f"excede el permitido para este pase ({acompanantes}). "
+                    f"Por favor ajusta la lista o incrementa el número de acompañantes."
+                ),
+                'status_code': 400,
+            })
+
         metadata.update({'answers':answers})
         res = self.lkf_api.post_forms_answers(metadata)
+        print('res=',res)
+        if res.get('status_code') in (200, 201):
+            parent_id = res.get('json', {}).get('id')
+            if acompanantes_grupo and len(acompanantes_grupo) > 0 and parent_id:
+                self.create_multiple_pass_threads(answers, acompanantes_grupo, parent_id)
         return res
+
+
+    def create_multiple_pass_threads(self, answers, acompanantes_grupo, parent_id):
+        """
+        Creates individual passes for each member of acompanantes_grupo in parallel threads.
+        Pops acompanantes_grupo from child answers to avoid recursion.
+        Links each child to the parent via url_padre, then updates the parent with all url_hijo.
+        """
+        parent_url = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{parent_id}"
+
+        def create_single_pass(acompanante):
+            pass_answers = deepcopy(answers)
+            pass_answers.pop(self.pase_entrada_fields['acompanantes_grupo'], None)
+            pass_answers.pop(self.pase_entrada_fields['qr_pase'], None)
+            pass_answers.pop(self.mf['codigo_qr'], None)
+            pass_answers[self.mf['nombre_pase']] = acompanante.get('nombre', '')
+            pass_answers[self.pase_entrada_fields['email']] = acompanante.get('email', '')
+            pass_answers[self.mf['telefono_pase']] = acompanante.get('telefono', '')
+            pass_answers[self.pase_entrada_fields['url_padre']] = parent_url
+
+            metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
+            metadata.update({
+                "id": self.object_id(),
+                "properties": {
+                    "device_properties": {
+                        "System": "Script",
+                        "Module": "Accesos",
+                        "Process": "Creación de pase grupo",
+                        "Action": "create_multiple_pass_threads",
+                        "File": "accesos/app.py"
+                    }
+                },
+            })
+            metadata.update({'answers': pass_answers})
+            return self.lkf_api.post_forms_answers(metadata)
+
+        child_urls = []
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = {
+                executor.submit(create_single_pass, acompanante): acompanante
+                for acompanante in acompanantes_grupo
+            }
+            for future in as_completed(futures):
+                acompanante = futures[future]
+                try:
+                    result = future.result()
+                    child_id = result.get('json', {}).get('id')
+                    if child_id:
+                        child_urls.append(f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{child_id}")
+                except Exception as e:
+                    print(f"Error creating pass for {acompanante.get('nombre')}: {e}")
+
+        if child_urls:
+            self.cr.update_one(
+                {'_id': ObjectId(parent_id)},
+                {'$set': {f"answers.{self.pase_entrada_fields['url_hijo']}": child_urls}}
+            )
+        return child_urls
+
+
 
     def create_visita_autorizada(self, visita_autorizada_obj, pase_obj={}):
         pase_info = pase_obj
@@ -9177,12 +9255,15 @@ class Accesos(OcrMixin, AccesosModel):
         Asigna registro a usuario
         """
         user_id_to_assign = self.unlist(data.get(self.USUARIOS_OBJ_ID, {}).get(self.mf['id_usuario'], ''))
+        print('user_id_to_assign',user_id_to_assign)
         if not user_id_to_assign:
             self.LKFException('No se encontro id de usuario en el registro a asignar')
         db_name = f'clave_{user_id_to_assign}'
         #sete la base de datos del usuario
         self.cr_db = self.get_couch_user_db(db_name)
-        record = self.cr_db.get(self.record_id)
+        print('self record id', self.record_id)
+        print('self record id', type(self.record_id))
+        record = self.cr_db.get(str(self.record_id))
         #test borrar esto
         # if record:
         if False:
@@ -9581,7 +9662,7 @@ class Accesos(OcrMixin, AccesosModel):
         Return:
             checks (list): Lista de json con la info del check
         """
-        rondin_url = f"https://app.linkaform.com/#/records/detail/{rondin_id}"
+        rondin_url = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{rondin_id}"
         query = [
             {"$match": {
                 "deleted_at": {"$exists": False},
@@ -9934,7 +10015,7 @@ class Accesos(OcrMixin, AccesosModel):
                 self.f['fecha_inspeccion_area']: fecha,
                 self.f['foto_evidencia_area_rondin']: check.get('foto_evidencia_area', []),
                 self.f['comentario_area_rondin']: check.get('comentario_check_area', check.get('comentario_area_rondin', '')),
-                self.f['url_registro_rondin']: f"https://app.linkaform.com/#/records/detail/{check.get('_id')}",
+                self.f['url_registro_rondin']: f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{check.get('_id')}",
                 self.f['duracion_traslado_area']: 0,
                 }
         return res
@@ -9969,10 +10050,10 @@ class Accesos(OcrMixin, AccesosModel):
         print('revisar que ponga la fecha de inspeccion')
         if data.get('rondin_id'):
             rondin_id = data.get('rondin_id')
-            answers[self.f['bitacora_rondin_url']] = f"https://app.linkaform.com/#/records/detail/{rondin_id}"
+            answers[self.f['bitacora_rondin_url']] = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{rondin_id}"
 
         if record.get('inspeccion_record_id'):
-            answers[self.f['url_inspeccion']] = f"https://app.linkaform.com/#/records/detail/{record.get('inspeccion_record_id', '')}"
+            answers[self.f['url_inspeccion']] = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{record.get('inspeccion_record_id', '')}"
 
         if data.get('rondin_name'):
             rondin_name = data.get('rondin_name')
