@@ -6604,7 +6604,9 @@ class Accesos(OcrMixin, AccesosModel):
             if type(x) == list:
                 for y in x:
                     u_id = y['user_id']
-                    if pics.get(u_id):
+                    if isinstance(u_id, list):
+                        u_id = u_id[0] if u_id else None
+                    if u_id and pics.get(u_id):
                         y['picture'] = pics[u_id]
             else:
                 if x:
