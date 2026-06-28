@@ -119,7 +119,7 @@ class Oracle(Base):
             error, = e.args
             print(f"Error querying view: {error.code} - {error.message}")
             email_to = ['misael@linkaform.com', 'josepato@linkaform.com']
-            titulo = f"Error Sync Oracle: Error al hacer Sync con Oracle en Manuelita"
+            titulo = f"Error Sync Oracle: Error al hacer Sync con Oracle"
             msg = titulo
             msg += f" Error code: {error.code}"
             msg += f" Error Mesage: {error.message}"
