@@ -117,20 +117,26 @@ class Oracle(Base):
                 result.append(dict(zip(columns, row)))
         except cx_Oracle.DatabaseError as e:
             error, = e.args
-            print(f"Error querying view: {error.code} - {error.message}")
-            email_to = ['misael@linkaform.com', 'josepato@linkaform.com']
-            titulo = f"Error Sync Oracle: Error al hacer Sync con Oracle"
-            msg = titulo
-            msg += f" Error code: {error.code}"
-            msg += f" Error Mesage: {error.message}"
+            titulo = f"Oracle Sync Error — view: {view_name} | code: {error.code}"
+            msg = (
+                f"=== Error Oracle ===\n"
+                f"Code:    {error.code}\n"
+                f"Message: {error.message}\n\n"
+                f"=== Query ejecutado ===\n{query}\n\n"
+                f"=== Contexto ===\n"
+                f"view_name:   {view_name}\n"
+                f"date_format: {date_format}\n"
+                f"columns:     {columns if columns else '(no se alcanzaron a leer)'}"
+            )
+            print(msg)
             data = {
                 'email_from': 'no-reply@linkaform.com',
                 'titulo': titulo,
                 'nombre': titulo,
                 'mensaje': msg,
-                'enviado_desde': 'Sync Oracle',
+                'enviado_desde': 'oracle/app.py: query_view',
             }
-            for email in email_to:
+            for email in ['misael@linkaform.com', 'josepato@linkaform.com']:
                 data['email_to'] = email
                 self.send_email_by_form(data)
 
