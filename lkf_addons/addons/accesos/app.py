@@ -2712,20 +2712,22 @@ class Accesos(OcrMixin, AccesosModel):
         Links each child to the parent via url_padre, then updates the parent with all url_hijo.
         """
         parent_url = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{parent_id}"
-
-        def create_single_pass(acompanante):
+        def create_single_pass(acompanante, parent_id):
+            record_id = self.object_id()
             pass_answers = deepcopy(answers)
             pass_answers.pop(self.pase_entrada_fields['acompanantes_grupo'], None)
+            pass_answers.pop(self.pase_entrada_fields['acompanantes'], None)
             pass_answers.pop(self.pase_entrada_fields['qr_pase'], None)
             pass_answers.pop(self.mf['codigo_qr'], None)
             pass_answers[self.mf['nombre_pase']] = acompanante.get('nombre', '')
+            pass_answers[self.pase_entrada_fields['link']] = pass_answers[self.pase_entrada_fields['link']].replace(parent_id, record_id)
             pass_answers[self.pase_entrada_fields['email']] = acompanante.get('email', '')
             pass_answers[self.mf['telefono_pase']] = acompanante.get('telefono', '')
             pass_answers[self.pase_entrada_fields['url_padre']] = parent_url
 
             metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
             metadata.update({
-                "id": self.object_id(),
+                "id": record_id,
                 "properties": {
                     "device_properties": {
                         "System": "Script",
@@ -2739,10 +2741,11 @@ class Accesos(OcrMixin, AccesosModel):
             metadata.update({'answers': pass_answers})
             return self.lkf_api.post_forms_answers(metadata)
 
-        child_urls = []
+        url_by_email = {}
+        # create_single_pass(acompanantes_grupo[0], parent_id)
         with ThreadPoolExecutor(max_workers=10) as executor:
             futures = {
-                executor.submit(create_single_pass, acompanante): acompanante
+                executor.submit(create_single_pass, acompanante, parent_id): acompanante
                 for acompanante in acompanantes_grupo
             }
             for future in as_completed(futures):
@@ -2751,16 +2754,27 @@ class Accesos(OcrMixin, AccesosModel):
                     result = future.result()
                     child_id = result.get('json', {}).get('id')
                     if child_id:
-                        child_urls.append(f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{child_id}")
+                        child_url = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{child_id}"
+                        url_by_email[acompanante.get('email', '')] = child_url
                 except Exception as e:
                     print(f"Error creating pass for {acompanante.get('nombre')}: {e}")
 
-        if child_urls:
+        child_group = [
+            {
+                self.pase_entrada_fields['nombre_acompanante']: acompanante.get('nombre', ''),
+                self.pase_entrada_fields['email_acompanante']: acompanante.get('email', ''),
+                self.pase_entrada_fields['telefono_acompanante']: acompanante.get('telefono', ''),
+                self.pase_entrada_fields['url_hijo']: url_by_email.get(acompanante.get('email', ''), ''),
+            }
+            for acompanante in acompanantes_grupo
+        ]
+
+        if child_group:
             self.cr.update_one(
                 {'_id': ObjectId(parent_id)},
-                {'$set': {f"answers.{self.pase_entrada_fields['url_hijo']}": child_urls}}
+                {'$set': {f"answers.{self.pase_entrada_fields['acompanantes_grupo']}": child_group}}
             )
-        return child_urls
+        return child_group
 
 
 
@@ -4201,6 +4215,8 @@ class Accesos(OcrMixin, AccesosModel):
                 'habilitar_vehiculo': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}", True]},
                 'tipo_visita_pase': f"$answers.{self.mf['tipo_visita_pase']}",     
                 'acompanantes': f"$answers.{self.pase_entrada_fields['acompanantes']}",       
+                'acompanantes_grupo': f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",       
+                'url_padre': f"$answers.{self.pase_entrada_fields['url_padre']}",       
                 },
             },
             {'$sort':{'created_at':-1}},
@@ -4263,19 +4279,37 @@ class Accesos(OcrMixin, AccesosModel):
                 x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.Location.f['location']): self.unlist(x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.f['address_geolocation']))
                 for x in ubicaciones_full_info
             }
-            grupo_visita = x.get('answers', {}).get(self.mf['grupo_visitados'], [])
+            grupo_visita = x.get('answers', {}).get(self.pase_entrada_fields['acompanantes_grupo'], [])
+            pase_fields_inv = {v: k for k, v in self.pase_entrada_fields.items()}
             if grupo_visita:
-                visita_list = []
-                for idx, visita in enumerate(grupo_visita):
-                    item = {
-                        'id': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['id_usuario'], '')) or idx,
-                        'username': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['username'], '')) or '',
-                        'name': visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['nombre_empleado'], '') or '',
-                        'telefono': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['telefono_visita_a'], '')) or '',
-                        'email': self.unlist(visita.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID, {}).get(self.mf['email_visita_a'], '')) or '',
+                acompanantes = []
+                for acompanante in grupo_visita:
+                    item = {pase_fields_inv.get(k, k): v for k, v in acompanante.items()}
+                    url = item.get('url_hijo', '')
+                    if url:
+                        item['qr_code'] = url.rstrip('/').rsplit('/', 1)[-1]
+                    acompanantes.append(item)
+
+                qr_codes = [a['qr_code'] for a in acompanantes if a.get('qr_code') and ObjectId.is_valid(a['qr_code'])]
+                if qr_codes:
+                    extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion']
+                    projection = {f"answers.{self.pase_entrada_fields[f]}": 1 for f in extra_fields}
+                    pases_info = {
+                        str(p['_id']): {
+                            field: p.get('answers', {}).get(self.pase_entrada_fields[field], '')
+                            for field in extra_fields
+                        }
+                        for p in self.cr.find(
+                            {'_id': {'$in': [ObjectId(qr) for qr in qr_codes]}, 'deleted_at': {'$exists': False}},
+                            projection,
+                        )
                     }
-                    visita_list.append(item)
-                x['visita_a_details'] = visita_list
+                    for acompanante in acompanantes:
+                        qr = acompanante.get('qr_code', '')
+                        if qr in pases_info:
+                            acompanante.update(pases_info[qr])
+
+                x['acompanantes_grupo'] = acompanantes
         print(simplejson.dumps(x, indent=4))
         if not x:
             self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
@@ -5424,7 +5458,7 @@ class Accesos(OcrMixin, AccesosModel):
             format_data = list(format_data)
         return format_data
 
-    def get_my_pases(self, tab_status, limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
+    def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
         employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
         fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_local = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0)
@@ -5443,6 +5477,8 @@ class Accesos(OcrMixin, AccesosModel):
             }
         ]
         }
+        if not tab_status:
+            tab_status = ""
         if tab_status.strip().lower() == "favoritos":
             match_query.update({f"answers.{self.pase_entrada_fields['favoritos']}":'si'})
         elif tab_status.strip().lower() == "activos":
@@ -5578,7 +5614,9 @@ class Accesos(OcrMixin, AccesosModel):
                     'perfil_pase': f"$answers.{self.mf['nombre_perfil']}",
                     'status_pase': f"$answers.{self.pase_entrada_fields['status_pase']}",
                     'pdf_to_img': f"$answers.{self.pase_entrada_fields['pdf_to_img']}",
-                    'autorizado_por':f"$answers.{self.pase_entrada_fields['autorizado_por']}"
+                    'autorizado_por':f"$answers.{self.pase_entrada_fields['autorizado_por']}",
+                    'acompanantes_grupo':f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",
+                    'acompanantes':f"$answers.{self.pase_entrada_fields['acompanantes']}"
                 }
             },
             {'$sort':{'_id':-1}},
