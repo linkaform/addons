@@ -62,36 +62,60 @@ class Oracle(Base):
         self.ORACLE_SID = self.settings.config.get('ORACLE_SID')
         self.ORACLE_USERNAME = self.settings.config['ORACLE_USERNAME']
         self.ORACLE_PASSWORD = self.settings.config['ORACLE_PASSWORD']
-        self.oracle = self.connect_to_oracle()
+        # self.oracle = self.connect_to_oracle()
+        self.orcale_connection = self.connect_to_oracle()
         self.f={}
 
     def connect_to_oracle(self):
         print('=== Establishing Connection to Oracle ===')
+        if self.ORACLE_SERVICE_NAME:
+            dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME)
+        elif self.ORACLE_SID:
+            dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, sid=self.ORACLE_SID) 
+        else:
+            self.LKFException("No se proporciono un service_name o sid")
+        
         try:
-            if self.ORACLE_SERVICE_NAME:
-                dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME)
-            elif self.ORACLE_SID:
-                dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, sid=self.ORACLE_SID) 
-            else:
-                self.LKFException("No se proporciono un service_name o sid")
-            
-            try:
-                self.orcale_connection = cx_Oracle.connect(self.ORACLE_USERNAME, self.ORACLE_PASSWORD, dsn)
-            except cx_Oracle.DatabaseError as e:
-                error, = e.args
-                print(f"Error code: {error.code}")
-                print(f"Error message: {error.message}")
-                print('Error',e)
-                return None
-                #return self.LKFException(f"Error code: {error.code} - {error.message}")
-            return self.orcale_connection
-        except  cx_Oracle.DatabaseError as e:
+            self.orcale_connection = cx_Oracle.connect(self.ORACLE_USERNAME, self.ORACLE_PASSWORD, dsn)
+        except cx_Oracle.DatabaseError as e:
             error, = e.args
+            print("01010101010"*5)
             print(f"Error code: {error.code}")
             print(f"Error message: {error.message}")
-            print('Error=',e)
-            return self.LKFException(f"Error code: {error.code} - {error.message}")
+            print('Error',e)
+            # return {'staus':503}
+            # return self.LKFException(f"Error code: {error.code} - {error.message}")
+            error, = e.args
+            msg = (
+                f"=== Error Oracle ===\n"
+                f"Code:    {error.code}\n"
+                f"Message: {error.message}\n\n"
+                # f"=== Query ejecutado ===\n{query}\n\n"
+                f"=== Contexto ===\n"
+                f"self.ORACLE_HOST:   {self.ORACLE_HOST}\n"
+                f"self.ORACLE_PORT: {self.ORACLE_PORT}\n"
+                f"self.ORACLE_SID: {self.ORACLE_SID}\n"
+                f"self.ORACLE_SERVICE_NAME: {self.ORACLE_SERVICE_NAME}\n"
+                f"self.ORACLE_USERNAME: {self.ORACLE_USERNAME}\n"
+            )
+            print(msg)
+            data = {
+                'email_from': 'no-reply@linkaform.com',
+                'titulo': "Oracle db connection error",
+                'nombre':  "Oracle db connection error",
+                'mensaje': msg,
+                'enviado_desde': 'oracle/app.py: connect_to_oracle',
+            }
+            for email in ['misael@linkaform.com', 'josepato@linkaform.com']:
+                data['email_to'] = email
+                self.send_email_by_form(data)
+            self.LKFException('No cursor, oracle connection')
 
+
+
+
+        return self.orcale_connection
+        
     def query_view(self, view_name, query=False, date_format=False):
         """
         Query a view in Oracle
@@ -139,6 +163,7 @@ class Oracle(Base):
             for email in ['misael@linkaform.com', 'josepato@linkaform.com']:
                 data['email_to'] = email
                 self.send_email_by_form(data)
+            self.LKFException('No cursor, query_view')
 
         finally:
             if cursor:
