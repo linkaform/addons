@@ -10937,6 +10937,8 @@ class Accesos(OcrMixin, AccesosModel):
         if res.get('status_code') in (200, 201, 202):
             record['status'] = 'synced'
             record['status'] = 'received'
+            record.pop('last_error', None)
+            record['status'] = 'received'
             self.cr_db.save(record)
             res = {'status_code': 200, 'type': 'success', 'msg': 'Area synced', 'data': {}}
         else:
@@ -10953,7 +10955,6 @@ class Accesos(OcrMixin, AccesosModel):
             record['updated_at'] = self.today_str( date_format='datetime')
             record['last_error'] = last_error
             self.cr_db.save(record)
-
         return res
 
     def delete_old_synced_areas(self, days=3):
