@@ -2708,7 +2708,7 @@ class Accesos(OcrMixin, AccesosModel):
         Pops acompanantes_grupo from child answers to avoid recursion.
         Links each child to the parent via url_padre, then updates the parent with all url_hijo.
         """
-        parent_url = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{parent_id}"
+        parent_url = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{parent_id}"
         def create_single_pass(acompanante, parent_id):
             record_id = self.object_id()
             pass_answers = deepcopy(answers)
@@ -2751,7 +2751,7 @@ class Accesos(OcrMixin, AccesosModel):
                     result = future.result()
                     child_id = result.get('json', {}).get('id')
                     if child_id:
-                        child_url = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{child_id}"
+                        child_url = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{child_id}"
                         url_by_email[acompanante.get('email', '')] = child_url
                 except Exception as e:
                     print(f"Error creating pass for {acompanante.get('nombre')}: {e}")
@@ -9700,7 +9700,7 @@ class Accesos(OcrMixin, AccesosModel):
         Return:
             checks (list): Lista de json con la info del check
         """
-        rondin_url = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{rondin_id}"
+        rondin_url = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{rondin_id}"
         query = [
             {"$match": {
                 "deleted_at": {"$exists": False},
@@ -10053,7 +10053,7 @@ class Accesos(OcrMixin, AccesosModel):
                 self.f['fecha_inspeccion_area']: fecha,
                 self.f['foto_evidencia_area_rondin']: check.get('foto_evidencia_area', []),
                 self.f['comentario_area_rondin']: check.get('comentario_check_area', check.get('comentario_area_rondin', '')),
-                self.f['url_registro_rondin']: f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{check.get('_id')}",
+                self.f['url_registro_rondin']: f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{check.get('_id')}",
                 self.f['duracion_traslado_area']: 0,
                 }
         return res
@@ -10088,10 +10088,10 @@ class Accesos(OcrMixin, AccesosModel):
         print('revisar que ponga la fecha de inspeccion')
         if data.get('rondin_id'):
             rondin_id = data.get('rondin_id')
-            answers[self.f['bitacora_rondin_url']] = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{rondin_id}"
+            answers[self.f['bitacora_rondin_url']] = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{rondin_id}"
 
         if record.get('inspeccion_record_id'):
-            answers[self.f['url_inspeccion']] = f"{self.settings.config['PROTOCOL']}://{self.settings.config['HOST']}/#/records/detail/{record.get('inspeccion_record_id', '')}"
+            answers[self.f['url_inspeccion']] = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{record.get('inspeccion_record_id', '')}"
 
         if data.get('rondin_name'):
             rondin_name = data.get('rondin_name')
@@ -10935,6 +10935,8 @@ class Accesos(OcrMixin, AccesosModel):
         if res.get('status_code') in (200, 201, 202):
             record['status'] = 'synced'
             record['status'] = 'received'
+            record.pop('last_error', None)
+            record['status'] = 'received'
             self.cr_db.save(record)
             res = {'status_code': 200, 'type': 'success', 'msg': 'Area synced', 'data': {}}
         else:
@@ -10951,7 +10953,6 @@ class Accesos(OcrMixin, AccesosModel):
             record['updated_at'] = self.today_str( date_format='datetime')
             record['last_error'] = last_error
             self.cr_db.save(record)
-
         return res
 
     def delete_old_synced_areas(self, days=3):

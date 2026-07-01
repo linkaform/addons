@@ -846,6 +846,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'fecha_hora_programada': 'abcde0001000000000010001',
             'grupo_areas':'66462aa5d4a4af2eea07e0d1',
             'grupo_asignado': '638a9ab3616398d2e392a9fa',
+            'grupo_asignado_rondin':'671055aaa487da57ba57b294',
             'id_grupo':'639b65dfaf316bacfc551ba2',
             'la_recurrencia_cuenta_con_fecha_final': '64374e47a208e5c0ff95e9bd',
             'la_tarea_es_de': 'abcde0001000000000010006',

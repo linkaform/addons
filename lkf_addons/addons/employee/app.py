@@ -144,11 +144,13 @@ class Employee(Base):
             res  = {f"answers.{field_id}": value}
         return res
 
-    def get_employee_data(self, name=None, user_id=None, username=None, email=None, phone=None, get_one=False):
+    def get_employee_data(self, name=None, user_id=None, username=None, email=None, phone=None, get_one=False, active=True):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.EMPLEADOS,
             }
+        if active:
+            match_query.update(self._get_match_q(self.employee_fields['estatus_dentro_empresa'], 'activo'))
         if name:
             match_query.update(self._get_match_q(self.f['worker_name'], name))
         if user_id:
