@@ -2533,12 +2533,10 @@ class Accesos(OcrMixin, AccesosModel):
         timezone = user_data.get('timezone','America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
         now_datetime_out = self.get_date_str(self.date_operation(now_datetime, '+', 8, 'hours'))
-        print("TIMEZONEE",timezone, now_datetime)
         # Setea personas vistadas
         answers[self.mf['grupo_visitados']] = []
         answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
-        print("CREAR PASE DE ACCESO",  self.access_pass_vista_a(access_pass.get('visita_a',[])))
-        # print(kjsabdk)
+
         ubicaciones = access_pass.get('ubicaciones')
         location = ubicaciones[0] if isinstance(ubicaciones, list) and ubicaciones else None
 
@@ -2647,7 +2645,6 @@ class Accesos(OcrMixin, AccesosModel):
                             "nombre_area": area,
                             "commentario_area": ""
                         })
-            print(f"Todas las áreas hasta ahora: {todas_areas}")
             access_pass["areas"] = todas_areas
 
         if access_pass.get('areas'):
@@ -5616,7 +5613,8 @@ class Accesos(OcrMixin, AccesosModel):
                     'pdf_to_img': f"$answers.{self.pase_entrada_fields['pdf_to_img']}",
                     'autorizado_por':f"$answers.{self.pase_entrada_fields['autorizado_por']}",
                     'acompanantes_grupo':f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",
-                    'acompanantes':f"$answers.{self.pase_entrada_fields['acompanantes']}"
+                    'acompanantes':f"$answers.{self.pase_entrada_fields['acompanantes']}",
+                    'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}"
                 }
             },
             {'$sort':{'_id':-1}},
