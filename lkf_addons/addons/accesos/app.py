@@ -4277,37 +4277,8 @@ class Accesos(OcrMixin, AccesosModel):
                 x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.Location.f['location']): self.unlist(x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.f['address_geolocation']))
                 for x in ubicaciones_full_info
             }
-            grupo_visita = x.get('answers', {}).get(self.pase_entrada_fields['acompanantes_grupo'], [])
-            pase_fields_inv = {v: k for k, v in self.pase_entrada_fields.items()}
-            if grupo_visita:
-                acompanantes = []
-                for acompanante in grupo_visita:
-                    item = {pase_fields_inv.get(k, k): v for k, v in acompanante.items()}
-                    url = item.get('url_hijo', '')
-                    if url:
-                        item['qr_code'] = url.rstrip('/').rsplit('/', 1)[-1]
-                    acompanantes.append(item)
-
-                qr_codes = [a['qr_code'] for a in acompanantes if a.get('qr_code') and ObjectId.is_valid(a['qr_code'])]
-                if qr_codes:
-                    extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion']
-                    projection = {f"answers.{self.pase_entrada_fields[f]}": 1 for f in extra_fields}
-                    pases_info = {
-                        str(p['_id']): {
-                            field: p.get('answers', {}).get(self.pase_entrada_fields[field], '')
-                            for field in extra_fields
-                        }
-                        for p in self.cr.find(
-                            {'_id': {'$in': [ObjectId(qr) for qr in qr_codes]}, 'deleted_at': {'$exists': False}},
-                            projection,
-                        )
-                    }
-                    for acompanante in acompanantes:
-                        qr = acompanante.get('qr_code', '')
-                        if qr in pases_info:
-                            acompanante.update(pases_info[qr])
-
-                x['acompanantes_grupo'] = acompanantes
+            x['acompanantes_grupo'] = x.get('answers', {}).get(self.pase_entrada_fields['acompanantes_grupo'], [])
+            self._hidratar_acompanantes([x])
         print(simplejson.dumps(x, indent=4))
         if not x:
             self.LKFException({'title':'Advertencia', 'msg':'Este pase fue eliminado o no pertenece a esta organizacion.'})
@@ -5456,6 +5427,54 @@ class Accesos(OcrMixin, AccesosModel):
             format_data = list(format_data)
         return format_data
 
+    def _hidratar_acompanantes(self, records_con_grupo):
+        """
+        records_con_grupo: lista de dicts, cada uno con la key 'acompanantes_grupo' cruda.
+        Modifica cada record in-place, normalizando y agregando el estatus real de cada acompañante.
+        """
+        pase_fields_inv = {v: k for k, v in self.pase_entrada_fields.items()}
+        all_qr_codes = set()
+
+        for x in records_con_grupo:
+            grupo_visita = x.get('acompanantes_grupo') or []
+            acompanantes = []
+            for acompanante in grupo_visita:
+                item = {pase_fields_inv.get(k, k): v for k, v in acompanante.items()}
+                url = item.get('url_hijo', '')
+                if url:
+                    item['qr_code'] = url.rstrip('/').rsplit('/', 1)[-1]
+                    if ObjectId.is_valid(item['qr_code']):
+                        all_qr_codes.add(item['qr_code'])
+                acompanantes.append(item)
+            x['acompanantes_grupo'] = acompanantes
+
+        if not all_qr_codes:
+            return
+
+        extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion']
+        field_aliases = {
+            'status_pase': 'estatus',
+            'walkin_fotografia': 'foto',
+            'walkin_identificacion': 'identificacion',
+        }
+        projection = {f"answers.{self.pase_entrada_fields[f]}": 1 for f in extra_fields}
+        pases_info = {
+            str(p['_id']): {
+                field_aliases[field]: p.get('answers', {}).get(self.pase_entrada_fields[field], '')
+                for field in extra_fields
+            }
+            for p in self.cr.find(
+                {'_id': {'$in': [ObjectId(qr) for qr in all_qr_codes]}, 'deleted_at': {'$exists': False}},
+                projection,
+            )
+        }
+
+        for x in records_con_grupo:
+            for acompanante in x.get('acompanantes_grupo', []):
+                qr = acompanante.get('qr_code', '')
+                if qr in pases_info:
+                    acompanante.update(pases_info[qr])
+
     def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
         employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
         fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
@@ -5624,6 +5643,7 @@ class Accesos(OcrMixin, AccesosModel):
         query.append({'$limit': limit})
         records = self.format_cr(self.cr.aggregate(query))
         # print("RECORDS",  simplejson.dumps(records, indent=4))
+        self._hidratar_acompanantes(records)
         for x in records:
             qr_code = x.get('_id')
             total_entradas = self.get_count_ingresos(qr_code)
@@ -5681,7 +5701,7 @@ class Accesos(OcrMixin, AccesosModel):
             x['autorizado_por'] = x.get('autorizado_por', "")
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
-
+            x['habilitar_vehiculo'] = x.get('habilitar_vehiculo', "")
 
             x['grupo_vehiculos'] = self.format_vehiculos_simple(x.pop('grupo_vehiculos',[]))
             x['grupo_equipos'] = self.format_equipos_simple(x.pop('grupo_equipos',[]))
@@ -5846,6 +5866,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "ubicaciones_geolocation" or \
                key == "habilitar_vehiculo" or \
                key == "acompanantes" or \
+               key == "acompanantes_grupo" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
