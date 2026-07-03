@@ -42,8 +42,6 @@ from bson.objectid import ObjectId
 from datetime import timedelta
 from couchdb.http import ResourceNotFound
 
-from linkaform_api import base
-
 from .model import BaseModel
 
 
