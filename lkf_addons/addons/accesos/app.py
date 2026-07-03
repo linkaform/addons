@@ -939,7 +939,7 @@ class Accesos(OcrMixin, AccesosModel):
         else:
             return self.LKFException({'title': 'Error en registro de asistencia', 'msg': {'response': response}})
 
-    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={}, nombre_suplente="", checkin_id=""):
+    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={}, nombre_suplente="", checkin_id="", roles=[]):
         """
         Se encarga de hacer el check in de un guardia.
 
@@ -1061,7 +1061,8 @@ class Accesos(OcrMixin, AccesosModel):
             },
             self.f['tipo_guardia']: 'guardia_regular',
             self.checkin_fields['checkin_type']: 'iniciar_turno',
-            self.f['image_checkin']: fotografia
+            self.f['image_checkin']: fotografia,
+            self.f['grupo_roles']: roles
         }
 
         if nombre_suplente:
@@ -9299,8 +9300,6 @@ class Accesos(OcrMixin, AccesosModel):
         db_name = f'clave_{user_id_to_assign}'
         #sete la base de datos del usuario
         self.cr_db = self.get_couch_user_db(db_name)
-        print('self record id', self.record_id)
-        print('self record id', type(self.record_id))
         record = self.cr_db.get(str(self.record_id))
         #test borrar esto
         # if record:

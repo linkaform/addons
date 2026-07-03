@@ -187,7 +187,7 @@ class OcrMixin:
 
     def ocr_identificacion(self, image_source: str, form_id: int = None,
                            model: str = 'google/gemini-2.5-flash-lite', 
-                           name: str = None) -> dict:
+                           name: str = None, is_employee: bool = False) -> dict:
         """
         Extrae los datos de una identificación (INE, pasaporte, licencia, etc.)
         y opcionalmente crea el registro en LinkaForm.
@@ -198,11 +198,16 @@ class OcrMixin:
             model:        Modelo OpenRouter a usar (opcional).
             MODEL = "anthropic/claude-haiku-4.5"  # excelente OCR, precio razonable
             MODEL = "google/gemini-2.5-flash"  # un escalón arriba, más caro pero mejor
+            name:         Si se indica, valida que la identificación pertenezca a esa persona.
+            is_employee:  Si es True, busca a la persona de la identificación en el
+                          catálogo de empleados (self.Employee.get_employee_data por
+                          nombre) y agrega 'es_empleado' (bool) y 'datos_empleado' a
+                          cada identificación extraída.
 
         Returns:
             dict con:
                 - status_code: 200/201/400/500
-                - data: campos extraídos por el OCR
+                - data: campos extraídos por el OCR (incluye 'es_empleado' si is_employee=True)
                 - folio: folio del registro creado (si se pasó form_id)
                 - msg: mensaje de resultado
 
@@ -232,6 +237,13 @@ class OcrMixin:
                     datos = raw_text['choices'][0]['message']['content']
 
         datos = self._ocr_normalizar(datos)
+
+        # 2.5 Verificar si la persona de la identificación es empleado (opcional)
+        if is_employee:
+            print('verificando elpmaldo')
+            datos = self._ocr_verificar_empleado(datos)
+            print('datos=', datos)
+            breakpoint()
 
         # 3. Validar
         errores = self._ocr_validar_id(datos)
@@ -268,7 +280,7 @@ class OcrMixin:
 
     def ocr_documento(self, image_source: str, fields: list = None,
                       extra_instructions: str = None, form_id: int = None,
-                      model: str = None) -> dict:
+                      model: str = None, is_employee: bool = False) -> dict:
         """
         OCR genérico para cualquier tipo de documento.
 
@@ -456,6 +468,23 @@ class OcrMixin:
             datos['nombre_completo'] += f" {datos['apellido_materno']}"
         if not datos['nombre_completo']:
             datos.pop('nombre_completo')
+        return datos
+
+    def _ocr_verificar_empleado(self, datos):
+        """
+        Verifica si la persona de la identificación está dada de alta como
+        empleado activo, buscándola por nombre completo con self.Employee.
+        Agrega 'es_empleado' (bool) y, si lo encuentra, 'datos_empleado'.
+        """
+        if isinstance(datos, list):
+            return [self._ocr_verificar_empleado(d) for d in datos]
+        nombre_completo = datos.get('nombre_completo')
+        empleado = None
+        if nombre_completo:
+            empleado = self.Employee.get_employee_data(name=nombre_completo, get_one=True)
+        datos['es_empleado'] = bool(empleado)
+        if empleado:
+            datos['datos_empleado'] = empleado
         return datos
 
     def _ocr_validar_id(self, datos) -> list:
