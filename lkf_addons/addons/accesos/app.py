@@ -36,7 +36,7 @@ Si tienes más de una aplicación, puedes:
 import pytz, logging, tempfile, os, uuid, simplejson, requests, jwt, arrow, threading, random, time, unicodedata
 import sys, json, base64, urllib.parse
 import time as time_module
-
+import re
 from math import ceil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
@@ -533,6 +533,7 @@ class Accesos(OcrMixin, AccesosModel):
                 id_vista = self.valid_url(id_vista['file_url'])
         id_vista = True
         today = self.get_today_format()
+        documentos_ok = foto_ok or id_vista
         if isinstance(today, datetime):
             today = today.strftime('%Y-%m-%d')
         elif today and isinstance(today, str) and len(today) > 10:
@@ -585,9 +586,9 @@ class Accesos(OcrMixin, AccesosModel):
             if answers.get(self.pase_entrada_fields['catalago_autorizado_por'],{}).get(self.pase_entrada_fields['autorizado_por']):
                 autorizado_ok = True
 
-        if foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
+        if documentos_ok and fecha_ok and vista_a_ok and autorizado_ok:
             status = 'activo'
-        elif foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
+        elif documentos_ok and fecha_ok and vista_a_ok and not autorizado_ok:
             status = 'por_autorizar'
         elif not fecha_ok:
             status = 'vencido'
@@ -4235,6 +4236,41 @@ class Accesos(OcrMixin, AccesosModel):
             f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['url_padre']= self.unlist(x.get('url_padre',''))
+            x['url_padre'] = self.unlist(x.get('url_padre',''))
+
+            # Si es un pase hijo, ir a buscar el link del pase padre
+            if x.get('url_padre'):
+                padre_id_match = re.search(r'/records/detail/([a-fA-F0-9]{24})', x['url_padre'])
+                if padre_id_match:
+                    padre_id = padre_id_match.group(1)
+                    try:
+                        padre_query = [
+                            {'$match': {
+                                "_id": ObjectId(padre_id),
+                                "form_id": self.PASE_ENTRADA,
+                                "deleted_at": {"$exists": False},
+                            }},
+                            {'$project': {
+                                '_id': 1,
+                                'link': f"$answers.{self.pase_entrada_fields['link']}",
+                                'estatus_pase_padre': f"$answers.{self.pase_entrada_fields['status_pase']}",
+                            }},
+                        ]
+                        padre_res = list(self.cr.aggregate(padre_query))
+                        if padre_res:
+                            x['link_padre'] = padre_res[0].get('link', '')
+                            x['estatus_pase_padre'] = padre_res[0].get('estatus_pase_padre', '')
+                        else:
+                            x['link_padre'] = ''
+                            x['estatus_pase_padre'] = ''
+                    except Exception as e:
+                        print(f"Error obteniendo link del pase padre {padre_id}: {e}")
+                        x['link_padre'] = ''
+                        x['estatus_pase_padre'] = ''
+                else:
+                    x['link_padre'] = ''
+                    x['estatus_pase_padre'] = ''
+
             x['email'] =self.unlist(x.get('email',''))
             x['telefono'] = self.unlist(x.get('telefono',''))
             x['curp'] = self.unlist(x.get('curp',''))
@@ -5453,11 +5489,12 @@ class Accesos(OcrMixin, AccesosModel):
         if not all_qr_codes:
             return
 
-        extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion']
+        extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion', 'link']
         field_aliases = {
             'status_pase': 'estatus',
             'walkin_fotografia': 'foto',
             'walkin_identificacion': 'identificacion',
+            'link': 'link',
         }
         projection = {f"answers.{self.pase_entrada_fields[f]}": 1 for f in extra_fields}
         pases_info = {
@@ -5870,6 +5907,8 @@ class Accesos(OcrMixin, AccesosModel):
                key == "acompanantes" or \
                key == "acompanantes_grupo" or \
                key == "url_padre" or \
+               key == "estatus_pase_padre" or \
+               key == "link_padre" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
@@ -7904,20 +7943,20 @@ class Accesos(OcrMixin, AccesosModel):
                 answers.update({f"{self.pase_entrada_fields[key]}": [value]})
             elif key == 'conservar_datos_por':
                 answers.update({f"{self.pase_entrada_fields[key]}": value.replace(" ", "_")})
-            elif key == 'acompanantes':
-                answers[self.pase_entrada_fields['acompanantes_grupo']] = {}
-                for index, item in enumerate(value):
-                    nombre = item.get('nombre', '')
-                    email = item.get('email', '')
-                    telefono = item.get('telefono', '')
-                    foto = item.get('foto', [])
-                    obj = {
-                        self.pase_entrada_fields['nombre_acompanante']: nombre,
-                        self.pase_entrada_fields['email_acompanante']: email,
-                        self.pase_entrada_fields['telefono_acompanante']: telefono,
-                        self.pase_entrada_fields['foto_acompanante']: foto,
-                    }
-                    answers[self.pase_entrada_fields['acompanantes_grupo']][(index + 1) * -1] = obj
+            # elif key == 'acompanantes':
+            #     answers[self.pase_entrada_fields['acompanantes_grupo']] = {}
+            #     for index, item in enumerate(value):
+            #         nombre = item.get('nombre', '')
+            #         email = item.get('email', '')
+            #         telefono = item.get('telefono', '')
+            #         foto = item.get('foto', [])
+            #         obj = {
+            #             self.pase_entrada_fields['nombre_acompanante']: nombre,
+            #             self.pase_entrada_fields['email_acompanante']: email,
+            #             self.pase_entrada_fields['telefono_acompanante']: telefono,
+            #             self.pase_entrada_fields['foto_acompanante']: foto,
+            #         }
+            #         answers[self.pase_entrada_fields['acompanantes_grupo']][(index + 1) * -1] = obj
             else:
                 if value:
                     answers.update({f"{self.pase_entrada_fields[key]}":value})
@@ -7933,25 +7972,6 @@ class Accesos(OcrMixin, AccesosModel):
                 status = self.access_pass_set_status(new_answers)
             answers[status_field] = status
 
-            res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
-            if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
-                pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
-                res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
-                res['json'].update({'telefono':pass_selected.get("telefono")})
-                res['json'].update({'enviar_a':pass_selected.get("nombre")})
-                #TODO pregutnar a Paco porque aqui usa el nombre del empeado con el user.get('email')
-                #en vez de la persona seleccionada como vista....
-                res['json'].update({'enviar_de':employee.get('worker_name')})
-                res['json'].update({'enviar_de_correo':employee.get('email')})
-                res['json'].update({'ubicacion':pass_selected.get('ubicacion')})
-                res['json'].update({'fecha_desde':pass_selected.get('fecha_de_expedicion')})
-                res['json'].update({'fecha_hasta':pass_selected.get('fecha_de_caducidad')})
-                res['json'].update({'asunto':pass_selected.get('tema_cita')})
-                res['json'].update({'descripcion':pass_selected.get('descripcion')})
-                res['json'].update({'pdf': pdf})
-                return res
-            else:
-                return res
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
                 pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
