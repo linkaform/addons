@@ -243,7 +243,6 @@ class OcrMixin:
             print('verificando elpmaldo')
             datos = self._ocr_verificar_empleado(datos)
             print('datos=', datos)
-            breakpoint()
 
         # 3. Validar
         errores = self._ocr_validar_id(datos)
