@@ -3,6 +3,7 @@
 
 # -*- coding: utf-8 -*-
 
+import traceback
 import cx_Oracle
 
 ### Linkaform Modules / Archivo de Modulo ###
@@ -80,6 +81,12 @@ class Oracle(Base):
         except cx_Oracle.DatabaseError as e:
             error, = e.args
             print("01010101010"*5)
+            print(f"ORACLE_HOST code: {self.ORACLE_HOST}")
+            print(f"ORACLE_PORT code: {self.ORACLE_PORT}")
+            print(f"ORACLE_SERVICE_NAME code: {self.ORACLE_SERVICE_NAME}")
+            print(f"ORACLE_SID code: {self.ORACLE_SID}")
+            print(f"ORACLE_USERNAME code: {self.ORACLE_USERNAME}")
+            print(f"Error code: {error.code}")
             print(f"Error code: {error.code}")
             print(f"Error message: {error.message}")
             print('Error',e)
@@ -99,6 +106,7 @@ class Oracle(Base):
                 f"self.ORACLE_USERNAME: {self.ORACLE_USERNAME}\n"
             )
             print(msg)
+            traceback.print_exc()
             data = {
                 'email_from': 'no-reply@linkaform.com',
                 'titulo': "Oracle db connection error",
@@ -110,9 +118,20 @@ class Oracle(Base):
                 data['email_to'] = email
                 self.send_email_by_form(data)
             self.LKFException('No cursor, oracle connection')
-
-
-
+        except Exception as e:
+            print("=========== GENERAL EXCEPTION ===========")
+            print(f"ORACLE_HOST: {self.ORACLE_HOST}")
+            print(f"ORACLE_PORT: {self.ORACLE_PORT}")
+            print(f"ORACLE_SERVICE_NAME: {self.ORACLE_SERVICE_NAME}")
+            print(f"ORACLE_SID: {self.ORACLE_SID}")
+            print(f"ORACLE_USERNAME: {self.ORACLE_USERNAME}")
+            print(f"Error type: {type(e).__name__}")
+            print(f"Error: {e}")
+            traceback.print_exc()
+            for email in ['misael@linkaform.com', 'josepato@linkaform.com']:
+                data['email_to'] = email
+                self.send_email_by_form(data)
+            self.LKFException(f'Error inesperado al conectar a Oracle: {type(e).__name__} - {e}')
 
         return self.orcale_connection
         
