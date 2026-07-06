@@ -4252,18 +4252,23 @@ class Accesos(OcrMixin, AccesosModel):
                             {'$project': {
                                 '_id': 1,
                                 'link': f"$answers.{self.pase_entrada_fields['link']}",
+                                'estatus_pase_padre': f"$answers.{self.pase_entrada_fields['status_pase']}",
                             }},
                         ]
                         padre_res = list(self.cr.aggregate(padre_query))
                         if padre_res:
                             x['link_padre'] = padre_res[0].get('link', '')
+                            x['estatus_pase_padre'] = padre_res[0].get('estatus_pase_padre', '')
                         else:
                             x['link_padre'] = ''
+                            x['estatus_pase_padre'] = ''
                     except Exception as e:
                         print(f"Error obteniendo link del pase padre {padre_id}: {e}")
                         x['link_padre'] = ''
+                        x['estatus_pase_padre'] = ''
                 else:
                     x['link_padre'] = ''
+                    x['estatus_pase_padre'] = ''
 
             x['email'] =self.unlist(x.get('email',''))
             x['telefono'] = self.unlist(x.get('telefono',''))
@@ -5901,6 +5906,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "acompanantes" or \
                key == "acompanantes_grupo" or \
                key == "url_padre" or \
+               key == "estatus_pase_padre" or \
                key == "link_padre" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
