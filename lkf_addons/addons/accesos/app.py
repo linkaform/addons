@@ -2718,7 +2718,8 @@ class Accesos(OcrMixin, AccesosModel):
             pass_answers.pop(self.pase_entrada_fields['qr_pase'], None)
             pass_answers.pop(self.mf['codigo_qr'], None)
             pass_answers[self.mf['nombre_pase']] = acompanante.get('nombre', '')
-            pass_answers[self.pase_entrada_fields['link']] = pass_answers[self.pase_entrada_fields['link']].replace(parent_id, record_id)
+            # pass_answers[self.pase_entrada_fields['link']] = pass_answers[self.pase_entrada_fields['link']].replace(parent_id, record_id)
+            pass_answers[self.pase_entrada_fields['link']] = pass_answers[self.pase_entrada_fields['link']].replace(str(parent_id), str(record_id))
             pass_answers[self.pase_entrada_fields['email']] = acompanante.get('email', '')
             pass_answers[self.mf['telefono_pase']] = acompanante.get('telefono', '')
             pass_answers[self.pase_entrada_fields['url_padre']] = parent_url
@@ -4233,6 +4234,7 @@ class Accesos(OcrMixin, AccesosModel):
             u =  x.get('visita_a_email',[])
             f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
+            x['url_padre']= self.unlist(x.get('url_padre',''))
             x['email'] =self.unlist(x.get('email',''))
             x['telefono'] = self.unlist(x.get('telefono',''))
             x['curp'] = self.unlist(x.get('curp',''))
@@ -5867,6 +5869,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "habilitar_vehiculo" or \
                key == "acompanantes" or \
                key == "acompanantes_grupo" or \
+               key == "url_padre" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
@@ -8189,6 +8192,21 @@ class Accesos(OcrMixin, AccesosModel):
                 answers.update({f"{self.pase_entrada_fields[key]}": archivo_invitacion})
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
+
+        # --- Manejo de acompañantes nuevos ---
+        acompanantes_nuevos = access_pass.get('acompanantes_grupo', []) or []
+        acompanantes_total = len(acompanantes_nuevos)
+
+        if acompanantes_nuevos:
+            registro_actual = self.get_record_by_folio(
+                folio, self.PASE_ENTRADA, select_columns={'_id': 1}, limit=1
+            ) or {}
+            parent_id = registro_actual.get('_id') or qr_code
+
+            child_group_nuevo = self.create_multiple_pass_threads(answers, acompanantes_nuevos, parent_id) if parent_id else []
+
+            answers[self.pase_entrada_fields['acompanantes_grupo']] = child_group_nuevo
+            answers[self.pase_entrada_fields['acompanantes']] = acompanantes_total
 
         if answers or folio:
             metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
