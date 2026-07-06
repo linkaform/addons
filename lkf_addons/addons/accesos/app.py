@@ -10998,7 +10998,6 @@ class Accesos(OcrMixin, AccesosModel):
         if record.get('geolocation'):
             metadata['geolocation'] = [record['geolocation']['long'], record['geolocation']['lat']]
         metadata.update({'answers': answers})
-
         res = self.lkf_api.post_forms_answers(metadata)
         # res = {'status_code':400, 'exception':'testing'}
         if res.get('status_code') in (200, 201, 202):
@@ -11159,7 +11158,7 @@ class Accesos(OcrMixin, AccesosModel):
         for rec in record_list:
             unique_records[rec.get('_id')] = rec
         record_list = list(unique_records.values())
-        print(f"[sync_records] Total registros a procesar (deduplicados): {len(record_list)}")
+        print(f"[sync_records] Total registros a procesar (duplicados): {len(record_list)}")
         if not record_list:
             print("[sync_records] No hay registros pendientes de sync")
             return
