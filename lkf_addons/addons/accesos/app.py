@@ -5901,6 +5901,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "acompanantes" or \
                key == "acompanantes_grupo" or \
                key == "url_padre" or \
+               key == "link_padre" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
