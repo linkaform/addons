@@ -36,7 +36,7 @@ Si tienes más de una aplicación, puedes:
 import pytz, logging, tempfile, os, uuid, simplejson, requests, jwt, arrow, threading, random, time, unicodedata
 import sys, json, base64, urllib.parse
 import time as time_module
-
+import re
 from math import ceil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
@@ -4235,6 +4235,36 @@ class Accesos(OcrMixin, AccesosModel):
             f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['url_padre']= self.unlist(x.get('url_padre',''))
+            x['url_padre'] = self.unlist(x.get('url_padre',''))
+
+            # Si es un pase hijo, ir a buscar el link del pase padre
+            if x.get('url_padre'):
+                padre_id_match = re.search(r'/records/detail/([a-fA-F0-9]{24})', x['url_padre'])
+                if padre_id_match:
+                    padre_id = padre_id_match.group(1)
+                    try:
+                        padre_query = [
+                            {'$match': {
+                                "_id": ObjectId(padre_id),
+                                "form_id": self.PASE_ENTRADA,
+                                "deleted_at": {"$exists": False},
+                            }},
+                            {'$project': {
+                                '_id': 1,
+                                'link': f"$answers.{self.pase_entrada_fields['link']}",
+                            }},
+                        ]
+                        padre_res = list(self.cr.aggregate(padre_query))
+                        if padre_res:
+                            x['link_padre'] = padre_res[0].get('link', '')
+                        else:
+                            x['link_padre'] = ''
+                    except Exception as e:
+                        print(f"Error obteniendo link del pase padre {padre_id}: {e}")
+                        x['link_padre'] = ''
+                else:
+                    x['link_padre'] = ''
+
             x['email'] =self.unlist(x.get('email',''))
             x['telefono'] = self.unlist(x.get('telefono',''))
             x['curp'] = self.unlist(x.get('curp',''))
@@ -5453,11 +5483,12 @@ class Accesos(OcrMixin, AccesosModel):
         if not all_qr_codes:
             return
 
-        extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion']
+        extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion', 'link']
         field_aliases = {
             'status_pase': 'estatus',
             'walkin_fotografia': 'foto',
             'walkin_identificacion': 'identificacion',
+            'link': 'link',
         }
         projection = {f"answers.{self.pase_entrada_fields[f]}": 1 for f in extra_fields}
         pases_info = {
