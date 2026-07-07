@@ -533,7 +533,7 @@ class Accesos(OcrMixin, AccesosModel):
                 id_vista = self.valid_url(id_vista['file_url'])
         id_vista = True
         today = self.get_today_format()
-        documentos_ok = foto_ok or id_vista
+        
         if isinstance(today, datetime):
             today = today.strftime('%Y-%m-%d')
         elif today and isinstance(today, str) and len(today) > 10:
@@ -585,10 +585,9 @@ class Accesos(OcrMixin, AccesosModel):
 
             if answers.get(self.pase_entrada_fields['catalago_autorizado_por'],{}).get(self.pase_entrada_fields['autorizado_por']):
                 autorizado_ok = True
-
-        if documentos_ok and fecha_ok and vista_a_ok and autorizado_ok:
+        if foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
             status = 'activo'
-        elif documentos_ok and fecha_ok and vista_a_ok and not autorizado_ok:
+        elif foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
             status = 'por_autorizar'
         elif not fecha_ok:
             status = 'vencido'
