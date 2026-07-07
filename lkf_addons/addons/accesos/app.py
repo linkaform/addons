@@ -5673,7 +5673,8 @@ class Accesos(OcrMixin, AccesosModel):
                     'autorizado_por':f"$answers.{self.pase_entrada_fields['autorizado_por']}",
                     'acompanantes_grupo':f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",
                     'acompanantes':f"$answers.{self.pase_entrada_fields['acompanantes']}",
-                    'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}"
+                    'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}",
+                    'url_padre':f"$answers.{self.pase_entrada_fields['url_padre']}"
                 }
             },
             {'$sort':{'_id':-1}},
@@ -5741,7 +5742,7 @@ class Accesos(OcrMixin, AccesosModel):
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['habilitar_vehiculo'] = x.get('habilitar_vehiculo', "")
-
+            x['url_padre']=x.get('url_padre','')
             x['grupo_vehiculos'] = self.format_vehiculos_simple(x.pop('grupo_vehiculos',[]))
             x['grupo_equipos'] = self.format_equipos_simple(x.pop('grupo_equipos',[]))
             x['comentarios'] = x['grupo_instrucciones_pase']
