@@ -1446,42 +1446,76 @@ class Accesos(OcrMixin, AccesosModel):
         return response
 
     def catalogos_pase_location(self):
-        user_id= self.user.get("user_id")
-        res = {}
+        user_id = self.user.get("user_id")
         match_query = {
-            "deleted_at":{"$exists":False},
+            "deleted_at": {"$exists": False},
             "form_id": self.CONF_AREA_EMPLEADOS,
         }
         if user_id:
             match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}"] = user_id
 
         query = [
-            {'$match': match_query },
+            {'$match': match_query},
             {'$unwind': f"$answers.{self.mf['areas_grupo']}"},
             {'$project': {
-                'area':f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
-                'set_as':f"$answers.{self.mf['areas_grupo']}.{self.Employee.f['area_default']}",
+                '_id': 0,
+                'area': f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
+                'nombre_area': f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
+                'set_as': f"$answers.{self.mf['areas_grupo']}.{self.Employee.f['area_default']}",
             }},
-            {'$group': {
-                '_id': {
-                    'set_as': '$set_as',
-                    'area': '$area',
-                },
-            }},
-            {'$project': {
-                '_id':0,
-                'area':'$_id.area',
-                'set_as':'$_id.set_as',
-            }}
         ]
+
         response = self.cr.aggregate(query)
-        res = {'ubicaciones_user':[],'ubicaciones_default':[]}
+
+        res = {
+            'ubicaciones_user': [],
+            'ubicaciones_default': [],
+            'ubicaciones_detalle': [],
+        }
+
+        detalle_por_ubicacion = {}
+
         for x in response:
-            if x.get('area') not in res['ubicaciones_user']:
-                res['ubicaciones_user'].append(x.get('area'))
-            if x.get('set_as')  == 'default':
-                if x.get('area') not in res['ubicaciones_default']:
-                    res['ubicaciones_default'].append(x.get('area'))
+            area = x.get('area')
+            set_as = x.get('set_as')
+            nombre_area = x.get('nombre_area')
+            es_default_area = set_as == 'default'
+
+            # --- ubicaciones_user (sin duplicados) ---
+            if area not in res['ubicaciones_user']:
+                res['ubicaciones_user'].append(area)
+
+            # --- ubicaciones_default ---
+            if es_default_area and area not in res['ubicaciones_default']:
+                res['ubicaciones_default'].append(area)
+
+            # --- detalle por ubicación ---
+            if area not in detalle_por_ubicacion:
+                detalle_por_ubicacion[area] = {
+                    'ubicacion': area,
+                    'es_default': False,
+                    'areas': [],
+                }
+
+            ya_existe = any(
+                a['nombre_area'] == nombre_area and a['es_default'] == es_default_area
+                for a in detalle_por_ubicacion[area]['areas']
+            )
+            if not ya_existe:
+                detalle_por_ubicacion[area]['areas'].append({
+                    'nombre_area': nombre_area,
+                    'es_default': es_default_area,
+                })
+
+            if es_default_area:
+                detalle_por_ubicacion[area]['es_default'] = True
+
+        res['ubicaciones_detalle'] = list(detalle_por_ubicacion.values())
+        print(simplejson.dumps(res, indent=4))
+
+        doc = self.cr.find_one(match_query)
+        print(json.dumps(doc["answers"][self.mf['areas_grupo']], indent=2, default=str))
+
         return res
 
     def catalagos_pase_no_jwt(self, qr_code):
