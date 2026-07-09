@@ -4701,10 +4701,12 @@ class Accesos(OcrMixin, AccesosModel):
                 'created_at':'$created_at',
                 "folio": "$folio",
                 "created_at":"$created_at",
+                "created_by":"$user_name",
                 "answers":"$answers",
             }},
             {'$sort':{'created_at':-1}},
         ]
+        
         result = self.format_cr_result(self.cr.aggregate(query), ids_label_dct=self.cons_f)
         for item in result:
             item = self.procesar_devoluciones_item(item)
