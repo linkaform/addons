@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.configuracion_modulo_seguridad.id }}</form_id>
+    <id>6a4c693d38f0d567c0e17118</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>nin=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6a4c65bd847c02cf0be63f05</field_id>
+                        <group_id>676975321df93a68a609f9ce</group_id>
+                        <id>6a4c65bd847c02cf0be63f05</id>
+                        <label>Opción de Condiciones de Servicio</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>descripción</value>
+                </item>
+                <item>
+                    <condition>nin=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6a4c65bd847c02cf0be63f05</field_id>
+                        <group_id>676975321df93a68a609f9ce</group_id>
+                        <id>6a4c65bd847c02cf0be63f05</id>
+                        <label>Opción de Condiciones de Servicio</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>vídeo</value>
+                </item>
+                <item>
+                    <condition>nin=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6a4c65bd847c02cf0be63f05</field_id>
+                        <group_id>676975321df93a68a609f9ce</group_id>
+                        <id>6a4c65bd847c02cf0be63f05</id>
+                        <label>Opción de Condiciones de Servicio</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>documento</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6a4c673722f825e7b3e46468</field_id>
+                    <group_id>None</group_id>
+                    <id>6a4c673722f825e7b3e46468</id>
+                    <label>Condiciones de Servicio</label>
+                    <type>textarea</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6a4c673722f825e7b3e46469</field_id>
+                    <group_id>676975321df93a68a609f9ce</group_id>
+                    <id>6a4c673722f825e7b3e46469</id>
+                    <label>Documento de Condiciones de Servicio</label>
+                    <type>files</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6a4c673722f825e7b3e4646a</field_id>
+                    <group_id>676975321df93a68a609f9ce</group_id>
+                    <id>6a4c673722f825e7b3e4646a</id>
+                    <label>Url de Video de Condiciones de Servicio</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>COndiciones de Servicio</name>
+            <operator>or</operator>
+            <rule_id>10171cfd1c9910e9</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6a4c65bd847c02cf0be63f05</field_id>
+                        <group_id>676975321df93a68a609f9ce</group_id>
+                        <id>6a4c65bd847c02cf0be63f05</id>
+                        <label>Opción de Condiciones de Servicio</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>descripción</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6a4c673722f825e7b3e46468</field_id>
+                    <group_id>None</group_id>
+                    <id>6a4c673722f825e7b3e46468</id>
+                    <label>Condiciones de Servicio</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>COndiciones de Servicio</name>
+            <operator>or</operator>
+            <rule_id>9602177205612bc</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6a4c65bd847c02cf0be63f05</field_id>
+                        <group_id>676975321df93a68a609f9ce</group_id>
+                        <id>6a4c65bd847c02cf0be63f05</id>
+                        <label>Opción de Condiciones de Servicio</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>documento</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6a4c673722f825e7b3e46469</field_id>
+                    <group_id>676975321df93a68a609f9ce</group_id>
+                    <id>6a4c673722f825e7b3e46469</id>
+                    <label>Documento de Condiciones de Servicio</label>
+                    <type>files</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>COndiciones de Servicio</name>
+            <operator>or</operator>
+            <rule_id>19cd1cbc22fb2345</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6a4c65bd847c02cf0be63f05</field_id>
+                        <group_id>676975321df93a68a609f9ce</group_id>
+                        <id>6a4c65bd847c02cf0be63f05</id>
+                        <label>Opción de Condiciones de Servicio</label>
+                        <type>checkbox</type>
+                    </field>
+                    <value>vídeo</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6a4c673722f825e7b3e4646a</field_id>
+                    <group_id>676975321df93a68a609f9ce</group_id>
+                    <id>6a4c673722f825e7b3e4646a</id>
+                    <label>Url de Video de Condiciones de Servicio</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>COndiciones de Servicio</name>
+            <operator>or</operator>
+            <rule_id>26e8e0d269e2209</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
