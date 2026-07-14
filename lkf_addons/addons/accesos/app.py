@@ -3970,6 +3970,7 @@ class Accesos(OcrMixin, AccesosModel):
             ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
         requerimientos = set()
         envios = set()
+        condiciones_servicio = {}
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": self.CONF_MODULO_SEGURIDAD,
@@ -3982,11 +3983,15 @@ class Accesos(OcrMixin, AccesosModel):
                 "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
             }},
         ]
-
         raw_result = self.format_cr(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
-                print("GRUPO", grupo)
+                #---Condiciones de servicio
+                condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio','')
+                condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio','')
+                condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio','')
+                condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio','')
+
                 #TODO Verficiar el cambio de key
                 ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
                 if ubicacion in ubicaciones:
@@ -4009,7 +4014,8 @@ class Accesos(OcrMixin, AccesosModel):
             "ubicaciones": ubicaciones,
             "requerimientos": list(requerimientos),
             "envios": list(envios),
-            "tipos": tipos
+            "tipos": tipos,
+            "condiciones_servicio":condiciones_servicio,
         }
 
     def get_config_accesos(self):

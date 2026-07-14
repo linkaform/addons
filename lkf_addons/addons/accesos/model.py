@@ -944,6 +944,11 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tipo_de_proveedor': '6a18e4086423e82150aa527c',
             'tolerancia_de_entrada_previa':"6a2835444172819eb764943b",
             'tolerancia_de_entrada_posterior':"6a22155492b193f057990682",
+
+            'opcion_condiciones_servicio':"6a4c65bd847c02cf0be63f05",
+            'desc_condiciones_servicio':"6a4c673722f825e7b3e46468",
+            'doc_condiciones_servicio':"6a4c673722f825e7b3e46469",
+            'url_condiciones_servicio':"6a4c673722f825e7b3e4646a",
         })
 
         self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']
