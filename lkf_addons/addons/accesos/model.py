@@ -664,6 +664,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
             'acompanantes':'6a22f7b7826f8544c6183362',
             'acompanantes_grupo':'6a22fc57c026befc685f4fe3',
+            'grupo_acompanantes':'6a22fc57c026befc685f4fe3',
             'apple_wallet_pass': '682785fbedd82a9104287e25',
             'archivo_invitacion': '673773741b2adb2d05d99d63',
             'area':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
