@@ -93,6 +93,10 @@ class Vehiculo(Base):
         self.ACTIVOS_FIJOS_CAT_ID = self.ACTIVOS_FIJOS_CAT.get('id')
         self.ACTIVOS_FIJOS_CAT_OBJ_ID = self.ACTIVOS_FIJOS_CAT.get('obj_id')
 
+        self.CATEGORIAS_DE_OBJETOS = self.lkm.catalog_id('categorias_de_objetos')
+        self.CATEGORIAS_DE_OBJETOS_ID = self.CATEGORIAS_DE_OBJETOS.get('id')
+        self.CATEGORIAS_DE_OBJETOS_OBJ_ID = self.CATEGORIAS_DE_OBJETOS.get('obj_id')
+
         self.TIPO_DE_EQUIPO = self.lkm.catalog_id('tipo_de_equipos')
         self.TIPO_DE_EQUIPO_ID = self.TIPO_DE_EQUIPO.get('id')
         self.TIPO_DE_EQUIPO_OBJ_ID = self.TIPO_DE_EQUIPO.get('obj_id')

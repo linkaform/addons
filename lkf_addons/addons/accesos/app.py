@@ -2772,7 +2772,8 @@ class Accesos(OcrMixin, AccesosModel):
                 },
             })
             metadata.update({'answers': pass_answers})
-            return self.lkf_api.post_forms_answers(metadata)
+            child_res = self.lkf_api.post_forms_answers(metadata)
+            return child_res
 
         url_by_email = {}
         # create_single_pass(acompanantes_grupo[0], parent_id)
@@ -2781,14 +2782,14 @@ class Accesos(OcrMixin, AccesosModel):
                 executor.submit(create_single_pass, acompanante, parent_id): acompanante
                 for acompanante in acompanantes_grupo
             }
-            for future in as_completed(futures):
+            for idx, future in enumerate(as_completed(futures)):
                 acompanante = futures[future]
                 try:
                     result = future.result()
                     child_id = result.get('json', {}).get('id')
                     if child_id:
                         child_url = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{child_id}"
-                        url_by_email[acompanante.get('email', '')] = child_url
+                        url_by_email[idx] = child_url
                 except Exception as e:
                     print(f"Error creating pass for {acompanante.get('nombre')}: {e}")
 
@@ -2797,9 +2798,9 @@ class Accesos(OcrMixin, AccesosModel):
                 self.pase_entrada_fields['nombre_acompanante']: acompanante.get('nombre', ''),
                 self.pase_entrada_fields['email_acompanante']: acompanante.get('email', ''),
                 self.pase_entrada_fields['telefono_acompanante']: acompanante.get('telefono', ''),
-                self.pase_entrada_fields['url_hijo']: url_by_email.get(acompanante.get('email', ''), ''),
+                self.pase_entrada_fields['url_hijo']: url_by_email.get(idx, ''),
             }
-            for acompanante in acompanantes_grupo
+            for idx, acompanante in enumerate(acompanantes_grupo)
         ]
 
         if child_group:
