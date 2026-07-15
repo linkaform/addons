@@ -2772,7 +2772,8 @@ class Accesos(OcrMixin, AccesosModel):
                 },
             })
             metadata.update({'answers': pass_answers})
-            return self.lkf_api.post_forms_answers(metadata)
+            child_res = self.lkf_api.post_forms_answers(metadata)
+            return child_res
 
         url_by_email = {}
         # create_single_pass(acompanantes_grupo[0], parent_id)
@@ -2781,14 +2782,14 @@ class Accesos(OcrMixin, AccesosModel):
                 executor.submit(create_single_pass, acompanante, parent_id): acompanante
                 for acompanante in acompanantes_grupo
             }
-            for future in as_completed(futures):
+            for idx, future in enumerate(as_completed(futures)):
                 acompanante = futures[future]
                 try:
                     result = future.result()
                     child_id = result.get('json', {}).get('id')
                     if child_id:
                         child_url = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{child_id}"
-                        url_by_email[acompanante.get('email', '')] = child_url
+                        url_by_email[idx] = child_url
                 except Exception as e:
                     print(f"Error creating pass for {acompanante.get('nombre')}: {e}")
 
@@ -2797,9 +2798,9 @@ class Accesos(OcrMixin, AccesosModel):
                 self.pase_entrada_fields['nombre_acompanante']: acompanante.get('nombre', ''),
                 self.pase_entrada_fields['email_acompanante']: acompanante.get('email', ''),
                 self.pase_entrada_fields['telefono_acompanante']: acompanante.get('telefono', ''),
-                self.pase_entrada_fields['url_hijo']: url_by_email.get(acompanante.get('email', ''), ''),
+                self.pase_entrada_fields['url_hijo']: url_by_email.get(idx, ''),
             }
-            for acompanante in acompanantes_grupo
+            for idx, acompanante in enumerate(acompanantes_grupo)
         ]
 
         if child_group:
@@ -7920,8 +7921,55 @@ class Accesos(OcrMixin, AccesosModel):
         qr_code= folio
         _folio= pass_selected.get("folio")
         answers={}
+        acompanantes_a_actualizar = []
         for key, value in access_pass.items():
             if not self.pase_entrada_fields.get(key):
+                continue
+            if key == 'grupo_acompanantes':
+                # El API solo permite mezclar respuestas de un grupo existente usando
+                # la posición (0-based) que ya ocupa ese elemento en el arreglo guardado.
+                # Los índices negativos siempre se interpretan como "agregar nuevo".
+                stored_acompanantes = pass_selected.get('acompanantes_grupo') or []
+                posicion_por_qr = {
+                    a.get('qr_code'): idx
+                    for idx, a in enumerate(stored_acompanantes)
+                    if a.get('qr_code')
+                }
+                acompanantes_previos = {
+                    a.get('qr_code'): a
+                    for a in stored_acompanantes
+                    if a.get('qr_code')
+                }
+                grupo_answers = {}
+                for acompanante in value:
+                    qr_code_acomp = acompanante.get('qr_code', '')
+                    posicion = posicion_por_qr.get(qr_code_acomp)
+                    if posicion is None:
+                        continue
+                    nombre = acompanante.get('nombre', '')
+                    email = acompanante.get('email', '')
+                    telefono = acompanante.get('telefono', '')
+                    foto = acompanante.get('foto', [])
+                    previo = acompanantes_previos.get(qr_code_acomp, {})
+                    cambios = {}
+                    if nombre != previo.get('nombre_acompanante', ''):
+                        cambios[self.pase_entrada_fields['nombre_acompanante']] = nombre
+                    if email != previo.get('email_acompanante', ''):
+                        cambios[self.pase_entrada_fields['email_acompanante']] = email
+                    if telefono != previo.get('telefono_acompanante', ''):
+                        cambios[self.pase_entrada_fields['telefono_acompanante']] = telefono
+                    if cambios:
+                        grupo_answers[posicion] = cambios
+                    if cambios or (foto or None) != (previo.get('foto') or None):
+                        acompanantes_a_actualizar.append({
+                            'qr_code': qr_code_acomp,
+                            'nombre': nombre,
+                            'email': email,
+                            'telefono': telefono,
+                            'foto': foto,
+                        })
+                if grupo_answers:
+                    answers[self.pase_entrada_fields['acompanantes_grupo']] = grupo_answers
                 continue
             if key == 'grupo_vehiculos':
                 answers[self.mf['grupo_vehiculos']]={}
@@ -8016,6 +8064,8 @@ class Accesos(OcrMixin, AccesosModel):
 
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
+                if acompanantes_a_actualizar:
+                    self._patch_acompanantes_pases(acompanantes_a_actualizar)
                 pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
@@ -8035,6 +8085,19 @@ class Accesos(OcrMixin, AccesosModel):
                 return res
         else:
             self.LKFException('No se mandarón parametros para actualizar')
+
+    def _patch_acompanantes_pases(self, acompanantes_a_actualizar):
+        for item in acompanantes_a_actualizar:
+            child_answers = {
+                self.mf['nombre_pase']: item['nombre'],
+                self.pase_entrada_fields['email']: item['email'],
+                self.mf['telefono_pase']: item['telefono'],
+                self.pase_entrada_fields['walkin_fotografia']: item['foto'],
+            }
+            try:
+                self.lkf_api.patch_multi_record(answers=child_answers, form_id=self.PASE_ENTRADA, record_id=[item['qr_code']])
+            except Exception as e:
+                print(f"Error actualizando pase de acompañante {item.get('qr_code')}: {e}")
 
     def update_pass_img(self, qr_code=None):
         self.pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))

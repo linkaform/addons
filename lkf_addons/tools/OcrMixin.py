@@ -237,12 +237,9 @@ class OcrMixin:
                     datos = raw_text['choices'][0]['message']['content']
 
         datos = self._ocr_normalizar(datos)
-
         # 2.5 Verificar si la persona de la identificación es empleado (opcional)
         if is_employee:
-            print('verificando elpmaldo')
             datos = self._ocr_verificar_empleado(datos)
-            print('datos=', datos)
 
         # 3. Validar
         errores = self._ocr_validar_id(datos)
