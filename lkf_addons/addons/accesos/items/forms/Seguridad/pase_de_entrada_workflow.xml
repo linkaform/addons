@@ -183,7 +183,7 @@
       &lt;h2 style="margin:0; font-size:22px; color:#021d49;"&gt;Hola {{record.answers.662c2937108836dec6d92580}},&lt;/h2&gt;
       {% for item in record.answers.663d4ba61b14fab90559ebb0 %}
         &lt;p style="margin:20px 0; font-size:16px; line-height:1.5; color:#555;"&gt;
-          {{item.69de77904da44bca8cf40fcf.62c5ff407febce07043024dd}} te ha invitado a visitarlo(a).
+          {{item.66a83ab5ca3453e21ea08d19.62c5ff407febce07043024dd}} te ha invitado a visitarlo(a).
 
           Se ha creado un pre-registro y está pendiente de asignación.  
           Por favor, completa tu pase dando clic en el botón:
@@ -193,76 +193,9 @@
 
     &lt;!-- Detalles de la visita --&gt;
     &lt;div style="padding:20px 25px; background:#f9fbfd; border-top:1px solid #e6e9ef;"&gt;
-      &lt;h2 style="margin-top:0; font-size:18px; color:#021d49;"&gt;Detalles de tu visita&lt;/h2&gt;
-    
-      &lt;!-- Fechas --&gt;
       &lt;ul style="list-style:none; padding:0; margin:15px 0; color:#444; font-size:15px;"&gt;
-        {% if record.answers.662c304fad7432d296d92581 == "Rango de fechas" %}
-          &lt;li&gt;&lt;strong&gt;Desde: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/li&gt;
-          &lt;li&gt;&lt;strong&gt;Hasta: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92583}}&lt;/li&gt;
-        {% else %}
-          &lt;li&gt;&lt;strong&gt;Fecha y hora: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92582}}&lt;/li&gt;
-        {% endif %}
-
-        &lt;li&gt;&lt;strong&gt;Límite de accesos: &lt;/strong&gt;{{record.answers.6635380dc9b3e7db4d59eb49}}&lt;/li&gt;
-        
-        {% if record.answers.662c304fad7432d296d92584 == "Limitar días de acceso" %}
-          &lt;li&gt;&lt;strong&gt;Días de acceso:&lt;/strong&gt; 
-            {% for dia in record.answers.662c304fad7432d296d92585 %}
-              {{ dia }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-          &lt;/li&gt;          
-          &lt;!-- &lt;li&gt;&lt;strong&gt;Días de acceso: &lt;/strong&gt;{{record.answers.662c304fad7432d296d92585}}&lt;/li&gt; --&gt;
-        {% endif %}
         &lt;li&gt;&lt;strong&gt;Tema de la cita: &lt;/strong&gt;{{record.answers.67329875978e6460083c5648}}&lt;/li&gt;
       &lt;/ul&gt;
-
-      &lt;!-- Ubicaciones --&gt;
-      {% if record.answers.6834e34fa6242006acedda0f|length == 1 %}
-      &lt;!-- SOLO UNA UBICACIÓN --&gt;
-      {% for item in record.answers.6834e34fa6242006acedda0f %}
-        &lt;div style="background:#fff; border:1px solid #e0e4eb; border-radius:8px; padding:12px 15px; margin-bottom:12px; text-align:left;"&gt;
-          &lt;p style="margin:0; font-size:15px; color:#021d49;"&gt;
-            &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663e5c57f5b8a7ce8211ed0b}}
-          &lt;/p&gt;
-          &lt;p style="margin:4px 0 0; font-size:14px; color:#555;"&gt;
-            &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663a7e0fe48382c5b1230902}}
-          &lt;/p&gt;
-          &lt;p style="margin:4px 0 0; font-size:14px; color:#016189;"&gt;
-            &lt;a href="https://www.google.com/maps?q={{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
-              target="_blank" 
-              style="color:#016189; text-decoration:none;"&gt;
-              📍 Ver en Google Maps
-            &lt;/a&gt;
-            &lt;!-- &lt;p&gt;{{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c}}&lt;/p&gt; --&gt;
-            &lt;/a&gt;
-          &lt;/p&gt;
-        &lt;/div&gt;
-      {% endfor %}
-      {% elif record.answers.6834e34fa6242006acedda0f|length &gt; 1 %}
-      &lt;!-- VARIAS UBICACIONES --&gt;
-      &lt;div style="margin-top:20px;"&gt;
-        &lt;h3 style="font-size:16px; color:#021d49; margin-bottom:10px;"&gt;Ubicaciones asignadas&lt;/h3&gt;
-      
-        {% for item in record.answers.6834e34fa6242006acedda0f %}
-          &lt;div style="background:#fff; border:1px solid #e0e4eb; border-radius:8px; padding:12px 15px; margin-bottom:12px; text-align:left;"&gt;
-            &lt;p style="margin:0; font-size:15px; color:#021d49;"&gt;
-              &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663e5c57f5b8a7ce8211ed0b}}
-            &lt;/p&gt;
-            &lt;p style="margin:4px 0 0; font-size:14px; color:#555;"&gt;
-              &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663a7e0fe48382c5b1230902}}
-            &lt;/p&gt;
-            &lt;p style="margin:4px 0 0; font-size:14px; color:#016189;"&gt;
-              &lt;a href="https://www.google.com/maps?q={{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
-                target="_blank" 
-                style="color:#016189; text-decoration:none;"&gt;
-                📍 Ver en Google Maps
-              &lt;/a&gt;
-            &lt;/p&gt;
-          &lt;/div&gt;
-        {% endfor %}
-      &lt;/div&gt;
-      {% endif %}
 
       &lt;!-- Botón --&gt;
       &lt;div style="margin-top:20px; text-align:center;"&gt;
@@ -472,18 +405,18 @@
       {% for item in record.answers.6834e34fa6242006acedda0f %}
         &lt;div style="background:#fff; border:1px solid #e0e4eb; border-radius:8px; padding:12px 15px; margin-bottom:12px; text-align:left;"&gt;
           &lt;p style="margin:0; font-size:15px; color:#021d49;"&gt;
-            &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663e5c57f5b8a7ce8211ed0b}}
+            &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}
           &lt;/p&gt;
           &lt;p style="margin:4px 0 0; font-size:14px; color:#555;"&gt;
-            &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663a7e0fe48382c5b1230902}}
+            &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}
           &lt;/p&gt;
           &lt;p style="margin:4px 0 0; font-size:14px; color:#016189;"&gt;
-            &lt;a href="https://www.google.com/maps?q={{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
+            &lt;a href="https://www.google.com/maps?q={{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
               target="_blank" 
               style="color:#016189; text-decoration:none;"&gt;
               📍 Ver en Google Maps
             &lt;/a&gt;
-            &lt;!-- &lt;p&gt;{{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c}}&lt;/p&gt; --&gt;
+            &lt;!-- &lt;p&gt;{{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c}}&lt;/p&gt; --&gt;
             &lt;/a&gt;
           &lt;/p&gt;
         &lt;/div&gt;
@@ -496,13 +429,13 @@
         {% for item in record.answers.6834e34fa6242006acedda0f %}
           &lt;div style="background:#fff; border:1px solid #e0e4eb; border-radius:8px; padding:12px 15px; margin-bottom:12px; text-align:left;"&gt;
             &lt;p style="margin:0; font-size:15px; color:#021d49;"&gt;
-              &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663e5c57f5b8a7ce8211ed0b}}
+              &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}
             &lt;/p&gt;
             &lt;p style="margin:4px 0 0; font-size:14px; color:#555;"&gt;
-              &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663a7e0fe48382c5b1230902}}
+              &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}
             &lt;/p&gt;
             &lt;p style="margin:4px 0 0; font-size:14px; color:#016189;"&gt;
-              &lt;a href="https://www.google.com/maps?q={{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
+              &lt;a href="https://www.google.com/maps?q={{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
                 target="_blank" 
                 style="color:#016189; text-decoration:none;"&gt;
                 📍 Ver en Google Maps
@@ -538,20 +471,17 @@
                                 <group_id>663d4ba61b14fab90559ebb0</group_id>
                                 <label>email</label>
                             </item>
+                            <item>
+                                <catalog_field_id>66a83ab5ca3453e21ea08d19</catalog_field_id>
+                                <field_id>638a9a7767c332f5d459fc82</field_id>
+                                <group_id>663d4ba61b14fab90559ebb0</group_id>
+                                <label>Email</label>
+                            </item>
                         </email_fields>
                         <emails>[]</emails>
                         <embed_company_picture>True</embed_company_picture>
                         <fields_attached>[]</fields_attached>
-                        <pdf_template>
-                            <_type>single_record</_type>
-                            <description>Plantilla para Gafete a Una Cara</description>
-                            <id>491</id>
-                            <name>Soter - Gafete a Una Cara</name>
-                            <owner>/api/infosync/user/10/</owner>
-                            <paginate>True</paginate>
-                            <properties>{}</properties>
-                            <resource_uri>/api/infosync/templates/491/</resource_uri>
-                        </pdf_template>
+                        <pdf_template>{}</pdf_template>
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>True</send_pdf>
@@ -635,6 +565,20 @@
                                 <type>checkbox</type>
                             </trigger_field>
                             <value>enviar_correo</value>
+                        </item>
+                        <item>
+                            <condition>not__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>673773741b2adb2d05d99d63</field_id>
+                                <group>{}</group>
+                                <label>Archivo de invitacion</label>
+                                <type>files</type>
+                            </trigger_field>
+                            <value>null</value>
                         </item>
                     </triggers>
                 </wf_fields>
