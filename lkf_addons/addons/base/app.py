@@ -105,12 +105,13 @@ class Base(BaseModel):
             # La DB no existe, crearla
             try:
                 user_id = db_name.split('_')[-1]
-                response = self.lkf_api.create_user_couch_db(user_id, db_name)
+                db_type , user_id = db_name.split('_')
+                response = self.lkf_api.create_user_couch_db(user_id, db_type)
                 db = self.lkf_api.couch.set_db(db_name)
             except Exception as e:
-                self.LKFException(f'Error al crear la base de datos {db_name}: {str(e)}')
+                self.LKFException(f'Error al crear la base de datos {db_name}: Exception: {str(e)}')
         except Exception as e:
-            self.LKFException(f'Error inesperado al acceder a la base de datos {db_name}: {str(e)}')
+            self.LKFException(f'Error inesperado al acceder a la base de datos {db_name}: Exception: {str(e)}')
 
         return db
 
