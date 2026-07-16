@@ -662,6 +662,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.pase_entrada_fields = {
             'acepto_aviso_datos_personales': '6827488724317731cb288117',
             'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
+            'condiciones_de_servicio': '6a5537ebc59717059285ad5d',
+            'documento_de_condiciones_de_servicio': '6a5537ebc59717059285ad5e',
+            'url_de_condiciones_de_servicio': '6a5537ebc59717059285ad5f',
             'acompanantes':'6a22f7b7826f8544c6183362',
             'acompanantes_grupo':'6a22fc57c026befc685f4fe3',
             'grupo_acompanantes':'6a22fc57c026befc685f4fe3',

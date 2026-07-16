@@ -2695,6 +2695,28 @@ class Accesos(OcrMixin, AccesosModel):
                     )
                 answers.update({self.pase_entrada_fields['grupo_areas_acceso']:areas_list})
 
+
+        #--Condiciones de Servicio
+        if access_pass.get('conservar_datos_por'):
+            answers[self.mf['conservar_datos_por']] = access_pass.get('conservar_datos_por','');
+
+        if access_pass.get('acepto_aviso_privacidad'):
+            if access_pass.get('acepto_aviso_privacidad') == 'true':
+                answers[self.mf['acepto_aviso_privacidad']] = 'sí'
+
+        if access_pass.get('acepto_reglas_ingreso'):
+            if access_pass.get('acepto_reglas_ingreso') == 'true':
+                answers[self.pase_entrada_fields['acepto_aviso_datos_personales']] = 'sí'
+
+
+        if access_pass.get('condiciones_descripcion_mostrado'):
+            answers[self.pase_entrada_fields['condiciones_de_servicio']] = access_pass.get('condiciones_descripcion_mostrado'):
+        if access_pass.get('condiciones_documento_mostrado'):
+            answers[self.pase_entrada_fields['documento_de_condiciones_de_servicio']] = access_pass.get('url_documento_reglas_ingreso')
+        if access_pass.get('condiciones_video_mostrado'):
+            answers[self.pase_entrada_fields['url_de_condiciones_de_servicio']] = access_pass.get('url_video_condiciones'):
+
+
         # Perfil de Pase
         answers[self.CONFIG_PERFILES_OBJ_ID] = {
             self.mf['nombre_perfil'] : perfil_pase
