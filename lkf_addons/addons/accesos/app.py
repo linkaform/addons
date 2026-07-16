@@ -2710,9 +2710,14 @@ class Accesos(OcrMixin, AccesosModel):
 
 
         if access_pass.get('condiciones_descripcion_mostrado'):
-            answers[self.pase_entrada_fields['condiciones_de_servicio']] = access_pass.get('condiciones_descripcion_mostrado')
+            answers[self.pase_entrada_fields['condiciones_de_servicio']] = access_pass.get('descripcion_condiciones_servicio','')
+        
         if access_pass.get('condiciones_documento_mostrado'):
+            print('---------------')
+            print('Documento',access_pass.get('url_documento_reglas_ingreso'))
+            print('---------------')
             answers[self.pase_entrada_fields['documento_de_condiciones_de_servicio']] = access_pass.get('url_documento_reglas_ingreso')
+        
         if access_pass.get('condiciones_video_mostrado'):
             answers[self.pase_entrada_fields['url_de_condiciones_de_servicio']] = access_pass.get('url_video_condiciones')
 
