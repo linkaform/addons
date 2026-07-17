@@ -206,6 +206,38 @@
       &lt;/div&gt;
     &lt;/div&gt;
 
+    &lt;!-- Condiciones de servicio: video y documento --&gt;
+    {% if record.answers.6a5537ebc59717059285ad5f or record.answers.6a5537ebc59717059285ad5e.file_url %}
+      &lt;div style="padding:20px 25px; background:#ffffff; border-top:1px solid #e6e9ef;"&gt;
+        &lt;p style="margin:0 0 12px 0; font-size:15px; font-weight:bold; color:#021d49;"&gt;Adjuntamos las condiciones de Servicio&lt;/p&gt;
+        &lt;table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"&gt;
+          
+          {% if record.answers.6a5537ebc59717059285ad5f %}
+            &lt;tr&gt;
+              &lt;td style="padding:6px 0;"&gt;
+                &lt;a href="{{record.answers.6a5537ebc59717059285ad5f}}" target="_blank" style="color:#0d6efd; text-decoration:underline; font-size:15px;"&gt;
+                  ▶ Ver video de condiciones de servicio
+                &lt;/a&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          {% endif %}
+
+          {% if record.answers.6a5537ebc59717059285ad5f %}
+            &lt;tr&gt;
+              &lt;td style="padding:6px 0;"&gt;
+                &lt;a href="{{record.answers.6a5537ebc59717059285ad5e.file_url}}" target="_blank" style="color:#0d6efd; text-decoration:underline; font-size:15px;"&gt;
+                  📄 Descargar documento de condiciones de servicio
+                &lt;/a&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          {% endif %}
+          
+        &lt;/table&gt;
+      &lt;/div&gt;
+    {% endif %}
+
+
+
     &lt;!-- Footer --&gt;
     &lt;div style="text-align:center; padding:20px; font-size:12px; color:#777; background:#f1f4f8;"&gt;
       &lt;p style="margin:0;"&gt;&amp;copy; 2026 &lt;a href="https://soter-app.webflow.io/" target="_blank" style="color:#021d49; text-decoration:none;"&gt;Clave 10&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
@@ -405,18 +437,18 @@
       {% for item in record.answers.6834e34fa6242006acedda0f %}
         &lt;div style="background:#fff; border:1px solid #e0e4eb; border-radius:8px; padding:12px 15px; margin-bottom:12px; text-align:left;"&gt;
           &lt;p style="margin:0; font-size:15px; color:#021d49;"&gt;
-            &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}
+            &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663e5c57f5b8a7ce8211ed0b}}
           &lt;/p&gt;
           &lt;p style="margin:4px 0 0; font-size:14px; color:#555;"&gt;
-            &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}
+            &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663a7e0fe48382c5b1230902}}
           &lt;/p&gt;
           &lt;p style="margin:4px 0 0; font-size:14px; color:#016189;"&gt;
-            &lt;a href="https://www.google.com/maps?q={{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
+            &lt;a href="https://www.google.com/maps?q={{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
               target="_blank" 
               style="color:#016189; text-decoration:none;"&gt;
               📍 Ver en Google Maps
             &lt;/a&gt;
-            &lt;!-- &lt;p&gt;{{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c}}&lt;/p&gt; --&gt;
+            &lt;!-- &lt;p&gt;{{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c}}&lt;/p&gt; --&gt;
             &lt;/a&gt;
           &lt;/p&gt;
         &lt;/div&gt;
@@ -429,13 +461,13 @@
         {% for item in record.answers.6834e34fa6242006acedda0f %}
           &lt;div style="background:#fff; border:1px solid #e0e4eb; border-radius:8px; padding:12px 15px; margin-bottom:12px; text-align:left;"&gt;
             &lt;p style="margin:0; font-size:15px; color:#021d49;"&gt;
-              &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663e5c57f5b8a7ce8211ed0b}}
+              &lt;strong&gt;Ubicación:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663e5c57f5b8a7ce8211ed0b}}
             &lt;/p&gt;
             &lt;p style="margin:4px 0 0; font-size:14px; color:#555;"&gt;
-              &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.66a83a74de752e12018fbc3c.663a7e0fe48382c5b1230902}}
+              &lt;strong&gt;Dirección:&lt;/strong&gt; {{item.69de774599d9d8a8f5f40fc1.663a7e0fe48382c5b1230902}}
             &lt;/p&gt;
             &lt;p style="margin:4px 0 0; font-size:14px; color:#016189;"&gt;
-              &lt;a href="https://www.google.com/maps?q={{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.66a83a74de752e12018fbc3c.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
+              &lt;a href="https://www.google.com/maps?q={{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.latitude}},{{item.69de774599d9d8a8f5f40fc1.663e5c8cf5b8a7ce8211ed0c.0.longitude}}" 
                 target="_blank" 
                 style="color:#016189; text-decoration:none;"&gt;
                 📍 Ver en Google Maps
@@ -471,17 +503,20 @@
                                 <group_id>663d4ba61b14fab90559ebb0</group_id>
                                 <label>email</label>
                             </item>
-                            <item>
-                                <catalog_field_id>66a83ab5ca3453e21ea08d19</catalog_field_id>
-                                <field_id>638a9a7767c332f5d459fc82</field_id>
-                                <group_id>663d4ba61b14fab90559ebb0</group_id>
-                                <label>Email</label>
-                            </item>
                         </email_fields>
                         <emails>[]</emails>
                         <embed_company_picture>True</embed_company_picture>
                         <fields_attached>[]</fields_attached>
-                        <pdf_template>{}</pdf_template>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Plantilla para Gafete a Una Cara</description>
+                            <id>491</id>
+                            <name>Soter - Gafete a Una Cara</name>
+                            <owner>/api/infosync/user/10/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/491/</resource_uri>
+                        </pdf_template>
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>True</send_pdf>
@@ -565,20 +600,6 @@
                                 <type>checkbox</type>
                             </trigger_field>
                             <value>enviar_correo</value>
-                        </item>
-                        <item>
-                            <condition>not__empty=</condition>
-                            <form_id>None</form_id>
-                            <other_value>None</other_value>
-                            <prefix>answer</prefix>
-                            <trigger_field>
-                                <catalog>{}</catalog>
-                                <field_id>673773741b2adb2d05d99d63</field_id>
-                                <group>{}</group>
-                                <label>Archivo de invitacion</label>
-                                <type>files</type>
-                            </trigger_field>
-                            <value>null</value>
                         </item>
                     </triggers>
                 </wf_fields>
