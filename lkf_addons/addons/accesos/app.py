@@ -2714,9 +2714,9 @@ class Accesos(OcrMixin, AccesosModel):
         
         if access_pass.get('condiciones_documento_mostrado'):
             print('---------------')
-            print('Documento',access_pass.get('url_documento_reglas_ingreso'))
+            print('Documento',access_pass.get('urls_documentos_reglas_ingreso'))
             print('---------------')
-            answers[self.pase_entrada_fields['documento_de_condiciones_de_servicio']] = access_pass.get('url_documento_reglas_ingreso')
+            answers[self.pase_entrada_fields['documento_de_condiciones_de_servicio']] = access_pass.get('urls_documentos_reglas_ingreso')
         
         if access_pass.get('condiciones_video_mostrado'):
             answers[self.pase_entrada_fields['url_de_condiciones_de_servicio']] = access_pass.get('url_video_condiciones')
@@ -3231,6 +3231,8 @@ class Accesos(OcrMixin, AccesosModel):
         res = {}
         if not area:
             default_booth , user_booths = self.get_user_booth(search_default=False)
+            if not default_booth:
+                return False
             location = default_booth.get('location')
             area = default_booth.get('area')
         guards_positions = self.config_get_guards_positions()
@@ -6397,6 +6399,12 @@ class Accesos(OcrMixin, AccesosModel):
         else:
             #! Si el usuario esta fuera de turno, se obtienen los guardias disponibles.
             default_booth , user_booths = self.get_user_booth(search_default=False)
+            if not default_booth and not user_booths:
+                context = {
+                    "information": "Este usuario no esta configurado con Turnos"
+                }
+                load_shift_json["context"] = context
+                return load_shift_json
             if not booth_location:
                 booth_location = default_booth.get('location', '')
                 booth_area = default_booth.get('area', '')
