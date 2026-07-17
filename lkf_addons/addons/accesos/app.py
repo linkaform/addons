@@ -5375,42 +5375,70 @@ class Accesos(OcrMixin, AccesosModel):
     def get_lista_pase(self, location, status='activo', inActive="true"):
         status_value = self.pase_entrada_fields.get('status_pase', '')
         match_query = {
-            "deleted_at":{"$exists":False},
+            "deleted_at": {"$exists": False},
             "form_id": self.PASE_ENTRADA,
         }
 
-
-        if inActive =="true":
-              match_query[f"answers.{self.pase_entrada_fields['status_pase']}"] =  {"$ne": "activo"}
+        if inActive == "true":
+            match_query[f"answers.{self.pase_entrada_fields['status_pase']}"] = {"$ne": "activo"}
         else:
-             match_query[f"answers.{self.pase_entrada_fields['status_pase']}"] = status
+            match_query[f"answers.{self.pase_entrada_fields['status_pase']}"] = status
 
-        proyect_fields = {'_id':1,
+        proyect_fields = {
+            '_id': 1,
             'folio': f"$folio",
             'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
-            'nombre': {"$ifNull":[
-                f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
-                f"$answers.{self.mf['nombre_pase']}"]},
-            'estatus':f"$answers.{self.pase_entrada_fields['status_pase']}",
-            'empresa': {"$ifNull":[
-                 f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['empresa']}",
-                 f"$answers.{self.pase_entrada_fields['walkin_empresa']}"]},
-            'foto': {"$ifNull":[
-                f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['foto']}",
-                f"$answers.{self.pase_entrada_fields['walkin_fotografia']}"]},
-            }
+            # Si no viene ni el nombre de la visita autorizada ni el del walkin,
+            # regresamos "Sin Nombre" en vez de null/vacío.
+            'nombre': {
+                "$ifNull": [
+                    f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
+                    {
+                        "$ifNull": [
+                            f"$answers.{self.mf['nombre_pase']}",
+                            "Sin Nombre",
+                        ]
+                    },
+                ]
+            },
+            'estatus': f"$answers.{self.pase_entrada_fields['status_pase']}",
+            'empresa': {
+                "$ifNull": [
+                    f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['empresa']}",
+                    f"$answers.{self.pase_entrada_fields['walkin_empresa']}",
+                ]
+            },
+            'foto': {
+                "$ifNull": [
+                    f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['foto']}",
+                    f"$answers.{self.pase_entrada_fields['walkin_fotografia']}",
+                ]
+            },
+            # Link/URL al pase padre si este pase es un pase hijo (acompañante).
+            # Ajusta la key 'url_padre' si en pase_entrada_fields vive con otro nombre.
+            'url_padre': {"$ifNull": [f"$answers.{self.pase_entrada_fields['url_padre']}", ""]},
+            # Bandera booleana de conveniencia: True si el pase tiene url_padre no vacío.
+            'tiene_padre': {
+                "$and": [
+                    {"$ne": [{"$ifNull": [f"$answers.{self.pase_entrada_fields['url_padre']}", ""]}, None]},
+                    {"$ne": [{"$ifNull": [f"$answers.{self.pase_entrada_fields['url_padre']}", ""]}, ""]},
+                ]
+            },
+        }
+
         query = [
-            {'$match': match_query },
+            {'$match': match_query},
             {'$unwind': f"$answers.{self.mf['grupo_ubicaciones_pase']}"},
-            {'$match': {f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location}},
+            {'$match': {f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": location}},
             {'$project': proyect_fields},
-            {'$sort':{'_id':-1}},
+            {'$sort': {'_id': -1}},
         ]
+
         records = self.format_cr(self.cr.aggregate(query))
         for rec in records:
             rec['qr_code'] = rec['_id']
-            rec['empresa'] = self.unlist(rec.get('empresa',[]))
-        return  records
+            rec['empresa'] = self.unlist(rec.get('empresa', []))
+        return records
 
     def get_list_last_user_move(self, qr, limit=100, status=False):
         match_query = {
@@ -6584,6 +6612,27 @@ class Accesos(OcrMixin, AccesosModel):
             ]
         return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
+    def extraer_id_padre(self, access_pass):
+        """
+        Extrae el _id del pase padre a partir de url_padre / link_padre.
+        Soporta ambos formatos vistos en la data:
+        - .../pase-update?id=<ID>&user=...
+        - .../records/detail/<ID>
+        """
+        url_padre = access_pass.get('url_padre') or access_pass.get('link_padre') or ''
+        if not url_padre:
+            return None
+
+        match = re.search(r'[?&]id=([a-fA-F0-9]{24})', url_padre)
+        if match:
+            return match.group(1)
+
+        match = re.search(r'/detail/([a-fA-F0-9]{24})', url_padre)
+        if match:
+            return match.group(1)
+
+        return None
+
     def search_access_pass(self, qr_code=None, location=None):
         """
         Busca pases de acceso
@@ -6597,43 +6646,76 @@ class Accesos(OcrMixin, AccesosModel):
             last_moves = self.get_list_last_user_move(qr_code, limit=10)
             if len(last_moves) > 0:
                 last_move = last_moves[0]
-            # else:
-            #     self.LKFException({"msg":"No se econtro ninguan entrada con pase "+ qr_code})
-            # print('last_moves=',simplejson.dumps(last_moves, indent=3))
-            #last_move = self.get_last_user_move(qr_code, location)
+
             gafete_info = {}
             access_pass = self.get_detail_access_pass(qr_code)
+
             if not last_move or last_move.get('status_visita') == 'salida':
                 tipo_movimiento = 'Entrada'
-                access_pass['grupo_vehiculos'] = self.format_vehiculos_simple(access_pass.get('grupo_vehiculos',[]))
-                access_pass['grupo_equipos'] = self.format_equipos_simple(access_pass.get('grupo_equipos',[]))
-                print("entrada",access_pass['grupo_vehiculos'])
+                access_pass['grupo_vehiculos'] = self.format_vehiculos_simple(access_pass.get('grupo_vehiculos', []))
+                access_pass['grupo_equipos'] = self.format_equipos_simple(access_pass.get('grupo_equipos', []))
+                print("entrada", access_pass['grupo_vehiculos'])
             else:
                 gafete_info['gafete_id'] = last_move.get('gafete_id')
                 gafete_info['locker_id'] = last_move.get('locker_id')
-                access_pass['grupo_vehiculos'] = self.format_vehiculos_simple(last_move.get('vehiculos',[]))
-                access_pass['grupo_equipos'] = self.format_equipos_simple(last_move.get('equipos',[]))
+                access_pass['grupo_vehiculos'] = self.format_vehiculos_simple(last_move.get('vehiculos', []))
+                access_pass['grupo_equipos'] = self.format_equipos_simple(last_move.get('equipos', []))
                 tipo_movimiento = 'Salida'
-                print("salida", access_pass['grupo_vehiculos'],access_pass['grupo_equipos'])
+                print("salida", access_pass['grupo_vehiculos'], access_pass['grupo_equipos'])
                 print("last_move", simplejson.dumps(last_move, indent=4))
-            #---Last Access
+
+            # --- Last Access ---
             access_pass['ultimo_acceso'] = last_moves
             access_pass['tipo_movimiento'] = tipo_movimiento
             access_pass['gafete_id'] = gafete_info.get('gafete_id')
             access_pass['locker_id'] = gafete_info.get("locker_id")
-            access_pass['status_pase']= self.unlist(access_pass.get('estatus',"")).title() or ""
-            access_pass['limitado_a_dias']= access_pass.get('limitado_a_dias','')
-            access_pass['limitado_a_acceso']= access_pass.get('limite_de_acceso','')
-            access_pass['config_dia_de_acceso']=access_pass.get('config_dia_de_acceso',"").replace("_", " ")
+            access_pass['status_pase'] = self.unlist(access_pass.get('estatus', "")).title() or ""
+            access_pass['limitado_a_dias'] = access_pass.get('limitado_a_dias', '')
+            access_pass['limitado_a_acceso'] = access_pass.get('limite_de_acceso', '')
+            access_pass['config_dia_de_acceso'] = access_pass.get('config_dia_de_acceso', "").replace("_", " ")
             total_entradas = self.get_count_ingresos(qr_code)
             access_pass['total_entradas'] = total_entradas.get('total_records') if total_entradas else "0"
             access_pass['anfitrions_data'] = access_pass.get('visita_a_details', [])
+
             if access_pass.get('grupo_areas_acceso'):
                 for area in access_pass['grupo_areas_acceso']:
                     area['status'] = self.get_area_status(access_pass['ubicacion'], area['nombre_area'])
+
+            # --- Pase padre y acompañantes vinculados ---
+            pase_padre = None
+
+            if access_pass.get('url_padre'):
+                # Este pase es un HIJO (acompañante): buscamos el padre completo
+                padre_id_match = re.search(r'/records/detail/([a-fA-F0-9]{24})', access_pass['url_padre'])
+                if padre_id_match:
+                    padre_id = padre_id_match.group(1)
+                    try:
+                        pase_padre = self.get_detail_access_pass(padre_id)
+                    except Exception as e:
+                        print(f"Error obteniendo pase padre completo {padre_id}: {e}")
+                        pase_padre = None
+
+                grupo_completo = pase_padre.get('acompanantes_grupo', []) if pase_padre else []
+            else:
+                # Este pase YA ES el padre: usamos su propio acompanantes_grupo
+                grupo_completo = access_pass.get('acompanantes_grupo', [])
+
+            # Excluimos al propio pase consultado de la lista de "otros acompañantes"
+            acompanantes_pases = [
+                a for a in grupo_completo if a.get('qr_code') != qr_code
+            ]
+
+            # Si hay un padre distinto al pase consultado, lo agregamos al array marcado como padre
+            if pase_padre:
+                pase_padre['es_padre'] = True
+                acompanantes_pases.insert(0, pase_padre)
+
+            access_pass['pase_padre'] = pase_padre
+            access_pass['acompanantes_pases'] = acompanantes_pases
+
             return access_pass
         else:
-            return self.LKFException({"status_code":400, "msg":'El parametro para QR, no es valido'})
+            return self.LKFException({"status_code": 400, "msg": 'El parametro para QR, no es valido'})
 
     def search_pass_by_status(self, status, query_update=None):
         match_query = {
