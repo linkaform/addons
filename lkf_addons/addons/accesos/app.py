@@ -1590,15 +1590,16 @@ class Accesos(OcrMixin, AccesosModel):
         group_level = options.get('group_level',1)
         return self.catalogo_view(catalog_id, form_id)
 
-    def catalogo_estados(self, options={}):
+    def catalogo_estados(self):
         catalog_id = self.ESTADO_ID
         form_id = self.PASE_ENTRADA
         return self.catalogo_view(catalog_id, form_id)
 
     def catalogo_roles(self):
-        catalog_id = self.ROL_CAT_ID
-        form_id = self.CHECKIN_CASETAS
-        return self.catalogo_view(catalog_id, form_id)
+        options = {}
+        catalog_id = self.ROL_CATALOG_ID
+        form_id = self.BITACORA_RONDINES
+        return self.catalogo_view(catalog_id, form_id, options)
 
     def catalogo_incidencias(self, cat="", sub_cat=""):
         # selector = {} #Aqui filtras igual que con mongo de que answers.tal.tal: name_hotel
