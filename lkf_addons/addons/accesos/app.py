@@ -1589,8 +1589,17 @@ class Accesos(OcrMixin, AccesosModel):
         # se quito porque ya no se edita el pase
         # cat_vehiculos= self.catalogo_vehiculos({})
         # cat_estados= self.catalogo_estados({})
-        pass_selected= self.get_pass_custom(qr_code)
-        res={"pass_selected":pass_selected}
+        pass_selected = self.get_pass_custom(qr_code)
+
+        ubicaciones = pass_selected.get('ubicacion', [])
+        config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones)
+        condiciones_servicio = config_modulo_seguridad.get('condiciones_servicio', {})
+
+        res = {
+            "pass_selected": pass_selected,
+            "documento_de_condiciones_de_servicio": condiciones_servicio.get('doc_condiciones_servicio', ''),
+            "url_de_condiciones_de_servicio": condiciones_servicio.get('url_condiciones_servicio', ''),
+        }
         return res
 
     def catalogo_categoria(self, options={}):
