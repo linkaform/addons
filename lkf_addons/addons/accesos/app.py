@@ -1537,6 +1537,11 @@ class Accesos(OcrMixin, AccesosModel):
         form_id = self.PASE_ENTRADA
         return self.catalogo_view(catalog_id, form_id)
 
+    def catalogo_roles(self):
+        catalog_id = self.ROL_CAT_ID
+        form_id = self.CHECKIN_CASETAS
+        return self.catalogo_view(catalog_id, form_id)
+
     def catalogo_incidencias(self, cat="", sub_cat=""):
         # selector = {} #Aqui filtras igual que con mongo de que answers.tal.tal: name_hotel
         # fields = ["_id"] #Aqui que te retorne los campos que quieras
