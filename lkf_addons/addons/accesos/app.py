@@ -839,10 +839,8 @@ class Accesos(OcrMixin, AccesosModel):
                         "title":'Aviso'
                     })
 
-        limite_acceso = access_pass.get('limite_de_acceso')
-        if len(total_entradas) > 0 and limite_acceso and int(limite_acceso) > 0:
-            if total_entradas['total_records']>= int(limite_acceso) :
-                self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
+        if self._pase_alcanzo_limite_entradas(total_entradas, access_pass.get('limite_de_acceso')):
+            self.LKFException({'msg':"Se ha completado el limite de entradas disponibles para este pase, edita el pase o crea uno nuevo.","title":'Revisa la Configuración'})
 
         timezone = pytz.timezone(self.user.get('timezone', 'America/Mexico_City'))
         fecha_actual = datetime.now(timezone).replace(microsecond=0)
@@ -915,8 +913,68 @@ class Accesos(OcrMixin, AccesosModel):
             }
             }
             # self.update_pase_entrada(values, record_id=[str(access_pass['_id']),])
+
+        selected_passes = data.get('selected_passes', [])
+        if selected_passes:
+            return self._do_access_grupo(access_pass, qr_code, location, area, data, selected_passes)
+
         res = self._do_access(access_pass, location, area, data)
         return res
+
+    def _pase_alcanzo_limite_entradas(self, total_entradas, limite_acceso):
+        '''
+        El conteo de entradas es individual por qr_code, así que esta validación
+        se corre por cada pase (principal y acompañantes) aunque el resto de las
+        validaciones de do_access solo se hagan una vez sobre el pase principal.
+        '''
+        if len(total_entradas) > 0 and limite_acceso and int(limite_acceso) > 0:
+            return total_entradas['total_records'] >= int(limite_acceso)
+        return False
+
+    def _do_access_grupo(self, access_pass, qr_code, location, area, data, selected_passes):
+        '''
+        Da acceso en paralelo al pase principal (ya validado en do_access) junto
+        con los pases acompañantes seleccionados en un pase grupal. El resto de
+        las validaciones (estatus, dias, fecha de caducidad, ubicación, tolerancia)
+        se comparten entre todos los pases del grupo y no se repiten aquí; solo se
+        revisa el límite de entradas de cada acompañante, ya que ese conteo es
+        propio de cada qr_code. Un acompañante que no pase esa validación se omite
+        y se reporta como error, sin afectar al resto del grupo.
+        '''
+        pases_a_procesar = [(str(qr_code), access_pass)]
+        resultados = []
+        qr_codes_vistos = {str(qr_code)}
+
+        for companion_qr in selected_passes:
+            companion_qr = str(companion_qr)
+            if companion_qr in qr_codes_vistos:
+                continue
+            qr_codes_vistos.add(companion_qr)
+            try:
+                companion_pass = self.get_detail_access_pass(companion_qr)
+            except Exception as e:
+                resultados.append({'qr_code': companion_qr, 'status': 'error', 'msg': f'No se encontro el pase: {e}'})
+                continue
+            total_entradas_companion = self.get_count_ingresos(companion_qr)
+            if self._pase_alcanzo_limite_entradas(total_entradas_companion, companion_pass.get('limite_de_acceso')):
+                resultados.append({'qr_code': companion_qr, 'status': 'error', 'msg': 'Se ha completado el limite de entradas disponibles para este pase.'})
+                continue
+            pases_a_procesar.append((companion_qr, companion_pass))
+
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = {
+                executor.submit(self._do_access, pase, location, area, data): qr
+                for qr, pase in pases_a_procesar
+            }
+            for future in as_completed(futures):
+                qr = futures[future]
+                try:
+                    response = future.result()
+                    resultados.append({'qr_code': qr, 'status': 'success', 'response': response})
+                except Exception as e:
+                    resultados.append({'qr_code': qr, 'status': 'error', 'msg': str(e)})
+
+        return {'accesos': resultados}
 
     def do_attendance(self, asistencia_answers):
         metadata = self.lkf_api.get_metadata(form_id=self.REGISTRO_ASISTENCIA)
