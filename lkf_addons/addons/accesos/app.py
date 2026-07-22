@@ -1090,6 +1090,8 @@ class Accesos(OcrMixin, AccesosModel):
         checkin = self.check_in_out_employees('in', now_datetime, checkin=checkin, employee_list=employee_list)
         checkin[self.f['configuracion_de_accesos']] = self.get_booth_config(location)
 
+      
+
         #! Se actualiza el check in con la informacion faltante.
         data.update({
                 'properties': {
@@ -1111,7 +1113,14 @@ class Accesos(OcrMixin, AccesosModel):
             checkin.update({
                 self.checkin_fields['fotografia_inicio_turno']: fotografia
             })
-
+        grupo_roles_payload = [
+            {
+                self.ROL_CATALOG_OBJ_ID: {
+                    self.f['rol']: rol
+                }
+            }
+            for rol in roles
+        ]
         asistencia_answers = {
             self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
                 self.Location.f['location']: location,
@@ -1120,7 +1129,7 @@ class Accesos(OcrMixin, AccesosModel):
             self.f['tipo_guardia']: 'guardia_regular',
             self.checkin_fields['checkin_type']: 'iniciar_turno',
             self.f['image_checkin']: fotografia,
-            self.f['grupo_roles']: roles
+            self.f['grupo_roles']: grupo_roles_payload
         }
 
         if nombre_suplente:
@@ -1580,8 +1589,17 @@ class Accesos(OcrMixin, AccesosModel):
         # se quito porque ya no se edita el pase
         # cat_vehiculos= self.catalogo_vehiculos({})
         # cat_estados= self.catalogo_estados({})
-        pass_selected= self.get_pass_custom(qr_code)
-        res={"pass_selected":pass_selected}
+        pass_selected = self.get_pass_custom(qr_code)
+
+        ubicaciones = pass_selected.get('ubicacion', [])
+        config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones)
+        condiciones_servicio = config_modulo_seguridad.get('condiciones_servicio', {})
+
+        res = {
+            "pass_selected": pass_selected,
+            "documento_de_condiciones_de_servicio": condiciones_servicio.get('doc_condiciones_servicio', ''),
+            "url_de_condiciones_de_servicio": condiciones_servicio.get('url_condiciones_servicio', ''),
+        }
         return res
 
     def catalogo_categoria(self, options={}):
@@ -1590,10 +1608,16 @@ class Accesos(OcrMixin, AccesosModel):
         group_level = options.get('group_level',1)
         return self.catalogo_view(catalog_id, form_id)
 
-    def catalogo_estados(self, options={}):
+    def catalogo_estados(self):
         catalog_id = self.ESTADO_ID
         form_id = self.PASE_ENTRADA
         return self.catalogo_view(catalog_id, form_id)
+
+    def catalogo_roles(self):
+        options = {}
+        catalog_id = self.ROL_CATALOG_ID
+        form_id = self.BITACORA_RONDINES
+        return self.catalogo_view(catalog_id, form_id, options)
 
     def catalogo_incidencias(self, cat="", sub_cat=""):
         # selector = {} #Aqui filtras igual que con mongo de que answers.tal.tal: name_hotel
@@ -3188,6 +3212,7 @@ class Accesos(OcrMixin, AccesosModel):
                 "_id": 0,
                 "start_turn_image": {"$ifNull": [f"$answers.{self.f['image_checkin']}", ""]},
                 "end_turn_image": {"$ifNull": [f"$answers.{self.f['foto_cierre_turno']}", ""]},
+                "roles": f"$answers.{self.f['grupo_roles']}",
             }}
         ]
         data = self.format_cr(self.cr.aggregate(query))
@@ -6347,6 +6372,7 @@ class Accesos(OcrMixin, AccesosModel):
                 'checkin_status': f"$answers.{self.f['guard_group']}.{self.f['checkin_status']}",
                 'checkin_position': f"$answers.{self.f['guard_group']}.{self.f['checkin_position']}",
                 'nombre_suplente': f"$answers.{self.f['guard_group']}.{self.checkin_fields['nombre_suplente']}",
+                'roles': f"$answers.{self.f['grupo_roles']}.{self.f['rol']}",
             }},
             {'$group':{
                 '_id': {
@@ -6361,7 +6387,8 @@ class Accesos(OcrMixin, AccesosModel):
                 'checkin_position': {'$last':'$checkin_position'},
                 'folio': {'$last':'$folio'},
                 'id_register': {'$last':'$_id'},
-                'nombre_suplente': {'$last':'$nombre_suplente'}
+                'nombre_suplente': {'$last':'$nombre_suplente'},
+                'roles':{'$last':'$roles'}
             }},
             {'$project':{
                 '_id': 0,
@@ -6375,7 +6402,8 @@ class Accesos(OcrMixin, AccesosModel):
                 'checkin_position': '$checkin_position',
                 'folio': '$folio',
                 'id_register': '$id_register',
-                'nombre_suplente': '$nombre_suplente'
+                'nombre_suplente': '$nombre_suplente',
+                'roles': '$roles'
             }}
         ]
         data = self.format_cr(self.cr.aggregate(query))
@@ -6394,7 +6422,8 @@ class Accesos(OcrMixin, AccesosModel):
                 'checkin_date':record.get('checkin_date'),
                 'checkout_date':record.get('checkout_date'),
                 'checkin_position':record.get('checkin_position'),
-                'nombre_suplente':record.get('nombre_suplente',"")
+                'nombre_suplente':record.get('nombre_suplente',""),
+                'roles':record.get('roles',[])
             }
         return format_data
 
@@ -6522,7 +6551,7 @@ class Accesos(OcrMixin, AccesosModel):
         load_shift_json["notes"] = self.get_list_notes(booth_location, booth_area, status='abierto')
         load_shift_json["user_booths"] = user_booths
         load_shift_json["booth_config"] = self.get_booth_config(booth_location)
-        # print(simplejson.dumps(load_shift_json, indent=4))
+        print(simplejson.dumps(load_shift_json, indent=4))
         return load_shift_json
 
     def get_user_last_checkin(self, user_id=False):
@@ -7844,6 +7873,11 @@ class Accesos(OcrMixin, AccesosModel):
         this_user['start_turn_image'] = attendance_images.get('start_turn_image', [])
         this_user['end_turn_image'] = attendance_images.get('end_turn_image', [])
         this_user['status_turn'] = status_turn
+        #! Se aplana la estructura de roles (viene como [{'rol': 'Gerente'}, ...])
+        #! a una lista simple de strings (['Gerente', ...]) para el frontend.
+        roles_raw = attendance_images.get('roles', [])
+        this_user['roles'] = [r.get('rol') for r in roles_raw if r.get('rol')]
+
         return this_user
 
     def update_guards_checkin(self, data_guard, record_id, location, area, user_data={}, nombre_suplente="", foto_checkin=[]):

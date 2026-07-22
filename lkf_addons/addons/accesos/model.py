@@ -181,8 +181,11 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.MENUS_CATALOG_ID = self.MENUS_CATALOG.get('id')
         self.MENUS_CATALOG_OBJ_ID = self.MENUS_CATALOG.get('obj_id')
 
+        self.ROL_CATALOG = self.lkm.catalog_id('rol')
+        self.ROL_CATALOG_ID = self.ROL_CATALOG.get('id')
+        self.ROL_CATALOG_OBJ_ID = self.ROL_CATALOG.get('obj_id')
         #----Dic Fields Forms
-
+ 
         ### Lista de catalogos requeridos para el uso offline de la aplicacion.
         self.clave10_catalogs = [
             self.LISTA_INCIDENCIAS_CAT_ID,
@@ -204,6 +207,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             self.TIPO_ARTICULOS_PERDIDOS_CAT_ID,
             self.PASE_ENTRADA_ID,
             self.ACTIVOS_FIJOS_CAT_ID,
+            self.ROL_CATALOG_ID
         ]
 
         ## Module Fields ##
