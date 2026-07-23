@@ -1594,11 +1594,12 @@ class Accesos(OcrMixin, AccesosModel):
         ubicaciones = pass_selected.get('ubicacion', [])
         config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones)
         condiciones_servicio = config_modulo_seguridad.get('condiciones_servicio', {})
-
+        print("CONDICION", condiciones_servicio)
         res = {
             "pass_selected": pass_selected,
             "documento_de_condiciones_de_servicio": condiciones_servicio.get('doc_condiciones_servicio', ''),
             "url_de_condiciones_de_servicio": condiciones_servicio.get('url_condiciones_servicio', ''),
+            "desc_condiciones_servicio": condiciones_servicio.get('desc_condiciones_servicio', ''),
         }
         return res
 
@@ -4099,15 +4100,15 @@ class Accesos(OcrMixin, AccesosModel):
         raw_result = self.format_cr(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
-                #---Condiciones de servicio
-                condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio','')
-                condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio','')
-                condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio','')
-                condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio','')
-
                 #TODO Verficiar el cambio de key
                 ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
                 if ubicacion in ubicaciones:
+                    #---Condiciones de servicio (solo del grupo que coincide con la ubicación)
+                    condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio', '')
+                    condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
+                    condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
+                    condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
+
                     clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
                     reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
                     if isinstance(reqs, list):
@@ -4128,7 +4129,7 @@ class Accesos(OcrMixin, AccesosModel):
             "requerimientos": list(requerimientos),
             "envios": list(envios),
             "tipos": tipos,
-            "condiciones_servicio":condiciones_servicio,
+            "condiciones_servicio": condiciones_servicio,
         }
 
     def get_config_accesos(self):
