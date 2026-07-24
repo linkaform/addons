@@ -8423,7 +8423,7 @@ class Accesos(OcrMixin, AccesosModel):
                             docs+="foto"
                         if index==0 :
                             docs+="-"
-                    link_pass= f"{link_info['link']}?id={link_info['qr_code']}&user={link_info['creado_por_id']}&docs={docs}"
+                    link_pass= f"{link_info['link']}?id={link_info['qr_code']}&user={self.user.get('parent_id')}&docs={docs}"
 
                 answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
             elif key == 'ubicacion':
