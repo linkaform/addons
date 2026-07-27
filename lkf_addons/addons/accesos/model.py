@@ -737,6 +737,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'habilitar_vehiculo':'6a218bf63b5cf6f0c1c55f29',
             'worker_position': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
+            'firma_reglas_de_acceso':'6a67caac45f44675221f56e7'
         }
 
         self.pase_grupo_visitados ={
