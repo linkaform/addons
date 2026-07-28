@@ -4779,13 +4779,15 @@ class Accesos(OcrMixin, AccesosModel):
         pr= self.format_cr_result(self.cr.aggregate(query))
         return self.format_cr_result(self.cr.aggregate(query))
 
-    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate=""):
+    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", limit=25, skip=0, locations=[]):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
         }
         if location:
-             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}"] = location
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}"] = location
+        if locations:
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}"] = {"$in": locations}
         if area:
              match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
         if status:
@@ -4813,6 +4815,14 @@ class Accesos(OcrMixin, AccesosModel):
                 f"answers.{self.cons_f['fecha_concesion']}": {"$lte": dateTo}
             })
 
+        count_result = self.format_cr(self.cr.aggregate([
+            {'$match': match_query},
+            {'$count': 'total'},
+        ]))
+        total_count = count_result[0]['total'] if count_result else 0
+        current_page = (skip // limit) + 1
+        total_pages = ceil(total_count / limit) if limit else 1
+
         query = [
             {'$match': match_query },
             # {'$unwind':f"$answers.{self.cons_f['grupo_equipos']}"},
@@ -4825,8 +4835,10 @@ class Accesos(OcrMixin, AccesosModel):
                 "answers":"$answers",
             }},
             {'$sort':{'created_at':-1}},
+            {'$skip': skip},
+            {'$limit': limit},
         ]
-        
+
         result = self.format_cr_result(self.cr.aggregate(query), ids_label_dct=self.cons_f)
         for item in result:
             item = self.procesar_devoluciones_item(item)
@@ -4836,7 +4848,13 @@ class Accesos(OcrMixin, AccesosModel):
                 item['firma']['file_url'] = item.pop('file_url')
             if item.get('file_name'):
                 item['firma']['file_name'] = item.pop('file_name')
-        return result
+        return {
+            'records': result,
+            'total_records': total_count,
+            'total_pages': total_pages,
+            'actual_page': current_page,
+            'records_on_page': len(result),
+        }
 
     def get_list_rondines(self, prioridades=[], dateFrom='', dateTo='', filterDate=""):
         match_query = {
