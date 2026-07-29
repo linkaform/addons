@@ -10382,18 +10382,17 @@ class Accesos(OcrMixin, AccesosModel):
             }
         return res
 
-    def format_incidencias_to_bitacora(self, bitacora_in_lkf, new_incidencias):
+    def get_incidencias_nuevas_rondin(self, bitacora_in_lkf, new_incidencias):
         """
-        Formate las incidencias para injectarlas al registro de bitacora de rondines
-        Si el registro de Bitacora de rondines tiene incidencias existente las toma encuenta
+        Filtra las incidencias que aun no existen en la bitacora de rondines
         Args:
             bitacora_in_lkf (json): El rondin con el cual se esta trabajando
             new_incidencias (json): Json de las incidencias entradas en los checks
         Return:
-            incidencias_list (list): Lista con json en el formto de ids para dar de alta en el rondin
+            nuevas (list): Incidencias (formato original) que no existian previamente en la bitacora
         """
-        incidencias_list = []
         incidencias_existentes = bitacora_in_lkf.get('bitacora_rondin_incidencias', [])
+        nuevas = []
         for incidencia in new_incidencias:
             fecha_str = self._format_fecha(incidencia.get('fecha_incidencia'))
             ya_existe = False
@@ -10404,15 +10403,67 @@ class Accesos(OcrMixin, AccesosModel):
                     inc_existente.get('fecha_hora_incidente_bitacora') == fecha_str):
                         ya_existe = True
                         break
-
             if not ya_existe:
-                new_item = self.format_ids_incidencias_to_bitacora(incidencia)
-                incidencias_list.append(new_item)
+                nuevas.append(incidencia)
+        return nuevas
 
-        for incidencia in incidencias_existentes:
-            new_item = self.format_ids_incidencias_to_bitacora(incidencia)
-            incidencias_list.append(new_item)
+    def format_incidencias_to_bitacora(self, bitacora_in_lkf, new_incidencias):
+        """
+        Formate las incidencias para injectarlas al registro de bitacora de rondines
+        Si el registro de Bitacora de rondines tiene incidencias existente las toma encuenta
+        Args:
+            bitacora_in_lkf (json): El rondin con el cual se esta trabajando
+            new_incidencias (json): Json de las incidencias entradas en los checks
+        Return:
+            incidencias_list (list): Lista con json en el formto de ids para dar de alta en el rondin
+        """
+        incidencias_existentes = bitacora_in_lkf.get('bitacora_rondin_incidencias', [])
+        nuevas = self.get_incidencias_nuevas_rondin(bitacora_in_lkf, new_incidencias)
+        incidencias_list = [self.format_ids_incidencias_to_bitacora(i) for i in nuevas]
+        incidencias_list += [self.format_ids_incidencias_to_bitacora(i) for i in incidencias_existentes]
         return incidencias_list
+
+    def create_incidencia_bitacora_from_rondin(self, incidencia, bitacora_in_lkf):
+        """
+        Crea el registro de la incidencia en self.BITACORA_INCIDENCIAS a partir de una
+        incidencia detectada en un check de area del rondin.
+        Args:
+            incidencia (json): Incidencia en formato original (area, fecha_incidencia, categoria, sub_categoria, incidencia, ...)
+            bitacora_in_lkf (json): El rondin (Bitacora de Rondines) al que pertenece la incidencia
+        Return:
+            res (json): Respuesta de post_forms_answers
+        """
+        metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_INCIDENCIAS)
+        metadata.update({
+            "properties": {
+                "device_properties": {
+                    "System": "Script",
+                    "Module": "Accesos",
+                    "Process": "Creación de incidencia desde rondín",
+                    "Action": "create_incidencia_bitacora_from_rondin",
+                    "File": "accesos/app.py"
+                }
+            }
+        })
+        rondin_url = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{bitacora_in_lkf.get('_id')}"
+        answers = {
+            self.incidence_fields['incidencia_catalog']: {
+                self.incidence_fields['categoria']: incidencia.get('categoria', ''),
+                self.incidence_fields['sub_categoria']: incidencia.get('sub_categoria', ''),
+                self.incidence_fields['incidencia']: incidencia.get('incidencia', ''),
+                self.incidence_fields['url_incidencia']: rondin_url,
+            },
+            self.incidence_fields['area_incidencia_catalog']: {
+                self.incidence_fields['area_incidencia']: incidencia.get('area', ''),
+            },
+            self.incidence_fields['estatus']: 'abierto',
+            self.incidence_fields['fecha_hora_incidencia']: incidencia.get('fecha_incidencia', ''),
+            self.incidence_fields['comentario_incidencia']: incidencia.get('comentario_incidente_bitacora', ''),
+            self.incidence_fields['evidencia_incidencia']: [i for i in incidencia.get('incidente_evidencia', []) if i.get('file_url', '')],
+            self.incidence_fields['documento_incidencia']: [i for i in incidencia.get('incidente_documento', []) if i.get('file_url', '')],
+        }
+        metadata.update({'answers': answers})
+        return self.lkf_api.post_forms_answers(metadata)
 
     def bitacora_set_area_format(self, bitacora, check):
         """
@@ -10515,13 +10566,12 @@ class Accesos(OcrMixin, AccesosModel):
                 if incidencias:
                     incidencias_list = []
                     for incidencia in incidencias:
-                        print('revisxart linea 1285 comentario_incidente_bitacora que llave trae incidencia')
                         item = {}
                         if incidencia.get('categoria'):
                             item = {self.LISTA_INCIDENCIAS_CAT_OBJ_ID: {
                                 self.f['categoria']: incidencia.get('categoria', ''),
                                 self.f['sub_categoria']: incidencia.get('sub_categoria', ''),
-                                self.f['incidencia']: incidencia.get('incidencia', ''),
+                                self.f['incidencia']: incidencia.get('incidente', incidencia.get('otro_incidente', '')),
                             }}
                         item.update({
                             self.f['incidente_open']: incidencia.get('incidente_open', ''),
@@ -10910,6 +10960,7 @@ class Accesos(OcrMixin, AccesosModel):
         areas_list = []
         conf_recorrido = {}
         estatus_bitacora_in_couch = data.get('status_user', '')
+        nuevas_incidencias_rondin = self.get_incidencias_nuevas_rondin(bitacora_in_lkf, incidencia_for_rondin)
         incidencias_list = self.format_incidencias_to_bitacora(bitacora_in_lkf, incidencia_for_rondin)
         answers[self.f['bitacora_rondin_incidencias']] = incidencias_list
 
@@ -11047,6 +11098,10 @@ class Accesos(OcrMixin, AccesosModel):
                 data['status'] = 'received'
                 data['inbox'] = False
                 self.cr_db.save(data)
+            if res.get('status_code') in [201, 202] and nuevas_incidencias_rondin:
+                for incidencia in nuevas_incidencias_rondin:
+                    res_incidencia = self.create_incidencia_bitacora_from_rondin(incidencia, bitacora_in_lkf)
+                    print('res_incidencia', res_incidencia)
         return res
 
     def update_bitacora_with_retry(self, bitacora_in_lkf, data, incidencia_for_rondin, checks_for_rondin, max_retries=5, base_wait=2):

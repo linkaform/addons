@@ -618,6 +618,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'total_deposito_incidencia':'66ec6821ea3c921534b22c30',
             'ubicacion_incidencia': f"{self.mf['ubicacion']}",
             'ubicacion_incidencia_catalog': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
+            'url_incidencia': '6927eb61d92ecf923b60a0de',
             #Robo de cableado
             'valor_estimado': '684c3e6821796d7880117f22',
         }
