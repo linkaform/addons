@@ -5024,6 +5024,7 @@ class Accesos(OcrMixin, AccesosModel):
             '_id': 1,
             'folio': "$folio",
             'created_at': "$created_at",
+            'created_by': "$user_name",
             'updated_at': "$updated_at",
             'a_quien_visita':f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
             'documento': f"$answers.{self.mf['documento']}",
@@ -5109,7 +5110,8 @@ class Accesos(OcrMixin, AccesosModel):
             r['equipos'] = self.format_equipos(r.get('equipos',[]))
             r['visita_a'] = self.format_visita(r.get('visita_a',[]))
             r['pase_id']=str(pase_id)
-
+            r['created_by'] = r.get('created_by','')
+            
         return {
             "records": records,
             "total_records": total_count,
@@ -5857,7 +5859,8 @@ class Accesos(OcrMixin, AccesosModel):
                     'acompanantes_grupo':f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",
                     'acompanantes':f"$answers.{self.pase_entrada_fields['acompanantes']}",
                     'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}",
-                    'url_padre':f"$answers.{self.pase_entrada_fields['url_padre']}"
+                    'url_padre':f"$answers.{self.pase_entrada_fields['url_padre']}",
+                    'created_by':"$user_name"
                 }
             },
             {'$sort':{'_id':-1}},
@@ -5929,7 +5932,7 @@ class Accesos(OcrMixin, AccesosModel):
             x['grupo_vehiculos'] = self.format_vehiculos_simple(x.pop('grupo_vehiculos',[]))
             x['grupo_equipos'] = self.format_equipos_simple(x.pop('grupo_equipos',[]))
             x['comentarios'] = x['grupo_instrucciones_pase']
-
+            x['created_by'] = x.get('created_by', "")
             comentarios = []
             for item in x.pop('comentarios', []):
                 comentario_pase = item.get('comentario_pase', '')
