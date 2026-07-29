@@ -10472,7 +10472,7 @@ class Accesos(OcrMixin, AccesosModel):
                 self.incidence_fields['area_incidencia']: incidencia.get('area', ''),
             },
             self.incidence_fields['estatus']: 'abierto',
-            self.incidence_fields['prioridad_incidencia']: incidencia.get('prioridad_incidencia', 'baja'),
+            self.incidence_fields['prioridad_incidencia']: incidencia.get('prioridad_incidencia', 'leve'),
             self.incidence_fields['notificacion_incidencia']: incidencia.get('notificacion_incidencia', 'no'),
             self.incidence_fields['fecha_hora_incidencia']: incidencia.get('fecha_incidencia', ''),
             self.incidence_fields['comentario_incidencia']: incidencia.get('comentario_incidente_bitacora', ''),
