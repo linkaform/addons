@@ -4099,6 +4099,7 @@ class Accesos(OcrMixin, AccesosModel):
             }},
         ]
         raw_result = self.format_cr(self.cr.aggregate(query))
+        print("QUE PASA",simplejson.dumps(raw_result, indent=4))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
                 #TODO Verficiar el cambio de key
@@ -4390,7 +4391,6 @@ class Accesos(OcrMixin, AccesosModel):
             f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['url_padre']= self.unlist(x.get('url_padre',''))
-            x['url_padre'] = self.unlist(x.get('url_padre',''))
 
             # Si es un pase hijo, ir a buscar el link del pase padre
             if x.get('url_padre'):
@@ -5948,6 +5948,23 @@ class Accesos(OcrMixin, AccesosModel):
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['habilitar_vehiculo'] = x.get('habilitar_vehiculo', "")
             x['url_padre']=x.get('url_padre','')
+            x['pase_padre'] = {}
+            if x['url_padre']:
+                padre_id = self.extraer_id_padre(x)
+                if padre_id:
+                    try:
+                        detalle_padre = self.get_detail_access_pass(padre_id) or {}
+                        x['pase_padre'] = {
+                            'foto': self.unlist(detalle_padre.get('foto', '')),
+                            'identificacion': self.unlist(detalle_padre.get('identificacion', '')),
+                            'nombre': self.unlist(detalle_padre.get('nombre', '')),
+                            'estatus': self.unlist(detalle_padre.get('estatus', '')),
+                            'telefono': self.unlist(detalle_padre.get('telefono', '')),
+                            'email': self.unlist(detalle_padre.get('email', '')),
+                        } if detalle_padre else {}
+                    except Exception as e:
+                        print(f"Error obteniendo pase padre {padre_id}: {e}")
+                        x['pase_padre'] = {}
             x['grupo_vehiculos'] = self.format_vehiculos_simple(x.pop('grupo_vehiculos',[]))
             x['grupo_equipos'] = self.format_equipos_simple(x.pop('grupo_equipos',[]))
             x['comentarios'] = x['grupo_instrucciones_pase']
