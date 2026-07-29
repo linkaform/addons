@@ -618,7 +618,6 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'total_deposito_incidencia':'66ec6821ea3c921534b22c30',
             'ubicacion_incidencia': f"{self.mf['ubicacion']}",
             'ubicacion_incidencia_catalog': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
-            'url_incidencia': '6927eb61d92ecf923b60a0de',
             #Robo de cableado
             'valor_estimado': '684c3e6821796d7880117f22',
         }
@@ -931,6 +930,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'fecha_hora_incidente_bitacora': '69000e4c43078234e5e08390',
             'area_incidente_bitacora': '69000e4c43078234e5e0838f',
             'comentario_incidente_bitacora': '681145323d9b5fa2e16e35cb',
+            'url_incidencia_bitacora': '6927eb61d92ecf923b60a0de',
             'id_usuario':'638a9a99616398d2e392a9f5',
             'nombre_area_salida':'663fb45992f2c5afcfe97ca8',
             'status_cron': 'abcde00010000000a0000000',

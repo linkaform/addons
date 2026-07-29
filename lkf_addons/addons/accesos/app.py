@@ -10390,6 +10390,7 @@ class Accesos(OcrMixin, AccesosModel):
                     self.f['categoria']: data.get('categoria', ''),
                     self.f['sub_categoria']: data.get('sub_categoria', ''),
                     self.f['incidencia']: data.get('incidencia', ''),
+                    self.f['url_incidencia_bitacora']: data.get('url_incidencia_bitacora', ''),
                 },
                 self.f['incidente_open']: data.get('incidente_open', ''),
                 self.f['comentario_incidente_bitacora']: data.get('comentario_incidente_bitacora', ''),
@@ -10440,13 +10441,12 @@ class Accesos(OcrMixin, AccesosModel):
         incidencias_list += [self.format_ids_incidencias_to_bitacora(i) for i in incidencias_existentes]
         return incidencias_list
 
-    def create_incidencia_bitacora_from_rondin(self, incidencia, bitacora_in_lkf):
+    def create_incidencia_bitacora_from_rondin(self, incidencia):
         """
         Crea el registro de la incidencia en self.BITACORA_INCIDENCIAS a partir de una
         incidencia detectada en un check de area del rondin.
         Args:
             incidencia (json): Incidencia en formato original (area, fecha_incidencia, categoria, sub_categoria, incidencia, ...)
-            bitacora_in_lkf (json): El rondin (Bitacora de Rondines) al que pertenece la incidencia
         Return:
             res (json): Respuesta de post_forms_answers
         """
@@ -10462,13 +10462,11 @@ class Accesos(OcrMixin, AccesosModel):
                 }
             }
         })
-        rondin_url = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{bitacora_in_lkf.get('_id')}"
         answers = {
             self.incidence_fields['incidencia_catalog']: {
                 self.incidence_fields['categoria']: incidencia.get('categoria', ''),
                 self.incidence_fields['sub_categoria']: incidencia.get('sub_categoria', ''),
                 self.incidence_fields['incidencia']: incidencia.get('incidencia', ''),
-                self.incidence_fields['url_incidencia']: rondin_url,
             },
             self.incidence_fields['area_incidencia_catalog']: {
                 self.incidence_fields['area_incidencia']: incidencia.get('area', ''),
@@ -10588,7 +10586,7 @@ class Accesos(OcrMixin, AccesosModel):
                             item = {self.LISTA_INCIDENCIAS_CAT_OBJ_ID: {
                                 self.f['categoria']: incidencia.get('categoria', ''),
                                 self.f['sub_categoria']: incidencia.get('sub_categoria', ''),
-                                self.f['incidencia']: incidencia.get('incidente', incidencia.get('otro_incidente', '')),
+                                self.f['incidencia']: incidencia.get('incidente') or incidencia.get('incidencia') or incidencia.get('otro_incidente', ''),
                             }}
                         item.update({
                             self.f['incidente_open']: incidencia.get('incidente_open', ''),
@@ -10978,6 +10976,15 @@ class Accesos(OcrMixin, AccesosModel):
         conf_recorrido = {}
         estatus_bitacora_in_couch = data.get('status_user', '')
         nuevas_incidencias_rondin = self.get_incidencias_nuevas_rondin(bitacora_in_lkf, incidencia_for_rondin)
+        for incidencia in nuevas_incidencias_rondin:
+            if incidencia.get('url_incidencia_bitacora'):
+                # Ya se creo en un intento previo de este mismo sync (reintento por 208)
+                continue
+            res_incidencia = self.create_incidencia_bitacora_from_rondin(incidencia)
+            print('res_incidencia', res_incidencia)
+            incidencia_id = res_incidencia.get('json', {}).get('id')
+            if incidencia_id:
+                incidencia['url_incidencia_bitacora'] = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{incidencia_id}"
         incidencias_list = self.format_incidencias_to_bitacora(bitacora_in_lkf, incidencia_for_rondin)
         answers[self.f['bitacora_rondin_incidencias']] = incidencias_list
 
@@ -11115,10 +11122,6 @@ class Accesos(OcrMixin, AccesosModel):
                 data['status'] = 'received'
                 data['inbox'] = False
                 self.cr_db.save(data)
-            if res.get('status_code') in [201, 202] and nuevas_incidencias_rondin:
-                for incidencia in nuevas_incidencias_rondin:
-                    res_incidencia = self.create_incidencia_bitacora_from_rondin(incidencia, bitacora_in_lkf)
-                    print('res_incidencia', res_incidencia)
         return res
 
     def update_bitacora_with_retry(self, bitacora_in_lkf, data, incidencia_for_rondin, checks_for_rondin, max_retries=5, base_wait=2):
@@ -11501,6 +11504,7 @@ class Accesos(OcrMixin, AccesosModel):
         Obtiene todos los registros de cocuhdb que esten con "status_user": "completed" y los
         procesa segun sea el tipo.
         """
+        print("ACTUALIZACION DE ADDONSSSSSS")
         print("\n" + "="*60)
         print("[sync_records] INICIO")
         record_list = []
