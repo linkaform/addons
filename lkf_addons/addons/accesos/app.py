@@ -10152,6 +10152,7 @@ class Accesos(OcrMixin, AccesosModel):
 
                 incidencia.update({
                     'area':               area_name,
+                    'ubicacion':          check.get('incidente_location', ''),
                     'fecha_incidencia':   fecha_check,
                     })
             incidencias += grupo_incidencias
@@ -10390,8 +10391,8 @@ class Accesos(OcrMixin, AccesosModel):
                     self.f['categoria']: data.get('categoria', ''),
                     self.f['sub_categoria']: data.get('sub_categoria', ''),
                     self.f['incidencia']: data.get('incidencia', ''),
-                    self.f['url_incidencia_bitacora']: data.get('url_incidencia_bitacora', ''),
                 },
+                self.f['url_incidencia_bitacora']: data.get('url_incidencia_bitacora', ''),
                 self.f['incidente_open']: data.get('incidente_open', ''),
                 self.f['comentario_incidente_bitacora']: data.get('comentario_incidente_bitacora', ''),
                 self.f['incidente_accion']: data.get('incidente_accion', ''),
@@ -10469,6 +10470,7 @@ class Accesos(OcrMixin, AccesosModel):
                 self.incidence_fields['incidencia']: incidencia.get('incidencia', ''),
             },
             self.incidence_fields['area_incidencia_catalog']: {
+                self.incidence_fields['ubicacion_incidencia']: incidencia.get('ubicacion', ''),
                 self.incidence_fields['area_incidencia']: incidencia.get('area', ''),
             },
             self.incidence_fields['estatus']: 'abierto',
@@ -10984,7 +10986,7 @@ class Accesos(OcrMixin, AccesosModel):
                 continue
             res_incidencia = self.create_incidencia_bitacora_from_rondin(incidencia)
             print('res_incidencia', res_incidencia)
-            incidencia_id = res_incidencia.get('json', {}).get('id')
+            incidencia_id = res_incidencia.get('json', {}).get('id') or res_incidencia.get('json', {}).get('_id')
             if incidencia_id:
                 incidencia['url_incidencia_bitacora'] = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{incidencia_id}"
         incidencias_list = self.format_incidencias_to_bitacora(bitacora_in_lkf, incidencia_for_rondin)
