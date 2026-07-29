@@ -1581,7 +1581,8 @@ class Accesos(OcrMixin, AccesosModel):
         print(simplejson.dumps(res, indent=4))
 
         doc = self.cr.find_one(match_query)
-        print(json.dumps(doc["answers"][self.mf['areas_grupo']], indent=2, default=str))
+        if doc:
+            print(json.dumps(doc["answers"][self.mf['areas_grupo']], indent=2, default=str))
 
         return res
 
