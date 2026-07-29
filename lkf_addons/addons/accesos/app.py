@@ -2702,7 +2702,7 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['walkin_fotografia']] = access_pass.get('foto')
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
-        answers[self.pase_entrada_fields['conservar_datos_por']]= access_pass.get('conservar_datos_por', '')
+        # answers[self.pase_entrada_fields['conservar_datos_por']]= access_pass.get('conservar_datos_por', '')
         created_from = access_pass.get('created_from')
         if created_from == 'app':
             created_from = 'pase_de_entrada_app'
@@ -2781,7 +2781,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         #--Condiciones de Servicio
         if access_pass.get('conservar_datos_por'):
-            answers[self.mf['conservar_datos_por']] = access_pass.get('conservar_datos_por','');
+            answers[self.mf['conservar_datos_por']] = access_pass.get('conservar_datos_por','').replace(' ', '_');
 
         if access_pass.get('acepto_aviso_privacidad'):
             if access_pass.get('acepto_aviso_privacidad') == 'true':
