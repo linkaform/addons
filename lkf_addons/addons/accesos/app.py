@@ -10152,7 +10152,6 @@ class Accesos(OcrMixin, AccesosModel):
 
                 incidencia.update({
                     'area':               area_name,
-                    'ubicacion':          check.get('incidente_location', ''),
                     'fecha_incidencia':   fecha_check,
                     })
             incidencias += grupo_incidencias
@@ -10463,18 +10462,15 @@ class Accesos(OcrMixin, AccesosModel):
                 }
             }
         })
-        lugar_incidencia = {}
-        if incidencia.get('ubicacion'):
-            lugar_incidencia[self.incidence_fields['ubicacion_incidencia']] = incidencia.get('ubicacion')
-        if incidencia.get('area'):
-            lugar_incidencia[self.incidence_fields['area_incidencia']] = incidencia.get('area')
         answers = {
             self.incidence_fields['incidencia_catalog']: {
                 self.incidence_fields['categoria']: incidencia.get('categoria', ''),
                 self.incidence_fields['sub_categoria']: incidencia.get('sub_categoria', ''),
                 self.incidence_fields['incidencia']: incidencia.get('incidencia', ''),
             },
-            self.incidence_fields['area_incidencia_catalog']: lugar_incidencia,
+            self.incidence_fields['area_incidencia_catalog']: {
+                self.incidence_fields['area_incidencia']: incidencia.get('area', ''),
+            },
             self.incidence_fields['estatus']: 'abierto',
             self.incidence_fields['prioridad_incidencia']: incidencia.get('prioridad_incidencia', 'leve'),
             self.incidence_fields['notificacion_incidencia']: incidencia.get('notificacion_incidencia', 'no'),
