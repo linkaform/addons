@@ -905,6 +905,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'areas_del_rondin': '66462aa5d4a4af2eea07e0d1',
             'duracion_rondin':'6639b47565d8e5c06fe97cf3',
             'duracion_traslado_area':'6760a9581e31b10a38a22f1f',
+            'porcentaje_obtenido_bitacora': '689a7ecfbf2b4be31039388e',
+            'cantidad_areas_inspeccionadas': '68a7b68a22ac030a67b7f8f8',
             'fecha_inspeccion_area':'6760a908a43b1b0e41abad6b',
             'fecha_programacion':'6760a8e68cef14ecd7f8b6fe',
             'fecha_inicio_rondin':'6818ea068a7f3446f1bae3b3',

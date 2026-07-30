@@ -10157,6 +10157,32 @@ class Accesos(OcrMixin, AccesosModel):
             incidencias += grupo_incidencias
         return incidencias
 
+    def get_incidencias_from_rondin_record(self, rondin_record):
+        """
+        Extrae y normaliza las incidencias reportadas a nivel rondín (record.incidencia_rondin
+        en CouchDB), a diferencia de las incidencias reportadas dentro de un check de área.
+        Args:
+            rondin_record (json): El documento de CouchDB del rondin (type='rondin')
+        Returns:
+            incidencias (list): Lista de dicts normalizados con info de cada incidencia,
+                mismo formato que get_incidencias_from_checks()
+        """
+        incidencias = []
+        incidencias_rondin = (rondin_record or {}).get('record', {}).get('incidencia_rondin', [])
+        for incidencia in incidencias_rondin:
+            incidencias.append({
+                'area':                          '',
+                'fecha_incidencia':              incidencia.get('fecha', ''),
+                'categoria':                      incidencia.get('categoria', ''),
+                'sub_categoria':                  incidencia.get('sub_categoria', ''),
+                'incidencia':                     incidencia.get('incidente') or incidencia.get('otro_incidente', ''),
+                'comentario_incidente_bitacora':  incidencia.get('comentario', ''),
+                'incidente_accion':               incidencia.get('accion', ''),
+                'incidente_evidencia':            incidencia.get('evidencia', []),
+                'incidente_documento':            incidencia.get('documento', []),
+            })
+        return incidencias
+
     def sync_rondin_to_lkf(self, rondin_id, rondin_record={}):
         """
         Sincroniza la bitácora del rondín hacia Linkaform ya sea usando checks ya procesados. O
@@ -10187,6 +10213,13 @@ class Accesos(OcrMixin, AccesosModel):
         # Obtiene los checks que se han contestado del rondin de Mongodb
         checks_for_rondin = self.get_rondin_checks(rondin_id)
 
+        if not rondin_record:
+            # Este sync se disparó solo por un check de área suelto (Stage 3), sin el
+            # documento 'rondin' en el mismo batch. Para saber si en realidad ya se
+            # finalizó (o canceló) el rondín -- y no depender de qué documento llegó en
+            # este sync en particular -- hay que leer el estado real y actual en CouchDB.
+            rondin_record = self.cr_db.get(rondin_id) or {}
+
         # Enriquecer checks con checked_at del doc CouchDB (que tiene la hora local real por área)
         couch_dates = {
             ca.get('area'): ca.get('checked_at')
@@ -10203,6 +10236,9 @@ class Accesos(OcrMixin, AccesosModel):
             fecha = chk.get('fecha_hora_inspeccion_area') or chk.get('fecha_inspeccion_area') or chk.get('created_at', '')
             print(f"    área={area!r}  fecha_inspeccion={chk.get('fecha_hora_inspeccion_area')!r}  created_at={chk.get('created_at')!r}  → usará={fecha!r}")
         incidencia_for_rondin = self.get_incidencias_from_checks(checks_for_rondin)
+        if rondin_record.get('record', {}).get('incidencia_rondin'):
+            self.do_attachments(rondin_record)
+            incidencia_for_rondin += self.get_incidencias_from_rondin_record(rondin_record)
         data = rondin_record or {
             '_id': rondin_id,
             'record': {},
@@ -10347,13 +10383,20 @@ class Accesos(OcrMixin, AccesosModel):
     ### Rondines <<<
 
     def get_bitacora_by_id(self, record_id):
+        # record_id es el _id de la primera versión (lo que couch guarda como rondin_id),
+        # pero LinkaForm crea un _id nuevo en cada patch (versionado) sin marcar el anterior
+        # como deleted_at. connection_record_id se mantiene estable entre todas las versiones,
+        # así que hay que buscar por ahí y tomar la más reciente, o si no se pierden los cambios
+        # de la última sincronización (dedup de incidencias, areas, etc. quedan obsoletos).
         try:
             query = [
                 {"$match": {
                     "deleted_at": {"$exists": False},
                     "form_id": self.BITACORA_RONDINES,
-                    "_id": ObjectId(record_id)
+                    "connection_record_id": ObjectId(record_id)
                 }},
+                {"$sort": {"updated_at": -1}},
+                {"$limit": 1},
                 {"$project": {
                     "_id": 1,
                     "folio": 1,
@@ -10380,12 +10423,18 @@ class Accesos(OcrMixin, AccesosModel):
         return fecha_str
 
     def format_ids_incidencias_to_bitacora(self, data):
-        fecha_str = self._format_fecha(data.get('fecha_incidencia'))
+        # data puede venir "fresca" (de get_incidencias_from_checks/get_incidencias_from_rondin_record,
+        # con llaves 'area'/'fecha_incidencia') o ya "existente" (de bitacora_in_lkf tras _labels(),
+        # con llaves 'nombre_area_salida'/'fecha_hora_incidente_bitacora') — se soportan ambas.
+        area = data.get('area')
+        if area is None:
+            area = data.get('nombre_area_salida', '')
+        fecha_str = self._format_fecha(data.get('fecha_incidencia') or data.get('fecha_hora_incidente_bitacora'))
         res = {
                 self.Location.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID: {
-                    self.f['nombre_area_salida']: data.get('area'),
+                    self.f['nombre_area_salida']: area,
                 },
-                self.f['fecha_hora_incidente_bitacora']: data.get('fecha_incidencia', fecha_str),
+                self.f['fecha_hora_incidente_bitacora']: fecha_str,
                 self.LISTA_INCIDENCIAS_CAT_OBJ_ID: {
                     self.f['categoria']: data.get('categoria', ''),
                     self.f['sub_categoria']: data.get('sub_categoria', ''),
@@ -11066,11 +11115,59 @@ class Accesos(OcrMixin, AccesosModel):
         elif estatus_bitacora_in_couch == 'cancel':
             answers[self.f['estatus_del_recorrido']] = 'cancelado'
         else:
-            answers[self.f['estatus_del_recorrido']] = 'realizado'
+            # Sin señal explícita del couch (p.ej. sync disparado solo por un check de
+            # área, sin el documento 'rondin' -- Stage 3 de sync_records). No asumir que
+            # terminó solo porque llegó un check: sigue en_proceso hasta que todas las
+            # áreas tengan fecha de inspección.
+            areas_formateadas = answers.get(self.f['areas_del_rondin'], [])
+            todas_checadas = bool(areas_formateadas) and all(a.get(self.f['fecha_inspeccion_area']) for a in areas_formateadas)
+            answers[self.f['estatus_del_recorrido']] = 'realizado' if todas_checadas else 'en_proceso'
 
         answers[self.CONFIGURACION_RECORRIDOS_OBJ_ID] = conf_recorrido
         if not answers.get(self.f['fecha_inicio_rondin']):
-            answers[self.f['fecha_inicio_rondin']] = data.get('record', {}).get('fecha_inicio', '')
+            primer_check = next(
+                (a for a in answers.get(self.f['areas_del_rondin'], []) if a.get(self.f['fecha_inspeccion_area'])),
+                None
+            )
+            answers[self.f['fecha_inicio_rondin']] = (
+                primer_check.get(self.f['fecha_inspeccion_area']) if primer_check
+                else data.get('record', {}).get('fecha_inicio', '')
+            )
+
+        if (answers.get(self.f['estatus_del_recorrido']) in ('realizado', 'cerrado')
+                and not answers.get(self.f['fecha_fin_rondin'])):
+            ultimo_check = next(
+                (a for a in reversed(answers.get(self.f['areas_del_rondin'], [])) if a.get(self.f['fecha_inspeccion_area'])),
+                None
+            )
+            answers[self.f['fecha_fin_rondin']] = (
+                ultimo_check.get(self.f['fecha_inspeccion_area']) if ultimo_check
+                else data.get('record', {}).get('fecha_finalizacion', '')
+            )
+
+        # Métricas del rondín (duración total, % de avance, áreas inspeccionadas y
+        # duración de traslado entre áreas). Antes las calculaba el before-trigger
+        # bitacora_rondines.py, pero ese trigger generaba una versión nueva del
+        # registro en cada guardado, así que se calculan aquí directamente.
+        areas_para_metricas = answers.get(self.f['areas_del_rondin'], [])
+        areas_con_fecha = sorted(
+            (
+                (self.date_2_epoch(a.get(self.f['fecha_inspeccion_area'])), a)
+                for a in areas_para_metricas
+                if self.date_2_epoch(a.get(self.f['fecha_inspeccion_area']))
+            ),
+            key=lambda x: x[0]
+        )
+        if areas_con_fecha:
+            fecha_inicio_epoch = self.date_2_epoch(answers.get(self.f['fecha_inicio_rondin'])) or areas_con_fecha[0][0]
+            first_epoch = areas_con_fecha[0][0]
+            for epoch, area in areas_con_fecha:
+                area[self.f['duracion_traslado_area']] = round((epoch - first_epoch) / 60, 2)
+            fecha_final_epoch = areas_con_fecha[-1][0]
+            cantidad_inspeccionadas = len(areas_con_fecha)
+            answers[self.f['duracion_rondin']] = round((fecha_final_epoch - fecha_inicio_epoch) / 60, 2)
+            answers[self.f['porcentaje_obtenido_bitacora']] = str(round((cantidad_inspeccionadas / len(areas_para_metricas)) * 100, 2)) + '%'
+            answers[self.f['cantidad_areas_inspeccionadas']] = f"{cantidad_inspeccionadas}/{len(areas_para_metricas)}"
 
         comentarios_in_couch = data.get('record', {}).get('comentarios_rondin', [])
         comentarios_in_lkf = bitacora_in_lkf.get('grupo_comentarios_generales', [])
@@ -11102,25 +11199,34 @@ class Accesos(OcrMixin, AccesosModel):
 
         answers[self.f['grupo_comentarios_generales']] = comentarios_finales
         if answers:
-            metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_RONDINES)
-            metadata.update(self.get_record_by_folio(bitacora_in_lkf.get('folio'), self.BITACORA_RONDINES, select_columns={'_id': 1}, limit=1))
+            record_id = bitacora_in_lkf.get('_id')
+            # areas_del_rondin, bitacora_rondin_incidencias y grupo_comentarios_generales se
+            # reconstruyen completos en cada sync (no son ediciones incrementales a filas
+            # existentes), así que se escriben directo a Mongo en vez de patch_multi_record:
+            # ese método espera un diccionario indexado por posición para grupos, y con un
+            # rebuild completo eso solo inserta filas nuevas y duplicaría el grupo en cada
+            # guardado (mismo criterio que el desglose de bitácora de transportistas).
+            grupos_completos = {}
+            for grupo_field in (self.f['areas_del_rondin'], self.f['bitacora_rondin_incidencias'], self.f['grupo_comentarios_generales']):
+                if grupo_field in answers:
+                    grupos_completos[f'answers.{grupo_field}'] = answers.pop(grupo_field)
+            if grupos_completos:
+                self.cr.update_one(
+                    {'_id': ObjectId(record_id), 'form_id': self.BITACORA_RONDINES, 'deleted_at': {'$exists': False}},
+                    {'$set': grupos_completos}
+                )
 
-            metadata.update({
-                'properties': {
-                    "device_properties": {
-                        "system": "Addons",
-                        "process":"Actualizacion de Bitacora",
-                        "accion":'rondines_cache',
-                        "folio": bitacora_in_lkf.get('folio'),
-                        "archive": "rondines_cache.py"
-                    }
-                },
-                'answers': answers,
-                '_id': bitacora_in_lkf.get('_id')
-            })
-            res = self.net.patch_forms_answers(metadata)
+            # patch_multi_record actualiza el resto de los campos (no repetitivos) en su
+            # lugar por _id, sin crear una nueva versión/registro en LinkaForm (a diferencia
+            # de patch_forms_answers, que reescribe el documento completo y genera un nuevo
+            # _id en cada llamada).
+            res = {'status_code': 202} if not answers else self.lkf_api.patch_multi_record(
+                answers=answers,
+                form_id=self.BITACORA_RONDINES,
+                record_id=[record_id]
+            )
             print('res',res)
-            if res.get('status_code') == 202:
+            if res.get('status_code') in (201, 202):
                 data['status'] = 'received'
                 data['inbox'] = False
                 self.cr_db.save(data)
