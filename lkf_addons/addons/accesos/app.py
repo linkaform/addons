@@ -4798,8 +4798,8 @@ class Accesos(OcrMixin, AccesosModel):
             match_query["$or"] = [
                 {"folio": {"$regex": pattern, "$options": "i"}},
                 {"user_name": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['nombre_equipo']}": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['marca_equipo_concesion']}": {"$regex": pattern, "$options": "i"}},
+                {f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['nombre_equipo']}": {"$regex": pattern, "$options": "i"}},
+                {f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['marca_equipo_concesion']}": {"$regex": pattern, "$options": "i"}},
                 {f"answers.{self.cons_f['persona_nombre_concesion']}": {"$regex": pattern, "$options": "i"}},
                 {f"answers.{self.cons_f['persona_nombre_otro']}": {"$regex": pattern, "$options": "i"}},
                 {f"answers.{self.cons_f['observacion_concesion']}": {"$regex": pattern, "$options": "i"}},
