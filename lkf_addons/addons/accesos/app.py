@@ -4099,7 +4099,6 @@ class Accesos(OcrMixin, AccesosModel):
             }},
         ]
         raw_result = self.format_cr(self.cr.aggregate(query))
-        print("QUE PASA",simplejson.dumps(raw_result, indent=4))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
                 #TODO Verficiar el cambio de key
@@ -4126,13 +4125,67 @@ class Accesos(OcrMixin, AccesosModel):
                                 envios.add(envs)
 
         tipos = self.get_tipos_de_pase(ubicaciones)
+        permisos_certificaciones = self.get_permisos_por_perfil(["Visitantes de Planta"]) if tipos else []
+
         return {
             "ubicaciones": ubicaciones,
             "requerimientos": list(requerimientos),
             "envios": list(envios),
             "tipos": tipos,
             "condiciones_servicio": condiciones_servicio,
+            "permisos_certificaciones": permisos_certificaciones,
         }
+
+
+    def get_tipos_de_pase(self, ubicaciones=[]):
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.CONF_PERFILES,
+                f"answers.{self.PERFILES_OBJ_ID}.{self.mf['walkin']}": "Si"
+            }},
+            {'$project': {
+                "ubicacion": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                "tipo": f"$answers.{self.PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}",
+            }},
+            {'$group': {
+                "_id": {"$ifNull": ["$ubicacion", "General"]},
+                "tipos": {"$addToSet": "$tipo"}
+            }},
+            {'$project': {
+                "_id": 0,
+                "ubicacion": "$_id",
+                "tipos": 1
+            }}
+        ]
+        if isinstance(ubicaciones, str):
+            ubicaciones = [ubicaciones,]
+        data = self.format_cr(self.cr.aggregate(query))
+        if not data:
+            return []
+        mapped = {
+            item.get("ubicacion", "General"): set(item.get("tipos", []))
+            for item in data
+        }
+
+        tipos_generales = mapped.get("General", set())
+
+        if not ubicaciones:
+            return sorted(tipos_generales)
+
+        tipos_por_ubicacion = []
+
+        for u in ubicaciones:
+            tipos_especificos = mapped.get(u, set())
+            tipos_reales = tipos_especificos | tipos_generales
+            tipos_por_ubicacion.append(tipos_reales)
+
+        tipos_comunes = tipos_por_ubicacion[0].copy()
+
+        for t in tipos_por_ubicacion[1:]:
+            tipos_comunes &= t
+        return sorted(tipos_comunes)
+
 
     def get_config_accesos(self):
         response = []
@@ -4222,13 +4275,83 @@ class Accesos(OcrMixin, AccesosModel):
         # print(simplejson.dumps(data, indent=4))
         return data
 
-    def get_tipos_de_pase(self, ubicaciones=[]):
+    def _flatten_scalar(self, value):
+        """Quita capas de lista anidadas hasta llegar a un valor plano (no lista)."""
+        while isinstance(value, list):
+            if not value:
+                return None
+            value = value[0]
+        return value
+
+    def _flatten_list(self, value):
+        """Quita capas de lista anidadas de más hasta llegar a una lista plana de valores."""
+        while isinstance(value, list) and len(value) == 1 and isinstance(value[0], list):
+            value = value[0]
+        if not isinstance(value, list):
+            value = [value] if value is not None else []
+        return value
+
+    def get_permisos_por_perfil(self, perfil):
+        if isinstance(perfil, str):
+            perfil = [perfil, ]
+
         query = [
             {'$match': {
                 "deleted_at": {"$exists": False},
                 "form_id": self.CONF_PERFILES,
-                f"answers.{self.PERFILES_OBJ_ID}.{self.mf['walkin']}": "Si"
+                f"answers.{self.PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}": {"$in": perfil}
             }},
+            {'$project': {
+                "_id": 0,
+                "nombre_permiso": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['nombre_permiso']}",
+                "requerimientos_pase": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['requerimientos']}",
+                "vigencia_certificado": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['vigencia_certificado']}",
+                "vigencia_certificado_en": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['vigencia_certificado_en']}",
+            }}
+        ]
+
+        data = self.format_cr(self.cr.aggregate(query))
+        if not data:
+            return []
+
+        permisos = []
+
+        for doc in data:
+            nombres = doc.get("nombre_permiso") or []
+            requerimientos = doc.get("requerimientos_pase") or []
+
+            vigencia_certificado = self._flatten_scalar(doc.get("vigencia_certificado"))
+            vigencia_certificado_en = self._flatten_scalar(doc.get("vigencia_certificado_en"))
+
+            if not isinstance(nombres, list):
+                nombres = [nombres]
+            if not isinstance(requerimientos, list):
+                requerimientos = [requerimientos]
+
+            for i, nombre in enumerate(nombres):
+                if not nombre:
+                    continue
+                reqs = self._flatten_list(requerimientos[i]) if i < len(requerimientos) else []
+                permisos.append({
+                    "nombre_permiso": nombre,
+                    "vigencia_certificado": vigencia_certificado,
+                    "vigencia_certificado_en": vigencia_certificado_en,
+                    "requerimientos_pase": reqs,
+                })
+
+        return permisos
+
+    def get_tipos_de_pase(self, ubicaciones=[], walkin=None):
+        match_stage = {
+            'deleted_at': {'$exists': False},
+            'form_id': self.CONF_PERFILES,
+        }
+
+        if walkin is not None:
+            match_stage[f"answers.{self.PERFILES_OBJ_ID}.{self.mf['walkin']}"] = walkin
+
+        query = [
+            {'$match': match_stage},
             {'$project': {
                 "ubicacion": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                 "tipo": f"$answers.{self.PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}",
@@ -4243,11 +4366,14 @@ class Accesos(OcrMixin, AccesosModel):
                 "tipos": 1
             }}
         ]
+
         if isinstance(ubicaciones, str):
             ubicaciones = [ubicaciones,]
+
         data = self.format_cr(self.cr.aggregate(query))
         if not data:
             return []
+
         mapped = {
             item.get("ubicacion", "General"): set(item.get("tipos", []))
             for item in data
@@ -4269,6 +4395,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         for t in tipos_por_ubicacion[1:]:
             tipos_comunes &= t
+
         return sorted(tipos_comunes)
 
     def get_count_ingresos(self, qr_code):

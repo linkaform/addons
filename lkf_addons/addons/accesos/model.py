@@ -339,7 +339,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
             'walkin':'66c4261351cc14058b020d48',
             'grupo_asignado_a':'6a309d27b3f21fceb68eeb01',
-            'nombre_forma': '5d810a982628de5556500d55'
+            'nombre_forma': '5d810a982628de5556500d55',
+            'permisos_certificaciones_grupo':'6622a883f795581dbd730290'
         }
         self.mf = mf
         ## Form Fields ##
