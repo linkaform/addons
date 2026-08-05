@@ -4463,6 +4463,7 @@ class Accesos(OcrMixin, AccesosModel):
                 'limitado_a_dias':f"$answers.{self.mf['config_dias_acceso']}",
                 'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
                 'perfil_pase':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}",
+                'walkin':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['walkin']}",
                 'tipo_de_pase':f"$answers.{self.pase_entrada_fields['perfil_pase']}",
                 'tipo_de_comentario': f"$answers.{self.mf['tipo_de_comentario']}",
                 'visita_a_nombre':
@@ -4575,6 +4576,8 @@ class Accesos(OcrMixin, AccesosModel):
                 visita_a.append(emp)
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
+            print("PERTFIL PASEEEE", perfil_pase)
+
             perfil_pase = self._labels(perfil_pase, self.mf)
             if x.get('fecha_de_caducidad') == "":
                 x['fecha_de_caducidad'] = x.get('fecha_de_expedicion')
