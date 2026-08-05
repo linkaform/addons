@@ -1591,16 +1591,17 @@ class Accesos(OcrMixin, AccesosModel):
         # cat_vehiculos= self.catalogo_vehiculos({})
         # cat_estados= self.catalogo_estados({})
         pass_selected = self.get_pass_custom(qr_code)
-
         ubicaciones = pass_selected.get('ubicacion', [])
-        config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones)
+        tipo_de_pase = pass_selected.get('tipo_de_pase', "")
+        config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones, tipo_de_pase)
         condiciones_servicio = config_modulo_seguridad.get('condiciones_servicio', {})
-        print("CONDICION", condiciones_servicio)
+        permisos_certificaciones = config_modulo_seguridad.get('permisos_certificaciones',)
         res = {
             "pass_selected": pass_selected,
             "documento_de_condiciones_de_servicio": condiciones_servicio.get('doc_condiciones_servicio', ''),
             "url_de_condiciones_de_servicio": condiciones_servicio.get('url_condiciones_servicio', ''),
             "desc_condiciones_servicio": condiciones_servicio.get('desc_condiciones_servicio', ''),
+            "permisos_certificaciones": permisos_certificaciones
         }
         return res
 
@@ -4079,7 +4080,7 @@ class Accesos(OcrMixin, AccesosModel):
 
 
 
-    def get_config_modulo_seguridad(self, ubicaciones=[]):
+    def get_config_modulo_seguridad(self, ubicaciones=[], tipo_de_pase=""):
         #TODO Verificar por que se envia asi la lista
         if isinstance(ubicaciones, list) and ubicaciones and isinstance(ubicaciones[0], dict):
             ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
@@ -4125,7 +4126,7 @@ class Accesos(OcrMixin, AccesosModel):
                                 envios.add(envs)
 
         tipos = self.get_tipos_de_pase(ubicaciones)
-        permisos_certificaciones = self.get_permisos_por_perfil(["Visitantes de Planta"]) if tipos else []
+        permisos_certificaciones = self.get_permisos_por_perfil(tipo_de_pase) if tipo_de_pase else ""
 
         return {
             "ubicaciones": ubicaciones,
@@ -6270,6 +6271,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "url_padre" or \
                key == "estatus_pase_padre" or \
                key == "link_padre" or \
+               key == "tipo_de_pase" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
