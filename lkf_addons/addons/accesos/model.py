@@ -874,6 +874,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tiempo_para_ejecutar_tarea_expresado_en': 'abcde0001000000000010005',
             'tipo_asignacion':'6a344c7a6e574352dcccc7ba',
             'tipo_rondin':'69b9b98d2a02f4a0dd35f5c1',
+            'tipo':'69b9b98d2a02f4a0dd35f5c1',
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
             'grupo_asignado_a':'6a31d37adeceb005758cd4e2',
             'area':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
