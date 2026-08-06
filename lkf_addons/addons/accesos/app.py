@@ -4520,7 +4520,7 @@ class Accesos(OcrMixin, AccesosModel):
             f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['url_padre']= self.unlist(x.get('url_padre',''))
-
+            x['walkin']=self.unlist(x.get('walkin', ''))
             # Si es un pase hijo, ir a buscar el link del pase padre
             if x.get('url_padre'):
                 padre_id_match = re.search(r'/records/detail/([a-fA-F0-9]{24})', x['url_padre'])
@@ -4576,7 +4576,6 @@ class Accesos(OcrMixin, AccesosModel):
                 visita_a.append(emp)
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
-            print("PERTFIL PASEEEE", perfil_pase)
 
             perfil_pase = self._labels(perfil_pase, self.mf)
             if x.get('fecha_de_caducidad') == "":
@@ -6275,6 +6274,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "estatus_pase_padre" or \
                key == "link_padre" or \
                key == "tipo_de_pase" or \
+               key == "walkin" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
