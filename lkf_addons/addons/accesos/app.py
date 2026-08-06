@@ -4506,6 +4506,7 @@ class Accesos(OcrMixin, AccesosModel):
             {'$sort':{'created_at':-1}},
         ]
         res = self.cr.aggregate(query)
+        
         x = {}
         for x in res:
             if get_answers:
@@ -4520,6 +4521,7 @@ class Accesos(OcrMixin, AccesosModel):
             f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['url_padre']= self.unlist(x.get('url_padre',''))
+            print("RESSSS",x.get('walkin', ''))
             x['walkin']=self.unlist(x.get('walkin', ''))
             # Si es un pase hijo, ir a buscar el link del pase padre
             if x.get('url_padre'):
@@ -8312,6 +8314,7 @@ class Accesos(OcrMixin, AccesosModel):
         pass_selected= self.get_detail_access_pass(qr_code=folio, get_answers=True)
         qr_code= folio
         _folio= pass_selected.get("folio")
+   
         answers={}
         acompanantes_a_actualizar = []
         for key, value in access_pass.items():
@@ -8425,6 +8428,15 @@ class Accesos(OcrMixin, AccesosModel):
                 answers.update({f"{self.pase_entrada_fields[key]}": [value]})
             elif key == 'conservar_datos_por':
                 answers.update({f"{self.pase_entrada_fields[key]}": value.replace(" ", "_")})
+            elif key =='permisos_certificaciones':
+                answers[self.mf['permisos_certificaciones_evidencias']] = {}
+                for index, item in enumerate(value):
+                    obj = {
+                        self.mf['nombre_del_permiso']: item.get('nombre_del_permiso', ''),
+                        self.mf['evidencia_documento_permiso']: item.get('documento', []),
+                        self.mf['evidencia_fotografia_permiso']: item.get('foto', []),
+                    }
+                    answers[self.mf['permisos_certificaciones_evidencias']][(index+1)*-1] = obj
             # elif key == 'acompanantes':
             #     answers[self.pase_entrada_fields['acompanantes_grupo']] = {}
             #     for index, item in enumerate(value):
