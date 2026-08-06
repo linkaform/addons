@@ -340,7 +340,11 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'walkin':'66c4261351cc14058b020d48',
             'grupo_asignado_a':'6a309d27b3f21fceb68eeb01',
             'nombre_forma': '5d810a982628de5556500d55',
-            'permisos_certificaciones_grupo':'6622a883f795581dbd730290'
+            'permisos_certificaciones_grupo':'6622a883f795581dbd730290',
+            'permisos_certificaciones_evidencias':'6a74d15ebbfb86985232bc76',
+            'nombre_del_permiso':'6a74d27fa9bf0d441f4c243f',
+            'evidencia_documento_permiso':'6a74d27fa9bf0d441f4c2440',
+            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441'
         }
         self.mf = mf
         ## Form Fields ##
@@ -738,7 +742,13 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'habilitar_vehiculo':'6a218bf63b5cf6f0c1c55f29',
             'worker_position': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
-            'firma_reglas_de_acceso':'6a67caac45f44675221f56e7'
+            'firma_reglas_de_acceso':'6a67caac45f44675221f56e7',
+            'permisos_certificaciones_grupo':'6622a883f795581dbd730290',
+            'permisos_certificaciones_evidencias':'6a74d15ebbfb86985232bc76',
+            'permisos_certificaciones':'6a74d15ebbfb86985232bc76',
+            'nombre_del_permiso':'6a74d27fa9bf0d441f4c243f',
+            'evidencia_documento_permiso':'6a74d27fa9bf0d441f4c2440',
+            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441'
         }
 
         self.pase_grupo_visitados ={
