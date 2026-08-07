@@ -1706,7 +1706,7 @@ class Accesos(OcrMixin, AccesosModel):
             self.employee = employee
             return {
                 self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
-                    self.mf['nombre_empleado']: [employee.get('worker_name')],
+                    self.mf['nombre_empleado']: employee.get('worker_name'),
                     self.mf['telefono_visita_a']: [self.unlist(employee.get('new_user_phone', employee.get('telefono2', employee.get('telefono1', ''))))],
                     self.mf['email_visita_a']: [self.unlist(employee.get('new_user_email', employee.get('usuario_email', '')))],
                     self.mf['user_id_empleado']: [self.unlist(employee.get('user_id_id', employee.get('usuario_id', '')))],
