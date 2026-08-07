@@ -1702,10 +1702,18 @@ class Accesos(OcrMixin, AccesosModel):
 
     def catalog_visita_a_pases(self, visita_a):
         if visita_a == 'Usuario Actual':
-            user_id = self.user['user_id']
             employee = self.Employee.get_employee_data(user_id=self.user['user_id'], get_one=True)
             self.employee = employee
-            visita_a = employee.get('worker_name')
+            return {
+                self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
+                    self.mf['nombre_empleado']: [employee.get('worker_name')],
+                    self.mf['telefono_visita_a']: [self.unlist(employee.get('new_user_phone', employee.get('telefono2', employee.get('telefono1', ''))))],
+                    self.mf['email_visita_a']: [self.unlist(employee.get('new_user_email', employee.get('usuario_email', '')))],
+                    self.mf['user_id_empleado']: [self.unlist(employee.get('user_id_id', employee.get('usuario_id', '')))],
+                    self.mf['departamento_empleado']: [self.unlist(employee.get('worker_department', ''))],
+                    self.mf['puesto_empleado']: [self.unlist(employee.get('worker_position', ''))],
+                }
+            }
         visita_set = {
             self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
                 self.mf['nombre_empleado'] : visita_a,
