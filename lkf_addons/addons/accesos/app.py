@@ -585,6 +585,7 @@ class Accesos(OcrMixin, AccesosModel):
 
             if answers.get(self.pase_entrada_fields['catalago_autorizado_por'],{}).get(self.pase_entrada_fields['autorizado_por']):
                 autorizado_ok = True
+        print("QUE PASA, ", foto_ok , id_vista , fecha_ok , vista_a_ok , autorizado_ok)
         if foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
             status = 'activo'
         elif foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
@@ -1702,7 +1703,11 @@ class Accesos(OcrMixin, AccesosModel):
 
     def catalog_visita_a_pases(self, visita_a):
         if visita_a == 'Usuario Actual':
-            employee = self.Employee.get_employee_data(user_id=self.user['user_id'], get_one=True)
+            employee = self.Employee.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
+            if not employee and self.user.get('email'):
+                employee = self.Employee.get_employee_data(email=self.user.get('email'), get_one=True)
+            if not employee and self.user.get('username'):
+                employee = self.Employee.get_employee_data(username=self.user.get('username'), get_one=True)
             self.employee = employee
             return {
                 self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
