@@ -1,10 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
     <templates>[]</templates>
-    <confirmation>{}</confirmation>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
     <description />
-    <_rev>1-e74c740b2f25a1d322ed1965d543dc6d</_rev>
-    <updated_at>2026-07-02T23:21:23.980819+00:00Z</updated_at>
+    <_rev>6-162edf803375e522e444f7930123aae0</_rev>
+    <updated_at>2026-07-03T00:45:40.157200+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -12,12 +16,15 @@
     <filters>{}</filters>
     <name>Rol</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2026-07-02T23:21:23.980819+00:00Z</created_at>
-    <advanced_options>{}</advanced_options>
-    <catalog_id>157801</catalog_id>
-    <sync_last_update>None</sync_last_update>
-    <_id>6a46f2730fc4d03a90da2208</_id>
-    <public>False</public>
+    <created_at>2026-07-03T00:45:40.157200+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
     <catalog_pages>
         <item>
             <page_fields>
@@ -43,8 +50,12 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_description>None</page_description>
             <page_name>Página 1</page_name>
+            <page_description>None</page_description>
         </item>
     </catalog_pages>
+    <sync_last_update>None</sync_last_update>
+    <_id>6a470634de711f1df3ec49b5</_id>
+    <public>False</public>
+    <catalog_id>157820</catalog_id>
 </lkf>
