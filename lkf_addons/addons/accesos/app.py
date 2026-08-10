@@ -476,8 +476,14 @@ class Accesos(OcrMixin, AccesosModel):
             if visita == 'Usuario Actual':
                 user_id = self.user['user_id']
                 employee = self.Employee.get_employee_data(user_id=self.user['user_id'], get_one=True)
+                if not employee or not employee.get('worker_name'):
+                    employee = self.Employee.get_employee_data(email=self.user.get('email'), get_one=True)
                 self.employee = employee
-                visita_set.update(self.visita_a_set_format(employee))
+                if employee and employee.get('worker_name'):
+                    visita_set.update(self.visita_a_set_format(employee))
+                else:
+                    visita_set = {self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
+                    self.mf['nombre_empleado'] : self.user.get('username', self.user.get('email', ''))}}
                 if visita_set:
                     res.append(visita_set)
                 continue
@@ -8467,7 +8473,11 @@ class Accesos(OcrMixin, AccesosModel):
             else:
                 if value:
                     answers.update({f"{self.pase_entrada_fields[key]}":value})
-        employee = getattr(self,'employee',self.get_employee_data(email=self.user.get('email'), get_one=True))
+        employee = getattr(self,'employee', None)
+        if not employee:
+            employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
+        if not employee:
+            employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         if answers:
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
