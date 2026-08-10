@@ -491,7 +491,7 @@ class Accesos(OcrMixin, AccesosModel):
                 employee = self.Employee.get_employee_data(name = visita, get_one=True)
                 self.employee = employee
             visita_set.update(self.visita_a_set_format(employee))
-            if visita_set and self.employee:
+            if visita_set and self.employee and self.employee.get('worker_name'):
                 res.append(visita_set)
             else:
                 visita_set = {self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
@@ -2696,7 +2696,7 @@ class Accesos(OcrMixin, AccesosModel):
             access_pass['config_limitar_acceso'] =  1
 
         answers[self.pase_entrada_fields['acompanantes']]= access_pass.get('acompanantes', 0)
-        answers[self.pase_entrada_fields['acompanantes_grupo']]= access_pass.get('acompanantes_grupo', 0)
+        answers[self.pase_entrada_fields['acompanantes_grupo']]= access_pass.get('acompanantes_grupo') or []
         answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
         answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
         answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',1)
@@ -9104,12 +9104,12 @@ class Accesos(OcrMixin, AccesosModel):
         """
         res = {}
         nombre_visita_a = employee.get('worker_name')
-        phone = self.unlist(employee.get('new_user_phone', employee.get('telefono2', employee.get('telefono1',""))))
-        email = self.unlist(employee.get('new_user_email', employee.get('usuario_email', "")))
-        user_id_id = self.unlist(employee.get('user_id_id',employee.get('usuario_id',"")))
-        username = self.unlist(employee.get('new_user_username',""))
-        departamento = self.unlist(employee.get('worker_department',""))
-        puesto = self.unlist(employee.get('worker_position',""))
+        phone = self.unlist(employee.get('new_user_phone', employee.get('telefono2', employee.get('telefono1',"")))) or ""
+        email = self.unlist(employee.get('new_user_email', employee.get('usuario_email', ""))) or ""
+        user_id_id = self.unlist(employee.get('user_id_id',employee.get('usuario_id',""))) or ""
+        username = self.unlist(employee.get('new_user_username',"")) or ""
+        departamento = self.unlist(employee.get('worker_department',"")) or ""
+        puesto = self.unlist(employee.get('worker_position',"")) or ""
         #Lo seteamo en una lista porque es campo catlog detail
         res = {self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
                 self.mf['nombre_empleado'] : nombre_visita_a,
