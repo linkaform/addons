@@ -865,7 +865,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'fecha_final_recurrencia': 'abcde0001000000000010099',
             'fecha_hora_programada': 'abcde0001000000000010001',
             'grupo_areas':'66462aa5d4a4af2eea07e0d1',
-            'grupo_asignado': '638a9ab3616398d2e392a9fa',
+            'grupo_asignado': '638a9ab3616398d2e392a9fa', # NOMBRE del grupo al que fue asignado desde del catalogo
             'grupo_asignado_rondin':'671055aaa487da57ba57b294',
             'id_grupo':'639b65dfaf316bacfc551ba2',
             'la_recurrencia_cuenta_con_fecha_final': '64374e47a208e5c0ff95e9bd',
@@ -886,7 +886,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tipo_rondin':'69b9b98d2a02f4a0dd35f5c1',
             'tipo':'69b9b98d2a02f4a0dd35f5c1',
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
-            'grupo_asignado_a':'6a31d37adeceb005758cd4e2',
+            'grupo_asignado_a':'6a31d37adeceb005758cd4e2', # GRUPO REPETITIVO asignado a
             'area':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
             'grupo':f"{self.GRUPOS_CAT_OBJ_ID}",
             'grupo_id':'5d810a982628de5556500d56',
