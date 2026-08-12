@@ -1,10 +1,11 @@
 name: Test - Pases de entrada (preprod)
 
 # Prueba sencilla: corre solo los 2 tests de integración de create_access_pass
-# contra la cuenta preprod (account_id 10). Disparo manual mientras se valida
-# que la mecánica completa (submódulo privado, imagen docker, credenciales)
-# funciona en un runner limpio.
+# contra la cuenta preprod (account_id 10). Se dispara en cada push a master,
+# y también se puede correr a mano desde la pestaña Actions.
 on:
+  push:
+    branches: [master]
   workflow_dispatch:
 
 jobs:
