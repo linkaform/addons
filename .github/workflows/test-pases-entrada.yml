@@ -33,6 +33,9 @@ jobs:
               'APIKEY': '${{ secrets.PREPROD_APIKEY }}',
               'ACCOUNT_ID': '${{ secrets.PREPROD_ACCOUNT_ID }}',
           })
+
+          settings.config.update(config)
+          settings = update_settings(settings)
           EOF
 
       - name: Apuntar entorno a preprod
