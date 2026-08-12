@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Antes de dejar salir un push a master, corre el test de pases de entrada
+# contra preprod. Si falla, el push se cancela.
+#
+# Instalar una vez por clon: git config core.hooksPath githooks
+# Saltarse una vez si hace falta: git push --no-verify
+
+BLOCK_BRANCH="refs/heads/master"
+should_run=false
+
+while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$remote_ref" = "$BLOCK_BRANCH" ]; then
+        should_run=true
+    fi
+done
+
+if [ "$should_run" = false ]; then
+    exit 0
+fi
+
+echo "-> Push a master detectado: corriendo test de pases de entrada contra preprod..."
+echo "   (para saltarte esto una vez: git push --no-verify)"
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT" || exit 1
+
+docker build --platform linux/amd64 -f test/docker/Dockerfile --target develop -t linkaform/lkf_test:develop test/docker
+if [ $? -ne 0 ]; then
+    echo "x No se pudo construir la imagen de test. Push cancelado."
+    exit 1
+fi
+
+docker run --rm \
+    -v "$REPO_ROOT/secrets/lkf_jwt_key.pub:/etc/ssl/certs/lkf_jwt_key.pub" \
+    -v "$REPO_ROOT/lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons" \
+    -v "$REPO_ROOT/modules:/usr/local/lib/python3.10/site-packages/lkf_modules" \
+    -v "$REPO_ROOT/test:/srv/lkf_test" \
+    -v "$REPO_ROOT/config:/srv/scripts/addons/config" \
+    -w /srv/lkf_test \
+    linkaform/lkf_test:develop \
+    pytest sdk_testing/accesos/passes/integration/test_create_access_pass_api.py -v
+
+test_exit=$?
+if [ $test_exit -ne 0 ]; then
+    echo ""
+    echo "x Los tests de pases de entrada fallaron contra preprod. Push cancelado."
+    echo "  Corrige el problema, o usa 'git push --no-verify' si necesitas saltarte esto (no recomendado)."
+    exit 1
+fi
+
+echo "OK: tests de pases de entrada pasaron. Continuando con el push."
+exit 0
