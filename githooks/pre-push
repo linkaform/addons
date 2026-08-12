@@ -24,6 +24,14 @@ echo "   (para saltarte esto una vez: git push --no-verify)"
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT" || exit 1
 
+# Copia de config/ con ENV forzado a preprod, para no depender de (ni tocar)
+# tu config/enviorment.py real. Este test solo debe poder correr contra preprod.
+CONFIG_COPY="$(mktemp -d)"
+trap 'rm -rf "$CONFIG_COPY"' EXIT
+cp -R "$REPO_ROOT/config/." "$CONFIG_COPY/"
+sed -i.bak "s/^ENV = 'prod'/# ENV = 'prod'/; s/^# ENV = 'preprod'/ENV = 'preprod'/" "$CONFIG_COPY/enviorment.py"
+rm -f "$CONFIG_COPY/enviorment.py.bak"
+
 docker build --platform linux/amd64 -f test/docker/Dockerfile --target develop -t linkaform/lkf_test:develop test/docker
 if [ $? -ne 0 ]; then
     echo "x No se pudo construir la imagen de test. Push cancelado."
@@ -35,7 +43,7 @@ docker run --rm \
     -v "$REPO_ROOT/lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons" \
     -v "$REPO_ROOT/modules:/usr/local/lib/python3.10/site-packages/lkf_modules" \
     -v "$REPO_ROOT/test:/srv/lkf_test" \
-    -v "$REPO_ROOT/config:/srv/scripts/addons/config" \
+    -v "$CONFIG_COPY:/srv/scripts/addons/config" \
     -w /srv/lkf_test \
     linkaform/lkf_test:develop \
     pytest sdk_testing/accesos/passes/integration/test_create_access_pass_api.py -v
