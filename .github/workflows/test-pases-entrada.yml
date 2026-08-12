@@ -43,6 +43,47 @@ jobs:
       - name: Construir imagen de test
         run: docker build -f test/docker/Dockerfile --target develop -t linkaform/lkf_test:develop test/docker
 
+      - name: "[TEMP] Diagnostico de login contra preprod"
+        run: |
+          cat > test/ci_debug_login.py <<'PYEOF'
+          import sys
+          sys.path.insert(0, 'sdk_testing/accesos')
+          sys.path.insert(0, '/usr/local/lib/python3.10/site-packages/lkf_modules/accesos/items/scripts/Accesos')
+          from lkf_modules.accesos.items.scripts.Accesos import accesos_utils  # dispara el side-effect de sys.path para account_settings
+          from account_settings import settings
+          from linkaform_api import utils
+
+          apikey = settings.config.get('APIKEY', settings.config.get('API_KEY'))
+          print('USERNAME:', settings.config.get('USERNAME'))
+          print('ACCOUNT_ID configurado:', settings.config.get('ACCOUNT_ID'))
+          print('HOST:', settings.config.get('HOST'))
+          print('APIKEY longitud:', len(apikey) if apikey else 0)
+
+          lkf_api = utils.Cache(settings)
+          resp = lkf_api.get_jwt(api_key=apikey, get_user=True)
+          print('TIPO RESPUESTA:', type(resp))
+          if isinstance(resp, dict):
+              print('CLAVES:', list(resp.keys()))
+              print('success:', resp.get('success'))
+              print('code:', resp.get('code'))
+              for campo in ('error', 'detail', 'message', 'status_code'):
+                  if campo in resp:
+                      print(f'{campo}:', resp[campo])
+              if 'user' in resp:
+                  print('user.id:', resp['user'].get('id'))
+                  print('user.parent_info.id:', resp['user'].get('parent_info', {}).get('id'))
+          else:
+              print('CONTENIDO (no-dict):', resp)
+          PYEOF
+          docker run --rm \
+            -v "${{ github.workspace }}/lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons" \
+            -v "${{ github.workspace }}/modules:/usr/local/lib/python3.10/site-packages/lkf_modules" \
+            -v "${{ github.workspace }}/test:/srv/lkf_test" \
+            -v "${{ github.workspace }}/config:/srv/scripts/addons/config" \
+            -w /srv/lkf_test \
+            linkaform/lkf_test:develop \
+            python3 ci_debug_login.py
+
       - name: Correr tests de integración (create_access_pass)
         run: |
           docker run --rm \
