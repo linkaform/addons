@@ -1037,7 +1037,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         #! Si la caseta esta abierta se actualizan los guardias solamente.
         if is_caseta_open:
-            res = self.update_guards_checkin([{'user_id': user_id, 'name': user_name}], self.last_check_in.get('_id',''), location, area, user, nombre_suplente, fotografia)
+            res = self.update_guards_checkin([{'user_id': user_id, 'name': user_name}], self.last_check_in.get('_id',''), location, area, user, nombre_suplente, fotografia, roles)
             format_res = self.unlist(res)
             if format_res.get('status_code') in [200, 201, 202]:
                 return format_res
@@ -6576,7 +6576,6 @@ class Accesos(OcrMixin, AccesosModel):
                 'checkin_status': f"$answers.{self.f['guard_group']}.{self.f['checkin_status']}",
                 'checkin_position': f"$answers.{self.f['guard_group']}.{self.f['checkin_position']}",
                 'nombre_suplente': f"$answers.{self.f['guard_group']}.{self.checkin_fields['nombre_suplente']}",
-                'roles': f"$answers.{self.f['grupo_roles']}.{self.f['rol']}",
             }},
             {'$group':{
                 '_id': {
@@ -6592,7 +6591,6 @@ class Accesos(OcrMixin, AccesosModel):
                 'folio': {'$last':'$folio'},
                 'id_register': {'$last':'$_id'},
                 'nombre_suplente': {'$last':'$nombre_suplente'},
-                'roles':{'$last':'$roles'}
             }},
             {'$project':{
                 '_id': 0,
@@ -6607,7 +6605,6 @@ class Accesos(OcrMixin, AccesosModel):
                 'folio': '$folio',
                 'id_register': '$id_register',
                 'nombre_suplente': '$nombre_suplente',
-                'roles': '$roles'
             }}
         ]
         data = self.format_cr(self.cr.aggregate(query))
@@ -6615,6 +6612,8 @@ class Accesos(OcrMixin, AccesosModel):
         if data:
             record = self.unlist(data)
             status = 'in' if record.get('checkin_status') in ['in', 'entrada'] else 'out'
+            #! Los roles se guardan en REGISTRO_ASISTENCIA, no en CHECKIN_CASETAS.
+            attendance_images = self.get_attendance_images(record.get('user_id'))
             format_data = {
                 'status':status,
                 'name': record.get('name'),
@@ -6627,7 +6626,7 @@ class Accesos(OcrMixin, AccesosModel):
                 'checkout_date':record.get('checkout_date'),
                 'checkin_position':record.get('checkin_position'),
                 'nombre_suplente':record.get('nombre_suplente',""),
-                'roles':record.get('roles',[])
+                'roles': self.flatten_roles(attendance_images.get('roles', []))
             }
         return format_data
 
@@ -8068,6 +8067,17 @@ class Accesos(OcrMixin, AccesosModel):
 
         return res
 
+    def flatten_roles(self, roles_raw):
+        """
+        Se aplana la estructura de roles (viene como [{ROL_CATALOG_OBJ_ID: {rol: 'Gerente'}}, ...])
+        a una lista simple de strings (['Gerente', ...]) para el frontend.
+        """
+        return [
+            r.get(self.ROL_CATALOG_OBJ_ID, {}).get(self.f['rol'])
+            for r in roles_raw
+            if r.get(self.ROL_CATALOG_OBJ_ID, {}).get(self.f['rol'])
+        ]
+
     def update_guard_status(self, guard, this_user):
         attendance_images = self.get_attendance_images(this_user.get('user_id', self.unlist(this_user.get('usuario_id', 0000))))
         status_turn = 'Turno Cerrado'
@@ -8077,14 +8087,11 @@ class Accesos(OcrMixin, AccesosModel):
         this_user['start_turn_image'] = attendance_images.get('start_turn_image', [])
         this_user['end_turn_image'] = attendance_images.get('end_turn_image', [])
         this_user['status_turn'] = status_turn
-        #! Se aplana la estructura de roles (viene como [{'rol': 'Gerente'}, ...])
-        #! a una lista simple de strings (['Gerente', ...]) para el frontend.
-        roles_raw = attendance_images.get('roles', [])
-        this_user['roles'] = [r.get('rol') for r in roles_raw if r.get('rol')]
+        this_user['roles'] = self.flatten_roles(attendance_images.get('roles', []))
 
         return this_user
 
-    def update_guards_checkin(self, data_guard, record_id, location, area, user_data={}, nombre_suplente="", foto_checkin=[]):
+    def update_guards_checkin(self, data_guard, record_id, location, area, user_data={}, nombre_suplente="", foto_checkin=[], roles=[]):
         response = []
         timezone = user_data.get('timezone', 'America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
@@ -8118,6 +8125,15 @@ class Accesos(OcrMixin, AccesosModel):
                 self.checkin_fields['checkin_type']: 'iniciar_turno',
                 self.f['image_checkin']: foto_checkin
             }
+            if roles:
+                asistencia_answers[self.f['grupo_roles']] = [
+                            {
+                                self.ROL_CATALOG_OBJ_ID: {
+                                    self.f['rol']: rol
+                                }
+                            }
+                            for rol in roles
+                        ]
 
             if nombre_suplente:
                 asistencia_answers.update({
