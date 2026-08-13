@@ -2844,7 +2844,7 @@ class Accesos(OcrMixin, AccesosModel):
             answers[self.pase_entrada_fields['catalago_autorizado_por']] = self.autorizar_pase_acceso(answers)
 
 
-        answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(answers)
+        answers[self.pase_entrada_fields['status_pase']] = kadskads
 
         acompanantes = answers.get(self.pase_entrada_fields['acompanantes'], 0)
         acompanantes_grupo = answers.get(self.pase_entrada_fields['acompanantes_grupo'], [])
