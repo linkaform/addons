@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import os
+import time
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
 from copy import deepcopy
@@ -278,10 +279,29 @@ def get_scripts(download_scritps={}):
             download_file(url, destination)
     return True
 
+FORM_VERSION_RE = re.compile(r'version:\s*\d+\s*\|?\s*')
+
+
+def stamp_form_version(description_text):
+    """Stamps a fresh 'version: <epoch>' marker, keeping any real description text
+    (and dropping a stale version marker from a previous download) so lkfaddons can
+    diff forms without relying on the server-mutated updated_at field.
+    """
+    existing = (description_text or '').strip()
+    existing = FORM_VERSION_RE.sub('', existing).strip(' |')
+    new_version = f'version: {int(time.time())}'
+    if existing:
+        return f'{new_version} | {existing}'
+    return new_version
+
+
 def save_form_xml(xml_data, form_name):
     global items, module_name
     tree = ET.ElementTree(ET.fromstring(xml_data))
     root = tree.getroot()
+    description = root.find('description')
+    if description is not None:
+        description.text = stamp_form_version(description.text)
     # print('dir' ,dir(element))
     if root.findall("form_pages"):
         for page in root.find('form_pages'):

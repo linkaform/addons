@@ -476,8 +476,14 @@ class Accesos(OcrMixin, AccesosModel):
             if visita == 'Usuario Actual':
                 user_id = self.user['user_id']
                 employee = self.Employee.get_employee_data(user_id=self.user['user_id'], get_one=True)
+                if not employee or not employee.get('worker_name'):
+                    employee = self.Employee.get_employee_data(email=self.user.get('email'), get_one=True)
                 self.employee = employee
-                visita_set.update(self.visita_a_set_format(employee))
+                if employee and employee.get('worker_name'):
+                    visita_set.update(self.visita_a_set_format(employee))
+                else:
+                    visita_set = {self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
+                    self.mf['nombre_empleado'] : self.user.get('username', self.user.get('email', ''))}}
                 if visita_set:
                     res.append(visita_set)
                 continue
@@ -491,7 +497,7 @@ class Accesos(OcrMixin, AccesosModel):
                 employee = self.Employee.get_employee_data(name = visita, get_one=True)
                 self.employee = employee
             visita_set.update(self.visita_a_set_format(employee))
-            if visita_set and self.employee:
+            if visita_set and self.employee and self.employee.get('worker_name'):
                 res.append(visita_set)
             else:
                 visita_set = {self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
@@ -524,7 +530,7 @@ class Accesos(OcrMixin, AccesosModel):
             if 'file_url' in foto.keys() and foto['file_url']:
                 foto_ok = self.valid_url(foto['file_url'])
         #TODO revisar configuracion
-        id_vista  = answers[self.pase_entrada_fields['walkin_identificacion']]
+        id_vista  = answers.get(self.pase_entrada_fields['walkin_identificacion'], [])
         if isinstance(id_vista, list) and len(id_vista) > 0:
             id_vista = id_vista[0]
 
@@ -585,6 +591,7 @@ class Accesos(OcrMixin, AccesosModel):
 
             if answers.get(self.pase_entrada_fields['catalago_autorizado_por'],{}).get(self.pase_entrada_fields['autorizado_por']):
                 autorizado_ok = True
+        print("QUE PASA, ", foto_ok , id_vista , fecha_ok , vista_a_ok , autorizado_ok)
         if foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
             status = 'activo'
         elif foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
@@ -1581,7 +1588,8 @@ class Accesos(OcrMixin, AccesosModel):
         print(simplejson.dumps(res, indent=4))
 
         doc = self.cr.find_one(match_query)
-        print(json.dumps(doc["answers"][self.mf['areas_grupo']], indent=2, default=str))
+        if doc:
+            print(json.dumps(doc["answers"][self.mf['areas_grupo']], indent=2, default=str))
 
         return res
 
@@ -1590,15 +1598,17 @@ class Accesos(OcrMixin, AccesosModel):
         # cat_vehiculos= self.catalogo_vehiculos({})
         # cat_estados= self.catalogo_estados({})
         pass_selected = self.get_pass_custom(qr_code)
-
         ubicaciones = pass_selected.get('ubicacion', [])
-        config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones)
+        tipo_de_pase = pass_selected.get('tipo_de_pase', "")
+        config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones, tipo_de_pase)
         condiciones_servicio = config_modulo_seguridad.get('condiciones_servicio', {})
-
+        permisos_certificaciones = config_modulo_seguridad.get('permisos_certificaciones',)
         res = {
             "pass_selected": pass_selected,
             "documento_de_condiciones_de_servicio": condiciones_servicio.get('doc_condiciones_servicio', ''),
             "url_de_condiciones_de_servicio": condiciones_servicio.get('url_condiciones_servicio', ''),
+            "desc_condiciones_servicio": condiciones_servicio.get('desc_condiciones_servicio', ''),
+            "permisos_certificaciones": permisos_certificaciones
         }
         return res
 
@@ -1699,10 +1709,22 @@ class Accesos(OcrMixin, AccesosModel):
 
     def catalog_visita_a_pases(self, visita_a):
         if visita_a == 'Usuario Actual':
-            user_id = self.user['user_id']
-            employee = self.Employee.get_employee_data(user_id=self.user['user_id'], get_one=True)
+            employee = self.Employee.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
+            if not employee and self.user.get('email'):
+                employee = self.Employee.get_employee_data(email=self.user.get('email'), get_one=True)
+            if not employee and self.user.get('username'):
+                employee = self.Employee.get_employee_data(username=self.user.get('username'), get_one=True)
             self.employee = employee
-            visita_a = employee.get('worker_name')
+            return {
+                self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
+                    self.mf['nombre_empleado']: employee.get('worker_name'),
+                    self.mf['telefono_visita_a']: [self.unlist(employee.get('new_user_phone', employee.get('telefono2', employee.get('telefono1', ''))))],
+                    self.mf['email_visita_a']: [self.unlist(employee.get('new_user_email', employee.get('usuario_email', '')))],
+                    self.mf['user_id_empleado']: [self.unlist(employee.get('user_id_id', employee.get('usuario_id', '')))],
+                    self.mf['departamento_empleado']: [self.unlist(employee.get('worker_department', ''))],
+                    self.mf['puesto_empleado']: [self.unlist(employee.get('worker_position', ''))],
+                }
+            }
         visita_set = {
             self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
                 self.mf['nombre_empleado'] : visita_a,
@@ -2680,7 +2702,7 @@ class Accesos(OcrMixin, AccesosModel):
             access_pass['config_limitar_acceso'] =  1
 
         answers[self.pase_entrada_fields['acompanantes']]= access_pass.get('acompanantes', 0)
-        answers[self.pase_entrada_fields['acompanantes_grupo']]= access_pass.get('acompanantes_grupo', 0)
+        answers[self.pase_entrada_fields['acompanantes_grupo']]= access_pass.get('acompanantes_grupo') or []
         answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
         answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
         answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',1)
@@ -2701,7 +2723,7 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['walkin_fotografia']] = access_pass.get('foto')
         answers[self.pase_entrada_fields['walkin_identificacion']] = access_pass.get('identificacion')
         answers[self.pase_entrada_fields['walkin_telefono']] = access_pass.get('telefono', '')
-
+        # answers[self.pase_entrada_fields['conservar_datos_por']]= access_pass.get('conservar_datos_por', '')
         created_from = access_pass.get('created_from')
         if created_from == 'app':
             created_from = 'pase_de_entrada_app'
@@ -2780,7 +2802,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         #--Condiciones de Servicio
         if access_pass.get('conservar_datos_por'):
-            answers[self.mf['conservar_datos_por']] = access_pass.get('conservar_datos_por','');
+            answers[self.mf['conservar_datos_por']] = access_pass.get('conservar_datos_por','').replace(' ', '_');
 
         if access_pass.get('acepto_aviso_privacidad'):
             if access_pass.get('acepto_aviso_privacidad') == 'true':
@@ -4077,7 +4099,7 @@ class Accesos(OcrMixin, AccesosModel):
 
 
 
-    def get_config_modulo_seguridad(self, ubicaciones=[]):
+    def get_config_modulo_seguridad(self, ubicaciones=[], tipo_de_pase=""):
         #TODO Verificar por que se envia asi la lista
         if isinstance(ubicaciones, list) and ubicaciones and isinstance(ubicaciones[0], dict):
             ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
@@ -4099,15 +4121,15 @@ class Accesos(OcrMixin, AccesosModel):
         raw_result = self.format_cr(self.cr.aggregate(query))
         for raw in raw_result:
             for grupo in raw.get('grupo_requisitos', []):
-                #---Condiciones de servicio
-                condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio','')
-                condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio','')
-                condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio','')
-                condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio','')
-
                 #TODO Verficiar el cambio de key
                 ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
                 if ubicacion in ubicaciones:
+                    #---Condiciones de servicio (solo del grupo que coincide con la ubicación)
+                    condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio', '')
+                    condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
+                    condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
+                    condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
+
                     clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
                     reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
                     if isinstance(reqs, list):
@@ -4123,13 +4145,67 @@ class Accesos(OcrMixin, AccesosModel):
                                 envios.add(envs)
 
         tipos = self.get_tipos_de_pase(ubicaciones)
+        permisos_certificaciones = self.get_permisos_por_perfil(tipo_de_pase) if tipo_de_pase else ""
+
         return {
             "ubicaciones": ubicaciones,
             "requerimientos": list(requerimientos),
             "envios": list(envios),
             "tipos": tipos,
-            "condiciones_servicio":condiciones_servicio,
+            "condiciones_servicio": condiciones_servicio,
+            "permisos_certificaciones": permisos_certificaciones,
         }
+
+
+    def get_tipos_de_pase(self, ubicaciones=[]):
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.CONF_PERFILES,
+                f"answers.{self.PERFILES_OBJ_ID}.{self.mf['walkin']}": "Si"
+            }},
+            {'$project': {
+                "ubicacion": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
+                "tipo": f"$answers.{self.PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}",
+            }},
+            {'$group': {
+                "_id": {"$ifNull": ["$ubicacion", "General"]},
+                "tipos": {"$addToSet": "$tipo"}
+            }},
+            {'$project': {
+                "_id": 0,
+                "ubicacion": "$_id",
+                "tipos": 1
+            }}
+        ]
+        if isinstance(ubicaciones, str):
+            ubicaciones = [ubicaciones,]
+        data = self.format_cr(self.cr.aggregate(query))
+        if not data:
+            return []
+        mapped = {
+            item.get("ubicacion", "General"): set(item.get("tipos", []))
+            for item in data
+        }
+
+        tipos_generales = mapped.get("General", set())
+
+        if not ubicaciones:
+            return sorted(tipos_generales)
+
+        tipos_por_ubicacion = []
+
+        for u in ubicaciones:
+            tipos_especificos = mapped.get(u, set())
+            tipos_reales = tipos_especificos | tipos_generales
+            tipos_por_ubicacion.append(tipos_reales)
+
+        tipos_comunes = tipos_por_ubicacion[0].copy()
+
+        for t in tipos_por_ubicacion[1:]:
+            tipos_comunes &= t
+        return sorted(tipos_comunes)
+
 
     def get_config_accesos(self):
         response = []
@@ -4219,13 +4295,83 @@ class Accesos(OcrMixin, AccesosModel):
         # print(simplejson.dumps(data, indent=4))
         return data
 
-    def get_tipos_de_pase(self, ubicaciones=[]):
+    def _flatten_scalar(self, value):
+        """Quita capas de lista anidadas hasta llegar a un valor plano (no lista)."""
+        while isinstance(value, list):
+            if not value:
+                return None
+            value = value[0]
+        return value
+
+    def _flatten_list(self, value):
+        """Quita capas de lista anidadas de más hasta llegar a una lista plana de valores."""
+        while isinstance(value, list) and len(value) == 1 and isinstance(value[0], list):
+            value = value[0]
+        if not isinstance(value, list):
+            value = [value] if value is not None else []
+        return value
+
+    def get_permisos_por_perfil(self, perfil):
+        if isinstance(perfil, str):
+            perfil = [perfil, ]
+
         query = [
             {'$match': {
                 "deleted_at": {"$exists": False},
                 "form_id": self.CONF_PERFILES,
-                f"answers.{self.PERFILES_OBJ_ID}.{self.mf['walkin']}": "Si"
+                f"answers.{self.PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}": {"$in": perfil}
             }},
+            {'$project': {
+                "_id": 0,
+                "nombre_permiso": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['nombre_permiso']}",
+                "requerimientos_pase": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['requerimientos']}",
+                "vigencia_certificado": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['vigencia_certificado']}",
+                "vigencia_certificado_en": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['vigencia_certificado_en']}",
+            }}
+        ]
+
+        data = self.format_cr(self.cr.aggregate(query))
+        if not data:
+            return []
+
+        permisos = []
+
+        for doc in data:
+            nombres = doc.get("nombre_permiso") or []
+            requerimientos = doc.get("requerimientos_pase") or []
+
+            vigencia_certificado = self._flatten_scalar(doc.get("vigencia_certificado"))
+            vigencia_certificado_en = self._flatten_scalar(doc.get("vigencia_certificado_en"))
+
+            if not isinstance(nombres, list):
+                nombres = [nombres]
+            if not isinstance(requerimientos, list):
+                requerimientos = [requerimientos]
+
+            for i, nombre in enumerate(nombres):
+                if not nombre:
+                    continue
+                reqs = self._flatten_list(requerimientos[i]) if i < len(requerimientos) else []
+                permisos.append({
+                    "nombre_permiso": nombre,
+                    "vigencia_certificado": vigencia_certificado,
+                    "vigencia_certificado_en": vigencia_certificado_en,
+                    "requerimientos_pase": reqs,
+                })
+
+        return permisos
+
+    def get_tipos_de_pase(self, ubicaciones=[], walkin=None):
+        match_stage = {
+            'deleted_at': {'$exists': False},
+            'form_id': self.CONF_PERFILES,
+        }
+
+        if walkin is not None:
+            match_stage[f"answers.{self.PERFILES_OBJ_ID}.{self.mf['walkin']}"] = walkin
+
+        query = [
+            {'$match': match_stage},
             {'$project': {
                 "ubicacion": f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
                 "tipo": f"$answers.{self.PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}",
@@ -4240,11 +4386,14 @@ class Accesos(OcrMixin, AccesosModel):
                 "tipos": 1
             }}
         ]
+
         if isinstance(ubicaciones, str):
             ubicaciones = [ubicaciones,]
+
         data = self.format_cr(self.cr.aggregate(query))
         if not data:
             return []
+
         mapped = {
             item.get("ubicacion", "General"): set(item.get("tipos", []))
             for item in data
@@ -4266,6 +4415,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         for t in tipos_por_ubicacion[1:]:
             tipos_comunes &= t
+
         return sorted(tipos_comunes)
 
     def get_count_ingresos(self, qr_code):
@@ -4332,6 +4482,7 @@ class Accesos(OcrMixin, AccesosModel):
                 'limitado_a_dias':f"$answers.{self.mf['config_dias_acceso']}",
                 'motivo_visita':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['motivo']}",
                 'perfil_pase':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}",
+                'walkin':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['walkin']}",
                 'tipo_de_pase':f"$answers.{self.pase_entrada_fields['perfil_pase']}",
                 'tipo_de_comentario': f"$answers.{self.mf['tipo_de_comentario']}",
                 'visita_a_nombre':
@@ -4374,6 +4525,7 @@ class Accesos(OcrMixin, AccesosModel):
             {'$sort':{'created_at':-1}},
         ]
         res = self.cr.aggregate(query)
+        
         x = {}
         for x in res:
             if get_answers:
@@ -4388,8 +4540,8 @@ class Accesos(OcrMixin, AccesosModel):
             f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['url_padre']= self.unlist(x.get('url_padre',''))
-            x['url_padre'] = self.unlist(x.get('url_padre',''))
-
+            print("RESSSS",x.get('walkin', ''))
+            x['walkin']=self.unlist(x.get('walkin', ''))
             # Si es un pase hijo, ir a buscar el link del pase padre
             if x.get('url_padre'):
                 padre_id_match = re.search(r'/records/detail/([a-fA-F0-9]{24})', x['url_padre'])
@@ -4445,6 +4597,7 @@ class Accesos(OcrMixin, AccesosModel):
                 visita_a.append(emp)
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
+
             perfil_pase = self._labels(perfil_pase, self.mf)
             if x.get('fecha_de_caducidad') == "":
                 x['fecha_de_caducidad'] = x.get('fecha_de_expedicion')
@@ -4778,17 +4931,30 @@ class Accesos(OcrMixin, AccesosModel):
         pr= self.format_cr_result(self.cr.aggregate(query))
         return self.format_cr_result(self.cr.aggregate(query))
 
-    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate=""):
+    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", limit=25, skip=0, locations=[], search=""):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
         }
         if location:
-             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.perdidos_fields['ubicacion_perdido']}"] = location
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}"] = location
+        if locations:
+             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}"] = {"$in": locations}
         if area:
              match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
         if status:
              match_query[f"answers.{self.cons_f['status_concesion']}"] = status
+        if search:
+            pattern = re.escape(search.strip())
+            match_query["$or"] = [
+                {"folio": {"$regex": pattern, "$options": "i"}},
+                {"user_name": {"$regex": pattern, "$options": "i"}},
+                {f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['nombre_equipo']}": {"$regex": pattern, "$options": "i"}},
+                {f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['marca_equipo_concesion']}": {"$regex": pattern, "$options": "i"}},
+                {f"answers.{self.cons_f['persona_nombre_concesion']}": {"$regex": pattern, "$options": "i"}},
+                {f"answers.{self.cons_f['persona_nombre_otro']}": {"$regex": pattern, "$options": "i"}},
+                {f"answers.{self.cons_f['observacion_concesion']}": {"$regex": pattern, "$options": "i"}},
+            ]
 
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         zona = user_data.get('timezone','America/Monterrey')
@@ -4812,6 +4978,14 @@ class Accesos(OcrMixin, AccesosModel):
                 f"answers.{self.cons_f['fecha_concesion']}": {"$lte": dateTo}
             })
 
+        count_result = self.format_cr(self.cr.aggregate([
+            {'$match': match_query},
+            {'$count': 'total'},
+        ]))
+        total_count = count_result[0]['total'] if count_result else 0
+        current_page = (skip // limit) + 1
+        total_pages = ceil(total_count / limit) if limit else 1
+
         query = [
             {'$match': match_query },
             # {'$unwind':f"$answers.{self.cons_f['grupo_equipos']}"},
@@ -4824,8 +4998,10 @@ class Accesos(OcrMixin, AccesosModel):
                 "answers":"$answers",
             }},
             {'$sort':{'created_at':-1}},
+            {'$skip': skip},
+            {'$limit': limit},
         ]
-        
+
         result = self.format_cr_result(self.cr.aggregate(query), ids_label_dct=self.cons_f)
         for item in result:
             item = self.procesar_devoluciones_item(item)
@@ -4835,7 +5011,13 @@ class Accesos(OcrMixin, AccesosModel):
                 item['firma']['file_url'] = item.pop('file_url')
             if item.get('file_name'):
                 item['firma']['file_name'] = item.pop('file_name')
-        return result
+        return {
+            'records': result,
+            'total_records': total_count,
+            'total_pages': total_pages,
+            'actual_page': current_page,
+            'records_on_page': len(result),
+        }
 
     def get_list_rondines(self, prioridades=[], dateFrom='', dateTo='', filterDate=""):
         match_query = {
@@ -5023,6 +5205,7 @@ class Accesos(OcrMixin, AccesosModel):
             '_id': 1,
             'folio': "$folio",
             'created_at': "$created_at",
+            'created_by': "$user_name",
             'updated_at': "$updated_at",
             'a_quien_visita':f"$answers.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}",
             'documento': f"$answers.{self.mf['documento']}",
@@ -5108,6 +5291,7 @@ class Accesos(OcrMixin, AccesosModel):
             r['equipos'] = self.format_equipos(r.get('equipos',[]))
             r['visita_a'] = self.format_visita(r.get('visita_a',[]))
             r['pase_id']=str(pase_id)
+            r['created_by'] = r.get('created_by','')
 
         return {
             "records": records,
@@ -5856,7 +6040,8 @@ class Accesos(OcrMixin, AccesosModel):
                     'acompanantes_grupo':f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",
                     'acompanantes':f"$answers.{self.pase_entrada_fields['acompanantes']}",
                     'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}",
-                    'url_padre':f"$answers.{self.pase_entrada_fields['url_padre']}"
+                    'url_padre':f"$answers.{self.pase_entrada_fields['url_padre']}",
+                    'created_by':"$user_name"
                 }
             },
             {'$sort':{'_id':-1}},
@@ -5925,10 +6110,27 @@ class Accesos(OcrMixin, AccesosModel):
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['habilitar_vehiculo'] = x.get('habilitar_vehiculo', "")
             x['url_padre']=x.get('url_padre','')
+            x['pase_padre'] = {}
+            if x['url_padre']:
+                padre_id = self.extraer_id_padre(x)
+                if padre_id:
+                    try:
+                        detalle_padre = self.get_detail_access_pass(padre_id) or {}
+                        x['pase_padre'] = {
+                            'foto': self.unlist(detalle_padre.get('foto', '')),
+                            'identificacion': self.unlist(detalle_padre.get('identificacion', '')),
+                            'nombre': self.unlist(detalle_padre.get('nombre', '')),
+                            'estatus': self.unlist(detalle_padre.get('estatus', '')),
+                            'telefono': self.unlist(detalle_padre.get('telefono', '')),
+                            'email': self.unlist(detalle_padre.get('email', '')),
+                        } if detalle_padre else {}
+                    except Exception as e:
+                        print(f"Error obteniendo pase padre {padre_id}: {e}")
+                        x['pase_padre'] = {}
             x['grupo_vehiculos'] = self.format_vehiculos_simple(x.pop('grupo_vehiculos',[]))
             x['grupo_equipos'] = self.format_equipos_simple(x.pop('grupo_equipos',[]))
             x['comentarios'] = x['grupo_instrucciones_pase']
-
+            x['created_by'] = x.get('created_by', "")
             comentarios = []
             for item in x.pop('comentarios', []):
                 comentario_pase = item.get('comentario_pase', '')
@@ -6092,6 +6294,8 @@ class Accesos(OcrMixin, AccesosModel):
                key == "url_padre" or \
                key == "estatus_pase_padre" or \
                key == "link_padre" or \
+               key == "tipo_de_pase" or \
+               key == "walkin" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
@@ -8129,6 +8333,7 @@ class Accesos(OcrMixin, AccesosModel):
         pass_selected= self.get_detail_access_pass(qr_code=folio, get_answers=True)
         qr_code= folio
         _folio= pass_selected.get("folio")
+   
         answers={}
         acompanantes_a_actualizar = []
         for key, value in access_pass.items():
@@ -8242,6 +8447,15 @@ class Accesos(OcrMixin, AccesosModel):
                 answers.update({f"{self.pase_entrada_fields[key]}": [value]})
             elif key == 'conservar_datos_por':
                 answers.update({f"{self.pase_entrada_fields[key]}": value.replace(" ", "_")})
+            elif key =='permisos_certificaciones':
+                answers[self.mf['permisos_certificaciones_evidencias']] = {}
+                for index, item in enumerate(value):
+                    obj = {
+                        self.mf['nombre_del_permiso']: item.get('nombre_del_permiso', ''),
+                        self.mf['evidencia_documento_permiso']: item.get('documento', []),
+                        self.mf['evidencia_fotografia_permiso']: item.get('foto', []),
+                    }
+                    answers[self.mf['permisos_certificaciones_evidencias']][(index+1)*-1] = obj
             # elif key == 'acompanantes':
             #     answers[self.pase_entrada_fields['acompanantes_grupo']] = {}
             #     for index, item in enumerate(value):
@@ -8259,7 +8473,11 @@ class Accesos(OcrMixin, AccesosModel):
             else:
                 if value:
                     answers.update({f"{self.pase_entrada_fields[key]}":value})
-        employee = getattr(self,'employee',self.get_employee_data(email=self.user.get('email'), get_one=True))
+        employee = getattr(self,'employee', None)
+        if not employee:
+            employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
+        if not employee:
+            employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         if answers:
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
@@ -8422,7 +8640,7 @@ class Accesos(OcrMixin, AccesosModel):
                             docs+="foto"
                         if index==0 :
                             docs+="-"
-                    link_pass= f"{link_info['link']}?id={link_info['qr_code']}&user={link_info['creado_por_id']}&docs={docs}"
+                    link_pass= f"{link_info['link']}?id={link_info['qr_code']}&user={self.user.get('parent_id')}&docs={docs}"
 
                 answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
             elif key == 'ubicacion':
@@ -8896,12 +9114,12 @@ class Accesos(OcrMixin, AccesosModel):
         """
         res = {}
         nombre_visita_a = employee.get('worker_name')
-        phone = self.unlist(employee.get('new_user_phone', employee.get('telefono2', employee.get('telefono1',""))))
-        email = self.unlist(employee.get('new_user_email', employee.get('usuario_email', "")))
-        user_id_id = self.unlist(employee.get('user_id_id',employee.get('usuario_id',"")))
-        username = self.unlist(employee.get('new_user_username',""))
-        departamento = self.unlist(employee.get('worker_department',""))
-        puesto = self.unlist(employee.get('worker_position',""))
+        phone = self.unlist(employee.get('new_user_phone', employee.get('telefono2', employee.get('telefono1',"")))) or ""
+        email = self.unlist(employee.get('new_user_email', employee.get('usuario_email', ""))) or ""
+        user_id_id = self.unlist(employee.get('user_id_id',employee.get('usuario_id',""))) or ""
+        username = self.unlist(employee.get('new_user_username',"")) or ""
+        departamento = self.unlist(employee.get('worker_department',"")) or ""
+        puesto = self.unlist(employee.get('worker_position',"")) or ""
         #Lo seteamo en una lista porque es campo catlog detail
         res = {self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
                 self.mf['nombre_empleado'] : nombre_visita_a,
@@ -10117,6 +10335,32 @@ class Accesos(OcrMixin, AccesosModel):
             incidencias += grupo_incidencias
         return incidencias
 
+    def get_incidencias_from_rondin_record(self, rondin_record):
+        """
+        Extrae y normaliza las incidencias reportadas a nivel rondín (record.incidencia_rondin
+        en CouchDB), a diferencia de las incidencias reportadas dentro de un check de área.
+        Args:
+            rondin_record (json): El documento de CouchDB del rondin (type='rondin')
+        Returns:
+            incidencias (list): Lista de dicts normalizados con info de cada incidencia,
+                mismo formato que get_incidencias_from_checks()
+        """
+        incidencias = []
+        incidencias_rondin = (rondin_record or {}).get('record', {}).get('incidencia_rondin', [])
+        for incidencia in incidencias_rondin:
+            incidencias.append({
+                'area':                          '',
+                'fecha_incidencia':              incidencia.get('fecha', ''),
+                'categoria':                      incidencia.get('categoria', ''),
+                'sub_categoria':                  incidencia.get('sub_categoria', ''),
+                'incidencia':                     incidencia.get('incidente') or incidencia.get('otro_incidente', ''),
+                'comentario_incidente_bitacora':  incidencia.get('comentario', ''),
+                'incidente_accion':               incidencia.get('accion', ''),
+                'incidente_evidencia':            incidencia.get('evidencia', []),
+                'incidente_documento':            incidencia.get('documento', []),
+            })
+        return incidencias
+
     def sync_rondin_to_lkf(self, rondin_id, rondin_record={}):
         """
         Sincroniza la bitácora del rondín hacia Linkaform ya sea usando checks ya procesados. O
@@ -10147,6 +10391,13 @@ class Accesos(OcrMixin, AccesosModel):
         # Obtiene los checks que se han contestado del rondin de Mongodb
         checks_for_rondin = self.get_rondin_checks(rondin_id)
 
+        if not rondin_record:
+            # Este sync se disparó solo por un check de área suelto (Stage 3), sin el
+            # documento 'rondin' en el mismo batch. Para saber si en realidad ya se
+            # finalizó (o canceló) el rondín -- y no depender de qué documento llegó en
+            # este sync en particular -- hay que leer el estado real y actual en CouchDB.
+            rondin_record = self.cr_db.get(rondin_id) or {}
+
         # Enriquecer checks con checked_at del doc CouchDB (que tiene la hora local real por área)
         couch_dates = {
             ca.get('area'): ca.get('checked_at')
@@ -10163,6 +10414,9 @@ class Accesos(OcrMixin, AccesosModel):
             fecha = chk.get('fecha_hora_inspeccion_area') or chk.get('fecha_inspeccion_area') or chk.get('created_at', '')
             print(f"    área={area!r}  fecha_inspeccion={chk.get('fecha_hora_inspeccion_area')!r}  created_at={chk.get('created_at')!r}  → usará={fecha!r}")
         incidencia_for_rondin = self.get_incidencias_from_checks(checks_for_rondin)
+        if rondin_record.get('record', {}).get('incidencia_rondin'):
+            self.do_attachments(rondin_record)
+            incidencia_for_rondin += self.get_incidencias_from_rondin_record(rondin_record)
         data = rondin_record or {
             '_id': rondin_id,
             'record': {},
@@ -10307,13 +10561,20 @@ class Accesos(OcrMixin, AccesosModel):
     ### Rondines <<<
 
     def get_bitacora_by_id(self, record_id):
+        # record_id es el _id de la primera versión (lo que couch guarda como rondin_id),
+        # pero LinkaForm crea un _id nuevo en cada patch (versionado) sin marcar el anterior
+        # como deleted_at. connection_record_id se mantiene estable entre todas las versiones,
+        # así que hay que buscar por ahí y tomar la más reciente, o si no se pierden los cambios
+        # de la última sincronización (dedup de incidencias, areas, etc. quedan obsoletos).
         try:
             query = [
                 {"$match": {
                     "deleted_at": {"$exists": False},
                     "form_id": self.BITACORA_RONDINES,
-                    "_id": ObjectId(record_id)
+                    "connection_record_id": ObjectId(record_id)
                 }},
+                {"$sort": {"updated_at": -1}},
+                {"$limit": 1},
                 {"$project": {
                     "_id": 1,
                     "folio": 1,
@@ -10340,17 +10601,24 @@ class Accesos(OcrMixin, AccesosModel):
         return fecha_str
 
     def format_ids_incidencias_to_bitacora(self, data):
-        fecha_str = self._format_fecha(data.get('fecha_incidencia'))
+        # data puede venir "fresca" (de get_incidencias_from_checks/get_incidencias_from_rondin_record,
+        # con llaves 'area'/'fecha_incidencia') o ya "existente" (de bitacora_in_lkf tras _labels(),
+        # con llaves 'nombre_area_salida'/'fecha_hora_incidente_bitacora') — se soportan ambas.
+        area = data.get('area')
+        if area is None:
+            area = data.get('nombre_area_salida', '')
+        fecha_str = self._format_fecha(data.get('fecha_incidencia') or data.get('fecha_hora_incidente_bitacora'))
         res = {
                 self.Location.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID: {
-                    self.f['nombre_area_salida']: data.get('area'),
+                    self.f['nombre_area_salida']: area,
                 },
-                self.f['fecha_hora_incidente_bitacora']: data.get('fecha_incidencia', fecha_str),
+                self.f['fecha_hora_incidente_bitacora']: fecha_str,
                 self.LISTA_INCIDENCIAS_CAT_OBJ_ID: {
                     self.f['categoria']: data.get('categoria', ''),
                     self.f['sub_categoria']: data.get('sub_categoria', ''),
                     self.f['incidencia']: data.get('incidencia', ''),
                 },
+                self.f['url_incidencia_bitacora']: data.get('url_incidencia_bitacora', ''),
                 self.f['incidente_open']: data.get('incidente_open', ''),
                 self.f['comentario_incidente_bitacora']: data.get('comentario_incidente_bitacora', ''),
                 self.f['incidente_accion']: data.get('incidente_accion', ''),
@@ -10358,6 +10626,31 @@ class Accesos(OcrMixin, AccesosModel):
                 self.f['incidente_documento']: [i for i in data.get('incidente_documento', []) if i.get('file_url', '')],
             }
         return res
+
+    def get_incidencias_nuevas_rondin(self, bitacora_in_lkf, new_incidencias):
+        """
+        Filtra las incidencias que aun no existen en la bitacora de rondines
+        Args:
+            bitacora_in_lkf (json): El rondin con el cual se esta trabajando
+            new_incidencias (json): Json de las incidencias entradas en los checks
+        Return:
+            nuevas (list): Incidencias (formato original) que no existian previamente en la bitacora
+        """
+        incidencias_existentes = bitacora_in_lkf.get('bitacora_rondin_incidencias', [])
+        nuevas = []
+        for incidencia in new_incidencias:
+            fecha_str = self._format_fecha(incidencia.get('fecha_incidencia'))
+            ya_existe = False
+            for inc_existente in incidencias_existentes:
+                if (inc_existente.get('incidencia') == incidencia.get('incidencia') and
+                    inc_existente.get('categoria') == incidencia.get('categoria') and
+                    inc_existente.get('nombre_area_salida') == incidencia.get('area') and
+                    inc_existente.get('fecha_hora_incidente_bitacora') == fecha_str):
+                        ya_existe = True
+                        break
+            if not ya_existe:
+                nuevas.append(incidencia)
+        return nuevas
 
     def format_incidencias_to_bitacora(self, bitacora_in_lkf, new_incidencias):
         """
@@ -10369,27 +10662,52 @@ class Accesos(OcrMixin, AccesosModel):
         Return:
             incidencias_list (list): Lista con json en el formto de ids para dar de alta en el rondin
         """
-        incidencias_list = []
         incidencias_existentes = bitacora_in_lkf.get('bitacora_rondin_incidencias', [])
-        for incidencia in new_incidencias:
-            fecha_str = self._format_fecha(incidencia.get('fecha_incidencia'))
-            ya_existe = False
-            for inc_existente in incidencias_existentes:
-                if (inc_existente.get('incidencia') == incidencia.get('incidencia') and
-                    inc_existente.get('categoria') == incidencia.get('categoria') and
-                    inc_existente.get('nombre_area_salida') == incidencia.get('area') and
-                    inc_existente.get('fecha_hora_incidente_bitacora') == fecha_str):
-                        ya_existe = True
-                        break
-
-            if not ya_existe:
-                new_item = self.format_ids_incidencias_to_bitacora(incidencia)
-                incidencias_list.append(new_item)
-
-        for incidencia in incidencias_existentes:
-            new_item = self.format_ids_incidencias_to_bitacora(incidencia)
-            incidencias_list.append(new_item)
+        nuevas = self.get_incidencias_nuevas_rondin(bitacora_in_lkf, new_incidencias)
+        incidencias_list = [self.format_ids_incidencias_to_bitacora(i) for i in nuevas]
+        incidencias_list += [self.format_ids_incidencias_to_bitacora(i) for i in incidencias_existentes]
         return incidencias_list
+
+    def create_incidencia_bitacora_from_rondin(self, incidencia):
+        """
+        Crea el registro de la incidencia en self.BITACORA_INCIDENCIAS a partir de una
+        incidencia detectada en un check de area del rondin.
+        Args:
+            incidencia (json): Incidencia en formato original (area, fecha_incidencia, categoria, sub_categoria, incidencia, ...)
+        Return:
+            res (json): Respuesta de post_forms_answers
+        """
+        metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_INCIDENCIAS)
+        metadata.update({
+            "properties": {
+                "device_properties": {
+                    "System": "Script",
+                    "Module": "Accesos",
+                    "Process": "Creación de incidencia desde rondín",
+                    "Action": "create_incidencia_bitacora_from_rondin",
+                    "File": "accesos/app.py"
+                }
+            }
+        })
+        answers = {
+            self.incidence_fields['incidencia_catalog']: {
+                self.incidence_fields['categoria']: incidencia.get('categoria', ''),
+                self.incidence_fields['sub_categoria']: incidencia.get('sub_categoria', ''),
+                self.incidence_fields['incidencia']: incidencia.get('incidencia', ''),
+            },
+            self.incidence_fields['area_incidencia_catalog']: {
+                self.incidence_fields['area_incidencia']: incidencia.get('area', ''),
+            },
+            self.incidence_fields['estatus']: 'abierto',
+            self.incidence_fields['prioridad_incidencia']: incidencia.get('prioridad_incidencia', 'leve'),
+            self.incidence_fields['notificacion_incidencia']: incidencia.get('notificacion_incidencia', 'no'),
+            self.incidence_fields['fecha_hora_incidencia']: incidencia.get('fecha_incidencia', ''),
+            self.incidence_fields['comentario_incidencia']: incidencia.get('comentario_incidente_bitacora', ''),
+            self.incidence_fields['evidencia_incidencia']: [i for i in incidencia.get('incidente_evidencia', []) if i.get('file_url', '')],
+            self.incidence_fields['documento_incidencia']: [i for i in incidencia.get('incidente_documento', []) if i.get('file_url', '')],
+        }
+        metadata.update({'answers': answers})
+        return self.lkf_api.post_forms_answers(metadata)
 
     def bitacora_set_area_format(self, bitacora, check):
         """
@@ -10492,13 +10810,12 @@ class Accesos(OcrMixin, AccesosModel):
                 if incidencias:
                     incidencias_list = []
                     for incidencia in incidencias:
-                        print('revisxart linea 1285 comentario_incidente_bitacora que llave trae incidencia')
                         item = {}
                         if incidencia.get('categoria'):
                             item = {self.LISTA_INCIDENCIAS_CAT_OBJ_ID: {
                                 self.f['categoria']: incidencia.get('categoria', ''),
                                 self.f['sub_categoria']: incidencia.get('sub_categoria', ''),
-                                self.f['incidencia']: incidencia.get('incidencia', ''),
+                                self.f['incidencia']: incidencia.get('incidente') or incidencia.get('incidencia') or incidencia.get('otro_incidente', ''),
                             }}
                         item.update({
                             self.f['incidente_open']: incidencia.get('incidente_open', ''),
@@ -10887,6 +11204,16 @@ class Accesos(OcrMixin, AccesosModel):
         areas_list = []
         conf_recorrido = {}
         estatus_bitacora_in_couch = data.get('status_user', '')
+        nuevas_incidencias_rondin = self.get_incidencias_nuevas_rondin(bitacora_in_lkf, incidencia_for_rondin)
+        for incidencia in nuevas_incidencias_rondin:
+            if incidencia.get('url_incidencia_bitacora'):
+                # Ya se creo en un intento previo de este mismo sync (reintento por 208)
+                continue
+            res_incidencia = self.create_incidencia_bitacora_from_rondin(incidencia)
+            print('res_incidencia', res_incidencia)
+            incidencia_id = res_incidencia.get('json', {}).get('id') or res_incidencia.get('json', {}).get('_id')
+            if incidencia_id:
+                incidencia['url_incidencia_bitacora'] = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{incidencia_id}"
         incidencias_list = self.format_incidencias_to_bitacora(bitacora_in_lkf, incidencia_for_rondin)
         answers[self.f['bitacora_rondin_incidencias']] = incidencias_list
 
@@ -10966,11 +11293,59 @@ class Accesos(OcrMixin, AccesosModel):
         elif estatus_bitacora_in_couch == 'cancel':
             answers[self.f['estatus_del_recorrido']] = 'cancelado'
         else:
-            answers[self.f['estatus_del_recorrido']] = 'realizado'
+            # Sin señal explícita del couch (p.ej. sync disparado solo por un check de
+            # área, sin el documento 'rondin' -- Stage 3 de sync_records). No asumir que
+            # terminó solo porque llegó un check: sigue en_proceso hasta que todas las
+            # áreas tengan fecha de inspección.
+            areas_formateadas = answers.get(self.f['areas_del_rondin'], [])
+            todas_checadas = bool(areas_formateadas) and all(a.get(self.f['fecha_inspeccion_area']) for a in areas_formateadas)
+            answers[self.f['estatus_del_recorrido']] = 'realizado' if todas_checadas else 'en_proceso'
 
         answers[self.CONFIGURACION_RECORRIDOS_OBJ_ID] = conf_recorrido
         if not answers.get(self.f['fecha_inicio_rondin']):
-            answers[self.f['fecha_inicio_rondin']] = data.get('record', {}).get('fecha_inicio', '')
+            primer_check = next(
+                (a for a in answers.get(self.f['areas_del_rondin'], []) if a.get(self.f['fecha_inspeccion_area'])),
+                None
+            )
+            answers[self.f['fecha_inicio_rondin']] = (
+                primer_check.get(self.f['fecha_inspeccion_area']) if primer_check
+                else data.get('record', {}).get('fecha_inicio', '')
+            )
+
+        if (answers.get(self.f['estatus_del_recorrido']) in ('realizado', 'cerrado')
+                and not answers.get(self.f['fecha_fin_rondin'])):
+            ultimo_check = next(
+                (a for a in reversed(answers.get(self.f['areas_del_rondin'], [])) if a.get(self.f['fecha_inspeccion_area'])),
+                None
+            )
+            answers[self.f['fecha_fin_rondin']] = (
+                ultimo_check.get(self.f['fecha_inspeccion_area']) if ultimo_check
+                else data.get('record', {}).get('fecha_finalizacion', '')
+            )
+
+        # Métricas del rondín (duración total, % de avance, áreas inspeccionadas y
+        # duración de traslado entre áreas). Antes las calculaba el before-trigger
+        # bitacora_rondines.py, pero ese trigger generaba una versión nueva del
+        # registro en cada guardado, así que se calculan aquí directamente.
+        areas_para_metricas = answers.get(self.f['areas_del_rondin'], [])
+        areas_con_fecha = sorted(
+            (
+                (self.date_2_epoch(a.get(self.f['fecha_inspeccion_area'])), a)
+                for a in areas_para_metricas
+                if self.date_2_epoch(a.get(self.f['fecha_inspeccion_area']))
+            ),
+            key=lambda x: x[0]
+        )
+        if areas_con_fecha:
+            fecha_inicio_epoch = self.date_2_epoch(answers.get(self.f['fecha_inicio_rondin'])) or areas_con_fecha[0][0]
+            first_epoch = areas_con_fecha[0][0]
+            for epoch, area in areas_con_fecha:
+                area[self.f['duracion_traslado_area']] = round((epoch - first_epoch) / 60, 2)
+            fecha_final_epoch = areas_con_fecha[-1][0]
+            cantidad_inspeccionadas = len(areas_con_fecha)
+            answers[self.f['duracion_rondin']] = round((fecha_final_epoch - fecha_inicio_epoch) / 60, 2)
+            answers[self.f['porcentaje_obtenido_bitacora']] = str(round((cantidad_inspeccionadas / len(areas_para_metricas)) * 100, 2)) + '%'
+            answers[self.f['cantidad_areas_inspeccionadas']] = f"{cantidad_inspeccionadas}/{len(areas_para_metricas)}"
 
         comentarios_in_couch = data.get('record', {}).get('comentarios_rondin', [])
         comentarios_in_lkf = bitacora_in_lkf.get('grupo_comentarios_generales', [])
@@ -11002,25 +11377,34 @@ class Accesos(OcrMixin, AccesosModel):
 
         answers[self.f['grupo_comentarios_generales']] = comentarios_finales
         if answers:
-            metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_RONDINES)
-            metadata.update(self.get_record_by_folio(bitacora_in_lkf.get('folio'), self.BITACORA_RONDINES, select_columns={'_id': 1}, limit=1))
+            record_id = bitacora_in_lkf.get('_id')
+            # areas_del_rondin, bitacora_rondin_incidencias y grupo_comentarios_generales se
+            # reconstruyen completos en cada sync (no son ediciones incrementales a filas
+            # existentes), así que se escriben directo a Mongo en vez de patch_multi_record:
+            # ese método espera un diccionario indexado por posición para grupos, y con un
+            # rebuild completo eso solo inserta filas nuevas y duplicaría el grupo en cada
+            # guardado (mismo criterio que el desglose de bitácora de transportistas).
+            grupos_completos = {}
+            for grupo_field in (self.f['areas_del_rondin'], self.f['bitacora_rondin_incidencias'], self.f['grupo_comentarios_generales']):
+                if grupo_field in answers:
+                    grupos_completos[f'answers.{grupo_field}'] = answers.pop(grupo_field)
+            if grupos_completos:
+                self.cr.update_one(
+                    {'_id': ObjectId(record_id), 'form_id': self.BITACORA_RONDINES, 'deleted_at': {'$exists': False}},
+                    {'$set': grupos_completos}
+                )
 
-            metadata.update({
-                'properties': {
-                    "device_properties": {
-                        "system": "Addons",
-                        "process":"Actualizacion de Bitacora",
-                        "accion":'rondines_cache',
-                        "folio": bitacora_in_lkf.get('folio'),
-                        "archive": "rondines_cache.py"
-                    }
-                },
-                'answers': answers,
-                '_id': bitacora_in_lkf.get('_id')
-            })
-            res = self.net.patch_forms_answers(metadata)
+            # patch_multi_record actualiza el resto de los campos (no repetitivos) en su
+            # lugar por _id, sin crear una nueva versión/registro en LinkaForm (a diferencia
+            # de patch_forms_answers, que reescribe el documento completo y genera un nuevo
+            # _id en cada llamada).
+            res = {'status_code': 202} if not answers else self.lkf_api.patch_multi_record(
+                answers=answers,
+                form_id=self.BITACORA_RONDINES,
+                record_id=[record_id]
+            )
             print('res',res)
-            if res.get('status_code') == 202:
+            if res.get('status_code') in (201, 202):
                 data['status'] = 'received'
                 data['inbox'] = False
                 self.cr_db.save(data)
@@ -11406,6 +11790,7 @@ class Accesos(OcrMixin, AccesosModel):
         Obtiene todos los registros de cocuhdb que esten con "status_user": "completed" y los
         procesa segun sea el tipo.
         """
+        print("ACTUALIZACION DE ADDONSSSSSS")
         print("\n" + "="*60)
         print("[sync_records] INICIO")
         record_list = []
