@@ -476,8 +476,14 @@ class Accesos(OcrMixin, AccesosModel):
             if visita == 'Usuario Actual':
                 user_id = self.user['user_id']
                 employee = self.Employee.get_employee_data(user_id=self.user['user_id'], get_one=True)
+                if not employee or not employee.get('worker_name'):
+                    employee = self.Employee.get_employee_data(email=self.user.get('email'), get_one=True)
                 self.employee = employee
-                visita_set.update(self.visita_a_set_format(employee))
+                if employee and employee.get('worker_name'):
+                    visita_set.update(self.visita_a_set_format(employee))
+                else:
+                    visita_set = {self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
+                    self.mf['nombre_empleado'] : self.user.get('username', self.user.get('email', ''))}}
                 if visita_set:
                     res.append(visita_set)
                 continue
@@ -491,7 +497,7 @@ class Accesos(OcrMixin, AccesosModel):
                 employee = self.Employee.get_employee_data(name = visita, get_one=True)
                 self.employee = employee
             visita_set.update(self.visita_a_set_format(employee))
-            if visita_set and self.employee:
+            if visita_set and self.employee and self.employee.get('worker_name'):
                 res.append(visita_set)
             else:
                 visita_set = {self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
@@ -524,7 +530,7 @@ class Accesos(OcrMixin, AccesosModel):
             if 'file_url' in foto.keys() and foto['file_url']:
                 foto_ok = self.valid_url(foto['file_url'])
         #TODO revisar configuracion
-        id_vista  = answers[self.pase_entrada_fields['walkin_identificacion']]
+        id_vista  = answers.get(self.pase_entrada_fields['walkin_identificacion'], [])
         if isinstance(id_vista, list) and len(id_vista) > 0:
             id_vista = id_vista[0]
 
@@ -585,6 +591,7 @@ class Accesos(OcrMixin, AccesosModel):
 
             if answers.get(self.pase_entrada_fields['catalago_autorizado_por'],{}).get(self.pase_entrada_fields['autorizado_por']):
                 autorizado_ok = True
+        print("QUE PASA, ", foto_ok , id_vista , fecha_ok , vista_a_ok , autorizado_ok)
         if foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
             status = 'activo'
         elif foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
@@ -1702,10 +1709,22 @@ class Accesos(OcrMixin, AccesosModel):
 
     def catalog_visita_a_pases(self, visita_a):
         if visita_a == 'Usuario Actual':
-            user_id = self.user['user_id']
-            employee = self.Employee.get_employee_data(user_id=self.user['user_id'], get_one=True)
+            employee = self.Employee.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
+            if not employee and self.user.get('email'):
+                employee = self.Employee.get_employee_data(email=self.user.get('email'), get_one=True)
+            if not employee and self.user.get('username'):
+                employee = self.Employee.get_employee_data(username=self.user.get('username'), get_one=True)
             self.employee = employee
-            visita_a = employee.get('worker_name')
+            return {
+                self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
+                    self.mf['nombre_empleado']: employee.get('worker_name'),
+                    self.mf['telefono_visita_a']: [self.unlist(employee.get('new_user_phone', employee.get('telefono2', employee.get('telefono1', ''))))],
+                    self.mf['email_visita_a']: [self.unlist(employee.get('new_user_email', employee.get('usuario_email', '')))],
+                    self.mf['user_id_empleado']: [self.unlist(employee.get('user_id_id', employee.get('usuario_id', '')))],
+                    self.mf['departamento_empleado']: [self.unlist(employee.get('worker_department', ''))],
+                    self.mf['puesto_empleado']: [self.unlist(employee.get('worker_position', ''))],
+                }
+            }
         visita_set = {
             self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID:{
                 self.mf['nombre_empleado'] : visita_a,
@@ -2683,7 +2702,7 @@ class Accesos(OcrMixin, AccesosModel):
             access_pass['config_limitar_acceso'] =  1
 
         answers[self.pase_entrada_fields['acompanantes']]= access_pass.get('acompanantes', 0)
-        answers[self.pase_entrada_fields['acompanantes_grupo']]= access_pass.get('acompanantes_grupo', 0)
+        answers[self.pase_entrada_fields['acompanantes_grupo']]= access_pass.get('acompanantes_grupo') or []
         answers[self.pase_entrada_fields['config_dia_de_acceso']] = access_pass.get('config_dia_de_acceso',"")
         answers[self.pase_entrada_fields['config_dias_acceso']] = access_pass.get('config_dias_acceso',"")
         answers[self.pase_entrada_fields['config_limitar_acceso']] = access_pass.get('config_limitar_acceso',1)
@@ -4506,6 +4525,7 @@ class Accesos(OcrMixin, AccesosModel):
             {'$sort':{'created_at':-1}},
         ]
         res = self.cr.aggregate(query)
+        
         x = {}
         for x in res:
             if get_answers:
@@ -4520,7 +4540,8 @@ class Accesos(OcrMixin, AccesosModel):
             f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['url_padre']= self.unlist(x.get('url_padre',''))
-
+            print("RESSSS",x.get('walkin', ''))
+            x['walkin']=self.unlist(x.get('walkin', ''))
             # Si es un pase hijo, ir a buscar el link del pase padre
             if x.get('url_padre'):
                 padre_id_match = re.search(r'/records/detail/([a-fA-F0-9]{24})', x['url_padre'])
@@ -4576,7 +4597,6 @@ class Accesos(OcrMixin, AccesosModel):
                 visita_a.append(emp)
             x['visita_a'] = visita_a
             perfil_pase = x.pop('perfil_pase') if x.get('perfil_pase') else []
-            print("PERTFIL PASEEEE", perfil_pase)
 
             perfil_pase = self._labels(perfil_pase, self.mf)
             if x.get('fecha_de_caducidad') == "":
@@ -6275,6 +6295,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "estatus_pase_padre" or \
                key == "link_padre" or \
                key == "tipo_de_pase" or \
+               key == "walkin" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
@@ -8312,6 +8333,7 @@ class Accesos(OcrMixin, AccesosModel):
         pass_selected= self.get_detail_access_pass(qr_code=folio, get_answers=True)
         qr_code= folio
         _folio= pass_selected.get("folio")
+   
         answers={}
         acompanantes_a_actualizar = []
         for key, value in access_pass.items():
@@ -8425,6 +8447,15 @@ class Accesos(OcrMixin, AccesosModel):
                 answers.update({f"{self.pase_entrada_fields[key]}": [value]})
             elif key == 'conservar_datos_por':
                 answers.update({f"{self.pase_entrada_fields[key]}": value.replace(" ", "_")})
+            elif key =='permisos_certificaciones':
+                answers[self.mf['permisos_certificaciones_evidencias']] = {}
+                for index, item in enumerate(value):
+                    obj = {
+                        self.mf['nombre_del_permiso']: item.get('nombre_del_permiso', ''),
+                        self.mf['evidencia_documento_permiso']: item.get('documento', []),
+                        self.mf['evidencia_fotografia_permiso']: item.get('foto', []),
+                    }
+                    answers[self.mf['permisos_certificaciones_evidencias']][(index+1)*-1] = obj
             # elif key == 'acompanantes':
             #     answers[self.pase_entrada_fields['acompanantes_grupo']] = {}
             #     for index, item in enumerate(value):
@@ -8442,7 +8473,11 @@ class Accesos(OcrMixin, AccesosModel):
             else:
                 if value:
                     answers.update({f"{self.pase_entrada_fields[key]}":value})
-        employee = getattr(self,'employee',self.get_employee_data(email=self.user.get('email'), get_one=True))
+        employee = getattr(self,'employee', None)
+        if not employee:
+            employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
+        if not employee:
+            employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
         if answers:
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
@@ -9079,12 +9114,12 @@ class Accesos(OcrMixin, AccesosModel):
         """
         res = {}
         nombre_visita_a = employee.get('worker_name')
-        phone = self.unlist(employee.get('new_user_phone', employee.get('telefono2', employee.get('telefono1',""))))
-        email = self.unlist(employee.get('new_user_email', employee.get('usuario_email', "")))
-        user_id_id = self.unlist(employee.get('user_id_id',employee.get('usuario_id',"")))
-        username = self.unlist(employee.get('new_user_username',""))
-        departamento = self.unlist(employee.get('worker_department',""))
-        puesto = self.unlist(employee.get('worker_position',""))
+        phone = self.unlist(employee.get('new_user_phone', employee.get('telefono2', employee.get('telefono1',"")))) or ""
+        email = self.unlist(employee.get('new_user_email', employee.get('usuario_email', ""))) or ""
+        user_id_id = self.unlist(employee.get('user_id_id',employee.get('usuario_id',""))) or ""
+        username = self.unlist(employee.get('new_user_username',"")) or ""
+        departamento = self.unlist(employee.get('worker_department',"")) or ""
+        puesto = self.unlist(employee.get('worker_position',"")) or ""
         #Lo seteamo en una lista porque es campo catlog detail
         res = {self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID: {
                 self.mf['nombre_empleado'] : nombre_visita_a,

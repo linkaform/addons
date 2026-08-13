@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>6-162edf803375e522e444f7930123aae0</_rev>
-    <updated_at>2026-07-03T00:45:40.157200+00:00Z</updated_at>
+    <_rev>1-ed88b75acdac1d4dd30ce9fbe9bafbc5</_rev>
+    <updated_at>2026-08-07T23:59:29.805087+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -16,7 +16,7 @@
     <filters>{}</filters>
     <name>Rol</name>
     <edit_public_records>False</edit_public_records>
-    <created_at>2026-07-03T00:45:40.157200+00:00Z</created_at>
+    <created_at>2026-08-07T23:59:29.805087+00:00Z</created_at>
     <advanced_options>
         <active>True</active>
         <folio>
@@ -25,6 +25,10 @@
             <config>False</config>
         </folio>
     </advanced_options>
+    <catalog_id>163442</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>6a767161e6a3fb2baccc6aa0</_id>
+    <public>False</public>
     <catalog_pages>
         <item>
             <page_fields>
@@ -50,12 +54,8 @@
                     <related_catalog>None</related_catalog>
                 </item>
             </page_fields>
-            <page_name>Página 1</page_name>
             <page_description>None</page_description>
+            <page_name>Página 1</page_name>
         </item>
     </catalog_pages>
-    <sync_last_update>None</sync_last_update>
-    <_id>6a470634de711f1df3ec49b5</_id>
-    <public>False</public>
-    <catalog_id>157820</catalog_id>
 </lkf>
