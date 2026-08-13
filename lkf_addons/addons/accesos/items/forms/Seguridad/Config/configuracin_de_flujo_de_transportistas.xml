@@ -10,7 +10,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <created_at>1786054309.0</created_at>
-    <description>version: 1786652260</description>
+    <description>version: 1786653837</description>
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
@@ -148,9 +148,9 @@
                     <groups_fields>
                         <item>66a83a74de752e12018fbc3c</item>
                         <item>663e5c57f5b8a7ce8211ed0b</item>
-                        <item>6a7e264a5dcce09738c16072</item>
+                        <item>6a7e2c5c23fb366f1918dea8</item>
                         <item>6a750a1afd4ed68d7c57c24d</item>
-                        <item>6a7e264a5dcce09738c16073</item>
+                        <item>6a7e2c5c23fb366f1918dea9</item>
                         <item>66fec5c023df72be6977c60a</item>
                         <item>5d810a982628de5556500d55</item>
                         <item>5d810a982628de5556500d56</item>
@@ -382,7 +382,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>6a7e264a5dcce09738c16072</field_id>
+                    <field_id>6a7e2c5c23fb366f1918dea8</field_id>
                     <field_type>radio</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>
@@ -554,7 +554,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>6a7e264a5dcce09738c16073</field_id>
+                    <field_id>6a7e2c5c23fb366f1918dea9</field_id>
                     <field_type>radio</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>
@@ -573,10 +573,10 @@
                             <value>caja_seca</value>
                         </item>
                         <item>
-                            <label>Refrigerada</label>
+                            <label>Refrigerado</label>
                             <points>None</points>
                             <selected>False</selected>
-                            <value>refrigerada</value>
+                            <value>refrigerado</value>
                         </item>
                     </options>
                     <properties>
@@ -991,5 +991,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1786652237.0</updated_at>
+    <updated_at>1786653792.0</updated_at>
 </lkf>
