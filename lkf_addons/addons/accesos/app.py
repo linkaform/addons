@@ -530,7 +530,7 @@ class Accesos(OcrMixin, AccesosModel):
             if 'file_url' in foto.keys() and foto['file_url']:
                 foto_ok = self.valid_url(foto['file_url'])
         #TODO revisar configuracion
-        id_vista  = answers[self.pase_entrada_fields['walkin_identificacion']]
+        id_vista  = answers.get(self.pase_entrada_fields['walkin_identificacion'], [])
         if isinstance(id_vista, list) and len(id_vista) > 0:
             id_vista = id_vista[0]
 
