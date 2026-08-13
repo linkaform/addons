@@ -4,6 +4,7 @@
 openpyxl==3.0.10
 pytest==7.2.2
 pytest-dependency==0.5.1
+pytest-mock==3.14.0
 
 ####################
 # Addons Requires
@@ -21,6 +22,7 @@ Jinja2==3.1.2
 matplotlib
 numpy
 openpyxl==3.0.10
+pandas
 opencv-python-headless==4.13.0.90
 pdf2image
 pdf2pptx

@@ -149,13 +149,28 @@
                 <record>
                     <created>True</created>
                     <deleted>False</deleted>
-                    <edited>True</edited>
+                    <edited>False</edited>
                     <run_multiple_times>True</run_multiple_times>
                     <runtime>before</runtime>
                 </record>
                 <wf_fields>
                     <operator>all</operator>
-                    <triggers>[]</triggers>
+                    <triggers>
+                        <item>
+                            <condition>is__empty=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6a345db8f1b0cf32e9021f93</field_id>
+                                <group>{}</group>
+                                <label>Registro Padre</label>
+                                <type>text</type>
+                            </trigger_field>
+                            <value> </value>
+                        </item>
+                    </triggers>
                 </wf_fields>
             </rules>
         </item>

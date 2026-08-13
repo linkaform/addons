@@ -34,6 +34,12 @@ RUN apt-get update && \
     mongodb-org-shell \
     mongodb-org-tools
 
+
+COPY ./docker/requires.txt /tmp/
+RUN pip install --upgrade pip
+RUN pip install -r /tmp/requires.txt
+RUN pip install twilio
+RUN pip install git+https://github.com/Bastian-Kuhn/wallet.git
 COPY ./secrets/lkf_jwt_key.pub /etc/ssl/certs/lkf_jwt_key.pub
 COPY ./lkfpwd.py /usr/local/lib/python3.10
 COPY ./docker/main_entrypoint.sh /docker/
@@ -47,23 +53,17 @@ WORKDIR /srv/scripts/addons/modules
 ####################################
 FROM linkaform/addons:base as develop
 
-
-COPY ./docker/requires.txt /tmp/
-COPY ./lkf_addons/bin/lkfaddons.py /usr/local/bin/lkfaddons
-RUN chmod a+x /usr/local/bin/lkfaddons
-
-RUN pip install --upgrade pip
-RUN pip install -r /tmp/requires.txt
-RUN pip install twilio
-RUN pip install git+https://github.com/Bastian-Kuhn/wallet.git
 WORKDIR /tmp/
 ADD https://f001.backblazeb2.com/file/lkf-resources/backblaze_utils-0.1.tar.gz ./backblaze_utils-0.1.tar.gz 
 RUN pip install backblaze_utils-0.1.tar.gz
-
 # RUN echo testsssssss
 #RUN git clone https://github.com/linkaform/backblaze_utils.git
 #WORKDIR /usr/local/bin/backblaze_utils
 RUN rm /tmp/*.tar.gz
+
+COPY ./lkf_addons/bin/lkfaddons.py /usr/local/bin/lkfaddons
+RUN chmod a+x /usr/local/bin/lkfaddons
+
 
 RUN adduser --home /srv/scripts/ --uid 1000 --disabled-password nonroot
 RUN mkdir -p /srv/scripts/addons/modules

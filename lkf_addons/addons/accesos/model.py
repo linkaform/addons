@@ -30,7 +30,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.chife_guard = 'guardia_lider'
         # Forms #
         '''
-        Use `self.FORM_NAME = self.lkm.form_id('form_name',id)` ---> Aquí deberás guardar los `ID` de los formularios. 
+        Use `self.FORM_NAME = self.lkm.form_id('form_name',id)` ---> Aquí deberás guardar los `ID` de los formularios.
         Para ello deberás llamar el método `lkm.form_id` del objeto `lkm` (linkaform modules, por sus siglas).
         En `lkm` están todas las funciones generales de módulos.
         '''
@@ -47,6 +47,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CONFIGURACION_RECORRIDOS_FORM = self.lkm.form_id('configuracion_de_recorridos','id')
         self.CONF_PERFILES = self.lkm.form_id('configuracion_de_perfiles','id')
         self.PASE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
+        self.PASE_ENTRADA_TRANSPORTISTA = self.lkm.form_id('pase_de_entrada_transportista','id')
         self.PROGRAMAR_TAREAS = self.lkm.form_id('programar_tareas', 'id')
         self.PUESTOS_GUARDIAS = self.lkm.form_id('puestos_de_guardias','id')
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
@@ -57,6 +58,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CHECK_UBICACIONES = self.lkm.form_id('check_ubicaciones','id')
         self.REGISTRO_ASISTENCIA = self.lkm.form_id('registro_de_asistencia','id')
         self.FORMATO_VACACIONES = self.lkm.form_id('formato_vacaciones_aviso','id')
+        self.PROVEEDORES_FORM = self.lkm.form_id('proveedores','id')
+        self.MENUS_FORM = self.lkm.form_id('configuracion_menus','id')
 
         self.last_check_in = []
         # self.FORM_ALTA_COLABORADORES = self.lkm.form_id('alta_de_colaboradores_visitantes','id')
@@ -67,10 +70,10 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         # self.FORM_PASE_DE_ENTRADA = self.lkm.form_id('pase_de_entrada','id')
         # self.FORM_REGISTRO_PERMISOS = self.lkm.form_id('registro_de_permisos','id')
 
-        #--Variables 
+        #--Variables
         ### Catálogos ###
         '''
-        Use `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos. 
+        Use `self.CATALOG_NAME = self.lkm.catalog_id('catalog_name',id)` ---> Aquí deberás guardar los `ID` de los catálogos.
         Para ello deberás llamar el método `lkm.catalog_id` del objeto `lkm`(linkaform modules, por sus siglas).
         En `lkm` están todas las funciones generales de módulos).
         '''
@@ -114,7 +117,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.TIPO_ARTICULOS_PERDIDOS_CAT = self.lkm.catalog_id('lista_de_objetos')
         self.TIPO_ARTICULOS_PERDIDOS_CAT_ID = self.TIPO_ARTICULOS_PERDIDOS_CAT.get('id')
         self.TIPO_ARTICULOS_PERDIDOS_CAT_OBJ_ID = self.TIPO_ARTICULOS_PERDIDOS_CAT.get('obj_id')
-        
+
         self.VISITA_AUTORIZADA_CAT = self.lkm.catalog_id('visita_autorizada')
         self.VISITA_AUTORIZADA_CAT_ID = self.VISITA_AUTORIZADA_CAT.get('id')
         self.VISITA_AUTORIZADA_CAT_OBJ_ID = self.VISITA_AUTORIZADA_CAT.get('obj_id')
@@ -126,6 +129,10 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CATEGORIAS_INCIDENCIAS = self.lkm.catalog_id('categora_incidentes')
         self.CATEGORIAS_INCIDENCIAS_ID = self.CATEGORIAS_INCIDENCIAS.get('id')
         self.CATEGORIAS_INCIDENCIAS_OBJ_ID = self.CATEGORIAS_INCIDENCIAS.get('obj_id')
+    
+        self.CATALOGO_FORMAS = self.lkm.catalog_id('catalogo_de_formas')
+        self.CATALOGO_FORMAS_CAT_ID = self.CATALOGO_FORMAS.get('id')
+        self.CATALOGO_FORMAS_OBJ_ID = self.CATALOGO_FORMAS.get('obj_id')
 
         self.SUB_CATEGORIAS_INCIDENCIAS = self.lkm.catalog_id('subcategoras_incidentes')
         self.SUB_CATEGORIAS_INCIDENCIAS_ID = self.SUB_CATEGORIAS_INCIDENCIAS.get('id')
@@ -143,11 +150,24 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.PROVEEDORES_CAT_ID = self.PROVEEDORES_CAT.get('id')
         self.PROVEEDORES_CAT_OBJ_ID = self.PROVEEDORES_CAT.get('obj_id')
 
+        self.PROVEEDORES_DE_PAQUETERIA_CAT = self.lkm.catalog_id('proveedores_de_paqueteria')
+        self.PROVEEDORES_DE_PAQUETERIA_CAT_ID = self.PROVEEDORES_DE_PAQUETERIA_CAT.get('id')
+        self.PROVEEDORES_DE_PAQUETERIA_CAT_OBJ_ID = self.PROVEEDORES_DE_PAQUETERIA_CAT.get('obj_id')
+
         self.load(module='Employee', **self.kwargs)
 
         # self.CONF_PERFIL = self.lkm.catalog_id('configuracion_de_perfiles','id')
         # self.CONF_PERFIL_ID = self.CONF_PERFIL.get('id')
         # self.CONF_PERFIL_OBJ_ID = self.CONF_PERFIL.get('obj_id')
+
+
+        self.TIPO_EQUIPOS_CAT = self.lkm.catalog_id('tipo_de_equipos')
+        self.TIPO_EQUIPOS_CAT_ID = self.TIPO_EQUIPOS_CAT.get('id')
+        self.TIPO_EQUIPOS_CAT_OBJ_ID = self.TIPO_EQUIPOS_CAT.get('obj_id')
+
+        self.TIPO_VEHICULOS_CAT = self.lkm.catalog_id('tipos_de_vehiculo')
+        self.TIPO_VEHICULOS_CAT_ID = self.TIPO_VEHICULOS_CAT.get('id')
+        self.TIPO_VEHICULOS_CAT_OBJ_ID = self.TIPO_VEHICULOS_CAT.get('obj_id')
 
         self.AREAS_DE_LAS_UBICACIONES_CAT = self.lkm.catalog_id('areas_de_las_ubicaciones')
         self.AREAS_DE_LAS_UBICACIONES_CAT_ID = self.AREAS_DE_LAS_UBICACIONES_CAT.get('id')
@@ -156,21 +176,54 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.AREAS_DE_LAS_UBICACIONES_SALIDA = self.lkm.catalog_id('areas_de_las_ubicaciones_salidas')
         self.AREAS_DE_LAS_UBICACIONES_SALIDA_ID = self.AREAS_DE_LAS_UBICACIONES_SALIDA.get('id')
         self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID = self.AREAS_DE_LAS_UBICACIONES_SALIDA.get('obj_id')
+
+        self.MENUS_CATALOG = self.lkm.catalog_id('elementos_menu')
+        self.MENUS_CATALOG_ID = self.MENUS_CATALOG.get('id')
+        self.MENUS_CATALOG_OBJ_ID = self.MENUS_CATALOG.get('obj_id')
+
+        self.ROL_CATALOG = self.lkm.catalog_id('rol')
+        self.ROL_CATALOG_ID = self.ROL_CATALOG.get('id')
+        self.ROL_CATALOG_OBJ_ID = self.ROL_CATALOG.get('obj_id')
         #----Dic Fields Forms
+ 
+        ### Lista de catalogos requeridos para el uso offline de la aplicacion.
+        self.clave10_catalogs = [
+            self.LISTA_INCIDENCIAS_CAT_ID,
+            self.SUB_CATEGORIAS_INCIDENCIAS_ID,
+            self.CATEGORIAS_INCIDENCIAS_ID,
+            self.AREAS_DE_LAS_UBICACIONES_CAT_ID,
+            self.UBICACIONES_CAT_ID,
+            self.CONFIGURACION_RECORRIDOS_ID,
+            self.USUARIOS_ID,
+            self.CONF_AREA_EMPLEADOS_CAT_ID,
+            self.TIPO_EQUIPOS_CAT_ID,
+            self.TIPO_VEHICULOS_CAT_ID,
+            self.LISTA_FALLAS_CAT_ID,
+            self.CONF_AREA_EMPLEADOS_AP_CAT_ID,
+            self.VISITA_AUTORIZADA_CAT_ID,
+            self.ESTADO_ID,
+            self.PROVEEDORES_CAT_ID,
+            self.LOCKERS_CAT_ID,
+            self.TIPO_ARTICULOS_PERDIDOS_CAT_ID,
+            self.PASE_ENTRADA_ID,
+            self.ACTIVOS_FIJOS_CAT_ID,
+            self.ROL_CATALOG_ID
+        ]
 
         ## Module Fields ##
-        ''' 
+        '''
         self.mf : Estos son los campos que deseas mantener solo dentro de este modulo.
         Asegúrese de utilizar `llave` y el `id` del campo ej.
         'nombre_campo': "1f2h3j4j5d6f7h8j9j1a",
         '''
+
         mf = {
             'acepto_aviso_datos_personales': '6827488724317731cb288117',
             'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
             'archivo_invitacion': '673773741b2adb2d05d99d63',
             'areas_grupo':'663cf9d77500019d1359eb9f',
             'articulo':'66ce2441d63bb7a3871adeaf',
-            #LOS CATALOGOS NO SE CCLASIFICAN COMO CAMPOS            
+            #LOS CATALOGOS NO SE CCLASIFICAN COMO CAMPOS
             'catalog_area_pase':'664fc5f3bbbef12ae61b15e9',
             'catalog_caseta':'66566d60d4619218b880cf04',
             'catalog_caseta_salida':'66566d60464fe63529d1c543',
@@ -285,11 +338,18 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'vigencia_certificado':'662962bb203407ab90c886e6',
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
             'walkin':'66c4261351cc14058b020d48',
+            'grupo_asignado_a':'6a309d27b3f21fceb68eeb01',
+            'nombre_forma': '5d810a982628de5556500d55',
+            'permisos_certificaciones_grupo':'6622a883f795581dbd730290',
+            'permisos_certificaciones_evidencias':'6a74d15ebbfb86985232bc76',
+            'nombre_del_permiso':'6a74d27fa9bf0d441f4c243f',
+            'evidencia_documento_permiso':'6a74d27fa9bf0d441f4c2440',
+            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441'
         }
         self.mf = mf
         ## Form Fields ##
         '''
-        `self.form_name`: En esta sección podrás agrupar todos los campos ya sea por forma o como desees enviarlos hacia tus servicios. 
+        `self.form_name`: En esta sección podrás agrupar todos los campos ya sea por forma o como desees enviarlos hacia tus servicios.
         En el caso de las búsquedas de Mongo, puedes hacer las búsquedas de manera anidada. Por lo cual podrás agrupar separadas por punto,
         ej. 663d4ba61b14fab90559ebb0.665f482cc9a2f8acf685c20b y así podrás hacer las búsquedas directo en la base de datos.
 
@@ -324,6 +384,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tipo_articulo_perdido':f"{self.mf['tipo_de_articulo_perdido']}",
             'ubicacion_catalog':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}",
             'ubicacion_perdido':f"{self.mf['ubicacion']}",
+            "nombre_articulo_perdido":"66ce2441d63bb7a3871adeaf"
         }
 
         #- Para salida de bitacora y lista
@@ -354,7 +415,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'visita_nombre_empleado': f"{self.mf['nombre_empleado']}",
             'visita_user_id_empleado':f"{self.mf['user_id_empleado']}",
         }
-        
+
         self.checkin_fields = {
             'boot_checkin_date':'663bffc28d00553254f274e1',
             'boot_checkout_date':'663bffc28d00553254f274e2',
@@ -436,7 +497,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'ubicacion_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             '_ubicacion_concesion': self.mf['ubicacion'],
         }
-        
+
         self.status_equipo_dict = {
             'complete':'completo',
             'damage':'dañado',
@@ -473,7 +534,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'falla_ubicacion': f"{self.mf['ubicacion']}",
             'falla_ubicacion_catalog':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
         }
-        
+
         #- Para creación , edición y lista de incidencias
         self.incidence_fields = {
             #Campos en grupo repetitivo Seguimiento:
@@ -516,7 +577,6 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'incidencia_documento_solucion':'683de45ddcf6fcee78e61edc',
             'incidencia_evidencia_solucion':'683de45ddcf6fcee78e61edb',
             'incidencia_personas_involucradas':'684c3e026d974f9625e1130f',
-            'incidente':'663973809fa65cafa759eb97',
             'info_coincide_con_videos': '684c3e026d974f9625e1130d',
             'llamo_a_policia': '688bbddbd40db062d071862f',
             'marca': '684c3eaa04aaab135d7dfbb4',
@@ -540,7 +600,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'prioridad_incidencia':'66ec69144a27bb6151a0255c',
             'puesto':'68d6efb0a209c0144d6c3761',
             'reporta_incidencia': '62c5ff407febce07043024dd',
-            'reporta_incidencia_catalog': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}", 
+            'reporta_incidencia_catalog': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}",
             'responsable': '688bbddbd40db062d0718630',
             'responsable_accion':'66ec69a914bf1142b6a024e2',
             'responsable_que_entrega': '688bb6ca2f094c5555b2097b',
@@ -566,7 +626,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             #Robo de cableado
             'valor_estimado': '684c3e6821796d7880117f22',
         }
-        
+
         #- Para creación , edición y lista de gafetes y lockers
         self.gafetes_fields = {
             'caseta_gafete':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
@@ -576,7 +636,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'ubicacion_gafete':f"{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             'visita_gafete':f"{self.mf['catalog_visita']}.{self.mf['nombre_visita']}",
         }
-        
+
         self.lockers_fields = {
             'locker_id':'66480101786e8cdb66e70124',
             'status_locker':"663961d5390b9ec511e97ca5",
@@ -599,7 +659,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'note_pic':'6647fadc96f80017ac388649',
             'note_status':'6647f9eb6eefdb1840684dc1',
         }
-        
+
         self.notes_project_fields = {
             'area': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
             'closed_by': f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
@@ -607,10 +667,16 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'location': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
             'support_guard':f"{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['worker_name_b']}",
         }
-        
+
         self.pase_entrada_fields = {
             'acepto_aviso_datos_personales': '6827488724317731cb288117',
             'acepto_aviso_privacidad': '6825268e0663cce4b1bf0a17',
+            'condiciones_de_servicio': '6a5537ebc59717059285ad5d',
+            'documento_de_condiciones_de_servicio': '6a5537ebc59717059285ad5e',
+            'url_de_condiciones_de_servicio': '6a5537ebc59717059285ad5f',
+            'acompanantes':'6a22f7b7826f8544c6183362',
+            'acompanantes_grupo':'6a22fc57c026befc685f4fe3',
+            'grupo_acompanantes':'6a22fc57c026befc685f4fe3',
             'apple_wallet_pass': '682785fbedd82a9104287e25',
             'archivo_invitacion': '673773741b2adb2d05d99d63',
             'area':f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
@@ -628,7 +694,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'email_pase':'662c2937108836dec6d92581',
             'empresa_pase_catalog':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['empresa']}",
             'empresa_pase':'66357d5e4f00f9018ce97ce9',
-            'favoritos':'674642e2d53ce9476994dd89',  
+            'favoritos':'674642e2d53ce9476994dd89',
             'fecha_hasta_pase':'662c304fad7432d296d92583',
             'foto_pase':f"{self.PASE_ENTRADA_OBJ_ID}.{self.mf['foto']}",
             'foto_pase_id':f"{self.mf['foto']}",
@@ -660,6 +726,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tipo_visita':"662c262cace163ca3ed3bb3a",
             'todas_las_areas':'68f9fdfbd9bf5cb7fd3caece',
             'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
+            'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
+            'url_hijo':"6a3dc2a391c36d239c1453a7",
+            'url_padre':"6a3dc2a391c36d239c1453b7",
             'ubicaciones':'6834e34fa6242006acedda0f',
             'vigencia_expresa_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e7",
             'vigencia_pase':f"{self.CONFIG_PERFILES_OBJ_ID}.662962bb203407ab90c886e6",
@@ -671,23 +740,31 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'walkin_nombre':'662c2937108836dec6d92580',
             'walkin_telefono':'662c2937108836dec6d92582',
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
-            'worker_position':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",    
+            'habilitar_vehiculo':'6a218bf63b5cf6f0c1c55f29',
+            'worker_position': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
+            'firma_reglas_de_acceso':'6a67caac45f44675221f56e7',
+            'permisos_certificaciones_grupo':'6622a883f795581dbd730290',
+            'permisos_certificaciones_evidencias':'6a74d15ebbfb86985232bc76',
+            'permisos_certificaciones':'6a74d15ebbfb86985232bc76',
+            'nombre_del_permiso':'6a74d27fa9bf0d441f4c243f',
+            'evidencia_documento_permiso':'6a74d27fa9bf0d441f4c2440',
+            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441'
         }
-        
+
         self.pase_grupo_visitados ={
         }
-        
+
         # self.pase_entrada_fields.update(self.pase_grupo_visitados)
         self.pase_grupo_areas = {
             'nombre_perfil':     f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
         }
-        
+
         # self.pase_entrada_fields.update(self.pase_grupo_areas)
         self.pase_grupo_vehiculos = {
             'nombre_perfil':     f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}",
-            'tipo_vehiuclo':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",        
+            'tipo_vehiuclo':   f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
         }
-        
+
         # self.pase_entrada_fields.update(self.pase_grupo_vehiculos)
         self.pase_entrada_fields.update({
             'ubicacion_cat': f"{self.UBICACIONES_CAT_OBJ_ID}",
@@ -726,11 +803,10 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'created_by': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_name']}",
             'comentario_area_pase':self.mf['commentario_area'],
             'ubicaciones': '6834e34fa6242006acedda0f',
-            'miembros_grupo':'69d3fc307a74fbc034b3e65f',
-            'miembros_grupo_nombre':'662c2937108836dec6d9258b',
-            'miembros_grupo_email':'69d401692bab86e937e57106',
-            'miembros_grupo_telefono':'69d401692bab86e937e57107',
-            'miembros_grupo_pase':'69d401692bab86e937e57108',
+            'nombre_acompanante':'6a23408693202c1f1c149692',
+            'email_acompanante':'6a23408693202c1f1c149693',
+            'telefono_acompanante':'6a23408693202c1f1c149694',
+            'foto_acompanante':'6a23408693202c1f1c149695',
         })
 
         self.conf_accesos_fields = {
@@ -746,6 +822,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'grupo_tipo_de_pase': '694055a57d064b380f010d7f',
             'ubicacion':"663e5c57f5b8a7ce8211ed0b",
             'ubicacion_cat':  f"{self.UBICACIONES_CAT_OBJ_ID}",
+            'prefijo_telefonico':'6a221532db633d0cf4faf12f',
+            'tolerancia_de_entrada_previa':"6a2835444172819eb764943b",
+            'tolerancia_de_entrada_posterior':"6a22155492b193f057990682",
         }
 
         self.paquetes_fields = {
@@ -773,6 +852,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'cada_cuantos_meses_se_repite': 'abcde0001000000000010019',
             'cada_cuantos_minutos_se_repite': 'abcde0001000000000010011',
             'cron_id':'abcde0001000000000011111',
+            'dag_id':'abcde0001000000000000000',
             'cuanto_tiempo_de_anticipacion': 'abcde0002000000000010004',
             'cuanto_tiempo_de_anticipacion_expresado_en': 'abcde0002000000000010005',
             'duracion_estimada': '6854459836ea891d9d2be7d9',
@@ -785,7 +865,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'fecha_final_recurrencia': 'abcde0001000000000010099',
             'fecha_hora_programada': 'abcde0001000000000010001',
             'grupo_areas':'66462aa5d4a4af2eea07e0d1',
-            'grupo_asignado': '638a9ab3616398d2e392a9fa',
+            'grupo_asignado': '638a9ab3616398d2e392a9fa', # NOMBRE del grupo al que fue asignado desde del catalogo
             'grupo_asignado_rondin':'671055aaa487da57ba57b294',
             'id_grupo':'639b65dfaf316bacfc551ba2',
             'la_recurrencia_cuenta_con_fecha_final': '64374e47a208e5c0ff95e9bd',
@@ -796,17 +876,25 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'que_dia_del_mes': 'abcde0001000000000010016',
             'que_dias_de_la_semana': 'abcde0001000000000010014',
             'se_repite_cada': 'abcde0001000000000010007',
+            'registro_padre':'6a345db8f1b0cf32e9021f93',
             'status':'abcde00010000000a0000000',
             'sucede_cada': 'abcde0001000000000010008',
             'sucede_recurrencia': 'abcde0001000000000010009',
             'tiempo_para_ejecutar_tarea': 'abcde0001000000000010004',
             'tiempo_para_ejecutar_tarea_expresado_en': 'abcde0001000000000010005',
+            'tipo_asignacion':'6a344c7a6e574352dcccc7ba',
             'tipo_rondin':'69b9b98d2a02f4a0dd35f5c1',
+            'tipo':'69b9b98d2a02f4a0dd35f5c1',
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
+            'grupo_asignado_a':'6a31d37adeceb005758cd4e2', # GRUPO REPETITIVO asignado a
+            'area':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
+            'grupo':f"{self.GRUPOS_CAT_OBJ_ID}",
+            'grupo_id':'5d810a982628de5556500d56',
+            'prompt_inspeccion':'6a0ce90fefa8de16875f0541',
         }
 
         self.notes_project_fields.update(self.notes_fields)
-        
+
         self.bitacora_acceos = {}
         ## Fields ##
         '''
@@ -829,10 +917,11 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'areas_del_rondin': '66462aa5d4a4af2eea07e0d1',
             'duracion_rondin':'6639b47565d8e5c06fe97cf3',
             'duracion_traslado_area':'6760a9581e31b10a38a22f1f',
+            'porcentaje_obtenido_bitacora': '689a7ecfbf2b4be31039388e',
+            'cantidad_areas_inspeccionadas': '68a7b68a22ac030a67b7f8f8',
             'fecha_inspeccion_area':'6760a908a43b1b0e41abad6b',
             'fecha_programacion':'6760a8e68cef14ecd7f8b6fe',
             'fecha_inicio_rondin':'6818ea068a7f3446f1bae3b3',
-            'grupo_areas_visitadas':'66462aa5d4a4af2eea07e0d1',
             'evidencia_incidencia':'66ec6846028e5550cbf012e0',
             'area_foto': '6763096aa99cee046ba766ad',
             'area_tag_id': '6762f7b0922cc2a2f57d4044',
@@ -844,11 +933,10 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'comentario_check_area': '681144fb0d423e25b42818d4',
             'check_status': '681fa6a8d916c74b691e174b',
             'status_check_ubicacion': '68e41c904da05123bf9326ee',
-            'incidente':'663973809fa65cafa759eb97',
+            'incidencia':'663973809fa65cafa759eb97',
             'categoria':'686807d46e41614d708f6fc9',
             'sub_categoria': '686807a7ee7705c5c8eb181a',
             'incidente_open': '6811455664dc22ecae83f75b',
-            'incidente_comentario': '681145323d9b5fa2e16e35cb',
             'incidente_accion': '681145323d9b5fa2e16e35cc',
             'incidente_evidencia': '681145323d9b5fa2e16e35cd',
             'incidente_documento': '685063ba36910b2da9952697',
@@ -856,6 +944,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'fecha_hora_incidente_bitacora': '69000e4c43078234e5e08390',
             'area_incidente_bitacora': '69000e4c43078234e5e0838f',
             'comentario_incidente_bitacora': '681145323d9b5fa2e16e35cb',
+            'url_incidencia_bitacora': '6927eb61d92ecf923b60a0de',
             'id_usuario':'638a9a99616398d2e392a9f5',
             'nombre_area_salida':'663fb45992f2c5afcfe97ca8',
             'status_cron': 'abcde00010000000a0000000',
@@ -873,5 +962,17 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'nombre_alerta': '695d36605f78faab793f497b',
             'accion_alerta': '695d36605f78faab793f497c',
             'llamar_num_alerta': '695d36605f78faab793f497d',
-            'email_alerta': '695d36605f78faab793f497e'
+            'email_alerta': '695d36605f78faab793f497e',
+            'url_inspeccion': '6a0c8ab354a0b8de897c62cc',
+            'proveedor_de_paqueteria': '6a1764be5451b26d5de3152b',
+            'tipo_de_proveedor': '6a18e4086423e82150aa527c',
+            'tolerancia_de_entrada_previa':"6a2835444172819eb764943b",
+            'tolerancia_de_entrada_posterior':"6a22155492b193f057990682",
+
+            'opcion_condiciones_servicio':"6a4c65bd847c02cf0be63f05",
+            'desc_condiciones_servicio':"6a4c673722f825e7b3e46468",
+            'doc_condiciones_servicio':"6a4c673722f825e7b3e46469",
+            'url_condiciones_servicio':"6a4c673722f825e7b3e4646a",
         })
+
+        self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']

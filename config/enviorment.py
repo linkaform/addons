@@ -2,7 +2,7 @@
 from settings import config
 
 ENV = 'prod' 
-#ENV = 'preprod' 
+# ENV = 'preprod' 
 #ENV = 'local' 
 
 # print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))

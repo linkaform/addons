@@ -3,6 +3,7 @@
 
 # -*- coding: utf-8 -*-
 
+import traceback
 import cx_Oracle
 
 ### Linkaform Modules / Archivo de Modulo ###
@@ -62,36 +63,78 @@ class Oracle(Base):
         self.ORACLE_SID = self.settings.config.get('ORACLE_SID')
         self.ORACLE_USERNAME = self.settings.config['ORACLE_USERNAME']
         self.ORACLE_PASSWORD = self.settings.config['ORACLE_PASSWORD']
-        self.oracle = self.connect_to_oracle()
+        # self.oracle = self.connect_to_oracle()
+        self.orcale_connection = self.connect_to_oracle()
         self.f={}
 
     def connect_to_oracle(self):
         print('=== Establishing Connection to Oracle ===')
+        if self.ORACLE_SERVICE_NAME:
+            dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME)
+        elif self.ORACLE_SID:
+            dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, sid=self.ORACLE_SID) 
+        else:
+            self.LKFException("No se proporciono un service_name o sid")
+        
         try:
-            if self.ORACLE_SERVICE_NAME:
-                dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, service_name=self.ORACLE_SERVICE_NAME)
-            elif self.ORACLE_SID:
-                dsn = cx_Oracle.makedsn(self.ORACLE_HOST, self.ORACLE_PORT, sid=self.ORACLE_SID) 
-            else:
-                self.LKFException("No se proporciono un service_name o sid")
-            
-            try:
-                self.orcale_connection = cx_Oracle.connect(self.ORACLE_USERNAME, self.ORACLE_PASSWORD, dsn)
-            except cx_Oracle.DatabaseError as e:
-                error, = e.args
-                print(f"Error code: {error.code}")
-                print(f"Error message: {error.message}")
-                print('Error',e)
-                return None
-                #return self.LKFException(f"Error code: {error.code} - {error.message}")
-            return self.orcale_connection
-        except  cx_Oracle.DatabaseError as e:
+            self.orcale_connection = cx_Oracle.connect(self.ORACLE_USERNAME, self.ORACLE_PASSWORD, dsn)
+        except cx_Oracle.DatabaseError as e:
             error, = e.args
+            print("01010101010"*5)
+            print(f"ORACLE_HOST code: {self.ORACLE_HOST}")
+            print(f"ORACLE_PORT code: {self.ORACLE_PORT}")
+            print(f"ORACLE_SERVICE_NAME code: {self.ORACLE_SERVICE_NAME}")
+            print(f"ORACLE_SID code: {self.ORACLE_SID}")
+            print(f"ORACLE_USERNAME code: {self.ORACLE_USERNAME}")
+            print(f"Error code: {error.code}")
             print(f"Error code: {error.code}")
             print(f"Error message: {error.message}")
-            print('Error=',e)
-            return self.LKFException(f"Error code: {error.code} - {error.message}")
+            print('Error',e)
+            # return {'staus':503}
+            # return self.LKFException(f"Error code: {error.code} - {error.message}")
+            error, = e.args
+            msg = (
+                f"=== Error Oracle ===\n"
+                f"Code:    {error.code}\n"
+                f"Message: {error.message}\n\n"
+                # f"=== Query ejecutado ===\n{query}\n\n"
+                f"=== Contexto ===\n"
+                f"self.ORACLE_HOST:   {self.ORACLE_HOST}\n"
+                f"self.ORACLE_PORT: {self.ORACLE_PORT}\n"
+                f"self.ORACLE_SID: {self.ORACLE_SID}\n"
+                f"self.ORACLE_SERVICE_NAME: {self.ORACLE_SERVICE_NAME}\n"
+                f"self.ORACLE_USERNAME: {self.ORACLE_USERNAME}\n"
+            )
+            print(msg)
+            traceback.print_exc()
+            data = {
+                'email_from': 'no-reply@linkaform.com',
+                'titulo': "Oracle db connection error",
+                'nombre':  "Oracle db connection error",
+                'mensaje': msg,
+                'enviado_desde': 'oracle/app.py: connect_to_oracle',
+            }
+            for email in ['misael@linkaform.com', 'josepato@linkaform.com']:
+                data['email_to'] = email
+                self.send_email_by_form(data)
+            self.LKFException('No cursor, oracle connection')
+        except Exception as e:
+            print("=========== GENERAL EXCEPTION ===========")
+            print(f"ORACLE_HOST: {self.ORACLE_HOST}")
+            print(f"ORACLE_PORT: {self.ORACLE_PORT}")
+            print(f"ORACLE_SERVICE_NAME: {self.ORACLE_SERVICE_NAME}")
+            print(f"ORACLE_SID: {self.ORACLE_SID}")
+            print(f"ORACLE_USERNAME: {self.ORACLE_USERNAME}")
+            print(f"Error type: {type(e).__name__}")
+            print(f"Error: {e}")
+            traceback.print_exc()
+            for email in ['misael@linkaform.com', 'josepato@linkaform.com']:
+                data['email_to'] = email
+                self.send_email_by_form(data)
+            self.LKFException(f'Error inesperado al conectar a Oracle: {type(e).__name__} - {e}')
 
+        return self.orcale_connection
+        
     def query_view(self, view_name, query=False, date_format=False):
         """
         Query a view in Oracle
@@ -117,7 +160,30 @@ class Oracle(Base):
                 result.append(dict(zip(columns, row)))
         except cx_Oracle.DatabaseError as e:
             error, = e.args
-            print(f"Error querying view: {error.code} - {error.message}")
+            titulo = f"Oracle Sync Error — view: {view_name} | code: {error.code}"
+            msg = (
+                f"=== Error Oracle ===\n"
+                f"Code:    {error.code}\n"
+                f"Message: {error.message}\n\n"
+                f"=== Query ejecutado ===\n{query}\n\n"
+                f"=== Contexto ===\n"
+                f"view_name:   {view_name}\n"
+                f"date_format: {date_format}\n"
+                f"columns:     {columns if columns else '(no se alcanzaron a leer)'}"
+            )
+            print(msg)
+            data = {
+                'email_from': 'no-reply@linkaform.com',
+                'titulo': titulo,
+                'nombre': titulo,
+                'mensaje': msg,
+                'enviado_desde': 'oracle/app.py: query_view',
+            }
+            for email in ['misael@linkaform.com', 'josepato@linkaform.com']:
+                data['email_to'] = email
+                self.send_email_by_form(data)
+            self.LKFException('No cursor, query_view')
+
         finally:
             if cursor:
                 cursor.close()

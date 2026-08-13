@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <templates>[]</templates>
+    <confirmation>
+        <message>¡Su información fue capturada!</message>
+        <button_message>Mandar respuestas</button_message>
+        <redirect_url>default</redirect_url>
+    </confirmation>
+    <description />
+    <_rev>1-ed88b75acdac1d4dd30ce9fbe9bafbc5</_rev>
+    <updated_at>2026-08-07T23:59:29.805087+00:00Z</updated_at>
+    <sync>
+        <element_request>{}</element_request>
+        <input_parameters>[]</input_parameters>
+    </sync>
+    <filters>{}</filters>
+    <name>Rol</name>
+    <edit_public_records>False</edit_public_records>
+    <created_at>2026-08-07T23:59:29.805087+00:00Z</created_at>
+    <advanced_options>
+        <active>True</active>
+        <folio>
+            <manual>False</manual>
+            <required>False</required>
+            <config>False</config>
+        </folio>
+    </advanced_options>
+    <catalog_id>163442</catalog_id>
+    <sync_last_update>None</sync_last_update>
+    <_id>6a767161e6a3fb2baccc6aa0</_id>
+    <public>False</public>
+    <catalog_pages>
+        <item>
+            <page_fields>
+                <item>
+                    <field_type>text</field_type>
+                    <properties>
+                        <send_email>False</send_email>
+                        <size>complete</size>
+                        <custom>None</custom>
+                    </properties>
+                    <key>True</key>
+                    <catalog_fields>[]</catalog_fields>
+                    <field_id>6a46f2730fc4d03a90da2209</field_id>
+                    <required>False</required>
+                    <fav>True</fav>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <relation_type>None</relation_type>
+                    <label>Nombre Rol</label>
+                    <catalog>{}</catalog>
+                    <catalog_id>None</catalog_id>
+                    <view_fields>[]</view_fields>
+                    <options>[]</options>
+                    <related_catalog>None</related_catalog>
+                </item>
+            </page_fields>
+            <page_description>None</page_description>
+            <page_name>Página 1</page_name>
+        </item>
+    </catalog_pages>
+</lkf>

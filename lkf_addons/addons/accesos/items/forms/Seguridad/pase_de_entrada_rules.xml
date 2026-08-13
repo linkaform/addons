@@ -415,14 +415,6 @@
                     <label>Apple Wallet Pass</label>
                     <type>files</type>
                 </item>
-                <item>
-                    <catalog_id>None</catalog_id>
-                    <field_id>6839d7213bedfdca2f5d7f50</field_id>
-                    <group_id>None</group_id>
-                    <id>6839d7213bedfdca2f5d7f50</id>
-                    <label>PaseID(test)</label>
-                    <type>text</type>
-                </item>
             </fields_ruled>
             <group_conditions>{}</group_conditions>
             <name>Ocultar Siempre</name>

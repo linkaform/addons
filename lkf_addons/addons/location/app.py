@@ -12,6 +12,8 @@ Se permite la redistribución y el uso en formas de código fuente y binario, co
 
 '''
 
+from bson import ObjectId
+
 from linkaform_api import base
 from lkf_addons.addons.base.app import Base
 
@@ -48,6 +50,7 @@ class Location(Base):
 
         self.f.update( {
             'area':'663e5d44f5b8a7ce8211ed0f',
+            'area_salida':'663fb45992f2c5afcfe97ca8',
             'area_qr_code':'663e5e4bf5b8a7ce8211ed13',
             'area_state':'663e5e4bf5b8a7ce8211ed14',
             'area_status':'663e5e4bf5b8a7ce8211ed15',
@@ -185,7 +188,9 @@ class Location(Base):
         # ids_label_dct={'area':self.f['area']} fuerza a obtener el diccionarion con esos nombres 
         # paso un error que daba otro label
         data = self.format_cr(self.cr.find(match_query, {area_path: 1}).sort(area_path, 1),  ids_label_dct={'area':self.f['area']})
-        return [x.get('area') for x in data if x.get('area')]
+        result = set(x.get('area') for x in data if x.get('area'))
+        result = list(result)
+        return result
 
     def get_areas_by_location_salidas(self, location_name):
         options={}
@@ -246,7 +251,7 @@ class Location(Base):
     def update_status_habitacion(self, name, status):
         """ Esta funcion actualiza el status de una areas segun su nombre
         Args:
-            name: nombre del area 
+            name: nombre del area
             status: nuevo status
         Returns:
             El resultado directo del patch
@@ -255,3 +260,189 @@ class Location(Base):
         answers = {self.f['area_state']:status}
         record_id = self.get_area_record_by_name(name, ['folio']).get('_id')
         return self.lkf_api.patch_multi_record( answers = answers, form_id=self.AREAS_DE_LAS_UBICACIONES, record_id=[record_id])
+
+    def get_ubicacion_by_id(self, record_id):
+        """ Obtiene el detalle de una única ubicación por su ID de registro
+        (mismo shape de campos que produce get_location_address).
+        Args:
+            record_id: El _id del registro de la ubicación (form 'ubicaciones').
+        Returns:
+            dict con folio, record_id, ubicacion y los datos de contacto.
+        Raises:
+            LKFException 404 si no existe.
+        """
+        if not record_id:
+            raise self.LKFException({'msg': 'record_id es requerido.', 'status_code': 400})
+
+        query = [
+            {'$match': {
+                '_id': ObjectId(record_id),
+                'form_id': self.UBICACIONES,
+                'deleted_at': {'$exists': False},
+            }},
+            {'$project': {
+                '_id': 1,
+                'folio': '$folio',
+                'location': f"$answers.{self.f['location']}",
+                'address_name': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_name']}",
+                'address': {'$first': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address']}"},
+                'address2': {'$first': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address2']}"},
+                'address_type': {'$first': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_type']}"},
+                'address_geolocation': {'$first': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['address_geolocation']}"},
+                'state': {'$first': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['state']}"},
+                'city': {'$first': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['city']}"},
+                'zip_code': {'$first': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['zip_code']}"},
+                'country': {'$first': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['country']}"},
+                'phone': {'$first': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['phone']}"},
+                'email': {'$first': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.f['email']}"},
+            }},
+        ]
+        response = self.format_cr(self.cr.aggregate(query))
+        response = self.unlist(response)
+        if not response:
+            raise self.LKFException({'msg': 'Ubicación no encontrada', 'status_code': 404})
+
+        location_name = response.get('location', '')
+        response['areas_count'] = len(self.get_areas_by_location(location_name))
+        response['record_id'] = str(response.get('_id', record_id))
+        return response
+
+    def get_catalog_ubicaciones_formatted(self, ubicacion):
+        """ Regresa la ubicación (registro del form 'ubicaciones') en una lista
+        de 0 o 1 elementos, mismo shape que get_ubicacion_by_id, para que el
+        front la pueda tratar igual que get_catalog_areas_formatted (una
+        petición por cada ubicación seleccionada en el top-nav).
+        Args:
+            ubicacion: nombre de la ubicación (ej. 'Planta Monterrey').
+        Returns:
+            list[dict]
+        """
+        location_data = self.get_location_address(ubicacion)
+        if not location_data:
+            return []
+        location_data['record_id'] = str(location_data.get('_id', ''))
+        location_data['areas_count'] = len(self.get_areas_by_location(ubicacion))
+        return [location_data]
+
+    def exists_ubicacion(self, nombre):
+        query = [
+            {'$match': {
+                'deleted_at': {'$exists': False},
+                'form_id': self.UBICACIONES,
+                f"answers.{self.f['location']}": nombre,
+            }},
+            {'$project': {'_id': 1}},
+            {'$limit': 1},
+        ]
+        res = self.format_cr(self.cr.aggregate(query))
+        return True if res else False
+
+    def create_new_ubicacion(self, nombre='', direccion='', colonia='', ciudad='',
+                              estado='', pais='', codigo_postal='', telefono='',
+                              email='', geolocalizacion=None):
+        """ Crea un registro nuevo en el form 'ubicaciones'.
+        Args:
+            nombre: nombre de la ubicación (requerido).
+            direccion, colonia, ciudad, estado, pais, codigo_postal, telefono,
+                email, geolocalizacion: campos del catálogo Contacto.
+        Returns:
+            La respuesta directa de post_forms_answers, o None si ya existía
+            una ubicación con ese nombre (idempotente, igual que create_new_area).
+        """
+        if not nombre:
+            raise self.LKFException({'msg': 'El nombre de la ubicación es requerido.', 'status_code': 400})
+        if self.exists_ubicacion(nombre):
+            return None
+
+        answers = {
+            self.f['location']: nombre,
+            self.CONTACTO_CAT_OBJ_ID: {
+                self.f['address_name']: nombre,
+                self.f['address']: direccion,
+                self.f['address2']: colonia,
+                self.f['city']: ciudad,
+                self.f['zip_code']: codigo_postal,
+                self.f['country']: pais,
+                self.f['state']: estado,
+                self.f['phone']: telefono,
+                self.f['email']: email,
+                self.f['address_geolocation']: geolocalizacion or {},
+            },
+        }
+
+        metadata = self.lkf_api.get_metadata(form_id=self.UBICACIONES)
+        metadata.update({
+            'properties': {
+                'device_properties': {
+                    'system': 'Addons',
+                    'process': 'Creacion de Ubicacion',
+                    'accion': 'create_new_ubicacion',
+                    'file': 'location/app.py',
+                },
+            },
+            'answers': answers,
+        })
+        return self.lkf_api.post_forms_answers(metadata)
+
+    def update_ubicacion(self, record_id='', nombre_actual='', nombre=None,
+                          direccion=None, colonia=None, ciudad=None, estado=None,
+                          pais=None, codigo_postal=None, telefono=None, email=None,
+                          geolocalizacion=None):
+        """ Actualiza los campos de contacto (y/o nombre) de una ubicación existente.
+        Solo los kwargs distintos de None se sobreescriben; el resto conserva
+        el valor actual del registro (patch parcial).
+        Args:
+            record_id: _id del registro a actualizar (o nombre_actual para localizarlo por nombre).
+            nombre_actual: nombre vigente de la ubicación, usado para localizarla si no hay record_id.
+            nombre, direccion, colonia, ciudad, estado, pais, codigo_postal,
+                telefono, email, geolocalizacion: nuevos valores (opcionales).
+        Returns:
+            La respuesta directa de patch_multi_record.
+        Raises:
+            LKFException 400/404 si falta el identificador o no se encuentra.
+        """
+        if not record_id and not nombre_actual:
+            raise self.LKFException({'msg': 'Se requiere record_id o nombre_actual de la ubicación.', 'status_code': 400})
+
+        if record_id:
+            current = self.get_ubicacion_by_id(record_id)
+        else:
+            current = self.get_location_address(nombre_actual)
+            record_id = str(current.get('_id', ''))
+
+        if not current:
+            raise self.LKFException({'msg': 'Ubicación no encontrada.', 'status_code': 404})
+
+        answers = {}
+        if nombre and nombre != nombre_actual:
+            answers[self.f['location']] = nombre
+
+        overrides = {
+            self.f['address']: direccion,
+            self.f['address2']: colonia,
+            self.f['city']: ciudad,
+            self.f['zip_code']: codigo_postal,
+            self.f['country']: pais,
+            self.f['state']: estado,
+            self.f['phone']: telefono,
+            self.f['email']: email,
+            self.f['address_geolocation']: geolocalizacion,
+        }
+        contacto_answers = {
+            self.f['address_name']: nombre or current.get('address_name', ''),
+            self.f['address']: current.get('address', ''),
+            self.f['address2']: current.get('address2', ''),
+            self.f['city']: current.get('city', ''),
+            self.f['zip_code']: current.get('zip_code', ''),
+            self.f['country']: current.get('country', ''),
+            self.f['state']: current.get('state', ''),
+            self.f['phone']: current.get('phone', ''),
+            self.f['email']: current.get('email', ''),
+            self.f['address_geolocation']: current.get('address_geolocation', ''),
+        }
+        for field_id, value in overrides.items():
+            if value is not None:
+                contacto_answers[field_id] = value
+        answers[self.CONTACTO_CAT_OBJ_ID] = contacto_answers
+
+        return self.lkf_api.patch_multi_record(answers=answers, form_id=self.UBICACIONES, record_id=[record_id])

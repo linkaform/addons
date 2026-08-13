@@ -144,11 +144,13 @@ class Employee(Base):
             res  = {f"answers.{field_id}": value}
         return res
 
-    def get_employee_data(self, name=None, user_id=None, username=None, email=None, phone=None, get_one=False):
+    def get_employee_data(self, name=None, user_id=None, username=None, email=None, phone=None, get_one=False, active=True):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.EMPLEADOS,
             }
+        if active:
+            match_query.update(self._get_match_q(self.employee_fields['estatus_dentro_empresa'], 'activo'))
         if name:
             match_query.update(self._get_match_q(self.f['worker_name'], name))
         if user_id:
@@ -236,9 +238,32 @@ class Employee(Base):
                     caseta = {'_id':None, 'location': ubicacion, 'area':location_areas[0]}
                 user_booths +=  [{'_id':None,'location': ubicacion, 'area': area} for area in location_areas]
         if not caseta:
+            is_a_guard = self.check_user_is_a_guard(user_id)
+            if not is_a_guard:
+                return False, False
             msg = f'No existe caseta configurada para usuario id: {user_id}'
             self.LKFException(msg)
         return caseta, user_booths
+
+    def check_user_is_a_guard(self, user_id):
+        query = [
+            {"$match": {
+                "deleted_at": {"$exists":False},
+                "form_id": self.MENUS_FORM,
+                f"answers.{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id
+            }},
+            {"$project": {
+                "_id": 0,
+                "menus": f"$answers.{self.menu_form_fields['elementos']}"
+            }}
+        ]
+        response = self.format_cr(self.cr.aggregate(query))
+        if response:
+            menus = self.unlist(response).get('menus', [])
+            unique_menus = set(menu.get(self.menu_form_fields['seccion']) for menu in menus)
+            format_menus = list(unique_menus)
+            return True if 'Turnos' in format_menus else False
+        return False
     
     def get_employee_pic(self, user_id):
         match_query = {
@@ -247,14 +272,16 @@ class Employee(Base):
             }
         match_query.update(self._get_match_q(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
         query = [
-            {'$match': match_query },    
-            {'$project':{ 
-                        '_id':1,
-                        'user_id':f"$answers.{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}",
-                        'pic_url':{"$first":f"$answers.{self.employee_fields['picture']}"}
-                        }
-            }
-            ]
+            {'$match': match_query },
+            {'$match': {
+                f'answers.{self.USUARIOS_OBJ_ID}.{self.employee_fields["user_id_id"]}': {'$exists': True, '$not': {'$in': [None, '', 0, []]}}
+            }},
+            {'$project':{
+                '_id':1,
+                'user_id': {"$ifNull": [f"$answers.{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", None]},
+                'pic_url':{"$first":f"$answers.{self.employee_fields['picture']}"}
+            }}
+        ]
         users = self.format_cr_result(self.cr.aggregate(query))
         res = {}
         for usr in users:

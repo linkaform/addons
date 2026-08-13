@@ -12,7 +12,7 @@ from linkaform_api.lkf_object import LKFBase
 ADDONS_PATH = '/usr/local/lib/python3.10/site-packages/lkf_addons/addons'
 MODULES_PATH = '/srv/scripts/addons/modules'
 
-default_image = 'linkaform/python3_lkf:latest'
+default_image = 'linkaform/addons:latest'
 
 from collections.abc import MutableMapping
 
