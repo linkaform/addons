@@ -2,6 +2,10 @@
 
 # Configurar llave publica dentro de servidor local.
 
+### Te marca : No Such file or directory : '/etc/ssl/certs/lkf_jwt_key.pub'
+
+Ver como configurar tu servidor local.
+
 ### Como configurar en tu servidor local.
 
 
@@ -23,7 +27,3 @@ bash
 este comando corre un compiacion de base de la imagen con el comando `docker compose build lkf-addons-base`
 
 
-
-### Te marca : No Such file or directory : '/etc/ssl/certs/lkf_jwt_key.pub'
-
-Ver como configurar tu servidor local.
