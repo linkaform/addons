@@ -8071,12 +8071,11 @@ class Accesos(OcrMixin, AccesosModel):
         """
         Se aplana la estructura de roles (viene como [{ROL_CATALOG_OBJ_ID: {rol: 'Gerente'}}, ...])
         a una lista simple de strings (['Gerente', ...]) para el frontend.
+
+        Nota: roles_raw ya pasó por format_cr/_labels, que aplana
+        {ROL_CATALOG_OBJ_ID: {rol_field_id: valor}} a {'rol': valor}.
         """
-        return [
-            r.get(self.ROL_CATALOG_OBJ_ID, {}).get(self.f['rol'])
-            for r in roles_raw
-            if r.get(self.ROL_CATALOG_OBJ_ID, {}).get(self.f['rol'])
-        ]
+        return [r.get('rol') for r in roles_raw if r.get('rol')]
 
     def update_guard_status(self, guard, this_user):
         attendance_images = self.get_attendance_images(this_user.get('user_id', self.unlist(this_user.get('usuario_id', 0000))))
