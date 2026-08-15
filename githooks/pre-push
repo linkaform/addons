@@ -24,13 +24,46 @@ echo "   (para saltarte esto una vez: git push --no-verify)"
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT" || exit 1
 
-# Copia de config/ con ENV forzado a preprod, para no depender de (ni tocar)
-# tu config/enviorment.py real. Este test solo debe poder correr contra preprod.
+# Credenciales dedicadas de preprod (cuenta 10), separadas de tu
+# config/local_settings.py de trabajo diario. Asi el test no depende de qué
+# cuenta tengas activa localmente -- igual que CI, que las inyecta desde
+# GitHub secrets en vez de usar el local_settings.py del working directory.
+PREPROD_ENV_FILE="$REPO_ROOT/secrets/preprod_test.env"
+if [ ! -f "$PREPROD_ENV_FILE" ]; then
+    echo "x Falta $PREPROD_ENV_FILE con las credenciales de preprod (cuenta 10)."
+    echo "  Copia secrets/preprod_test.env.example y llena los valores. Push cancelado."
+    exit 1
+fi
+# shellcheck disable=SC1090
+source "$PREPROD_ENV_FILE"
+if [ -z "$PREPROD_USERNAME" ] || [ -z "$PREPROD_APIKEY" ] || [ -z "$PREPROD_ACCOUNT_ID" ]; then
+    echo "x $PREPROD_ENV_FILE existe pero le faltan valores (PREPROD_USERNAME/PREPROD_APIKEY/PREPROD_ACCOUNT_ID). Push cancelado."
+    exit 1
+fi
+
+# Copia de config/ con ENV forzado a preprod y local_settings.py regenerado
+# desde las credenciales de preprod de arriba, para no depender de (ni tocar)
+# tu config real. Este test solo debe poder correr contra preprod cuenta 10.
 CONFIG_COPY="$(mktemp -d)"
 trap 'rm -rf "$CONFIG_COPY"' EXIT
 cp -R "$REPO_ROOT/config/." "$CONFIG_COPY/"
 sed -i.bak "s/^ENV = 'prod'/# ENV = 'prod'/; s/^# ENV = 'preprod'/ENV = 'preprod'/" "$CONFIG_COPY/enviorment.py"
 rm -f "$CONFIG_COPY/enviorment.py.bak"
+
+cat > "$CONFIG_COPY/local_settings.py" <<EOF
+# coding: utf-8
+from settings import *
+from uts import update_settings
+
+config.update({
+    'USERNAME': '$PREPROD_USERNAME',
+    'APIKEY': '$PREPROD_APIKEY',
+    'ACCOUNT_ID': '$PREPROD_ACCOUNT_ID',
+})
+
+settings.config.update(config)
+settings = update_settings(settings)
+EOF
 
 docker build --platform linux/amd64 -f test/docker/Dockerfile --target develop -t linkaform/lkf_test:develop test/docker
 if [ $? -ne 0 ]; then
