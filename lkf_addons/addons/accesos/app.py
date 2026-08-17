@@ -2608,6 +2608,7 @@ class Accesos(OcrMixin, AccesosModel):
             }
         return format_res
 
+    # feature: pases
     def create_access_pass(self, access_pass):
         """
         Crea pase de acceso

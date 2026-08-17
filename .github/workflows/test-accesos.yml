@@ -3,9 +3,15 @@ name: Test - Accesos (preprod)
 # Corre solo las pruebas del feature de "accesos" que realmente se vio afectado
 # por el cambio, en vez de correr todas las pruebas del módulo en cada push.
 #
-# El job "detect" revisa qué funciones de app.py cambiaron y decide qué
-# features corren:
-#   - pases -> palabras clave: pase, pass, do_access
+# El job "detect" revisa qué funciones de app.py cambiaron. Solo cuentan las
+# funciones que tienen un tag explícito en el comentario justo arriba del
+# "def", ej:
+#
+#   # feature: pases
+#   def create_access_pass(self, access_pass):
+#
+# Si la función no tiene tag, se ignora -- no hay fallback por nombre. Para
+# que una función dispare su feature, hay que etiquetarla explícitamente.
 #
 # Limitación conocida: si un push solo modifica un archivo de test (sin
 # tocar app.py), no se detecta nada y no corre ningún feature. test/sdk_testing
@@ -13,9 +19,10 @@ name: Test - Accesos (preprod)
 # dentro de él, solo que el submódulo avanzó de commit. Validar tests nuevos
 # localmente (contenedor) antes de subir.
 #
-# Para agregar un feature nuevo: agregar sus palabras clave en el script del
-# job "detect" y agregar el job de integración correspondiente, siguiendo el
-# mismo patrón que "integration-pases-entrada".
+# Para agregar un feature nuevo: etiquetar sus funciones en app.py con
+# "# feature: <nombre>", agregar el nombre a la lista de tags conocidos en el
+# script del job "detect", y agregar el job de integración correspondiente,
+# siguiendo el mismo patrón que "integration-pases-entrada".
 on:
   push:
     branches: [master]
@@ -54,28 +61,40 @@ jobs:
             | grep -E '^@@' \
             | sed -E 's/^@@ -[0-9]+(,[0-9]+)? \+([0-9]+)(,[0-9]+)? @@.*/\2/')
 
-          FUNCS=""
+          RUN_PASES=false
           for LINE in $CHANGED_LINES; do
-            FN=$(awk -v target="$LINE" '
-              NR <= target && $0 ~ /^[[:space:]]*def [A-Za-z_][A-Za-z0-9_]*\(/ { line=$0 }
+            # Ubica el "def" más cercano hacia arriba desde la línea que
+            # cambió, y devuelve "numero_de_linea:nombre_funcion".
+            HIT=$(awk -v target="$LINE" '
+              NR <= target && $0 ~ /^[[:space:]]*def [A-Za-z_][A-Za-z0-9_]*\(/ { defline=NR; line=$0 }
               END {
                 if (line != "") {
                   sub(/^[[:space:]]*def /, "", line)
                   sub(/\(.*/, "", line)
-                  print line
+                  print defline ":" line
                 }
               }
             ' "$FILE")
-            FUNCS="$FUNCS $FN"
-          done
-          echo "Funciones modificadas en app.py: $FUNCS"
+            [ -z "$HIT" ] && continue
 
-          RUN_PASES=false
-          for FN in $FUNCS; do
-            LOWER=$(echo "$FN" | tr 'A-Z' 'a-z')
-            case "$LOWER" in
-              *pase*|*pass*|*do_access*) RUN_PASES=true ;;
-            esac
+            DEFLINE="${HIT%%:*}"
+            FN="${HIT#*:}"
+            echo "Función modificada en app.py: $FN (línea $DEFLINE)"
+
+            # Tag explícito: "# feature: <nombre>" justo arriba del def.
+            # Sin tag, la función se ignora.
+            TAG_LINE=$(sed -n "$((DEFLINE - 1))p" "$FILE")
+            TAG=$(echo "$TAG_LINE" | sed -nE 's/^[[:space:]]*#[[:space:]]*feature:[[:space:]]*([A-Za-z0-9_]+).*/\1/p')
+
+            if [ -z "$TAG" ]; then
+              echo "  -> sin tag, se ignora"
+              continue
+            fi
+
+            echo "  -> tag encontrado: $TAG"
+            if [ "$TAG" = "pases" ]; then
+              RUN_PASES=true
+            fi
           done
 
           echo "run_pases=$RUN_PASES"
