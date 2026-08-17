@@ -2618,7 +2618,7 @@ class Accesos(OcrMixin, AccesosModel):
         access_pass (json): json con datos completos para generar el pase
 
         return:
-
+        
         """
         #---Define Metadata
         print('-----------------------')
