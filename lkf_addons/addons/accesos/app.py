@@ -5340,7 +5340,11 @@ class Accesos(OcrMixin, AccesosModel):
             "limit":limit,
             "skip":skip
         }
-        return self.format_gafete(self.lkf_api.search_catalog( self.GAFETES_CAT_ID, mango_query))
+        data = self.lkf_api.search_catalog( self.GAFETES_CAT_ID, mango_query)
+        if data:
+            format_data = self.format_gafete(data)
+            return format_data
+        return []
 
     def get_lockers(self, status='Disponible', location=None, area=None, tipo_locker='Locker', locker_id=None, limit=1000, skip=0):
         selector = {}
