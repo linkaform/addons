@@ -3100,6 +3100,7 @@ class Accesos(OcrMixin, AccesosModel):
         return res
 
     def format_gafete(self, data):
+        #test
         res = []
         for r in data:
             row = {}
