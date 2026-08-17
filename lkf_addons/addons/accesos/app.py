@@ -2585,6 +2585,7 @@ class Accesos(OcrMixin, AccesosModel):
         return result
 
     def get_locations_address(self, list_locations=[]):
+        # COMENTARIO
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": self.UBICACIONES,
