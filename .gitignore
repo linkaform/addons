@@ -8,6 +8,7 @@ __pycache__/
 local_settings.py
 account_settings.py
 lkfpowd.py
+secrets/preprod_test.env
 # Distribution / packaging
 .Python
 build/
@@ -130,3 +131,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# MacOS
+.DS_Store
+
+# Claude
+CLAUDE.md

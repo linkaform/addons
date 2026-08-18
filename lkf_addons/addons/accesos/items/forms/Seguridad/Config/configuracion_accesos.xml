@@ -14,8 +14,8 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1734386377.0</created_at>
-    <description />
+    <created_at>1786741800.0</created_at>
+    <description>version: 1786759419</description>
     <edit_public_records>True</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
@@ -133,7 +133,7 @@
                         <catalog_field_id>{{ catalog.empleados.obj_id }}</catalog_field_id>
                         <catalog_id>{{ catalog.empleados.id }}</catalog_id>
                         <field_type>text</field_type>
-                        <filters>None</filters>
+                        <filters />
                         <geofence>None</geofence>
                         <last>True</last>
                         <related_catalog>{}</related_catalog>
@@ -655,7 +655,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>True</public>
-    <resource_uri>/api/infosync/form/127409/</resource_uri>
+    <resource_uri>/api/infosync/form/164680/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -676,5 +676,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1773097015.0</updated_at>
+    <updated_at>1786759362.0</updated_at>
 </lkf>

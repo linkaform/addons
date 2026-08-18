@@ -1,16 +1,21 @@
 #!/usr/bin/env bash
-# Antes de dejar salir un push a master, corre el test de pases de entrada
-# contra preprod. Si falla, el push se cancela.
+# Antes de dejar salir un push a master, corre el test del feature de accesos
+# que realmente se vio afectado (por ahora solo detecta "pases"). Si falla,
+# el push se cancela.
 #
 # Instalar una vez por clon: git config core.hooksPath githooks
 # Saltarse una vez si hace falta: git push --no-verify
 
 BLOCK_BRANCH="refs/heads/master"
 should_run=false
+old_sha=""
+new_sha=""
 
 while read local_ref local_sha remote_ref remote_sha; do
     if [ "$remote_ref" = "$BLOCK_BRANCH" ]; then
         should_run=true
+        old_sha="$remote_sha"
+        new_sha="$local_sha"
     fi
 done
 
@@ -18,19 +23,112 @@ if [ "$should_run" = false ]; then
     exit 0
 fi
 
-echo "-> Push a master detectado: corriendo test de pases de entrada contra preprod..."
-echo "   (para saltarte esto una vez: git push --no-verify)"
-
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT" || exit 1
 
-# Copia de config/ con ENV forzado a preprod, para no depender de (ni tocar)
-# tu config/enviorment.py real. Este test solo debe poder correr contra preprod.
+# Detectar qué features de accesos se ven afectados por este push, mirando
+# qué funciones de app.py cambiaron (misma lógica que
+# .github/workflows/test-accesos.yml, job "detect"). Solo cuentan las
+# funciones con un tag explícito arriba del "def" ("# feature: pases") --
+# sin tag, la función se ignora, no hay fallback por nombre. Limitación
+# conocida: si el push solo modifica un archivo de test (sin tocar app.py) no
+# se detecta nada -- validar ese caso corriendo el contenedor manualmente.
+APP_FILE="lkf_addons/addons/accesos/app.py"
+run_pases=false
+
+if [ -z "$old_sha" ] || [ "$old_sha" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$old_sha" 2>/dev/null; then
+    echo "-> No hay base para diff (branch nueva), corriendo todos los features por seguridad."
+    run_pases=true
+else
+    changed_lines=$(git diff --unified=0 "$old_sha" "$new_sha" -- "$APP_FILE" \
+        | grep -E '^@@' \
+        | sed -E 's/^@@ -[0-9]+(,[0-9]+)? \+([0-9]+)(,[0-9]+)? @@.*/\2/')
+
+    seen_deflines=""
+    for line in $changed_lines; do
+        hit=$(awk -v target="$line" '
+            NR <= target && $0 ~ /^[[:space:]]*def [A-Za-z_][A-Za-z0-9_]*\(/ { defline=NR; l=$0 }
+            END {
+                if (l != "") {
+                    sub(/^[[:space:]]*def /, "", l)
+                    sub(/\(.*/, "", l)
+                    print defline ":" l
+                }
+            }
+        ' "$APP_FILE")
+        [ -z "$hit" ] && continue
+
+        defline="${hit%%:*}"
+        fn="${hit#*:}"
+
+        case " $seen_deflines " in
+            *" $defline "*) continue ;;
+        esac
+        seen_deflines="$seen_deflines $defline"
+
+        echo "-> Función modificada en app.py: $fn (línea $defline)"
+
+        tag_line=$(sed -n "$((defline - 1))p" "$APP_FILE")
+        tag=$(echo "$tag_line" | sed -nE 's/^[[:space:]]*#[[:space:]]*feature:[[:space:]]*([A-Za-z0-9_]+).*/\1/p')
+
+        if [ -z "$tag" ]; then
+            echo "   -> sin tag, se ignora"
+            continue
+        fi
+
+        echo "   -> tag encontrado: $tag"
+        [ "$tag" = "pases" ] && run_pases=true
+    done
+fi
+
+if [ "$run_pases" = false ]; then
+    echo "-> No se detectaron cambios relacionados a pases de entrada. Saltando test."
+    exit 0
+fi
+
+echo "-> Push a master detectado: corriendo test de pases de entrada contra preprod..."
+echo "   (para saltarte esto una vez: git push --no-verify)"
+
+# Credenciales dedicadas de preprod (cuenta 10), separadas de tu
+# config/local_settings.py de trabajo diario. Asi el test no depende de qué
+# cuenta tengas activa localmente -- igual que CI, que las inyecta desde
+# GitHub secrets en vez de usar el local_settings.py del working directory.
+PREPROD_ENV_FILE="$REPO_ROOT/secrets/preprod_test.env"
+if [ ! -f "$PREPROD_ENV_FILE" ]; then
+    echo "x Falta $PREPROD_ENV_FILE con las credenciales de preprod (cuenta 10)."
+    echo "  Copia secrets/preprod_test.env.example y llena los valores. Push cancelado."
+    exit 1
+fi
+# shellcheck disable=SC1090
+source "$PREPROD_ENV_FILE"
+if [ -z "$PREPROD_USERNAME" ] || [ -z "$PREPROD_APIKEY" ] || [ -z "$PREPROD_ACCOUNT_ID" ]; then
+    echo "x $PREPROD_ENV_FILE existe pero le faltan valores (PREPROD_USERNAME/PREPROD_APIKEY/PREPROD_ACCOUNT_ID). Push cancelado."
+    exit 1
+fi
+
+# Copia de config/ con ENV forzado a preprod y local_settings.py regenerado
+# desde las credenciales de preprod de arriba, para no depender de (ni tocar)
+# tu config real. Este test solo debe poder correr contra preprod cuenta 10.
 CONFIG_COPY="$(mktemp -d)"
 trap 'rm -rf "$CONFIG_COPY"' EXIT
 cp -R "$REPO_ROOT/config/." "$CONFIG_COPY/"
 sed -i.bak "s/^ENV = 'prod'/# ENV = 'prod'/; s/^# ENV = 'preprod'/ENV = 'preprod'/" "$CONFIG_COPY/enviorment.py"
 rm -f "$CONFIG_COPY/enviorment.py.bak"
+
+cat > "$CONFIG_COPY/local_settings.py" <<EOF
+# coding: utf-8
+from settings import *
+from uts import update_settings
+
+config.update({
+    'USERNAME': '$PREPROD_USERNAME',
+    'APIKEY': '$PREPROD_APIKEY',
+    'ACCOUNT_ID': '$PREPROD_ACCOUNT_ID',
+})
+
+settings.config.update(config)
+settings = update_settings(settings)
+EOF
 
 docker build --platform linux/amd64 -f test/docker/Dockerfile --target develop -t linkaform/lkf_test:develop test/docker
 if [ $? -ne 0 ]; then
