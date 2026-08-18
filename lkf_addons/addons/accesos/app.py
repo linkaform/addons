@@ -3481,10 +3481,11 @@ class Accesos(OcrMixin, AccesosModel):
             }
         return res
 
-    def get_page_stats(self, booth_area, location, page='', month=None, year=None):
-        timezone = pytz.timezone('America/Mexico_City')
+    def get_page_stats(self, booth_area, location, page='', month=None, year=None, dateFrom='', dateTo='', filterDate='', dynamic_filters=None):
+        timezone = pytz.timezone(self.user.get('timezone', 'America/Mexico_City'))
         today = datetime.now(timezone).strftime("%Y-%m-%d")
         res={}
+        dynamic_filters = dynamic_filters or []
         if page == 'Turnos':
             #Visitas dentro, Gafetes pendientes y Vehiculos estacionados
             query_visitas = [
@@ -3612,20 +3613,48 @@ class Accesos(OcrMixin, AccesosModel):
 
         elif page == 'Accesos' or page == 'Bitacoras':
             #Visitas en el dia, personal dentro, vehiculos dentro, salidas registradas y personas dentro
+            zona = self.user.get('timezone', 'America/Monterrey')
+            if filterDate and filterDate != "range":
+                dateFrom, dateTo = self.get_range_dates(filterDate, zona)
+                if dateFrom:
+                    dateFrom = str(dateFrom)
+                if dateTo:
+                    dateTo = str(dateTo)
+
+            extra_match = {}
+            for item in dynamic_filters:
+                if item.get('key') == 'perfil_visita':
+                    extra_match[f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}"] = {"$in": item.get('value')}
+                elif item.get('key') == 'visita_a':
+                    extra_match[f"answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}"] = {"$in": item.get('value')}
+
+            if dateFrom and dateTo:
+                date_floor, date_ceiling = dateFrom, dateTo
+                salida_floor, salida_ceiling = dateFrom, dateTo
+            else:
+                date_floor, date_ceiling = f"{today} 00:00:00", f"{today} 23:59:59"
+                salida_floor, salida_ceiling = f"{today} 00:00:00", None
+
             match_query_one = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
             }
+            if dateFrom and dateTo:
+                match_query_one[f"answers.{self.mf['fecha_entrada']}"] = {"$gte": dateFrom, "$lte": dateTo}
+            else:
+                match_query_one[f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}"] = {"$in": ["Activo"]}
+            match_query_one.update(extra_match)
 
             match_query_two = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": date_floor, "$lte": date_ceiling}
             }
+            if not (dateFrom and dateTo):
+                match_query_two[f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}"] = {"$in": ["Activo"]}
+            match_query_two.update(extra_match)
 
             if not booth_area == 'todas' and booth_area:
                 match_query_one.update({
@@ -3716,7 +3745,6 @@ class Accesos(OcrMixin, AccesosModel):
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_visitas))
-            today_salida = f"{today} 00:00:00"
             resultado_dia = self.format_cr(self.cr.aggregate(query_visitas_dia))
 
             total_vehiculos_dentro = resultado[0]['total_vehiculos_dentro'] if resultado else 0
@@ -3731,11 +3759,18 @@ class Accesos(OcrMixin, AccesosModel):
             for visita in detalle_visitas_todas:
                 status_visita = visita['status_visita'].lower()
 
-                if status_visita == "entrada":
-                    personas_dentro += 1
+                if dateFrom and dateTo:
+                    if status_visita == "entrada":
+                        personas_dentro += 1
+                    elif status_visita == "salida":
+                        salidas += 1
+                else:
+                    if status_visita == "entrada":
+                        personas_dentro += 1
 
-                if visita.get('fecha_salida') and visita.get('fecha_salida') >= today_salida:
-                    salidas += 1
+                    fecha_salida = visita.get('fecha_salida')
+                    if fecha_salida and fecha_salida >= salida_floor and (not salida_ceiling or fecha_salida <= salida_ceiling):
+                        salidas += 1
 
             res['total_vehiculos_dentro'] = total_vehiculos_dentro
             res['total_equipos_dentro'] = total_equipos_dentro
