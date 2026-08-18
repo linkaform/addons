@@ -2855,7 +2855,7 @@ class Accesos(OcrMixin, AccesosModel):
         fecha_visita_pasada = fecha_visita_check[:10] < now_datetime[:10]
 
         if answers[self.pase_entrada_fields['status_pase']] == 'vencido' or fecha_visita_pasada:
-            self.LKFException({
+            raise self.LKFException({
                 'msg': 'No se puede crear un pase con fecha de visita en el pasado.',
                 'status_code': 400,
             })
