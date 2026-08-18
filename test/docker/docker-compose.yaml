@@ -11,7 +11,6 @@ services:
       - ../../modules:/usr/local/lib/python3.10/site-packages/lkf_modules/
       - ../:/srv/lkf_test/
       - ../../config/:/srv/scripts/addons/config/
-      - ../:/srv/lkf_test/config/
     build:
      context: ./
      dockerfile: Dockerfile
@@ -28,9 +27,11 @@ services:
     volumes:
       - ../:/srv/lkf_test/
       # - ../../config/:/srv/config
-      - ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.7/site-packages/linkaform_api/
+      - ../../secrets/lkf_jwt_key.pub:/etc/ssl/certs/lkf_jwt_key.pub
+      - ~/lkf/linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/
+      - ../../lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons/
+      - ../../modules:/usr/local/lib/python3.10/site-packages/lkf_modules/
       - ../../config:/srv/scripts/addons/config
-      # - ../:/srv/lkf_test/config/
       #- ../:/srv/addons
     build:
      context: ./

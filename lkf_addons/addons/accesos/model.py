@@ -339,7 +339,12 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'vigencia_certificado_en':'662962bb203407ab90c886e7',
             'walkin':'66c4261351cc14058b020d48',
             'grupo_asignado_a':'6a309d27b3f21fceb68eeb01',
-            'nombre_forma': '5d810a982628de5556500d55'
+            'nombre_forma': '5d810a982628de5556500d55',
+            'permisos_certificaciones_grupo':'6622a883f795581dbd730290',
+            'permisos_certificaciones_evidencias':'6a74d15ebbfb86985232bc76',
+            'nombre_del_permiso':'6a74d27fa9bf0d441f4c243f',
+            'evidencia_documento_permiso':'6a74d27fa9bf0d441f4c2440',
+            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441'
         }
         self.mf = mf
         ## Form Fields ##
@@ -618,7 +623,6 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'total_deposito_incidencia':'66ec6821ea3c921534b22c30',
             'ubicacion_incidencia': f"{self.mf['ubicacion']}",
             'ubicacion_incidencia_catalog': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
-            'url_incidencia': '6927eb61d92ecf923b60a0de',
             #Robo de cableado
             'valor_estimado': '684c3e6821796d7880117f22',
         }
@@ -738,7 +742,13 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'worker_department': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_department']}",
             'habilitar_vehiculo':'6a218bf63b5cf6f0c1c55f29',
             'worker_position': f"{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.f['worker_position']}",
-            'firma_reglas_de_acceso':'6a67caac45f44675221f56e7'
+            'firma_reglas_de_acceso':'6a67caac45f44675221f56e7',
+            'permisos_certificaciones_grupo':'6622a883f795581dbd730290',
+            'permisos_certificaciones_evidencias':'6a74d15ebbfb86985232bc76',
+            'permisos_certificaciones':'6a74d15ebbfb86985232bc76',
+            'nombre_del_permiso':'6a74d27fa9bf0d441f4c243f',
+            'evidencia_documento_permiso':'6a74d27fa9bf0d441f4c2440',
+            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441'
         }
 
         self.pase_grupo_visitados ={
@@ -855,7 +865,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'fecha_final_recurrencia': 'abcde0001000000000010099',
             'fecha_hora_programada': 'abcde0001000000000010001',
             'grupo_areas':'66462aa5d4a4af2eea07e0d1',
-            'grupo_asignado': '638a9ab3616398d2e392a9fa',
+            'grupo_asignado': '638a9ab3616398d2e392a9fa', # NOMBRE del grupo al que fue asignado desde del catalogo
             'grupo_asignado_rondin':'671055aaa487da57ba57b294',
             'id_grupo':'639b65dfaf316bacfc551ba2',
             'la_recurrencia_cuenta_con_fecha_final': '64374e47a208e5c0ff95e9bd',
@@ -874,8 +884,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tiempo_para_ejecutar_tarea_expresado_en': 'abcde0001000000000010005',
             'tipo_asignacion':'6a344c7a6e574352dcccc7ba',
             'tipo_rondin':'69b9b98d2a02f4a0dd35f5c1',
+            'tipo':'69b9b98d2a02f4a0dd35f5c1',
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
-            'grupo_asignado_a':'6a31d37adeceb005758cd4e2',
+            'grupo_asignado_a':'6a31d37adeceb005758cd4e2', # GRUPO REPETITIVO asignado a
             'area':f"{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}",
             'grupo':f"{self.GRUPOS_CAT_OBJ_ID}",
             'grupo_id':'5d810a982628de5556500d56',
@@ -906,6 +917,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'areas_del_rondin': '66462aa5d4a4af2eea07e0d1',
             'duracion_rondin':'6639b47565d8e5c06fe97cf3',
             'duracion_traslado_area':'6760a9581e31b10a38a22f1f',
+            'porcentaje_obtenido_bitacora': '689a7ecfbf2b4be31039388e',
+            'cantidad_areas_inspeccionadas': '68a7b68a22ac030a67b7f8f8',
             'fecha_inspeccion_area':'6760a908a43b1b0e41abad6b',
             'fecha_programacion':'6760a8e68cef14ecd7f8b6fe',
             'fecha_inicio_rondin':'6818ea068a7f3446f1bae3b3',
@@ -931,6 +944,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'fecha_hora_incidente_bitacora': '69000e4c43078234e5e08390',
             'area_incidente_bitacora': '69000e4c43078234e5e0838f',
             'comentario_incidente_bitacora': '681145323d9b5fa2e16e35cb',
+            'url_incidencia_bitacora': '6927eb61d92ecf923b60a0de',
             'id_usuario':'638a9a99616398d2e392a9f5',
             'nombre_area_salida':'663fb45992f2c5afcfe97ca8',
             'status_cron': 'abcde00010000000a0000000',
