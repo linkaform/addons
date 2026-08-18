@@ -2826,6 +2826,17 @@ class Accesos(OcrMixin, AccesosModel):
 
         answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(answers)
 
+        fecha_visita_check = access_pass['fecha_desde_visita']
+        if isinstance(fecha_visita_check, datetime):
+            fecha_visita_check = fecha_visita_check.strftime('%Y-%m-%d')
+        fecha_visita_pasada = fecha_visita_check[:10] < now_datetime[:10]
+
+        if answers[self.pase_entrada_fields['status_pase']] == 'vencido' or fecha_visita_pasada:
+            self.LKFException({
+                'msg': 'No se puede crear un pase con fecha de visita en el pasado.',
+                'status_code': 400,
+            })
+
         acompanantes = answers.get(self.pase_entrada_fields['acompanantes'], 0)
         acompanantes_grupo = answers.get(self.pase_entrada_fields['acompanantes_grupo'], [])
         if acompanantes_grupo and len(acompanantes_grupo) > int(acompanantes or 0):
