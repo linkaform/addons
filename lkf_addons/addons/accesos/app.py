@@ -1611,7 +1611,7 @@ class Accesos(OcrMixin, AccesosModel):
             "url_de_condiciones_de_servicio": condiciones_servicio.get('url_condiciones_servicio', ''),
             "desc_condiciones_servicio": condiciones_servicio.get('desc_condiciones_servicio', ''),
             "permisos_certificaciones": permisos_certificaciones,
-            "ubicaciones": config_modulo_seguridad.get('ubicaciones', []),
+            "ubicaciones": config_modulo_seguridad.get('ubicaciones_info', []),
             "empresa": config_modulo_seguridad.get('empresa', {})
         }
         return res
@@ -4223,7 +4223,8 @@ class Accesos(OcrMixin, AccesosModel):
             empresa_telefono = self.unlist(employee.get("usuario_telefono", "")) or ""
 
         return {
-            "ubicaciones": ubicaciones_info,
+            "ubicaciones": ubicaciones,
+            "ubicaciones_info": ubicaciones_info,
             "requerimientos": list(requerimientos),
             "envios": list(envios),
             "tipos": tipos,
