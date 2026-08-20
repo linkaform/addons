@@ -1593,11 +1593,20 @@ class Accesos(OcrMixin, AccesosModel):
 
         return res
 
-    def catalagos_pase_no_jwt(self, qr_code):
+    def catalagos_pase_no_jwt(self, qr_code, account_id=''):
         # se quito porque ya no se edita el pase
         # cat_vehiculos= self.catalogo_vehiculos({})
         # cat_estados= self.catalogo_estados({})
         pass_selected = self.get_pass_custom(qr_code)
+        
+        company=""
+        empresa_email = ""
+        empresa_telefono = ""
+        if account_id:
+            employee = self.Employee.get_employee_data(user_id=account_id, get_one=True)
+            company = employee.get("company","")
+            empresa_email = self.unlist(employee.get("usuario_email","")) or ""
+            empresa_telefono = self.unlist(employee.get("usuario_telefono","")) or ""
         ubicaciones = pass_selected.get('ubicacion', [])
         tipo_de_pase = pass_selected.get('tipo_de_pase', "")
         config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones, tipo_de_pase)
@@ -1623,7 +1632,12 @@ class Accesos(OcrMixin, AccesosModel):
             "url_de_condiciones_de_servicio": condiciones_servicio.get('url_condiciones_servicio', ''),
             "desc_condiciones_servicio": condiciones_servicio.get('desc_condiciones_servicio', ''),
             "permisos_certificaciones": permisos_certificaciones,
-            "ubicaciones": ubicaciones_info
+            "ubicaciones": ubicaciones_info,
+            "empresa": {
+                "nombre": company,
+                "email": empresa_email,
+                "telefono": empresa_telefono,
+            }
         }
         return res
 
