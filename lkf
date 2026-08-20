@@ -4,6 +4,15 @@ set -e
 set -u
 #set -o pipefail
 
+# Los servidores de preprod/prod (ej. vmswarm0) corren en linux/amd64.
+# En Mac Apple Silicon, docker build/compose usan arm64 por defecto y las
+# imagenes publicadas quedan sin manifest amd64, causando:
+#   "no matching manifest for linux/amd64 in the manifest list entries"
+# Forzamos amd64 (Docker Desktop lo emula via buildx/QEMU) para que las
+# imagenes construidas y publicadas desde Mac sean compatibles con esos
+# servidores. En Linux amd64 esto es un no-op.
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
+
 echo "" >.env
 _usage(){
   APP=$(basename "$0")

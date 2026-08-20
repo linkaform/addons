@@ -2,10 +2,10 @@
 # Image for develop                #
 ####################################
 #FROM python:3.7-slim-bullseye as addons-base
-FROM python:3.10.14-bullseye as addons-base
+FROM python:3.10.14-bullseye AS addons-base
 
 
-MAINTAINER Linkaform
+LABEL maintainer="Linkaform"
 
 RUN apt-get update && \
     apt-get -y install \
@@ -51,7 +51,7 @@ WORKDIR /srv/scripts/addons/modules
 ####################################
 # Image for develop                #
 ####################################
-FROM linkaform/addons:base as develop
+FROM linkaform/addons:base AS develop
 
 WORKDIR /tmp/
 ADD https://f001.backblazeb2.com/file/lkf-resources/backblaze_utils-0.1.tar.gz ./backblaze_utils-0.1.tar.gz 
@@ -93,7 +93,7 @@ WORKDIR /srv/scripts/addons/modules
 ####################################
 # Image for prodcution             #
 ####################################
-FROM develop as prod
+FROM develop AS prod
 
 
 USER root
