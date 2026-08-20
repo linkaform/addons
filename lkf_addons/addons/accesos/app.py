@@ -1598,33 +1598,12 @@ class Accesos(OcrMixin, AccesosModel):
         # cat_vehiculos= self.catalogo_vehiculos({})
         # cat_estados= self.catalogo_estados({})
         pass_selected = self.get_pass_custom(qr_code)
-        
-        company=""
-        empresa_email = ""
-        empresa_telefono = ""
-        if account_id:
-            employee = self.Employee.get_employee_data(user_id=account_id, get_one=True)
-            company = employee.get("company","")
-            empresa_email = self.unlist(employee.get("usuario_email","")) or ""
-            empresa_telefono = self.unlist(employee.get("usuario_telefono","")) or ""
+
         ubicaciones = pass_selected.get('ubicacion', [])
         tipo_de_pase = pass_selected.get('tipo_de_pase', "")
-        config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones, tipo_de_pase)
+        config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones, tipo_de_pase, account_id=account_id)
         condiciones_servicio = config_modulo_seguridad.get('condiciones_servicio', {})
         permisos_certificaciones = config_modulo_seguridad.get('permisos_certificaciones',)
-
-        ubicaciones_list = ubicaciones if isinstance(ubicaciones, list) else [ubicaciones]
-        ubicaciones_info = []
-        for location_name in ubicaciones_list:
-            if not location_name:
-                continue
-            location_address = self.get_location_address(location_name)
-            ubicaciones_info.append({
-                "name": location_name,
-                "city": location_address.get('city'),
-                "state": location_address.get('state'),
-                "address": location_address.get('address'),
-            })
 
         res = {
             "pass_selected": pass_selected,
@@ -1632,12 +1611,8 @@ class Accesos(OcrMixin, AccesosModel):
             "url_de_condiciones_de_servicio": condiciones_servicio.get('url_condiciones_servicio', ''),
             "desc_condiciones_servicio": condiciones_servicio.get('desc_condiciones_servicio', ''),
             "permisos_certificaciones": permisos_certificaciones,
-            "ubicaciones": ubicaciones_info,
-            "empresa": {
-                "nombre": company,
-                "email": empresa_email,
-                "telefono": empresa_telefono,
-            }
+            "ubicaciones": config_modulo_seguridad.get('ubicaciones', []),
+            "empresa": config_modulo_seguridad.get('empresa', {})
         }
         return res
 
@@ -4177,7 +4152,7 @@ class Accesos(OcrMixin, AccesosModel):
 
 
 
-    def get_config_modulo_seguridad(self, ubicaciones=[], tipo_de_pase=""):
+    def get_config_modulo_seguridad(self, ubicaciones=[], tipo_de_pase="", account_id=''):
         #TODO Verificar por que se envia asi la lista
         if isinstance(ubicaciones, list) and ubicaciones and isinstance(ubicaciones[0], dict):
             ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
@@ -4225,13 +4200,40 @@ class Accesos(OcrMixin, AccesosModel):
         tipos = self.get_tipos_de_pase(ubicaciones)
         permisos_certificaciones = self.get_permisos_por_perfil(tipo_de_pase) if tipo_de_pase else ""
 
+        ubicaciones_list = ubicaciones if isinstance(ubicaciones, list) else [ubicaciones]
+        ubicaciones_info = []
+        for location_name in ubicaciones_list:
+            if not location_name:
+                continue
+            location_address = self.get_location_address(location_name)
+            ubicaciones_info.append({
+                "name": location_name,
+                "city": location_address.get('city'),
+                "state": location_address.get('state'),
+                "address": location_address.get('address'),
+            })
+
+        company = ""
+        empresa_email = ""
+        empresa_telefono = ""
+        if account_id:
+            employee = self.Employee.get_employee_data(user_id=account_id, get_one=True)
+            company = employee.get("company", "")
+            empresa_email = self.unlist(employee.get("usuario_email", "")) or ""
+            empresa_telefono = self.unlist(employee.get("usuario_telefono", "")) or ""
+
         return {
-            "ubicaciones": ubicaciones,
+            "ubicaciones": ubicaciones_info,
             "requerimientos": list(requerimientos),
             "envios": list(envios),
             "tipos": tipos,
             "condiciones_servicio": condiciones_servicio,
             "permisos_certificaciones": permisos_certificaciones,
+            "empresa": {
+                "nombre": company,
+                "email": empresa_email,
+                "telefono": empresa_telefono,
+            },
         }
 
 
