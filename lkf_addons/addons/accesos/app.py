@@ -8620,7 +8620,252 @@ class Accesos(OcrMixin, AccesosModel):
         pass_img_file_url = pass_img_url.get('file_url')
         return [{'file_name': pass_img_file_name, 'file_url': pass_img_file_url}]
 
-    
+    def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
+        answers = {}
+        perfil_pase = access_pass.get('perfil_pase', 'Visita General')
+        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
+        this_user = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
+        this_user_name = this_user.get('worker_name', '')
+        timezone = user_data.get('timezone','America/Monterrey')
+        now_datetime =self.today_str(timezone, date_format='datetime')
+        answers[self.mf['grupo_visitados']] = []
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
+        nombre_visita_a = employee.get('worker_name')
+
+        # answers[self.UBICACIONES_CAT_OBJ_ID] = {}
+        # answers[self.UBICACIONES_CAT_OBJ_ID][self.f['location']] = location
+        answers[self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID] = {}
+        answers[self.CONFIG_PERFILES_OBJ_ID] = {}
+        answers[self.VISITA_AUTORIZADA_CAT_OBJ_ID] = {}
+        # answers[self.pase_entrada_fields['qr_pase']] = []
+        for key, value in access_pass.items():
+            if key == 'grupo_vehiculos':
+                vehiculos = access_pass.get('grupo_vehiculos',[])
+                if vehiculos:
+                    list_vehiculos = []
+                    for item in vehiculos:
+                        tipo = item.get('tipo_vehiculo', item.get('tipo', ''))
+                        marca = item.get('marca_vehiculo', item.get('marca', ''))
+                        modelo = item.get('modelo_vehiculo', item.get('modelo', ''))
+                        estado = item.get('state', item.get('estado', ''))
+                        placas = item.get('placas_vehiculo', item.get('placas', ''))
+                        color = item.get('color_vehiculo', item.get('color', ''))
+                        list_vehiculos.append({
+                            self.TIPO_DE_VEHICULO_OBJ_ID:{
+                                self.mf['tipo_vehiculo']:tipo,
+                                self.mf['marca_vehiculo']:marca,
+                                self.mf['modelo_vehiculo']:modelo,
+                            },
+                            self.ESTADO_OBJ_ID:{
+                                self.mf['nombre_estado']:estado,
+                            },
+                            self.mf['placas_vehiculo']:placas,
+                            self.mf['color_vehiculo']:color,
+                        })
+                    answers[self.mf['grupo_vehiculos']] = list_vehiculos
+            elif key == 'grupo_equipos':
+                equipos = access_pass.get('grupo_equipos',[])
+                if equipos:
+                    list_equipos = []
+                    for item in equipos:
+                        tipo = item.get('tipo_equipo', item.get('tipo', '')).lower().replace(' ', '_')
+                        nombre = item.get('nombre_articulo', item.get('nombre', ''))
+                        marca = item.get('marca_articulo', item.get('marca', ''))
+                        modelo = item.get('modelo_articulo', item.get('modelo', ''))
+                        color = item.get('color_articulo', item.get('color', ''))
+                        serie = item.get('numero_serie', item.get('serie', ''))
+                        list_equipos.append({
+                            self.mf['tipo_equipo']:tipo,
+                            self.mf['nombre_articulo']:nombre,
+                            self.mf['marca_articulo']:marca,
+                            self.mf['modelo_articulo']:modelo,
+                            self.mf['color_articulo']:color,
+                            self.mf['numero_serie']:serie,
+                        })
+                    answers[self.mf['grupo_equipos']] = list_equipos
+            elif key == 'grupo_instrucciones_pase':
+                acciones = access_pass.get('grupo_instrucciones_pase',[])
+                if acciones:
+                    acciones_list = []
+                    for c in acciones:
+                        acciones_list.append(
+                            {
+                                self.pase_entrada_fields['tipo_comentario']:c.get('tipo_comentario'),
+                                self.pase_entrada_fields['comentario_pase'] :c.get('comentario_pase')
+                            }
+                        )
+                    answers.update({self.pase_entrada_fields['grupo_instrucciones_pase']:acciones_list})
+            elif key == 'grupo_areas_acceso':
+                acciones = access_pass.get('grupo_areas_acceso',[])
+                if acciones:
+                    acciones_list = []
+                    for c in acciones:
+                        acciones_list.append(
+                            {
+                                self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID : {
+                                    self.pase_entrada_fields['nombre_area']:c.get('nombre_area')
+                                } ,
+                                self.pase_entrada_fields['commentario_area'] :c.get('commentario_area')
+                            }
+                        )
+                    answers.update({self.pase_entrada_fields['grupo_areas_acceso']:acciones_list})
+            elif key == 'autorizado_por':
+                answers[self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID] = {
+                    self.mf['nombre_guardia_apoyo'] : this_user_name,
+                }
+            elif key == 'link':
+                link_info=access_pass.get('link', '')
+                if link_info:
+                    docs=""
+                    for index, d in enumerate(link_info["docs"]):
+                        if(d == "agregarIdentificacion"):
+                            docs+="iden"
+                        elif(d == "agregarFoto"):
+                            docs+="foto"
+                        if index==0 :
+                            docs+="-"
+                    link_pass= f"{link_info['link']}?id={link_info['qr_code']}&user={self.user.get('parent_id')}&docs={docs}"
+
+                answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
+            elif key == 'ubicacion':
+                # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
+                ubicaciones = access_pass.get('ubicacion',[])
+                if ubicaciones:
+                    ubicaciones_list = []
+                    for ubi in ubicaciones:
+                        ubicaciones_list.append(
+                            {
+                                self.pase_entrada_fields['ubicacion_cat']:{ self.mf["ubicacion"] : ubi}
+                            }
+                        )
+                    answers.update({self.pase_entrada_fields['ubicaciones']:ubicaciones_list})
+            elif key == 'created_from':
+                created_from = access_pass.get('created_from')
+                if created_from == 'app':
+                    created_from = 'pase_de_entrada_app'
+                elif created_from == 'web':
+                    created_from = 'pase_de_entrada_web'
+                elif created_from == 'nueva_visita':
+                    created_from = 'nueva_visita'
+                elif created_from == 'auto_registro':
+                    created_from = 'auto_registro'
+                else:
+                    created_from = 'nueva_visita'
+
+                if created_from:
+                    answers[self.pase_entrada_fields['creado_desde']] = created_from
+
+            elif key == 'visita_a':
+                answers[self.mf['grupo_visitados']] = self.access_pass_vista_a(access_pass.get('visita_a',[]))
+
+            elif key == 'perfil_pase':
+                # Perfil de Pase
+                answers[self.CONFIG_PERFILES_OBJ_ID] = {}
+                answers[self.CONFIG_PERFILES_OBJ_ID] = {
+                    self.mf['nombre_perfil'] : perfil_pase,
+                }
+                options = {
+                      "group_level": 2,
+                      "startkey": [perfil_pase],
+                      "endkey": [f"{perfil_pase}\n",{}],
+                    }
+                cat_perfil = self.catalogo_view(self.CONFIG_PERFILES_ID, self.PASE_ENTRADA, options)
+                if len(cat_perfil) > 0:
+                    cat_perfil[0][self.mf['motivo']]= [cat_perfil[0].get(self.mf['motivo'])]
+                    cat_perfil = cat_perfil[0]
+                answers[self.CONFIG_PERFILES_OBJ_ID].update(cat_perfil)
+                if answers[self.CONFIG_PERFILES_OBJ_ID].get(self.mf['nombre_permiso']) and \
+                   type(answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']]) == str:
+                    answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']] = [answers[self.CONFIG_PERFILES_OBJ_ID][self.mf['nombre_permiso']],]
+            elif key == 'archivo_invitacion':
+                # id_forma = 121736
+                id_forma = self.PASE_ENTRADA
+                # id_campo = '673773741b2adb2d05d99d63'
+                id_campo = self.pase_entrada_fields['archivo_invitacion']
+                tema_cita = access_pass.get("tema_cita")
+                descripcion = access_pass.get("descripcion")
+                fecha_desde_visita = access_pass.get("fecha_desde_visita")
+                fecha_desde_hasta = access_pass.get("fecha_desde_hasta")
+                creado_por_email = access_pass.get("link", {}).get("creado_por_email")
+                ubicacion = access_pass.get("ubicacion",'')
+                nombre = access_pass.get("nombre_pase",'')
+                visita_a = access_pass.get("visita_a",'')
+                email = access_pass.get("email_pase",'')
+
+                start_datetime = datetime.strptime(fecha_desde_visita, "%Y-%m-%d %H:%M:%S")
+
+                if not fecha_desde_hasta:
+                    stop_datetime = start_datetime + timedelta(hours=1)
+                else:
+                    stop_datetime = datetime.strptime(fecha_desde_hasta, "%Y-%m-%d %H:%M:%S")
+
+                meeting = [
+                    {
+                        "id": 1,
+                        "start": start_datetime,
+                        "stop": stop_datetime,
+                        "name": tema_cita,
+                        "description": descripcion,
+                        "location": ubicacion,
+                        "allday": False,
+                        "rrule": None,
+                        "alarm_ids": [{"interval": "minutes", "duration": 10, "name": "Reminder"}],
+                        'organizer_name': visita_a,
+                        'organizer_email': creado_por_email,
+                        "attendee_ids": [{"email": email, "nombre": nombre}, {"email": creado_por_email, "nombre": visita_a}],
+                    }
+                ]
+                respuesta_ics = self.upload_ics(id_forma, id_campo, meetings=meeting)
+                file_name = respuesta_ics.get('file_name', '')
+                file_url = respuesta_ics.get('file_url', '')
+
+                archivo_invitacion= [
+                    {
+                        "file_name": f"{file_name}",
+                        "file_url": f"{file_url}"
+                    }
+                ]
+                answers.update({f"{self.pase_entrada_fields[key]}": archivo_invitacion})
+            else:
+                answers.update({f"{self.pase_entrada_fields[key]}":value})
+
+        # --- Manejo de acompañantes nuevos ---
+        acompanantes_nuevos = access_pass.get('acompanantes_grupo', []) or []
+        acompanantes_total = len(acompanantes_nuevos)
+
+        if acompanantes_nuevos:
+            registro_actual = self.get_record_by_folio(
+                folio, self.PASE_ENTRADA, select_columns={'_id': 1}, limit=1
+            ) or {}
+            parent_id = registro_actual.get('_id') or qr_code
+
+            child_group_nuevo = self.create_multiple_pass_threads(answers, acompanantes_nuevos, parent_id) if parent_id else []
+
+            answers[self.pase_entrada_fields['acompanantes_grupo']] = child_group_nuevo
+            answers[self.pase_entrada_fields['acompanantes']] = acompanantes_total
+
+        if answers or folio:
+            metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
+            metadata.update(self.get_record_by_folio(folio, self.PASE_ENTRADA, select_columns={'_id':1}, limit=1))
+
+            metadata.update({
+                    'properties': {
+                        "device_properties":{
+                            "system": "Addons",
+                            "process":"Actualizacion de Pase de Entrada",
+                            "accion":'update_full_pass',
+                            "folio": folio,
+                            "archive": "pase_acceso.py"
+                        }
+                    },
+                    'answers': answers,
+                    '_id': qr_code
+                })
+            res= self.net.patch_forms_answers(metadata)
+            return res
+        else:
+            self.LKFException('No se mandarón parametros para actualizar')
+
     def update_active_pass(self, folio=None, qr_code=None, update_obj={}):
         pass_selected= self.get_detail_access_pass(qr_code=qr_code)
         if not pass_selected.get('fecha_de_caducidad'):
