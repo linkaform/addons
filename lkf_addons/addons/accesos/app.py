@@ -8675,8 +8675,7 @@ class Accesos(OcrMixin, AccesosModel):
                         if index==0 :
                             docs+="-"
                     link_pass= f"{link_info['link']}?id={link_info['qr_code']}&user={self.user.get('parent_id')}&docs={docs}"
-
-                answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
+                    answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
             elif key == 'ubicacion':
                 # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
                 ubicaciones = access_pass.get('ubicacion',[])
