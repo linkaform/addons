@@ -2335,9 +2335,9 @@ class Accesos(OcrMixin, AccesosModel):
                 answers[self.incidence_fields['incidencia_catalog']].update({
                     self.incidence_fields['sub_categoria']: data_incidences['sub_categoria']
                 })
-            elif key == 'incidencia':
+            elif key in ('incidencia', 'incidente'):
                 answers[self.incidence_fields['incidencia_catalog']].update({
-                    self.incidence_fields['incidencia']: data_incidences.get('incidencia', data_incidences.get('incidente'))
+                    self.incidence_fields['incidencia']: data_incidences.get('incidencia') or data_incidences.get('incidente')
                 })
 
             elif key == 'ubicacion_incidencia' or key == 'area_incidencia':
