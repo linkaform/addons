@@ -2616,7 +2616,6 @@ class Accesos(OcrMixin, AccesosModel):
 
     # feature: pases
     def create_access_pass(self, access_pass):
-        #COMENTARIO
         """
         Crea pase de acceso
 
