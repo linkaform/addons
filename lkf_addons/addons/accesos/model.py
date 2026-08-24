@@ -724,6 +724,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'telefono_pase':'662c2937108836dec6d92582',
             'tipo_comentario':'66af1977ffb6fd75e769f457',
             'tipo_visita':"662c262cace163ca3ed3bb3a",
+            'tipo_de_pase_select':'6a0c941e332e2e7b0ab303f8',
             'todas_las_areas':'68f9fdfbd9bf5cb7fd3caece',
             'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
             'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
