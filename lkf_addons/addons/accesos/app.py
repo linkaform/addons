@@ -1612,7 +1612,8 @@ class Accesos(OcrMixin, AccesosModel):
             "desc_condiciones_servicio": condiciones_servicio.get('desc_condiciones_servicio', ''),
             "permisos_certificaciones": permisos_certificaciones,
             "ubicaciones": config_modulo_seguridad.get('ubicaciones_info', []),
-            "empresa": config_modulo_seguridad.get('empresa', {})
+            "empresa": config_modulo_seguridad.get('empresa', {}),
+            "logotipo_pase": config_modulo_seguridad.get('logotipo_pase', '')
         }
         return res
 
@@ -4159,6 +4160,7 @@ class Accesos(OcrMixin, AccesosModel):
         requerimientos = set()
         envios = set()
         condiciones_servicio = {}
+        logotipo_pase = ""
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": self.CONF_MODULO_SEGURIDAD,
@@ -4182,6 +4184,7 @@ class Accesos(OcrMixin, AccesosModel):
                     condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
                     condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
                     condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
+                    logotipo_pase = grupo.get('logotipo_pase', '') or logotipo_pase
 
                     clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
                     reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
@@ -4230,6 +4233,7 @@ class Accesos(OcrMixin, AccesosModel):
             "tipos": tipos,
             "condiciones_servicio": condiciones_servicio,
             "permisos_certificaciones": permisos_certificaciones,
+            "logotipo_pase": logotipo_pase,
             "empresa": {
                 "nombre": company,
                 "email": empresa_email,

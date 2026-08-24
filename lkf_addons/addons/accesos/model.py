@@ -344,7 +344,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'permisos_certificaciones_evidencias':'6a74d15ebbfb86985232bc76',
             'nombre_del_permiso':'6a74d27fa9bf0d441f4c243f',
             'evidencia_documento_permiso':'6a74d27fa9bf0d441f4c2440',
-            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441'
+            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441',
+            'logotipo_pase':'6a8cc71df78a808b7dcde656'
         }
         self.mf = mf
         ## Form Fields ##
