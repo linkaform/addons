@@ -42,6 +42,9 @@ class CatalogResource(items.Items):
         else:
             install_order = []
         install_order += [x  for x in instalable_catalogs.keys() if x not in install_order]
+        print(f'Install Order ({len(install_order)}):')
+        for i, name in enumerate(install_order, 1):
+            print(f'  {i:3}. {name}')
         for catalog_name in install_order:
             detail = instalable_catalogs.get(catalog_name)
             if not detail:
@@ -55,13 +58,15 @@ class CatalogResource(items.Items):
             catalog_model = self.load_module_template_file(this_path, catalog_name)
             self.this_path = this_path
             res = self.lkf.install_catalog(self.module, catalog_name, catalog_model, local_path=path, **kwargs)
-            for file_type, files in detail.items():
-                if file_type == 'data' and self.load_data:
-                    self.load_info(files, file_type, res )
-                if file_type == 'demo' and self.load_demo:
-                    self.load_info(files, file_type, res )
-                    
-                        # catalog_json = self.load_items_file(file_type, file, 'json')
+            if res.get('status') in ('update', 'create'):
+                print('Installing Catalog: ', catalog_name)
+                for file_type, files in detail.items():
+                    if file_type == 'data' and self.load_data:
+                        self.load_info(files, file_type, res )
+                    if file_type == 'demo' and self.load_demo:
+                        self.load_info(files, file_type, res )
+
+                            # catalog_json = self.load_items_file(file_type, file, 'json')
 
     def get_catalog_modules(self, all_items, parent_path=None):
         data_file = []

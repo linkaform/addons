@@ -50,7 +50,9 @@ class FormResource(items.Items):
             install_order = []
         install_order += [x  for x in instalable_forms.keys() if x not in install_order]
         response = []
-        print('Install Order: ', install_order)
+        print(f'Install Order ({len(install_order)}):')
+        for i, name in enumerate(install_order, 1):
+            print(f'  {i:3}. {name}')
 
         # install_order = ['green_house_inventory_move']
         for form_name in install_order:
@@ -71,8 +73,9 @@ class FormResource(items.Items):
             if kwargs.get('item_ids'):
                 if item and item['item_id'] not in [int(x) for x in kwargs.get('item_ids',[])]:
                     continue    
-            print('Installing Form: ' ,form_name)
             res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'))
+            if res.get('status') in ('update','create'):
+                print('Installing Form: ' ,form_name)
             response.append(
                     {
                         'module':self.module,
@@ -83,7 +86,7 @@ class FormResource(items.Items):
                         'lkf_response':res
                     }
                 )
-            if res.get('status') in ('update','create','unchanged'):
+            if res.get('status') in ('update','create'):
                 for config, conf_files in detail.items():
                     if config == 'workflow':
                         # res['status'] = 'create'
