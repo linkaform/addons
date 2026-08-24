@@ -155,7 +155,10 @@ def do_load_modules(load_modules, **kwargs):
                     install_order = forms.install_order
                 except:
                     install_order = []
-                print('Install Order: ', install_order)
+                if install_order:
+                    print(f'Configured Install Order ({len(install_order)}):')
+                    for i, name in enumerate(install_order, 1):
+                        print(f'  {i:3}. {name}')
                 form_dict = form_resource.instalable_forms(install_order, **kwargs)
                 ###forms
                 response += form_resource.install_forms(form_dict, **kwargs)

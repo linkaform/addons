@@ -4,8 +4,8 @@ volumes:
 
 networks:
   linkaform:
-    external:
-      name: linkaform
+    name: linkaform
+    external: true
 
 services:
   lkf-addons-base:
