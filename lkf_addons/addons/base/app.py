@@ -88,7 +88,6 @@ class Base(BaseModel):
             "company": "",
             "send_welcome": False
         }
-        print(simplejson.dumps(body_request, indent=3))
 
         response = self.lkf_api.create_user(body_request)
         return response
@@ -1534,8 +1533,62 @@ class Schedule(Base):
             frecuency['once'] = True
         return frecuency
 
+    #Grupo "Parametros del Script" de la forma Programar Tareas
+    SCRIPT_PARAMS_GROUP = 'abcde0001000000000030001'
+    SCRIPT_PARAM_NAME = 'abcde0001000000000030002'
+    SCRIPT_PARAM_VALUE = 'abcde0001000000000030003'
+
+    def parse_script_param(self, value):
+        """
+        Los parametros se capturan como texto en la forma, aqui se convierten al tipo
+        real para que lleguen al DAG como numero, booleano, lista o diccionario:
+            '2'                       -> 2
+            '2.5'                     -> 2.5
+            'si'                      -> True
+            '{"Rondin Nocturno": 2}'  -> {'Rondin Nocturno': 2}
+            'programado'              -> 'programado'
+        """
+        if not isinstance(value, str):
+            return value
+        value = value.strip()
+        if not value:
+            return value
+        if value.lower() in ('true', 'si', 'sí'):
+            return True
+        if value.lower() in ('false', 'no'):
+            return False
+        try:
+            return simplejson.loads(value)
+        except ValueError:
+            return value
+
     def get_script_map(self):
-        return {}
+        """
+        Parametros extra que se le mandan al script cuando el item programado es un
+        script (LKFRunScript).
+
+        Se capturan en el grupo "Parametros del Script" de la forma Programar Tareas,
+        un renglon por parametro (Parametro / Valor), y se agregan al params de la
+        tarea del DAG de airflow junto con el script_id:
+
+            params = {'script_id': 163256, 'horas': 2}
+
+        De ahi LKFRunScript los manda en el post de run_script y el script los lee.
+        Ej. para Cerrar Rondines: horas=2, minutos_sin_check=15,
+        horas_por_recorrido={"Rondin Nocturno": 2, "Planta Norte::Rondin Perimetral": 5}
+        """
+        params = {}
+        for row in self.answers.get(self.SCRIPT_PARAMS_GROUP, []) or []:
+            if not isinstance(row, dict):
+                continue
+            name = self.unlist(row.get(self.SCRIPT_PARAM_NAME))
+            if not name:
+                continue
+            value = self.parse_script_param(self.unlist(row.get(self.SCRIPT_PARAM_VALUE)))
+            params[str(name).strip()] = value
+        if params:
+            print('======log: parametros del script:', params)
+        return params
 
     def lkf_date(self, date_str):
         global current_record
