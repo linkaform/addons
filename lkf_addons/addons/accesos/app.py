@@ -4186,10 +4186,12 @@ class Accesos(OcrMixin, AccesosModel):
             {'$limit': 1},
             {'$project': {
                 "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
+                "logotipo_pase": f"$answers.{self.mf['logotipo_pase']}",
             }},
         ]
         raw_result = self.format_cr(self.cr.aggregate(query))
         for raw in raw_result:
+            logotipo_pase = self.unlist(raw.get('logotipo_pase', [])) or logotipo_pase
             for grupo in raw.get('grupo_requisitos', []):
                 #TODO Verficiar el cambio de key
                 ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
@@ -4199,7 +4201,6 @@ class Accesos(OcrMixin, AccesosModel):
                     condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
                     condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
                     condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
-                    logotipo_pase = grupo.get('logotipo_pase', '') or logotipo_pase
 
                     clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
                     reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
