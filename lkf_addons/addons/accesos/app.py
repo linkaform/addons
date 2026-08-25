@@ -2646,7 +2646,7 @@ class Accesos(OcrMixin, AccesosModel):
         answers = {}
         ics_invitation = False
 
-        campos_requeridos = ['ubicaciones', 'perfil_pase', 'visita_a']
+        campos_requeridos = ['ubicaciones']
         faltantes = [campo for campo in campos_requeridos if not access_pass.get(campo)]
         if faltantes:
             raise self.LKFException({
