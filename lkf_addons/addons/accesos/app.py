@@ -1028,6 +1028,20 @@ class Accesos(OcrMixin, AccesosModel):
         user = self.lkf_api.get_user_by_id(user_id)
         user_name = user.get('name', '')
 
+        #! Roles normales (catalogo, hardcode o localStorage) se aceptan tal
+        #! cual, sin validar, para no romper check-in en cuentas/usuarios que
+        #! aun no capturan el grupo "Roles" de configuracion_areas_y_empleados.
+        #! Solo se valida lo que huela a rol de administracion: eso unicamente
+        #! se acepta si esta realmente asignado al usuario en esa forma.
+        if roles:
+            roles_admin_solicitados = [rol for rol in roles if re.search('admin', rol, re.IGNORECASE)]
+            if roles_admin_solicitados:
+                roles_permitidos = self.get_roles_usuario(user_id)
+                roles_admin_rechazados = [rol for rol in roles_admin_solicitados if rol not in roles_permitidos]
+                if roles_admin_rechazados:
+                    print(f"Roles administrativos rechazados para user_id {user_id}: {roles_admin_rechazados}")
+                roles = [rol for rol in roles if rol not in roles_admin_rechazados]
+
         #! Si is_boot_available no encontró el registro abierto (ej. condición de carrera),
         #! se hace una búsqueda explícita por estado abierto como salvaguarda.
         if not is_caseta_open:
@@ -1520,6 +1534,30 @@ class Accesos(OcrMixin, AccesosModel):
         print(response)
         return response
 
+    def get_roles_usuario(self, user_id):
+        """
+        Roles configurados para user_id en el grupo repetitivo "Roles" de
+        configuracion_areas_y_empleados (fuente de verdad para validar roles
+        de turno; no confundir con self.f['grupo_roles'], que es el grupo de
+        roles de registro_de_asistencia/configuracion_de_recorridos).
+        """
+        if not user_id:
+            return []
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.CONF_AREA_EMPLEADOS,
+            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id,
+        }
+        doc = self.cr.find_one(match_query)
+        if not doc:
+            return []
+        roles_raw = doc.get("answers", {}).get(self.Employee.f['roles_grupo'], []) or []
+        return [
+            r.get(self.Employee.f['catalog_rol_empleado'], {}).get(self.f['rol'])
+            for r in roles_raw
+            if r.get(self.Employee.f['catalog_rol_empleado'], {}).get(self.f['rol'])
+        ]
+
     def catalogos_pase_location(self):
         user_id = self.user.get("user_id")
         match_query = {
@@ -1546,6 +1584,7 @@ class Accesos(OcrMixin, AccesosModel):
             'ubicaciones_user': [],
             'ubicaciones_default': [],
             'ubicaciones_detalle': [],
+            'roles_usuario': [],
         }
 
         detalle_por_ubicacion = {}
@@ -1591,6 +1630,8 @@ class Accesos(OcrMixin, AccesosModel):
         doc = self.cr.find_one(match_query)
         if doc:
             print(json.dumps(doc["answers"][self.mf['areas_grupo']], indent=2, default=str))
+
+        res['roles_usuario'] = self.get_roles_usuario(user_id)
 
         return res
 

@@ -119,6 +119,7 @@ class Employee(Base):
         f = {
             'area':'663e5d44f5b8a7ce8211ed0f',
             'areas_grupo': '663cf9d77500019d1359eb9f',
+            'catalog_rol_empleado': '6a470634de711f1df3ec49b5',
             'departamento_empleado': '663bc4ed8a6b120eab4d7f1e',
             'grupo_puestos': '663c015f3ac46d98e8f27495',
             'location': '663e5c57f5b8a7ce8211ed0b',
@@ -127,6 +128,7 @@ class Employee(Base):
             'nombre_empleado': '62c5ff407febce07043024dd',
             'nombre_guardia_apoyo': '663bd36eb19b7fb7d9e97ccb',
             'puesto_empleado': '663bc4c79b8046ce89e97cf4',
+            'roles_grupo': '6a8e10938910e8a112fbbc21',
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
         }
         if hasattr(self, 'f'):
