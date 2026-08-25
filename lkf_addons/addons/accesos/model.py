@@ -344,7 +344,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'permisos_certificaciones_evidencias':'6a74d15ebbfb86985232bc76',
             'nombre_del_permiso':'6a74d27fa9bf0d441f4c243f',
             'evidencia_documento_permiso':'6a74d27fa9bf0d441f4c2440',
-            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441'
+            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441',
+            'logotipo_pase':'6a8cc71df78a808b7dcde656'
         }
         self.mf = mf
         ## Form Fields ##
@@ -724,6 +725,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'telefono_pase':'662c2937108836dec6d92582',
             'tipo_comentario':'66af1977ffb6fd75e769f457',
             'tipo_visita':"662c262cace163ca3ed3bb3a",
+            'tipo_de_pase_select':'6a0c941e332e2e7b0ab303f8',
             'todas_las_areas':'68f9fdfbd9bf5cb7fd3caece',
             'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
             'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",

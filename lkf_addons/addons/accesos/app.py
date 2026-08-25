@@ -125,6 +125,7 @@ class Accesos(OcrMixin, AccesosModel):
                     ### Campos Select
                     f"{self.mf['empresa']}":[access_pass.get('empresa'),],
                     f"{self.pase_entrada_fields['perfil_pase_id']}": [access_pass['tipo_de_pase'],],
+                    f"{self.pase_entrada_fields['tipo_de_pase_select']}": [access_pass.get('tipo_de_pase', 'visita'),],
                     # f"{self.pase_entrada_fields['status_pase']}":[access_pass['estatus'],],
                     f"{self.pase_entrada_fields['status_pase']}":['Activo',],
                     f"{self.pase_entrada_fields['foto_pase_id']}": access_pass.get("foto",[]), #[access_pass['foto'],], #.get('foto','')
@@ -1612,7 +1613,8 @@ class Accesos(OcrMixin, AccesosModel):
             "desc_condiciones_servicio": condiciones_servicio.get('desc_condiciones_servicio', ''),
             "permisos_certificaciones": permisos_certificaciones,
             "ubicaciones": config_modulo_seguridad.get('ubicaciones_info', []),
-            "empresa": config_modulo_seguridad.get('empresa', {})
+            "empresa": config_modulo_seguridad.get('empresa', {}),
+            "logotipo_pase": config_modulo_seguridad.get('logotipo_pase', '')
         }
         return res
 
@@ -2615,7 +2617,6 @@ class Accesos(OcrMixin, AccesosModel):
 
     # feature: pases
     def create_access_pass(self, access_pass):
-        #COMENTARIO
         """
         Crea pase de acceso
 
@@ -2644,6 +2645,14 @@ class Accesos(OcrMixin, AccesosModel):
         })
         answers = {}
         ics_invitation = False
+
+        campos_requeridos = ['email', 'telefono', 'ubicaciones', 'perfil_pase', 'visita_a']
+        faltantes = [campo for campo in campos_requeridos if not access_pass.get(campo)]
+        if faltantes:
+            raise self.LKFException({
+                'msg': f"Faltan campos requeridos: {', '.join(faltantes)}.",
+                'status_code': 400,
+            })
 
         record_id = metadata['id']
 
@@ -2853,6 +2862,13 @@ class Accesos(OcrMixin, AccesosModel):
 
         answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(answers)
 
+        telefono_valor = access_pass.get('telefono', '')
+        if telefono_valor and not re.fullmatch(r'\+\d{1,3}\d{10}', telefono_valor):
+            raise self.LKFException({
+                'msg': 'El telefono debe contener exactamente 10 digitos, sin letras ni simbolos.',
+                'status_code': 400,
+            }) 
+        
         fecha_visita_check = access_pass['fecha_desde_visita']
         if isinstance(fecha_visita_check, datetime):
             fecha_visita_check = fecha_visita_check.strftime('%Y-%m-%d')
@@ -2867,7 +2883,7 @@ class Accesos(OcrMixin, AccesosModel):
         acompanantes = answers.get(self.pase_entrada_fields['acompanantes'], 0)
         acompanantes_grupo = answers.get(self.pase_entrada_fields['acompanantes_grupo'], [])
         if acompanantes_grupo and len(acompanantes_grupo) > int(acompanantes or 0):
-            self.LKFException({
+            raise self.LKFException({
                 'msg': (
                     f"El número de acompañantes en la lista ({len(acompanantes_grupo)}) "
                     f"excede el permitido para este pase ({acompanantes}). "
@@ -4159,6 +4175,7 @@ class Accesos(OcrMixin, AccesosModel):
         requerimientos = set()
         envios = set()
         condiciones_servicio = {}
+        logotipo_pase = ""
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": self.CONF_MODULO_SEGURIDAD,
@@ -4169,10 +4186,12 @@ class Accesos(OcrMixin, AccesosModel):
             {'$limit': 1},
             {'$project': {
                 "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
+                "logotipo_pase": f"$answers.{self.mf['logotipo_pase']}",
             }},
         ]
         raw_result = self.format_cr(self.cr.aggregate(query))
         for raw in raw_result:
+            logotipo_pase = self.unlist(raw.get('logotipo_pase', [])) or logotipo_pase
             for grupo in raw.get('grupo_requisitos', []):
                 #TODO Verficiar el cambio de key
                 ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
@@ -4230,6 +4249,7 @@ class Accesos(OcrMixin, AccesosModel):
             "tipos": tipos,
             "condiciones_servicio": condiciones_servicio,
             "permisos_certificaciones": permisos_certificaciones,
+            "logotipo_pase": logotipo_pase,
             "empresa": {
                 "nombre": company,
                 "email": empresa_email,
@@ -9027,7 +9047,7 @@ class Accesos(OcrMixin, AccesosModel):
                         if index==0 :
                             docs+="-"
                     link_pass= f"{link_info['link']}"
-                answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
+                    answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
             elif key == 'ubicacion':
                 answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
             elif key == 'visita_a':

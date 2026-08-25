@@ -105,7 +105,7 @@ class Base(BaseModel):
             try:
                 user_id = db_name.split('_')[-1]
                 db_type , user_id = db_name.split('_')
-                response = self.lkf_api.create_user_couch_db(user_id, db_type)
+                response = self.lkf_api.create_user_couch_db(user_id, db_name)
                 db = self.lkf_api.couch.set_db(db_name)
             except Exception as e:
                 self.LKFException(f'Error al crear la base de datos {db_name}: Exception: {str(e)}')
