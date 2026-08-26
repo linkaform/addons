@@ -2938,6 +2938,8 @@ class Accesos(OcrMixin, AccesosModel):
         print('res=',res)
         if res.get('status_code') in (200, 201):
             parent_id = res.get('json', {}).get('id')
+            if link_info:
+                res.setdefault('json', {})['link'] = link_pass
             if acompanantes_grupo and len(acompanantes_grupo) > 0 and parent_id:
                 self.create_multiple_pass_threads(answers, acompanantes_grupo, parent_id)
         return res
@@ -8938,6 +8940,9 @@ class Accesos(OcrMixin, AccesosModel):
                     '_id': qr_code
                 })
             res= self.net.patch_forms_answers(metadata)
+            link_pass = answers.get(self.pase_entrada_fields['link'])
+            if link_pass and res.get('status_code') in (200, 201, 202):
+                res.setdefault('json', {})['link'] = link_pass
             return res
         else:
             self.LKFException('No se mandarón parametros para actualizar')
