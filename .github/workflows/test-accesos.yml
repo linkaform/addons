@@ -68,8 +68,11 @@ jobs:
           for LINE in $CHANGED_LINES; do
             # Ubica el "def" más cercano hacia arriba desde la línea que
             # cambió, y devuelve "numero_de_linea:nombre_funcion".
+            # target+1 porque el tag "# feature: ..." vive una línea arriba
+            # del "def": si lo que cambió fue esa línea de comentario, el
+            # "def" real queda una línea por debajo del target.
             HIT=$(awk -v target="$LINE" '
-              NR <= target && $0 ~ /^[[:space:]]*def [A-Za-z_][A-Za-z0-9_]*\(/ { defline=NR; line=$0 }
+              NR <= target + 1 && $0 ~ /^[[:space:]]*def [A-Za-z_][A-Za-z0-9_]*\(/ { defline=NR; line=$0 }
               END {
                 if (line != "") {
                   sub(/^[[:space:]]*def /, "", line)
