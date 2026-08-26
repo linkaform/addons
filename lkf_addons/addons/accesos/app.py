@@ -8699,6 +8699,7 @@ class Accesos(OcrMixin, AccesosModel):
         pass_img_file_url = pass_img_url.get('file_url')
         return [{'file_name': pass_img_file_name, 'file_url': pass_img_file_url}]
 
+    # feature: update
     def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
         answers = {}
         perfil_pase = access_pass.get('perfil_pase', 'Visita General')
