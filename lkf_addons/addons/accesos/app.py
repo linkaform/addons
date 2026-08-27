@@ -523,13 +523,7 @@ class Accesos(OcrMixin, AccesosModel):
             status (str): String con status
         """
         if requerimientos is None:
-            try:
-                requerimientos = self.get_requerimientos_ubicaciones(
-                    self.get_ubicaciones_from_answers(answers))
-            except Exception as e:
-                print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
-                #---Si no se pudo leer la configuracion se conserva el criterio previo
-                requerimientos = ['fotografia',]
+            requerimientos = self.get_requerimientos_pase(answers)
         requerimientos = [r.lower() for r in (requerimientos or []) if isinstance(r, str)]
         foto_requerida = 'fotografia' in requerimientos
         identificacion_requerida = 'identificacion' in requerimientos
@@ -541,6 +535,10 @@ class Accesos(OcrMixin, AccesosModel):
         vista_a_ok = False
         autorizado_ok = False
         status = 'proceso'
+        #---Sin nombre no hay pase que activar, ej. acompanantes que el invitado
+        #   todavia no ha llenado.
+        nombre_pase = answers.get(self.pase_entrada_fields['walkin_nombre'], '')
+        nombre_ok = bool(nombre_pase and str(nombre_pase).strip())
         if foto_requerida:
             foto = answers.get(self.pase_entrada_fields['walkin_fotografia'])
             if isinstance(foto, list) and len(foto) > 0:
@@ -612,10 +610,10 @@ class Accesos(OcrMixin, AccesosModel):
 
             if answers.get(self.pase_entrada_fields['catalago_autorizado_por'],{}).get(self.pase_entrada_fields['autorizado_por']):
                 autorizado_ok = True
-        print("QUE PASA, ", foto_ok , id_vista , fecha_ok , vista_a_ok , autorizado_ok)
-        if foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
+        print("QUE PASA, ", nombre_ok, foto_ok , id_vista , fecha_ok , vista_a_ok , autorizado_ok)
+        if nombre_ok and foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
             status = 'activo'
-        elif foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
+        elif nombre_ok and foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
             status = 'por_autorizar'
         elif not fecha_ok:
             status = 'vencido'
@@ -2965,11 +2963,12 @@ class Accesos(OcrMixin, AccesosModel):
             if link_info:
                 res.setdefault('json', {})['link'] = link_pass
             if acompanantes_grupo and len(acompanantes_grupo) > 0 and parent_id:
-                self.create_multiple_pass_threads(answers, acompanantes_grupo, parent_id)
+                self.create_multiple_pass_threads(answers, acompanantes_grupo, parent_id,
+                    requerimientos=requerimientos)
         return res
 
 
-    def create_multiple_pass_threads(self, answers, acompanantes_grupo, parent_id):
+    def create_multiple_pass_threads(self, answers, acompanantes_grupo, parent_id, requerimientos=None):
         """
         Creates individual passes for each member of acompanantes_grupo in parallel threads.
         Pops acompanantes_grupo from child answers to avoid recursion.
@@ -2989,6 +2988,10 @@ class Accesos(OcrMixin, AccesosModel):
             pass_answers[self.pase_entrada_fields['email']] = acompanante.get('email', '')
             pass_answers[self.mf['telefono_pase']] = acompanante.get('telefono', '')
             pass_answers[self.pase_entrada_fields['url_padre']] = parent_url
+            #---El status no se hereda del titular, el acompanante puede venir sin
+            #   datos para que el invitado los complete despues.
+            pass_answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
+                pass_answers, requerimientos=requerimientos)
 
             metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
             metadata.update({
@@ -4242,46 +4245,25 @@ class Accesos(OcrMixin, AccesosModel):
         requerimientos = set()
         envios = set()
         condiciones_servicio = {}
-        logotipo_pase = ""
-        match_query = {
-            "deleted_at": {"$exists": False},
-            "form_id": self.CONF_MODULO_SEGURIDAD,
-        }
-        query = [
-            {'$match': match_query},
-            {'$sort': {'updated_at': -1}},
-            {'$limit': 1},
-            {'$project': {
-                "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
-                "logotipo_pase": f"$answers.{self.mf['logotipo_pase']}",
-            }},
-        ]
-        raw_result = self.format_cr(self.cr.aggregate(query))
-        for raw in raw_result:
-            logotipo_pase = self.unlist(raw.get('logotipo_pase', [])) or logotipo_pase
-            for grupo in raw.get('grupo_requisitos', []):
-                #TODO Verficiar el cambio de key
-                ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
-                if ubicacion in ubicaciones:
-                    #---Condiciones de servicio (solo del grupo que coincide con la ubicación)
-                    condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio', '')
-                    condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
-                    condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
-                    condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
+        config, grupos = self.get_grupos_requisitos_ubicaciones(ubicaciones)
+        logotipo_pase = self.unlist(config.get('logotipo_pase', [])) or ""
+        for grupo in grupos:
+            #---Condiciones de servicio (solo del grupo que coincide con la ubicación)
+            condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio', '')
+            condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
+            condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
+            condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
 
-                    clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
-                    reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
-                    if isinstance(reqs, list):
-                        requerimientos.update(reqs)
-                    envios = set()
-                    envio_por_list = self.conf_modulo_seguridad.get('envio_por', [])
-                    for item in envio_por_list if isinstance(envio_por_list, list) else [envio_por_list]:
-                        envs = grupo.get(item) or grupo.get('envio_por', [])
-                        if envs:
-                            if isinstance(envs, list):
-                                envios.update(envs)
-                            else:
-                                envios.add(envs)
+            requerimientos.update(self.get_datos_requeridos_grupo(grupo))
+            envios = set()
+            envio_por_list = self.conf_modulo_seguridad.get('envio_por', [])
+            for item in envio_por_list if isinstance(envio_por_list, list) else [envio_por_list]:
+                envs = grupo.get(item) or grupo.get('envio_por', [])
+                if envs:
+                    if isinstance(envs, list):
+                        envios.update(envs)
+                    else:
+                        envios.add(envs)
 
         tipos = self.get_tipos_de_pase(ubicaciones)
         permisos_certificaciones = self.get_permisos_por_perfil(tipo_de_pase) if tipo_de_pase else ""
@@ -4378,19 +4360,36 @@ class Accesos(OcrMixin, AccesosModel):
                 docs.append(doc)
         return '-'.join(docs)
 
-    def get_requerimientos_ubicaciones(self, ubicaciones=[]):
+    def get_datos_requeridos_grupo(self, grupo):
         """
-        Regresa los datos requeridos (fotografia, identificacion) que pide la
-        configuracion del modulo de seguridad para las ubicaciones dadas.
-        Si ninguna de las ubicaciones pide requerimientos regresa una lista vacia,
-        es decir el visitante no tiene nada que complementar.
+        Regresa los datos requeridos (fotografia, identificacion) de un grupo de
+        requisitos de la configuracion del modulo de seguridad.
+
+        args:
+            grupo (json): Grupo de requisitos
+
+        return:
+            datos_requeridos (list): Lista de datos requeridos
+        """
+        clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
+        reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, []) or []
+        if isinstance(reqs, str):
+            reqs = [reqs,]
+        return reqs if isinstance(reqs, list) else []
+
+    def get_grupos_requisitos_ubicaciones(self, ubicaciones=[]):
+        """
+        Lee la configuracion del modulo de seguridad y regresa los grupos de
+        requisitos que aplican a las ubicaciones dadas.
 
         args:
             ubicaciones (str|list): Nombre(s) de la ubicacion
 
         return:
-            requerimientos (list): Lista de datos requeridos
+            config (json): Configuracion del modulo de seguridad
+            grupos (list): Grupos de requisitos que coinciden con las ubicaciones
         """
+        #TODO Verificar por que se envia asi la lista
         if isinstance(ubicaciones, str):
             ubicaciones = [ubicaciones,]
         ubicaciones = [
@@ -4398,9 +4397,6 @@ class Accesos(OcrMixin, AccesosModel):
             for u in ubicaciones or []
         ]
         ubicaciones = [u for u in ubicaciones if u]
-        if not ubicaciones:
-            return []
-        requerimientos = set()
         query = [
             {'$match': {
                 "deleted_at": {"$exists": False},
@@ -4410,19 +4406,54 @@ class Accesos(OcrMixin, AccesosModel):
             {'$limit': 1},
             {'$project': {
                 "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
+                "logotipo_pase": f"$answers.{self.mf['logotipo_pase']}",
             }},
         ]
-        clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
-        for raw in self.format_cr(self.cr.aggregate(query)):
-            for grupo in raw.get('grupo_requisitos', []) or []:
-                #TODO Verficiar el cambio de key
-                ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
-                if ubicacion not in ubicaciones:
-                    continue
-                reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, []) or []
-                if isinstance(reqs, str):
-                    reqs = [reqs,]
-                requerimientos.update(reqs)
+        raw_result = self.format_cr(self.cr.aggregate(query))
+        config = raw_result[0] if raw_result else {}
+        grupos = []
+        for grupo in config.get('grupo_requisitos', []) or []:
+            #TODO Verficiar el cambio de key
+            ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
+            if ubicacion in ubicaciones:
+                grupos.append(grupo)
+        return config, grupos
+
+    def get_requerimientos_pase(self, answers):
+        """
+        Regresa los datos requeridos que aplican a un pase segun sus ubicaciones.
+
+        args:
+            answers (json): Objeto de answers del pase
+
+        return:
+            requerimientos (list): Lista de datos requeridos
+        """
+        try:
+            return self.get_requerimientos_ubicaciones(self.get_ubicaciones_from_answers(answers))
+        except Exception as e:
+            print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
+            #---Si no se pudo leer la configuracion se conserva el criterio previo
+            return ['fotografia',]
+
+    def get_requerimientos_ubicaciones(self, ubicaciones=[]):
+        """
+        Regresa los datos requeridos (fotografia, identificacion) que pide la
+        configuracion del modulo de seguridad para las ubicaciones dadas.
+        Si el pase es para varias ubicaciones se suman los requerimientos, para
+        cumplir con el minimo de cada una. Si ninguna pide requerimientos regresa
+        una lista vacia, es decir el visitante no tiene nada que complementar.
+
+        args:
+            ubicaciones (str|list): Nombre(s) de la ubicacion
+
+        return:
+            requerimientos (list): Lista de datos requeridos
+        """
+        requerimientos = set()
+        config, grupos = self.get_grupos_requisitos_ubicaciones(ubicaciones)
+        for grupo in grupos:
+            requerimientos.update(self.get_datos_requeridos_grupo(grupo))
         return list(requerimientos)
 
     def get_tipos_de_pase(self, ubicaciones=[]):
@@ -8768,18 +8799,20 @@ class Accesos(OcrMixin, AccesosModel):
         if answers:
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
+            requerimientos = self.get_requerimientos_pase(new_answers)
             # Si viene con estatus cancelado se salta la funcion de asignar estatus
             status_field = self.pase_entrada_fields['status_pase']
             if answers.get(status_field) == 'cancelado':
                 status = 'cancelado'
             else:
-                status = self.access_pass_set_status(new_answers)
+                status = self.access_pass_set_status(new_answers, requerimientos=requerimientos)
             answers[status_field] = status
 
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
                 if acompanantes_a_actualizar:
-                    self._patch_acompanantes_pases(acompanantes_a_actualizar)
+                    self._patch_acompanantes_pases(acompanantes_a_actualizar,
+                        requerimientos=requerimientos)
                 pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
@@ -8800,7 +8833,8 @@ class Accesos(OcrMixin, AccesosModel):
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
-    def _patch_acompanantes_pases(self, acompanantes_a_actualizar):
+    def _patch_acompanantes_pases(self, acompanantes_a_actualizar, requerimientos=None):
+        status_field = self.pase_entrada_fields['status_pase']
         for item in acompanantes_a_actualizar:
             child_answers = {
                 self.mf['nombre_pase']: item['nombre'],
@@ -8808,6 +8842,17 @@ class Accesos(OcrMixin, AccesosModel):
                 self.mf['telefono_pase']: item['telefono'],
                 self.pase_entrada_fields['walkin_fotografia']: item['foto'],
             }
+            #---Ya con los datos del acompanante se revisa si su pase puede activarse
+            try:
+                registro = self.cr.find_one({'_id': ObjectId(item['qr_code'])}) or {}
+                child_stored = registro.get('answers') or {}
+                if child_stored and child_stored.get(status_field) != 'cancelado':
+                    new_child_answers = deepcopy(child_stored)
+                    new_child_answers.update(child_answers)
+                    child_answers[status_field] = self.access_pass_set_status(
+                        new_child_answers, requerimientos=requerimientos)
+            except Exception as e:
+                print(f"Error calculando status del pase de acompañante {item.get('qr_code')}: {e}")
             try:
                 self.lkf_api.patch_multi_record(answers=child_answers, form_id=self.PASE_ENTRADA, record_id=[item['qr_code']])
             except Exception as e:
