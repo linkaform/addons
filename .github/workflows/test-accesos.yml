@@ -23,6 +23,11 @@ name: Test - Accesos (preprod)
 # "# feature: <nombre>", agregar el nombre a la lista de tags conocidos en el
 # script del job "detect", y agregar el job de integración correspondiente,
 # siguiendo el mismo patrón que "integration-pases-entrada".
+#
+# "update_pases" es la excepción: su test de integración escribe contra
+# PROD real, cuya DB no es alcanzable desde los runners de GitHub (ni hay
+# secrets PROD_* configurados). Ese job solo deja un aviso; el test real
+# corre en local vía .githooks/pre-push.
 on:
   push:
     branches: [master]
@@ -164,53 +169,18 @@ jobs:
             pytest sdk_testing/accesos/passes/integration/test_create_access_pass_api.py -v
 
   integration-pases-update:
+    # Este test escribe contra PROD real. No corre aquí: la DB de prod
+    # (db2/db3/db4.linkaform.com) no es alcanzable desde los runners de
+    # GitHub, y tampoco hay secrets PROD_* configurados (whitelistear IPs
+    # dinámicas de GitHub en el firewall de una DB de prod no es buena
+    # idea). Se corre localmente vía el hook .githooks/pre-push, que usa
+    # las credenciales reales ya configuradas en la máquina del dev.
     needs: detect
     if: needs.detect.outputs.run_update_pases == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Configurar acceso SSH al submódulo sdk_testing
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SDK_TESTING_DEPLOY_KEY }}
- 
-      - name: Checkout addons (con submódulos)
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
- 
-      - name: Generar config/local_settings.py desde secrets
+      - name: Aviso
         run: |
-          cat > config/local_settings.py <<EOF
-          # coding: utf-8
-          from settings import *
-          from uts import update_settings
- 
-          config.update({
-              'USERNAME': '${{ secrets.PREPROD_USERNAME }}',
-              'APIKEY': '${{ secrets.PREPROD_APIKEY }}',
-              'ACCOUNT_ID': '${{ secrets.PREPROD_ACCOUNT_ID }}',
-          })
- 
-          settings.config.update(config)
-          settings = update_settings(settings)
-          EOF
- 
-      - name: Apuntar entorno a prod
-        run: |
-          sed -i "s/^# ENV = 'prod'/ENV = 'prod'/; s/^ENV = 'preprod'/# ENV = 'preprod'/" config/enviorment.py
-          grep "^ENV" config/enviorment.py
-
-      - name: Construir imagen de test
-        run: docker build -f test/docker/Dockerfile --target develop -t linkaform/lkf_test:develop test/docker
-
-      - name: Correr tests de integración (update_full_pass)
-        run: |
-          docker run --rm \
-            -v "${{ github.workspace }}/secrets/lkf_jwt_key.pub:/etc/ssl/certs/lkf_jwt_key.pub" \
-            -v "${{ github.workspace }}/lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons" \
-            -v "${{ github.workspace }}/modules:/usr/local/lib/python3.10/site-packages/lkf_modules" \
-            -v "${{ github.workspace }}/test:/srv/lkf_test" \
-            -v "${{ github.workspace }}/config:/srv/scripts/addons/config" \
-            -w /srv/lkf_test \
-            linkaform/lkf_test:develop \
-            pytest sdk_testing/accesos/passes/integration/test_update_full_pass_api.py -v --allow-prod-integration
+          echo "update_full_pass cambió (feature: update_pases)."
+          echo "Su test de integración corre solo localmente (contra PROD real),"
+          echo "vía el hook .githooks/pre-push -- no en GitHub Actions."
