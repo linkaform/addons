@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+#
+# Corre localmente (en Docker) el test de integración afectado por un
+# cambio en lkf_addons/addons/accesos/app.py, antes de dejar salir el push.
+#
+# Usa la misma lógica de detección por tag "# feature: <nombre>" que
+# .github/workflows/test-accesos.yml, comparando lo que se va a pushear
+# contra la rama remota. Solo revisa pushes a master (igual que el
+# workflow, que corre "on: push: branches: [master]").
+#
+# Feature "pases"        -> corre test_create_access_pass_api.py en local
+#                            contra preprod.
+# Feature "update_pases" -> corre test_update_full_pass_api.py en local
+#                            contra PROD REAL (con --allow-prod-integration).
+#                            Escribe datos reales en producción.
+#
+# En ambos casos el hook cambia config/enviorment.py al entorno que
+# corresponda solo durante esa corrida y lo restaura siempre al final
+# (pase o falle el test), para no dejar mutado tu entorno local de trabajo.
+
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+FILE="lkf_addons/addons/accesos/app.py"
+ENV_FILE="config/enviorment.py"
+Z40="0000000000000000000000000000000000000000"
+
+RUN_PASES=false
+RUN_UPDATE_PASES=false
+
+while read -r LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
+  [ "$LOCAL_SHA" = "$Z40" ] && continue           # se está borrando la rama remota
+  [ "$LOCAL_REF" = "refs/heads/master" ] || continue
+
+  if [ "$REMOTE_SHA" = "$Z40" ] || ! git cat-file -e "$REMOTE_SHA" 2>/dev/null; then
+    echo "pre-push: no hay base remota usable, se omite la detección automática de features."
+    continue
+  fi
+
+  if ! git diff --name-only "$REMOTE_SHA" "$LOCAL_SHA" -- "$FILE" | grep -qx "$FILE"; then
+    continue
+  fi
+
+  STAGED_FILE="$(mktemp)"
+  git show "$LOCAL_SHA:$FILE" > "$STAGED_FILE"
+
+  CHANGED_LINES=$(git diff --unified=0 "$REMOTE_SHA" "$LOCAL_SHA" -- "$FILE" \
+    | grep -E '^@@' \
+    | sed -E 's/^@@ -[0-9]+(,[0-9]+)? \+([0-9]+)(,[0-9]+)? @@.*/\2/')
+
+  for LINE in $CHANGED_LINES; do
+    # target+1 porque el tag "# feature: ..." vive una línea arriba del
+    # "def": si lo que cambió fue esa línea de comentario, el "def" real
+    # queda una línea por debajo del target.
+    HIT=$(awk -v target="$LINE" '
+      NR <= target + 1 && $0 ~ /^[[:space:]]*def [A-Za-z_][A-Za-z0-9_]*\(/ { defline=NR; line=$0 }
+      END {
+        if (line != "") {
+          sub(/^[[:space:]]*def /, "", line)
+          sub(/\(.*/, "", line)
+          print defline ":" line
+        }
+      }
+    ' "$STAGED_FILE")
+    [ -z "$HIT" ] && continue
+
+    DEFLINE="${HIT%%:*}"
+    FN="${HIT#*:}"
+    TAG_LINE=$(sed -n "$((DEFLINE - 1))p" "$STAGED_FILE")
+    TAG=$(echo "$TAG_LINE" | sed -nE 's/^[[:space:]]*#[[:space:]]*feature:[[:space:]]*([A-Za-z0-9_]+).*/\1/p')
+
+    [ -z "$TAG" ] && continue
+
+    echo "pre-push: función modificada '$FN' -> feature '$TAG'"
+    [ "$TAG" = "pases" ] && RUN_PASES=true
+    [ "$TAG" = "update_pases" ] && RUN_UPDATE_PASES=true
+  done
+
+  rm -f "$STAGED_FILE"
+done
+
+if [ "$RUN_PASES" != "true" ] && [ "$RUN_UPDATE_PASES" != "true" ]; then
+  exit 0
+fi
+
+ORIGINAL_ENV_CONTENT="$(cat "$ENV_FILE")"
+restore_env() {
+  printf '%s' "$ORIGINAL_ENV_CONTENT" > "$ENV_FILE"
+}
+trap restore_env EXIT
+
+# $1 = label, $2 = sed a config/enviorment.py, $3 = test file, resto = args extra de pytest
+run_integration_test() {
+  local label="$1" env_sed="$2" test_file="$3"
+  shift 3
+  echo ""
+  echo "pre-push: corriendo test de integración ($label)..."
+  echo ""
+
+  sed "$env_sed" "$ENV_FILE" > "$ENV_FILE.tmp" && mv "$ENV_FILE.tmp" "$ENV_FILE"
+
+  if ! docker compose -f test/docker/docker-compose.yaml run --rm lkf-test \
+    pytest "$test_file" -v "$@"; then
+    echo ""
+    echo "El test de integración ($label) falló. Push abortado."
+    echo "Corrige el problema o usa 'git push --no-verify' si necesitas saltarte el check."
+    exit 1
+  fi
+}
+
+if [ "$RUN_PASES" = "true" ]; then
+  run_integration_test "create_access_pass, preprod" \
+    "s/^ENV = 'prod'/# ENV = 'prod'/; s/^# ENV = 'preprod'/ENV = 'preprod'/" \
+    "sdk_testing/accesos/passes/integration/test_create_access_pass_api.py"
+fi
+
+if [ "$RUN_UPDATE_PASES" = "true" ]; then
+  echo ""
+  echo "AVISO: update_full_pass cambió (feature: update_pases). Este test"
+  echo "escribe datos reales en PROD."
+  run_integration_test "update_full_pass, PROD REAL" \
+    "s/^# ENV = 'prod'/ENV = 'prod'/; s/^ENV = 'preprod'/# ENV = 'preprod'/" \
+    "sdk_testing/accesos/passes/integration/test_update_full_pass_api.py" \
+    --allow-prod-integration
+fi
+
+exit 0
