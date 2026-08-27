@@ -61,22 +61,61 @@ docker network create -d bridge --gateway 172.23.0.1 --subnet 172.23.0.0/16 link
 
 ### Configuring you Addons Settings
 
-On the `config` folder there is a file called `settings.py` here are the baisc settings are ment to stay as they are. They are for basic configuration or for explanation purposes. You should create a file called `local_settings.py` on the same folder, this file is NOT uploaded to the repo, and here is where you place you sesitive information, this information is designe to live only on your local computer. All other sesitive information that you like will go here
+On the `config` folder there is a file called `settings.py` here are the baisc settings are ment to stay as they are. They are for basic configuration or for explanation purposes.
 
-`local_settings.py`
-```python
-# coding: utf-8
-from  settings import * 
-print('loading settings')
+Las credenciales viven en `secrets/accounts.ini`, una seccion por cuenta. Ese archivo NO se
+versiona (ver `.gitignore`) y solo existe en tu maquina. La cuenta activa se guarda en
+`secrets/current_domain`.
 
+`secrets/accounts.ini`
+```ini
+[global]
+# secretos compartidos por todas las cuentas
+couch_user         = admin
+couch_password     = ...
 
-config.update({
-            'USERNAME' : 'your_likaform_username@here.com',
-            'APIKEY': 'your_APIKEY_HERE', 
-})
+[tu_dominio]
+username           = tu_usuario@ejemplo.com
+apikey             = tu_apikey_aqui
+# solo si la rama de modules NO se llama como la seccion
+branch_name        = account_1234
+account_id         = 1234
+```
 
+Toda llave de la seccion se sube a `config` en MAYUSCULAS, asi que para agregar algo nuevo
+basta ponerlo en el ini. `branch_name` y `account_id` son la excepcion: solo las usa
+`workwith`.
 
-``` 
+Hay una plantilla en `secrets/accounts.ini.example`.
+
+#### Cambiar de cuenta: `workwith`
+
+No edites `local_settings.py` a mano. Para trabajar sobre otra cuenta:
+
+```bash
+./lkf workwith              # cuenta actual y dominios disponibles
+./lkf workwith hlmando      # cambia de cuenta Y deja modules/ en su rama
+```
+
+`workwith` apunta las credenciales, cambia `modules/` a la rama de esa cuenta y le integra
+`master` conservando los cambios de la rama (`merge -X ours`), avisandote que archivos se
+resolvieron a tu favor.
+
+Corre en el **host**, no dentro del contenedor: `modules/` es un submodulo cuyo `.git` real
+no esta montado ahi adentro. Y **no hace login**, asi que sirve tambien cuando las
+credenciales activas estan rotas.
+
+Si `modules/` tiene cambios sin commitear, `workwith` aborta antes de tocar nada: haz commit
+o `git stash` primero, para no arrastrar trabajo de una cuenta a la rama de otra.
+
+#### Hooks
+
+Instala los hooks del repo una sola vez. El `pre-commit` evita que las credenciales lleguen
+a git aunque alguien haga `git add -f`:
+
+```bash
+git config core.hooksPath githooks
+```
 
 
 ### Enableing Bash History

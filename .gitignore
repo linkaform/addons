@@ -8,7 +8,12 @@ __pycache__/
 local_settings.py
 account_settings.py
 lkfpowd.py
-secrets/preprod_test.env
+# secrets/ va por lista blanca: cualquier archivo nuevo ahi queda fuera por defecto,
+# en vez de depender de acordarse de agregar la regla.
+secrets/*
+!secrets/README.md
+!secrets/lkf_jwt_key.pub
+!secrets/*.example
 # Distribution / packaging
 .Python
 build/
