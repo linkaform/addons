@@ -809,6 +809,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'email_acompanante':'6a23408693202c1f1c149693',
             'telefono_acompanante':'6a23408693202c1f1c149694',
             'foto_acompanante':'6a23408693202c1f1c149695',
+            'habilitar_fotografia':'6a8f4aa6559440e39d89a1d8',
+            'habilitar_identificacion':'6a8f4aa6559440e39d89a1d9'
         })
 
         self.conf_accesos_fields = {

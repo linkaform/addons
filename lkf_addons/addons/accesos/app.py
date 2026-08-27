@@ -557,6 +557,7 @@ class Accesos(OcrMixin, AccesosModel):
                 id_vista = self.valid_url(id_vista['file_url'])
             else:
                 id_vista = False
+
         today = self.get_today_format()
         
         if isinstance(today, datetime):
@@ -610,8 +611,10 @@ class Accesos(OcrMixin, AccesosModel):
 
             if answers.get(self.pase_entrada_fields['catalago_autorizado_por'],{}).get(self.pase_entrada_fields['autorizado_por']):
                 autorizado_ok = True
-        print("QUE PASA, ", nombre_ok, foto_ok , id_vista , fecha_ok , vista_a_ok , autorizado_ok)
+        print("DEBUG ACCESS_PASS_SET_STATUS criterios:", "nombre_ok=", nombre_ok, "foto_ok=", foto_ok,
+              "id_vista=", id_vista, "fecha_ok=", fecha_ok, "vista_a_ok=", vista_a_ok, "autorizado_ok=", autorizado_ok)
         if nombre_ok and foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
+
             status = 'activo'
         elif nombre_ok and foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
             status = 'por_autorizar'
@@ -2684,7 +2687,7 @@ class Accesos(OcrMixin, AccesosModel):
         access_pass (json): json con datos completos para generar el pase
 
         return:
-        
+
         """
         #---Define Metadata
         print('-----------------------')
@@ -2705,7 +2708,7 @@ class Accesos(OcrMixin, AccesosModel):
         answers = {}
         ics_invitation = False
 
-        campos_requeridos = ['ubicaciones']
+        campos_requeridos = ['ubicaciones', 'perfil_pase', 'visita_a']
         faltantes = [campo for campo in campos_requeridos if not access_pass.get(campo)]
         if faltantes:
             raise self.LKFException({
@@ -2788,6 +2791,8 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',now_datetime)
         answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',now_datetime_out)
         answers[self.pase_entrada_fields['habilitar_vehiculo']]= access_pass.get('habilitar_vehiculo', 'no')
+        answers[self.pase_entrada_fields['habilitar_fotografia']]= access_pass.get('habilitar_fotografia', 'no')
+        answers[self.pase_entrada_fields['habilitar_identificacion']]= access_pass.get('habilitar_identificacion', 'no')
         answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase','fecha_fija')
         # answers[self.pase_entrada_fields['fecha_fija']] = access_pass.get('fechaFija',now_datetime)
         answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
@@ -4835,6 +4840,8 @@ class Accesos(OcrMixin, AccesosModel):
                 'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
                 'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}",
                 'habilitar_vehiculo': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}", True]},
+                'habilitar_fotografia': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_fotografia']}", True]},
+                'habilitar_identificacion': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_identificacion']}", True]},
                 'tipo_visita_pase': f"$answers.{self.mf['tipo_visita_pase']}",     
                 'acompanantes': f"$answers.{self.pase_entrada_fields['acompanantes']}",       
                 'acompanantes_grupo': f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",       
@@ -4859,7 +4866,6 @@ class Accesos(OcrMixin, AccesosModel):
             f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['url_padre']= self.unlist(x.get('url_padre',''))
-            print("RESSSS",x.get('walkin', ''))
             x['walkin']=self.unlist(x.get('walkin', ''))
             # Si es un pase hijo, ir a buscar el link del pase padre
             if x.get('url_padre'):
@@ -4899,6 +4905,8 @@ class Accesos(OcrMixin, AccesosModel):
             x['curp'] = self.unlist(x.get('curp',''))
             x['motivo_visita'] = self.unlist(x.get('motivo_visita',''))
             x['habilitar_vehiculo']=x.get('habilitar_vehiculo',False)
+            x['habilitar_fotografia']= x.get('habilitar_fotografia', False)
+            x['habilitar_identificacion']=x.get('habilitar_identificacion', False)
             x['acompanantes']=x.get('acompanantes',0)
             x['tipo_visita_pase']= x.get('tipo_visita_pase')
             for idx, nombre in enumerate(v):
@@ -6363,6 +6371,8 @@ class Accesos(OcrMixin, AccesosModel):
                     'acompanantes_grupo':f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",
                     'acompanantes':f"$answers.{self.pase_entrada_fields['acompanantes']}",
                     'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}",
+                    'habilitar_identificacion':f"$answers.{self.pase_entrada_fields['habilitar_identificacion']}",
+                    'habilitar_fotografia':f"$answers.{self.pase_entrada_fields['habilitar_fotografia']}",
                     'url_padre':f"$answers.{self.pase_entrada_fields['url_padre']}",
                     'created_by':"$user_name"
                 }
@@ -6431,7 +6441,9 @@ class Accesos(OcrMixin, AccesosModel):
             x['autorizado_por'] = x.get('autorizado_por', "")
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
-            x['habilitar_vehiculo'] = x.get('habilitar_vehiculo', "")
+            x['habilitar_vehiculo'] = x.get('habilitar_vehiculo', True)
+            x['habilitar_fotografia'] = x.get('habilitar_fotografia', True)
+            x['habilitar_identificacion'] = x.get('habilitar_identificacion', True)
             x['url_padre']=x.get('url_padre','')
             x['pase_padre'] = {}
             if x['url_padre']:
@@ -6612,6 +6624,8 @@ class Accesos(OcrMixin, AccesosModel):
                key == "empresa" or \
                key == "ubicaciones_geolocation" or \
                key == "habilitar_vehiculo" or \
+               key == "habilitar_identificacion" or \
+               key == "habilitar_fotografia" or \
                key == "acompanantes" or \
                key == "acompanantes_grupo" or \
                key == "url_padre" or \
@@ -8671,7 +8685,7 @@ class Accesos(OcrMixin, AccesosModel):
         pass_selected= self.get_detail_access_pass(qr_code=folio, get_answers=True)
         qr_code= folio
         _folio= pass_selected.get("folio")
-   
+
         answers={}
         acompanantes_a_actualizar = []
         for key, value in access_pass.items():
@@ -8724,7 +8738,7 @@ class Accesos(OcrMixin, AccesosModel):
                     answers[self.pase_entrada_fields['acompanantes_grupo']] = grupo_answers
                 continue
             if key == 'grupo_vehiculos':
-                answers[self.mf['grupo_vehiculos']]={}
+                grupo_vehiculos_answers = {}
                 for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
                     tipo = item.get('tipo',item.get('tipo_vehiculo',''))
                     marca = item.get('marca',item.get('marca_vehiculo',''))
@@ -8746,9 +8760,13 @@ class Accesos(OcrMixin, AccesosModel):
                         self.mf['color_vehiculo']:color,
                         self.f['foto_vehiculo']:foto_vehiculo,
                     }
-                    answers[self.mf['grupo_vehiculos']][(index+1)*-1]=obj
+                    grupo_vehiculos_answers[(index+1)*-1]=obj
+                #---Si no vienen vehiculos no se manda la key, para no mandar un grupo
+                #   vacio a la plataforma (regresaba un error generico).
+                if grupo_vehiculos_answers:
+                    answers[self.mf['grupo_vehiculos']] = grupo_vehiculos_answers
             elif key == 'grupo_equipos':
-                answers[self.mf['grupo_equipos']]={}
+                grupo_equipos_answers = {}
                 for index, item in enumerate(value):
                     nombre = item.get('nombre',item.get('nombre_articulo',''))
                     marca = item.get('marca',item.get('marca_articulo',''))
@@ -8766,7 +8784,11 @@ class Accesos(OcrMixin, AccesosModel):
                         self.mf['modelo_articulo']:modelo,
                         self.f['foto_equipo']:foto_equipo,
                     }
-                    answers[self.mf['grupo_equipos']][(index+1)*-1]=obj
+                    grupo_equipos_answers[(index+1)*-1]=obj
+                #---Si no vienen equipos no se manda la key, para no mandar un grupo
+                #   vacio a la plataforma (regresaba un error generico).
+                if grupo_equipos_answers:
+                    answers[self.mf['grupo_equipos']] = grupo_equipos_answers
             elif key == 'visita_a':
                 for index, item in enumerate(access_pass.get('visita_a',[])):
                     answers[self.mf['grupo_visitados']] = answers.get(self.mf['grupo_visitados'],{})
@@ -8808,6 +8830,12 @@ class Accesos(OcrMixin, AccesosModel):
             #             self.pase_entrada_fields['foto_acompanante']: foto,
             #         }
             #         answers[self.pase_entrada_fields['acompanantes_grupo']][(index + 1) * -1] = obj
+            elif key == 'firma_reglas_de_acceso':
+                #---El campo es tipo "images" (multi_selection), la plataforma espera
+                #   siempre una lista aunque sea una sola firma.
+                if value:
+                    firma_value = value if isinstance(value, list) else [value]
+                    answers.update({self.pase_entrada_fields[key]: firma_value})
             else:
                 if value:
                     answers.update({f"{self.pase_entrada_fields[key]}":value})
@@ -8828,7 +8856,9 @@ class Accesos(OcrMixin, AccesosModel):
                 status = self.access_pass_set_status(new_answers, requerimientos=requerimientos)
             answers[status_field] = status
 
+            print("DEBUG UPDATE_PASS payload a enviar:", answers)
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
+            print("DEBUG UPDATE_PASS respuesta patch_multi_record:", res)
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
                 if acompanantes_a_actualizar:
                     self._patch_acompanantes_pases(acompanantes_a_actualizar,
