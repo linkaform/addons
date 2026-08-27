@@ -2676,7 +2676,6 @@ class Accesos(OcrMixin, AccesosModel):
 
     # feature: pases
     def create_access_pass(self, access_pass):
-        # prueba robusta del hook pre-push y CI: valida deteccion de feature "pases"
         """
         Crea pase de acceso
 
@@ -8891,7 +8890,6 @@ class Accesos(OcrMixin, AccesosModel):
 
     # feature: update_pases
     def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
-        # prueba robusta del hook pre-push y CI: valida deteccion de feature "update_pases"
         answers = {}
         perfil_pase = access_pass.get('perfil_pase', 'Visita General')
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
