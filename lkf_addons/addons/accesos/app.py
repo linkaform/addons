@@ -2915,15 +2915,28 @@ class Accesos(OcrMixin, AccesosModel):
         #---Valor
         # Crea invitacion de calendario
         if created_from in ('pase_de_entrada_app', 'pase_de_entrada_web') or True:
-            #TODO FLUJO DE AUTORIZACION DE PASES
             answers.update(self.access_pass_create_ics(access_pass, answers, ics_invitation))
-            answers[self.pase_entrada_fields['catalago_autorizado_por']] = self.autorizar_pase_acceso(answers)
+            #TODO FLUJO DE AUTORIZACION DE PASES: nueva_visita y web/app se
+            #   auto-autorizan con quien crea el pase (el empleado que invita
+            #   ya lo esta avalando); eso permite que web/app pasen a activo
+            #   solos cuando el visitante complete su foto/identificacion via
+            #   el link (update_pass vuelve a evaluar el status). auto_registro
+            #   NO se auto-autoriza, por eso cae en por_autorizar en vez de
+            #   activo aunque ya traiga foto/identificacion reales.
+            if created_from != 'auto_registro':
+                answers[self.pase_entrada_fields['catalago_autorizado_por']] = self.autorizar_pase_acceso(answers)
 
 
-        #---Si ninguna ubicacion pide foto ni identificacion el pase queda activo,
-        #   el visitante no tiene nada que complementar.
-        answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
-            answers, requerimientos=requerimientos)
+        #---nueva_visita (ya autorizado arriba) y auto_registro (sin autorizar,
+        #   por eso cae en por_autorizar si ya esta completo) se evaluan normal.
+        #   web/app siempre arrancan en proceso, para compartir el link y que el
+        #   visitante agregue su foto/identificacion; update_pass vuelve a
+        #   evaluar access_pass_set_status cuando el visitante completa esos datos.
+        if created_from in ('nueva_visita', 'auto_registro'):
+            answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
+                answers, requerimientos=requerimientos)
+        else:
+            answers[self.pase_entrada_fields['status_pase']] = 'proceso'
 
         telefono_valor = access_pass.get('telefono', '')
         if telefono_valor and not re.fullmatch(r'\+\d{1,3}\d{10}', telefono_valor):
@@ -2989,9 +3002,14 @@ class Accesos(OcrMixin, AccesosModel):
             pass_answers[self.mf['telefono_pase']] = acompanante.get('telefono', '')
             pass_answers[self.pase_entrada_fields['url_padre']] = parent_url
             #---El status no se hereda del titular, el acompanante puede venir sin
-            #   datos para que el invitado los complete despues.
-            pass_answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
-                pass_answers, requerimientos=requerimientos)
+            #   datos para que el invitado los complete despues. Misma regla que
+            #   en la creacion del titular: nueva_visita/auto_registro se evaluan
+            #   normal, web/app siempre arrancan en proceso.
+            if pass_answers.get(self.pase_entrada_fields['creado_desde']) in ('nueva_visita', 'auto_registro'):
+                pass_answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
+                    pass_answers, requerimientos=requerimientos)
+            else:
+                pass_answers[self.pase_entrada_fields['status_pase']] = 'proceso'
 
             metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
             metadata.update({
