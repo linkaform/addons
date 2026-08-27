@@ -506,7 +506,7 @@ class Accesos(OcrMixin, AccesosModel):
                 res.append(visita_set)
         return res
 
-    def access_pass_set_status(self, answers):
+    def access_pass_set_status(self, answers, requerimientos=None):
         """
         Evalua criterios del pase y regresa el status del pase
         Proceso
@@ -514,31 +514,51 @@ class Accesos(OcrMixin, AccesosModel):
         Vencido
         args:
             answers (json): Objeto de answers
+            requerimientos (list): Datos requeridos (fotografia, identificacion) que
+                pide la ubicacion del pase. Si no se manda se consulta la
+                configuracion del modulo de seguridad. Si la ubicacion no pide
+                requerimientos el visitante no tiene nada que complementar y el
+                pase puede quedar activo.
         return:
             status (str): String con status
         """
-        foto_ok = False
-        id_vista = False
+        if requerimientos is None:
+            try:
+                requerimientos = self.get_requerimientos_ubicaciones(
+                    self.get_ubicaciones_from_answers(answers))
+            except Exception as e:
+                print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
+                #---Si no se pudo leer la configuracion se conserva el criterio previo
+                requerimientos = ['fotografia',]
+        requerimientos = [r.lower() for r in (requerimientos or []) if isinstance(r, str)]
+        foto_requerida = 'fotografia' in requerimientos
+        identificacion_requerida = 'identificacion' in requerimientos
+
+        #---Si la ubicacion no pide el dato, el visitante no tiene nada que complementar
+        foto_ok = not foto_requerida
+        id_vista = not identificacion_requerida
         fecha_ok = False
         vista_a_ok = False
         autorizado_ok = False
         status = 'proceso'
-        foto = answers.get(self.pase_entrada_fields['walkin_fotografia'])
-        if isinstance(foto, list) and len(foto) > 0:
-            foto = foto[0]
+        if foto_requerida:
+            foto = answers.get(self.pase_entrada_fields['walkin_fotografia'])
+            if isinstance(foto, list) and len(foto) > 0:
+                foto = foto[0]
 
-        if isinstance(foto, dict):
-            if 'file_url' in foto.keys() and foto['file_url']:
-                foto_ok = self.valid_url(foto['file_url'])
-        #TODO revisar configuracion
-        id_vista  = answers.get(self.pase_entrada_fields['walkin_identificacion'], [])
-        if isinstance(id_vista, list) and len(id_vista) > 0:
-            id_vista = id_vista[0]
+            if isinstance(foto, dict):
+                if 'file_url' in foto.keys() and foto['file_url']:
+                    foto_ok = self.valid_url(foto['file_url'])
 
-        if isinstance(id_vista, dict):
-            if 'file_url' in id_vista.keys() and id_vista['file_url']:
+        if identificacion_requerida:
+            id_vista = answers.get(self.pase_entrada_fields['walkin_identificacion'], [])
+            if isinstance(id_vista, list) and len(id_vista) > 0:
+                id_vista = id_vista[0]
+
+            if isinstance(id_vista, dict) and id_vista.get('file_url'):
                 id_vista = self.valid_url(id_vista['file_url'])
-        id_vista = True
+            else:
+                id_vista = False
         today = self.get_today_format()
         
         if isinstance(today, datetime):
@@ -2697,17 +2717,18 @@ class Accesos(OcrMixin, AccesosModel):
 
         record_id = metadata['id']
 
+        #---El pase puede ser para varias ubicaciones, se suman los requerimientos
+        #   de todas para cumplir con el minimo de cada una.
+        try:
+            requerimientos = self.get_requerimientos_ubicaciones(access_pass.get('ubicaciones', []))
+        except Exception as e:
+            print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
+            requerimientos = ['fotografia',]
+
         link_info = access_pass.get('link', "")
-        docs=""
 
         if link_info:
-            for index, d in enumerate(link_info["docs"]):
-                if(d == "agregarIdentificacion"):
-                    docs+="iden"
-                elif(d == "agregarFoto"):
-                    docs+="foto"
-                if index==0 :
-                    docs+="-"
+            docs = self.get_docs_pase_link(requerimientos, link_info.get('docs', []))
             link_pass= f"{link_info['link']}?id={record_id}&user={self.user.get('parent_id')}&docs={docs}"
             answers[self.pase_entrada_fields['link']] = link_pass
         lkf_qr = generar_qr.LKF_QR(self.settings)
@@ -2901,7 +2922,10 @@ class Accesos(OcrMixin, AccesosModel):
             answers[self.pase_entrada_fields['catalago_autorizado_por']] = self.autorizar_pase_acceso(answers)
 
 
-        answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(answers)
+        #---Si ninguna ubicacion pide foto ni identificacion el pase queda activo,
+        #   el visitante no tiene nada que complementar.
+        answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
+            answers, requerimientos=requerimientos)
 
         telefono_valor = access_pass.get('telefono', '')
         if telefono_valor and not re.fullmatch(r'\+\d{1,3}\d{10}', telefono_valor):
@@ -4300,6 +4324,106 @@ class Accesos(OcrMixin, AccesosModel):
             },
         }
 
+
+    def get_ubicaciones_from_answers(self, answers):
+        """
+        Regresa la lista de nombres de ubicaciones de un pase
+
+        args:
+            answers (json): Objeto de answers del pase
+
+        return:
+            ubicaciones (list): Lista de nombres de ubicacion
+        """
+        ubicaciones = []
+        for ubicacion in answers.get(self.pase_entrada_fields['ubicaciones'], []) or []:
+            if not isinstance(ubicacion, dict):
+                continue
+            nombre = ubicacion.get(self.pase_entrada_fields['ubicacion_cat'], {}).get(self.mf['ubicacion'], '')
+            if nombre and nombre not in ubicaciones:
+                ubicaciones.append(nombre)
+        if not ubicaciones:
+            ubicacion_cat = answers.get(self.UBICACIONES_CAT_OBJ_ID, {})
+            if isinstance(ubicacion_cat, dict):
+                nombre = ubicacion_cat.get(self.mf['ubicacion'], '')
+                if nombre:
+                    ubicaciones.append(nombre)
+        return ubicaciones
+
+    def get_docs_pase_link(self, requerimientos=[], docs_front=[]):
+        """
+        Arma el valor del parametro docs del link para completar el pase.
+        Se suman los requerimientos de todas las ubicaciones del pase (el pase
+        debe cumplir con el minimo de cada una) mas lo que mande el front.
+
+        args:
+            requerimientos (list): Datos requeridos (fotografia, identificacion)
+            docs_front (list): Docs que manda el front (agregarFoto, agregarIdentificacion)
+
+        return:
+            docs (str): Ej. 'iden-foto'
+        """
+        docs_map = {
+            'identificacion': 'iden',
+            'agregaridentificacion': 'iden',
+            'fotografia': 'foto',
+            'agregarfoto': 'foto',
+        }
+        docs = []
+        for item in list(requerimientos or []) + list(docs_front or []):
+            if not isinstance(item, str):
+                continue
+            doc = docs_map.get(item.lower())
+            if doc and doc not in docs:
+                docs.append(doc)
+        return '-'.join(docs)
+
+    def get_requerimientos_ubicaciones(self, ubicaciones=[]):
+        """
+        Regresa los datos requeridos (fotografia, identificacion) que pide la
+        configuracion del modulo de seguridad para las ubicaciones dadas.
+        Si ninguna de las ubicaciones pide requerimientos regresa una lista vacia,
+        es decir el visitante no tiene nada que complementar.
+
+        args:
+            ubicaciones (str|list): Nombre(s) de la ubicacion
+
+        return:
+            requerimientos (list): Lista de datos requeridos
+        """
+        if isinstance(ubicaciones, str):
+            ubicaciones = [ubicaciones,]
+        ubicaciones = [
+            (u.get('name') or u.get('id')) if isinstance(u, dict) else u
+            for u in ubicaciones or []
+        ]
+        ubicaciones = [u for u in ubicaciones if u]
+        if not ubicaciones:
+            return []
+        requerimientos = set()
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.CONF_MODULO_SEGURIDAD,
+            }},
+            {'$sort': {'updated_at': -1}},
+            {'$limit': 1},
+            {'$project': {
+                "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
+            }},
+        ]
+        clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
+        for raw in self.format_cr(self.cr.aggregate(query)):
+            for grupo in raw.get('grupo_requisitos', []) or []:
+                #TODO Verficiar el cambio de key
+                ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
+                if ubicacion not in ubicaciones:
+                    continue
+                reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, []) or []
+                if isinstance(reqs, str):
+                    reqs = [reqs,]
+                requerimientos.update(reqs)
+        return list(requerimientos)
 
     def get_tipos_de_pase(self, ubicaciones=[]):
         query = [
@@ -8797,14 +8921,13 @@ class Accesos(OcrMixin, AccesosModel):
             elif key == 'link':
                 link_info=access_pass.get('link', '')
                 if link_info:
-                    docs=""
-                    for index, d in enumerate(link_info["docs"]):
-                        if(d == "agregarIdentificacion"):
-                            docs+="iden"
-                        elif(d == "agregarFoto"):
-                            docs+="foto"
-                        if index==0 :
-                            docs+="-"
+                    #---Se suman los requerimientos de todas las ubicaciones del pase
+                    try:
+                        requerimientos = self.get_requerimientos_ubicaciones(access_pass.get('ubicacion', []))
+                    except Exception as e:
+                        print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
+                        requerimientos = []
+                    docs = self.get_docs_pase_link(requerimientos, link_info.get('docs', []))
                     link_pass= f"{link_info['link']}?id={link_info['qr_code']}&user={self.user.get('parent_id')}&docs={docs}"
                     answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
             elif key == 'ubicacion':
