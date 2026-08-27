@@ -2676,6 +2676,7 @@ class Accesos(OcrMixin, AccesosModel):
 
     # feature: pases
     def create_access_pass(self, access_pass):
+        # prueba del hook pre-push: este comentario deberia disparar el test de pases
         """
         Crea pase de acceso
 
