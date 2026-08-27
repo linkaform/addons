@@ -85,9 +85,11 @@ if [ "$RUN_PASES" != "true" ] && [ "$RUN_UPDATE_PASES" != "true" ]; then
   exit 0
 fi
 
-ORIGINAL_ENV_CONTENT="$(cat "$ENV_FILE")"
+ENV_BACKUP="$(mktemp)"
+cp "$ENV_FILE" "$ENV_BACKUP"
 restore_env() {
-  printf '%s' "$ORIGINAL_ENV_CONTENT" > "$ENV_FILE"
+  cp "$ENV_BACKUP" "$ENV_FILE"
+  rm -f "$ENV_BACKUP"
 }
 trap restore_env EXIT
 
