@@ -7,7 +7,7 @@
             <config>True</config>
             <inc_by>1</inc_by>
             <manual>False</manual>
-            <next>897</next>
+            <next>907</next>
             <padding_zeros>5</padding_zeros>
             <prefix />
             <required>False</required>
@@ -21,7 +21,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <created_at>1722301145.0</created_at>
-    <description>version: 1787777164</description>
+    <description>version: 1787872649</description>
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
@@ -3742,7 +3742,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -7454,7 +7454,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -7534,7 +7534,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -7796,7 +7796,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -8465,7 +8465,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -8545,7 +8545,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -8650,6 +8650,16 @@
             <script>{}</script>
         </item>
         <item>
+            <_type>multiple-records</_type>
+            <description>Template para Seguridad sobre múltiples registros de gafetes de pase de entrada</description>
+            <id>647</id>
+            <name>Seguridad - Pases grupales</name>
+            <owner>/api/infosync/user/10/</owner>
+            <paginate>True</paginate>
+            <properties>{}</properties>
+            <resource_uri>/api/infosync/templates/647/</resource_uri>
+        </item>
+        <item>
             <_type>single_record</_type>
             <description>Template para Seguridad gafete de pase de entrada</description>
             <id>646</id>
@@ -8670,5 +8680,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1787777083.0</updated_at>
+    <updated_at>1787848583.0</updated_at>
 </lkf>
