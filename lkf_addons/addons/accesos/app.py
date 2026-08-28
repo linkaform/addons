@@ -527,7 +527,6 @@ class Accesos(OcrMixin, AccesosModel):
         requerimientos = [r.lower() for r in (requerimientos or []) if isinstance(r, str)]
         foto_requerida = 'fotografia' in requerimientos
         identificacion_requerida = 'identificacion' in requerimientos
-
         #---Si la ubicacion no pide el dato, el visitante no tiene nada que complementar
         foto_ok = not foto_requerida
         id_vista = not identificacion_requerida
@@ -2725,6 +2724,7 @@ class Accesos(OcrMixin, AccesosModel):
         except Exception as e:
             print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
             requerimientos = ['fotografia',]
+        requerimientos = self.apply_habilitar_overrides(access_pass, requerimientos)
 
         link_info = access_pass.get('link', "")
 
@@ -2791,8 +2791,12 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',now_datetime)
         answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',now_datetime_out)
         answers[self.pase_entrada_fields['habilitar_vehiculo']]= access_pass.get('habilitar_vehiculo', 'no')
-        answers[self.pase_entrada_fields['habilitar_fotografia']]= access_pass.get('habilitar_fotografia', 'no')
-        answers[self.pase_entrada_fields['habilitar_identificacion']]= access_pass.get('habilitar_identificacion', 'no')
+        #---Sin default: si el pase no dice nada, que decida la config de la ubicacion
+        #   (ver apply_habilitar_overrides), no forzar 'no' que la exentaria siempre.
+        if access_pass.get('habilitar_fotografia') is not None:
+            answers[self.pase_entrada_fields['habilitar_fotografia']] = access_pass.get('habilitar_fotografia')
+        if access_pass.get('habilitar_identificacion') is not None:
+            answers[self.pase_entrada_fields['habilitar_identificacion']] = access_pass.get('habilitar_identificacion')
         answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase','fecha_fija')
         # answers[self.pase_entrada_fields['fecha_fija']] = access_pass.get('fechaFija',now_datetime)
         answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
@@ -2937,7 +2941,15 @@ class Accesos(OcrMixin, AccesosModel):
         #   web/app siempre arrancan en proceso, para compartir el link y que el
         #   visitante agregue su foto/identificacion; update_pass vuelve a
         #   evaluar access_pass_set_status cuando el visitante completa esos datos.
-        if created_from in ('nueva_visita', 'auto_registro'):
+        #   Excepcion: si el admin manda habilitar_fotografia/habilitar_identificacion
+        #   explicito desde el front, se evalua normal para permitir que el pase
+        #   quede activo directo cuando ya no haya requerimientos pendientes.
+        admin_override_habilitar = (
+            access_pass.get('habilitar_fotografia') is not None or
+            access_pass.get('habilitar_identificacion') is not None
+        )
+        if created_from in ('nueva_visita', 'auto_registro') or (
+                created_from in ('pase_de_entrada_app', 'pase_de_entrada_web') and admin_override_habilitar):
             answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
                 answers, requerimientos=requerimientos)
         else:
@@ -3377,7 +3389,6 @@ class Accesos(OcrMixin, AccesosModel):
         form_id = self.PASE_ENTRADA
         res_list = []
         response = {}
-
         if not isinstance(location_names, list):
             location_names = [location_names]
 
@@ -4444,22 +4455,62 @@ class Accesos(OcrMixin, AccesosModel):
                 grupos.append(grupo)
         return config, grupos
 
-    def get_requerimientos_pase(self, answers):
+    def get_requerimientos_pase(self, answers, access_pass=None):
         """
         Regresa los datos requeridos que aplican a un pase segun sus ubicaciones.
 
         args:
             answers (json): Objeto de answers del pase
+            access_pass (json): Payload crudo del pase (opcional). Si trae
+                explicitamente 'habilitar_fotografia'/'habilitar_identificacion'
+                (true/false), esos valores tienen primera prioridad sobre lo que
+                pida la configuracion del modulo de seguridad de la ubicacion.
 
         return:
             requerimientos (list): Lista de datos requeridos
         """
         try:
-            return self.get_requerimientos_ubicaciones(self.get_ubicaciones_from_answers(answers))
+            requerimientos = self.get_requerimientos_ubicaciones(self.get_ubicaciones_from_answers(answers))
         except Exception as e:
             print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
             #---Si no se pudo leer la configuracion se conserva el criterio previo
-            return ['fotografia',]
+            requerimientos = ['fotografia',]
+        if access_pass:
+            requerimientos = self.apply_habilitar_overrides(access_pass, requerimientos)
+            print("REQUERIMIENTOS", requerimientos)
+        return requerimientos
+
+    def apply_habilitar_overrides(self, access_pass, requerimientos):
+        """
+        Aplica sobre los requerimientos de la ubicacion lo que el pase pida
+        explicitamente con 'habilitar_fotografia'/'habilitar_identificacion'.
+        Estos campos son primera prioridad: si vienen en true/false en el pase,
+        ganan sobre la configuracion de la ubicacion. Si no vienen (el pase no
+        manda el campo), se respeta lo que pida la configuracion.
+
+        args:
+            access_pass (json): Payload crudo del pase
+            requerimientos (list): Requerimientos que pide la configuracion de la ubicacion
+
+        return:
+            requerimientos (list): Requerimientos ya con el override aplicado
+        """
+        requerimientos = set(requerimientos or [])
+        overrides = {'fotografia': 'habilitar_fotografia', 'identificacion': 'habilitar_identificacion'}
+        for dato, campo in overrides.items():
+            valor = access_pass.get(campo)
+            print(f"DEBUG APPLY_HABILITAR_OVERRIDES campo={campo} valor={valor!r} tipo={type(valor)}")
+            if valor is None:
+                continue
+            if isinstance(valor, str):
+                habilitado = valor.strip().lower() in ('si', 'sí', 'true', '1')
+            else:
+                habilitado = bool(valor)
+            if habilitado:
+                requerimientos.add(dato)
+            else:
+                requerimientos.discard(dato)
+        return list(requerimientos)
 
     def get_requerimientos_ubicaciones(self, ubicaciones=[]):
         """
@@ -6186,12 +6237,18 @@ class Accesos(OcrMixin, AccesosModel):
         if not all_qr_codes:
             return
 
-        extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion', 'link']
+        extra_fields = [
+            'status_pase', 'walkin_fotografia', 'walkin_identificacion', 'link',
+            'walkin_nombre', 'walkin_email', 'walkin_telefono',
+        ]
         field_aliases = {
             'status_pase': 'estatus',
             'walkin_fotografia': 'foto',
             'walkin_identificacion': 'identificacion',
             'link': 'link',
+            'walkin_nombre': 'nombre_acompanante',
+            'walkin_email': 'email_acompanante',
+            'walkin_telefono': 'telefono_acompanante',
         }
         projection = {f"answers.{self.pase_entrada_fields[f]}": 1 for f in extra_fields}
         pases_info = {
@@ -8856,7 +8913,13 @@ class Accesos(OcrMixin, AccesosModel):
         if answers:
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
-            requerimientos = self.get_requerimientos_pase(new_answers)
+            #---habilitar_fotografia/identificacion pueden venir en este update o ya
+            #   estar guardados de antes; si nunca se decidieron (None) gana la config.
+            habilitar_context = {
+                'habilitar_fotografia': new_answers.get(self.pase_entrada_fields['habilitar_fotografia']),
+                'habilitar_identificacion': new_answers.get(self.pase_entrada_fields['habilitar_identificacion']),
+            }
+            requerimientos = self.get_requerimientos_pase(new_answers, access_pass=habilitar_context)
             # Si viene con estatus cancelado se salta la funcion de asignar estatus
             status_field = self.pase_entrada_fields['status_pase']
             if answers.get(status_field) == 'cancelado':
@@ -9038,6 +9101,15 @@ class Accesos(OcrMixin, AccesosModel):
                     except Exception as e:
                         print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
                         requerimientos = []
+                    #---Igual que el status: gana lo que venga en este update, si no
+                    #   lo que ya estaba guardado, si no la config de la ubicacion.
+                    habilitar_context_link = {
+                        'habilitar_fotografia': access_pass.get('habilitar_fotografia',
+                            pass_selected['answers'].get(self.pase_entrada_fields['habilitar_fotografia'])),
+                        'habilitar_identificacion': access_pass.get('habilitar_identificacion',
+                            pass_selected['answers'].get(self.pase_entrada_fields['habilitar_identificacion'])),
+                    }
+                    requerimientos = self.apply_habilitar_overrides(habilitar_context_link, requerimientos)
                     docs = self.get_docs_pase_link(requerimientos, link_info.get('docs', []))
                     link_pass= f"{link_info['link']}?id={link_info['qr_code']}&user={self.user.get('parent_id')}&docs={docs}"
                     answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
