@@ -6237,12 +6237,18 @@ class Accesos(OcrMixin, AccesosModel):
         if not all_qr_codes:
             return
 
-        extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion', 'link']
+        extra_fields = [
+            'status_pase', 'walkin_fotografia', 'walkin_identificacion', 'link',
+            'walkin_nombre', 'walkin_email', 'walkin_telefono',
+        ]
         field_aliases = {
             'status_pase': 'estatus',
             'walkin_fotografia': 'foto',
             'walkin_identificacion': 'identificacion',
             'link': 'link',
+            'walkin_nombre': 'nombre_acompanante',
+            'walkin_email': 'email_acompanante',
+            'walkin_telefono': 'telefono_acompanante',
         }
         projection = {f"answers.{self.pase_entrada_fields[f]}": 1 for f in extra_fields}
         pases_info = {
