@@ -8917,9 +8917,17 @@ class Accesos(OcrMixin, AccesosModel):
     def update_pass_img(self, qr_code=None):
         self.pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
         pdf_url = self.pdf.get('json', {}).get('download_url')
+        if not pdf_url:
+            print('No se pudo obtener el download_url del PDF:', self.pdf)
+            if self.pdf.get('status_code') == 404:
+                self.LKFException({'title': 'Error', 'msg': 'El pase ya no existe o fue eliminado.'})
+            return False
         id_forma = self.PASE_ENTRADA
         id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
         pass_img_url = self.upload_pdf_as_image(id_forma, id_campo_pdf_to_img, pdf_url)
+        if pass_img_url.get('error'):
+            print('No se pudo convertir el PDF a imagen:', pass_img_url)
+            return False
         pass_img_file_name = pass_img_url.get('file_name')
         pass_img_file_url = pass_img_url.get('file_url')
         return [{'file_name': pass_img_file_name, 'file_url': pass_img_file_url}]
