@@ -6538,7 +6538,10 @@ class Accesos(OcrMixin, AccesosModel):
         templates = self.lkf_api.get_pdf_templates(self.PASE_ENTRADA) or []
         template_id = next((t.get('id') for t in templates if t.get('_type') == 'multiple-records'), None)
         records_uri = ['/api/infosync/form_answer/{}/'.format(rid) for rid in record_ids]
-        return self.lkf_api.get_pdf_record(records_uri, template_id=template_id, name_pdf=name_pdf)
+        res = self.lkf_api.get_pdf_record(records_uri, template_id=template_id, name_pdf=name_pdf)
+        if res:
+            res['_id'] = str(res.get('_id', ''))
+        return res
 
     def get_paquetes(self, location= "", area="", status="", dateFrom="", dateTo="", filterDate=""):
         match_query = {
