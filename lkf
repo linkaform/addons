@@ -35,6 +35,8 @@ _usage(){
       echo "      $APP restart <preprod|prod> <account_id>  [depricated] use update"
       echo "      $APP update <preprod|prod> <account_id>  Update a given account addons containers image on given environment"
       echo "      $APP test                    Runs all tests"
+      echo "      $APP workwith <domain_name>  Elige la cuenta activa y deja modules/ en su rama"
+      echo "      $APP workwith                Muestra la cuenta actual y los dominios disponibles"
       echo
       echo
       exit 1
@@ -344,6 +346,17 @@ fi
 echo "Action", $Acction
 
 case "$Acction" in
+
+  workwith)
+    # Corre en el HOST a proposito: modules/ es un submodulo cuyo .git real no
+    # esta montado en el contenedor, asi que git no funciona ahi adentro.
+    if [[ "$Service" == "0" ]]; then
+      python3 "$(dirname "$(readlink -f "$0")")/bin/workwith.py"
+    else
+      python3 "$(dirname "$(readlink -f "$0")")/bin/workwith.py" "$Service"
+    fi
+    exit $?
+  ;;
 
 
   addons)
