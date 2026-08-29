@@ -73,7 +73,7 @@ class FormResource(items.Items):
             if kwargs.get('item_ids'):
                 if item and item['item_id'] not in [int(x) for x in kwargs.get('item_ids',[])]:
                     continue    
-            res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'))
+            res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'), **kwargs)
             if res.get('status') in ('update','create'):
                 print('Installing Form: ' ,form_name)
             response.append(

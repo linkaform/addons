@@ -58,7 +58,10 @@ class ScriptResource(items.Items):
                         local_path=detail.get('path'), 
                         **kwargs
                     )
-                except:
+                except Exception as e:
+                    # Antes era un `except: continue` mudo: cualquier fallo (subida, creacion
+                    # de carpeta, move) se perdia y la instalacion parecia exitosa.
+                    print(f'Error instalando el script {script_name}: {e}')
                     continue
     def get_script_modules(self, all_items: list, parent_path: str = None) -> dict:
         """
