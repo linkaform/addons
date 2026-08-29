@@ -8754,6 +8754,11 @@ class Accesos(OcrMixin, AccesosModel):
 
         answers={}
         acompanantes_a_actualizar = []
+        #---grupo_vehiculos/grupo_equipos se reemplazan completos via $set directo a
+        #   Mongo (no via patch_multi_record, que solo permite agregar/editar por
+        #   posicion): lo que mande el front sustituye el grupo repetitivo entero,
+        #   incluyendo vaciarlo si mandan una lista vacia.
+        replace_groups = {}
         for key, value in access_pass.items():
             if not self.pase_entrada_fields.get(key):
                 continue
@@ -8804,8 +8809,8 @@ class Accesos(OcrMixin, AccesosModel):
                     answers[self.pase_entrada_fields['acompanantes_grupo']] = grupo_answers
                 continue
             if key == 'grupo_vehiculos':
-                grupo_vehiculos_answers = {}
-                for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
+                nuevo_grupo_vehiculos = []
+                for item in access_pass.get('grupo_vehiculos',[]):
                     tipo = item.get('tipo',item.get('tipo_vehiculo',''))
                     marca = item.get('marca',item.get('marca_vehiculo',''))
                     modelo = item.get('modelo',item.get('modelo_vehiculo',''))
@@ -8826,14 +8831,11 @@ class Accesos(OcrMixin, AccesosModel):
                         self.mf['color_vehiculo']:color,
                         self.f['foto_vehiculo']:foto_vehiculo,
                     }
-                    grupo_vehiculos_answers[(index+1)*-1]=obj
-                #---Si no vienen vehiculos no se manda la key, para no mandar un grupo
-                #   vacio a la plataforma (regresaba un error generico).
-                if grupo_vehiculos_answers:
-                    answers[self.mf['grupo_vehiculos']] = grupo_vehiculos_answers
+                    nuevo_grupo_vehiculos.append(obj)
+                replace_groups[self.mf['grupo_vehiculos']] = nuevo_grupo_vehiculos
             elif key == 'grupo_equipos':
-                grupo_equipos_answers = {}
-                for index, item in enumerate(value):
+                nuevo_grupo_equipos = []
+                for item in value:
                     nombre = item.get('nombre',item.get('nombre_articulo',''))
                     marca = item.get('marca',item.get('marca_articulo',''))
                     color = item.get('color',item.get('color_articulo',''))
@@ -8850,11 +8852,8 @@ class Accesos(OcrMixin, AccesosModel):
                         self.mf['modelo_articulo']:modelo,
                         self.f['foto_equipo']:foto_equipo,
                     }
-                    grupo_equipos_answers[(index+1)*-1]=obj
-                #---Si no vienen equipos no se manda la key, para no mandar un grupo
-                #   vacio a la plataforma (regresaba un error generico).
-                if grupo_equipos_answers:
-                    answers[self.mf['grupo_equipos']] = grupo_equipos_answers
+                    nuevo_grupo_equipos.append(obj)
+                replace_groups[self.mf['grupo_equipos']] = nuevo_grupo_equipos
             elif key == 'visita_a':
                 for index, item in enumerate(access_pass.get('visita_a',[])):
                     answers[self.mf['grupo_visitados']] = answers.get(self.mf['grupo_visitados'],{})
@@ -8910,9 +8909,10 @@ class Accesos(OcrMixin, AccesosModel):
             employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
         if not employee:
             employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
-        if answers:
+        if answers or replace_groups:
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
+            new_answers.update(replace_groups)
             #---habilitar_fotografia/identificacion pueden venir en este update o ya
             #   estar guardados de antes; si nunca se decidieron (None) gana la config.
             habilitar_context = {
@@ -8932,6 +8932,11 @@ class Accesos(OcrMixin, AccesosModel):
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
             print("DEBUG UPDATE_PASS respuesta patch_multi_record:", res)
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
+                if replace_groups:
+                    self.cr.update_one(
+                        {'_id': ObjectId(qr_code), 'form_id': self.PASE_ENTRADA, 'deleted_at': {'$exists': False}},
+                        {'$set': {f'answers.{field_id}': grupo for field_id, grupo in replace_groups.items()}}
+                    )
                 if acompanantes_a_actualizar:
                     self._patch_acompanantes_pases(acompanantes_a_actualizar,
                         requerimientos=requerimientos)
