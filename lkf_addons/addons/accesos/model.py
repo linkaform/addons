@@ -397,6 +397,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'comentario':"66ba83cc079d8a54634711c1",
             'documento':f"{self.mf['documento']}",
             'email_empleado': f"{self.mf['email_empleado']}",
+            'equipo_vehiculo_confirmado': 'e1d51c08409deb7974943188',
             'fecha_entrada':f"{self.mf['fecha_entrada']}",
             'fecha_salida':f"{self.mf['fecha_salida']}",
             "gafete_catalog": "66a83ace56d1e741159ce114",
@@ -810,7 +811,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'telefono_acompanante':'6a23408693202c1f1c149694',
             'foto_acompanante':'6a23408693202c1f1c149695',
             'habilitar_fotografia':'6a8f4aa6559440e39d89a1d8',
-            'habilitar_identificacion':'6a8f4aa6559440e39d89a1d9'
+            'habilitar_identificacion':'6a8f4aa6559440e39d89a1d9',
+            'equipo_vehiculo_acompanante':'4ce480e50aa1dc9db2d3beed',
         })
 
         self.conf_accesos_fields = {

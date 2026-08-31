@@ -98,7 +98,7 @@ class Accesos(OcrMixin, AccesosModel):
             return format_data
         return wrapper
 
-    def _do_access(self, access_pass, location, area, data):
+    def _do_access(self, access_pass, location, area, data, equipo_vehiculo_confirmado=None):
         '''
         Registra el acceso del pase de entrada a ubicación.
         solo puede ser ejecutado después de revisar los accesos
@@ -144,6 +144,9 @@ class Accesos(OcrMixin, AccesosModel):
             f"{self.mf['codigo_qr']}": str(access_pass['_id']),
             f"{self.mf['fecha_entrada']}":self.today_str(employee.get('timezone', 'America/Monterrey'), date_format='datetime'),
         }
+        if equipo_vehiculo_confirmado:
+            answers[self.bitacora_fields['equipo_vehiculo_confirmado']] = equipo_vehiculo_confirmado
+
         vehiculos = data.get('vehiculo',[])
         if vehiculos:
             list_vehiculos = []
@@ -969,13 +972,21 @@ class Accesos(OcrMixin, AccesosModel):
         propio de cada qr_code. Un acompañante que no pase esa validación se omite
         y se reporta como error, sin afectar al resto del grupo.
         '''
-        pases_a_procesar = [(str(qr_code), access_pass)]
+        pases_a_procesar = [(str(qr_code), access_pass, None)]
         resultados = []
         qr_codes_vistos = {str(qr_code)}
 
-        for companion_qr in selected_passes:
-            companion_qr = str(companion_qr)
-            if companion_qr in qr_codes_vistos:
+        for item in selected_passes:
+            # selected_passes puede traer ids planos (compatibilidad) o
+            # objetos {id, equipo_vehiculo} con lo que el guardia confirmó
+            # que el acompañante sí trajo consigo al momento de entrar.
+            if isinstance(item, dict):
+                companion_qr = str(item.get('id', ''))
+                equipo_vehiculo_confirmado = item.get('equipo_vehiculo') or []
+            else:
+                companion_qr = str(item)
+                equipo_vehiculo_confirmado = []
+            if not companion_qr or companion_qr in qr_codes_vistos:
                 continue
             qr_codes_vistos.add(companion_qr)
             try:
@@ -987,12 +998,12 @@ class Accesos(OcrMixin, AccesosModel):
             if self._pase_alcanzo_limite_entradas(total_entradas_companion, companion_pass.get('limite_de_acceso')):
                 resultados.append({'qr_code': companion_qr, 'status': 'error', 'msg': 'Se ha completado el limite de entradas disponibles para este pase.'})
                 continue
-            pases_a_procesar.append((companion_qr, companion_pass))
+            pases_a_procesar.append((companion_qr, companion_pass, equipo_vehiculo_confirmado))
 
         with ThreadPoolExecutor(max_workers=10) as executor:
             futures = {
-                executor.submit(self._do_access, pase, location, area, data): qr
-                for qr, pase in pases_a_procesar
+                executor.submit(self._do_access, pase, location, area, data, equipo_vehiculo_confirmado): qr
+                for qr, pase, equipo_vehiculo_confirmado in pases_a_procesar
             }
             for future in as_completed(futures):
                 qr = futures[future]
@@ -4894,9 +4905,10 @@ class Accesos(OcrMixin, AccesosModel):
                 'habilitar_fotografia': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_fotografia']}", True]},
                 'habilitar_identificacion': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_identificacion']}", True]},
                 'tipo_visita_pase': f"$answers.{self.mf['tipo_visita_pase']}",     
-                'acompanantes': f"$answers.{self.pase_entrada_fields['acompanantes']}",       
-                'acompanantes_grupo': f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",       
-                'url_padre': f"$answers.{self.pase_entrada_fields['url_padre']}",       
+                'acompanantes': f"$answers.{self.pase_entrada_fields['acompanantes']}",
+                'acompanantes_grupo': f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",
+                'url_padre': f"$answers.{self.pase_entrada_fields['url_padre']}",
+                'equipo_vehiculo_acompanante': f"$answers.{self.pase_entrada_fields['equipo_vehiculo_acompanante']}",
                 },
             },
             {'$sort':{'created_at':-1}},
@@ -6237,18 +6249,26 @@ class Accesos(OcrMixin, AccesosModel):
         if not all_qr_codes:
             return
 
+<<<<<<< Updated upstream
         extra_fields = [
             'status_pase', 'walkin_fotografia', 'walkin_identificacion', 'link',
             'walkin_nombre', 'walkin_email', 'walkin_telefono',
         ]
+=======
+        extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion', 'link', 'equipo_vehiculo_acompanante']
+>>>>>>> Stashed changes
         field_aliases = {
             'status_pase': 'estatus',
             'walkin_fotografia': 'foto',
             'walkin_identificacion': 'identificacion',
             'link': 'link',
+<<<<<<< Updated upstream
             'walkin_nombre': 'nombre_acompanante',
             'walkin_email': 'email_acompanante',
             'walkin_telefono': 'telefono_acompanante',
+=======
+            'equipo_vehiculo_acompanante': 'equipo_vehiculo',
+>>>>>>> Stashed changes
         }
         projection = {f"answers.{self.pase_entrada_fields[f]}": 1 for f in extra_fields}
         pases_info = {
@@ -6699,6 +6719,7 @@ class Accesos(OcrMixin, AccesosModel):
                key == "link_padre" or \
                key == "tipo_de_pase" or \
                key == "walkin" or \
+               key == "equipo_vehiculo_acompanante" or \
                key == "google_wallet_pass_url":
                 answers[key] = value
         answers['folio']= pass_selected.get("folio")
