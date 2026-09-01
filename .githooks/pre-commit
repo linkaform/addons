@@ -4,7 +4,7 @@
 # secrets/ se ignora por lista blanca en .gitignore, pero un `git add -f` la saltaria.
 # Este hook es la segunda red: revisa lo que de verdad va a quedar en el commit.
 #
-# Se instala con:  git config core.hooksPath githooks
+# Se instala con:  git config core.hooksPath .githooks
 
 set -u
 
