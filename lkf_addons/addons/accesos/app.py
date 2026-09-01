@@ -1526,31 +1526,23 @@ class Accesos(OcrMixin, AccesosModel):
         }
         return res
 
-    def catalogo_tipo_concesion(self,location="", tipo=""):
+    def catalogo_tipo_concesion(self, tipo=""):
         catalog_id = self.ACTIVOS_FIJOS_CAT_ID
         form_id= self.CONCESSIONED_ARTICULOS
-        options={}
         response=[]
-        if location and not tipo:
-            response= self.catalogo_view(catalog_id, form_id)
+        if tipo:
+            options = {
+                "group_level": 2,
+                "startkey": [tipo],
+                "endkey": [f"{tipo}\n"]
+            }
+            res= self.catalogo_view(catalog_id, form_id, options)
+            if res:
+                # Se obtienen datos extras de los articulos
+                # Nombre, imagen y costo.
+                response = self.get_more_info_conscessioned_articles(res)
         else:
-
-            if location and tipo:
-                options = {
-                    "group_level": 2,
-                    "startkey": [tipo],
-                    "endkey": [f"{tipo}\n"]
-                }
-                res= self.catalogo_view(catalog_id, form_id, options)
-                format_data = []
-                if res:
-                    # Se obtienen datos extras de los articulos
-                    # Nombre, imagen y costo.
-                    format_data = self.get_more_info_conscessioned_articles(res)
-                    response=format_data
-
-            elif tipo and not location:
-                self.LKFException('Location es requerido')
+            response= self.catalogo_view(catalog_id, form_id)
         print(response)
         return response
 
