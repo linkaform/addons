@@ -3377,26 +3377,26 @@ class Accesos(OcrMixin, AccesosModel):
         return format_data
 
     def get_areas_by_locations(self, location_names):
-        catalog_id = self.AREAS_DE_LAS_UBICACIONES_CAT_ID
-        form_id = self.PASE_ENTRADA
-        res_list = []
         response = {}
         if not isinstance(location_names, list):
             location_names = [location_names]
 
         if location_names:
-            for l in location_names:
-                options = {
-                    'startkey': [l],
-                    'endkey': [f"{l}\n",{}],
-                    'group_level':2
-                }
-                res = self.catalogo_view(catalog_id, form_id, options)
-                if res and isinstance(res, list):
-                    res_list.extend(res)
+            query = [
+                {"$match": {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.AREAS_DE_LAS_UBICACIONES,
+                    f"answers.{self.Location.UBICACIONES_CAT_OBJ_ID}.{self.Location.f['location']}": {"$in": location_names}
+                }},
+                {"$group": {
+                    "_id": f"$answers.{self.Location.f['area']}"
+                }}
+            ]
+            res = self.cr.aggregate(query)
+            areas = [r['_id'] for r in res if r.get('_id')]
 
             response.update({
-                "areas_by_location": list(set(res_list))
+                "areas_by_location": areas
             })
 
         return response
