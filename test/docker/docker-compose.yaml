@@ -11,6 +11,7 @@ services:
       - ../../modules:/usr/local/lib/python3.10/site-packages/lkf_modules/
       - ../:/srv/lkf_test/
       - ../../config/:/srv/scripts/addons/config/
+      - ../../secrets:/srv/scripts/addons/secrets
     build:
      context: ./
      dockerfile: Dockerfile
@@ -32,6 +33,7 @@ services:
       - ../../lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons/
       - ../../modules:/usr/local/lib/python3.10/site-packages/lkf_modules/
       - ../../config:/srv/scripts/addons/config
+      - ../../secrets:/srv/scripts/addons/secrets
       #- ../:/srv/addons
     build:
      context: ./
