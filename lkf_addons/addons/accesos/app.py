@@ -5301,7 +5301,7 @@ class Accesos(OcrMixin, AccesosModel):
         pr= self.format_cr_result(self.cr.aggregate(query))
         return self.format_cr_result(self.cr.aggregate(query))
 
-    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", limit=25, skip=0, locations=[], search=""):
+    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", limit=25, skip=0, locations=[], search="", search_fields=[]):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
@@ -5316,15 +5316,21 @@ class Accesos(OcrMixin, AccesosModel):
              match_query[f"answers.{self.cons_f['status_concesion']}"] = status
         if search:
             pattern = re.escape(search.strip())
-            match_query["$or"] = [
-                {"folio": {"$regex": pattern, "$options": "i"}},
-                {"user_name": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['nombre_equipo']}": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['marca_equipo_concesion']}": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['persona_nombre_concesion']}": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['persona_nombre_otro']}": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['observacion_concesion']}": {"$regex": pattern, "$options": "i"}},
-            ]
+            searchable_fields = {
+                "folio": "folio",
+                "user_name": "user_name",
+                "nombre_equipo": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['nombre_equipo']}",
+                "marca_equipo_concesion": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['marca_equipo_concesion']}",
+                "categoria_equipo_concesion": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['categoria_equipo_concesion']}",
+                "persona_nombre_concesion": f"answers.{self.cons_f['persona_nombre_concesion']}",
+                "persona_nombre_otro": f"answers.{self.cons_f['persona_nombre_otro']}",
+                "observacion_concesion": f"answers.{self.cons_f['observacion_concesion']}",
+            }
+            if search_fields:
+                fields_to_search = [searchable_fields[f] for f in search_fields if f in searchable_fields]
+            else:
+                fields_to_search = list(searchable_fields.values())
+            match_query["$or"] = [{field: {"$regex": pattern, "$options": "i"}} for field in fields_to_search]
 
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         zona = user_data.get('timezone','America/Monterrey')
@@ -5381,6 +5387,7 @@ class Accesos(OcrMixin, AccesosModel):
                 item['firma']['file_url'] = item.pop('file_url')
             if item.get('file_name'):
                 item['firma']['file_name'] = item.pop('file_name')
+        print("QUE PASA",simplejson.dumps(result,indent=4))
         return {
             'records': result,
             'total_records': total_count,
