@@ -1,7 +1,9 @@
 # coding: utf-8
 import simplejson
+import time
 
 from linkaform_api import utils, lkf_models
+from linkaform_api.network import HTTP_TIMING
 
 from lkf_addons import items 
 
@@ -56,6 +58,7 @@ class FormResource(items.Items):
 
         # install_order = ['green_house_inventory_move']
         for form_name in install_order:
+            form_started_at = time.time() if HTTP_TIMING else None
             detail = instalable_forms[form_name]
             if detail.get('path'):
                 this_path = '{}/{}'.format(self.path, detail['path'])
@@ -73,7 +76,7 @@ class FormResource(items.Items):
             if kwargs.get('item_ids'):
                 if item and item['item_id'] not in [int(x) for x in kwargs.get('item_ids',[])]:
                     continue    
-            res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'))
+            res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'), **kwargs)
             if res.get('status') in ('update','create'):
                 print('Installing Form: ' ,form_name)
             response.append(
@@ -97,6 +100,11 @@ class FormResource(items.Items):
                 print('Status Code 400:', res)
                 error = res.get('json',{}).get('error','Please try again!!!')
                 raise self.LKFException(f'Error installing form: {form_name}. Error msg {error}')
+            if form_started_at is not None:
+                # Total por forma (plantilla + form + workflows + rules), para separar
+                # el tiempo del back del tiempo local de render/parseo del XML.
+                print('[form] {:>7.2f}s  {} ({})'.format(
+                    time.time() - form_started_at, form_name, res.get('status', 'sin cambios')))
         return response
  
     def get_form_modules(self, all_items, parent_path=None):
