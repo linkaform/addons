@@ -37,6 +37,8 @@ _usage(){
       echo "      $APP test                    Runs all tests"
       echo "      $APP workwith <domain_name>  Elige la cuenta activa y deja modules/ en su rama"
       echo "      $APP workwith                Muestra la cuenta actual y los dominios disponibles"
+      echo "      $APP workon <local|preprod|prod>  Elige el environment activo"
+      echo "      $APP workon                  Muestra el environment actual y los disponibles"
       echo
       echo
       exit 1
@@ -354,6 +356,17 @@ case "$Acction" in
       python3 "$(dirname "$(readlink -f "$0")")/bin/workwith.py"
     else
       python3 "$(dirname "$(readlink -f "$0")")/bin/workwith.py" "$Service"
+    fi
+    exit $?
+  ;;
+
+  workon)
+    # Solo escribe secrets/current_env; config/enviorment.py lo lee al arrancar, asi
+    # que no hace falta reiniciar el contenedor, solo relanzar el script.
+    if [[ "$Service" == "0" ]]; then
+      python3 "$(dirname "$(readlink -f "$0")")/bin/workon.py"
+    else
+      python3 "$(dirname "$(readlink -f "$0")")/bin/workon.py" "$Service"
     fi
     exit $?
   ;;
