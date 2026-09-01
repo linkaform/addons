@@ -2671,7 +2671,7 @@ class Accesos(OcrMixin, AccesosModel):
     # feature: pases
     def create_access_pass(self, access_pass):
         """
-        Crea pase de acceso
+        Crea pase de accesoo
 
         args:
         location (str): Ubicacion de donde se crea el paso
