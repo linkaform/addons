@@ -1565,9 +1565,9 @@ class Accesos(OcrMixin, AccesosModel):
             return []
         roles_raw = doc.get("answers", {}).get(self.Employee.f['roles_grupo'], []) or []
         return [
-            r.get(self.Employee.f['catalog_rol_empleado'], {}).get(self.f['rol'])
+            r.get(self.ROL_CATALOG_OBJ_ID, {}).get(self.f['rol'])
             for r in roles_raw
-            if r.get(self.Employee.f['catalog_rol_empleado'], {}).get(self.f['rol'])
+            if r.get(self.ROL_CATALOG_OBJ_ID, {}).get(self.f['rol'])
         ]
 
     def catalogos_pase_location(self):
