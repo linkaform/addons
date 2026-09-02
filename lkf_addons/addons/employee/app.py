@@ -247,6 +247,69 @@ class Employee(Base):
             self.LKFException(msg)
         return caseta, user_booths
 
+    def get_ubicaciones_permitidas(self, user_id=None, username=None):
+        """
+        Ubicaciones y areas asignadas al empleado en configuracion_areas_y_empleados.
+        Un item con ubicacion pero sin nombre de area significa acceso a TODAS
+        las areas de esa ubicacion (sin_limite=True), misma semantica que
+        get_user_booth.
+        El empleado se resuelve por el user_id del jwt y, como llave secundaria,
+        por username. El email no se usa: en el back no es unico.
+        Returns:
+        {ubicacion: {'areas': [...], 'areas_default': [...],
+                     'sin_limite': bool, 'es_default': bool}}
+        """
+        if user_id is None:
+            user_id = self.user.get('user_id')
+        if username is None:
+            username = self.user.get('username')
+
+        identidades = []
+        if user_id:
+            identidades.append(
+                {f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id})
+        if username:
+            identidades.append(
+                {f"answers.{self.EMPLOYEE_OBJ_ID}.{self.f['new_user_username']}": username})
+        if not identidades:
+            # sin identidad no se asume acceso a nada
+            return {}
+
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.CONF_AREA_EMPLEADOS,
+            "$or": identidades,
+            }
+        areas_path = self.f['areas_group']
+        cat_obj_id = self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID
+
+        permisos = {}
+        for doc in self.cr.find(match_query, {f"answers.{areas_path}": 1}):
+            for item in doc.get('answers', {}).get(areas_path, []) or []:
+                area_cat = item.get(cat_obj_id, {}) or {}
+                location = self.unlist(area_cat.get(self.f['location']))
+                if not location:
+                    continue
+                area = self.unlist(area_cat.get(self.f['area']))
+                es_default = item.get(self.f['area_default']) == 'default'
+                permiso = permisos.setdefault(location, {
+                    'areas': [],
+                    'areas_default': [],
+                    'sin_limite': False,
+                    'es_default': False,
+                    })
+                if es_default:
+                    permiso['es_default'] = True
+                if not area:
+                    # ubicacion sin area: acceso a todas las areas de la ubicacion
+                    permiso['sin_limite'] = True
+                    continue
+                if area not in permiso['areas']:
+                    permiso['areas'].append(area)
+                if es_default and area not in permiso['areas_default']:
+                    permiso['areas_default'].append(area)
+        return permisos
+
     def check_user_is_a_guard(self, user_id):
         query = [
             {"$match": {

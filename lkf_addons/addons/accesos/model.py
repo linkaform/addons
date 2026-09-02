@@ -94,9 +94,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CONFIG_PERFILES_ID = self.CONFIG_PERFILES.get('id')
         self.CONFIG_PERFILES_OBJ_ID = self.CONFIG_PERFILES.get('obj_id')
 
-        self.DEFINICION_PERMISOS = self.lkm.catalog_id('definicion_de_permisos')
-        self.DEFINICION_PERMISOS_ID = self.DEFINICION_PERMISOS.get('id')
-        self.DEFINICION_PERMISOS_OBJ_ID = self.DEFINICION_PERMISOS.get('obj_id')
+        self.DEFINICION_REQUERIMIENTOS = self.lkm.catalog_id('definicion_de_requerimientos')
+        self.DEFINICION_REQUERIMIENTOS_ID = self.DEFINICION_REQUERIMIENTOS.get('id')
+        self.DEFINICION_REQUERIMIENTOS_OBJ_ID = self.DEFINICION_REQUERIMIENTOS.get('obj_id')
 
         self.GAFETES_CAT = self.lkm.catalog_id('gafetes')
         self.GAFETES_CAT_ID = self.GAFETES_CAT.get('id')

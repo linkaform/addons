@@ -13,7 +13,7 @@ install_order = [
                     'lista_de_incidentes',
                     'lockers',
                     'definicion_de_examenes',
-                    'definicion_de_permisos',
+                    'definicion_de_requerimientos',
                     'configuracion_de_recorridos',
                     'configuracion_de_recorridos_areas_de_inspeccion',
                     'perfiles',

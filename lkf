@@ -39,6 +39,7 @@ _usage(){
       echo "      $APP workwith                Muestra la cuenta actual y los dominios disponibles"
       echo "      $APP workon <local|preprod|prod>  Elige el environment activo"
       echo "      $APP workon                  Muestra el environment actual y los disponibles"
+      echo "      $APP setup                   Instala los git hooks del repo (una vez por clon)"
       echo
       echo
       exit 1
@@ -369,6 +370,27 @@ case "$Acction" in
       python3 "$(dirname "$(readlink -f "$0")")/bin/workon.py" "$Service"
     fi
     exit $?
+  ;;
+
+  setup)
+    # Corre en el HOST: instala los hooks versionados en .githooks/. core.hooksPath
+    # vive en .git/config, o sea es local por clon y no se versiona -- por eso cada
+    # quien tiene que correr esto una vez despues de clonar, o los hooks no corren.
+    Repo_root="$(dirname "$(readlink -f "$0")")"
+    if [[ ! -d "$Repo_root/.githooks" ]]; then
+      echo "x No existe $Repo_root/.githooks, no hay hooks que instalar."
+      exit 1
+    fi
+    git -C "$Repo_root" config core.hooksPath .githooks
+    echo "OK: core.hooksPath -> .githooks"
+    for hook in "$Repo_root"/.githooks/*; do
+      [[ -f "$hook" ]] || continue
+      # Si el clon tiene core.filemode=false el bit ejecutable se pierde en el
+      # checkout, y git se salta el hook sin decir nada.
+      chmod +x "$hook"
+      echo "  - $(basename "$hook")"
+    done
+    exit 0
   ;;
 
 

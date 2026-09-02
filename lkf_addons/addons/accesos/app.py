@@ -1519,12 +1519,14 @@ class Accesos(OcrMixin, AccesosModel):
         depositos = self.answers.get(self.incidence_fields['datos_deposito_incidencia'],[])
         return sum([x[self.incidence_fields['cantidad']] for x in depositos])
 
-    def catalogos_pase_area(self, location_name):
-        user_id= self.user.get("user_id")
-        res={
-            "areas_by_location" : self.get_areas_by_location(location_name)
-        }
-        return res
+    def catalogos_pase_area(self, location_name, uso=None):
+        # sin `uso` no aplica marca ni permisos: mismo comportamiento de siempre.
+        # se conserva la llave de respuesta por compatibilidad con clave10 y soter
+        if uso == 'pases':
+            res = self.get_areas_pase(location_name)
+        else:
+            res = self.get_areas_modulo(location_name, uso=uso)
+        return {"areas_by_location": res.get('areas_by_location', [])}
 
     def catalogo_tipo_concesion(self, tipo=""):
         catalog_id = self.ACTIVOS_FIJOS_CAT_ID
@@ -1571,80 +1573,13 @@ class Accesos(OcrMixin, AccesosModel):
         ]
 
     def catalogos_pase_location(self):
-        user_id = self.user.get("user_id")
-        match_query = {
-            "deleted_at": {"$exists": False},
-            "form_id": self.CONF_AREA_EMPLEADOS,
-        }
-        if user_id:
-            match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}"] = user_id
-
-        query = [
-            {'$match': match_query},
-            {'$unwind': f"$answers.{self.mf['areas_grupo']}"},
-            {'$project': {
-                '_id': 0,
-                'area': f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
-                'nombre_area': f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
-                'set_as': f"$answers.{self.mf['areas_grupo']}.{self.Employee.f['area_default']}",
-            }},
-        ]
-
-        response = self.cr.aggregate(query)
-
-        res = {
-            'ubicaciones_user': [],
-            'ubicaciones_default': [],
-            'ubicaciones_detalle': [],
-            'roles_usuario': [],
-        }
-
-        detalle_por_ubicacion = {}
-
-        for x in response:
-            area = x.get('area')
-            set_as = x.get('set_as')
-            nombre_area = x.get('nombre_area')
-            es_default_area = set_as == 'default'
-
-            # --- ubicaciones_user (sin duplicados) ---
-            if area not in res['ubicaciones_user']:
-                res['ubicaciones_user'].append(area)
-
-            # --- ubicaciones_default ---
-            if es_default_area and area not in res['ubicaciones_default']:
-                res['ubicaciones_default'].append(area)
-
-            # --- detalle por ubicación ---
-            if area not in detalle_por_ubicacion:
-                detalle_por_ubicacion[area] = {
-                    'ubicacion': area,
-                    'es_default': False,
-                    'areas': [],
-                }
-
-            ya_existe = any(
-                a['nombre_area'] == nombre_area and a['es_default'] == es_default_area
-                for a in detalle_por_ubicacion[area]['areas']
-            )
-            if not ya_existe:
-                detalle_por_ubicacion[area]['areas'].append({
-                    'nombre_area': nombre_area,
-                    'es_default': es_default_area,
-                })
-
-            if es_default_area:
-                detalle_por_ubicacion[area]['es_default'] = True
-
-        res['ubicaciones_detalle'] = list(detalle_por_ubicacion.values())
-        print(simplejson.dumps(res, indent=4))
-
-        doc = self.cr.find_one(match_query)
-        if doc:
-            print(json.dumps(doc["answers"][self.mf['areas_grupo']], indent=2, default=str))
-
-        res['roles_usuario'] = self.get_roles_usuario(user_id)
-
+        """
+        Ubicaciones, areas y roles del usuario para el pase de entrada.
+        Las areas ya vienen filtradas por permisos y por la marca de uso "pases".
+        """
+        res = self.get_areas_pase()
+        res.pop('areas_by_location', None)
+        res['roles_usuario'] = self.get_roles_usuario(self.user.get("user_id"))
         return res
 
     def catalagos_pase_no_jwt(self, qr_code, account_id=''):
@@ -3376,30 +3311,114 @@ class Accesos(OcrMixin, AccesosModel):
             format_data = self.unlist(data)
         return format_data
 
+    def es_rol_administrativo(self, user_id=None):
+        """
+        True si el usuario tiene algun rol administrativo configurado.
+        Mismo criterio que do_checkin: regex 'admin' sobre el nombre del rol.
+        """
+        if user_id is None:
+            user_id = self.user.get('user_id')
+        if not user_id:
+            return False
+        return any(
+            re.search('admin', rol, re.IGNORECASE)
+            for rol in self.get_roles_usuario(user_id) if rol
+            )
+
+    def _permiso_abierto(self):
+        # permiso sin restriccion de areas para una ubicacion
+        return {
+            'areas': [],
+            'areas_default': [],
+            'sin_limite': True,
+            'es_default': False,
+            }
+
+    def get_areas_modulo(self, locations=None, uso=None,
+                         con_permisos=False, user_id=None, username=None):
+        """
+        Areas de una o varias ubicaciones para un modulo.
+        `uso` aplica la marca "Utilizar Area en:" del campo utilizar_area_en:
+        si la ubicacion tiene alguna area marcada con ese uso, solo esas; si no
+        tiene ninguna, todas. uso=None no filtra por marca.
+        `con_permisos` limita a las areas asignadas al empleado en
+        configuracion_areas_y_empleados y, sin `locations`, usa las ubicaciones
+        del propio empleado; un rol administrativo se lo salta. Sin permisos
+        `locations` es obligatorio: no hay de donde inferirlas.
+        Returns:
+        {'ubicaciones_user': [...], 'ubicaciones_default': [...],
+         'ubicaciones_detalle': [{'ubicacion', 'es_default',
+                                  'areas': [{'nombre_area', 'es_default'}]}],
+         'areas_by_location': [nombre_area, ...]}
+        """
+        if locations and not isinstance(locations, list):
+            locations = [locations]
+        locations = [l for l in (locations or []) if l]
+
+        res = {
+            'ubicaciones_user': [],
+            'ubicaciones_default': [],
+            'ubicaciones_detalle': [],
+            'areas_by_location': [],
+            }
+
+        if con_permisos:
+            permisos = self.get_ubicaciones_permitidas(user_id=user_id, username=username)
+            if self.es_rol_administrativo(user_id):
+                # un rol administrativo no se limita a las areas de su configuracion
+                for location in locations:
+                    permisos.setdefault(location, self._permiso_abierto())
+                for permiso in permisos.values():
+                    permiso['sin_limite'] = True
+            ubicaciones = [l for l in permisos if not locations or l in locations]
+        else:
+            permisos = {location: self._permiso_abierto() for location in locations}
+            ubicaciones = list(locations)
+
+        if not ubicaciones:
+            return res
+
+        areas_por_ubicacion = self.get_areas_por_uso(ubicaciones, uso=uso)
+
+        areas_planas = set()
+        for location in sorted(ubicaciones):
+            permiso = permisos[location]
+            areas_uso = areas_por_ubicacion.get(location, [])
+            if permiso['sin_limite']:
+                areas = list(areas_uso)
+            else:
+                areas = [a for a in areas_uso if a in permiso['areas']]
+
+            res['ubicaciones_user'].append(location)
+            if permiso['es_default']:
+                res['ubicaciones_default'].append(location)
+            res['ubicaciones_detalle'].append({
+                'ubicacion': location,
+                'es_default': permiso['es_default'],
+                'areas': [
+                    {'nombre_area': area, 'es_default': area in permiso['areas_default']}
+                    for area in areas
+                    ],
+                })
+            areas_planas.update(areas)
+
+        res['areas_by_location'] = sorted(areas_planas)
+        return res
+
+    def get_areas_pase(self, locations=None, user_id=None, username=None):
+        """
+        Areas utilizables para pase de entrada: marca 'pases' + permisos del
+        empleado. Sin `locations` regresa todas las ubicaciones del empleado.
+        """
+        return self.get_areas_modulo(locations, uso='pases', con_permisos=True,
+                                     user_id=user_id, username=username)
+
     def get_areas_by_locations(self, location_names):
-        response = {}
-        if not isinstance(location_names, list):
-            location_names = [location_names]
-
-        if location_names:
-            query = [
-                {"$match": {
-                    "deleted_at": {"$exists": False},
-                    "form_id": self.AREAS_DE_LAS_UBICACIONES,
-                    f"answers.{self.Location.UBICACIONES_CAT_OBJ_ID}.{self.Location.f['location']}": {"$in": location_names}
-                }},
-                {"$group": {
-                    "_id": f"$answers.{self.Location.f['area']}"
-                }}
-            ]
-            res = self.cr.aggregate(query)
-            areas = [r['_id'] for r in res if r.get('_id')]
-
-            response.update({
-                "areas_by_location": areas
-            })
-
-        return response
+        # delega en get_areas_pase; se conserva la llave de respuesta por
+        # compatibilidad con clave10 y soter
+        return {
+            "areas_by_location": self.get_areas_pase(location_names).get('areas_by_location', [])
+        }
 
     def get_area_images(self, areas, location=None):
         if not location:
@@ -4253,7 +4272,7 @@ class Accesos(OcrMixin, AccesosModel):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CARGA_PERMISOS_VISITANTES,
-            f"answers.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['nombre_permiso']}":certificacion,
+            f"answers.{self.DEFINICION_REQUERIMIENTOS_OBJ_ID}.{self.mf['nombre_permiso']}":certificacion,
             f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['curp']}":id_user,
         }
         if empresa:
@@ -4690,10 +4709,10 @@ class Accesos(OcrMixin, AccesosModel):
             }},
             {'$project': {
                 "_id": 0,
-                "nombre_permiso": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['nombre_permiso']}",
-                "requerimientos_pase": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['requerimientos']}",
-                "vigencia_certificado": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['vigencia_certificado']}",
-                "vigencia_certificado_en": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['vigencia_certificado_en']}",
+                "nombre_permiso": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_REQUERIMIENTOS_OBJ_ID}.{self.mf['nombre_permiso']}",
+                "requerimientos_pase": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_REQUERIMIENTOS_OBJ_ID}.{self.mf['requerimientos']}",
+                "vigencia_certificado": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_REQUERIMIENTOS_OBJ_ID}.{self.mf['vigencia_certificado']}",
+                "vigencia_certificado_en": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_REQUERIMIENTOS_OBJ_ID}.{self.mf['vigencia_certificado_en']}",
             }}
         ]
 

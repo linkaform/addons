@@ -110,12 +110,17 @@ o `git stash` primero, para no arrastrar trabajo de una cuenta a la rama de otra
 
 #### Hooks
 
-Instala los hooks del repo una sola vez. El `pre-commit` evita que las credenciales lleguen
-a git aunque alguien haga `git add -f`:
+Instala los hooks del repo una sola vez por clon. El `pre-commit` evita que las credenciales
+lleguen a git aunque alguien haga `git add -f`; el `pre-push` corre el test de integracion de
+accesos afectado antes de dejar salir un push a master.
 
 ```bash
-git config core.hooksPath githooks
+./lkf setup
 ```
+
+Esto apunta `core.hooksPath` a `.githooks/` y marca los hooks como ejecutables. Hace falta
+correrlo a mano porque `core.hooksPath` vive en `.git/config`, que no se versiona: recien
+clonado, el repo no tiene ningun hook activo. Si los hooks dejan de correr, vuelve a correrlo.
 
 
 ### Enableing Bash History

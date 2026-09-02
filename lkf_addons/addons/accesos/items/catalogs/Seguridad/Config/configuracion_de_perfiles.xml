@@ -8,7 +8,7 @@
     </confirmation>
     <description />
     <_rev>22-47b6fec24ccc30c60e7a93650f2dd947</_rev>
-    <updated_at>2024-07-30T00:58:59.775561+00:00Z</updated_at>
+    <updated_at>2026-09-01T23:27:30.207920+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -136,18 +136,18 @@
                     </catalog_fields>
                     <fav>None</fav>
                     <required>False</required>
-                    <field_id>{{ catalog.definicion_de_permisos.obj_id }}</field_id>
+                    <field_id>{{ catalog.definicion_de_requerimientos.obj_id }}</field_id>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
                         <filters>None</filters>
                         <view_index>0</view_index>
-                        <couch_id>{{ catalog.definicion_de_permisos.obj_id }}</couch_id>
+                        <couch_id>{{ catalog.definicion_de_requerimientos.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <catalog_id>{{ catalog.definicion_de_requerimientos.id }}</catalog_id>
                         <view_fields>
                             <item>662962bb203407ab90c886e4</item>
                         </view_fields>
-                        <name>{{ catalog.definicion_de_permisos.name }}</name>
+                        <name>{{ catalog.definicion_de_requerimientos.name }}</name>
                     </catalog>
                     <relation_type>None</relation_type>
                     <label>Permisos/certificaciones</label>
@@ -171,8 +171,8 @@
                         <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.definicion_de_requerimientos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_requerimientos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <relation_type>None</relation_type>
@@ -197,8 +197,8 @@
                         <filters>None</filters>
                         <field_type>checkbox</field_type>
                         <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.definicion_de_requerimientos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_requerimientos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <relation_type>None</relation_type>
@@ -222,8 +222,8 @@
                         <filters>None</filters>
                         <field_type>integer</field_type>
                         <view_index>0</view_index>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.definicion_de_requerimientos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_requerimientos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <relation_type>None</relation_type>
@@ -247,8 +247,8 @@
                         <filters>None</filters>
                         <field_type>select</field_type>
                         <view_index>0</view_index>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.definicion_de_requerimientos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_requerimientos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <relation_type>None</relation_type>
@@ -272,8 +272,8 @@
                         <filters>None</filters>
                         <field_type>files</field_type>
                         <view_index>0</view_index>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.definicion_de_requerimientos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_requerimientos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <relation_type>None</relation_type>
@@ -297,8 +297,8 @@
                         <filters>None</filters>
                         <field_type>images</field_type>
                         <view_index>0</view_index>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.definicion_de_requerimientos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_requerimientos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <relation_type>None</relation_type>
@@ -321,8 +321,8 @@
                         <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.definicion_de_requerimientos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_requerimientos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <options>[]</options>
@@ -339,8 +339,8 @@
                         <filters>None</filters>
                         <field_type>decimal</field_type>
                         <view_index>2</view_index>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.definicion_de_requerimientos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_requerimientos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <options>[]</options>
@@ -358,8 +358,8 @@
                         <filters>None</filters>
                         <field_type>text</field_type>
                         <view_index>0</view_index>
-                        <catalog_field_id>{{ catalog.definicion_de_permisos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.definicion_de_permisos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.definicion_de_requerimientos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.definicion_de_requerimientos.id }}</catalog_id>
                         <view_fields>[]</view_fields>
                     </catalog>
                     <relation_type>None</relation_type>

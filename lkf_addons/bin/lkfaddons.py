@@ -10,6 +10,8 @@ from linkaform_api.lkf_object import LKFBase
 from download_module import download_modules
 from download_module import ADDONS_PATH, MODULES_PATH
 
+from lkf_addons.items.migration_resource import MigrationResource
+
 # sys.path.append(ADDONS_PATH)
 # sys.path.append('/srv/scripts/addons/config/')
 # sys.path.append('/srv/scripts/addons/modules')
@@ -101,6 +103,21 @@ def do_load_modules(load_modules, **kwargs):
         print('-'*35 + f' Loding Module: {module} ' + '-'*35)
         #TODO revisar porque no corren las reglas
         if install.get('all') or install.get(module):
+            ### Migraciones
+            # Van antes que todo: reapuntan los docs de LKFModules cuyo item_name o
+            # module cambio, para que los install_* de abajo encuentren el item que ya
+            # existe en vez de crear uno nuevo. Cada *Resource construye su propio
+            # LKFModules, que cachea module_data al instanciarse, asi que si esto
+            # corriera despues los resolvedores {{ catalog.X.id }} verian los nombres
+            # viejos.
+            migration_resource = MigrationResource(
+                path=ADDONS_PATH,
+                module=module,
+                settings=settings,
+                **kwargs
+                )
+            migration_resource.run_migrations()
+
             #####################################################################
             ### Scripts
             if load_script:
