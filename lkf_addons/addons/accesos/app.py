@@ -1554,23 +1554,30 @@ class Accesos(OcrMixin, AccesosModel):
         configuracion_areas_y_empleados (fuente de verdad para validar roles
         de turno; no confundir con self.f['grupo_roles'], que es el grupo de
         roles de registro_de_asistencia/configuracion_de_recorridos).
+
+        No se referencia el obj_id del catalogo embebido dentro de
+        roles_grupo: ese obj_id cambia entre cuentas (cada cuenta puede
+        tener embebido un catalogo distinto). Se proyecta el item completo
+        del grupo y se deja que format_cr/_labels lo aplane, quedandose
+        solo con el campo 'rol' (self.f['rol'], estable entre cuentas)
+        sin importar que catalogo lo envuelva.
         """
         if not user_id:
             return []
-        match_query = {
-            "deleted_at": {"$exists": False},
-            "form_id": self.CONF_AREA_EMPLEADOS,
-            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id,
-        }
-        doc = self.cr.find_one(match_query)
-        if not doc:
-            return []
-        roles_raw = doc.get("answers", {}).get(self.Employee.f['roles_grupo'], []) or []
-        return [
-            r.get(self.Employee.f['catalog_rol_empleado'], {}).get(self.f['rol'])
-            for r in roles_raw
-            if r.get(self.Employee.f['catalog_rol_empleado'], {}).get(self.f['rol'])
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.CONF_AREA_EMPLEADOS,
+                f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id,
+            }},
+            {'$unwind': f"$answers.{self.Employee.f['roles_grupo']}"},
+            {'$project': {
+                '_id': 0,
+                'roles': f"$answers.{self.Employee.f['roles_grupo']}",
+            }},
         ]
+        data = self.format_cr(self.cr.aggregate(query))
+        return [x['rol'] for x in data if x.get('rol')]
 
     def catalogos_pase_location(self):
         """
