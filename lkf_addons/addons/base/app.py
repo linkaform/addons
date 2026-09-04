@@ -315,6 +315,305 @@ class Base(BaseModel):
             update_file = {"error":"Fallo al subir el archivo"}
         return update_file
 
+    def format_menus(self, data):
+        """
+        Formatea los datos de los registros obtenidos en el catalogo de ELEMENTOS MENU
+        para obtener los menus.
+        """
+        if not data:
+            return []
+
+        f = self.menu_catalog_fields
+        format_data = []
+        for item in data:
+            format_data.append({
+                # Módulo
+                "menu_key":           item.get(f['catalog_menu_key']),
+                "menu":               item.get(f['catalog_menu']),
+                "menu_order":         item.get(f['catalog_menu_order']),
+                "menu_icon":          item.get(f['catalog_menu_icon']),
+                "menu_columns":       item.get(f['catalog_menu_columns']),
+                # Sección
+                "seccion_key":        item.get(f['catalog_seccion_key']),
+                "seccion":            item.get(f['catalog_seccion']),
+                "seccion_order":      item.get(f['catalog_seccion_order']),
+                "seccion_column":     item.get(f['catalog_seccion_column']),
+                "seccion_href":       item.get(f['catalog_seccion_href']),
+                "seccion_icon":       item.get(f['catalog_seccion_icon']),
+                "seccion_icon_color": item.get(f['catalog_seccion_icon_color']),
+                # Item
+                "elemento":           item.get(f['catalog_elemento']),
+                "key":                item.get(f['catalog_key']),
+                "type":               item.get(f['catalog_type']),
+                "item_order":         item.get(f['catalog_item_order']),
+                "href_web":           item.get(f['catalog_href_web']),
+                "route_mobile":       item.get(f['catalog_route_mobile']),
+                "plataforms":         item.get(f['catalog_plataforms']),
+                "item_icon":          item.get(f['catalog_item_icon']),
+                "seccion_description": item.get(f['catalog_seccion_description']),
+            })
+        return format_data
+
+    def get_format_user_menus(self, filter_keys=None):
+        """
+        Obtiene los menus por default del catalogo de ELEMENTOS MENU.
+        """
+        selector = {}
+        if filter_keys:
+            selector = {f"answers.{self.menu_catalog_fields['catalog_key']}": {"$in": filter_keys}}
+
+        mango_query = {
+            "selector": selector,
+            "limit": 10000,
+        }
+        data = self.format_menus(self.lkf_api.search_catalog( self.MENUS_CATALOG_ID, mango_query))
+        return data
+
+    def get_structured_mobile_menu(self, data):
+        """
+        Agrupa una lista plana de items de menú en la estructura
+        jerárquica para móvil: módulo > submodulos > items.
+        """
+        modules_dict = {}
+
+        for item in data:
+            if str(item.get('plataforms') or '').lower() != 'mobile':
+                continue
+
+            menu_key    = item.get('menu_key') or self.slugify(item.get('menu', ''), '_')
+            seccion_key = item.get('seccion_key') or self.slugify(item.get('seccion', ''), '_')
+
+            if menu_key not in modules_dict:
+                modules_dict[menu_key] = {
+                    'id':         menu_key.replace('_', '-'),
+                    'key':        menu_key,
+                    'label':      item.get('menu', ''),
+                    'icon':       item.get('menu_icon'),
+                    'order':      item.get('menu_order') or len(modules_dict) + 1,
+                    'submodules': {}
+                }
+
+            submodules = modules_dict[menu_key]['submodules']
+
+            if seccion_key not in submodules:
+                submodules[seccion_key] = {
+                    'id':         seccion_key.replace('_', '-'),
+                    'key':        seccion_key,
+                    'label':      item.get('seccion', ''),
+                    'description': item.get('seccion_description') or '',
+                    'order':      item.get('seccion_order') or len(submodules) + 1,
+                    'icon':       item.get('seccion_icon'),
+                    'iconBgColor': item.get('seccion_icon_color'),
+                    'items':      {}
+                }
+
+            item_key = item.get('key') or self.slugify(item.get('elemento', ''), '_')
+            if item_key not in submodules[seccion_key]['items']:
+                item_data = {
+                    'key':   item_key,
+                    'label': item.get('elemento', ''),
+                    'type':  item.get('type', 'link'),
+                    'order': item.get('item_order') or len(submodules[seccion_key]['items']) + 1,
+                    'icon':  item.get('item_icon') or '',
+                }
+                item_route = item.get('route_mobile')
+                if item_route:
+                    item_data['route'] = item_route
+                submodules[seccion_key]['items'][item_key] = item_data
+
+        modules = []
+        for module in modules_dict.values():
+            submodules = sorted(module['submodules'].values(), key=lambda s: s['order'])
+            for s in submodules:
+                s['items'] = sorted(s['items'].values(), key=lambda i: i['order'])
+            modules.append({**module, 'submodules': submodules})
+
+        return {'menu': sorted(modules, key=lambda m: m['order'])}
+
+    def get_structured_web_menu(self, data):
+        """
+        Agrupa una lista plana de items de menú en la estructura
+        jerárquica módulo > sección > items.
+        """
+        modules_dict = {}
+
+        for item in data:
+            if str(item.get('plataforms') or '').lower() != 'web':
+                continue
+
+            menu_key    = item.get('menu_key') or self.slugify(item.get('menu', ''), '_')
+            seccion_key = item.get('seccion_key') or self.slugify(item.get('seccion', ''), '_')
+
+            if menu_key not in modules_dict:
+                modules_dict[menu_key] = {
+                    'id':       menu_key.replace('_', '-'),
+                    'key':      menu_key,
+                    'label':    item.get('menu', ''),
+                    'icon':     item.get('menu_icon'),
+                    'order':    item.get('menu_order') or len(modules_dict) + 1,
+                    'columns':  item.get('menu_columns'),
+                    'sections': {}
+                }
+
+            sections = modules_dict[menu_key]['sections']
+
+            if seccion_key not in sections:
+                seccion_href = item.get('seccion_href')
+                seccion_data = {
+                    'id':     seccion_key.replace('_', '-'),
+                    'key':    seccion_key,
+                    'label':  item.get('seccion', ''),
+                    'order':  item.get('seccion_order') or len(sections) + 1,
+                    'column': item.get('seccion_column') or len(sections) + 1,
+                    'items':  {}
+                }
+                if seccion_href:
+                    seccion_data['href'] = seccion_href
+                sections[seccion_key] = seccion_data
+
+            item_href = item.get('href_web')
+            item_key = item.get('key') or self.slugify(item.get('elemento', ''), '_')
+            if item_key not in sections[seccion_key]['items']:
+                item_data = {
+                    'key':   item_key,
+                    'label': item.get('elemento', ''),
+                    'type':  item.get('type', 'link'),
+                    'order': item.get('item_order') or len(sections[seccion_key]['items']) + 1,
+                }
+                if item_href:
+                    item_data['href'] = item_href
+                sections[seccion_key]['items'][item_key] = item_data
+
+        modules = []
+        for module in modules_dict.values():
+            sections = sorted(module['sections'].values(), key=lambda s: s['order'])
+            for s in sections:
+                s['items'] = sorted(s['items'].values(), key=lambda i: i['order'])
+            modules.append({**module, 'sections': sections})
+
+        return {'modules': sorted(modules, key=lambda m: m['order'])}
+
+    def get_user_menus(self, platform=''):
+        print('esta entrando aqui...')
+        """
+        Obtiene los menus personalizados para el usuario
+        actual desde los registros de la forma de CONFIGURACION MENUS.
+        """
+        query = [
+            {"$match": {
+                "form_id": self.MENUS_FORM,
+                "deleted_at": {"$exists": False},
+                f"answers.{self.USUARIOS_OBJ_ID}.{self.menu_form_fields['usuario_id']}": self.user.get('user_id')
+            }},
+            {"$project": {
+                "_id": 0,
+                "elementos": f"$answers.{self.menu_form_fields['elementos']}"
+            }},
+            {"$unwind": "$elementos"},
+            {"$project": {
+                "menu_key": f"$elementos.{self.MENUS_CATALOG_OBJ_ID}.{self.menu_form_fields['key']}",
+            }}
+        ]
+        data = self.format_cr(self.cr.aggregate(query), ids_label_dct=self.menu_form_fields)
+        if data:
+            menu_keys = [self.unlist(item['menu_key']) for item in data if item.get('menu_key')]
+            data = self.get_format_user_menus(filter_keys=menu_keys)
+        else:
+            data = self.get_format_user_menus()
+
+        if platform == 'mobile':
+            return self.get_structured_mobile_menu(data)
+
+        modules = self.get_structured_web_menu(data)
+        return modules
+
+    def set_item_permits(self, user_id, item_needed, item_type):
+        """
+        Comparte los items necesarios para el usuario
+        """
+        permissions = 'can_read_item'
+        share_data = {
+            "owner": f"/api/infosync/user/{user_id}/",
+            "perm": permissions
+        }
+        if item_type == 'form':
+            user_item = self.lkf_api.get_user_forms(user_id)
+        elif item_type == 'catalog':
+            user_item = self.lkf_api.get_user_catalog(user_id)
+        elif item_type == 'script':
+            user_item = self.lkf_api.get_user_scripts(user_id)
+        else:
+            self.LKFException('Item type not found: ', item_type)
+        res = {}
+        user_item = user_item.get('data',[])
+        if isinstance(user_item, dict):
+            user_item = []
+        user_item = [item for item in user_item ]
+        unshare_items = []
+        for item in user_item:
+            if item['id'] not in item_needed:
+                unshare_items.append(item)
+
+        if unshare_items:
+            unshare_items_data = []
+            for item in unshare_items:
+                unshare_data = {'group_id':None, 'filter_name':None}
+                unshare_data['uri'] = f"/api/infosync/file_shared/{item['shared_id']}/"
+                unshare_data['item_id'] = item['id']
+                unshare_items_data.append(unshare_data)
+            if unshare_items_data:
+                res = self.lkf_api.share_form(unshare_items_data, unshare=True)
+
+        user_item_ids = {item['id'] for item in user_item}
+        items_to_share = item_needed - user_item_ids
+        for item_id in items_to_share:
+            share_data["file_shared"]=  f"/api/infosync/item/{item_id}/"
+            res = self.lkf_api.share_form(share_data)
+            if res['status_code'] != 201:
+                self.LKFException(f'Error al compartir scritp: {share_data}')
+        return res
+
+    def set_user_permissions(self):
+        """
+        Comparte las Formas, Catalogos y Scripts necesarios para el usuario tomando en cuenta
+        sus menus asignados.
+        """
+        data = self._labels(self.answers, ids_label_dct=self.menu_form_fields)
+        user_id = data.get('usuario_id')
+        if user_id and isinstance(user_id, list):
+            user_id = user_id[0]
+        permissions = 'can_read_item'
+        share_data = {
+            "owner": f"/api/infosync/user/{user_id}/",
+            "perm": permissions
+        }
+        forms_needed = set()
+        catalogs_needed = set()
+        scripts_needed = set()
+        menus = {i.get('menu', '').lower().replace(' ', '_') for i in data.get('elementos', [])}
+        menus = ['always'] + list(menus)
+        for menu in menus:
+            config = self.module_permits.get(menu, {})
+            if not config:
+                continue
+            forms_needed.update([x for x in config.get('forms',[]) if x])
+            catalogs_needed.update([x for x in config.get('catalogs') if x])
+            scripts_needed.update([x for x in config.get('scripts') if x])
+        response_forms = self.set_item_permits(user_id, forms_needed, item_type='form')
+        response_catalog = self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
+        response_scripts = self.set_item_permits(user_id, scripts_needed,  item_type='script')
+
+        return True
+
+    def slugify(self, text, sep='-'):
+        """
+        Convierte un texto en un slug,
+        reemplazando espacios y caracteres especiales.
+        """
+        text = unicodedata.normalize('NFKD', str(text)).encode('ascii', 'ignore').decode('ascii')
+        text = re.sub(r'[^\w\s-]', '', text.lower().strip())
+        return re.sub(r'[\s_-]+', sep, text)
+
 from linkaform_api import  upload_file
 
 #fields_no_update = ['post_status', 'next_cut_week', 'cut_week', 'cycle_group', 'ready_year_week']
@@ -1882,302 +2181,3 @@ class Schedule(Base):
                 all_users.append(x)
 
         return all_users
-
-    def format_menus(self, data):
-        """
-        Formatea los datos de los registros obtenidos en el catalogo de ELEMENTOS MENU
-        para obtener los menus.
-        """
-        if not data:
-            return []
-
-        f = self.menu_catalog_fields
-        format_data = []
-        for item in data:
-            format_data.append({
-                # Módulo
-                "menu_key":           item.get(f['catalog_menu_key']),
-                "menu":               item.get(f['catalog_menu']),
-                "menu_order":         item.get(f['catalog_menu_order']),
-                "menu_icon":          item.get(f['catalog_menu_icon']),
-                "menu_columns":       item.get(f['catalog_menu_columns']),
-                # Sección
-                "seccion_key":        item.get(f['catalog_seccion_key']),
-                "seccion":            item.get(f['catalog_seccion']),
-                "seccion_order":      item.get(f['catalog_seccion_order']),
-                "seccion_column":     item.get(f['catalog_seccion_column']),
-                "seccion_href":       item.get(f['catalog_seccion_href']),
-                "seccion_icon":       item.get(f['catalog_seccion_icon']),
-                "seccion_icon_color": item.get(f['catalog_seccion_icon_color']),
-                # Item
-                "elemento":           item.get(f['catalog_elemento']),
-                "key":                item.get(f['catalog_key']),
-                "type":               item.get(f['catalog_type']),
-                "item_order":         item.get(f['catalog_item_order']),
-                "href_web":           item.get(f['catalog_href_web']),
-                "route_mobile":       item.get(f['catalog_route_mobile']),
-                "plataforms":         item.get(f['catalog_plataforms']),
-                "item_icon":          item.get(f['catalog_item_icon']),
-                "seccion_description": item.get(f['catalog_seccion_description']),
-            })
-        return format_data
-
-    def get_format_user_menus(self, filter_keys=None):
-        """
-        Obtiene los menus por default del catalogo de ELEMENTOS MENU.
-        """
-        selector = {}
-        if filter_keys:
-            selector = {f"answers.{self.menu_catalog_fields['catalog_key']}": {"$in": filter_keys}}
-
-        mango_query = {
-            "selector": selector,
-            "limit": 10000,
-        }
-        data = self.format_menus(self.lkf_api.search_catalog( self.MENUS_CATALOG_ID, mango_query))
-        return data
-
-    def get_structured_mobile_menu(self, data):
-        """
-        Agrupa una lista plana de items de menú en la estructura
-        jerárquica para móvil: módulo > submodulos > items.
-        """
-        modules_dict = {}
-
-        for item in data:
-            if str(item.get('plataforms') or '').lower() != 'mobile':
-                continue
-
-            menu_key    = item.get('menu_key') or self.slugify(item.get('menu', ''), '_')
-            seccion_key = item.get('seccion_key') or self.slugify(item.get('seccion', ''), '_')
-
-            if menu_key not in modules_dict:
-                modules_dict[menu_key] = {
-                    'id':         menu_key.replace('_', '-'),
-                    'key':        menu_key,
-                    'label':      item.get('menu', ''),
-                    'icon':       item.get('menu_icon'),
-                    'order':      item.get('menu_order') or len(modules_dict) + 1,
-                    'submodules': {}
-                }
-
-            submodules = modules_dict[menu_key]['submodules']
-
-            if seccion_key not in submodules:
-                submodules[seccion_key] = {
-                    'id':         seccion_key.replace('_', '-'),
-                    'key':        seccion_key,
-                    'label':      item.get('seccion', ''),
-                    'description': item.get('seccion_description') or '',
-                    'order':      item.get('seccion_order') or len(submodules) + 1,
-                    'icon':       item.get('seccion_icon'),
-                    'iconBgColor': item.get('seccion_icon_color'),
-                    'items':      {}
-                }
-
-            item_key = item.get('key') or self.slugify(item.get('elemento', ''), '_')
-            if item_key not in submodules[seccion_key]['items']:
-                item_data = {
-                    'key':   item_key,
-                    'label': item.get('elemento', ''),
-                    'type':  item.get('type', 'link'),
-                    'order': item.get('item_order') or len(submodules[seccion_key]['items']) + 1,
-                    'icon':  item.get('item_icon') or '',
-                }
-                item_route = item.get('route_mobile')
-                if item_route:
-                    item_data['route'] = item_route
-                submodules[seccion_key]['items'][item_key] = item_data
-
-        modules = []
-        for module in modules_dict.values():
-            submodules = sorted(module['submodules'].values(), key=lambda s: s['order'])
-            for s in submodules:
-                s['items'] = sorted(s['items'].values(), key=lambda i: i['order'])
-            modules.append({**module, 'submodules': submodules})
-
-        return {'menu': sorted(modules, key=lambda m: m['order'])}
-
-    def get_structured_web_menu(self, data):
-        """
-        Agrupa una lista plana de items de menú en la estructura
-        jerárquica módulo > sección > items.
-        """
-        modules_dict = {}
-
-        for item in data:
-            if str(item.get('plataforms') or '').lower() != 'web':
-                continue
-
-            menu_key    = item.get('menu_key') or self.slugify(item.get('menu', ''), '_')
-            seccion_key = item.get('seccion_key') or self.slugify(item.get('seccion', ''), '_')
-
-            if menu_key not in modules_dict:
-                modules_dict[menu_key] = {
-                    'id':       menu_key.replace('_', '-'),
-                    'key':      menu_key,
-                    'label':    item.get('menu', ''),
-                    'icon':     item.get('menu_icon'),
-                    'order':    item.get('menu_order') or len(modules_dict) + 1,
-                    'columns':  item.get('menu_columns'),
-                    'sections': {}
-                }
-
-            sections = modules_dict[menu_key]['sections']
-
-            if seccion_key not in sections:
-                seccion_href = item.get('seccion_href')
-                seccion_data = {
-                    'id':     seccion_key.replace('_', '-'),
-                    'key':    seccion_key,
-                    'label':  item.get('seccion', ''),
-                    'order':  item.get('seccion_order') or len(sections) + 1,
-                    'column': item.get('seccion_column') or len(sections) + 1,
-                    'items':  {}
-                }
-                if seccion_href:
-                    seccion_data['href'] = seccion_href
-                sections[seccion_key] = seccion_data
-
-            item_href = item.get('href_web')
-            item_key = item.get('key') or self.slugify(item.get('elemento', ''), '_')
-            if item_key not in sections[seccion_key]['items']:
-                item_data = {
-                    'key':   item_key,
-                    'label': item.get('elemento', ''),
-                    'type':  item.get('type', 'link'),
-                    'order': item.get('item_order') or len(sections[seccion_key]['items']) + 1,
-                }
-                if item_href:
-                    item_data['href'] = item_href
-                sections[seccion_key]['items'][item_key] = item_data
-
-        modules = []
-        for module in modules_dict.values():
-            sections = sorted(module['sections'].values(), key=lambda s: s['order'])
-            for s in sections:
-                s['items'] = sorted(s['items'].values(), key=lambda i: i['order'])
-            modules.append({**module, 'sections': sections})
-
-        return {'modules': sorted(modules, key=lambda m: m['order'])}
-
-    def get_user_menus(self, platform=''):
-        print('esta entrando aqui...')
-        """
-        Obtiene los menus personalizados para el usuario 
-        actual desde los registros de la forma de CONFIGURACION MENUS.
-        """
-        query = [
-            {"$match": {
-                "form_id": self.MENUS_FORM,
-                "deleted_at": {"$exists": False},
-                f"answers.{self.USUARIOS_OBJ_ID}.{self.menu_form_fields['usuario_id']}": self.user.get('user_id')
-            }},
-            {"$project": {
-                "_id": 0,
-                "elementos": f"$answers.{self.menu_form_fields['elementos']}"
-            }},
-            {"$unwind": "$elementos"},
-            {"$project": {
-                "menu_key": f"$elementos.{self.MENUS_CATALOG_OBJ_ID}.{self.menu_form_fields['key']}",
-            }}
-        ]
-        data = self.format_cr(self.cr.aggregate(query), ids_label_dct=self.menu_form_fields)    
-        if data:
-            menu_keys = [self.unlist(item['menu_key']) for item in data if item.get('menu_key')]
-            data = self.get_format_user_menus(filter_keys=menu_keys)
-        else:
-            data = self.get_format_user_menus()
-
-        if platform == 'mobile':
-            return self.get_structured_mobile_menu(data)
-
-        modules = self.get_structured_web_menu(data)
-        return modules
-
-    def set_item_permits(self, user_id, item_needed, item_type):
-        """
-        Comparte los items necesarios para el usuario
-        """
-        permissions = 'can_read_item'
-        share_data = {
-            "owner": f"/api/infosync/user/{user_id}/",
-            "perm": permissions
-        }
-        if item_type == 'form':
-            user_item = self.lkf_api.get_user_forms(user_id)
-        elif item_type == 'catalog':
-            user_item = self.lkf_api.get_user_catalog(user_id)
-        elif item_type == 'script':
-            user_item = self.lkf_api.get_user_scripts(user_id)
-        else:
-            self.LKFException('Item type not found: ', item_type)
-        res = {}
-        user_item = user_item.get('data',[])
-        if isinstance(user_item, dict):
-            user_item = []
-        user_item = [item for item in user_item ]
-        unshare_items = []
-        for item in user_item:
-            if item['id'] not in item_needed:
-                unshare_items.append(item)
-
-        if unshare_items:
-            unshare_items_data = []
-            for item in unshare_items:
-                unshare_data = {'group_id':None, 'filter_name':None}
-                unshare_data['uri'] = f"/api/infosync/file_shared/{item['shared_id']}/"
-                unshare_data['item_id'] = item['id']
-                unshare_items_data.append(unshare_data)
-            if unshare_items_data:
-                res = self.lkf_api.share_form(unshare_items_data, unshare=True)
-
-        user_item_ids = {item['id'] for item in user_item}
-        items_to_share = item_needed - user_item_ids
-        for item_id in items_to_share:
-            share_data["file_shared"]=  f"/api/infosync/item/{item_id}/"
-            res = self.lkf_api.share_form(share_data)
-            if res['status_code'] != 201:
-                self.LKFException(f'Error al compartir scritp: {share_data}')
-        return res
-
-    def set_user_permissions(self):
-        """
-        Comparte las Formas, Catalogos y Scripts necesarios para el usuario tomando en cuenta
-        sus menus asignados.
-        """
-        data = self._labels(self.answers, ids_label_dct=self.menu_form_fields)
-        user_id = data.get('usuario_id')
-        if user_id and isinstance(user_id, list):
-            user_id = user_id[0]
-        permissions = 'can_read_item'
-        share_data = {
-            "owner": f"/api/infosync/user/{user_id}/",
-            "perm": permissions
-        }
-        forms_needed = set()
-        catalogs_needed = set()
-        scripts_needed = set()
-        menus = {i.get('menu', '').lower().replace(' ', '_') for i in data.get('elementos', [])}
-        menus = ['always'] + list(menus)
-        for menu in menus:
-            config = self.module_permits.get(menu, {})
-            if not config:
-                continue
-            forms_needed.update([x for x in config.get('forms',[]) if x])
-            catalogs_needed.update([x for x in config.get('catalogs') if x])
-            scripts_needed.update([x for x in config.get('scripts') if x])
-        response_forms = self.set_item_permits(user_id, forms_needed, item_type='form')
-        response_catalog = self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
-        response_scripts = self.set_item_permits(user_id, scripts_needed,  item_type='script')
-
-        return True
-
-    def slugify(self, text, sep='-'):
-        """
-        Convierte un texto en un slug, 
-        reemplazando espacios y caracteres especiales.
-        """
-        text = unicodedata.normalize('NFKD', str(text)).encode('ascii', 'ignore').decode('ascii')
-        text = re.sub(r'[^\w\s-]', '', text.lower().strip())
-        return re.sub(r'[\s_-]+', sep, text)
