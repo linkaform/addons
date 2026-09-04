@@ -2955,12 +2955,13 @@ class Accesos(OcrMixin, AccesosModel):
             answers[self.pase_entrada_fields['status_pase']] = 'proceso'
 
         telefono_valor = access_pass.get('telefono', '')
-        if telefono_valor and not re.fullmatch(r'\+\d{1,3}\d{10}', telefono_valor):
+        telefono_pattern = r'\d{10}' if created_from == 'auto_registro' else r'\+\d{1,3}\d{10}'
+        if telefono_valor and not re.fullmatch(telefono_pattern, telefono_valor):
             raise self.LKFException({
                 'msg': 'El telefono debe contener exactamente 10 digitos, sin letras ni simbolos.',
                 'status_code': 400,
-            }) 
-        
+            })
+
         fecha_visita_check = access_pass['fecha_desde_visita']
         if isinstance(fecha_visita_check, datetime):
             fecha_visita_check = fecha_visita_check.strftime('%Y-%m-%d')
@@ -4448,8 +4449,7 @@ class Accesos(OcrMixin, AccesosModel):
         config = raw_result[0] if raw_result else {}
         grupos = []
         for grupo in config.get('grupo_requisitos', []) or []:
-            #TODO Verficiar el cambio de key
-            ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
+            ubicacion = grupo.get('ubicacion', '')
             if ubicacion in ubicaciones:
                 grupos.append(grupo)
         return config, grupos
