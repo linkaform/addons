@@ -4674,10 +4674,10 @@ class Accesos(OcrMixin, AccesosModel):
                 format_grupo_requisitos.append({
                     'envio_por': req.get('envio_por',[]) ,
                     'datos_requeridos': req.get('datos_requeridos',[]) ,
-                    'ubicacion': self.unlist(req.get('incidente_location') or []),
-                    'prefijo_telefonico': req.get('prefijo_telefonico'),
-                    'tolerancia_de_entrada_previa': req.get('tolerancia_de_entrada_previa'),
-                    'tolerancia_de_entrada_posterior': req.get('tolerancia_de_entrada_posterior')
+                    'ubicacion': self._flatten_str_list(req.get('incidente_location')),
+                    'prefijo_telefonico': self._flatten_scalar(req.get('prefijo_telefonico')),
+                    'tolerancia_de_entrada_previa': self._flatten_scalar(req.get('tolerancia_de_entrada_previa')),
+                    'tolerancia_de_entrada_posterior': self._flatten_scalar(req.get('tolerancia_de_entrada_posterior'))
                 })
             data.update({
                 'exclude_inputs': format_exclude_inputs,
@@ -4695,6 +4695,24 @@ class Accesos(OcrMixin, AccesosModel):
                 return None
             value = value[0]
         return value
+
+    def _flatten_str_list(self, value):
+        """Aplana cualquier anidamiento a una lista plana de strings no vacios.
+
+        Los campos de catalogo llegan con profundidad variable ("A", ["A"],
+        [["A", "B"]]). No sirve `unlist` aqui: colapsa a un escalar, asi que
+        pierde las demas ubicaciones cuando el requisito aplica a varias, y
+        deja `[]` (no un string) cuando no hay ninguna capturada.
+        """
+        flat = []
+        pending = [value]
+        while pending:
+            item = pending.pop(0)
+            if isinstance(item, (list, tuple)):
+                pending = list(item) + pending
+            elif isinstance(item, str) and item.strip():
+                flat.append(item.strip())
+        return flat
 
     def _flatten_list(self, value):
         """Quita capas de lista anidadas de más hasta llegar a una lista plana de valores."""
