@@ -15,8 +15,11 @@
 #                            Escribe datos reales en producción.
 #
 # En ambos casos el hook fuerza el entorno pasando LKF_ENV al contenedor de
-# test (ver run_integration_test), sin tocar ningún archivo del repo ni del
-# entorno local de trabajo.
+# test (ver run_integration_test). Ademas cambia a la cuenta de pruebas
+# dedicada (account_10, dominio "seguridad") con "./lkf workwith" antes de
+# correr los tests -- igual que CI, que inyecta esas mismas credenciales via
+# GitHub secrets -- y regresa a la cuenta que tenias activa al terminar
+# (pase o falle el test).
 
 set -uo pipefail
 
@@ -82,6 +85,32 @@ done
 
 if [ "$RUN_PASES" != "true" ] && [ "$RUN_UPDATE_PASES" != "true" ]; then
   exit 0
+fi
+
+# Cuenta de pruebas dedicada (account_10, seguridad@linkaform.com), separada
+# de la que tengas activa localmente -- misma cuenta que usa CI. La usan
+# ambos tests (ver comentarios en test_update_full_pass_api.py y
+# conftest.py, que arman el usuario a partir de la cuenta activa).
+TEST_DOMAIN="seguridad"
+PREV_DOMAIN="$(cat secrets/current_domain 2>/dev/null || true)"
+
+restore_domain() {
+  if [ -n "$PREV_DOMAIN" ] && [ "$PREV_DOMAIN" != "$TEST_DOMAIN" ]; then
+    echo ""
+    echo "pre-push: restaurando cuenta activa ('$PREV_DOMAIN')..."
+    "$REPO_ROOT/lkf" workwith "$PREV_DOMAIN" || \
+      echo "pre-push: AVISO -- no se pudo restaurar la cuenta '$PREV_DOMAIN' automaticamente. Corre './lkf workwith $PREV_DOMAIN' a mano."
+  fi
+}
+trap restore_domain EXIT
+
+if [ "$PREV_DOMAIN" != "$TEST_DOMAIN" ]; then
+  echo ""
+  echo "pre-push: cambiando a la cuenta de pruebas '$TEST_DOMAIN' (account_10)..."
+  if ! "$REPO_ROOT/lkf" workwith "$TEST_DOMAIN"; then
+    echo "pre-push: no se pudo cambiar a la cuenta de pruebas '$TEST_DOMAIN'. Push abortado."
+    exit 1
+  fi
 fi
 
 # $1 = label, $2 = LKF_ENV para el contenedor, $3 = test file, resto = args extra de pytest
