@@ -98,8 +98,9 @@ def ir_a_rama(rama):
         print('  (creada desde origin/%s)' % rama)
     else:
         raise Error('La rama "%s" no existe ni local ni en origin.\n\n'
-                    'Si la cuenta todavia usa el nombre viejo, ponlo en su seccion del catalogo:\n'
-                    '    branch_name = account_<id>\n\n'
+                    'Si la cuenta todavia solo tiene su rama vieja account_<id>, dale la suya:\n\n'
+                    '    ./lkf branches plan       # revisa que copiaria\n'
+                    '    ./lkf branches create     # la crea y limpia branch_name del catalogo\n\n'
                     'Ramas disponibles: %s' % (rama, ', '.join(sorted(locales | remotas))))
     print('  rama          : %s (antes %s)' % (rama, actual))
 
@@ -148,6 +149,30 @@ def merge_master():
     git('commit', '--no-edit', '--quiet')
     print('  master        : %d commit(s) integrados' % pendientes)
     return choques
+
+
+def aviso_rama_vieja(cat, domain, rama):
+    """Avisa si la rama vieja account_<id> trae commits que esta rama no tiene.
+
+    Mientras la migracion a nombres de dominio no termine, las dos ramas del par estan
+    vivas y cualquiera del equipo puede seguir commiteando en la vieja. Esto no bloquea
+    nada: solo evita que te enteres hasta que ya perdiste el trabajo de alguien.
+    """
+    account_id = cat[domain].get('account_id', '').strip()
+    if not account_id:
+        return
+    vieja = 'account_%s' % account_id
+    if vieja == rama:
+        return
+    if not git('rev-parse', '--verify', '--quiet', 'origin/' + vieja, check=False):
+        return
+    pendientes = git('rev-list', '--count', 'HEAD..origin/%s' % vieja, check=False)
+    if not pendientes or pendientes == '0':
+        return
+    print('\n  OJO: origin/%s tiene %s commit(s) que esta rama no trae.' % (vieja, pendientes))
+    print('  Alguien sigue trabajando en la rama vieja. Revisalos con:')
+    print('     cd modules && git log --oneline HEAD..origin/%s' % vieja)
+    print('  y traelos con:  git merge origin/%s' % vieja)
 
 
 def mostrar_estado(cat):
@@ -212,6 +237,8 @@ def main(argv):
         for f in choques:
             print('     %s' % f)
         print('  revisalos si master traia algo que te sirva.')
+
+    aviso_rama_vieja(cat, domain, rama)
     return 0
 
 

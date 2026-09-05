@@ -77,9 +77,9 @@ couch_password     = ...
 [tu_dominio]
 username           = tu_usuario@ejemplo.com
 apikey             = tu_apikey_aqui
-# solo si la rama de modules NO se llama como la seccion
-branch_name        = account_1234
 account_id         = 1234
+# solo si la rama de modules NO se llama como la seccion (ver `./lkf branches`)
+# branch_name      = account_1234
 ```
 
 Toda llave de la seccion se sube a `config` en MAYUSCULAS, asi que para agregar algo nuevo
@@ -107,6 +107,36 @@ credenciales activas estan rotas.
 
 Si `modules/` tiene cambios sin commitear, `workwith` aborta antes de tocar nada: haz commit
 o `git stash` primero, para no arrastrar trabajo de una cuenta a la rama de otra.
+
+#### Rama por cuenta: `branches`
+
+Historicamente las ramas de `modules/` se llaman `account_<account_id>` (`account_29954`),
+mientras la cuenta se identifica por su dominio (`gfh`). Esa doble identidad es la razon de
+ser de `branch_name`. Estamos cerrandola: cada cuenta recibe una rama que se llama como su
+dominio.
+
+```bash
+./lkf branches plan       # que copiaria, y por que se brinca lo que se brinca
+./lkf branches create     # crea las ramas en origin y limpia branch_name del catalogo
+./lkf branches status     # divergencia entre cada par (rama vieja, rama nueva)
+```
+
+`create` **no renombra ni borra nada**: copia `origin/account_<id>` a una rama nueva con el
+nombre del dominio, apuntando al mismo commit. Las viejas siguen vivas para que el equipo
+migre a su ritmo, y si una rama nueva ya existe con otro commit, se salta en vez de forzar.
+
+El costo de copiar en vez de renombrar es que mientras las dos ramas del par existan,
+cualquier commit en la vieja se queda fuera de la nueva. Para eso estan `branches status`
+y el aviso que da `workwith` al entrar a una cuenta cuya rama vieja se adelanto.
+
+A un dominio sin rama de origen no se le inventa una. La excepcion se pide a mano:
+
+```bash
+./lkf branches create --desde-master soter
+```
+
+De aqui en adelante, en cuentas nuevas **username = dominio = rama**, asi que no hace falta
+nada de esto: basta que la seccion se llame igual que la rama.
 
 #### Hooks
 

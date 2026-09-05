@@ -39,6 +39,7 @@ _usage(){
       echo "      $APP workwith                Muestra la cuenta actual y los dominios disponibles"
       echo "      $APP workon <local|preprod|prod>  Elige el environment activo"
       echo "      $APP workon                  Muestra el environment actual y los disponibles"
+      echo "      $APP branches [plan|create|status]  Copia cada rama account_<id> de modules/ a una rama con el nombre del dominio"
       echo "      $APP setup                   Instala los git hooks del repo (una vez por clon)"
       echo
       echo
@@ -358,6 +359,15 @@ case "$Acction" in
     else
       python3 "$(dirname "$(readlink -f "$0")")/bin/workwith.py" "$Service"
     fi
+    exit $?
+  ;;
+
+  branches)
+    # Como workwith, corre en el HOST: le habla a git dentro del submodulo modules/.
+    # Se pasan los argumentos crudos porque branches.py tiene flags propios, y el
+    # parseo posicional de arriba ($Service/$Branch) no alcanza para eso.
+    shift
+    python3 "$(dirname "$(readlink -f "$0")")/bin/branches.py" ${@+"$@"}
     exit $?
   ;;
 
