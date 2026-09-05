@@ -14,9 +14,12 @@
 #                            contra PROD REAL (con --allow-prod-integration).
 #                            Escribe datos reales en producción.
 #
-# En ambos casos el hook cambia config/enviorment.py al entorno que
-# corresponda solo durante esa corrida y lo restaura siempre al final
-# (pase o falle el test), para no dejar mutado tu entorno local de trabajo.
+# En ambos casos el hook fuerza el entorno pasando LKF_ENV al contenedor de
+# test (ver run_integration_test). Ademas cambia a la cuenta de pruebas
+# dedicada (account_10, dominio "seguridad") con "./lkf workwith" antes de
+# correr los tests -- igual que CI, que inyecta esas mismas credenciales via
+# GitHub secrets -- y regresa a la cuenta que tenias activa al terminar
+# (pase o falle el test).
 
 set -uo pipefail
 
@@ -24,7 +27,6 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 
 FILE="lkf_addons/addons/accesos/app.py"
-ENV_FILE="config/enviorment.py"
 Z40="0000000000000000000000000000000000000000"
 
 RUN_PASES=false
@@ -85,25 +87,47 @@ if [ "$RUN_PASES" != "true" ] && [ "$RUN_UPDATE_PASES" != "true" ]; then
   exit 0
 fi
 
-ENV_BACKUP="$(mktemp)"
-cp "$ENV_FILE" "$ENV_BACKUP"
-restore_env() {
-  cp "$ENV_BACKUP" "$ENV_FILE"
-  rm -f "$ENV_BACKUP"
-}
-trap restore_env EXIT
+# Cuenta de pruebas dedicada (account_10, seguridad@linkaform.com), separada
+# de la que tengas activa localmente -- misma cuenta que usa CI. La usan
+# ambos tests (ver comentarios en test_update_full_pass_api.py y
+# conftest.py, que arman el usuario a partir de la cuenta activa).
+TEST_DOMAIN="seguridad"
+PREV_DOMAIN="$(cat secrets/current_domain 2>/dev/null || true)"
 
-# $1 = label, $2 = sed a config/enviorment.py, $3 = test file, resto = args extra de pytest
+restore_domain() {
+  if [ -n "$PREV_DOMAIN" ] && [ "$PREV_DOMAIN" != "$TEST_DOMAIN" ]; then
+    echo ""
+    echo "pre-push: restaurando cuenta activa ('$PREV_DOMAIN')..."
+    "$REPO_ROOT/lkf" workwith "$PREV_DOMAIN" || \
+      echo "pre-push: AVISO -- no se pudo restaurar la cuenta '$PREV_DOMAIN' automaticamente. Corre './lkf workwith $PREV_DOMAIN' a mano."
+  fi
+}
+trap restore_domain EXIT
+
+if [ "$PREV_DOMAIN" != "$TEST_DOMAIN" ]; then
+  echo ""
+  echo "pre-push: cambiando a la cuenta de pruebas '$TEST_DOMAIN' (account_10)..."
+  if ! "$REPO_ROOT/lkf" workwith "$TEST_DOMAIN"; then
+    echo "pre-push: no se pudo cambiar a la cuenta de pruebas '$TEST_DOMAIN'. Push abortado."
+    exit 1
+  fi
+fi
+
+# $1 = label, $2 = LKF_ENV para el contenedor, $3 = test file, resto = args extra de pytest
+#
+# config/enviorment.py ya no tiene una línea literal "ENV = 'prod'" que editar
+# (ver commit 59fdcac, "Se toma en cuenta workon enviorment para testing"): ahora
+# resuelve ENV vía _env_activo(), que prioriza la variable LKF_ENV. Se la pasamos
+# al `docker compose run` en vez de mutar ningún archivo, así no hace falta
+# backup/restore de nada.
 run_integration_test() {
-  local label="$1" env_sed="$2" test_file="$3"
+  local label="$1" env_value="$2" test_file="$3"
   shift 3
   echo ""
   echo "pre-push: corriendo test de integración ($label)..."
   echo ""
 
-  sed "$env_sed" "$ENV_FILE" > "$ENV_FILE.tmp" && mv "$ENV_FILE.tmp" "$ENV_FILE"
-
-  if ! docker compose -f test/docker/docker-compose.yaml run --rm lkf-test \
+  if ! docker compose -f test/docker/docker-compose.yaml run --rm -e LKF_ENV="$env_value" lkf-test \
     pytest "$test_file" -v "$@"; then
     echo ""
     echo "El test de integración ($label) falló. Push abortado."
@@ -113,8 +137,7 @@ run_integration_test() {
 }
 
 if [ "$RUN_PASES" = "true" ]; then
-  run_integration_test "create_access_pass, preprod" \
-    "s/^ENV = 'prod'/# ENV = 'prod'/; s/^# ENV = 'preprod'/ENV = 'preprod'/" \
+  run_integration_test "create_access_pass, preprod" preprod \
     "sdk_testing/accesos/passes/integration/test_create_access_pass_api.py"
 fi
 
@@ -122,8 +145,7 @@ if [ "$RUN_UPDATE_PASES" = "true" ]; then
   echo ""
   echo "AVISO: update_full_pass cambió (feature: update_pases). Este test"
   echo "escribe datos reales en PROD."
-  run_integration_test "update_full_pass, PROD REAL" \
-    "s/^# ENV = 'prod'/ENV = 'prod'/; s/^ENV = 'preprod'/# ENV = 'preprod'/" \
+  run_integration_test "update_full_pass, PROD REAL" prod \
     "sdk_testing/accesos/passes/integration/test_update_full_pass_api.py" \
     --allow-prod-integration
 fi
