@@ -18,6 +18,17 @@ from linkaform_api import base
 from lkf_addons.addons.base.app import Base
 
 
+# Compatibilidad hacia atras para get_areas_por_uso.
+# Antes de que existiera la marca "Utilizar Area en:", una caseta se reconocia
+# por su tipo de area. Mientras las cuentas migran, un area cuenta como marcada
+# para el uso indicado si su tipo esta en esta lista, aunque no tenga la marca.
+# Comparacion normalizada (minusculas, sin espacios sobrantes).
+# TODO: quitar cuando todas las cuentas tengan sus areas marcadas.
+USO_TIPO_COMPAT = {
+    'casetas': ('caseta', 'casetas'),
+    }
+
+
 class Location(Base):
 
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
@@ -56,7 +67,9 @@ class Location(Base):
             'area_status':'663e5e4bf5b8a7ce8211ed15',
             'location':'663e5c57f5b8a7ce8211ed0b',
             'location_id':'68101945f4996c72247baac4',
-            'new_city': '6654187fc85ce22aaf8bb070'
+            'new_city': '6654187fc85ce22aaf8bb070',
+            'tipo_de_area':'663e5e68f5b8a7ce8211ed18',
+            'utilizar_area_en':'6a9756e4faa39a6f6edeeb82'
         }
         )
 
@@ -191,6 +204,64 @@ class Location(Base):
         result = set(x.get('area') for x in data if x.get('area'))
         result = list(result)
         return result
+
+    def get_areas_por_uso(self, location_names, uso=None):
+        """
+        Obtiene las areas de una o varias ubicaciones aplicando la marca
+        "Utilizar Area en:" (self.f['utilizar_area_en']).
+        Por ubicacion: si al menos un area esta marcada con `uso`, solo se
+        regresan esas; si ninguna lo esta, se regresan todas las de esa ubicacion.
+        uso=None no aplica marca: regresa todas las areas de cada ubicacion.
+        Por compatibilidad (ver USO_TIPO_COMPAT), un area sin marca tambien
+        cuenta si su tipo de area corresponde al uso pedido.
+        return:
+        {ubicacion: [nombre_area, ...]}
+        """
+        if not location_names:
+            return {}
+        if not isinstance(location_names, list):
+            location_names = [location_names]
+        location_names = [l for l in location_names if l]
+        if not location_names:
+            return {}
+
+        location_path = f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}"
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.AREAS_DE_LAS_UBICACIONES,
+                location_path: {"$in": location_names},
+            }},
+            {'$project': {
+                '_id': 0,
+                'location': f"${location_path}",
+                'area': f"$answers.{self.f['area']}",
+                'usos': {'$ifNull': [f"$answers.{self.f['utilizar_area_en']}", []]},
+                'tipo': f"$answers.{self.TIPO_AREA_OBJ_ID}.{self.f['tipo_de_area']}",
+            }},
+        ]
+
+        tipos_compat = USO_TIPO_COMPAT.get(uso, ())
+        todas = {}
+        marcadas = {}
+        for row in self.cr.aggregate(query):
+            location = self.unlist(row.get('location'))
+            area = self.unlist(row.get('area'))
+            if not location or not area:
+                continue
+            # utilizar_area_en es checkbox: llega como lista de valores
+            usos = row.get('usos') or []
+            if not isinstance(usos, list):
+                usos = [usos]
+            tipo = (self.unlist(row.get('tipo')) or '').strip().lower()
+            todas.setdefault(location, set()).add(area)
+            if (uso and uso in usos) or (tipo and tipo in tipos_compat):
+                marcadas.setdefault(location, set()).add(area)
+
+        return {
+            location: sorted(marcadas.get(location) or areas)
+            for location, areas in todas.items()
+            }
 
     def get_areas_by_location_salidas(self, location_name):
         options={}

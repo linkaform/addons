@@ -1,9 +1,17 @@
 # coding: utf-8
-from settings import config
+import os
 
-ENV = 'prod' 
-# ENV = 'preprod' 
-#ENV = 'local' 
+from settings import config, SECRETS_PATH
+
+def _env_activo():
+    env = os.environ.get('LKF_ENV', '').strip()
+    if not env:
+        current_env_file = os.path.join(SECRETS_PATH, 'current_env')
+        if os.path.exists(current_env_file):
+            env = open(current_env_file, encoding='utf-8').read().strip()
+    return env if env in ('local', 'preprod', 'prod') else 'prod'
+
+ENV = _env_activo()
 
 # print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
 mongo_hosts = config.get('mongo_hosts')

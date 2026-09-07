@@ -636,6 +636,83 @@
                     <related_catalog>None</related_catalog>
                 </item>
                 <item>
+                    <field_type>checkbox</field_type>
+                    <view_fields>[]</view_fields>
+                    <catalog_fields>[]</catalog_fields>
+                    <fav>True</fav>
+                    <required>False</required>
+                    <field_id>6a9756e4faa39a6f6edeeb82</field_id>
+                    <catalog>{}</catalog>
+                    <relation_type>None</relation_type>
+                    <label>Utilizar Area en:</label>
+                    <related_catalog_key>[]</related_catalog_key>
+                    <options>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>pases</value>
+                            <label>Pases</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>incidencias</value>
+                            <label>Incidencias</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>paqueteria</value>
+                            <label>Paquetería</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>fallas</value>
+                            <label>Fallas</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>articulos_perdidos</value>
+                            <label>Artículos Perdidos</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>rondines</value>
+                            <label>Rondines</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>articulos_concesionados</value>
+                            <label>Artículos Concesionados</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>notas</value>
+                            <label>Notas</label>
+                        </item>
+                        <item>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>casetas</value>
+                            <label>Casetas</label>
+                        </item>
+                    </options>
+                    <catalog_id>None</catalog_id>
+                    <key>None</key>
+                    <properties>
+                        <selected>0</selected>
+                        <openChoice>False</openChoice>
+                        <orientation>vertical</orientation>
+                        <custom>None</custom>
+                    </properties>
+                    <related_catalog>None</related_catalog>
+                </item>
+                <item>
                     <field_type>text</field_type>
                     <required>False</required>
                     <field_id>6762f7b0922cc2a2f57d4044</field_id>

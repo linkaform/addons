@@ -94,9 +94,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CONFIG_PERFILES_ID = self.CONFIG_PERFILES.get('id')
         self.CONFIG_PERFILES_OBJ_ID = self.CONFIG_PERFILES.get('obj_id')
 
-        self.DEFINICION_PERMISOS = self.lkm.catalog_id('definicion_de_permisos')
-        self.DEFINICION_PERMISOS_ID = self.DEFINICION_PERMISOS.get('id')
-        self.DEFINICION_PERMISOS_OBJ_ID = self.DEFINICION_PERMISOS.get('obj_id')
+        self.DEFINICION_REQUERIMIENTOS = self.lkm.catalog_id('definicion_de_requerimientos')
+        self.DEFINICION_REQUERIMIENTOS_ID = self.DEFINICION_REQUERIMIENTOS.get('id')
+        self.DEFINICION_REQUERIMIENTOS_OBJ_ID = self.DEFINICION_REQUERIMIENTOS.get('obj_id')
 
         self.GAFETES_CAT = self.lkm.catalog_id('gafetes')
         self.GAFETES_CAT_ID = self.GAFETES_CAT.get('id')
@@ -344,7 +344,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'permisos_certificaciones_evidencias':'6a74d15ebbfb86985232bc76',
             'nombre_del_permiso':'6a74d27fa9bf0d441f4c243f',
             'evidencia_documento_permiso':'6a74d27fa9bf0d441f4c2440',
-            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441'
+            'evidencia_fotografia_permiso':'6a74d27fa9bf0d441f4c2441',
+            'logotipo_pase':'6a8cc71df78a808b7dcde656'
         }
         self.mf = mf
         ## Form Fields ##
@@ -724,6 +725,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'telefono_pase':'662c2937108836dec6d92582',
             'tipo_comentario':'66af1977ffb6fd75e769f457',
             'tipo_visita':"662c262cace163ca3ed3bb3a",
+            'tipo_de_pase_select':'6a0c941e332e2e7b0ab303f8',
             'todas_las_areas':'68f9fdfbd9bf5cb7fd3caece',
             'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
             'ubicacion_pase':f"{self.mf['catalog_ubicacion']}.{self.mf['ubicacion']}",
@@ -807,6 +809,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'email_acompanante':'6a23408693202c1f1c149693',
             'telefono_acompanante':'6a23408693202c1f1c149694',
             'foto_acompanante':'6a23408693202c1f1c149695',
+            'habilitar_fotografia':'6a8f4aa6559440e39d89a1d8',
+            'habilitar_identificacion':'6a8f4aa6559440e39d89a1d9'
         })
 
         self.conf_accesos_fields = {

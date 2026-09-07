@@ -119,6 +119,7 @@ class Employee(Base):
         f = {
             'area':'663e5d44f5b8a7ce8211ed0f',
             'areas_grupo': '663cf9d77500019d1359eb9f',
+            'catalog_rol_empleado': '6a470634de711f1df3ec49b5',
             'departamento_empleado': '663bc4ed8a6b120eab4d7f1e',
             'grupo_puestos': '663c015f3ac46d98e8f27495',
             'location': '663e5c57f5b8a7ce8211ed0b',
@@ -127,6 +128,7 @@ class Employee(Base):
             'nombre_empleado': '62c5ff407febce07043024dd',
             'nombre_guardia_apoyo': '663bd36eb19b7fb7d9e97ccb',
             'puesto_empleado': '663bc4c79b8046ce89e97cf4',
+            'roles_grupo': '6a8e10938910e8a112fbbc21',
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
         }
         if hasattr(self, 'f'):
@@ -244,6 +246,69 @@ class Employee(Base):
             msg = f'No existe caseta configurada para usuario id: {user_id}'
             self.LKFException(msg)
         return caseta, user_booths
+
+    def get_ubicaciones_permitidas(self, user_id=None, username=None):
+        """
+        Ubicaciones y areas asignadas al empleado en configuracion_areas_y_empleados.
+        Un item con ubicacion pero sin nombre de area significa acceso a TODAS
+        las areas de esa ubicacion (sin_limite=True), misma semantica que
+        get_user_booth.
+        El empleado se resuelve por el user_id del jwt y, como llave secundaria,
+        por username. El email no se usa: en el back no es unico.
+        Returns:
+        {ubicacion: {'areas': [...], 'areas_default': [...],
+                     'sin_limite': bool, 'es_default': bool}}
+        """
+        if user_id is None:
+            user_id = self.user.get('user_id')
+        if username is None:
+            username = self.user.get('username')
+
+        identidades = []
+        if user_id:
+            identidades.append(
+                {f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id})
+        if username:
+            identidades.append(
+                {f"answers.{self.EMPLOYEE_OBJ_ID}.{self.f['new_user_username']}": username})
+        if not identidades:
+            # sin identidad no se asume acceso a nada
+            return {}
+
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.CONF_AREA_EMPLEADOS,
+            "$or": identidades,
+            }
+        areas_path = self.f['areas_group']
+        cat_obj_id = self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID
+
+        permisos = {}
+        for doc in self.cr.find(match_query, {f"answers.{areas_path}": 1}):
+            for item in doc.get('answers', {}).get(areas_path, []) or []:
+                area_cat = item.get(cat_obj_id, {}) or {}
+                location = self.unlist(area_cat.get(self.f['location']))
+                if not location:
+                    continue
+                area = self.unlist(area_cat.get(self.f['area']))
+                es_default = item.get(self.f['area_default']) == 'default'
+                permiso = permisos.setdefault(location, {
+                    'areas': [],
+                    'areas_default': [],
+                    'sin_limite': False,
+                    'es_default': False,
+                    })
+                if es_default:
+                    permiso['es_default'] = True
+                if not area:
+                    # ubicacion sin area: acceso a todas las areas de la ubicacion
+                    permiso['sin_limite'] = True
+                    continue
+                if area not in permiso['areas']:
+                    permiso['areas'].append(area)
+                if es_default and area not in permiso['areas_default']:
+                    permiso['areas_default'].append(area)
+        return permisos
 
     def check_user_is_a_guard(self, user_id):
         query = [

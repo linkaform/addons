@@ -4,6 +4,15 @@ set -e
 set -u
 #set -o pipefail
 
+# Los servidores de preprod/prod (ej. vmswarm0) corren en linux/amd64.
+# En Mac Apple Silicon, docker build/compose usan arm64 por defecto y las
+# imagenes publicadas quedan sin manifest amd64, causando:
+#   "no matching manifest for linux/amd64 in the manifest list entries"
+# Forzamos amd64 (Docker Desktop lo emula via buildx/QEMU) para que las
+# imagenes construidas y publicadas desde Mac sean compatibles con esos
+# servidores. En Linux amd64 esto es un no-op.
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
+
 echo "" >.env
 _usage(){
   APP=$(basename "$0")
@@ -26,6 +35,12 @@ _usage(){
       echo "      $APP restart <preprod|prod> <account_id>  [depricated] use update"
       echo "      $APP update <preprod|prod> <account_id>  Update a given account addons containers image on given environment"
       echo "      $APP test                    Runs all tests"
+      echo "      $APP workwith <domain_name>  Elige la cuenta activa y deja modules/ en su rama"
+      echo "      $APP workwith                Muestra la cuenta actual y los dominios disponibles"
+      echo "      $APP workon <local|preprod|prod>  Elige el environment activo"
+      echo "      $APP workon                  Muestra el environment actual y los disponibles"
+      echo "      $APP branches [plan|create|status]  Copia cada rama account_<id> de modules/ a una rama con el nombre del dominio"
+      echo "      $APP setup                   Instala los git hooks del repo (una vez por clon)"
       echo
       echo
       exit 1
@@ -335,6 +350,58 @@ fi
 echo "Action", $Acction
 
 case "$Acction" in
+
+  workwith)
+    # Corre en el HOST a proposito: modules/ es un submodulo cuyo .git real no
+    # esta montado en el contenedor, asi que git no funciona ahi adentro.
+    if [[ "$Service" == "0" ]]; then
+      python3 "$(dirname "$(readlink -f "$0")")/bin/workwith.py"
+    else
+      python3 "$(dirname "$(readlink -f "$0")")/bin/workwith.py" "$Service"
+    fi
+    exit $?
+  ;;
+
+  branches)
+    # Como workwith, corre en el HOST: le habla a git dentro del submodulo modules/.
+    # Se pasan los argumentos crudos porque branches.py tiene flags propios, y el
+    # parseo posicional de arriba ($Service/$Branch) no alcanza para eso.
+    shift
+    python3 "$(dirname "$(readlink -f "$0")")/bin/branches.py" ${@+"$@"}
+    exit $?
+  ;;
+
+  workon)
+    # Solo escribe secrets/current_env; config/enviorment.py lo lee al arrancar, asi
+    # que no hace falta reiniciar el contenedor, solo relanzar el script.
+    if [[ "$Service" == "0" ]]; then
+      python3 "$(dirname "$(readlink -f "$0")")/bin/workon.py"
+    else
+      python3 "$(dirname "$(readlink -f "$0")")/bin/workon.py" "$Service"
+    fi
+    exit $?
+  ;;
+
+  setup)
+    # Corre en el HOST: instala los hooks versionados en .githooks/. core.hooksPath
+    # vive en .git/config, o sea es local por clon y no se versiona -- por eso cada
+    # quien tiene que correr esto una vez despues de clonar, o los hooks no corren.
+    Repo_root="$(dirname "$(readlink -f "$0")")"
+    if [[ ! -d "$Repo_root/.githooks" ]]; then
+      echo "x No existe $Repo_root/.githooks, no hay hooks que instalar."
+      exit 1
+    fi
+    git -C "$Repo_root" config core.hooksPath .githooks
+    echo "OK: core.hooksPath -> .githooks"
+    for hook in "$Repo_root"/.githooks/*; do
+      [[ -f "$hook" ]] || continue
+      # Si el clon tiene core.filemode=false el bit ejecutable se pierde en el
+      # checkout, y git se salta el hook sin decir nada.
+      chmod +x "$hook"
+      echo "  - $(basename "$hook")"
+    done
+    exit 0
+  ;;
 
 
   addons)

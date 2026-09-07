@@ -1,9 +1,18 @@
 # coding: utf-8
 # print('=================== LODING SETTINGS FOR ENVIOIRMENT: {} ==================='.format(ENV))
+import os
+
 from linkaform_api import settings
 
 MODULES_PATH = '/srv/scripts/addons/modules'
 ADDONS_PATH = '/usr/local/lib/python3.10/site-packages/lkf_addons/addons'
+
+# Raiz de secrets/ (accounts.ini, current_domain, current_env). Se resuelve relativo
+# a este archivo en vez de hardcodearse, para que de lo mismo correr en el host que
+# dentro del contenedor, donde el repo vive en /srv/scripts/addons. local_settings.py
+# lo consume por el `from settings import *`.
+SECRETS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'secrets')
 
 config = {
     'COLLECTION' : 'form_answer',

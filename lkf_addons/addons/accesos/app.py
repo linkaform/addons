@@ -125,6 +125,7 @@ class Accesos(OcrMixin, AccesosModel):
                     ### Campos Select
                     f"{self.mf['empresa']}":[access_pass.get('empresa'),],
                     f"{self.pase_entrada_fields['perfil_pase_id']}": [access_pass['tipo_de_pase'],],
+                    f"{self.pase_entrada_fields['tipo_de_pase_select']}": [access_pass.get('tipo_de_pase', 'visita'),],
                     # f"{self.pase_entrada_fields['status_pase']}":[access_pass['estatus'],],
                     f"{self.pase_entrada_fields['status_pase']}":['Activo',],
                     f"{self.pase_entrada_fields['foto_pase_id']}": access_pass.get("foto",[]), #[access_pass['foto'],], #.get('foto','')
@@ -505,7 +506,7 @@ class Accesos(OcrMixin, AccesosModel):
                 res.append(visita_set)
         return res
 
-    def access_pass_set_status(self, answers):
+    def access_pass_set_status(self, answers, requerimientos=None):
         """
         Evalua criterios del pase y regresa el status del pase
         Proceso
@@ -513,31 +514,49 @@ class Accesos(OcrMixin, AccesosModel):
         Vencido
         args:
             answers (json): Objeto de answers
+            requerimientos (list): Datos requeridos (fotografia, identificacion) que
+                pide la ubicacion del pase. Si no se manda se consulta la
+                configuracion del modulo de seguridad. Si la ubicacion no pide
+                requerimientos el visitante no tiene nada que complementar y el
+                pase puede quedar activo.
         return:
             status (str): String con status
         """
-        foto_ok = False
-        id_vista = False
+        if requerimientos is None:
+            requerimientos = self.get_requerimientos_pase(answers)
+        requerimientos = [r.lower() for r in (requerimientos or []) if isinstance(r, str)]
+        foto_requerida = 'fotografia' in requerimientos
+        identificacion_requerida = 'identificacion' in requerimientos
+        #---Si la ubicacion no pide el dato, el visitante no tiene nada que complementar
+        foto_ok = not foto_requerida
+        id_vista = not identificacion_requerida
         fecha_ok = False
         vista_a_ok = False
         autorizado_ok = False
         status = 'proceso'
-        foto = answers.get(self.pase_entrada_fields['walkin_fotografia'])
-        if isinstance(foto, list) and len(foto) > 0:
-            foto = foto[0]
+        #---Sin nombre no hay pase que activar, ej. acompanantes que el invitado
+        #   todavia no ha llenado.
+        nombre_pase = answers.get(self.pase_entrada_fields['walkin_nombre'], '')
+        nombre_ok = bool(nombre_pase and str(nombre_pase).strip())
+        if foto_requerida:
+            foto = answers.get(self.pase_entrada_fields['walkin_fotografia'])
+            if isinstance(foto, list) and len(foto) > 0:
+                foto = foto[0]
 
-        if isinstance(foto, dict):
-            if 'file_url' in foto.keys() and foto['file_url']:
-                foto_ok = self.valid_url(foto['file_url'])
-        #TODO revisar configuracion
-        id_vista  = answers.get(self.pase_entrada_fields['walkin_identificacion'], [])
-        if isinstance(id_vista, list) and len(id_vista) > 0:
-            id_vista = id_vista[0]
+            if isinstance(foto, dict):
+                if 'file_url' in foto.keys() and foto['file_url']:
+                    foto_ok = self.valid_url(foto['file_url'])
 
-        if isinstance(id_vista, dict):
-            if 'file_url' in id_vista.keys() and id_vista['file_url']:
+        if identificacion_requerida:
+            id_vista = answers.get(self.pase_entrada_fields['walkin_identificacion'], [])
+            if isinstance(id_vista, list) and len(id_vista) > 0:
+                id_vista = id_vista[0]
+
+            if isinstance(id_vista, dict) and id_vista.get('file_url'):
                 id_vista = self.valid_url(id_vista['file_url'])
-        id_vista = True
+            else:
+                id_vista = False
+
         today = self.get_today_format()
         
         if isinstance(today, datetime):
@@ -591,10 +610,12 @@ class Accesos(OcrMixin, AccesosModel):
 
             if answers.get(self.pase_entrada_fields['catalago_autorizado_por'],{}).get(self.pase_entrada_fields['autorizado_por']):
                 autorizado_ok = True
-        print("QUE PASA, ", foto_ok , id_vista , fecha_ok , vista_a_ok , autorizado_ok)
-        if foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
+        print("DEBUG ACCESS_PASS_SET_STATUS criterios:", "nombre_ok=", nombre_ok, "foto_ok=", foto_ok,
+              "id_vista=", id_vista, "fecha_ok=", fecha_ok, "vista_a_ok=", vista_a_ok, "autorizado_ok=", autorizado_ok)
+        if nombre_ok and foto_ok and id_vista and fecha_ok and vista_a_ok and autorizado_ok:
+
             status = 'activo'
-        elif foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
+        elif nombre_ok and foto_ok and id_vista and fecha_ok and vista_a_ok and not autorizado_ok:
             status = 'por_autorizar'
         elif not fecha_ok:
             status = 'vencido'
@@ -1027,6 +1048,20 @@ class Accesos(OcrMixin, AccesosModel):
         user = self.lkf_api.get_user_by_id(user_id)
         user_name = user.get('name', '')
 
+        #! Roles normales (catalogo, hardcode o localStorage) se aceptan tal
+        #! cual, sin validar, para no romper check-in en cuentas/usuarios que
+        #! aun no capturan el grupo "Roles" de configuracion_areas_y_empleados.
+        #! Solo se valida lo que huela a rol de administracion: eso unicamente
+        #! se acepta si esta realmente asignado al usuario en esa forma.
+        if roles:
+            roles_admin_solicitados = [rol for rol in roles if re.search('admin', rol, re.IGNORECASE)]
+            if roles_admin_solicitados:
+                roles_permitidos = self.get_roles_usuario(user_id)
+                roles_admin_rechazados = [rol for rol in roles_admin_solicitados if rol not in roles_permitidos]
+                if roles_admin_rechazados:
+                    print(f"Roles administrativos rechazados para user_id {user_id}: {roles_admin_rechazados}")
+                roles = [rol for rol in roles if rol not in roles_admin_rechazados]
+
         #! Si is_boot_available no encontró el registro abierto (ej. condición de carrera),
         #! se hace una búsqueda explícita por estado abierto como salvaguarda.
         if not is_caseta_open:
@@ -1037,7 +1072,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         #! Si la caseta esta abierta se actualizan los guardias solamente.
         if is_caseta_open:
-            res = self.update_guards_checkin([{'user_id': user_id, 'name': user_name}], self.last_check_in.get('_id',''), location, area, user, nombre_suplente, fotografia)
+            res = self.update_guards_checkin([{'user_id': user_id, 'name': user_name}], self.last_check_in.get('_id',''), location, area, user, nombre_suplente, fotografia, roles)
             format_res = self.unlist(res)
             if format_res.get('status_code') in [200, 201, 202]:
                 return format_res
@@ -1484,131 +1519,97 @@ class Accesos(OcrMixin, AccesosModel):
         depositos = self.answers.get(self.incidence_fields['datos_deposito_incidencia'],[])
         return sum([x[self.incidence_fields['cantidad']] for x in depositos])
 
-    def catalogos_pase_area(self, location_name):
-        user_id= self.user.get("user_id")
-        res={
-            "areas_by_location" : self.get_areas_by_location(location_name)
-        }
-        return res
+    def catalogos_pase_area(self, location_name, uso=None):
+        # sin `uso` no aplica marca ni permisos: mismo comportamiento de siempre.
+        # se conserva la llave de respuesta por compatibilidad con clave10 y soter
+        if uso == 'pases':
+            res = self.get_areas_pase(location_name)
+        else:
+            res = self.get_areas_modulo(location_name, uso=uso)
+        return {"areas_by_location": res.get('areas_by_location', [])}
 
-    def catalogo_tipo_concesion(self,location="", tipo=""):
+    def catalogo_tipo_concesion(self, tipo=""):
         catalog_id = self.ACTIVOS_FIJOS_CAT_ID
         form_id= self.CONCESSIONED_ARTICULOS
-        options={}
         response=[]
-        if location and not tipo:
-            response= self.catalogo_view(catalog_id, form_id)
+        if tipo:
+            options = {
+                "group_level": 2,
+                "startkey": [tipo],
+                "endkey": [f"{tipo}\n"]
+            }
+            res= self.catalogo_view(catalog_id, form_id, options)
+            if res:
+                # Se obtienen datos extras de los articulos
+                # Nombre, imagen y costo.
+                response = self.get_more_info_conscessioned_articles(res)
         else:
-
-            if location and tipo:
-                options = {
-                    "group_level": 2,
-                    "startkey": [tipo],
-                    "endkey": [f"{tipo}\n"]
-                }
-                res= self.catalogo_view(catalog_id, form_id, options)
-                format_data = []
-                if res:
-                    # Se obtienen datos extras de los articulos
-                    # Nombre, imagen y costo.
-                    format_data = self.get_more_info_conscessioned_articles(res)
-                    response=format_data
-
-            elif tipo and not location:
-                self.LKFException('Location es requerido')
+            response= self.catalogo_view(catalog_id, form_id)
         print(response)
         return response
 
-    def catalogos_pase_location(self):
-        user_id = self.user.get("user_id")
-        match_query = {
-            "deleted_at": {"$exists": False},
-            "form_id": self.CONF_AREA_EMPLEADOS,
-        }
-        if user_id:
-            match_query[f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}"] = user_id
+    def get_roles_usuario(self, user_id):
+        """
+        Roles configurados para user_id en el grupo repetitivo "Roles" de
+        configuracion_areas_y_empleados (fuente de verdad para validar roles
+        de turno; no confundir con self.f['grupo_roles'], que es el grupo de
+        roles de registro_de_asistencia/configuracion_de_recorridos).
 
+        No se referencia el obj_id del catalogo embebido dentro de
+        roles_grupo: ese obj_id cambia entre cuentas (cada cuenta puede
+        tener embebido un catalogo distinto). Se proyecta el item completo
+        del grupo y se deja que format_cr/_labels lo aplane, quedandose
+        solo con el campo 'rol' (self.f['rol'], estable entre cuentas)
+        sin importar que catalogo lo envuelva.
+        """
+        if not user_id:
+            return []
         query = [
-            {'$match': match_query},
-            {'$unwind': f"$answers.{self.mf['areas_grupo']}"},
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.CONF_AREA_EMPLEADOS,
+                f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id,
+            }},
+            {'$unwind': f"$answers.{self.Employee.f['roles_grupo']}"},
             {'$project': {
                 '_id': 0,
-                'area': f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
-                'nombre_area': f"$answers.{self.mf['areas_grupo']}.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}",
-                'set_as': f"$answers.{self.mf['areas_grupo']}.{self.Employee.f['area_default']}",
+                'roles': f"$answers.{self.Employee.f['roles_grupo']}",
             }},
         ]
+        data = self.format_cr(self.cr.aggregate(query))
+        return [x['rol'] for x in data if x.get('rol')]
 
-        response = self.cr.aggregate(query)
-
-        res = {
-            'ubicaciones_user': [],
-            'ubicaciones_default': [],
-            'ubicaciones_detalle': [],
-        }
-
-        detalle_por_ubicacion = {}
-
-        for x in response:
-            area = x.get('area')
-            set_as = x.get('set_as')
-            nombre_area = x.get('nombre_area')
-            es_default_area = set_as == 'default'
-
-            # --- ubicaciones_user (sin duplicados) ---
-            if area not in res['ubicaciones_user']:
-                res['ubicaciones_user'].append(area)
-
-            # --- ubicaciones_default ---
-            if es_default_area and area not in res['ubicaciones_default']:
-                res['ubicaciones_default'].append(area)
-
-            # --- detalle por ubicación ---
-            if area not in detalle_por_ubicacion:
-                detalle_por_ubicacion[area] = {
-                    'ubicacion': area,
-                    'es_default': False,
-                    'areas': [],
-                }
-
-            ya_existe = any(
-                a['nombre_area'] == nombre_area and a['es_default'] == es_default_area
-                for a in detalle_por_ubicacion[area]['areas']
-            )
-            if not ya_existe:
-                detalle_por_ubicacion[area]['areas'].append({
-                    'nombre_area': nombre_area,
-                    'es_default': es_default_area,
-                })
-
-            if es_default_area:
-                detalle_por_ubicacion[area]['es_default'] = True
-
-        res['ubicaciones_detalle'] = list(detalle_por_ubicacion.values())
-        print(simplejson.dumps(res, indent=4))
-
-        doc = self.cr.find_one(match_query)
-        if doc:
-            print(json.dumps(doc["answers"][self.mf['areas_grupo']], indent=2, default=str))
-
+    def catalogos_pase_location(self):
+        """
+        Ubicaciones, areas y roles del usuario para el pase de entrada.
+        Las areas ya vienen filtradas por permisos y por la marca de uso "pases".
+        """
+        res = self.get_areas_pase()
+        res.pop('areas_by_location', None)
+        res['roles_usuario'] = self.get_roles_usuario(self.user.get("user_id"))
         return res
 
-    def catalagos_pase_no_jwt(self, qr_code):
+    def catalagos_pase_no_jwt(self, qr_code, account_id=''):
         # se quito porque ya no se edita el pase
         # cat_vehiculos= self.catalogo_vehiculos({})
         # cat_estados= self.catalogo_estados({})
         pass_selected = self.get_pass_custom(qr_code)
+
         ubicaciones = pass_selected.get('ubicacion', [])
         tipo_de_pase = pass_selected.get('tipo_de_pase', "")
-        config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones, tipo_de_pase)
+        config_modulo_seguridad = self.get_config_modulo_seguridad(ubicaciones, tipo_de_pase, account_id=account_id)
         condiciones_servicio = config_modulo_seguridad.get('condiciones_servicio', {})
         permisos_certificaciones = config_modulo_seguridad.get('permisos_certificaciones',)
+
         res = {
             "pass_selected": pass_selected,
             "documento_de_condiciones_de_servicio": condiciones_servicio.get('doc_condiciones_servicio', ''),
             "url_de_condiciones_de_servicio": condiciones_servicio.get('url_condiciones_servicio', ''),
             "desc_condiciones_servicio": condiciones_servicio.get('desc_condiciones_servicio', ''),
-            "permisos_certificaciones": permisos_certificaciones
+            "permisos_certificaciones": permisos_certificaciones,
+            "ubicaciones": config_modulo_seguridad.get('ubicaciones_info', []),
+            "empresa": config_modulo_seguridad.get('empresa', {}),
+            "logotipo_pase": config_modulo_seguridad.get('logotipo_pase', '')
         }
         return res
 
@@ -2335,9 +2336,9 @@ class Accesos(OcrMixin, AccesosModel):
                 answers[self.incidence_fields['incidencia_catalog']].update({
                     self.incidence_fields['sub_categoria']: data_incidences['sub_categoria']
                 })
-            elif key == 'incidencia':
+            elif key in ('incidencia', 'incidente'):
                 answers[self.incidence_fields['incidencia_catalog']].update({
-                    self.incidence_fields['incidencia']: data_incidences.get('incidencia', data_incidences.get('incidente'))
+                    self.incidence_fields['incidencia']: data_incidences.get('incidencia') or data_incidences.get('incidente')
                 })
 
             elif key == 'ubicacion_incidencia' or key == 'area_incidencia':
@@ -2585,6 +2586,7 @@ class Accesos(OcrMixin, AccesosModel):
         return result
 
     def get_locations_address(self, list_locations=[]):
+        # COMENTARIO
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": self.UBICACIONES,
@@ -2608,9 +2610,10 @@ class Accesos(OcrMixin, AccesosModel):
             }
         return format_res
 
+    # feature: pases
     def create_access_pass(self, access_pass):
         """
-        Crea pase de acceso
+        Crea pase de accesoo
 
         args:
         location (str): Ubicacion de donde se crea el paso
@@ -2638,19 +2641,29 @@ class Accesos(OcrMixin, AccesosModel):
         answers = {}
         ics_invitation = False
 
+        campos_requeridos = ['ubicaciones', 'perfil_pase', 'visita_a']
+        faltantes = [campo for campo in campos_requeridos if not access_pass.get(campo)]
+        if faltantes:
+            raise self.LKFException({
+                'msg': f"Faltan campos requeridos: {', '.join(faltantes)}.",
+                'status_code': 400,
+            })
+
         record_id = metadata['id']
 
+        #---El pase puede ser para varias ubicaciones, se suman los requerimientos
+        #   de todas para cumplir con el minimo de cada una.
+        try:
+            requerimientos = self.get_requerimientos_ubicaciones(access_pass.get('ubicaciones', []))
+        except Exception as e:
+            print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
+            requerimientos = ['fotografia',]
+        requerimientos = self.apply_habilitar_overrides(access_pass, requerimientos)
+
         link_info = access_pass.get('link', "")
-        docs=""
 
         if link_info:
-            for index, d in enumerate(link_info["docs"]):
-                if(d == "agregarIdentificacion"):
-                    docs+="iden"
-                elif(d == "agregarFoto"):
-                    docs+="foto"
-                if index==0 :
-                    docs+="-"
+            docs = self.get_docs_pase_link(requerimientos, link_info.get('docs', []))
             link_pass= f"{link_info['link']}?id={record_id}&user={self.user.get('parent_id')}&docs={docs}"
             answers[self.pase_entrada_fields['link']] = link_pass
         lkf_qr = generar_qr.LKF_QR(self.settings)
@@ -2712,6 +2725,12 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',now_datetime)
         answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',now_datetime_out)
         answers[self.pase_entrada_fields['habilitar_vehiculo']]= access_pass.get('habilitar_vehiculo', 'no')
+        #---Sin default: si el pase no dice nada, que decida la config de la ubicacion
+        #   (ver apply_habilitar_overrides), no forzar 'no' que la exentaria siempre.
+        if access_pass.get('habilitar_fotografia') is not None:
+            answers[self.pase_entrada_fields['habilitar_fotografia']] = access_pass.get('habilitar_fotografia')
+        if access_pass.get('habilitar_identificacion') is not None:
+            answers[self.pase_entrada_fields['habilitar_identificacion']] = access_pass.get('habilitar_identificacion')
         answers[self.pase_entrada_fields['tipo_visita_pase']] = access_pass.get('tipo_visita_pase','fecha_fija')
         # answers[self.pase_entrada_fields['fecha_fija']] = access_pass.get('fechaFija',now_datetime)
         answers[self.pase_entrada_fields['status_pase']] = access_pass.get('status_pase',"").lower()
@@ -2839,17 +2858,60 @@ class Accesos(OcrMixin, AccesosModel):
         #---Valor
         # Crea invitacion de calendario
         if created_from in ('pase_de_entrada_app', 'pase_de_entrada_web') or True:
-            #TODO FLUJO DE AUTORIZACION DE PASES
             answers.update(self.access_pass_create_ics(access_pass, answers, ics_invitation))
-            answers[self.pase_entrada_fields['catalago_autorizado_por']] = self.autorizar_pase_acceso(answers)
+            #TODO FLUJO DE AUTORIZACION DE PASES: nueva_visita y web/app se
+            #   auto-autorizan con quien crea el pase (el empleado que invita
+            #   ya lo esta avalando); eso permite que web/app pasen a activo
+            #   solos cuando el visitante complete su foto/identificacion via
+            #   el link (update_pass vuelve a evaluar el status). auto_registro
+            #   NO se auto-autoriza, por eso cae en por_autorizar en vez de
+            #   activo aunque ya traiga foto/identificacion reales.
+            if created_from != 'auto_registro':
+                answers[self.pase_entrada_fields['catalago_autorizado_por']] = self.autorizar_pase_acceso(answers)
 
 
-        answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(answers)
+        #---nueva_visita (ya autorizado arriba) y auto_registro (sin autorizar,
+        #   por eso cae en por_autorizar si ya esta completo) se evaluan normal.
+        #   web/app siempre arrancan en proceso, para compartir el link y que el
+        #   visitante agregue su foto/identificacion; update_pass vuelve a
+        #   evaluar access_pass_set_status cuando el visitante completa esos datos.
+        #   Excepcion: si el admin manda habilitar_fotografia/habilitar_identificacion
+        #   explicito desde el front, se evalua normal para permitir que el pase
+        #   quede activo directo cuando ya no haya requerimientos pendientes.
+        admin_override_habilitar = (
+            access_pass.get('habilitar_fotografia') is not None or
+            access_pass.get('habilitar_identificacion') is not None
+        )
+        if created_from in ('nueva_visita', 'auto_registro') or (
+                created_from in ('pase_de_entrada_app', 'pase_de_entrada_web') and admin_override_habilitar):
+            answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
+                answers, requerimientos=requerimientos)
+        else:
+            answers[self.pase_entrada_fields['status_pase']] = 'proceso'
+
+        telefono_valor = access_pass.get('telefono', '')
+        telefono_pattern = r'\d{10}' if created_from == 'auto_registro' else r'\+\d{1,3}\d{10}'
+        if telefono_valor and not re.fullmatch(telefono_pattern, telefono_valor):
+            raise self.LKFException({
+                'msg': 'El telefono debe contener exactamente 10 digitos, sin letras ni simbolos.',
+                'status_code': 400,
+            })
+
+        fecha_visita_check = access_pass['fecha_desde_visita']
+        if isinstance(fecha_visita_check, datetime):
+            fecha_visita_check = fecha_visita_check.strftime('%Y-%m-%d')
+        fecha_visita_pasada = fecha_visita_check[:10] < now_datetime[:10]
+
+        if answers[self.pase_entrada_fields['status_pase']] == 'vencido' or fecha_visita_pasada:
+            raise self.LKFException({
+                'msg': 'No se puede crear un pase con fecha de visita en el pasado.',
+                'status_code': 400,
+            })
 
         acompanantes = answers.get(self.pase_entrada_fields['acompanantes'], 0)
         acompanantes_grupo = answers.get(self.pase_entrada_fields['acompanantes_grupo'], [])
         if acompanantes_grupo and len(acompanantes_grupo) > int(acompanantes or 0):
-            self.LKFException({
+            raise self.LKFException({
                 'msg': (
                     f"El número de acompañantes en la lista ({len(acompanantes_grupo)}) "
                     f"excede el permitido para este pase ({acompanantes}). "
@@ -2863,12 +2925,15 @@ class Accesos(OcrMixin, AccesosModel):
         print('res=',res)
         if res.get('status_code') in (200, 201):
             parent_id = res.get('json', {}).get('id')
+            if link_info:
+                res.setdefault('json', {})['link'] = link_pass
             if acompanantes_grupo and len(acompanantes_grupo) > 0 and parent_id:
-                self.create_multiple_pass_threads(answers, acompanantes_grupo, parent_id)
+                self.create_multiple_pass_threads(answers, acompanantes_grupo, parent_id,
+                    requerimientos=requerimientos)
         return res
 
 
-    def create_multiple_pass_threads(self, answers, acompanantes_grupo, parent_id):
+    def create_multiple_pass_threads(self, answers, acompanantes_grupo, parent_id, requerimientos=None):
         """
         Creates individual passes for each member of acompanantes_grupo in parallel threads.
         Pops acompanantes_grupo from child answers to avoid recursion.
@@ -2888,6 +2953,15 @@ class Accesos(OcrMixin, AccesosModel):
             pass_answers[self.pase_entrada_fields['email']] = acompanante.get('email', '')
             pass_answers[self.mf['telefono_pase']] = acompanante.get('telefono', '')
             pass_answers[self.pase_entrada_fields['url_padre']] = parent_url
+            #---El status no se hereda del titular, el acompanante puede venir sin
+            #   datos para que el invitado los complete despues. Misma regla que
+            #   en la creacion del titular: nueva_visita/auto_registro se evaluan
+            #   normal, web/app siempre arrancan en proceso.
+            if pass_answers.get(self.pase_entrada_fields['creado_desde']) in ('nueva_visita', 'auto_registro'):
+                pass_answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
+                    pass_answers, requerimientos=requerimientos)
+            else:
+                pass_answers[self.pase_entrada_fields['status_pase']] = 'proceso'
 
             metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
             metadata.update({
@@ -2906,21 +2980,23 @@ class Accesos(OcrMixin, AccesosModel):
             child_res = self.lkf_api.post_forms_answers(metadata)
             return child_res
 
-        url_by_email = {}
-        # create_single_pass(acompanantes_grupo[0], parent_id)
+        #---El url del hijo se guarda en la posicion que ocupa su acompanante en el
+        #   grupo, no en el orden en que terminan los threads, si no se cruzan.
+        url_by_index = {}
         with ThreadPoolExecutor(max_workers=10) as executor:
             futures = {
-                executor.submit(create_single_pass, acompanante, parent_id): acompanante
-                for acompanante in acompanantes_grupo
+                executor.submit(create_single_pass, acompanante, parent_id): idx
+                for idx, acompanante in enumerate(acompanantes_grupo)
             }
-            for idx, future in enumerate(as_completed(futures)):
-                acompanante = futures[future]
+            for future in as_completed(futures):
+                idx = futures[future]
+                acompanante = acompanantes_grupo[idx]
                 try:
                     result = future.result()
                     child_id = result.get('json', {}).get('id')
                     if child_id:
                         child_url = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{child_id}"
-                        url_by_email[idx] = child_url
+                        url_by_index[idx] = child_url
                 except Exception as e:
                     print(f"Error creating pass for {acompanante.get('nombre')}: {e}")
 
@@ -2929,7 +3005,7 @@ class Accesos(OcrMixin, AccesosModel):
                 self.pase_entrada_fields['nombre_acompanante']: acompanante.get('nombre', ''),
                 self.pase_entrada_fields['email_acompanante']: acompanante.get('email', ''),
                 self.pase_entrada_fields['telefono_acompanante']: acompanante.get('telefono', ''),
-                self.pase_entrada_fields['url_hijo']: url_by_email.get(idx, ''),
+                self.pase_entrada_fields['url_hijo']: url_by_index.get(idx, ''),
             }
             for idx, acompanante in enumerate(acompanantes_grupo)
         ]
@@ -3243,31 +3319,114 @@ class Accesos(OcrMixin, AccesosModel):
             format_data = self.unlist(data)
         return format_data
 
+    def es_rol_administrativo(self, user_id=None):
+        """
+        True si el usuario tiene algun rol administrativo configurado.
+        Mismo criterio que do_checkin: regex 'admin' sobre el nombre del rol.
+        """
+        if user_id is None:
+            user_id = self.user.get('user_id')
+        if not user_id:
+            return False
+        return any(
+            re.search('admin', rol, re.IGNORECASE)
+            for rol in self.get_roles_usuario(user_id) if rol
+            )
+
+    def _permiso_abierto(self):
+        # permiso sin restriccion de areas para una ubicacion
+        return {
+            'areas': [],
+            'areas_default': [],
+            'sin_limite': True,
+            'es_default': False,
+            }
+
+    def get_areas_modulo(self, locations=None, uso=None,
+                         con_permisos=False, user_id=None, username=None):
+        """
+        Areas de una o varias ubicaciones para un modulo.
+        `uso` aplica la marca "Utilizar Area en:" del campo utilizar_area_en:
+        si la ubicacion tiene alguna area marcada con ese uso, solo esas; si no
+        tiene ninguna, todas. uso=None no filtra por marca.
+        `con_permisos` limita a las areas asignadas al empleado en
+        configuracion_areas_y_empleados y, sin `locations`, usa las ubicaciones
+        del propio empleado; un rol administrativo se lo salta. Sin permisos
+        `locations` es obligatorio: no hay de donde inferirlas.
+        Returns:
+        {'ubicaciones_user': [...], 'ubicaciones_default': [...],
+         'ubicaciones_detalle': [{'ubicacion', 'es_default',
+                                  'areas': [{'nombre_area', 'es_default'}]}],
+         'areas_by_location': [nombre_area, ...]}
+        """
+        if locations and not isinstance(locations, list):
+            locations = [locations]
+        locations = [l for l in (locations or []) if l]
+
+        res = {
+            'ubicaciones_user': [],
+            'ubicaciones_default': [],
+            'ubicaciones_detalle': [],
+            'areas_by_location': [],
+            }
+
+        if con_permisos:
+            permisos = self.get_ubicaciones_permitidas(user_id=user_id, username=username)
+            if self.es_rol_administrativo(user_id):
+                # un rol administrativo no se limita a las areas de su configuracion
+                for location in locations:
+                    permisos.setdefault(location, self._permiso_abierto())
+                for permiso in permisos.values():
+                    permiso['sin_limite'] = True
+            ubicaciones = [l for l in permisos if not locations or l in locations]
+        else:
+            permisos = {location: self._permiso_abierto() for location in locations}
+            ubicaciones = list(locations)
+
+        if not ubicaciones:
+            return res
+
+        areas_por_ubicacion = self.get_areas_por_uso(ubicaciones, uso=uso)
+
+        areas_planas = set()
+        for location in sorted(ubicaciones):
+            permiso = permisos[location]
+            areas_uso = areas_por_ubicacion.get(location, [])
+            if permiso['sin_limite']:
+                areas = list(areas_uso)
+            else:
+                areas = [a for a in areas_uso if a in permiso['areas']]
+
+            res['ubicaciones_user'].append(location)
+            if permiso['es_default']:
+                res['ubicaciones_default'].append(location)
+            res['ubicaciones_detalle'].append({
+                'ubicacion': location,
+                'es_default': permiso['es_default'],
+                'areas': [
+                    {'nombre_area': area, 'es_default': area in permiso['areas_default']}
+                    for area in areas
+                    ],
+                })
+            areas_planas.update(areas)
+
+        res['areas_by_location'] = sorted(areas_planas)
+        return res
+
+    def get_areas_pase(self, locations=None, user_id=None, username=None):
+        """
+        Areas utilizables para pase de entrada: marca 'pases' + permisos del
+        empleado. Sin `locations` regresa todas las ubicaciones del empleado.
+        """
+        return self.get_areas_modulo(locations, uso='pases', con_permisos=True,
+                                     user_id=user_id, username=username)
+
     def get_areas_by_locations(self, location_names):
-        catalog_id = self.AREAS_DE_LAS_UBICACIONES_CAT_ID
-        form_id = self.PASE_ENTRADA
-        res_list = []
-        response = {}
-
-        if not isinstance(location_names, list):
-            location_names = [location_names]
-
-        if location_names:
-            for l in location_names:
-                options = {
-                    'startkey': [l],
-                    'endkey': [f"{l}\n",{}],
-                    'group_level':2
-                }
-                res = self.catalogo_view(catalog_id, form_id, options)
-                if res and isinstance(res, list):
-                    res_list.extend(res)
-
-            response.update({
-                "areas_by_location": list(set(res_list))
-            })
-
-        return response
+        # delega en get_areas_pase; se conserva la llave de respuesta por
+        # compatibilidad con clave10 y soter
+        return {
+            "areas_by_location": self.get_areas_pase(location_names).get('areas_by_location', [])
+        }
 
     def get_area_images(self, areas, location=None):
         if not location:
@@ -3467,10 +3626,11 @@ class Accesos(OcrMixin, AccesosModel):
             }
         return res
 
-    def get_page_stats(self, booth_area, location, page='', month=None, year=None):
-        timezone = pytz.timezone('America/Mexico_City')
+    def get_page_stats(self, booth_area, location, page='', month=None, year=None, dateFrom='', dateTo='', filterDate='', dynamic_filters=None):
+        timezone = pytz.timezone(self.user.get('timezone', 'America/Mexico_City'))
         today = datetime.now(timezone).strftime("%Y-%m-%d")
         res={}
+        dynamic_filters = dynamic_filters or []
         if page == 'Turnos':
             #Visitas dentro, Gafetes pendientes y Vehiculos estacionados
             query_visitas = [
@@ -3598,20 +3758,48 @@ class Accesos(OcrMixin, AccesosModel):
 
         elif page == 'Accesos' or page == 'Bitacoras':
             #Visitas en el dia, personal dentro, vehiculos dentro, salidas registradas y personas dentro
+            zona = self.user.get('timezone', 'America/Monterrey')
+            if filterDate and filterDate != "range":
+                dateFrom, dateTo = self.get_range_dates(filterDate, zona)
+                if dateFrom:
+                    dateFrom = str(dateFrom)
+                if dateTo:
+                    dateTo = str(dateTo)
+
+            extra_match = {}
+            for item in dynamic_filters:
+                if item.get('key') == 'perfil_visita':
+                    extra_match[f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.mf['nombre_perfil']}"] = {"$in": item.get('value')}
+                elif item.get('key') == 'visita_a':
+                    extra_match[f"answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}"] = {"$in": item.get('value')}
+
+            if dateFrom and dateTo:
+                date_floor, date_ceiling = dateFrom, dateTo
+                salida_floor, salida_ceiling = dateFrom, dateTo
+            else:
+                date_floor, date_ceiling = f"{today} 00:00:00", f"{today} 23:59:59"
+                salida_floor, salida_ceiling = f"{today} 00:00:00", None
+
             match_query_one = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
             }
+            if dateFrom and dateTo:
+                match_query_one[f"answers.{self.mf['fecha_entrada']}"] = {"$gte": dateFrom, "$lte": dateTo}
+            else:
+                match_query_one[f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}"] = {"$in": ["Activo"]}
+            match_query_one.update(extra_match)
 
             match_query_two = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}": {"$in": ["Activo"]},
                 f"answers.{self.bitacora_fields['ubicacion']}": location,
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": f"{today} 00:00:00", "$lte": f"{today} 23:59:59"}
+                f"answers.{self.mf['fecha_entrada']}": {"$gte": date_floor, "$lte": date_ceiling}
             }
+            if not (dateFrom and dateTo):
+                match_query_two[f"answers.{self.PASE_ENTRADA_OBJ_ID}.{self.pase_entrada_fields['status_pase']}"] = {"$in": ["Activo"]}
+            match_query_two.update(extra_match)
 
             if not booth_area == 'todas' and booth_area:
                 match_query_one.update({
@@ -3702,7 +3890,6 @@ class Accesos(OcrMixin, AccesosModel):
             ]
 
             resultado = self.format_cr(self.cr.aggregate(query_visitas))
-            today_salida = f"{today} 00:00:00"
             resultado_dia = self.format_cr(self.cr.aggregate(query_visitas_dia))
 
             total_vehiculos_dentro = resultado[0]['total_vehiculos_dentro'] if resultado else 0
@@ -3717,11 +3904,18 @@ class Accesos(OcrMixin, AccesosModel):
             for visita in detalle_visitas_todas:
                 status_visita = visita['status_visita'].lower()
 
-                if status_visita == "entrada":
-                    personas_dentro += 1
+                if dateFrom and dateTo:
+                    if status_visita == "entrada":
+                        personas_dentro += 1
+                    elif status_visita == "salida":
+                        salidas += 1
+                else:
+                    if status_visita == "entrada":
+                        personas_dentro += 1
 
-                if visita.get('fecha_salida') and visita.get('fecha_salida') >= today_salida:
-                    salidas += 1
+                    fecha_salida = visita.get('fecha_salida')
+                    if fecha_salida and fecha_salida >= salida_floor and (not salida_ceiling or fecha_salida <= salida_ceiling):
+                        salidas += 1
 
             res['total_vehiculos_dentro'] = total_vehiculos_dentro
             res['total_equipos_dentro'] = total_equipos_dentro
@@ -4086,7 +4280,7 @@ class Accesos(OcrMixin, AccesosModel):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CARGA_PERMISOS_VISITANTES,
-            f"answers.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['nombre_permiso']}":certificacion,
+            f"answers.{self.DEFINICION_REQUERIMIENTOS_OBJ_ID}.{self.mf['nombre_permiso']}":certificacion,
             f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['curp']}":id_user,
         }
         if empresa:
@@ -4099,63 +4293,262 @@ class Accesos(OcrMixin, AccesosModel):
 
 
 
-    def get_config_modulo_seguridad(self, ubicaciones=[], tipo_de_pase=""):
+    def get_config_modulo_seguridad(self, ubicaciones=[], tipo_de_pase="", account_id=''):
         #TODO Verificar por que se envia asi la lista
         if isinstance(ubicaciones, list) and ubicaciones and isinstance(ubicaciones[0], dict):
             ubicaciones = [u.get('name') or u.get('id') for u in ubicaciones]
         requerimientos = set()
         envios = set()
         condiciones_servicio = {}
-        match_query = {
-            "deleted_at": {"$exists": False},
-            "form_id": self.CONF_MODULO_SEGURIDAD,
-        }
-        query = [
-            {'$match': match_query},
-            {'$sort': {'updated_at': -1}},
-            {'$limit': 1},
-            {'$project': {
-                "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
-            }},
-        ]
-        raw_result = self.format_cr(self.cr.aggregate(query))
-        for raw in raw_result:
-            for grupo in raw.get('grupo_requisitos', []):
-                #TODO Verficiar el cambio de key
-                ubicacion = grupo.get('incidente_location', grupo.get('ubicacion_recorrido', ''))
-                if ubicacion in ubicaciones:
-                    #---Condiciones de servicio (solo del grupo que coincide con la ubicación)
-                    condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio', '')
-                    condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
-                    condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
-                    condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
+        config, grupos = self.get_grupos_requisitos_ubicaciones(ubicaciones)
+        logotipo_pase = self.unlist(config.get('logotipo_pase', [])) or ""
+        for grupo in grupos:
+            #---Condiciones de servicio (solo del grupo que coincide con la ubicación)
+            condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio', '')
+            condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
+            condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
+            condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
 
-                    clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
-                    reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, [])
-                    if isinstance(reqs, list):
-                        requerimientos.update(reqs)
-                    envios = set()
-                    envio_por_list = self.conf_modulo_seguridad.get('envio_por', [])
-                    for item in envio_por_list if isinstance(envio_por_list, list) else [envio_por_list]:
-                        envs = grupo.get(item) or grupo.get('envio_por', [])
-                        if envs:
-                            if isinstance(envs, list):
-                                envios.update(envs)
-                            else:
-                                envios.add(envs)
+            requerimientos.update(self.get_datos_requeridos_grupo(grupo))
+            envios = set()
+            envio_por_list = self.conf_modulo_seguridad.get('envio_por', [])
+            for item in envio_por_list if isinstance(envio_por_list, list) else [envio_por_list]:
+                envs = grupo.get(item) or grupo.get('envio_por', [])
+                if envs:
+                    if isinstance(envs, list):
+                        envios.update(envs)
+                    else:
+                        envios.add(envs)
 
         tipos = self.get_tipos_de_pase(ubicaciones)
         permisos_certificaciones = self.get_permisos_por_perfil(tipo_de_pase) if tipo_de_pase else ""
 
+        ubicaciones_list = ubicaciones if isinstance(ubicaciones, list) else [ubicaciones]
+        ubicaciones_info = []
+        for location_name in ubicaciones_list:
+            if not location_name:
+                continue
+            location_address = self.get_location_address(location_name)
+            ubicaciones_info.append({
+                "name": location_name,
+                "city": location_address.get('city'),
+                "state": location_address.get('state'),
+                "address": location_address.get('address'),
+            })
+
+        company = ""
+        empresa_email = ""
+        empresa_telefono = ""
+        if account_id:
+            employee = self.Employee.get_employee_data(user_id=account_id, get_one=True)
+            company = employee.get("company", "")
+            empresa_email = self.unlist(employee.get("usuario_email", "")) or ""
+            empresa_telefono = self.unlist(employee.get("usuario_telefono", "")) or ""
+
         return {
             "ubicaciones": ubicaciones,
+            "ubicaciones_info": ubicaciones_info,
             "requerimientos": list(requerimientos),
             "envios": list(envios),
             "tipos": tipos,
             "condiciones_servicio": condiciones_servicio,
             "permisos_certificaciones": permisos_certificaciones,
+            "logotipo_pase": logotipo_pase,
+            "empresa": {
+                "nombre": company,
+                "email": empresa_email,
+                "telefono": empresa_telefono,
+            },
         }
 
+
+    def get_ubicaciones_from_answers(self, answers):
+        """
+        Regresa la lista de nombres de ubicaciones de un pase
+
+        args:
+            answers (json): Objeto de answers del pase
+
+        return:
+            ubicaciones (list): Lista de nombres de ubicacion
+        """
+        ubicaciones = []
+        for ubicacion in answers.get(self.pase_entrada_fields['ubicaciones'], []) or []:
+            if not isinstance(ubicacion, dict):
+                continue
+            nombre = ubicacion.get(self.pase_entrada_fields['ubicacion_cat'], {}).get(self.mf['ubicacion'], '')
+            if nombre and nombre not in ubicaciones:
+                ubicaciones.append(nombre)
+        if not ubicaciones:
+            ubicacion_cat = answers.get(self.UBICACIONES_CAT_OBJ_ID, {})
+            if isinstance(ubicacion_cat, dict):
+                nombre = ubicacion_cat.get(self.mf['ubicacion'], '')
+                if nombre:
+                    ubicaciones.append(nombre)
+        return ubicaciones
+
+    def get_docs_pase_link(self, requerimientos=[], docs_front=[]):
+        """
+        Arma el valor del parametro docs del link para completar el pase.
+        Se suman los requerimientos de todas las ubicaciones del pase (el pase
+        debe cumplir con el minimo de cada una) mas lo que mande el front.
+
+        args:
+            requerimientos (list): Datos requeridos (fotografia, identificacion)
+            docs_front (list): Docs que manda el front (agregarFoto, agregarIdentificacion)
+
+        return:
+            docs (str): Ej. 'iden-foto'
+        """
+        docs_map = {
+            'identificacion': 'iden',
+            'agregaridentificacion': 'iden',
+            'fotografia': 'foto',
+            'agregarfoto': 'foto',
+        }
+        docs = []
+        for item in list(requerimientos or []) + list(docs_front or []):
+            if not isinstance(item, str):
+                continue
+            doc = docs_map.get(item.lower())
+            if doc and doc not in docs:
+                docs.append(doc)
+        return '-'.join(docs)
+
+    def get_datos_requeridos_grupo(self, grupo):
+        """
+        Regresa los datos requeridos (fotografia, identificacion) de un grupo de
+        requisitos de la configuracion del modulo de seguridad.
+
+        args:
+            grupo (json): Grupo de requisitos
+
+        return:
+            datos_requeridos (list): Lista de datos requeridos
+        """
+        clave_conf = self.conf_modulo_seguridad.get('datos_requeridos')
+        reqs = grupo.get('datos_requeridos') or grupo.get(clave_conf, []) or []
+        if isinstance(reqs, str):
+            reqs = [reqs,]
+        return reqs if isinstance(reqs, list) else []
+
+    def get_grupos_requisitos_ubicaciones(self, ubicaciones=[]):
+        """
+        Lee la configuracion del modulo de seguridad y regresa los grupos de
+        requisitos que aplican a las ubicaciones dadas.
+
+        args:
+            ubicaciones (str|list): Nombre(s) de la ubicacion
+
+        return:
+            config (json): Configuracion del modulo de seguridad
+            grupos (list): Grupos de requisitos que coinciden con las ubicaciones
+        """
+        #TODO Verificar por que se envia asi la lista
+        if isinstance(ubicaciones, str):
+            ubicaciones = [ubicaciones,]
+        ubicaciones = [
+            (u.get('name') or u.get('id')) if isinstance(u, dict) else u
+            for u in ubicaciones or []
+        ]
+        ubicaciones = [u for u in ubicaciones if u]
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.CONF_MODULO_SEGURIDAD,
+            }},
+            {'$sort': {'updated_at': -1}},
+            {'$limit': 1},
+            {'$project': {
+                "grupo_requisitos": f"$answers.{self.conf_modulo_seguridad['grupo_requisitos']}",
+                "logotipo_pase": f"$answers.{self.mf['logotipo_pase']}",
+            }},
+        ]
+        raw_result = self.format_cr(self.cr.aggregate(query))
+        config = raw_result[0] if raw_result else {}
+        grupos = []
+        for grupo in config.get('grupo_requisitos', []) or []:
+            ubicacion = grupo.get('ubicacion', '')
+            if ubicacion in ubicaciones:
+                grupos.append(grupo)
+        return config, grupos
+
+    def get_requerimientos_pase(self, answers, access_pass=None):
+        """
+        Regresa los datos requeridos que aplican a un pase segun sus ubicaciones.
+
+        args:
+            answers (json): Objeto de answers del pase
+            access_pass (json): Payload crudo del pase (opcional). Si trae
+                explicitamente 'habilitar_fotografia'/'habilitar_identificacion'
+                (true/false), esos valores tienen primera prioridad sobre lo que
+                pida la configuracion del modulo de seguridad de la ubicacion.
+
+        return:
+            requerimientos (list): Lista de datos requeridos
+        """
+        try:
+            requerimientos = self.get_requerimientos_ubicaciones(self.get_ubicaciones_from_answers(answers))
+        except Exception as e:
+            print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
+            #---Si no se pudo leer la configuracion se conserva el criterio previo
+            requerimientos = ['fotografia',]
+        if access_pass:
+            requerimientos = self.apply_habilitar_overrides(access_pass, requerimientos)
+            print("REQUERIMIENTOS", requerimientos)
+        return requerimientos
+
+    def apply_habilitar_overrides(self, access_pass, requerimientos):
+        """
+        Aplica sobre los requerimientos de la ubicacion lo que el pase pida
+        explicitamente con 'habilitar_fotografia'/'habilitar_identificacion'.
+        Estos campos son primera prioridad: si vienen en true/false en el pase,
+        ganan sobre la configuracion de la ubicacion. Si no vienen (el pase no
+        manda el campo), se respeta lo que pida la configuracion.
+
+        args:
+            access_pass (json): Payload crudo del pase
+            requerimientos (list): Requerimientos que pide la configuracion de la ubicacion
+
+        return:
+            requerimientos (list): Requerimientos ya con el override aplicado
+        """
+        requerimientos = set(requerimientos or [])
+        overrides = {'fotografia': 'habilitar_fotografia', 'identificacion': 'habilitar_identificacion'}
+        for dato, campo in overrides.items():
+            valor = access_pass.get(campo)
+            print(f"DEBUG APPLY_HABILITAR_OVERRIDES campo={campo} valor={valor!r} tipo={type(valor)}")
+            if valor is None:
+                continue
+            if isinstance(valor, str):
+                habilitado = valor.strip().lower() in ('si', 'sí', 'true', '1')
+            else:
+                habilitado = bool(valor)
+            if habilitado:
+                requerimientos.add(dato)
+            else:
+                requerimientos.discard(dato)
+        return list(requerimientos)
+
+    def get_requerimientos_ubicaciones(self, ubicaciones=[]):
+        """
+        Regresa los datos requeridos (fotografia, identificacion) que pide la
+        configuracion del modulo de seguridad para las ubicaciones dadas.
+        Si el pase es para varias ubicaciones se suman los requerimientos, para
+        cumplir con el minimo de cada una. Si ninguna pide requerimientos regresa
+        una lista vacia, es decir el visitante no tiene nada que complementar.
+
+        args:
+            ubicaciones (str|list): Nombre(s) de la ubicacion
+
+        return:
+            requerimientos (list): Lista de datos requeridos
+        """
+        requerimientos = set()
+        config, grupos = self.get_grupos_requisitos_ubicaciones(ubicaciones)
+        for grupo in grupos:
+            requerimientos.update(self.get_datos_requeridos_grupo(grupo))
+        return list(requerimientos)
 
     def get_tipos_de_pase(self, ubicaciones=[]):
         query = [
@@ -4281,10 +4674,10 @@ class Accesos(OcrMixin, AccesosModel):
                 format_grupo_requisitos.append({
                     'envio_por': req.get('envio_por',[]) ,
                     'datos_requeridos': req.get('datos_requeridos',[]) ,
-                    'ubicacion': self.unlist(req.get('incidente_location') or []),
-                    'prefijo_telefonico': req.get('prefijo_telefonico'),
-                    'tolerancia_de_entrada_previa': req.get('tolerancia_de_entrada_previa'),
-                    'tolerancia_de_entrada_posterior': req.get('tolerancia_de_entrada_posterior')
+                    'ubicacion': self._flatten_str_list(req.get('incidente_location')),
+                    'prefijo_telefonico': self._flatten_scalar(req.get('prefijo_telefonico')),
+                    'tolerancia_de_entrada_previa': self._flatten_scalar(req.get('tolerancia_de_entrada_previa')),
+                    'tolerancia_de_entrada_posterior': self._flatten_scalar(req.get('tolerancia_de_entrada_posterior'))
                 })
             data.update({
                 'exclude_inputs': format_exclude_inputs,
@@ -4302,6 +4695,24 @@ class Accesos(OcrMixin, AccesosModel):
                 return None
             value = value[0]
         return value
+
+    def _flatten_str_list(self, value):
+        """Aplana cualquier anidamiento a una lista plana de strings no vacios.
+
+        Los campos de catalogo llegan con profundidad variable ("A", ["A"],
+        [["A", "B"]]). No sirve `unlist` aqui: colapsa a un escalar, asi que
+        pierde las demas ubicaciones cuando el requisito aplica a varias, y
+        deja `[]` (no un string) cuando no hay ninguna capturada.
+        """
+        flat = []
+        pending = [value]
+        while pending:
+            item = pending.pop(0)
+            if isinstance(item, (list, tuple)):
+                pending = list(item) + pending
+            elif isinstance(item, str) and item.strip():
+                flat.append(item.strip())
+        return flat
 
     def _flatten_list(self, value):
         """Quita capas de lista anidadas de más hasta llegar a una lista plana de valores."""
@@ -4323,10 +4734,10 @@ class Accesos(OcrMixin, AccesosModel):
             }},
             {'$project': {
                 "_id": 0,
-                "nombre_permiso": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['nombre_permiso']}",
-                "requerimientos_pase": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['requerimientos']}",
-                "vigencia_certificado": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['vigencia_certificado']}",
-                "vigencia_certificado_en": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_PERMISOS_OBJ_ID}.{self.mf['vigencia_certificado_en']}",
+                "nombre_permiso": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_REQUERIMIENTOS_OBJ_ID}.{self.mf['nombre_permiso']}",
+                "requerimientos_pase": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_REQUERIMIENTOS_OBJ_ID}.{self.mf['requerimientos']}",
+                "vigencia_certificado": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_REQUERIMIENTOS_OBJ_ID}.{self.mf['vigencia_certificado']}",
+                "vigencia_certificado_en": f"$answers.{self.mf['permisos_certificaciones_grupo']}.{self.DEFINICION_REQUERIMIENTOS_OBJ_ID}.{self.mf['vigencia_certificado_en']}",
             }}
         ]
 
@@ -4516,6 +4927,8 @@ class Accesos(OcrMixin, AccesosModel):
                 'conservar_datos_por': f"$answers.{self.pase_entrada_fields['conservar_datos_por']}",
                 'ubicaciones': f"$answers.{self.pase_entrada_fields['ubicaciones']}",
                 'habilitar_vehiculo': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}", True]},
+                'habilitar_fotografia': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_fotografia']}", True]},
+                'habilitar_identificacion': {"$ifNull": [f"$answers.{self.pase_entrada_fields['habilitar_identificacion']}", True]},
                 'tipo_visita_pase': f"$answers.{self.mf['tipo_visita_pase']}",     
                 'acompanantes': f"$answers.{self.pase_entrada_fields['acompanantes']}",       
                 'acompanantes_grupo': f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",       
@@ -4540,7 +4953,6 @@ class Accesos(OcrMixin, AccesosModel):
             f =  x.get('visita_a_telefono',[])
             x['empresa'] = self.unlist(x.get('empresa',''))
             x['url_padre']= self.unlist(x.get('url_padre',''))
-            print("RESSSS",x.get('walkin', ''))
             x['walkin']=self.unlist(x.get('walkin', ''))
             # Si es un pase hijo, ir a buscar el link del pase padre
             if x.get('url_padre'):
@@ -4580,6 +4992,8 @@ class Accesos(OcrMixin, AccesosModel):
             x['curp'] = self.unlist(x.get('curp',''))
             x['motivo_visita'] = self.unlist(x.get('motivo_visita',''))
             x['habilitar_vehiculo']=x.get('habilitar_vehiculo',False)
+            x['habilitar_fotografia']= x.get('habilitar_fotografia', False)
+            x['habilitar_identificacion']=x.get('habilitar_identificacion', False)
             x['acompanantes']=x.get('acompanantes',0)
             x['tipo_visita_pase']= x.get('tipo_visita_pase')
             for idx, nombre in enumerate(v):
@@ -4931,7 +5345,7 @@ class Accesos(OcrMixin, AccesosModel):
         pr= self.format_cr_result(self.cr.aggregate(query))
         return self.format_cr_result(self.cr.aggregate(query))
 
-    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", limit=25, skip=0, locations=[], search=""):
+    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", limit=25, skip=0, locations=[], search="", search_fields=[]):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
@@ -4946,15 +5360,21 @@ class Accesos(OcrMixin, AccesosModel):
              match_query[f"answers.{self.cons_f['status_concesion']}"] = status
         if search:
             pattern = re.escape(search.strip())
-            match_query["$or"] = [
-                {"folio": {"$regex": pattern, "$options": "i"}},
-                {"user_name": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['nombre_equipo']}": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['marca_equipo_concesion']}": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['persona_nombre_concesion']}": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['persona_nombre_otro']}": {"$regex": pattern, "$options": "i"}},
-                {f"answers.{self.cons_f['observacion_concesion']}": {"$regex": pattern, "$options": "i"}},
-            ]
+            searchable_fields = {
+                "folio": "folio",
+                "user_name": "user_name",
+                "nombre_equipo": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['nombre_equipo']}",
+                "marca_equipo_concesion": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['marca_equipo_concesion']}",
+                "categoria_equipo_concesion": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['categoria_equipo_concesion']}",
+                "persona_nombre_concesion": f"answers.{self.cons_f['persona_nombre_concesion']}",
+                "persona_nombre_otro": f"answers.{self.cons_f['persona_nombre_otro']}",
+                "observacion_concesion": f"answers.{self.cons_f['observacion_concesion']}",
+            }
+            if search_fields:
+                fields_to_search = [searchable_fields[f] for f in search_fields if f in searchable_fields]
+            else:
+                fields_to_search = list(searchable_fields.values())
+            match_query["$or"] = [{field: {"$regex": pattern, "$options": "i"}} for field in fields_to_search]
 
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         zona = user_data.get('timezone','America/Monterrey')
@@ -5011,6 +5431,7 @@ class Accesos(OcrMixin, AccesosModel):
                 item['firma']['file_url'] = item.pop('file_url')
             if item.get('file_name'):
                 item['firma']['file_name'] = item.pop('file_name')
+        print("QUE PASA",simplejson.dumps(result,indent=4))
         return {
             'records': result,
             'total_records': total_count,
@@ -5340,7 +5761,11 @@ class Accesos(OcrMixin, AccesosModel):
             "limit":limit,
             "skip":skip
         }
-        return self.format_gafete(self.lkf_api.search_catalog( self.GAFETES_CAT_ID, mango_query))
+        data = self.lkf_api.search_catalog( self.GAFETES_CAT_ID, mango_query)
+        if data:
+            format_data = self.format_gafete(data)
+            return format_data
+        return []
 
     def get_lockers(self, status='Disponible', location=None, area=None, tipo_locker='Locker', locker_id=None, limit=1000, skip=0):
         selector = {}
@@ -5855,12 +6280,18 @@ class Accesos(OcrMixin, AccesosModel):
         if not all_qr_codes:
             return
 
-        extra_fields = ['status_pase', 'walkin_fotografia', 'walkin_identificacion', 'link']
+        extra_fields = [
+            'status_pase', 'walkin_fotografia', 'walkin_identificacion', 'link',
+            'walkin_nombre', 'walkin_email', 'walkin_telefono',
+        ]
         field_aliases = {
             'status_pase': 'estatus',
             'walkin_fotografia': 'foto',
             'walkin_identificacion': 'identificacion',
             'link': 'link',
+            'walkin_nombre': 'nombre_acompanante',
+            'walkin_email': 'email_acompanante',
+            'walkin_telefono': 'telefono_acompanante',
         }
         projection = {f"answers.{self.pase_entrada_fields[f]}": 1 for f in extra_fields}
         pases_info = {
@@ -6040,6 +6471,8 @@ class Accesos(OcrMixin, AccesosModel):
                     'acompanantes_grupo':f"$answers.{self.pase_entrada_fields['acompanantes_grupo']}",
                     'acompanantes':f"$answers.{self.pase_entrada_fields['acompanantes']}",
                     'habilitar_vehiculo':f"$answers.{self.pase_entrada_fields['habilitar_vehiculo']}",
+                    'habilitar_identificacion':f"$answers.{self.pase_entrada_fields['habilitar_identificacion']}",
+                    'habilitar_fotografia':f"$answers.{self.pase_entrada_fields['habilitar_fotografia']}",
                     'url_padre':f"$answers.{self.pase_entrada_fields['url_padre']}",
                     'created_by':"$user_name"
                 }
@@ -6108,7 +6541,9 @@ class Accesos(OcrMixin, AccesosModel):
             x['autorizado_por'] = x.get('autorizado_por', "")
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
-            x['habilitar_vehiculo'] = x.get('habilitar_vehiculo', "")
+            x['habilitar_vehiculo'] = x.get('habilitar_vehiculo', True)
+            x['habilitar_fotografia'] = x.get('habilitar_fotografia', True)
+            x['habilitar_identificacion'] = x.get('habilitar_identificacion', True)
             x['url_padre']=x.get('url_padre','')
             x['pase_padre'] = {}
             if x['url_padre']:
@@ -6198,6 +6633,15 @@ class Accesos(OcrMixin, AccesosModel):
 
     def get_pdf_seg(self, qr_code, template_id=None, name_pdf=None):
         return self.lkf_api.get_pdf_record(qr_code, template_id = template_id, name_pdf =name_pdf, send_url=True)
+
+    def get_pdf_multi(self, record_ids, name_pdf=''):
+        templates = self.lkf_api.get_pdf_templates(self.PASE_ENTRADA) or []
+        template_id = next((t.get('id') for t in templates if t.get('_type') == 'multiple-records'), None)
+        records_uri = ['/api/infosync/form_answer/{}/'.format(rid) for rid in record_ids]
+        res = self.lkf_api.get_pdf_record(records_uri, template_id=template_id, name_pdf=name_pdf)
+        if res:
+            res['_id'] = str(res.get('_id', ''))
+        return res
 
     def get_paquetes(self, location= "", area="", status="", dateFrom="", dateTo="", filterDate=""):
         match_query = {
@@ -6289,6 +6733,8 @@ class Accesos(OcrMixin, AccesosModel):
                key == "empresa" or \
                key == "ubicaciones_geolocation" or \
                key == "habilitar_vehiculo" or \
+               key == "habilitar_identificacion" or \
+               key == "habilitar_fotografia" or \
                key == "acompanantes" or \
                key == "acompanantes_grupo" or \
                key == "url_padre" or \
@@ -6576,7 +7022,6 @@ class Accesos(OcrMixin, AccesosModel):
                 'checkin_status': f"$answers.{self.f['guard_group']}.{self.f['checkin_status']}",
                 'checkin_position': f"$answers.{self.f['guard_group']}.{self.f['checkin_position']}",
                 'nombre_suplente': f"$answers.{self.f['guard_group']}.{self.checkin_fields['nombre_suplente']}",
-                'roles': f"$answers.{self.f['grupo_roles']}.{self.f['rol']}",
             }},
             {'$group':{
                 '_id': {
@@ -6592,7 +7037,6 @@ class Accesos(OcrMixin, AccesosModel):
                 'folio': {'$last':'$folio'},
                 'id_register': {'$last':'$_id'},
                 'nombre_suplente': {'$last':'$nombre_suplente'},
-                'roles':{'$last':'$roles'}
             }},
             {'$project':{
                 '_id': 0,
@@ -6607,7 +7051,6 @@ class Accesos(OcrMixin, AccesosModel):
                 'folio': '$folio',
                 'id_register': '$id_register',
                 'nombre_suplente': '$nombre_suplente',
-                'roles': '$roles'
             }}
         ]
         data = self.format_cr(self.cr.aggregate(query))
@@ -6615,6 +7058,8 @@ class Accesos(OcrMixin, AccesosModel):
         if data:
             record = self.unlist(data)
             status = 'in' if record.get('checkin_status') in ['in', 'entrada'] else 'out'
+            #! Los roles se guardan en REGISTRO_ASISTENCIA, no en CHECKIN_CASETAS.
+            attendance_images = self.get_attendance_images(record.get('user_id'))
             format_data = {
                 'status':status,
                 'name': record.get('name'),
@@ -6627,7 +7072,7 @@ class Accesos(OcrMixin, AccesosModel):
                 'checkout_date':record.get('checkout_date'),
                 'checkin_position':record.get('checkin_position'),
                 'nombre_suplente':record.get('nombre_suplente',""),
-                'roles':record.get('roles',[])
+                'roles': self.flatten_roles(attendance_images.get('roles', []))
             }
         return format_data
 
@@ -8068,6 +8513,16 @@ class Accesos(OcrMixin, AccesosModel):
 
         return res
 
+    def flatten_roles(self, roles_raw):
+        """
+        Se aplana la estructura de roles (viene como [{ROL_CATALOG_OBJ_ID: {rol: 'Gerente'}}, ...])
+        a una lista simple de strings (['Gerente', ...]) para el frontend.
+
+        Nota: roles_raw ya pasó por format_cr/_labels, que aplana
+        {ROL_CATALOG_OBJ_ID: {rol_field_id: valor}} a {'rol': valor}.
+        """
+        return [r.get('rol') for r in roles_raw if r.get('rol')]
+
     def update_guard_status(self, guard, this_user):
         attendance_images = self.get_attendance_images(this_user.get('user_id', self.unlist(this_user.get('usuario_id', 0000))))
         status_turn = 'Turno Cerrado'
@@ -8077,14 +8532,11 @@ class Accesos(OcrMixin, AccesosModel):
         this_user['start_turn_image'] = attendance_images.get('start_turn_image', [])
         this_user['end_turn_image'] = attendance_images.get('end_turn_image', [])
         this_user['status_turn'] = status_turn
-        #! Se aplana la estructura de roles (viene como [{'rol': 'Gerente'}, ...])
-        #! a una lista simple de strings (['Gerente', ...]) para el frontend.
-        roles_raw = attendance_images.get('roles', [])
-        this_user['roles'] = [r.get('rol') for r in roles_raw if r.get('rol')]
+        this_user['roles'] = self.flatten_roles(attendance_images.get('roles', []))
 
         return this_user
 
-    def update_guards_checkin(self, data_guard, record_id, location, area, user_data={}, nombre_suplente="", foto_checkin=[]):
+    def update_guards_checkin(self, data_guard, record_id, location, area, user_data={}, nombre_suplente="", foto_checkin=[], roles=[]):
         response = []
         timezone = user_data.get('timezone', 'America/Monterrey')
         now_datetime =self.today_str(timezone, date_format='datetime')
@@ -8118,6 +8570,15 @@ class Accesos(OcrMixin, AccesosModel):
                 self.checkin_fields['checkin_type']: 'iniciar_turno',
                 self.f['image_checkin']: foto_checkin
             }
+            if roles:
+                asistencia_answers[self.f['grupo_roles']] = [
+                            {
+                                self.ROL_CATALOG_OBJ_ID: {
+                                    self.f['rol']: rol
+                                }
+                            }
+                            for rol in roles
+                        ]
 
             if nombre_suplente:
                 asistencia_answers.update({
@@ -8333,9 +8794,14 @@ class Accesos(OcrMixin, AccesosModel):
         pass_selected= self.get_detail_access_pass(qr_code=folio, get_answers=True)
         qr_code= folio
         _folio= pass_selected.get("folio")
-   
+
         answers={}
         acompanantes_a_actualizar = []
+        #---grupo_vehiculos/grupo_equipos se reemplazan completos via $set directo a
+        #   Mongo (no via patch_multi_record, que solo permite agregar/editar por
+        #   posicion): lo que mande el front sustituye el grupo repetitivo entero,
+        #   incluyendo vaciarlo si mandan una lista vacia.
+        replace_groups = {}
         for key, value in access_pass.items():
             if not self.pase_entrada_fields.get(key):
                 continue
@@ -8386,8 +8852,8 @@ class Accesos(OcrMixin, AccesosModel):
                     answers[self.pase_entrada_fields['acompanantes_grupo']] = grupo_answers
                 continue
             if key == 'grupo_vehiculos':
-                answers[self.mf['grupo_vehiculos']]={}
-                for index, item in enumerate(access_pass.get('grupo_vehiculos',[])):
+                nuevo_grupo_vehiculos = []
+                for item in access_pass.get('grupo_vehiculos',[]):
                     tipo = item.get('tipo',item.get('tipo_vehiculo',''))
                     marca = item.get('marca',item.get('marca_vehiculo',''))
                     modelo = item.get('modelo',item.get('modelo_vehiculo',''))
@@ -8408,10 +8874,11 @@ class Accesos(OcrMixin, AccesosModel):
                         self.mf['color_vehiculo']:color,
                         self.f['foto_vehiculo']:foto_vehiculo,
                     }
-                    answers[self.mf['grupo_vehiculos']][(index+1)*-1]=obj
+                    nuevo_grupo_vehiculos.append(obj)
+                replace_groups[self.mf['grupo_vehiculos']] = nuevo_grupo_vehiculos
             elif key == 'grupo_equipos':
-                answers[self.mf['grupo_equipos']]={}
-                for index, item in enumerate(value):
+                nuevo_grupo_equipos = []
+                for item in value:
                     nombre = item.get('nombre',item.get('nombre_articulo',''))
                     marca = item.get('marca',item.get('marca_articulo',''))
                     color = item.get('color',item.get('color_articulo',''))
@@ -8428,7 +8895,8 @@ class Accesos(OcrMixin, AccesosModel):
                         self.mf['modelo_articulo']:modelo,
                         self.f['foto_equipo']:foto_equipo,
                     }
-                    answers[self.mf['grupo_equipos']][(index+1)*-1]=obj
+                    nuevo_grupo_equipos.append(obj)
+                replace_groups[self.mf['grupo_equipos']] = nuevo_grupo_equipos
             elif key == 'visita_a':
                 for index, item in enumerate(access_pass.get('visita_a',[])):
                     answers[self.mf['grupo_visitados']] = answers.get(self.mf['grupo_visitados'],{})
@@ -8470,6 +8938,12 @@ class Accesos(OcrMixin, AccesosModel):
             #             self.pase_entrada_fields['foto_acompanante']: foto,
             #         }
             #         answers[self.pase_entrada_fields['acompanantes_grupo']][(index + 1) * -1] = obj
+            elif key == 'firma_reglas_de_acceso':
+                #---El campo es tipo "images" (multi_selection), la plataforma espera
+                #   siempre una lista aunque sea una sola firma.
+                if value:
+                    firma_value = value if isinstance(value, list) else [value]
+                    answers.update({self.pase_entrada_fields[key]: firma_value})
             else:
                 if value:
                     answers.update({f"{self.pase_entrada_fields[key]}":value})
@@ -8478,21 +8952,37 @@ class Accesos(OcrMixin, AccesosModel):
             employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
         if not employee:
             employee = self.get_employee_data(email=self.user.get('email'), get_one=True)
-        if answers:
+        if answers or replace_groups:
             new_answers = deepcopy(pass_selected['answers'])
             new_answers.update(answers)
+            new_answers.update(replace_groups)
+            #---habilitar_fotografia/identificacion pueden venir en este update o ya
+            #   estar guardados de antes; si nunca se decidieron (None) gana la config.
+            habilitar_context = {
+                'habilitar_fotografia': new_answers.get(self.pase_entrada_fields['habilitar_fotografia']),
+                'habilitar_identificacion': new_answers.get(self.pase_entrada_fields['habilitar_identificacion']),
+            }
+            requerimientos = self.get_requerimientos_pase(new_answers, access_pass=habilitar_context)
             # Si viene con estatus cancelado se salta la funcion de asignar estatus
             status_field = self.pase_entrada_fields['status_pase']
             if answers.get(status_field) == 'cancelado':
                 status = 'cancelado'
             else:
-                status = self.access_pass_set_status(new_answers)
+                status = self.access_pass_set_status(new_answers, requerimientos=requerimientos)
             answers[status_field] = status
 
+            print("DEBUG UPDATE_PASS payload a enviar:", answers)
             res= self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
+            print("DEBUG UPDATE_PASS respuesta patch_multi_record:", res)
             if res.get('status_code') == 201 or res.get('status_code') == 202 and folio:
+                if replace_groups:
+                    self.cr.update_one(
+                        {'_id': ObjectId(qr_code), 'form_id': self.PASE_ENTRADA, 'deleted_at': {'$exists': False}},
+                        {'$set': {f'answers.{field_id}': grupo for field_id, grupo in replace_groups.items()}}
+                    )
                 if acompanantes_a_actualizar:
-                    self._patch_acompanantes_pases(acompanantes_a_actualizar)
+                    self._patch_acompanantes_pases(acompanantes_a_actualizar,
+                        requerimientos=requerimientos)
                 pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
                 res['json'].update({'qr_pase':pass_selected.get("qr_pase")})
                 res['json'].update({'telefono':pass_selected.get("telefono")})
@@ -8513,7 +9003,8 @@ class Accesos(OcrMixin, AccesosModel):
         else:
             self.LKFException('No se mandarón parametros para actualizar')
 
-    def _patch_acompanantes_pases(self, acompanantes_a_actualizar):
+    def _patch_acompanantes_pases(self, acompanantes_a_actualizar, requerimientos=None):
+        status_field = self.pase_entrada_fields['status_pase']
         for item in acompanantes_a_actualizar:
             child_answers = {
                 self.mf['nombre_pase']: item['nombre'],
@@ -8521,6 +9012,17 @@ class Accesos(OcrMixin, AccesosModel):
                 self.mf['telefono_pase']: item['telefono'],
                 self.pase_entrada_fields['walkin_fotografia']: item['foto'],
             }
+            #---Ya con los datos del acompanante se revisa si su pase puede activarse
+            try:
+                registro = self.cr.find_one({'_id': ObjectId(item['qr_code'])}) or {}
+                child_stored = registro.get('answers') or {}
+                if child_stored and child_stored.get(status_field) != 'cancelado':
+                    new_child_answers = deepcopy(child_stored)
+                    new_child_answers.update(child_answers)
+                    child_answers[status_field] = self.access_pass_set_status(
+                        new_child_answers, requerimientos=requerimientos)
+            except Exception as e:
+                print(f"Error calculando status del pase de acompañante {item.get('qr_code')}: {e}")
             try:
                 self.lkf_api.patch_multi_record(answers=child_answers, form_id=self.PASE_ENTRADA, record_id=[item['qr_code']])
             except Exception as e:
@@ -8529,13 +9031,22 @@ class Accesos(OcrMixin, AccesosModel):
     def update_pass_img(self, qr_code=None):
         self.pdf = getattr(self, 'pdf', self.lkf_api.get_pdf_record(qr_code, name_pdf='Pase de Entrada', send_url=True))
         pdf_url = self.pdf.get('json', {}).get('download_url')
+        if not pdf_url:
+            print('No se pudo obtener el download_url del PDF:', self.pdf)
+            if self.pdf.get('status_code') == 404:
+                self.LKFException({'title': 'Error', 'msg': 'El pase ya no existe o fue eliminado.'})
+            return False
         id_forma = self.PASE_ENTRADA
         id_campo_pdf_to_img = self.pase_entrada_fields['pdf_to_img']
         pass_img_url = self.upload_pdf_as_image(id_forma, id_campo_pdf_to_img, pdf_url)
+        if pass_img_url.get('error'):
+            print('No se pudo convertir el PDF a imagen:', pass_img_url)
+            return False
         pass_img_file_name = pass_img_url.get('file_name')
         pass_img_file_url = pass_img_url.get('file_url')
         return [{'file_name': pass_img_file_name, 'file_url': pass_img_file_url}]
 
+    # feature: update_pases
     def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
         answers = {}
         perfil_pase = access_pass.get('perfil_pase', 'Visita General')
@@ -8632,17 +9143,24 @@ class Accesos(OcrMixin, AccesosModel):
             elif key == 'link':
                 link_info=access_pass.get('link', '')
                 if link_info:
-                    docs=""
-                    for index, d in enumerate(link_info["docs"]):
-                        if(d == "agregarIdentificacion"):
-                            docs+="iden"
-                        elif(d == "agregarFoto"):
-                            docs+="foto"
-                        if index==0 :
-                            docs+="-"
+                    #---Se suman los requerimientos de todas las ubicaciones del pase
+                    try:
+                        requerimientos = self.get_requerimientos_ubicaciones(access_pass.get('ubicacion', []))
+                    except Exception as e:
+                        print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
+                        requerimientos = []
+                    #---Igual que el status: gana lo que venga en este update, si no
+                    #   lo que ya estaba guardado, si no la config de la ubicacion.
+                    habilitar_context_link = {
+                        'habilitar_fotografia': access_pass.get('habilitar_fotografia',
+                            pass_selected['answers'].get(self.pase_entrada_fields['habilitar_fotografia'])),
+                        'habilitar_identificacion': access_pass.get('habilitar_identificacion',
+                            pass_selected['answers'].get(self.pase_entrada_fields['habilitar_identificacion'])),
+                    }
+                    requerimientos = self.apply_habilitar_overrides(habilitar_context_link, requerimientos)
+                    docs = self.get_docs_pase_link(requerimientos, link_info.get('docs', []))
                     link_pass= f"{link_info['link']}?id={link_info['qr_code']}&user={self.user.get('parent_id')}&docs={docs}"
-
-                answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
+                    answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
             elif key == 'ubicacion':
                 # answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
                 ubicaciones = access_pass.get('ubicacion',[])
@@ -8778,6 +9296,9 @@ class Accesos(OcrMixin, AccesosModel):
                     '_id': qr_code
                 })
             res= self.net.patch_forms_answers(metadata)
+            link_pass = answers.get(self.pase_entrada_fields['link'])
+            if link_pass and res.get('status_code') in (200, 201, 202):
+                res.setdefault('json', {})['link'] = link_pass
             return res
         else:
             self.LKFException('No se mandarón parametros para actualizar')
@@ -8928,7 +9449,7 @@ class Accesos(OcrMixin, AccesosModel):
                         if index==0 :
                             docs+="-"
                     link_pass= f"{link_info['link']}"
-                answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
+                    answers.update({f"{self.pase_entrada_fields[key]}":link_pass})
             elif key == 'ubicacion':
                 answers[self.pase_entrada_fields['ubicacion_cat']] = {self.mf['ubicacion']:access_pass['ubicacion']}
             elif key == 'visita_a':

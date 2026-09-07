@@ -10,7 +10,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <created_at>1786054309.0</created_at>
-    <description>version: 1786653837</description>
+    <description>version: 1788802648</description>
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
@@ -65,6 +65,12 @@
                             <value>inspeccion_de_entrada</value>
                         </item>
                         <item>
+                            <label>Inspeccion Sello Entrada</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>inspeccion_sello_entrada</value>
+                        </item>
+                        <item>
                             <label>Carga / Descarga</label>
                             <points>None</points>
                             <selected>False</selected>
@@ -81,6 +87,12 @@
                             <points>None</points>
                             <selected>False</selected>
                             <value>inspeccion_salida</value>
+                        </item>
+                        <item>
+                            <label>Inspeccion Sello Salida</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>inspeccion_sello_salida</value>
                         </item>
                     </options>
                     <properties>
@@ -991,5 +1003,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1786653792.0</updated_at>
+    <updated_at>1788802648.0</updated_at>
 </lkf>

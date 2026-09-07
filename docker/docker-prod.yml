@@ -1,13 +1,11 @@
-version: '3.4'
-
 volumes:
   infosync_media:
 
 
 networks:
   linkaform:
-    external:
-      name: linkaform
+    name: linkaform
+    external: true
 
 services:
   lkf-addons:

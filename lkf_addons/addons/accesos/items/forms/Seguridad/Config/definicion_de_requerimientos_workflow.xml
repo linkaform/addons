@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
-    <form_id>{{ form.definicion_de_permisos.id }}</form_id>
+    <form_id>{{ form.definicion_de_requerimientos.id }}</form_id>
     <id>662980f5f44f5ac4acf8cb71</id>
     <workflows>
         <item>
@@ -12,17 +12,17 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>{{ catalog.definicion_de_permisos.obj_id }}</couch_id>
-                                <id>{{ catalog.definicion_de_permisos.id }}</id>
-                                <name>Definicion de Permisos</name>
+                                <couch_id>{{ catalog.definicion_de_requerimientos.obj_id }}</couch_id>
+                                <id>{{ catalog.definicion_de_requerimientos.id }}</id>
+                                <name>Definicion de Requerimientos</name>
                             </item>
                         </synched_catalogs>
                     </configuration>
-                    <name>Sincronizar definición de permisos</name>
+                    <name>Sincronizar definición de requerimientos</name>
                 </item>
             </actions>
             <id>662980f5f44f5ac4acf8cb6f</id>
-            <name>Sincronizar forma a catálogo definición de permisos</name>
+            <name>Sincronizar forma a catálogo definición de requerimientos</name>
             <rules>
                 <metadata>
                     <connection>[]</connection>

@@ -8,13 +8,13 @@
     </confirmation>
     <description />
     <_rev>40-89ae85117e8ae4a3cb1d93da7e77ad00</_rev>
-    <updated_at>2024-07-30T00:58:57.576488+00:00Z</updated_at>
+    <updated_at>2026-09-01T23:27:30.207920+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
     </sync>
     <filters>{}</filters>
-    <name>Definicion de Permisos</name>
+    <name>Definicion de Requerimientos</name>
     <edit_public_records>False</edit_public_records>
     <created_at>2024-07-30T00:58:57.576488+00:00Z</created_at>
     <advanced_options>

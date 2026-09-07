@@ -1,0 +1,54 @@
+#!/bin/bash
+# Impide que las credenciales lleguen a git.
+#
+# secrets/ se ignora por lista blanca en .gitignore, pero un `git add -f` la saltaria.
+# Este hook es la segunda red: revisa lo que de verdad va a quedar en el commit.
+#
+# Se instala con:  git config core.hooksPath .githooks
+
+set -u
+
+PERMITIDOS_RE='^secrets/(README\.md|lkf_jwt_key\.pub|[^/]+\.example)$'
+
+# --cached: lo que esta en el indice, que es lo que se va a commitear
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged" ] && exit 0
+
+malos=""
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  case "$f" in
+    secrets/*)
+      if ! echo "$f" | grep -qE "$PERMITIDOS_RE"; then
+        malos="${malos}    $f"$'\n'
+      fi
+      ;;
+    *local_settings.py|*current_domain|*accounts.ini)
+      malos="${malos}    $f"$'\n'
+      ;;
+  esac
+done <<< "$staged"
+
+if [ -n "$malos" ]; then
+  cat >&2 <<EOF
+
+============================================================
+COMMIT BLOQUEADO: hay archivos con credenciales en el commit
+
+$malos
+Estos archivos NO deben versionarse nunca. Sacalos del indice:
+
+    git restore --staged <archivo>
+
+Solo se versionan de secrets/: README.md, lkf_jwt_key.pub y los *.example
+
+Si de verdad necesitas commitear alguno (revisalo dos veces):
+
+    git commit --no-verify
+============================================================
+
+EOF
+  exit 1
+fi
+
+exit 0

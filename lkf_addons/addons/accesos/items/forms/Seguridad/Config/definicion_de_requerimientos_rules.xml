@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <lkf>
-    <form_id>{{ form.definicion_de_permisos.id }}</form_id>
+    <form_id>{{ form.definicion_de_requerimientos.id }}</form_id>
     <id>66ff30e342c1e19689227acb</id>
     <rules>
         <item>

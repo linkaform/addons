@@ -484,12 +484,25 @@ class Items(LKFException):
                     # Recurse into subfolder(s)
                     yield from self.flatten(children, prefix=f"{prefix}{folder}/")  
 
+    def print_grouped_items(self, title, items):
+        grouped = {}
+        for item in items:
+            if '/' in item:
+                folder, name = item.rsplit('/', 1)
+            else:
+                folder, name = '.', item
+            grouped.setdefault(folder, []).append(name)
+        print(f'{title} ({len(items)}):')
+        for folder in sorted(grouped):
+            print(f'  {folder}/')
+            for name in sorted(grouped[folder]):
+                print(f'    {name}')
+
     def get_anddons_and_modules_items(self, itype, sub_dir=None):
         res_addons = self.get_all_items_json(itype, sub_dir=sub_dir, path=ADDONS_PATH)
         res_modules = self.get_all_items_json(itype, sub_dir=sub_dir, path=MODULES_PATH)
         addons_modules = self.merge_addons_modules(res_addons,res_modules)
-        print('Module Items: ')
-        print(" ".join(self.flatten(addons_modules)))
+        self.print_grouped_items('Module Items', list(self.flatten(addons_modules)))
         return addons_modules
 
     def get_all_items_json(self, itype, sub_dir=None, path=MODULES_PATH):
