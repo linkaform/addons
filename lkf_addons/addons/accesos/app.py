@@ -12202,17 +12202,23 @@ class Accesos(OcrMixin, AccesosModel):
             return {'status_code': 400, 'type': 'error', 'msg': 'Missing _id or _rev', 'data': {}}
 
         answers = self.get_area_model(record)
+        if answers.get('error'):
+            record['status'] = 'error'
+            record['updated_at'] = self.today_str(date_format='datetime')
+            record['last_error'] = answers['error']
+            self.cr_db.save(record)
+            return {'status_code': 400, 'type': 'error', 'msg': answers['error'], 'data': {}}
+
         metadata = self.lkf_api.get_metadata(form_id=self.CONFIGURACION_AREA_FORM)
+        metadata.update({'id': _id})
         if record.get('geolocation'):
             metadata['geolocation'] = [record['geolocation']['long'], record['geolocation']['lat']]
         metadata.update({'answers': answers})
         res = self.lkf_api.post_forms_answers(metadata)
         # res = {'status_code':400, 'exception':'testing'}
         if res.get('status_code') in (200, 201, 202):
-            record['status'] = 'synced'
             record['status'] = 'received'
             record.pop('last_error', None)
-            record['status'] = 'received'
             self.cr_db.save(record)
             res = {'status_code': 200, 'type': 'success', 'msg': 'Area synced', 'data': {}}
         else:
@@ -12222,7 +12228,6 @@ class Accesos(OcrMixin, AccesosModel):
             else:
                 last_error = res.get('json',{}).get('error','Error al crear la configuracon del area')
             if isinstance(last_error, dict):
-                record['status'] = 'error'
                 last_error = last_error.get('exception', last_error)
 
             res = {'status_code': 400, 'type': 'error', 'msg': last_error, 'data': {}}
