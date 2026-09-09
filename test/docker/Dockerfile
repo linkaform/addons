@@ -11,7 +11,10 @@ FROM python:3.10.14-bullseye as develop
 RUN curl -fsSL https://pgp.mongodb.com/server-5.0.asc | gpg -o /usr/share/keyrings/mongodb-server-5.0.gpg --dearmor
 RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-5.0.gpg] http://repo.mongodb.org/apt/debian bullseye/mongodb-org/5.0 main" | tee /etc/apt/sources.list.d/mongodb-org-5.0.list
 
-RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list
+RUN sed -i \
+    -e 's|^# deb http://snapshot|deb http://snapshot|' \
+    -e 's|^deb http://deb.debian.org|# deb http://deb.debian.org|' \
+    /etc/apt/sources.list
 RUN apt-get update -o Acquire::Check-Valid-Until=false && \
     apt-get -y install \
     vim \
