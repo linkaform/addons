@@ -1,0 +1,61 @@
+# Mini-back local: simula la parte del backend de LinkaForm que corre scripts
+# de addons dentro del contenedor de la cuenta. Para devs que no tienen el
+# repo infosync-api.
+#
+#   cd ~/lkf/addons
+#   docker compose -f docker/docker-compose.miniback.yml up -d --build
+#   curl localhost:8000/api/health
+#
+# Para tirarlo: mismo comando con `down` en lugar de `up -d`.
+#
+# Si ya tienes el infosync-api real ocupando el 8000, levanta este en otro
+# puerto:  MINIBACK_PORT=8010 docker compose -f docker/... up -d
+#
+# Para probar un worktree en vez del arbol principal:
+#   LKF_ADDONS_CONTAINER=lkf-addons-<worktree> docker compose -f docker/... up -d
+
+name: lkf-miniback
+
+networks:
+  linkaform:
+    name: linkaform
+    external: true
+
+services:
+  miniback:
+    restart: "no"
+    container_name: lkf-miniback
+    hostname: miniback
+    image: linkaform/miniback:develop
+    build:
+      context: ../miniback
+      dockerfile: Dockerfile
+    networks:
+      linkaform:
+    ports:
+      - "${MINIBACK_PORT:-8000}:8000"
+    environment:
+      LKF_ADDONS_CONTAINER: ${LKF_ADDONS_CONTAINER:-lkf-addons}
+      LKF_MODULES_PATH: ${LKF_MODULES_PATH:-/srv/scripts/addons/modules}
+      LKF_ACCOUNT_ID: ${LKF_ACCOUNT_ID:-}
+      LKF_UPSTREAM: ${LKF_UPSTREAM:-https://app.linkaform.com}
+      MINIBACK_TIMEOUT: ${MINIBACK_TIMEOUT:-120}
+      MINIBACK_INDEX_TTL: ${MINIBACK_INDEX_TTL:-30}
+      # 0 = sin tope: las peticiones del front corren en paralelo.
+      MINIBACK_MAX_CONCURRENT: ${MINIBACK_MAX_CONCURRENT:-0}
+    volumes:
+      # El docker.sock del host: es como este contenedor le hace `docker exec`
+      # al de addons. Equivale a acceso root al host, ver miniback/README.md.
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Solo para resolver el account_id por default (current_domain +
+      # accounts.ini). Nada mas se lee de aqui.
+      - ../secrets:/srv/scripts/addons/secrets:ro
+      # El codigo del mini-back en vivo, para no rebuildear en cada cambio.
+      - ../miniback:/srv/miniback
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    stdin_open: true
+    tty: true
