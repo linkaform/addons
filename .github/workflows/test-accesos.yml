@@ -156,7 +156,7 @@ jobs:
       - name: Construir imagen de test
         run: docker build -f test/docker/Dockerfile --target develop -t linkaform/lkf_test:develop test/docker
 
-      - name: Correr tests de integración (marker: create_passes)
+      - name: "Correr tests de integración (marker: create_passes)"
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/secrets/lkf_jwt_key.pub:/etc/ssl/certs/lkf_jwt_key.pub" \
