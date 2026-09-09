@@ -156,7 +156,7 @@ jobs:
       - name: Construir imagen de test
         run: docker build -f test/docker/Dockerfile --target develop -t linkaform/lkf_test:develop test/docker
 
-      - name: Correr tests de integración (create_access_pass)
+      - name: Correr tests de integración (marker: create_passes)
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/secrets/lkf_jwt_key.pub:/etc/ssl/certs/lkf_jwt_key.pub" \
@@ -166,7 +166,7 @@ jobs:
             -v "${{ github.workspace }}/config:/srv/scripts/addons/config" \
             -w /srv/lkf_test \
             linkaform/lkf_test:develop \
-            pytest sdk_testing/accesos/passes/integration/test_create_access_pass_api.py -v
+            pytest sdk_testing/accesos -m create_passes -v
 
   integration-pases-update:
     # Este test escribe contra PROD real. No corre aquí: la DB de prod
