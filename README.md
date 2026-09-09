@@ -304,6 +304,21 @@ Depending you choice
 ### Stoping 
 `./lkf stop addons`
 
+### Probar tus scripts desde un front, sin el backend
+
+El backend de LinkaForm es el que recibe la peticion del front y corre tu
+script dentro del contenedor de la cuenta. Si no tienes el repo
+`infosync-api`, el `miniback/` simula esa parte: expone
+`/api/infosync/scripts/run/` con el mismo contrato y hace el `docker exec`
+contra tu `lkf-addons`.
+
+```
+docker compose -f docker/docker-compose.miniback.yml up -d --build
+curl localhost:8000/api/health
+```
+
+Detalles, variables de entorno y limitaciones en [`miniback/README.md`](miniback/README.md).
+
 
 ## Installing you modules on LinkaForm
 
