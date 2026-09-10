@@ -584,15 +584,18 @@ class Base(BaseModel):
         user_id = data.get('usuario_id')
         if user_id and isinstance(user_id, list):
             user_id = user_id[0]
-        permissions = 'can_read_item'
-        share_data = {
-            "owner": f"/api/infosync/user/{user_id}/",
-            "perm": permissions
-        }
+        return self.apply_user_menu_permissions(user_id, data.get('elementos', []))
+
+    def apply_user_menu_permissions(self, user_id, elementos):
+        """
+        Igual que set_user_permissions, pero recibe user_id/elementos ya resueltos en vez de
+        leerlos de self.answers -- permite correrla para varios usuarios en paralelo
+        (ThreadPoolExecutor) sin que un hilo pise el self.answers de otro.
+        """
         forms_needed = set()
         catalogs_needed = set()
         scripts_needed = set()
-        menus = {i.get('menu', '').lower().replace(' ', '_') for i in data.get('elementos', [])}
+        menus = {i.get('menu', '').lower().replace(' ', '_') for i in elementos}
         menus = ['always'] + list(menus)
         for menu in menus:
             config = self.module_permits.get(menu, {})
@@ -601,9 +604,9 @@ class Base(BaseModel):
             forms_needed.update([x for x in config.get('forms',[]) if x])
             catalogs_needed.update([x for x in config.get('catalogs') if x])
             scripts_needed.update([x for x in config.get('scripts') if x])
-        response_forms = self.set_item_permits(user_id, forms_needed, item_type='form')
-        response_catalog = self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
-        response_scripts = self.set_item_permits(user_id, scripts_needed,  item_type='script')
+        self.set_item_permits(user_id, forms_needed, item_type='form')
+        self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
+        self.set_item_permits(user_id, scripts_needed,  item_type='script')
 
         return True
 
