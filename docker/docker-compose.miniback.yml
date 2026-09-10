@@ -37,6 +37,12 @@ services:
     environment:
       LKF_ADDONS_CONTAINER: ${LKF_ADDONS_CONTAINER:-lkf-addons}
       LKF_MODULES_PATH: ${LKF_MODULES_PATH:-/srv/scripts/addons/modules}
+      # Destino de los *_sdk.py: son wrappers CLI que le pegan por HTTP a
+      # la app Sanic de su propio contenedor, asi que ahi tiene que estar
+      # sirviendo, no solo levantado.
+      LKF_SANIC_CONTAINER: ${LKF_SANIC_CONTAINER:-lkf-sanic-app}
+      LKF_SANIC_MODULES_PATH: ${LKF_SANIC_MODULES_PATH:-/srv/lkf-sanic-app/modules}
+      LKF_SANIC_PYTHONPATH: ${LKF_SANIC_PYTHONPATH:-/srv/lkf-sanic-app/config:/srv/lkf-sanic-app}
       LKF_ACCOUNT_ID: ${LKF_ACCOUNT_ID:-}
       LKF_UPSTREAM: ${LKF_UPSTREAM:-https://app.linkaform.com}
       MINIBACK_TIMEOUT: ${MINIBACK_TIMEOUT:-120}

@@ -57,9 +57,11 @@ def get_body(request):
 @app.before_server_start
 async def abrir_cliente(app, loop):
     app.ctx.http = httpx.AsyncClient(timeout=30.0)
-    # Se resuelve una sola vez, para que armar script_args no cueste un
-    # `docker inspect` por peticion.
-    await runner.docker_image()
+    # Se resuelven una sola vez, para que armar script_args no cueste un
+    # `docker inspect` por peticion. Si un contenedor esta abajo no pasa nada:
+    # se reintenta en la peticion que lo necesite.
+    for target in settings.TARGETS:
+        await runner.docker_image(target)
 
 
 @app.after_server_stop
@@ -69,19 +71,31 @@ async def cerrar_cliente(app, loop):
 
 @app.get('/api/health')
 async def health(request):
-    body = {
-        'ok': True,
-        'container': settings.CONTAINER,
+    destinos = []
+    todo_ok = True
+    for target in settings.TARGETS:
+        destino = {
+            'name': target['name'],
+            'container': target['container'],
+            'runs': 'todo lo demas' if target['name'] == 'addons'
+                    else '*{}'.format(settings.SDK_SUFFIX),
+        }
+        try:
+            destino['scripts'] = len(await index.get_index(target))
+            destino['ok'] = True
+        except ContainerError as e:
+            # El mini-back esta vivo; el que no responde es la dependencia.
+            destino['ok'] = False
+            destino['scripts'] = 0
+            destino['error'] = str(e)
+            todo_ok = False
+        destinos.append(destino)
+
+    return json_response({
+        'ok': todo_ok,
         'account_id': settings.ACCOUNT_ID,
-    }
-    try:
-        body['scripts'] = len(await index.get_index())
-    except ContainerError as e:
-        # El mini-back esta vivo; el que no responde es el contenedor de addons.
-        body['ok'] = False
-        body['scripts'] = 0
-        body['error'] = str(e)
-    return json_response(body)
+        'targets': destinos,
+    })
 
 
 @app.route('/api/infosync/scripts/run/', methods=['POST', 'GET', 'OPTIONS'],
@@ -98,11 +112,15 @@ async def scripts_run(request):
         return json_response({'error': 'Missing params.', 'success': False}, status=400)
 
     try:
-        script_path = await index.resolve(script_name)
-    except ScriptNotFound:
+        script_path, target = await index.resolve(script_name)
+    except ScriptNotFound as e:
+        contenedor = e.target['container'] if e.target else '?'
         return json_response({
             'code': 11,
             'error': 'The script does not exist.',
+            'detail': '{} no esta en el indice de "{}"'.format(
+                script_name, contenedor),
+            'container': contenedor,
             'success': False,
         }, status=404)
     except ScriptAmbiguous as e:
@@ -113,18 +131,31 @@ async def scripts_run(request):
             'success': False,
         }, status=400)
     except ContainerError as e:
+        # La dependencia esta caida: no es un error de la peticion.
         return json_response({
-            'code': 12, 'error': str(e), 'success': False}, status=400)
+            'code': 12, 'error': str(e), 'success': False}, status=503)
 
-    if runner._cache['docker_image'] is None:
+    if not runner._cache['docker_image'].get(target['container']):
         # El contenedor pudo haber arrancado despues del mini-back.
-        await runner.docker_image()
+        await runner.docker_image(target)
 
-    args = runner.build_args(body, request.headers.get('Authorization'), script_path)
+    args = runner.build_args(
+        body, request.headers.get('Authorization'), script_path, target)
 
     try:
-        returncode, stdout, stderr = await runner.run(script_path, args)
-    except (ContainerError, ScriptTimeout) as e:
+        returncode, stdout, stderr = await runner.run(target, script_path, args)
+    except ContainerError as e:
+        # La dependencia esta caida: no es un error de la peticion.
+        return json_response({
+            'code': 12,
+            'error': str(e),
+            'container': target['container'],
+            'response': {},
+            'log': '',
+            'success': False,
+        }, status=503)
+    except ScriptTimeout as e:
+        # Aqui si fallo el script: se colgo.
         return json_response({
             'code': 12,
             'error': str(e),
@@ -181,7 +212,11 @@ async def login(request):
 
 
 if __name__ == '__main__':
-    print('miniback: contenedor destino = {}'.format(settings.CONTAINER))
+    for target in settings.TARGETS:
+        print('miniback: destino [{}] -> contenedor "{}" ({})'.format(
+            target['name'], target['container'],
+            'todo lo demas' if target['name'] == 'addons'
+            else '*{}'.format(settings.SDK_SUFFIX)))
     print('miniback: account_id por default = {}'.format(settings.ACCOUNT_ID))
     app.run(
         host='0.0.0.0',

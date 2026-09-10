@@ -15,9 +15,14 @@ front (localhost:3000)
    |  POST /api/infosync/scripts/run/
    v
 mini-back (localhost:8000)          <- este servicio
-   |  docker exec lkf-addons python /srv/.../script.py '{}' '{...}' 'False'
-   v
-contenedor lkf-addons               <- tu codigo de modules/, en vivo
+   |
+   +-- script_name termina en _sdk.py ?
+   |
+   |-- no --> docker exec lkf-addons     python /srv/scripts/addons/modules/.../x.py
+   |          contenedor lkf-addons      <- tu codigo de modules/, en vivo
+   |
+   +-- si --> docker exec lkf-sanic-app  python /srv/lkf-sanic-app/modules/.../x_sdk.py
+              contenedor lkf-sanic-app   <- repo lkf-sanic-apps, en vivo
 ```
 
 ## Arrancarlo
@@ -29,11 +34,15 @@ curl localhost:8000/api/health
 ```
 
 ```json
-{"ok": true, "container": "lkf-addons", "account_id": 10, "scripts": 163}
+{"ok": true, "account_id": 10, "targets": [
+  {"name": "addons", "container": "lkf-addons",    "runs": "todo lo demas", "scripts": 163, "ok": true},
+  {"name": "sdk",    "container": "lkf-sanic-app", "runs": "*_sdk.py",      "scripts": 162, "ok": true}
+]}
 ```
 
 Necesitas el contenedor `lkf-addons` corriendo (`./lkf start addons`): el
-mini-back no lo levanta, solo le habla.
+mini-back no lo levanta, solo le habla. Para los `*_sdk.py`, ademas el
+contenedor `lkf-sanic-app` del repo `lkf-sanic-apps`.
 
 Para tirarlo:
 
@@ -83,13 +92,44 @@ miniback: >>> docker exec lkf-addons python /srv/scripts/addons/modules/accesos/
 miniback: <<< returncode=0
 ```
 
+## A que contenedor va cada script
+
+El **nombre del script decide el destino**, sin fallback:
+
+| `script_name`             | Contenedor      | Modulos                       |
+| ------------------------- | --------------- | ----------------------------- |
+| `*_sdk.py`                | `lkf-sanic-app` | `/srv/lkf-sanic-app/modules`  |
+| todo lo demas             | `lkf-addons`    | `/srv/scripts/addons/modules` |
+
+Cada destino tiene su propio indice. Un `*_sdk.py` que no este en el
+contenedor de Sanic da 404 diciendo en que contenedor busco; **no** se busca
+despues en `lkf-addons`, ni al reves. La regla es el nombre, punto.
+
+Los `*_sdk.py` corren con `PYTHONPATH=/srv/lkf-sanic-app/config:/srv/lkf-sanic-app`,
+que necesitan para resolver `from account_settings import *` y
+`from middleware.auth import ...`.
+
+### Los _sdk.py necesitan la app Sanic sirviendo
+
+No son scripts autonomos: `dispatch()` (`app/middleware/auth.py`) le pega a
+`http://0.0.0.0:8000/{modulo}/{endpoint}` **dentro de su propio contenedor**.
+No basta con que `lkf-sanic-app` exista o este levantado con `sleep infinity`:
+la app tiene que estar respondiendo en el puerto 8000 interno.
+
+Si el contenedor esta caido, la respuesta es **503**, no 400: la peticion
+estaba bien, la dependencia es la que no esta. `/api/health` marca `ok:false`
+en ese destino y sigue sirviendo el otro con normalidad.
+
 ## Variables de entorno
 
 | Variable               | Default                       | Para que                                                        |
 | ---------------------- | ----------------------------- | --------------------------------------------------------------- |
 | `MINIBACK_PORT`        | `8000`                        | Puerto publicado en el host.                                     |
 | `LKF_ADDONS_CONTAINER` | `lkf-addons`                  | Contenedor destino del `docker exec`.                            |
-| `LKF_MODULES_PATH`     | `/srv/scripts/addons/modules` | Raiz del indice, dentro del contenedor destino.                  |
+| `LKF_MODULES_PATH`     | `/srv/scripts/addons/modules` | Raiz del indice de addons, dentro de su contenedor.              |
+| `LKF_SANIC_CONTAINER`  | `lkf-sanic-app`               | Contenedor destino de los `*_sdk.py`.                            |
+| `LKF_SANIC_MODULES_PATH` | `/srv/lkf-sanic-app/modules` | Raiz del indice de los `*_sdk.py`.                              |
+| `LKF_SANIC_PYTHONPATH` | `config:raiz de la app`       | PYTHONPATH con el que corren los `*_sdk.py`.                     |
 | `LKF_ACCOUNT_ID`       | vacio                         | `account_id` por default. Vacio = se resuelve de `secrets/`.      |
 | `LKF_SECRETS_PATH`     | `/srv/scripts/addons/secrets` | Donde busca `current_domain` y `accounts.ini`.                   |
 | `LKF_UPSTREAM`         | `https://app.linkaform.com`   | Destino del proxy de login.                                      |
@@ -159,8 +199,9 @@ eso no se simula.
 
 | HTTP | `code` | Cuando                                                        |
 | ---- | ------ | ------------------------------------------------------------- |
-| 404  | 11     | El `script_name` no existe en ningun modulo.                  |
-| 400  | 12     | El script fallo, el contenedor no responde, o se agoto el timeout. |
+| 404  | 11     | El `script_name` no existe en el indice de SU destino.        |
+| 400  | 12     | El script fallo, o se agoto `MINIBACK_TIMEOUT`.               |
+| 503  | 12     | El contenedor destino no existe o no esta corriendo.          |
 | 400  | 20     | El mismo nombre de archivo esta en dos modulos (ver `matches`). |
 | 400  | —      | Falta `script_name`, o el body no es JSON valido.             |
 | 502  | —      | No se pudo contactar `LKF_UPSTREAM` en el login.              |

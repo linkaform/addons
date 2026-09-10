@@ -18,7 +18,8 @@ import shlex
 import settings
 from errors import ContainerError, ScriptTimeout
 
-_cache = {'docker_image': None}
+# Imagen de cada contenedor destino, cacheada por nombre de contenedor.
+_cache = {'docker_image': {}}
 _semaforo = {'sem': None}
 
 
@@ -71,24 +72,25 @@ async def exec_async(cmd, timeout):
     )
 
 
-async def docker_image():
+async def docker_image(target):
     """Imagen del contenedor destino, para script_args['docker_image'].
 
     En el back sale de script.properties['container'] (tasks.py:158). Aqui se
     pregunta al contenedor y se cachea; si no se puede, se manda None en vez
     de tumbar la corrida: ningun script del repo lo usa para decidir nada.
     """
-    if _cache['docker_image'] is not None:
-        return _cache['docker_image']
-    cmd = ['docker', 'inspect', '--format', '{{.Config.Image}}', settings.CONTAINER]
+    contenedor = target['container']
+    if _cache['docker_image'].get(contenedor):
+        return _cache['docker_image'][contenedor]
+    cmd = ['docker', 'inspect', '--format', '{{.Config.Image}}', contenedor]
     try:
         returncode, stdout, _ = await exec_async(cmd, timeout=10)
         if returncode == 0:
-            _cache['docker_image'] = stdout.strip()
+            _cache['docker_image'][contenedor] = stdout.strip()
     except Exception as e:
         print('miniback: no se pudo resolver la imagen de "{}": {}'.format(
-            settings.CONTAINER, e))
-    return _cache['docker_image']
+            contenedor, e))
+    return _cache['docker_image'].get(contenedor)
 
 
 def build_record(body):
@@ -117,7 +119,7 @@ def build_record(body):
     return record
 
 
-def build_script_args(body, auth_header, script_path):
+def build_script_args(body, auth_header, script_path, target):
     """Argumento 2, antes de serializar.
 
     El back arma script_args = {'data': <body completo>} (script_resource.py:717)
@@ -135,11 +137,11 @@ def build_script_args(body, auth_header, script_path):
         'account_id': account_id,
         'name': script_path.rsplit('/', 1)[-1],
         # Ya resuelta y cacheada al arrancar; aqui solo se lee.
-        'docker_image': _cache['docker_image'],
+        'docker_image': _cache['docker_image'].get(target['container']),
     }
 
 
-def build_args(body, auth_header, script_path):
+def build_args(body, auth_header, script_path, target):
     """Los tres argumentos del script, en orden.
 
     El tercero es el record_to_long de tasks.py:122: aqui siempre 'False',
@@ -147,15 +149,22 @@ def build_args(body, auth_header, script_path):
     """
     return [
         build_record(body),
-        json.dumps(build_script_args(body, auth_header, script_path)),
+        json.dumps(build_script_args(body, auth_header, script_path, target)),
         'False',
     ]
 
 
-def build_cmd(script_path, args):
+def build_cmd(target, script_path, args):
     """El `docker exec` completo. Port de tasks.py:206-214, sin el `env time`
-    del mtail, que solo sirve para la telemetria del servidor."""
-    return ['docker', 'exec', settings.CONTAINER, 'python', script_path] + list(args)
+    del mtail, que solo sirve para la telemetria del servidor.
+
+    El destino puede pedir variables de entorno propias: los *_sdk.py necesitan
+    PYTHONPATH para resolver account_settings y middleware.
+    """
+    cmd = ['docker', 'exec']
+    for clave, valor in sorted(target.get('env', {}).items()):
+        cmd += ['-e', '{}={}'.format(clave, valor)]
+    return cmd + [target['container'], 'python', script_path] + list(args)
 
 
 def _log_salida(returncode, stdout, stderr):
@@ -168,13 +177,13 @@ def _log_salida(returncode, stdout, stderr):
     print(stderr if stderr else '(vacio)')
 
 
-async def run(script_path, args):
-    """Corre el script en el contenedor destino.
+async def run(target, script_path, args):
+    """Corre el script en el contenedor que le toca al destino.
 
     Devuelve (returncode, stdout, stderr). No interpreta nada: de eso se
     encargan format_output y get_exception_error.
     """
-    cmd = build_cmd(script_path, args)
+    cmd = build_cmd(target, script_path, args)
     # El comando queda impreso tal cual para poder pegarlo en una terminal y
     # reproducir la corrida a mano. Es el modo de depuracion principal.
     print('\nminiback: >>> {}'.format(' '.join(shlex.quote(part) for part in cmd)))
@@ -194,7 +203,7 @@ async def run(script_path, args):
     if returncode == 125 or 'No such container' in stderr or 'is not running' in stderr:
         raise ContainerError(
             'no se pudo ejecutar en el contenedor "{}": {}'.format(
-                settings.CONTAINER, stderr.strip() or 'returncode 125'))
+                target['container'], stderr.strip() or 'returncode 125'))
 
     return returncode, stdout, stderr
 

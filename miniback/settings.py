@@ -7,12 +7,46 @@ La tabla completa de variables esta en miniback/README.md.
 import configparser
 import os
 
-# Contenedor de addons al que se le hace `docker exec`. Cambiar a
-# lkf-addons-<worktree> para probar el codigo de un worktree.
-CONTAINER = os.environ.get('LKF_ADDONS_CONTAINER', 'lkf-addons')
+# --- destinos -----------------------------------------------------------
+# Un script se corre en el contenedor que le toca segun su nombre. Los dos
+# destinos difieren en el contenedor, en donde viven los modulos y en el
+# entorno que necesita el interprete.
 
-# Raiz del indice de scripts, dentro del contenedor destino.
-MODULES_PATH = os.environ.get('LKF_MODULES_PATH', '/srv/scripts/addons/modules')
+# Sufijo que manda un script al contenedor de la app Sanic.
+SDK_SUFFIX = '_sdk.py'
+
+ADDONS = {
+    'name': 'addons',
+    'container': os.environ.get('LKF_ADDONS_CONTAINER', 'lkf-addons'),
+    'modules_path': os.environ.get('LKF_MODULES_PATH', '/srv/scripts/addons/modules'),
+    'env': {},
+}
+
+# Los *_sdk.py son wrappers CLI que le pegan por HTTP a la app Sanic de su
+# propio contenedor (app/middleware/auth.py, dispatch -> 0.0.0.0:8000), asi
+# que ahi no basta con que el contenedor exista: la app tiene que estar
+# sirviendo. El PYTHONPATH es necesario porque `from account_settings import *`
+# pide config/ en el path y `from middleware.auth import ...` pide su padre.
+SANIC = {
+    'name': 'sdk',
+    'container': os.environ.get('LKF_SANIC_CONTAINER', 'lkf-sanic-app'),
+    'modules_path': os.environ.get('LKF_SANIC_MODULES_PATH', '/srv/lkf-sanic-app/modules'),
+    'env': {
+        'PYTHONPATH': os.environ.get(
+            'LKF_SANIC_PYTHONPATH',
+            '/srv/lkf-sanic-app/config:/srv/lkf-sanic-app'),
+    },
+}
+
+TARGETS = (ADDONS, SANIC)
+
+
+def target_for(script_name):
+    """A que contenedor le toca este script. El nombre manda, sin fallback."""
+    return SANIC if script_name.endswith(SDK_SUFFIX) else ADDONS
+
+
+# --- resto de la configuracion ------------------------------------------
 
 # secrets/ del repo addons, montado en este contenedor. Solo se usa para
 # resolver el account_id por default.

@@ -15,7 +15,12 @@ class ContainerError(MinibackError):
 
 
 class ScriptNotFound(MinibackError):
-    """El script_name no esta en el indice."""
+    """El script_name no esta en el indice de su destino."""
+
+    def __init__(self, script_name, target=None):
+        self.script_name = script_name
+        self.target = target
+        super().__init__(script_name)
 
 
 class ScriptTimeout(MinibackError):
