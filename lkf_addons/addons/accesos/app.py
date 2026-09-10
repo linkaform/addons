@@ -9149,6 +9149,11 @@ class Accesos(OcrMixin, AccesosModel):
                     except Exception as e:
                         print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
                         requerimientos = []
+                    try:
+                        pass_selected = self.get_detail_access_pass(qr_code=qr_code, get_answers=True)
+                    except Exception as e:
+                        print(f"DEBUG PASS_SELECTED ERROR: {e}")
+                        pass_selected = {'answers': {}}
                     #---Igual que el status: gana lo que venga en este update, si no
                     #   lo que ya estaba guardado, si no la config de la ubicacion.
                     habilitar_context_link = {
