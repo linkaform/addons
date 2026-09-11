@@ -220,7 +220,7 @@ class BaseModel(base.LKF_Base):
         self.GET_STATS = self.lkm.script_id('get_stats','id')
         self.GAFETES_LOCKERS = self.lkm.script_id('gafetes_lockers','id')
         self.NOTAS = self.lkm.script_id('notes','id')
-        self.PAQUETERIA = self.lkm.script_id('paqueteria','id')
+        self.SCRIPT_PAQUETERIA = self.lkm.script_id('paqueteria','id')
         self.SCRIPT_TURNOS = self.lkm.script_id('script_turnos','id')
         self.SCRIPT_PASE_ACCESO = self.lkm.script_id('pase_de_acceso','id')
         self.SCRIPT_PASE_ACCESO_API = self.lkm.script_id('pase_de_acceso_use_api','id')
