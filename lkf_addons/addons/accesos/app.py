@@ -69,6 +69,193 @@ class Accesos(OcrMixin, AccesosModel):
         # Module Globals#
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
+        self.PERMISSION_MODULE_MAP = {
+            # ── Bitacoras ─────────────────────────────────────────────────────────────
+            "bitacoras": [
+                # web (módulo accesos)
+                "entradas",
+                "salidas",
+                "accesos_hoy",
+                "todos_accesos",
+                "vehiculos_dentro",
+                "vehiculos_todos",
+                "equipos_dentro",
+                "equipos_todos",
+                # mobile (módulo bitacoras)
+                "bit_personal_todas",
+                "bit_personal_entradas",
+                "bit_personal_salidas",
+                "bit_vehiculos_todas",
+                "bit_vehiculos_dentro",
+                "bit_equipos_todas",
+                "bit_equipos_dentro",
+                "bitacora_transportista"
+            ],
+            # ── Accesos ───────────────────────────────────────────────────────────────
+            "accesos": [
+                "nuevo_acceso",
+            ],
+            # ── Rondines ──────────────────────────────────────────────────────────────
+            "rondines": [
+                "nuevo_rondin",
+                "rondines_todos",
+                "rondines_nuevos",
+                "rondines_en_progreso",
+                "rondines_pausados",
+                "rondines_finalizados",
+                "rondines_check_areas",
+                "rondines_incidencias",
+                "rondines_recorridos",
+                "nueva_area_rondin",
+                "areas_rondin_todos",
+            ],
+            # ── Articulos ─────────────────────────────────────────────────────────────
+            "articulos": [
+                "nuevo_paquete",
+                "paquetes_pendientes",
+                "paquetes_entregados",
+                "paquetes_todos",
+                "nuevo_articulo_perdido",
+                "articulos_perdidos_pendientes",
+                "articulos_perdidos_entregados",
+                "articulos_perdidos_todos",
+                "nuevo_articulo_concesionado",
+                "articulos_concesionados_pendientes",
+                "articulos_concesionados_parciales",
+                "articulos_concesionados_devueltos",
+                "articulos_concesionados_todos",
+            ],
+            # ── Incidencias ───────────────────────────────────────────────────────────
+            "incidencias": [
+                "nueva_incidencia",
+                "incidencias_abiertas",
+                "incidencias_cerradas",
+                "incidencias_todos",
+                # fallas
+                "nueva_falla",
+                "fallas_abiertas",
+                "fallas_cerradas",
+                "fallas_todos",
+            ],
+            # ── Notas ─────────────────────────────────────────────────────────────────
+            "notas": [
+                "turno_nueva_nota",
+                "turno_notas_pendientes",
+                "turno_cerrada_nota",
+                "turno_todas_nota",
+                "nueva_nota",
+                "notas_pendientes",
+                "notas_cerradas",
+                "notas_todos",
+            ],
+            # ── Pases ─────────────────────────────────────────────────────────────────
+            "pases": [
+                "nuevo_pase",
+                "pases_activos",
+                "pases_por_autorizar",
+                "pases_en_proceso",
+                "todos_pases",
+                "pases_todos",
+            ],
+            # ── Turnos ────────────────────────────────────────────────────────────────
+            "turnos": [
+                "turno_inicio_cierre",
+                "iniciar_cerrar_turno",
+            ],
+            # ── Reportes ──────────────────────────────────────────────────────────────
+            # Sin items activos en el catálogo actual (no tienen href/route)
+            "reportes": [
+                "turno_reportes"
+            ],
+        }
+
+    def get_users_ids(self):
+        query = [
+            {"$match": {
+                "form_id": self.CONF_ACCESOS,
+                "deleted_at": {"$exists": False},
+            }},
+            {"$project": {
+                "_id": 0,
+                "user_id": f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['id_usuario']}",
+            }},
+        ]
+        data = self.format_cr(self.cr.aggregate(query))
+        format_data = []
+        if data:
+            DISCARD_USERS = [self.user.get('parent_id')]
+            for item in data:
+                if item.get('user_id') and item['user_id'] not in DISCARD_USERS:
+                    format_data.append(self.unlist(item['user_id']))
+            format_data = set(format_data)
+            format_data = list(format_data)
+        return format_data
+
+    def format_menus(self, data):
+        """
+        Formatea los datos de los registros obtenidos en el catalogo de ELEMENTOS MENU
+        para obtener los menus.
+        """
+        f = self.menu_catalog_fields
+        format_data = []
+        for item in data:
+            format_data.append({
+                # Módulo
+                "menu_key":           item.get(f['catalog_menu_key']),
+                "menu":               item.get(f['catalog_menu']),
+                "menu_order":         item.get(f['catalog_menu_order']),
+                "menu_icon":          item.get(f['catalog_menu_icon']),
+                "menu_columns":       item.get(f['catalog_menu_columns']),
+                # Sección
+                "seccion_key":        item.get(f['catalog_seccion_key']),
+                "seccion":            item.get(f['catalog_seccion']),
+                "seccion_order":      item.get(f['catalog_seccion_order']),
+                "seccion_column":     item.get(f['catalog_seccion_column']),
+                "seccion_icon":       item.get(f['catalog_seccion_icon']),
+                "seccion_icon_color": item.get(f['catalog_seccion_icon_color']),
+                # Item
+                "elemento":           item.get(f['catalog_elemento']),
+                "key":                item.get(f['catalog_key']),
+                "type":               item.get(f['catalog_type']),
+                "item_order":         item.get(f['catalog_item_order']),
+                "href_web":           item.get(f['catalog_href_web']),
+                "route_mobile":       item.get(f['catalog_route_mobile']),
+                "plataforms":         item.get(f['catalog_plataforms']),
+            })
+        return format_data
+
+    def get_format_user_menus(self, filter_keys=None):
+        """
+        Obtiene los menus por default del catalogo de ELEMENTOS MENU.
+        """
+        selector = {}
+        if filter_keys:
+            selector = {f"answers.{self.menu_catalog_fields['catalog_key']}": {"$in": filter_keys}}
+
+        mango_query = {
+            "selector": selector,
+            "limit": 10000,
+        }
+        data = self.format_menus(self.lkf_api.search_catalog(self.MENUS_CATALOG_ID, mango_query))
+        return data
+
+    def _existing_menu_record_id(self, user_id):
+        """
+        Busca si el usuario ya tiene un registro en la forma nueva CONFIGURACION_MENUS.
+        """
+        query = [
+            {"$match": {
+                "form_id": self.MENUS_FORM,
+                "deleted_at": {"$exists": False},
+                f"answers.{self.USUARIOS_OBJ_ID}.{self.menu_form_fields['usuario_id']}": user_id,
+            }},
+            {"$sort": {"_id": -1}},
+            {"$limit": 1},
+            {"$project": {"_id": 1}},
+        ]
+        record = self.format_cr(self.cr.aggregate(query), get_one=True)
+        return record.get('_id') if record else None
+
     '''
     funciones internas: son funciones que solo se pueden mandar llamar dentro de este archivo. Si se hereda la clase
     esta función no puede ser invocada.
