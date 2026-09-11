@@ -4861,7 +4861,7 @@ class Accesos(OcrMixin, AccesosModel):
                 format_grupo_requisitos.append({
                     'envio_por': req.get('envio_por',[]) ,
                     'datos_requeridos': req.get('datos_requeridos',[]) ,
-                    'ubicacion': self._flatten_str_list(req.get('incidente_location')),
+                    'ubicacion': self._flatten_str_list(req.get('ubicacion')),
                     'prefijo_telefonico': self._flatten_scalar(req.get('prefijo_telefonico')),
                     'tolerancia_de_entrada_previa': self._flatten_scalar(req.get('tolerancia_de_entrada_previa')),
                     'tolerancia_de_entrada_posterior': self._flatten_scalar(req.get('tolerancia_de_entrada_posterior'))
