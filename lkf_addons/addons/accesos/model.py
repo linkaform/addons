@@ -181,6 +181,40 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.MENUS_CATALOG_ID = self.MENUS_CATALOG.get('id')
         self.MENUS_CATALOG_OBJ_ID = self.MENUS_CATALOG.get('obj_id')
 
+        self.menu_form_fields = {
+            "username": "6759e4a7a9a6e13c7b26da33",
+            "usuario_id": "638a9a99616398d2e392a9f5",
+            "grupo_asignado": "638a9ab3616398d2e392a9fa",
+            "grupo_id": "639b65dfaf316bacfc551ba2",
+            "elementos": "69efaf4c4a59aa2591074f45",
+            "menu": "69efaf883bcb25ed1458465d",
+            "seccion": "69efaf883bcb25ed1458465e",
+            "elemento": "69efaf883bcb25ed1458465f",
+            "key": "69efb57c4a59aa2591074f4e",
+            "plataforms": "69f27e8cdf4d7acc80f2e9b0"
+        }
+
+        self.menu_catalog_fields = {
+            "catalog_menu_key": "69f28216c76fd3bed14949a2",
+            "catalog_menu": "69efaf883bcb25ed1458465d",
+            "catalog_menu_order": "69f27e8cdf4d7acc80f2e9a8",
+            "catalog_menu_icon": "69f27e8cdf4d7acc80f2e9a9",
+            "catalog_menu_columns": "69f27e8cdf4d7acc80f2e9aa",
+            "catalog_seccion_key": "69f28216c76fd3bed14949a3",
+            "catalog_seccion": "69efaf883bcb25ed1458465e",
+            "catalog_seccion_order": "69f27e8cdf4d7acc80f2e9ab",
+            "catalog_seccion_column": "69f27e8cdf4d7acc80f2e9ac",
+            "catalog_seccion_icon": "69f27e8cdf4d7acc80f2e9ad",
+            "catalog_seccion_icon_color": "69f27e8cdf4d7acc80f2e9ae",
+            "catalog_elemento": "69efaf883bcb25ed1458465f",
+            "catalog_key": "69efb57c4a59aa2591074f4e",
+            "catalog_type": "69efb3dcfc8545da78179bf9",
+            "catalog_item_order": "69efb3dcfc8545da78179bfa",
+            "catalog_href_web": "69efb3dcfc8545da78179bf8",
+            "catalog_route_mobile": "69f27e8cdf4d7acc80f2e9af",
+            "catalog_plataforms": "69f27e8cdf4d7acc80f2e9b0"
+        }
+
         self.ROL_CATALOG = self.lkm.catalog_id('rol')
         self.ROL_CATALOG_ID = self.ROL_CATALOG.get('id')
         self.ROL_CATALOG_OBJ_ID = self.ROL_CATALOG.get('obj_id')
