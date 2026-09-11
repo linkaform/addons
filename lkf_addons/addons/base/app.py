@@ -165,6 +165,23 @@ class Base(BaseModel):
             res = self.lkf_api.patch_multi_record(answers=answers, form_id=129150, folios=[folio])
             return res
 
+    def share_menus_script(self, user_id):
+        """
+        Comparte unicamente el script de menus (self.SCRIPT_MENUS) con el
+        usuario -- bootstrap para un usuario recien creado en la forma
+        Usuarios, antes de que tenga cualquier otro permiso de modulo (no
+        depende de un registro en CONFIGURACION_MENUS todavia).
+        """
+        data_to_share = {
+            "file_shared": f"/api/infosync/get_scripts/{self.SCRIPT_MENUS}/",
+            "owner": f"/api/infosync/user/{user_id}/",
+            "perm": "can_read_item",
+        }
+        res = self.lkf_api.share_script(data_to_share)
+        if res['status_code'] != 201:
+            self.LKFException(f'Error al compartir script de menus: {data_to_share}')
+        return res
+
     def _project_format(self, data):
         return self.project_format(data)
 
