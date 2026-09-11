@@ -1080,7 +1080,7 @@ class Accesos(OcrMixin, AccesosModel):
                 tolerancia_entrada_previa = None
                 tolerancia_entrada_posterior = None
                 for req in grupo_requisitos:
-                    if req.get('ubicacion') == location:
+                    if location in req.get('ubicacion', []):
                         tolerancia_entrada_previa = req.get('tolerancia_de_entrada_previa')
                         tolerancia_entrada_posterior = req.get('tolerancia_de_entrada_posterior')
                         break
