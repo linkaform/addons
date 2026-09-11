@@ -5440,6 +5440,37 @@ class Accesos(OcrMixin, AccesosModel):
             'records_on_page': len(result),
         }
 
+    def revisar_disponibilidad_art_concesionado(self, tipo=""):
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.CONCESSIONED_ARTICULOS,
+            f"answers.{self.cons_f['status_concesion']}": {"$in": ["abierto", "parcial"]},
+        }
+        if tipo:
+            pattern = re.escape(tipo.strip())
+            match_query[f"answers.{self.cons_f['grupo_equipos']}"] = {
+                "$elemMatch": {
+                    self.cons_f['nombre_equipo']: {"$regex": pattern, "$options": "i"},
+                    self.cons_f['status_concesion_equipo']: {"$ne": "devuelto"},
+                }
+            }
+
+        query = [
+            {'$match': match_query},
+            {'$project': {
+                "_id": "$_id",
+                "folio": "$folio",
+                "created_at": "$created_at",
+                "created_by": "$user_name",
+                "answers": "$answers",
+            }},
+            {'$sort': {'created_at': -1}},
+        ]
+        result = self.format_cr_result(self.cr.aggregate(query), ids_label_dct=self.cons_f)
+        for item in result:
+            item = self.procesar_devoluciones_item(item)
+        return result
+
     def get_list_rondines(self, prioridades=[], dateFrom='', dateTo='', filterDate=""):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -6608,7 +6639,8 @@ class Accesos(OcrMixin, AccesosModel):
                 "_id": 0,
                 "article_name": f"$answers.{self.cons_f['_nombre_equipo']}",
                 "article_image": f"$answers.{self.cons_f['_imagen_equipo_concesion']}",
-                "article_cost": f"$answers.{self.cons_f['_costo_equipo_concesion']}"
+                "article_cost": f"$answers.{self.cons_f['_costo_equipo_concesion']}",
+                "tipo_activo": f"$answers.{self.cons_f['tipo_activo']}"
             }}
         ]
         data = self.format_cr(self.cr.aggregate(query))
