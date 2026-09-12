@@ -146,6 +146,18 @@ class Employee(Base):
             res  = {f"answers.{field_id}": value}
         return res
 
+    def _get_match_q_nested(self, field_id, value, max_depth=20):
+        """
+        LinkaForm a veces re-anida el valor de un campo de catalogo/lookup al
+        volver a guardar el registro (ej. 30080 -> [30080] -> [[30080]] -> ...).
+        Compara el campo contra `value` envuelto en 0 a `max_depth` listas de un
+        solo elemento, sin importar que tan anidado haya quedado guardado.
+        """
+        candidates = [value]
+        for _ in range(max_depth):
+            candidates.append([candidates[-1]])
+        return {f"answers.{field_id}": {'$in': candidates}}
+
     def get_employee_data(self, name=None, user_id=None, username=None, email=None, phone=None, get_one=False, active=True):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -198,8 +210,8 @@ class Employee(Base):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
-            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}":user_id
             }
+        match_query.update(self._get_match_q_nested(f"{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
 
         unwind = {'$unwind': f"$answers.{self.f['areas_group']}"}
         query= [
@@ -238,6 +250,9 @@ class Employee(Base):
                 location_areas =  self.Location.get_areas_by_location(ubicacion)
                 if not caseta and location_areas:
                     caseta = {'_id':None, 'location': ubicacion, 'area':location_areas[0]}
+                elif caseta and caseta.get('location') == ubicacion and not caseta.get('area') and location_areas:
+                    #! La caseta default ya existia pero sin area (Set solo con Ubicacion), se completa con la primer area de esa ubicacion.
+                    caseta['area'] = location_areas[0]
                 user_booths +=  [{'_id':None,'location': ubicacion, 'area': area} for area in location_areas]
         if not caseta:
             is_a_guard = self.check_user_is_a_guard(user_id)
@@ -379,9 +394,23 @@ class Employee(Base):
                     f"answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": {"$in": location_name}
                     })
         if area_name:
-            unwind_query.update({
-                f"answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}": area_name
-                })
+            area_field = f"answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}"
+            #! Un Set con solo Ubicacion (sin area) representa "todas las areas de esa ubicacion".
+            #! Si el area buscada pertenece a esa ubicacion, se incluyen tambien esos registros sin area.
+            covers_all_areas = (
+                type(location_name) == str
+                and area_name in self.Location.get_areas_by_location(location_name)
+                )
+            if covers_all_areas:
+                location_field = f"answers.{self.f['areas_group']}.{self.Location.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}"
+                unwind_query.update({
+                    "$or": [
+                        {area_field: area_name},
+                        {area_field: {"$in": [None, ""]}, location_field: location_name},
+                        ]
+                    })
+            else:
+                unwind_query.update({area_field: area_name})
         if kwargs.get('position'):
             positions = kwargs.get('position')
             match_query.update({
