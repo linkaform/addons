@@ -1160,7 +1160,8 @@ class Accesos(OcrMixin, AccesosModel):
         resultados = []
         qr_codes_vistos = {str(qr_code)}
 
-        for companion_qr in selected_passes:
+        for companion in selected_passes:
+            companion_qr = companion.get('id') if isinstance(companion, dict) else companion
             companion_qr = str(companion_qr)
             if companion_qr in qr_codes_vistos:
                 continue
@@ -5656,6 +5657,7 @@ class Accesos(OcrMixin, AccesosModel):
         result = self.format_cr_result(self.cr.aggregate(query), ids_label_dct=self.cons_f)
         for item in result:
             item = self.procesar_devoluciones_item(item)
+        print(simplejson.dumps(result, indent=4))
         return result
 
     def get_list_rondines(self, prioridades=[], dateFrom='', dateTo='', filterDate=""):
@@ -7957,6 +7959,7 @@ class Accesos(OcrMixin, AccesosModel):
         rec = self.format_cr([record,], get_one=True, ids_label_dct=self.cons_f)
         fecha = self.today_str(tz_name=self.user.get('timezone'),date_format='datetime')
         status = data.get('status')
+        forzar_dev = data.get('forzar_dev', False)
         if rec['status_concesion'] == "cancelado":
             self.LKFException(f"No es posible devolver o modifcar una concesion  {rec['folio']}")
         if rec['status_concesion'] == "devuelto":
@@ -7979,6 +7982,7 @@ class Accesos(OcrMixin, AccesosModel):
                 eq[self.cons_f['status_concesion_equipo']] = "devuelto"
                 eq[self.cons_f['cantidad_equipo_devuelto']]  = eq[self.cons_f['cantidad_equipo_concesion']]
                 eq[self.cons_f['cantidad_equipo_pendiente']]  = 0
+                eq[self.cons_f['se_forzo_devolucion']] = "si" if forzar_dev else "no"
 
                 #devolucion de equipos
                 dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
@@ -8011,6 +8015,7 @@ class Accesos(OcrMixin, AccesosModel):
                             gq[self.cons_f['status_concesion_equipo']] = "devuelto"
                             gq[self.cons_f['cantidad_equipo_devuelto']]  = gq[self.cons_f['cantidad_equipo_concesion']]
                             gq[self.cons_f['cantidad_equipo_pendiente']]  = 0
+                            gq[self.cons_f['se_forzo_devolucion']] = "si" if forzar_dev else "no"
 
                 pendiente_by_move_id[eq['id_movimiento']] = pendiente_by_move_id.get(eq['id_movimiento'],0)
                 cantidad_devuelta = eq['cantidad_devuelta']
