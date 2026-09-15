@@ -37,7 +37,7 @@ Si tienes más de una aplicación, puedes:
 
 # Importaciones necesarias
 import simplejson, importlib
-import re, os, zipfile, wget, random, shutil, datetime, unicodedata
+import re, os, time, zipfile, wget, random, shutil, datetime, unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from bson.objectid import ObjectId
 from datetime import timedelta
@@ -67,7 +67,7 @@ class Base(BaseModel):
        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
     def create_user_account(self, user_data):
-        if user_data.get(self.f['new_user_status']) == 'Creado':
+        if user_data.get(self.f['new_user_status']) == 'creado':
             return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
 
         complete_name = user_data.get(self.f['new_user_complete_name'])
@@ -90,7 +90,27 @@ class Base(BaseModel):
             "send_welcome": False
         }
 
+        created_epoch = int(time.time())
         response = self.lkf_api.create_user(body_request)
+        if response.get('status_code') in [200, 201, 202]:
+            # create_user no regresa el user_id en la respuesta, hay que
+            # buscarlo aparte. Ni get_user_by_username (la API ya no permite
+            # filtrar por ese campo, regresa 400) ni get_user_by_email (el
+            # email no es unico, puede haber varios usuarios con el mismo)
+            # sirven para identificarlo sin ambiguedad. Se usa get_updated_users
+            # desde justo antes del alta y se filtra por username exacto, que
+            # si es unico en la plataforma.
+            # Este script corre con runtime "before" en el workflow (antes de
+            # que LinkaForm guarde el registro), asi que no se puede escribir
+            # con una llamada aparte (patch_multi_record) -- ese guardado
+            # posterior del antes pisaria el cambio. Hay que mutar user_data
+            # (el mismo dict que self.answers) para que el entry-point script
+            # lo regrese como replace_ans y quede en el mismo guardado.
+            recent_users = self.lkf_api.get_updated_users(created_epoch)
+            new_user_id = next((u.get('id') for u in recent_users if u.get('username') == username), None)
+            if new_user_id:
+                user_data[self.f['new_user_id']] = new_user_id
+                user_data[self.f['new_user_status']] = 'creado'
         return response
 
     def get_couch_user_db(self, db_name):

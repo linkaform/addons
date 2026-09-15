@@ -9030,21 +9030,21 @@ class Accesos(OcrMixin, AccesosModel):
             if not self.pase_entrada_fields.get(key):
                 continue
             if key == 'grupo_acompanantes':
-                # El API solo permite mezclar respuestas de un grupo existente usando
-                # la posición (0-based) que ya ocupa ese elemento en el arreglo guardado.
-                # Los índices negativos siempre se interpretan como "agregar nuevo".
+                # patch_multi_record solo permite mezclar por posicion, una a la vez
+                # (los indices negativos siempre se interpretan como "agregar nuevo").
+                # Cuando 2+ acompanantes cambian en el mismo guardado, la API de
+                # LinkaForm truena (400 generico, code 12) al reemplazar mas de una
+                # posicion del grupo en la misma llamada. Igual que al crear el grupo
+                # (linea ~3200) y que grupo_vehiculos/grupo_equipos mas abajo, se
+                # reconstruye y reemplaza el grupo completo directo en Mongo via
+                # replace_groups en vez de mandarlo por patch_multi_record.
                 stored_acompanantes = pass_selected.get('acompanantes_grupo') or []
                 posicion_por_qr = {
                     a.get('qr_code'): idx
                     for idx, a in enumerate(stored_acompanantes)
                     if a.get('qr_code')
                 }
-                acompanantes_previos = {
-                    a.get('qr_code'): a
-                    for a in stored_acompanantes
-                    if a.get('qr_code')
-                }
-                grupo_answers = {}
+                cambios_por_qr = {}
                 for acompanante in value:
                     qr_code_acomp = acompanante.get('qr_code', '')
                     posicion = posicion_por_qr.get(qr_code_acomp)
@@ -9054,17 +9054,15 @@ class Accesos(OcrMixin, AccesosModel):
                     email = acompanante.get('email', '')
                     telefono = acompanante.get('telefono', '')
                     foto = acompanante.get('foto', [])
-                    previo = acompanantes_previos.get(qr_code_acomp, {})
-                    cambios = {}
-                    if nombre != previo.get('nombre_acompanante', ''):
-                        cambios[self.pase_entrada_fields['nombre_acompanante']] = nombre
-                    if email != previo.get('email_acompanante', ''):
-                        cambios[self.pase_entrada_fields['email_acompanante']] = email
-                    if telefono != previo.get('telefono_acompanante', ''):
-                        cambios[self.pase_entrada_fields['telefono_acompanante']] = telefono
-                    if cambios:
-                        grupo_answers[posicion] = cambios
-                    if cambios or (foto or None) != (previo.get('foto') or None):
+                    previo = stored_acompanantes[posicion]
+                    hay_cambio = (
+                        nombre != previo.get('nombre_acompanante', '')
+                        or email != previo.get('email_acompanante', '')
+                        or telefono != previo.get('telefono_acompanante', '')
+                    )
+                    if hay_cambio:
+                        cambios_por_qr[qr_code_acomp] = {'nombre': nombre, 'email': email, 'telefono': telefono}
+                    if hay_cambio or (foto or None) != (previo.get('foto') or None):
                         acompanantes_a_actualizar.append({
                             'qr_code': qr_code_acomp,
                             'nombre': nombre,
@@ -9072,8 +9070,17 @@ class Accesos(OcrMixin, AccesosModel):
                             'telefono': telefono,
                             'foto': foto,
                         })
-                if grupo_answers:
-                    answers[self.pase_entrada_fields['acompanantes_grupo']] = grupo_answers
+                if cambios_por_qr:
+                    nuevo_grupo_acompanantes = []
+                    for previo in stored_acompanantes:
+                        cambio = cambios_por_qr.get(previo.get('qr_code', ''))
+                        nuevo_grupo_acompanantes.append({
+                            self.pase_entrada_fields['nombre_acompanante']: cambio['nombre'] if cambio else previo.get('nombre_acompanante', ''),
+                            self.pase_entrada_fields['email_acompanante']: cambio['email'] if cambio else previo.get('email_acompanante', ''),
+                            self.pase_entrada_fields['telefono_acompanante']: cambio['telefono'] if cambio else previo.get('telefono_acompanante', ''),
+                            self.pase_entrada_fields['url_hijo']: previo.get('url_hijo', ''),
+                        })
+                    replace_groups[self.pase_entrada_fields['acompanantes_grupo']] = nuevo_grupo_acompanantes
                 continue
             if key == 'grupo_vehiculos':
                 nuevo_grupo_vehiculos = []
