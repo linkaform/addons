@@ -531,6 +531,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'ubicacion_catalog_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}",
             'ubicacion_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             '_ubicacion_concesion': self.mf['ubicacion'],
+            'tipo_activo':'6aa33c3a8711c7a4f571a738',
+            'se_forzo_devolucion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.6aa7b40e6a6d4e42a9d7725e"
         }
 
         self.status_equipo_dict = {
