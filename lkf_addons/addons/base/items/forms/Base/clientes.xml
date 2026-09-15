@@ -14,8 +14,8 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1766006725.0</created_at>
-    <description>version: 1766033226</description>
+    <created_at>1788896513.0</created_at>
+    <description>version: 1789509598</description>
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
@@ -54,7 +54,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>True</fav>
-                    <field_id>66bfc0accd15883ed163e9b0</field_id>
+                    <field_id>667468e3e577b8b98c852aaa</field_id>
                     <field_type>text</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
@@ -477,7 +477,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>69431f6ff0ecf47319478c41</item>
+                        <item>6aa064a0e471fd6c09558448</item>
                         <item>66bfd517cd15883ed163e9b3</item>
                     </groups_fields>
                     <help_text>None</help_text>
@@ -730,7 +730,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/144809/</resource_uri>
+    <resource_uri>/api/infosync/form/167036/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -751,5 +751,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1766033226.0</updated_at>
+    <updated_at>1789509598.0</updated_at>
 </lkf>
