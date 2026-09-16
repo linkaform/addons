@@ -49,7 +49,7 @@
                         <item>66ce23efc5c4d148311adf86</item>
                     </catalog_fields>
                     <required>False</required>
-                    <field_id>{{ catalog.categorias_artiuclos_peridos.obj_id }}</field_id>
+                    <field_id>{{ catalog.categorias_de_objetos.obj_id }}</field_id>
                     <label>Tipo</label>
                     <catalog>
                         <catalog_fields>[]</catalog_fields>
@@ -57,11 +57,11 @@
                             <item>66ce23efc5c4d148311adf86</item>
                         </view_fields>
                         <view_index>0</view_index>
-                        <couch_id>{{ catalog.categorias_artiuclos_peridos.obj_id }}</couch_id>
+                        <couch_id>{{ catalog.categorias_de_objetos.obj_id }}</couch_id>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.categorias_artiuclos_peridos.id }}</catalog_id>
+                        <catalog_id>{{ catalog.categorias_de_objetos.id }}</catalog_id>
                         <filters />
-                        <name>{{ catalog.categorias_artiuclos_peridos.name }}</name>
+                        <name>{{ catalog.categorias_de_objetos.name }}</name>
                     </catalog>
                     <properties>{}</properties>
                 </item>
@@ -78,8 +78,8 @@
                         <view_fields>[]</view_fields>
                         <field_type>text</field_type>
                         <view_index>1</view_index>
-                        <catalog_field_id>{{ catalog.categorias_artiuclos_peridos.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.categorias_artiuclos_peridos.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.categorias_de_objetos.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.categorias_de_objetos.id }}</catalog_id>
                         <filters />
                     </catalog>
                     <options>[]</options>
