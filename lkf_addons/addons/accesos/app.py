@@ -11063,7 +11063,10 @@ class Accesos(OcrMixin, AccesosModel):
             }}
         ]
         response = self.format_cr(self.cr.aggregate(query))
-        return {self.unlist(x.get('incidente_area', '')): x for x in response}
+        # El nombre del área queda etiquetado como 'note_booth' (no 'incidente_area') en el
+        # labeling de CHECK_UBICACIONES -- sin este fallback, todos los checks colapsaban a la
+        # misma llave '' y solo sobrevivía el último en el dict resultante.
+        return {self.unlist(x.get('incidente_area') or x.get('note_booth', '')): x for x in response}
 
     def get_incidencias_from_checks(self, checks_for_rondin):
         """
@@ -11543,7 +11546,7 @@ class Accesos(OcrMixin, AccesosModel):
         Return
             res (json): El json con ids de cada set del grupo repetitivo del rondin
         """
-        area_name = self.unlist(check.get('incidente_area', '?'))
+        area_name = self.unlist(check.get('incidente_area') or check.get('note_booth', '?'))
         timezone_str = check.get('timezone') or self.user.get('timezone')
         fecha = (check.get('fecha_hora_inspeccion_area')
                  or check.get('fecha_inspeccion_area'))
@@ -11563,7 +11566,7 @@ class Accesos(OcrMixin, AccesosModel):
         print(f"    [set_area_fmt] área={area_name!r}  fecha={fecha!r}  fuente={fecha_source}")
         res = self._lables_to_ids(check)
         res ={  self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID: {
-                    self.mf['nombre_area']: self.unlist(check.get('incidente_area', '')),
+                    self.mf['nombre_area']: area_name,
                     },
                 self.f['fecha_inspeccion_area']: fecha,
                 self.f['foto_evidencia_area_rondin']: check.get('foto_evidencia_area', []),
@@ -12053,7 +12056,7 @@ class Accesos(OcrMixin, AccesosModel):
         bitacora_in_lkf['areas_del_rondin'] = bitacora_in_lkf.get('areas_del_rondin',[])
 
         for item in bitacora_in_lkf['areas_del_rondin']:
-            nombre_area = item.get('incidente_area')
+            nombre_area = item.get('incidente_area') or item.get('note_booth')
             if checks_for_rondin.get(nombre_area):
                 item.update(checks_for_rondin.pop(nombre_area))
 
