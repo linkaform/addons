@@ -11118,6 +11118,70 @@ class Accesos(OcrMixin, AccesosModel):
             })
         return incidencias
 
+    def create_bitacora_rondin(self, rondin_id, rondin_record):
+        """
+        Crea el registro de BITACORA_RONDINES en Linkaform para un rondín que se originó
+        en el cliente (rondín libre o iniciado desde el catálogo de recorridos -- ver
+        mapConfigToRondinDoc.ts en clave10-app, doc con inbox=False) y por lo tanto nunca
+        tuvo una bitácora previa con la que hacer match por connection_record_id en
+        get_bitacora_by_id. A diferencia de los rondines programados (assign_user_inbox
+        ya los deja creados en Linkaform con inbox=True antes de que el móvil los toque).
+
+        Se fuerza el mismo rondin_id como _id del nuevo registro en Linkaform (mismo
+        patrón que config_area, línea 12523: metadata.update({'id': _id})), así queda
+        con connection_record_id == rondin_id desde la primera versión y las siguientes
+        sincronizaciones lo encuentran con el get_bitacora_by_id(rondin_id) de siempre.
+        Args:
+            rondin_id (str): _id del doc de CouchDB (rondin_record), forzado también
+                como _id del nuevo registro en Linkaform.
+            rondin_record (json): El documento de CouchDB del rondin.
+        Return:
+            bitacora_in_lkf (json|None): El registro recién creado (mismo formato que
+                get_bitacora_by_id), o None si falló la creación.
+        """
+        record = rondin_record.get('record', {})
+        try:
+            metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_RONDINES)
+            metadata.update({
+                'id': rondin_id,
+                "properties": {
+                    "device_properties": {
+                        "System": "Script",
+                        "Module": "Accesos",
+                        "Process": "Creación de bitácora para rondín iniciado desde la app",
+                        "Action": "create_bitacora_rondin",
+                        "File": "accesos/app.py"
+                    }
+                }
+            })
+            answers = {
+                self.f['fecha_programacion']: self._ensure_date_str(record.get('fecha_programada', '')),
+                self.f['fecha_inicio_rondin']: self._ensure_date_str(record.get('fecha_inicio', '')),
+                self.f['estatus_del_recorrido']: 'en_proceso',
+                self.f['areas_del_rondin']: [],
+                self.USUARIOS_OBJ_ID: {
+                    self.f['new_user_complete_name']: rondin_record.get('created_by_name', ''),
+                    self.f['new_user_id']: [rondin_record.get('created_by_id')],
+                    self.f['new_user_email']: [self.user.get('email', '')]
+                },
+                self.CONFIGURACION_RECORRIDOS_OBJ_ID: {
+                    self.f['nombre_del_recorrido']: record.get('nombre_rondin', ''),
+                    self.f['ubicacion_recorrido']: record.get('ubicacion_rondin', '')
+                }
+            }
+            metadata.update({'answers': answers})
+            res = self.lkf_api.post_forms_answers(metadata)
+        except Exception as e:
+            print(f"  [create_bitacora_rondin] EXCEPTION creando bitácora para rondin_id={rondin_id}: {e}")
+            return None
+
+        if res.get('status_code') not in (200, 201, 202):
+            print(f"  [create_bitacora_rondin] ERROR creando bitácora para rondin_id={rondin_id}: {res}")
+            return None
+
+        print(f"  [create_bitacora_rondin] bitácora creada para rondin_id={rondin_id}")
+        return self.get_bitacora_by_id(rondin_id)
+
     def sync_rondin_to_lkf(self, rondin_id, rondin_record={}):
         """
         Sincroniza la bitácora del rondín hacia Linkaform ya sea usando checks ya procesados. O
@@ -11131,6 +11195,10 @@ class Accesos(OcrMixin, AccesosModel):
         print(f"\n  [sync_rondin] rondin_id={rondin_id}")
         status = {}
         bitacora_in_lkf = self.get_bitacora_by_id(rondin_id)
+        if not bitacora_in_lkf and rondin_record.get('inbox') is False:
+            # Rondín iniciado desde la app (libre o desde catálogo): nunca existió una
+            # bitácora previa en Linkaform, hay que crearla en vez de reportar 404.
+            bitacora_in_lkf = self.create_bitacora_rondin(rondin_id, rondin_record)
         if not bitacora_in_lkf:
             print(f"  [sync_rondin] ERROR: bitácora no encontrada en LKF para rondin_id={rondin_id}")
             rondin_record['status'] = 'not_found'
@@ -12020,7 +12088,7 @@ class Accesos(OcrMixin, AccesosModel):
                 answers[self.f['fecha_fin_rondin']] = self._ensure_date_str(value)
             elif key == 'estatus_del_recorrido' and value:
                 answers[self.f['estatus_del_recorrido']] = value
-            elif key == 'incidente_location':
+            elif key in ('ubicacion', 'incidente_location'):
                 conf_recorrido.update({
                     self.f['ubicacion_recorrido']: value
                 })
