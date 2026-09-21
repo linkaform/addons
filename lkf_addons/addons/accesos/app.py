@@ -12498,7 +12498,244 @@ class Accesos(OcrMixin, AccesosModel):
 
         return answers
 
+    def get_record_ubicacion(self, ubicacion=None, area=None, tag_id_area=None):
+        match_query = {
+            "deleted_at":{"$exists":False},
+            "form_id": self.AREAS_DE_LAS_UBICACIONES,
+        }
+        if ubicacion:
+            match_query.update({
+            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.configuracion_area['ubicacion']}": ubicacion
+            })
+        if area:
+            match_query.update({
+            f"answers.{self.configuracion_area['area']}": area
+            })
+        if tag_id_area:
+            match_query.update({
+                f"answers.{self.area_update['tag_id_area']}": tag_id_area
+            })
+
+        query = [
+            {'$match': match_query },
+            {'$project': {
+                'folio': {'$ifNull': ['$folio', '']},
+                '_id': 1,
+                'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.configuracion_area['ubicacion']}",
+                'area': f"$answers.{self.configuracion_area['area']}",
+                'tag_id_area': {'$ifNull': [f"$answers.{self.area_update['tag_id_area']}", '']},
+                'foto_area': {'$ifNull': [f"$answers.{self.area_update['foto_area']}", []]},
+                'tipo_area': f"$answers.{self.TIPO_AREA_OBJ_ID}.{self.area_update['tipo_area']}",
+                'nombre_direccion': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.area_update['nombre_direccion']}",
+                'pais_area': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.area_update['pais_area']}",
+                'ciudad_area': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.area_update['ciudad_area']}",
+                'colonia_area': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.area_update['colonia_area']}",
+                'direccion_area': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.area_update['direccion_area']}",
+                'geolocalizacion_area': f"$answers.{self.CONTACTO_CAT_OBJ_ID}.{self.area_update['geolocalizacion_area']}",
+                'geolocation_especific': f"$answers.{self.area_update['geolocalizacion_area_ubicacion']}",
+                'estatus_area': f"$answers.{self.area_update['estatus_area']}",
+                'estatus': f"$answers.{self.area_update['estatus']}",
+                'qr_area': f"$answers.{self.area_update['qr_area']}"
+            }},
+            {'$limit': 1},
+            {'$sort':{'folio':-1}},
+        ]
+        res = self.format_cr(self.cr.aggregate(query))
+        res = self.unlist(res)
+        return res
+
+    def update_area(self, data):
+        ubicacion = data.get('ubicacion', '')
+        area = data.get('area', '')
+        if not ubicacion:
+            return {'status_code': 400, 'type': 'error', 'msg': 'La ubicacion no puede estar vacia.', 'data': {}}
+        area_ubicacion_data = self.get_record_ubicacion(ubicacion=ubicacion, area=area)
+        if not area_ubicacion_data:
+            return {'status_code': 400, 'type': 'error', 'msg': 'No se encontro el area especificada.', 'data': {}}
+        folio = area_ubicacion_data.get('folio', '')
+        record_id = area_ubicacion_data.get('_id', '')
+
+        answers={}
+        geolocation_especific = {
+            'latitude': area_ubicacion_data.get('latitude'),
+            'longitude': area_ubicacion_data.get('longitude')
+        }
+
+        for key, value in area_ubicacion_data.items():
+            if key == 'area':
+                answers[self.configuracion_area['area']] = value # type: ignore
+            elif key == 'ubicacion':
+                answers[self.UBICACIONES_CAT_OBJ_ID] = {
+                    self.configuracion_area['ubicacion']: value, # type: ignore
+                }
+            elif key == 'tipo_area':
+                # editable: si data trae un tipo_de_area nuevo, reemplaza el existente
+                answers[self.TIPO_AREA_OBJ_ID] = {
+                    self.area_update['tipo_area']: data.get('tipo_de_area') or value
+                }
+            elif key == 'nombre_direccion':
+                answers[self.CONTACTO_CAT_OBJ_ID] = {
+                    self.area_update['nombre_direccion']: value,
+                    self.area_update['pais_area']: area_ubicacion_data.get('pais_area', []),
+                    self.area_update['ciudad_area']: area_ubicacion_data.get('ciudad_area', []),
+                    self.area_update['direccion_area']: area_ubicacion_data.get('direccion_area', []),
+                    self.area_update['geolocalizacion_area']: area_ubicacion_data.get('geolocalizacion_area', [])
+                }
+            elif key == 'estatus_area':
+                answers[self.area_update['estatus_area']] = value
+            elif key == 'estatus':
+                answers[self.area_update['estatus']] = value
+            elif key == 'tag_id_area':
+                answers[self.area_update['tag_id_area']] = data.get('qr_area') or value
+            elif key == 'qr_area':
+                answers[self.area_update['qr_area']] = value
+            elif key == 'foto_area':
+                answers[self.area_update['foto_area']] = data.get('foto_area') or value
+            elif key == 'latitude' or key == 'longitude':
+                answers[self.area_update['geolocalizacion_area_ubicacion']] = geolocation_especific # type: ignore
+            else:
+                pass
+
+        metadata = self.lkf_api.get_metadata(form_id=self.AREAS_DE_LAS_UBICACIONES)
+        metadata.update({
+            'properties': {
+                "device_properties":{
+                    "System": "Addons",
+                    "Process":"Actualizacion de Area",
+                    "Action":'update_area',
+                    "File": "accesos/app.py"
+                }
+            },
+            'answers': answers,
+            '_id': record_id
+        })
+        response = self.net.patch_forms_answers(metadata)
+        return response
+
+    def get_contact_details(self, direccion):
+        selector = {}
+
+        selector.update({
+            f"answers.{self.area_update['nombre_direccion']}": direccion, # type: ignore
+        })
+
+        fields = [
+            "_id",
+            f"answers.{self.area_update['nombre_direccion']}", # type: ignore
+            f"answers.{self.area_update['pais_area']}",
+            f"answers.{self.area_update['direccion_area']}",
+            f"answers.{self.area_update['colonia_area']}",
+            f"answers.{self.area_update['geolocalizacion_area']}",
+            f"answers.{self.area_update['ciudad_area']}",
+        ]
+
+        mango_query = {
+            "selector": selector,
+            "fields": fields,
+            "limit": 1,
+        }
+        res = self.lkf_api.search_catalog(131890, mango_query)
+        res = self.unlist(res)
+        if res:
+            res.pop('_id', None)
+            res.pop('_rev', None)
+            res.pop('created_at', None)
+            res.pop('updated_at', None)
+        return res if res else {}
+
+    def exists_area(self, ubicacion, area):
+        query = [
+            {'$match': {
+                "deleted_at":{"$exists":False},
+                "form_id": self.AREAS_DE_LAS_UBICACIONES,
+                f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.configuracion_area['ubicacion']}": ubicacion,
+                f"answers.{self.configuracion_area['area']}": area
+            }},
+            {'$project': {
+                '_id': 1,
+            }},
+            {'$limit': 1},
+        ]
+        res = self.format_cr(self.cr.aggregate(query))
+        return True if res else False
+
+    def create_new_area(self, data, force_id=None):
+        exists_area = self.exists_area(data.get('ubicacion', {}), data.get('nombre_nueva_area', ''))
+        if exists_area:
+            return {'status_code': 208, 'type': 'success', 'msg': 'El area ya existe. Solo se actualizo la informacion rellenada.', 'data': {}}
+        contact_details = self.get_contact_details(data.get('ubicacion', {}))
+        answers = {
+            self.mf['nombre_area']: data.get('nombre_nueva_area'),
+            self.f['area_foto']: data.get('foto_area'),
+            self.f['area_tag_id']: data.get('qr_area'),
+            self.Location.UBICACIONES_CAT_OBJ_ID: {
+                self.mf['nombre_ubicacion_salida']: data.get('ubicacion', ''),
+            },
+            self.Location.TIPO_AREA_OBJ_ID: {
+                self.area_update['tipo_area']: data.get('tipo_de_area', '')
+            },
+            self.area_update['geolocalizacion_area_ubicacion']: getattr(self, 'geolocation_area', {}) or {},
+            self.CONTACTO_CAT_OBJ_ID: contact_details,
+            self.area_update['estatus']: 'activa',
+            self.area_update['estatus_area']: 'disponible',
+        }
+        response = self.create_register(
+            module='Accesos',
+            process='Creacion de una area',
+            action='config_area',
+            file='accesos/app.py',
+            form_id=self.AREAS_DE_LAS_UBICACIONES,
+            answers=answers,
+            force_id=force_id,
+        )
+
+        return response
+
+    def create_register(self, module: str, process: str, action: str, file: str, form_id: int, answers: dict, force_id=None):
+        """Crea un registro en Linkaform con los metadatos y respuestas proporcionadas.
+
+        Args:
+            module (str): El nombre del módulo que está ejecutando la acción.
+            process (str): El nombre del proceso que se está ejecutando.
+            action (str): El nombre del script que se está ejecutando.
+            file (str): La ruta del archivo donde se encuentra el app del modulo utilizado(Ej. jit/app.py).
+            form_id (str): El ID de la forma en Linkaform.
+            answers (dict): El diccionario de respuestas ya formateado.
+            force_id: si se proporciona, se usa como _id del registro nuevo en Mongo.
+
+        Returns:
+            response: La respuesta de la API de Linkaform al crear el registro.
+        """
+        metadata = self.lkf_api.get_metadata(form_id=form_id)
+        if hasattr(self, 'geolocation_area'):
+            if isinstance(self.geolocation_area, dict):
+                metadata['geolocation'] = [ self.geolocation_area.get('latitude',0),self.geolocation_area.get('longitude',0) ]
+            elif isinstance(self.geolocation_area, list):
+                metadata['geolocation'] = self.geolocation_area
+
+        metadata.update({
+            "properties": {
+                "device_properties":{
+                    "System": "Script",
+                    "Module": module,
+                    "Process": process,
+                    "Action": action,
+                    "File": file
+                }
+            },
+        })
+        if force_id:
+            metadata.update({'id': force_id})
+        metadata.update({'answers':answers})
+        response = self.lkf_api.post_forms_answers(metadata)
+        return response
+
     def config_area(self, record):
+        """
+        Sincroniza un area capturada offline (CouchDB) directo contra "Areas de las
+        Ubicaciones" -- ya no pasa por "Configuracion de Area" (esa forma solo disparaba,
+        via workflow nativo, el mismo update_area.py que ahora se llama aqui directo).
+        """
         if not record:
             return {'status_code': 400, 'type': 'error', 'msg': 'No record provided', 'data': {}}
 
@@ -12508,32 +12745,52 @@ class Accesos(OcrMixin, AccesosModel):
         if not _id or not _rev:
             return {'status_code': 400, 'type': 'error', 'msg': 'Missing _id or _rev', 'data': {}}
 
-        answers = self.get_area_model(record)
-        if answers.get('error'):
+        data_couch = record.get('record', {})
+        ubicacion = data_couch.get('incidente_location', '')
+        # La app manda el nombre siempre bajo 'incidente_area', sin importar si el toggle
+        # "Existe en catalogo?" esta en Si o en No -- 'area_catalogo' nunca llega poblado
+        # desde la app actual, asi que no sirve para distinguir creacion de edicion.
+        nombre_area = data_couch.get('area_catalogo') or data_couch.get('incidente_area')
+
+        if not ubicacion or not nombre_area:
+            msg = 'Ubicacion Requerida' if not ubicacion else 'Nombre de Area Requerido'
             record['status'] = 'error'
             record['updated_at'] = self.today_str(date_format='datetime')
-            record['last_error'] = answers['error']
+            record['last_error'] = msg
             self.cr_db.save(record)
-            return {'status_code': 400, 'type': 'error', 'msg': answers['error'], 'data': {}}
+            return {'status_code': 400, 'type': 'error', 'msg': msg, 'data': {}}
 
-        metadata = self.lkf_api.get_metadata(form_id=self.CONFIGURACION_AREA_FORM)
-        metadata.update({'id': _id})
+        data = {
+            'ubicacion': ubicacion,
+            'area': nombre_area,
+            'nombre_nueva_area': nombre_area,
+            'tipo_de_area': data_couch.get('tipo_area', ''),
+            'foto_area': data_couch.get('area_foto', []),
+            'qr_area': data_couch.get('area_tag_id', ''),
+        }
+
         if record.get('geolocation'):
-            metadata['geolocation'] = [record['geolocation']['long'], record['geolocation']['lat']]
-        metadata.update({'answers': answers})
-        res = self.lkf_api.post_forms_answers(metadata)
-        # res = {'status_code':400, 'exception':'testing'}
-        if res.get('status_code') in (200, 201, 202):
+            self.geolocation_area = {
+                'latitude': record['geolocation'].get('lat'),
+                'longitude': record['geolocation'].get('long'),
+            }
+
+        # La unica forma confiable de saber si es una edicion es revisar si el area ya
+        # existe (por ubicacion+nombre) -- el campo que manda la app no distingue esto.
+        if self.exists_area(ubicacion, nombre_area):
+            res = self.update_area(data)
+        else:
+            # Area nueva: se fuerza que el _id en Mongo coincida con el _id de CouchDB.
+            res = self.create_new_area(data, force_id=_id)
+
+        if res.get('status_code') in (200, 201, 202, 208):
             record['status'] = 'received'
             record.pop('last_error', None)
             self.cr_db.save(record)
             res = {'status_code': 200, 'type': 'success', 'msg': 'Area synced', 'data': {}}
         else:
             record['status'] = 'error'
-            if res['status_code'] == 400:
-                last_error = res.get('json',{})
-            else:
-                last_error = res.get('json',{}).get('error','Error al crear la configuracon del area')
+            last_error = res.get('json') or res.get('msg') or 'Error al sincronizar el area'
             if isinstance(last_error, dict):
                 last_error = last_error.get('exception', last_error)
 
