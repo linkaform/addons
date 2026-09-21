@@ -856,6 +856,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'cada_cuantos_meses_se_repite': 'abcde0001000000000010019',
             'cada_cuantos_minutos_se_repite': 'abcde0001000000000010011',
             'cron_id':'abcde0001000000000011111',
+            'cron_conf':'abcde0001000000000011111',
             'dag_id':'abcde0001000000000000000',
             'cuanto_tiempo_de_anticipacion': 'abcde0002000000000010004',
             'cuanto_tiempo_de_anticipacion_expresado_en': 'abcde0002000000000010005',
