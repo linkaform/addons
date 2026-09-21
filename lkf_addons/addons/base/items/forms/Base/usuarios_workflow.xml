@@ -448,7 +448,22 @@
                 </record>
                 <wf_fields>
                     <operator>all</operator>
-                    <triggers>[]</triggers>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>679d023876ad7f5ba642f4ed</field_id>
+                                <group>{}</group>
+                                <label>Estatus</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>creado</value>
+                        </item>
+                    </triggers>
                 </wf_fields>
             </rules>
         </item>

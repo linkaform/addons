@@ -37,7 +37,8 @@ Si tienes más de una aplicación, puedes:
 
 # Importaciones necesarias
 import simplejson, importlib
-import re, os, zipfile, wget, random, shutil, datetime, unicodedata
+import re, os, time, zipfile, wget, random, shutil, datetime, unicodedata
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from bson.objectid import ObjectId
 from datetime import timedelta
 from couchdb.http import ResourceNotFound
@@ -66,7 +67,7 @@ class Base(BaseModel):
        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
     def create_user_account(self, user_data):
-        if user_data.get(self.f['new_user_status']) == 'Creado':
+        if user_data.get(self.f['new_user_status']) == 'creado':
             return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
 
         complete_name = user_data.get(self.f['new_user_complete_name'])
@@ -89,7 +90,27 @@ class Base(BaseModel):
             "send_welcome": False
         }
 
+        created_epoch = int(time.time())
         response = self.lkf_api.create_user(body_request)
+        if response.get('status_code') in [200, 201, 202]:
+            # create_user no regresa el user_id en la respuesta, hay que
+            # buscarlo aparte. Ni get_user_by_username (la API ya no permite
+            # filtrar por ese campo, regresa 400) ni get_user_by_email (el
+            # email no es unico, puede haber varios usuarios con el mismo)
+            # sirven para identificarlo sin ambiguedad. Se usa get_updated_users
+            # desde justo antes del alta y se filtra por username exacto, que
+            # si es unico en la plataforma.
+            # Este script corre con runtime "before" en el workflow (antes de
+            # que LinkaForm guarde el registro), asi que no se puede escribir
+            # con una llamada aparte (patch_multi_record) -- ese guardado
+            # posterior del antes pisaria el cambio. Hay que mutar user_data
+            # (el mismo dict que self.answers) para que el entry-point script
+            # lo regrese como replace_ans y quede en el mismo guardado.
+            recent_users = self.lkf_api.get_updated_users(created_epoch)
+            new_user_id = next((u.get('id') for u in recent_users if u.get('username') == username), None)
+            if new_user_id:
+                user_data[self.f['new_user_id']] = new_user_id
+                user_data[self.f['new_user_status']] = 'creado'
         return response
 
     def get_couch_user_db(self, db_name):
@@ -105,7 +126,7 @@ class Base(BaseModel):
             try:
                 user_id = db_name.split('_')[-1]
                 db_type , user_id = db_name.split('_')
-                response = self.lkf_api.create_user_couch_db(user_id, db_name)
+                response = self.lkf_api.create_user_couch_db(user_id, db_type)
                 db = self.lkf_api.couch.set_db(db_name)
             except Exception as e:
                 self.LKFException(f'Error al crear la base de datos {db_name}: Exception: {str(e)}')
@@ -163,6 +184,23 @@ class Base(BaseModel):
             #TODO Checar por que el form id de Usuarios no trae el id correcto
             res = self.lkf_api.patch_multi_record(answers=answers, form_id=129150, folios=[folio])
             return res
+
+    def share_menus_script(self, user_id):
+        """
+        Comparte unicamente el script de menus (self.SCRIPT_MENUS) con el
+        usuario -- bootstrap para un usuario recien creado en la forma
+        Usuarios, antes de que tenga cualquier otro permiso de modulo (no
+        depende de un registro en CONFIGURACION_MENUS todavia).
+        """
+        data_to_share = {
+            "file_shared": f"/api/infosync/get_scripts/{self.SCRIPT_MENUS}/",
+            "owner": f"/api/infosync/user/{user_id}/",
+            "perm": "can_read_item",
+        }
+        res = self.lkf_api.share_script(data_to_share)
+        if res['status_code'] != 201:
+            self.LKFException(f'Error al compartir script de menus: {data_to_share}')
+        return res
 
     def _project_format(self, data):
         return self.project_format(data)
@@ -505,6 +543,8 @@ class Base(BaseModel):
                 "deleted_at": {"$exists": False},
                 f"answers.{self.USUARIOS_OBJ_ID}.{self.menu_form_fields['usuario_id']}": self.user.get('user_id')
             }},
+            {"$sort": {"_id": -1}},
+            {"$limit": 1},
             {"$project": {
                 "_id": 0,
                 "elementos": f"$answers.{self.menu_form_fields['elementos']}"
@@ -582,15 +622,18 @@ class Base(BaseModel):
         user_id = data.get('usuario_id')
         if user_id and isinstance(user_id, list):
             user_id = user_id[0]
-        permissions = 'can_read_item'
-        share_data = {
-            "owner": f"/api/infosync/user/{user_id}/",
-            "perm": permissions
-        }
+        return self.apply_user_menu_permissions(user_id, data.get('elementos', []))
+
+    def apply_user_menu_permissions(self, user_id, elementos):
+        """
+        Igual que set_user_permissions, pero recibe user_id/elementos ya resueltos en vez de
+        leerlos de self.answers -- permite correrla para varios usuarios en paralelo
+        (ThreadPoolExecutor) sin que un hilo pise el self.answers de otro.
+        """
         forms_needed = set()
         catalogs_needed = set()
         scripts_needed = set()
-        menus = {i.get('menu', '').lower().replace(' ', '_') for i in data.get('elementos', [])}
+        menus = {i.get('menu', '').lower().replace(' ', '_') for i in elementos}
         menus = ['always'] + list(menus)
         for menu in menus:
             config = self.module_permits.get(menu, {})
@@ -599,11 +642,164 @@ class Base(BaseModel):
             forms_needed.update([x for x in config.get('forms',[]) if x])
             catalogs_needed.update([x for x in config.get('catalogs') if x])
             scripts_needed.update([x for x in config.get('scripts') if x])
-        response_forms = self.set_item_permits(user_id, forms_needed, item_type='form')
-        response_catalog = self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
-        response_scripts = self.set_item_permits(user_id, scripts_needed,  item_type='script')
+        self.set_item_permits(user_id, forms_needed, item_type='form')
+        self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
+        self.set_item_permits(user_id, scripts_needed,  item_type='script')
 
         return True
+
+    def _get_user_menu_record(self, user_id):
+        query = [
+            {"$match": {
+                "form_id": self.MENUS_FORM,
+                "deleted_at": {"$exists": False},
+                f"answers.{self.USUARIOS_OBJ_ID}.{self.menu_form_fields['usuario_id']}": user_id
+            }},
+            {"$sort": {"_id": -1}},
+            {"$limit": 1},
+            {"$project": {
+                "_id": 1,
+                "elementos": f"$answers.{self.menu_form_fields['elementos']}"
+            }}
+        ]
+        data = self.format_cr(self.cr.aggregate(query), get_one=True, labels_off=True)
+        return data
+
+    def get_menus_x_users(self, user_ids=None):
+        """
+        Trae usuarios con registro en CONFIGURACION_ACCESOS (legacy) y sus
+        menus asignados -- todos (via self.Accesos.get_users_ids) o solo los
+        indicados en user_ids.
+        """
+        target_ids = user_ids if user_ids is not None else self.Accesos.get_users_ids()
+        if not target_ids:
+            return []
+
+        query = [
+            {"$match": {
+                "form_id": self.Accesos.CONF_ACCESOS,
+                "deleted_at": {"$exists": False},
+                f"answers.{self.Accesos.EMPLOYEE_OBJ_ID}.{self.Accesos.mf['id_usuario']}": {'$in': target_ids}
+            }},
+            {"$project": {
+                "_id": 0,
+                "username": f"$answers.{self.Accesos.EMPLOYEE_OBJ_ID}.{self.Accesos.mf['username']}",
+                "user_id": f"$answers.{self.Accesos.EMPLOYEE_OBJ_ID}.{self.Accesos.mf['id_usuario']}",
+                "menus": f"$answers.{self.Accesos.conf_accesos_fields['menus']}",
+            }},
+            {"$group": {
+                "_id": "$username",
+                "user_id": {"$first": "$user_id"},
+                "menus":   {"$first": "$menus"},
+            }},
+            {"$project": {
+                "_id": 0,
+                "username": "$_id",
+                "user_id": 1,
+                "menus": 1,
+            }}
+        ]
+        return self.format_cr(self.cr.aggregate(query))
+
+    def _process_legacy_user(self, user, dry_run):
+        """
+        Migra un solo usuario de CONFIGURACION_ACCESOS (legacy) a
+        CONFIGURACION_MENUS. No comparte estado mutable con otros hilos (cada
+        llamada arma su propio `metadata`/`answers`), para poder correrse
+        dentro de un ThreadPoolExecutor sin condiciones de carrera.
+        """
+        username = user['username']
+        user_id = self.unlist(user['user_id'])
+        menus = user['menus'] or []
+
+        new_menus = []
+        for menu in menus:
+            new_menus.extend(self.Accesos.PERMISSION_MODULE_MAP.get(menu, []))
+        details_menus = self.Accesos.get_format_user_menus(filter_keys=new_menus)
+
+        clear_menus = []
+        for menu in details_menus:
+            clear_menus.append({
+                f"{self.MENUS_CATALOG_OBJ_ID}": {
+                    self.menu_form_fields['menu']: menu['menu'],
+                    self.menu_form_fields['seccion']: menu['seccion'],
+                    self.menu_form_fields['elemento']: menu['elemento'],
+                    self.menu_form_fields['key']: [menu['key']],
+                    self.menu_form_fields['plataforms']: [menu['plataforms']],
+                }
+            })
+
+        answers = {
+            self.USUARIOS_OBJ_ID: {
+                self.menu_form_fields['username']: username,
+                self.menu_form_fields['usuario_id']: [user_id],
+            },
+            self.menu_form_fields['elementos']: clear_menus,
+        }
+
+        existing = self._get_user_menu_record(user_id)
+        existing_id = existing.get('_id') if existing else None
+        action = "update" if existing_id else "create"
+
+        if dry_run:
+            return {
+                "user_id": user_id,
+                "username": username,
+                "action": action,
+                "menu_count": len(clear_menus),
+            }
+
+        metadata = self.lkf_api.get_metadata(form_id=self.MENUS_FORM)
+        metadata.update({'answers': answers})
+        if existing_id:
+            metadata['_id'] = existing_id
+            res = self.net.patch_forms_answers(metadata)
+        else:
+            metadata.pop('_id', None)
+            res = self.lkf_api.post_forms_answers(metadata)
+        return {
+            "user_id": user_id,
+            "username": username,
+            "action": action,
+            "status_code": res.get('status_code'),
+            "error": res.get('json') or res.get('content'),
+        }
+
+    def migrate_legacy_menus(self, user_ids=None, dry_run=False):
+        """
+        Migra CONFIGURACION_ACCESOS (legacy) a CONFIGURACION_MENUS para todos
+        los usuarios con registro legacy (o solo los indicados en user_ids).
+        Actualiza el registro existente si el usuario ya tenia uno en
+        CONFIGURACION_MENUS, en vez de crear uno duplicado (ver
+        clave10_menus_registro_duplicado_ultimo_gana).
+
+        Corre un usuario a la vez tarda lo mismo sin importar cuantos
+        usuarios se pidan (costo fijo alto por invocacion) mas 1
+        search_catalog secuencial por usuario -- con cuentas grandes esto
+        choca con el mismo timeout de gateway que resync_all_permissions.
+        Se paralela por usuario igual que esa funcion.
+        """
+        menus_x_user = self.get_menus_x_users(user_ids=user_ids)
+
+        results = []
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = {
+                executor.submit(self._process_legacy_user, user, dry_run): user
+                for user in menus_x_user
+            }
+            for future in as_completed(futures):
+                user = futures[future]
+                try:
+                    results.append(future.result())
+                except Exception as e:
+                    results.append({
+                        "user_id": self.unlist(user.get('user_id')),
+                        "username": user.get('username'),
+                        "action": "error",
+                        "error": str(e),
+                    })
+
+        return results
 
     def slugify(self, text, sep='-'):
         """

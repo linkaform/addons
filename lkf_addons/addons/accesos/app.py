@@ -69,6 +69,193 @@ class Accesos(OcrMixin, AccesosModel):
         # Module Globals#
         super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
+        self.PERMISSION_MODULE_MAP = {
+            # ── Bitacoras ─────────────────────────────────────────────────────────────
+            "bitacoras": [
+                # web (módulo accesos)
+                "entradas",
+                "salidas",
+                "accesos_hoy",
+                "todos_accesos",
+                "vehiculos_dentro",
+                "vehiculos_todos",
+                "equipos_dentro",
+                "equipos_todos",
+                # mobile (módulo bitacoras)
+                "bit_personal_todas",
+                "bit_personal_entradas",
+                "bit_personal_salidas",
+                "bit_vehiculos_todas",
+                "bit_vehiculos_dentro",
+                "bit_equipos_todas",
+                "bit_equipos_dentro",
+                "bitacora_transportista"
+            ],
+            # ── Accesos ───────────────────────────────────────────────────────────────
+            "accesos": [
+                "nuevo_acceso",
+            ],
+            # ── Rondines ──────────────────────────────────────────────────────────────
+            "rondines": [
+                "nuevo_rondin",
+                "rondines_todos",
+                "rondines_nuevos",
+                "rondines_en_progreso",
+                "rondines_pausados",
+                "rondines_finalizados",
+                "rondines_check_areas",
+                "rondines_incidencias",
+                "rondines_recorridos",
+                "nueva_area_rondin",
+                "areas_rondin_todos",
+            ],
+            # ── Articulos ─────────────────────────────────────────────────────────────
+            "articulos": [
+                "nuevo_paquete",
+                "paquetes_pendientes",
+                "paquetes_entregados",
+                "paquetes_todos",
+                "nuevo_articulo_perdido",
+                "articulos_perdidos_pendientes",
+                "articulos_perdidos_entregados",
+                "articulos_perdidos_todos",
+                "nuevo_articulo_concesionado",
+                "articulos_concesionados_pendientes",
+                "articulos_concesionados_parciales",
+                "articulos_concesionados_devueltos",
+                "articulos_concesionados_todos",
+            ],
+            # ── Incidencias ───────────────────────────────────────────────────────────
+            "incidencias": [
+                "nueva_incidencia",
+                "incidencias_abiertas",
+                "incidencias_cerradas",
+                "incidencias_todos",
+                # fallas
+                "nueva_falla",
+                "fallas_abiertas",
+                "fallas_cerradas",
+                "fallas_todos",
+            ],
+            # ── Notas ─────────────────────────────────────────────────────────────────
+            "notas": [
+                "turno_nueva_nota",
+                "turno_notas_pendientes",
+                "turno_cerrada_nota",
+                "turno_todas_nota",
+                "nueva_nota",
+                "notas_pendientes",
+                "notas_cerradas",
+                "notas_todos",
+            ],
+            # ── Pases ─────────────────────────────────────────────────────────────────
+            "pases": [
+                "nuevo_pase",
+                "pases_activos",
+                "pases_por_autorizar",
+                "pases_en_proceso",
+                "todos_pases",
+                "pases_todos",
+            ],
+            # ── Turnos ────────────────────────────────────────────────────────────────
+            "turnos": [
+                "turno_inicio_cierre",
+                "iniciar_cerrar_turno",
+            ],
+            # ── Reportes ──────────────────────────────────────────────────────────────
+            # Sin items activos en el catálogo actual (no tienen href/route)
+            "reportes": [
+                "turno_reportes"
+            ],
+        }
+
+    def get_users_ids(self):
+        query = [
+            {"$match": {
+                "form_id": self.CONF_ACCESOS,
+                "deleted_at": {"$exists": False},
+            }},
+            {"$project": {
+                "_id": 0,
+                "user_id": f"$answers.{self.EMPLOYEE_OBJ_ID}.{self.mf['id_usuario']}",
+            }},
+        ]
+        data = self.format_cr(self.cr.aggregate(query))
+        format_data = []
+        if data:
+            DISCARD_USERS = [self.user.get('parent_id')]
+            for item in data:
+                if item.get('user_id') and item['user_id'] not in DISCARD_USERS:
+                    format_data.append(self.unlist(item['user_id']))
+            format_data = set(format_data)
+            format_data = list(format_data)
+        return format_data
+
+    def format_menus(self, data):
+        """
+        Formatea los datos de los registros obtenidos en el catalogo de ELEMENTOS MENU
+        para obtener los menus.
+        """
+        f = self.menu_catalog_fields
+        format_data = []
+        for item in data:
+            format_data.append({
+                # Módulo
+                "menu_key":           item.get(f['catalog_menu_key']),
+                "menu":               item.get(f['catalog_menu']),
+                "menu_order":         item.get(f['catalog_menu_order']),
+                "menu_icon":          item.get(f['catalog_menu_icon']),
+                "menu_columns":       item.get(f['catalog_menu_columns']),
+                # Sección
+                "seccion_key":        item.get(f['catalog_seccion_key']),
+                "seccion":            item.get(f['catalog_seccion']),
+                "seccion_order":      item.get(f['catalog_seccion_order']),
+                "seccion_column":     item.get(f['catalog_seccion_column']),
+                "seccion_icon":       item.get(f['catalog_seccion_icon']),
+                "seccion_icon_color": item.get(f['catalog_seccion_icon_color']),
+                # Item
+                "elemento":           item.get(f['catalog_elemento']),
+                "key":                item.get(f['catalog_key']),
+                "type":               item.get(f['catalog_type']),
+                "item_order":         item.get(f['catalog_item_order']),
+                "href_web":           item.get(f['catalog_href_web']),
+                "route_mobile":       item.get(f['catalog_route_mobile']),
+                "plataforms":         item.get(f['catalog_plataforms']),
+            })
+        return format_data
+
+    def get_format_user_menus(self, filter_keys=None):
+        """
+        Obtiene los menus por default del catalogo de ELEMENTOS MENU.
+        """
+        selector = {}
+        if filter_keys:
+            selector = {f"answers.{self.menu_catalog_fields['catalog_key']}": {"$in": filter_keys}}
+
+        mango_query = {
+            "selector": selector,
+            "limit": 10000,
+        }
+        data = self.format_menus(self.lkf_api.search_catalog(self.MENUS_CATALOG_ID, mango_query))
+        return data
+
+    def _existing_menu_record_id(self, user_id):
+        """
+        Busca si el usuario ya tiene un registro en la forma nueva CONFIGURACION_MENUS.
+        """
+        query = [
+            {"$match": {
+                "form_id": self.MENUS_FORM,
+                "deleted_at": {"$exists": False},
+                f"answers.{self.USUARIOS_OBJ_ID}.{self.menu_form_fields['usuario_id']}": user_id,
+            }},
+            {"$sort": {"_id": -1}},
+            {"$limit": 1},
+            {"$project": {"_id": 1}},
+        ]
+        record = self.format_cr(self.cr.aggregate(query), get_one=True)
+        return record.get('_id') if record else None
+
     '''
     funciones internas: son funciones que solo se pueden mandar llamar dentro de este archivo. Si se hereda la clase
     esta función no puede ser invocada.
@@ -893,7 +1080,7 @@ class Accesos(OcrMixin, AccesosModel):
                 tolerancia_entrada_previa = None
                 tolerancia_entrada_posterior = None
                 for req in grupo_requisitos:
-                    if req.get('ubicacion') == location:
+                    if location in req.get('ubicacion', []):
                         tolerancia_entrada_previa = req.get('tolerancia_de_entrada_previa')
                         tolerancia_entrada_posterior = req.get('tolerancia_de_entrada_posterior')
                         break
@@ -973,7 +1160,8 @@ class Accesos(OcrMixin, AccesosModel):
         resultados = []
         qr_codes_vistos = {str(qr_code)}
 
-        for companion_qr in selected_passes:
+        for companion in selected_passes:
+            companion_qr = companion.get('id') if isinstance(companion, dict) else companion
             companion_qr = str(companion_qr)
             if companion_qr in qr_codes_vistos:
                 continue
@@ -4674,7 +4862,7 @@ class Accesos(OcrMixin, AccesosModel):
                 format_grupo_requisitos.append({
                     'envio_por': req.get('envio_por',[]) ,
                     'datos_requeridos': req.get('datos_requeridos',[]) ,
-                    'ubicacion': self._flatten_str_list(req.get('incidente_location')),
+                    'ubicacion': self._flatten_str_list(req.get('ubicacion')),
                     'prefijo_telefonico': self._flatten_scalar(req.get('prefijo_telefonico')),
                     'tolerancia_de_entrada_previa': self._flatten_scalar(req.get('tolerancia_de_entrada_previa')),
                     'tolerancia_de_entrada_posterior': self._flatten_scalar(req.get('tolerancia_de_entrada_posterior'))
@@ -5439,6 +5627,38 @@ class Accesos(OcrMixin, AccesosModel):
             'actual_page': current_page,
             'records_on_page': len(result),
         }
+
+    def revisar_disponibilidad_art_concesionado(self, tipo=""):
+        match_query = {
+            "deleted_at": {"$exists": False},
+            "form_id": self.CONCESSIONED_ARTICULOS,
+            f"answers.{self.cons_f['status_concesion']}": {"$in": ["abierto", "parcial"]},
+        }
+        if tipo:
+            pattern = re.escape(tipo.strip())
+            match_query[f"answers.{self.cons_f['grupo_equipos']}"] = {
+                "$elemMatch": {
+                    self.cons_f['nombre_equipo']: {"$regex": pattern, "$options": "i"},
+                    self.cons_f['status_concesion_equipo']: {"$ne": "devuelto"},
+                }
+            }
+
+        query = [
+            {'$match': match_query},
+            {'$project': {
+                "_id": "$_id",
+                "folio": "$folio",
+                "created_at": "$created_at",
+                "created_by": "$user_name",
+                "answers": "$answers",
+            }},
+            {'$sort': {'created_at': -1}},
+        ]
+        result = self.format_cr_result(self.cr.aggregate(query), ids_label_dct=self.cons_f)
+        for item in result:
+            item = self.procesar_devoluciones_item(item)
+        print(simplejson.dumps(result, indent=4))
+        return result
 
     def get_list_rondines(self, prioridades=[], dateFrom='', dateTo='', filterDate=""):
         match_query = {
@@ -6608,7 +6828,8 @@ class Accesos(OcrMixin, AccesosModel):
                 "_id": 0,
                 "article_name": f"$answers.{self.cons_f['_nombre_equipo']}",
                 "article_image": f"$answers.{self.cons_f['_imagen_equipo_concesion']}",
-                "article_cost": f"$answers.{self.cons_f['_costo_equipo_concesion']}"
+                "article_cost": f"$answers.{self.cons_f['_costo_equipo_concesion']}",
+                "tipo_activo": f"$answers.{self.cons_f['tipo_activo']}"
             }}
         ]
         data = self.format_cr(self.cr.aggregate(query))
@@ -7738,6 +7959,7 @@ class Accesos(OcrMixin, AccesosModel):
         rec = self.format_cr([record,], get_one=True, ids_label_dct=self.cons_f)
         fecha = self.today_str(tz_name=self.user.get('timezone'),date_format='datetime')
         status = data.get('status')
+        forzar_dev = data.get('forzar_dev', False)
         if rec['status_concesion'] == "cancelado":
             self.LKFException(f"No es posible devolver o modifcar una concesion  {rec['folio']}")
         if rec['status_concesion'] == "devuelto":
@@ -7760,6 +7982,7 @@ class Accesos(OcrMixin, AccesosModel):
                 eq[self.cons_f['status_concesion_equipo']] = "devuelto"
                 eq[self.cons_f['cantidad_equipo_devuelto']]  = eq[self.cons_f['cantidad_equipo_concesion']]
                 eq[self.cons_f['cantidad_equipo_pendiente']]  = 0
+                eq[self.cons_f['se_forzo_devolucion']] = "si" if forzar_dev else "no"
 
                 #devolucion de equipos
                 dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
@@ -7792,6 +8015,7 @@ class Accesos(OcrMixin, AccesosModel):
                             gq[self.cons_f['status_concesion_equipo']] = "devuelto"
                             gq[self.cons_f['cantidad_equipo_devuelto']]  = gq[self.cons_f['cantidad_equipo_concesion']]
                             gq[self.cons_f['cantidad_equipo_pendiente']]  = 0
+                            gq[self.cons_f['se_forzo_devolucion']] = "si" if forzar_dev else "no"
 
                 pendiente_by_move_id[eq['id_movimiento']] = pendiente_by_move_id.get(eq['id_movimiento'],0)
                 cantidad_devuelta = eq['cantidad_devuelta']
@@ -8806,21 +9030,21 @@ class Accesos(OcrMixin, AccesosModel):
             if not self.pase_entrada_fields.get(key):
                 continue
             if key == 'grupo_acompanantes':
-                # El API solo permite mezclar respuestas de un grupo existente usando
-                # la posición (0-based) que ya ocupa ese elemento en el arreglo guardado.
-                # Los índices negativos siempre se interpretan como "agregar nuevo".
+                # patch_multi_record solo permite mezclar por posicion, una a la vez
+                # (los indices negativos siempre se interpretan como "agregar nuevo").
+                # Cuando 2+ acompanantes cambian en el mismo guardado, la API de
+                # LinkaForm truena (400 generico, code 12) al reemplazar mas de una
+                # posicion del grupo en la misma llamada. Igual que al crear el grupo
+                # (linea ~3200) y que grupo_vehiculos/grupo_equipos mas abajo, se
+                # reconstruye y reemplaza el grupo completo directo en Mongo via
+                # replace_groups en vez de mandarlo por patch_multi_record.
                 stored_acompanantes = pass_selected.get('acompanantes_grupo') or []
                 posicion_por_qr = {
                     a.get('qr_code'): idx
                     for idx, a in enumerate(stored_acompanantes)
                     if a.get('qr_code')
                 }
-                acompanantes_previos = {
-                    a.get('qr_code'): a
-                    for a in stored_acompanantes
-                    if a.get('qr_code')
-                }
-                grupo_answers = {}
+                cambios_por_qr = {}
                 for acompanante in value:
                     qr_code_acomp = acompanante.get('qr_code', '')
                     posicion = posicion_por_qr.get(qr_code_acomp)
@@ -8830,17 +9054,15 @@ class Accesos(OcrMixin, AccesosModel):
                     email = acompanante.get('email', '')
                     telefono = acompanante.get('telefono', '')
                     foto = acompanante.get('foto', [])
-                    previo = acompanantes_previos.get(qr_code_acomp, {})
-                    cambios = {}
-                    if nombre != previo.get('nombre_acompanante', ''):
-                        cambios[self.pase_entrada_fields['nombre_acompanante']] = nombre
-                    if email != previo.get('email_acompanante', ''):
-                        cambios[self.pase_entrada_fields['email_acompanante']] = email
-                    if telefono != previo.get('telefono_acompanante', ''):
-                        cambios[self.pase_entrada_fields['telefono_acompanante']] = telefono
-                    if cambios:
-                        grupo_answers[posicion] = cambios
-                    if cambios or (foto or None) != (previo.get('foto') or None):
+                    previo = stored_acompanantes[posicion]
+                    hay_cambio = (
+                        nombre != previo.get('nombre_acompanante', '')
+                        or email != previo.get('email_acompanante', '')
+                        or telefono != previo.get('telefono_acompanante', '')
+                    )
+                    if hay_cambio:
+                        cambios_por_qr[qr_code_acomp] = {'nombre': nombre, 'email': email, 'telefono': telefono}
+                    if hay_cambio or (foto or None) != (previo.get('foto') or None):
                         acompanantes_a_actualizar.append({
                             'qr_code': qr_code_acomp,
                             'nombre': nombre,
@@ -8848,8 +9070,17 @@ class Accesos(OcrMixin, AccesosModel):
                             'telefono': telefono,
                             'foto': foto,
                         })
-                if grupo_answers:
-                    answers[self.pase_entrada_fields['acompanantes_grupo']] = grupo_answers
+                if cambios_por_qr:
+                    nuevo_grupo_acompanantes = []
+                    for previo in stored_acompanantes:
+                        cambio = cambios_por_qr.get(previo.get('qr_code', ''))
+                        nuevo_grupo_acompanantes.append({
+                            self.pase_entrada_fields['nombre_acompanante']: cambio['nombre'] if cambio else previo.get('nombre_acompanante', ''),
+                            self.pase_entrada_fields['email_acompanante']: cambio['email'] if cambio else previo.get('email_acompanante', ''),
+                            self.pase_entrada_fields['telefono_acompanante']: cambio['telefono'] if cambio else previo.get('telefono_acompanante', ''),
+                            self.pase_entrada_fields['url_hijo']: previo.get('url_hijo', ''),
+                        })
+                    replace_groups[self.pase_entrada_fields['acompanantes_grupo']] = nuevo_grupo_acompanantes
                 continue
             if key == 'grupo_vehiculos':
                 nuevo_grupo_vehiculos = []
@@ -9149,6 +9380,11 @@ class Accesos(OcrMixin, AccesosModel):
                     except Exception as e:
                         print(f"DEBUG REQUERIMIENTOS ERROR: {e}")
                         requerimientos = []
+                    try:
+                        pass_selected = self.get_detail_access_pass(qr_code=qr_code, get_answers=True)
+                    except Exception as e:
+                        print(f"DEBUG PASS_SELECTED ERROR: {e}")
+                        pass_selected = {'answers': {}}
                     #---Igual que el status: gana lo que venga en este update, si no
                     #   lo que ya estaba guardado, si no la config de la ubicacion.
                     habilitar_context_link = {
@@ -10827,7 +11063,10 @@ class Accesos(OcrMixin, AccesosModel):
             }}
         ]
         response = self.format_cr(self.cr.aggregate(query))
-        return {self.unlist(x.get('incidente_area', '')): x for x in response}
+        # El nombre del área queda etiquetado como 'note_booth' (no 'incidente_area') en el
+        # labeling de CHECK_UBICACIONES -- sin este fallback, todos los checks colapsaban a la
+        # misma llave '' y solo sobrevivía el último en el dict resultante.
+        return {self.unlist(x.get('incidente_area') or x.get('note_booth', '')): x for x in response}
 
     def get_incidencias_from_checks(self, checks_for_rondin):
         """
@@ -10882,6 +11121,70 @@ class Accesos(OcrMixin, AccesosModel):
             })
         return incidencias
 
+    def create_bitacora_rondin(self, rondin_id, rondin_record):
+        """
+        Crea el registro de BITACORA_RONDINES en Linkaform para un rondín que se originó
+        en el cliente (rondín libre o iniciado desde el catálogo de recorridos -- ver
+        mapConfigToRondinDoc.ts en clave10-app, doc con inbox=False) y por lo tanto nunca
+        tuvo una bitácora previa con la que hacer match por connection_record_id en
+        get_bitacora_by_id. A diferencia de los rondines programados (assign_user_inbox
+        ya los deja creados en Linkaform con inbox=True antes de que el móvil los toque).
+
+        Se fuerza el mismo rondin_id como _id del nuevo registro en Linkaform (mismo
+        patrón que config_area, línea 12523: metadata.update({'id': _id})), así queda
+        con connection_record_id == rondin_id desde la primera versión y las siguientes
+        sincronizaciones lo encuentran con el get_bitacora_by_id(rondin_id) de siempre.
+        Args:
+            rondin_id (str): _id del doc de CouchDB (rondin_record), forzado también
+                como _id del nuevo registro en Linkaform.
+            rondin_record (json): El documento de CouchDB del rondin.
+        Return:
+            bitacora_in_lkf (json|None): El registro recién creado (mismo formato que
+                get_bitacora_by_id), o None si falló la creación.
+        """
+        record = rondin_record.get('record', {})
+        try:
+            metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_RONDINES)
+            metadata.update({
+                'id': rondin_id,
+                "properties": {
+                    "device_properties": {
+                        "System": "Script",
+                        "Module": "Accesos",
+                        "Process": "Creación de bitácora para rondín iniciado desde la app",
+                        "Action": "create_bitacora_rondin",
+                        "File": "accesos/app.py"
+                    }
+                }
+            })
+            answers = {
+                self.f['fecha_programacion']: self._ensure_date_str(record.get('fecha_programada', '')),
+                self.f['fecha_inicio_rondin']: self._ensure_date_str(record.get('fecha_inicio', '')),
+                self.f['estatus_del_recorrido']: 'en_proceso',
+                self.f['areas_del_rondin']: [],
+                self.USUARIOS_OBJ_ID: {
+                    self.f['new_user_complete_name']: rondin_record.get('created_by_name', ''),
+                    self.f['new_user_id']: [rondin_record.get('created_by_id')],
+                    self.f['new_user_email']: [self.user.get('email', '')]
+                },
+                self.CONFIGURACION_RECORRIDOS_OBJ_ID: {
+                    self.f['nombre_del_recorrido']: record.get('nombre_rondin', ''),
+                    self.f['ubicacion_recorrido']: record.get('ubicacion_rondin', '')
+                }
+            }
+            metadata.update({'answers': answers})
+            res = self.lkf_api.post_forms_answers(metadata)
+        except Exception as e:
+            print(f"  [create_bitacora_rondin] EXCEPTION creando bitácora para rondin_id={rondin_id}: {e}")
+            return None
+
+        if res.get('status_code') not in (200, 201, 202):
+            print(f"  [create_bitacora_rondin] ERROR creando bitácora para rondin_id={rondin_id}: {res}")
+            return None
+
+        print(f"  [create_bitacora_rondin] bitácora creada para rondin_id={rondin_id}")
+        return self.get_bitacora_by_id(rondin_id)
+
     def sync_rondin_to_lkf(self, rondin_id, rondin_record={}):
         """
         Sincroniza la bitácora del rondín hacia Linkaform ya sea usando checks ya procesados. O
@@ -10895,6 +11198,10 @@ class Accesos(OcrMixin, AccesosModel):
         print(f"\n  [sync_rondin] rondin_id={rondin_id}")
         status = {}
         bitacora_in_lkf = self.get_bitacora_by_id(rondin_id)
+        if not bitacora_in_lkf and rondin_record.get('inbox') is False:
+            # Rondín iniciado desde la app (libre o desde catálogo): nunca existió una
+            # bitácora previa en Linkaform, hay que crearla en vez de reportar 404.
+            bitacora_in_lkf = self.create_bitacora_rondin(rondin_id, rondin_record)
         if not bitacora_in_lkf:
             print(f"  [sync_rondin] ERROR: bitácora no encontrada en LKF para rondin_id={rondin_id}")
             rondin_record['status'] = 'not_found'
@@ -11239,7 +11546,7 @@ class Accesos(OcrMixin, AccesosModel):
         Return
             res (json): El json con ids de cada set del grupo repetitivo del rondin
         """
-        area_name = self.unlist(check.get('incidente_area', '?'))
+        area_name = self.unlist(check.get('incidente_area') or check.get('note_booth', '?'))
         timezone_str = check.get('timezone') or self.user.get('timezone')
         fecha = (check.get('fecha_hora_inspeccion_area')
                  or check.get('fecha_inspeccion_area'))
@@ -11259,7 +11566,7 @@ class Accesos(OcrMixin, AccesosModel):
         print(f"    [set_area_fmt] área={area_name!r}  fecha={fecha!r}  fuente={fecha_source}")
         res = self._lables_to_ids(check)
         res ={  self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID: {
-                    self.mf['nombre_area']: self.unlist(check.get('incidente_area', '')),
+                    self.mf['nombre_area']: area_name,
                     },
                 self.f['fecha_inspeccion_area']: fecha,
                 self.f['foto_evidencia_area_rondin']: check.get('foto_evidencia_area', []),
@@ -11749,7 +12056,7 @@ class Accesos(OcrMixin, AccesosModel):
         bitacora_in_lkf['areas_del_rondin'] = bitacora_in_lkf.get('areas_del_rondin',[])
 
         for item in bitacora_in_lkf['areas_del_rondin']:
-            nombre_area = item.get('incidente_area')
+            nombre_area = item.get('incidente_area') or item.get('note_booth')
             if checks_for_rondin.get(nombre_area):
                 item.update(checks_for_rondin.pop(nombre_area))
 
@@ -11784,7 +12091,7 @@ class Accesos(OcrMixin, AccesosModel):
                 answers[self.f['fecha_fin_rondin']] = self._ensure_date_str(value)
             elif key == 'estatus_del_recorrido' and value:
                 answers[self.f['estatus_del_recorrido']] = value
-            elif key == 'incidente_location':
+            elif key in ('ubicacion', 'incidente_location'):
                 conf_recorrido.update({
                     self.f['ubicacion_recorrido']: value
                 })
