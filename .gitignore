@@ -7,7 +7,8 @@ __pycache__/
 #Linkaform Exlcudes
 local_settings.py
 account_settings.py
-lkfpowd.py
+lkfpwd.py
+config/get_couch_user_password.py
 # secrets/ va por lista blanca: cualquier archivo nuevo ahi queda fuera por defecto,
 # en vez de depender de acordarse de agregar la regla.
 secrets/*
@@ -142,3 +143,8 @@ dmypy.json
 
 # Claude
 CLAUDE.md
+
+# Config de Claude Code por instalacion: que plugins habilita cada quien y
+# sus permisos locales. No se versiona - es decision de quien instala.
+.claude/settings.json
+.claude/settings.local.json
