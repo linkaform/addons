@@ -322,7 +322,7 @@ _udpate_container(){
 
 _run_tests(){
   echo "the command for was " $1
-  cd ~/lkf/addons/test/docker
+  cd ~/clave10-sdk/addons/test/docker
   docker stop lkf-do-test && docker rm lkf-do-test
   docker compose up lkf-do-test
 }

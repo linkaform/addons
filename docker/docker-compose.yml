@@ -30,7 +30,6 @@ services:
       - ../secrets:/srv/scripts/addons/secrets
       - ../modules:/srv/scripts/addons/modules
       - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/ 
-      - ../../lkf/infosync_scripts/:/srv/infosync_scripts
       - ../../../.bash_lkf_history:/srv/scripts/.bash_history
     command: sleep infinity
     stdin_open: true
@@ -59,7 +58,6 @@ services:
       - ../secrets:/srv/scripts/addons/secrets
       - ../modules:/srv/scripts/addons/modules
       - ../../linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/ 
-      - ../../lkf/infosync_scripts/:/srv/infosync_scripts
       - ../../../.bash_lkf_history:/srv/scripts/.bash_history
     command: sleep infinity
     stdin_open: true
