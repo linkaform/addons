@@ -6013,8 +6013,11 @@ class Accesos(OcrMixin, AccesosModel):
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_FALLAS,
         }
-        if location:
-            match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}"] = location
+        # El front manda una lista de ubicaciones; otros callers mandan un string.
+        locations = location if isinstance(location, list) else [location]
+        locations = [loc for loc in locations if loc]
+        if locations:
+            match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_ubicacion']}"] = {"$in": locations}
         if area:
             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.fallas_fields['falla_caseta']}"] = area
         if status:
@@ -6085,16 +6088,22 @@ class Accesos(OcrMixin, AccesosModel):
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_INCIDENCIAS,
         }
-        if location:
-             match_query[f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}"] = location
+        # El front manda una lista de ubicaciones; otros callers mandan un string.
+        locations = location if isinstance(location, list) else [location]
+        locations = [loc for loc in locations if loc]
+        if locations:
+             match_query[f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}"] = {"$in": locations}
         if area:
              match_query[f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}"] = area
+        # Prioridad y estatus se guardan normalizados (ej. 'critica', 'abierto'); se acepta
+        # cualquier capitalización/acento del caller.
+        prioridades = [self.clean_text(p) for p in (prioridades or []) if p]
         if prioridades:
             match_query[f"answers.{self.incidence_fields['prioridad_incidencia']}"] = {"$in": prioridades}
         if folio:
             match_query.update({"folio":folio})
         if status:
-            match_query.update({f"answers.{self.incidence_fields['estatus']}": status})
+            match_query.update({f"answers.{self.incidence_fields['estatus']}": self.clean_text(status)})
 
         user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
         zona = user_data.get('timezone','America/Monterrey')
@@ -8354,7 +8363,6 @@ class Accesos(OcrMixin, AccesosModel):
             "fecha_hora_incidencia": incidence_selected.get('fecha_hora_incidencia', ''),
             "ubicacion_incidencia": incidence_selected.get('ubicacion_incidencia', ''),
             "area_incidencia": incidence_selected.get('area_incidencia', ''),
-            "incidencia": incidence_selected.get('incidencia', ''),
             "tipo_incidencia": incidence_selected.get('tipo_incidencia', ''),
             "comentario_incidencia": incidence_selected.get('comentario_incidencia', ''),
             "tipo_dano_incidencia": incidence_selected.get('tipo_dano_incidencia', []),
@@ -8373,23 +8381,25 @@ class Accesos(OcrMixin, AccesosModel):
             "seguimientos_incidencia_nuevo": [incidencia_grupo_seguimiento],
             "categoria": incidence_selected.get("categoria", ''),
             "sub_categoria": incidence_selected.get("sub_categoria", ''),
-            "incidencia": incidence_selected.get("incidencia", ''),
+            "incidencia": incidence_selected.get("incidencia") or incidence_selected.get("incidente") or '',
             "estatus": estatus or incidence_selected.get("estatus", '')
         }
         answers = {}
         for key, value in incidencia_seg.items():
             if key == 'categoria':
-                answers[self.incidence_fields['incidencia_catalog']].update({
+                answers.setdefault(self.incidence_fields['incidencia_catalog'], {}).update({
                     self.incidence_fields['categoria']: value
                 })
             if key == 'sub_categoria':
-                answers[self.incidence_fields['incidencia_catalog']].update({
+                answers.setdefault(self.incidence_fields['incidencia_catalog'], {}).update({
                     self.incidence_fields['sub_categoria']: value
                 })
-            if key == 'incidencia':
-                answers[self.incidence_fields['incidencia_catalog']].update({
-                    self.incidence_fields['incidencia']: incidencia_seg['incidencia']
-                })
+            # La llave vive como 'incidencia' o 'incidente' según el caller; se aceptan ambas
+            # y un valor vacío no pisa uno ya capturado por la otra llave.
+            if key in ('incidencia', 'incidente'):
+                catalog = answers.setdefault(self.incidence_fields['incidencia_catalog'], {})
+                if value or not catalog.get(self.incidence_fields['incidencia']):
+                    catalog[self.incidence_fields['incidencia']] = value
             if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
                 if incidencia_seg['ubicacion_incidencia'] and not incidencia_seg['area_incidencia']:
                     answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['ubicacion_incidencia']:incidencia_seg['ubicacion_incidencia']}
@@ -8400,8 +8410,6 @@ class Accesos(OcrMixin, AccesosModel):
                     self.incidence_fields['area_incidencia']:incidencia_seg['area_incidencia']}
             elif  key == 'reporta_incidencia':
                 answers[self.incidence_fields['reporta_incidencia_catalog']] = {self.incidence_fields['reporta_incidencia']:value}
-            elif  key == 'incidencia':
-                answers[self.incidence_fields['incidencia_catalog']] = {self.incidence_fields['incidencia']:value}
             elif key == 'personas_involucradas_incidencia':
                 personas = incidencia_seg.get('personas_involucradas_incidencia',[])
                 if personas:
@@ -8501,6 +8509,9 @@ class Accesos(OcrMixin, AccesosModel):
                 answers[self.incidence_fields['color_piel']] = f"{value}".lower().replace(" ", "_")
             elif key == 'estatus':
                 answers[self.incidence_fields['estatus']] = f"{value}".lower().replace(" ", "_")
+            elif key in ('categoria', 'sub_categoria', 'incidencia', 'incidente'):
+                # Ya se agregaron dentro del catálogo de incidencia arriba.
+                pass
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         print("ANSWERS", simplejson.dumps(answers, indent=4))
@@ -8559,17 +8570,19 @@ class Accesos(OcrMixin, AccesosModel):
         # answers[self.incidence_fields['estatus']]="abierto"
         for key, value in data_incidences.items():
             if key == 'categoria':
-                answers[self.incidence_fields['incidencia_catalog']].update({
+                answers.setdefault(self.incidence_fields['incidencia_catalog'], {}).update({
                     self.incidence_fields['categoria']:data_incidences['categoria']
                 })
             if key == 'sub_categoria':
-                answers[self.incidence_fields['incidencia_catalog']].update({
+                answers.setdefault(self.incidence_fields['incidencia_catalog'], {}).update({
                     self.incidence_fields['sub_categoria']: data_incidences['sub_categoria']
                 })
-            if key == 'incidencia':
-                answers[self.incidence_fields['incidencia_catalog']].update({
-                    self.incidence_fields['incidencia']: data_incidences['incidencia']
-                })
+            # La llave vive como 'incidencia' o 'incidente' según el caller; se aceptan ambas
+            # y un valor vacío no pisa uno ya capturado por la otra llave.
+            if key in ('incidencia', 'incidente'):
+                catalog = answers.setdefault(self.incidence_fields['incidencia_catalog'], {})
+                if value or not catalog.get(self.incidence_fields['incidencia']):
+                    catalog[self.incidence_fields['incidencia']] = value
             if  key == 'ubicacion_incidencia' or key == 'area_incidencia':
                 if data_incidences['ubicacion_incidencia'] and not data_incidences['area_incidencia']:
                     answers[self.incidence_fields['ubicacion_incidencia_catalog']] = {self.incidence_fields['ubicacion_incidencia']:data_incidences['ubicacion_incidencia']}
@@ -8580,8 +8593,6 @@ class Accesos(OcrMixin, AccesosModel):
                     self.incidence_fields['area_incidencia']:data_incidences['area_incidencia']}
             elif  key == 'reporta_incidencia':
                 answers[self.incidence_fields['reporta_incidencia_catalog']] = {self.incidence_fields['reporta_incidencia']:value}
-            elif  key == 'incidencia':
-                answers[self.incidence_fields['incidencia_catalog']] = {self.incidence_fields['incidencia']:value}
             elif key == 'personas_involucradas_incidencia':
                 personas = data_incidences.get('personas_involucradas_incidencia',[])
                 if personas:
@@ -8679,7 +8690,9 @@ class Accesos(OcrMixin, AccesosModel):
                 answers[self.incidence_fields['color_piel']] = f"{value}".lower().replace(" ", "_")
             elif key == 'estatus':
                 answers[self.incidence_fields['estatus']] = f"{value}".lower().replace(" ", "_")
-
+            elif key in ('categoria', 'sub_categoria', 'incidencia', 'incidente'):
+                # Ya se agregaron dentro del catálogo de incidencia arriba.
+                pass
             else:
                 answers.update({f"{self.incidence_fields[key]}":value})
         # print("incidencias answers", simplejson.dumps(answers, indent=4) )
