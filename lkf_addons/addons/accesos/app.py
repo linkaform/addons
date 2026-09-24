@@ -5648,10 +5648,10 @@ class Accesos(OcrMixin, AccesosModel):
             f"answers.{self.cons_f['status_concesion']}": {"$in": ["abierto", "parcial"]},
         }
         if tipo:
-            pattern = re.escape(tipo.strip())
+            # Igualdad exacta: el nombre del equipo debe coincidir tal cual (incluye mayusculas)
             match_query[f"answers.{self.cons_f['grupo_equipos']}"] = {
                 "$elemMatch": {
-                    self.cons_f['nombre_equipo']: {"$regex": pattern, "$options": "i"},
+                    self.cons_f['nombre_equipo']: tipo.strip(),
                     self.cons_f['status_concesion_equipo']: {"$ne": "devuelto"},
                 }
             }
@@ -6101,11 +6101,18 @@ class Accesos(OcrMixin, AccesosModel):
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_INCIDENCIAS,
         }
+<<<<<<< Updated upstream
         # El front manda una lista de ubicaciones; otros callers mandan un string.
         locations = location if isinstance(location, list) else [location]
         locations = [loc for loc in locations if loc]
         if locations:
              match_query[f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}"] = {"$in": locations}
+=======
+        if location:
+             # El front puede mandar una ubicacion (str) o varias (list) desde el selector del header
+             ubicacion_key = f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}"
+             match_query[ubicacion_key] = {"$in": location} if isinstance(location, list) else location
+>>>>>>> Stashed changes
         if area:
              match_query[f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}"] = area
         # Prioridad y estatus se guardan normalizados (ej. 'critica', 'abierto'); se acepta
