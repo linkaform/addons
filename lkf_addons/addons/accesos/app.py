@@ -1069,6 +1069,11 @@ class Accesos(OcrMixin, AccesosModel):
         if fecha_caducidad_con_margen < fecha_actual:
             self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
 
+        # Casetas multiubicación: el pase vale si incluye cualquiera de las ubicaciones de la
+        # caseta, y la entrada se registra en la que coincidió (la base gana si también está).
+        booth_locations = self.get_booth_locations(area, location)
+        location = next((loc for loc in booth_locations if loc in access_pass.get("ubicacion", [])), location)
+
         # Validación de tolerancia de entrada para pases de fecha fija
         fecha_visita = access_pass.get('fecha_de_expedicion')
         if fecha_visita:
@@ -1109,7 +1114,8 @@ class Accesos(OcrMixin, AccesosModel):
                     })
 
         if location not in access_pass.get("ubicacion",[]):
-            msg = f"La ubicación {location}, no se encuentra en el pase. Pase valido para las siguientes ubicaciones: {access_pass.get('ubicacion',[])}."
+            ubicaciones_caseta = ', '.join(booth_locations) if len(booth_locations) > 1 else location
+            msg = f"La ubicación {ubicaciones_caseta}, no se encuentra en el pase. Pase valido para las siguientes ubicaciones: {access_pass.get('ubicacion',[])}."
             self.LKFException({'msg':msg,"title":'Revisa la Configuración'})
 
         if self.validate_access_pass_location(qr_code, location):
@@ -1565,8 +1571,8 @@ class Accesos(OcrMixin, AccesosModel):
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
         if not area:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar el area de donde se realizara la salida."})
-        if last_check_out.get('ubicacion_entrada') != location:
-            self.LKFException({"status_code":400, "msg":f"Este usuario ingreso en {location} y no puede salir en {last_check_out.get('ubicacion_entrada')}."})
+        if last_check_out.get('ubicacion_entrada') not in self.get_booth_locations(area, location):
+            self.LKFException({"status_code":400, "msg":f"Este usuario ingreso en {last_check_out.get('ubicacion_entrada')} y no puede salir en {location}."})
         if last_check_out.get('folio'):
             folio = last_check_out.get('folio',0)
             checkin_date_str = last_check_out.get('checkin_date')
@@ -3968,10 +3974,17 @@ class Accesos(OcrMixin, AccesosModel):
                 date_floor, date_ceiling = f"{today} 00:00:00", f"{today} 23:59:59"
                 salida_floor, salida_ceiling = f"{today} 00:00:00", None
 
+            # Bitácoras manda una lista de ubicaciones (selector del header); Accesos manda la de
+            # la caseta, que si es multiubicación incluye también sus ubicaciones extra.
+            stats_locations = location if isinstance(location, list) else [location]
+            stats_locations = [loc for loc in stats_locations if loc]
+            if page == 'Accesos' and len(stats_locations) == 1 and booth_area and booth_area != 'todas':
+                stats_locations = self.get_booth_locations(booth_area, stats_locations[0])
+
             match_query_one = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.bitacora_fields['ubicacion']}": location,
+                f"answers.{self.bitacora_fields['ubicacion']}": {"$in": stats_locations},
             }
             if dateFrom and dateTo:
                 match_query_one[f"answers.{self.mf['fecha_entrada']}"] = {"$gte": dateFrom, "$lte": dateTo}
@@ -3982,7 +3995,7 @@ class Accesos(OcrMixin, AccesosModel):
             match_query_two = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.bitacora_fields['ubicacion']}": location,
+                f"answers.{self.bitacora_fields['ubicacion']}": {"$in": stats_locations},
                 f"answers.{self.mf['fecha_entrada']}": {"$gte": date_floor, "$lte": date_ceiling}
             }
             if not (dateFrom and dateTo):
@@ -6295,8 +6308,10 @@ class Accesos(OcrMixin, AccesosModel):
 
         return notes
 
-    def get_lista_pase(self, location, status='activo', inActive="true"):
+    def get_lista_pase(self, location, status='activo', inActive="true", area=None):
         status_value = self.pase_entrada_fields.get('status_pase', '')
+        # Con caseta multiubicación se listan los pases de cualquiera de sus ubicaciones.
+        locations = self.get_booth_locations(area, location)
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": self.PASE_ENTRADA,
@@ -6351,14 +6366,18 @@ class Accesos(OcrMixin, AccesosModel):
 
         query = [
             {'$match': match_query},
-            {'$unwind': f"$answers.{self.mf['grupo_ubicaciones_pase']}"},
-            {'$match': {f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": location}},
+            # Sin $unwind: un pase con varias de las ubicaciones saldría repetido.
+            {'$match': {f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": {"$in": locations}}},
             {'$project': proyect_fields},
             {'$sort': {'_id': -1}},
         ]
 
         records = self.format_cr(self.cr.aggregate(query))
         for rec in records:
+            # 'ubicacion' sigue siendo un string: la ubicación de la caseta que coincide con el pase.
+            ubicaciones_pase = rec.get('ubicacion') or []
+            ubicaciones_pase = ubicaciones_pase if isinstance(ubicaciones_pase, list) else [ubicaciones_pase]
+            rec['ubicacion'] = next((loc for loc in locations if loc in ubicaciones_pase), self.unlist(ubicaciones_pase))
             rec['qr_code'] = rec['_id']
             rec['empresa'] = self.unlist(rec.get('empresa', []))
         return records
@@ -7057,7 +7076,70 @@ class Accesos(OcrMixin, AccesosModel):
                 booth_address.pop('folio')
                 booth.update(booth_address)
                 user_booths_with_area.append(booth)
+        extra_locations = self.get_areas_extra_locations([(b.get('area'), b.get('location')) for b in user_booths_with_area])
+        for booth in user_booths_with_area:
+            booth['extra_locations'] = extra_locations.get((booth.get('area'), booth.get('location')), [])
         return user_booths_with_area
+
+    def get_booth_locations(self, area, location):
+        '''
+        Ubicaciones en las que opera una caseta: la base y, si el área es multiubicación,
+        sus ubicaciones extra (Accesos Parque Industrial). La base siempre va primero.
+        '''
+        if not location:
+            return []
+        extra = self.get_areas_extra_locations([(area, location)]).get((area, location), []) if area else []
+        return [location] + extra
+
+    def get_areas_extra_locations(self, areas):
+        '''
+        Ubicaciones extra de las áreas configuradas como "Multiple Ubicacion" = si.
+        areas: lista de tuplas (area, ubicacion base).
+        Regresa {(area, ubicacion base): [ubicaciones extra]} solo para las áreas multiubicación;
+        las extra salen de "Accesos Parque Industrial" y no incluyen la ubicación base.
+        '''
+        areas = [(a, l) for a, l in areas if a and l]
+        if not areas:
+            return {}
+        loc_f = self.Location.f
+        area_names = list({a for a, _ in areas})
+        multi_areas = self.cr.find({
+            "deleted_at": {"$exists": False},
+            "form_id": self.Location.AREAS_DE_LAS_UBICACIONES,
+            f"answers.{loc_f['area']}": {"$in": area_names},
+            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{loc_f['location']}": {"$in": list({l for _, l in areas})},
+            f"answers.{loc_f['multiple_ubicacion']}": "si",
+        }, {f"answers.{loc_f['area']}": 1, f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{loc_f['location']}": 1})
+        multi = set()
+        for rec in multi_areas:
+            ans = rec.get('answers', {})
+            multi.add((ans.get(loc_f['area']), self.unlist(ans.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(loc_f['location']))))
+        multi &= set(areas)
+        if not multi:
+            return {}
+
+        # "Accesos Parque Industrial" referencia el área solo por nombre (no puede traer también
+        # su ubicación: el catalog-detail choca con el id de la ubicación del grupo). Solo se
+        # consideran áreas multiubicación, así que un nombre repetido solo es ambiguo si ambas
+        # áreas están marcadas como multiubicación.
+        parque_records = self.cr.find({
+            "deleted_at": {"$exists": False},
+            "form_id": self.ACCESOS_PARQUE_INDUSTRIAL,
+            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{loc_f['area']}": {"$in": list({a for a, _ in multi})},
+        }, {"answers": 1})
+        locations_by_area = {}
+        for rec in parque_records:
+            ans = rec.get('answers', {})
+            area = self.unlist(ans.get(self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID, {}).get(loc_f['area']))
+            for row in ans.get(self.f['parque_industrial_ubicaciones'], []) or []:
+                loc = self.unlist(row.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(loc_f['location']))
+                if loc and loc not in locations_by_area.setdefault(area, []):
+                    locations_by_area[area].append(loc)
+
+        return {
+            (area, base): [loc for loc in locations_by_area.get(area, []) if loc != base]
+            for area, base in multi
+        }
 
     def get_user_contacts(self):
         user_id = self.user['user_id']
@@ -7411,6 +7493,7 @@ class Accesos(OcrMixin, AccesosModel):
             "city": booth_address.get('city'),
             "state": booth_address.get('state'),
             "address": booth_address.get('address'),
+            "extra_locations": self.get_areas_extra_locations([(booth_area, booth_location)]).get((booth_area, booth_location), []),
         }
 
         #! Si el último checkin está cerrado pero existe uno huérfano abierto,

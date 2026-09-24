@@ -53,6 +53,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
         self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
         self.CONF_MODULO_SEGURIDAD = self.lkm.form_id('configuracion_modulo_seguridad','id')
+        self.ACCESOS_PARQUE_INDUSTRIAL = self.lkm.form_id('accesos_parque_industrial','id')
         self.PAQUETERIA = self.lkm.form_id('paqueteria','id')
         self.BITACORA_RONDINES = self.lkm.form_id('bitacora_rondines','id')
         self.CHECK_UBICACIONES = self.lkm.form_id('check_ubicaciones','id')
@@ -956,6 +957,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.f.update(self.checkin_fields)
         self.f.update({
             'areas_del_rondin': '66462aa5d4a4af2eea07e0d1',
+            'parque_industrial_ubicaciones': '6ab3fb87108a47cbae506b6a',
             'duracion_rondin':'6639b47565d8e5c06fe97cf3',
             'duracion_traslado_area':'6760a9581e31b10a38a22f1f',
             'porcentaje_obtenido_bitacora': '689a7ecfbf2b4be31039388e',
