@@ -331,52 +331,12 @@ class Accesos(OcrMixin, AccesosModel):
             f"{self.mf['codigo_qr']}": str(access_pass['_id']),
             f"{self.mf['fecha_entrada']}":self.today_str(employee.get('timezone', 'America/Monterrey'), date_format='datetime'),
         }
-        vehiculos = data.get('vehiculo',[])
-        if vehiculos:
-            list_vehiculos = []
-            for item in vehiculos:
-                if item:
-                    tipo = item.get('tipo','')
-                    marca = item.get('marca','')
-                    modelo = item.get('modelo','')
-                    estado = item.get('estado','')
-                    placas = item.get('placas','')
-                    color = item.get('color','')
-                    list_vehiculos.append({
-                        self.TIPO_DE_VEHICULO_OBJ_ID:{
-                            self.mf['tipo_vehiculo']:tipo,
-                            self.mf['marca_vehiculo']:marca,
-                            self.mf['modelo_vehiculo']:modelo,
-                        },
-                        self.ESTADO_OBJ_ID:{
-                            self.mf['nombre_estado']:estado,
-                        },
-                        self.mf['placas_vehiculo']:placas,
-                        self.mf['color_vehiculo']:color,
-                        self.mf['foto_vehiculo']:item.get('foto_vehiculo',[])
-                    })
+        list_vehiculos = self._answers_vehiculos(data.get('vehiculo', []))
+        if list_vehiculos:
             answers[self.mf['grupo_vehiculos']] = list_vehiculos
 
-        equipos = data.get('equipo',[])
-
-        if equipos:
-            list_equipos = []
-            for item in equipos:
-                tipo = item.get('tipo','').lower().replace(' ', '_')
-                nombre = item.get('nombre','')
-                marca = item.get('marca','')
-                modelo = item.get('modelo','')
-                color = item.get('color','')
-                serie = item.get('serie','')
-                list_equipos.append({
-                    self.mf['tipo_equipo']:tipo,
-                    self.mf['nombre_articulo']:nombre,
-                    self.mf['marca_articulo']:marca,
-                    self.mf['modelo_articulo']:modelo,
-                    self.mf['color_articulo']:color,
-                    self.mf['numero_serie']:serie,
-                    self.mf['foto_equipo']:item.get('foto_equipo',[])
-                })
+        list_equipos = self._answers_equipos(data.get('equipo', []))
+        if list_equipos:
             answers[self.mf['grupo_equipos']] = list_equipos
 
         gafete = data.get('gafete',{})
@@ -1140,7 +1100,102 @@ class Accesos(OcrMixin, AccesosModel):
             return self._do_access_grupo(access_pass, qr_code, location, area, data, selected_passes)
 
         res = self._do_access(access_pass, location, area, data)
+        if not self._acceso_guardado(res):
+            self.LKFException({'title': 'Error al registrar el acceso', 'msg': self._error_bitacora(res)})
         return res
+
+    def _answers_vehiculos(self, vehiculos):
+        """Vehiculos en formato de la bitacora (grupo_vehiculos)."""
+        list_vehiculos = []
+        for item in vehiculos or []:
+            if item:
+                list_vehiculos.append({
+                    self.TIPO_DE_VEHICULO_OBJ_ID:{
+                        self.mf['tipo_vehiculo']:item.get('tipo',''),
+                        self.mf['marca_vehiculo']:item.get('marca',''),
+                        self.mf['modelo_vehiculo']:item.get('modelo',''),
+                    },
+                    self.ESTADO_OBJ_ID:{
+                        self.mf['nombre_estado']:item.get('estado',''),
+                    },
+                    self.mf['placas_vehiculo']:item.get('placas',''),
+                    self.mf['color_vehiculo']:item.get('color',''),
+                    self.mf['foto_vehiculo']:item.get('foto_vehiculo',[])
+                })
+        return list_vehiculos
+
+    def _answers_equipos(self, equipos):
+        """Equipos en formato de la bitacora (grupo_equipos)."""
+        list_equipos = []
+        for item in equipos or []:
+            if item:
+                tipo, nombre = self._tipo_equipo_bitacora(item.get('tipo', ''), item.get('nombre', ''))
+                list_equipos.append({
+                    self.mf['tipo_equipo']:tipo,
+                    self.mf['nombre_articulo']:nombre,
+                    self.mf['marca_articulo']:item.get('marca',''),
+                    self.mf['modelo_articulo']:item.get('modelo',''),
+                    self.mf['color_articulo']:item.get('color',''),
+                    self.mf['numero_serie']:item.get('serie',''),
+                    self.mf['foto_equipo']:item.get('foto_equipo',[])
+                })
+        return list_equipos
+
+    def _data_acompanante(self, data, companion_pass):
+        """
+        Datos de acceso para un acompanante: comparte ubicacion, comentarios y
+        visita con el titular, pero el equipo y vehiculo son los de su propio pase.
+        """
+        data_acompanante = dict(data)
+        data_acompanante['equipo'] = self.format_equipos_simple(companion_pass.get('grupo_equipos') or [])
+        data_acompanante['vehiculo'] = self.format_vehiculos_simple(companion_pass.get('grupo_vehiculos') or [])
+        return data_acompanante
+
+    # Opciones del radio "Tipo de equipo" en la Bitacora de entradas y salidas.
+    # En el Pase de entrada el tipo es un catalogo opcional, asi que puede venir
+    # vacio o con un valor que el radio no acepta.
+    TIPOS_EQUIPO_BITACORA = ('herramienta', 'computo', 'tablet', 'otra')
+
+    def _tipo_equipo_bitacora(self, tipo, nombre):
+        """
+        Regresa (tipo, nombre) validos para la bitacora: si el tipo del pase no es
+        una opcion del radio se usa 'otra' y el tipo original se conserva en el
+        nombre del articulo si este viene vacio.
+        """
+        tipo = (tipo or '').strip()
+        slug = unicodedata.normalize('NFKD', tipo).encode('ascii', 'ignore').decode('ascii')
+        slug = slug.lower().replace(' ', '_')
+        if slug in self.TIPOS_EQUIPO_BITACORA:
+            return slug, nombre
+        return 'otra', nombre or tipo
+
+    def _acceso_guardado(self, response):
+        return isinstance(response, dict) and response.get('status_code') in (200, 201)
+
+    def _error_bitacora(self, response):
+        """
+        Convierte la respuesta de error de post_forms_answers en texto legible,
+        ej. 'Equipo > Tipo de equipo: Este campo es requerido'.
+        """
+        errores = []
+
+        def recorrer(nodo, ruta):
+            if not isinstance(nodo, dict):
+                return
+            label = nodo.get('label')
+            msgs = nodo.get('msg')
+            if label and msgs:
+                errores.append(f"{' > '.join(ruta + [label])}: {', '.join(msgs)}")
+            grupo = nodo.get('group', {})
+            ruta_hijos = ruta + [grupo['label']] if isinstance(grupo, dict) and grupo.get('label') else ruta
+            for k, v in nodo.items():
+                if k not in ('group', 'msg', 'label', 'error'):
+                    recorrer(v, ruta_hijos)
+
+        recorrer((response or {}).get('json') or {}, [])
+        if errores:
+            return '; '.join(errores)
+        return f"No se pudo guardar el registro (status {(response or {}).get('status_code')})"
 
     def _pase_alcanzo_limite_entradas(self, total_entradas, limite_acceso):
         '''
@@ -1162,7 +1217,7 @@ class Accesos(OcrMixin, AccesosModel):
         propio de cada qr_code. Un acompañante que no pase esa validación se omite
         y se reporta como error, sin afectar al resto del grupo.
         '''
-        pases_a_procesar = [(str(qr_code), access_pass)]
+        pases_a_procesar = [(str(qr_code), access_pass, data)]
         resultados = []
         qr_codes_vistos = {str(qr_code)}
 
@@ -1181,18 +1236,21 @@ class Accesos(OcrMixin, AccesosModel):
             if self._pase_alcanzo_limite_entradas(total_entradas_companion, companion_pass.get('limite_de_acceso')):
                 resultados.append({'qr_code': companion_qr, 'status': 'error', 'msg': 'Se ha completado el limite de entradas disponibles para este pase.'})
                 continue
-            pases_a_procesar.append((companion_qr, companion_pass))
+            pases_a_procesar.append((companion_qr, companion_pass, self._data_acompanante(data, companion_pass)))
 
         with ThreadPoolExecutor(max_workers=10) as executor:
             futures = {
-                executor.submit(self._do_access, pase, location, area, data): qr
-                for qr, pase in pases_a_procesar
+                executor.submit(self._do_access, pase, location, area, data_pase): qr
+                for qr, pase, data_pase in pases_a_procesar
             }
             for future in as_completed(futures):
                 qr = futures[future]
                 try:
                     response = future.result()
-                    resultados.append({'qr_code': qr, 'status': 'success', 'response': response})
+                    if self._acceso_guardado(response):
+                        resultados.append({'qr_code': qr, 'status': 'success', 'response': response})
+                    else:
+                        resultados.append({'qr_code': qr, 'status': 'error', 'msg': self._error_bitacora(response), 'response': response})
                 except Exception as e:
                     resultados.append({'qr_code': qr, 'status': 'error', 'msg': str(e)})
 
