@@ -2117,6 +2117,19 @@ class Accesos(OcrMixin, AccesosModel):
             answers[self.cons_f['tipo_persona_solicita']] = 'otro'
 
         answers[self.cons_f['grupo_equipos']] = []
+        # Solo se guardan en el equipo los campos del grupo "equipos en prestamo";
+        # cualquier otro id quedaria en Mongo pero LKF no lo mostraria.
+        campos_grupo_equipos = (
+            'nombre_equipo', 'categoria_equipo_concesion', 'costo_equipo_concesion',
+            'imagen_equipo_concesion', 'cantidad_equipo_concesion', 'subotal_concesion_equipo',
+            'id_movimiento', 'evidencia_prestamo', 'comentario_prestamo',
+        )
+        # Los fronts mandan la foto y el comentario del prestamo con los nombres
+        # de los campos de Devoluciones; se traducen a los del prestamo.
+        renombrar_prestamo = {
+            'evidencia_entrega': 'evidencia_prestamo',
+            'comentario_entrega': 'comentario_prestamo',
+        }
         # Equipo
         for equipo in equipos:
             if equipo.get('id_movimiento') and ObjectId.is_valid(equipo['id_movimiento']):
@@ -2128,6 +2141,9 @@ class Accesos(OcrMixin, AccesosModel):
                 self.cons_f['id_movimiento'] : str(ObjectId())
             }
             for key, value in equipo.items():
+                key = renombrar_prestamo.get(key, key)
+                if key not in campos_grupo_equipos:
+                    continue
                 if '.' in self.cons_f[key]:
                     catalog_id, field_id = self.cons_f[key].split('.')
                     eq[catalog_id] = eq.get(catalog_id,{})
@@ -5961,6 +5977,15 @@ class Accesos(OcrMixin, AccesosModel):
         devoluciones_totales = item.get('grupo_equipos_devolucion', [])
 
         for equipo in equipos:
+            # Foto y comentario del prestamo. Los registros viejos los tienen guardados
+            # con los ids de Devoluciones (evidencia_entrega/comentario_entrega) dentro del equipo.
+            equipo['evidencia_prestamo'] = equipo.get('evidencia_prestamo') or equipo.get('evidencia_entrega') or []
+            equipo['comentario_prestamo'] = equipo.get('comentario_prestamo') or equipo.get('comentario_entrega') or ""
+            # TODO: alias temporal para la app movil publicada, que aun lee estos nombres
+            # del equipo. Quitar cuando salga la version que lee evidencia_prestamo.
+            equipo['evidencia_entrega'] = equipo['evidencia_prestamo']
+            equipo['comentario_entrega'] = equipo['comentario_prestamo']
+
             # Obtenemos el ID que identifica el movimiento del equipo
             id_mov = equipo.get('id_movimiento')
 
@@ -8081,10 +8106,11 @@ class Accesos(OcrMixin, AccesosModel):
                 dev[self.cons_f['cantidad_devolucion']]  = self.get_cantidad_pendiente(rec, self.format_cr([eq],get_one=True, ids_label_dct=self.cons_f), status)
                 dev[self.cons_f['estatus_equipo']]  = self.status_equipo_dict[data.get('state')]
                 dev[self.cons_f['quien_entrega']] =  data.get('quien_entrega')
-                dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company')
+                dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company', data.get('company'))
                 dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
-                dev[self.cons_f['evidencia_entrega']] =  eq.get('evidencia',  eq.get('evidencia_entrega'))
-                dev[self.cons_f['comentario_entrega']] = data.get('comenario_entrega',data.get('comentarios'))
+                # En devolucion total la evidencia viene en la raiz del request, no en cada equipo
+                dev[self.cons_f['evidencia_entrega']] =  data.get('evidencia',  data.get('evidencia_entrega'))
+                dev[self.cons_f['comentario_entrega']] = data.get('comentario_entrega', data.get('comenario_entrega', data.get('comentarios')))
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
         else:
@@ -8116,11 +8142,11 @@ class Accesos(OcrMixin, AccesosModel):
                 dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
                 dev[self.cons_f['id_movimiento_devolucion']]  = eq['id_movimiento']
                 dev[self.cons_f['evidencia_entrega']] =  eq.get('evidencia',  eq.get('evidencia_entrega'))
-                dev[self.cons_f['comentario_entrega']] = eq.get('comenario_entrega',data.get('comentarios'))
+                dev[self.cons_f['comentario_entrega']] = eq.get('comentario_entrega') or eq.get('comenario_entrega') or data.get('comentario_entrega', data.get('comentarios'))
                 dev[self.cons_f['cantidad_devolucion']]  = cantidad_devuelta
                 dev[self.cons_f['estatus_equipo']]  = self.status_equipo_dict[eq['state']]
                 dev[self.cons_f['quien_entrega']] =  data.get('quien_entrega')
-                dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company')
+                dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company', data.get('company'))
                 dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
