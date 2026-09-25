@@ -8105,7 +8105,14 @@ class Accesos(OcrMixin, AccesosModel):
                 #devolucion de equipos
                 dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
                 dev[self.cons_f['id_movimiento_devolucion']]  = eq[self.cons_f['id_movimiento']]
-                dev[self.cons_f['cantidad_devolucion']]  = self.get_cantidad_pendiente(rec, self.format_cr([eq],get_one=True, ids_label_dct=self.cons_f), status)
+                # get_cantidad_pendiente regresa lo que queda pendiente (en total siempre 0),
+                # se usa solo para validar; lo devuelto es lo que faltaba tras devoluciones parciales.
+                eq_fmt = self.format_cr([eq],get_one=True, ids_label_dct=self.cons_f)
+                self.get_cantidad_pendiente(rec, eq_fmt, status)
+                ya_devuelto = sum(
+                    d.get('cantidad_devolucion', 0) for d in rec.get('grupo_equipos_devolucion', [])
+                    if d.get('id_movimiento_devolucion') == eq_fmt['id_movimiento'])
+                dev[self.cons_f['cantidad_devolucion']]  = eq_fmt['cantidad_equipo_concesion'] - ya_devuelto
                 dev[self.cons_f['estatus_equipo']]  = self.status_equipo_dict[data.get('state')]
                 dev[self.cons_f['quien_entrega']] =  data.get('quien_entrega')
                 dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company', data.get('company'))
