@@ -187,20 +187,46 @@ class Base(BaseModel):
 
     def share_menus_script(self, user_id):
         """
-        Comparte unicamente el script de menus (self.SCRIPT_MENUS) con el
-        usuario -- bootstrap para un usuario recien creado en la forma
-        Usuarios, antes de que tenga cualquier otro permiso de modulo (no
-        depende de un registro en CONFIGURACION_MENUS todavia).
+        Bootstrap de menus: comparte el script de menus (self.SCRIPT_MENUS) y el
+        catalogo ELEMENTOS_MENU (self.MENUS_CATALOG_ID) con el usuario. Sin
+        cualquiera de los dos el usuario no puede obtener sus menus, asi que no
+        dependen del workflow de CONFIGURACION_MENUS. Solo agrega (no descomparte)
+        y omite lo que el usuario ya tiene.
+        No lanza excepcion: regresa {'ok': bool, 'errors': [...]} para no frenar
+        a quien lo llama.
         """
-        data_to_share = {
-            "file_shared": f"/api/infosync/get_scripts/{self.SCRIPT_MENUS}/",
-            "owner": f"/api/infosync/user/{user_id}/",
-            "perm": "can_read_item",
-        }
-        res = self.lkf_api.share_script(data_to_share)
-        if res['status_code'] != 201:
-            self.LKFException(f'Error al compartir script de menus: {data_to_share}')
-        return res
+        errors = []
+        owner = f"/api/infosync/user/{user_id}/"
+
+        user_scripts = self.lkf_api.get_user_scripts(user_id).get('data', [])
+        if isinstance(user_scripts, dict):
+            user_scripts = []
+        if self.SCRIPT_MENUS and self.SCRIPT_MENUS not in {s['id'] for s in user_scripts}:
+            data_to_share = {
+                "file_shared": f"/api/infosync/get_scripts/{self.SCRIPT_MENUS}/",
+                "owner": owner,
+                "perm": "can_read_item",
+            }
+            res = self.lkf_api.share_script(data_to_share)
+            if res.get('status_code') != 201:
+                errors.append({'script': self.SCRIPT_MENUS, 'res': res})
+
+        user_catalogs = self.lkf_api.get_user_catalog(user_id).get('data', [])
+        if isinstance(user_catalogs, dict):
+            user_catalogs = []
+        if self.MENUS_CATALOG_ID and self.MENUS_CATALOG_ID not in {c['id'] for c in user_catalogs}:
+            data_to_share = {
+                "file_shared": f"/api/infosync/item/{self.MENUS_CATALOG_ID}/",
+                "owner": owner,
+                "perm": "can_read_item",
+            }
+            res = self.lkf_api.share_form(data_to_share)
+            if res.get('status_code') != 201:
+                errors.append({'catalog': self.MENUS_CATALOG_ID, 'res': res})
+
+        if errors:
+            print('Error al compartir bootstrap de menus', user_id, errors)
+        return {'ok': not errors, 'errors': errors}
 
     def _project_format(self, data):
         return self.project_format(data)
@@ -569,7 +595,9 @@ class Base(BaseModel):
 
     def set_item_permits(self, user_id, item_needed, item_type):
         """
-        Comparte los items necesarios para el usuario
+        Comparte los items necesarios para el usuario.
+        Regresa la lista de items que no se pudieron compartir; un share fallido
+        no corta los demas.
         """
         permissions = 'can_read_item'
         share_data = {
@@ -606,12 +634,13 @@ class Base(BaseModel):
 
         user_item_ids = {item['id'] for item in user_item}
         items_to_share = item_needed - user_item_ids
+        failed = []
         for item_id in items_to_share:
             share_data["file_shared"]=  f"/api/infosync/item/{item_id}/"
             res = self.lkf_api.share_form(share_data)
-            if res['status_code'] != 201:
-                self.LKFException(f'Error al compartir scritp: {share_data}')
-        return res
+            if res.get('status_code') != 201:
+                failed.append({'type': item_type, 'id': item_id, 'status_code': res.get('status_code')})
+        return failed
 
     def set_user_permissions(self):
         """
@@ -642,9 +671,12 @@ class Base(BaseModel):
             forms_needed.update([x for x in config.get('forms',[]) if x])
             catalogs_needed.update([x for x in config.get('catalogs') if x])
             scripts_needed.update([x for x in config.get('scripts') if x])
-        self.set_item_permits(user_id, forms_needed, item_type='form')
-        self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
-        self.set_item_permits(user_id, scripts_needed,  item_type='script')
+        failed = []
+        failed += self.set_item_permits(user_id, forms_needed, item_type='form')
+        failed += self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
+        failed += self.set_item_permits(user_id, scripts_needed,  item_type='script')
+        if failed:
+            self.LKFException(f'Error al compartir permisos al usuario {user_id}: {failed}')
 
         return True
 
