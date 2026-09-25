@@ -2111,7 +2111,9 @@ class Accesos(OcrMixin, AccesosModel):
             else:
                 answers[self.cons_f[key]] = value
 
-        if self.cons_f['persona_nombre_concesion'] in answers:
+        # persona_nombre_concesion es una ruta de catalogo ("catalogo.campo") y en answers
+        # queda anidada, asi que se revisa el dato recibido y no la llave de answers.
+        if data_articles.get('persona_nombre_concesion'):
             answers[self.cons_f['tipo_persona_solicita']] = 'empleado'
         else:
             answers[self.cons_f['tipo_persona_solicita']] = 'otro'
