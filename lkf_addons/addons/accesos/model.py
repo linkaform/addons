@@ -364,7 +364,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tipo_equipo': '663e4730724f688b3059eb38',
             'tipo_locker': '66ccfec6acaa16b31e5593a3',
             'tipo_registro': '66358a5e50e5c61267832f90',
-            #'tipo_equipo':'6639a9d9d38959539f59eb9f',
+            # En el PASE el tipo es un catalog-select (catálogo de tipos de equipo);
+            # 'tipo_equipo' es el radio de la BITACORA, otro campo.
+            'tipo_equipo_pase': '6639a9d9d38959539f59eb9f',
             'tipo_vehiculo': '65f22098d1dc5e0b9529e89a',
             'tipo_visita_pase': '662c304fad7432d296d92581',
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',

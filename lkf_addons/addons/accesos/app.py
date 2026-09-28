@@ -1155,6 +1155,25 @@ class Accesos(OcrMixin, AccesosModel):
     # En el Pase de entrada el tipo es un catalogo opcional, asi que puede venir
     # vacio o con un valor que el radio no acepta.
     TIPOS_EQUIPO_BITACORA = ('herramienta', 'computo', 'tablet', 'otra')
+    # Tipos del catálogo de la cuenta que equivalen a una opción del radio de la bitácora.
+    SINONIMOS_TIPO_EQUIPO_BITACORA = {
+        'computadora': 'computo', 'laptop': 'computo', 'lap_top': 'computo', 'pc': 'computo',
+        'computadora_portatil': 'computo', 'herramientas': 'herramienta', 'ipad': 'tablet',
+    }
+
+    def _tipo_equipo_pase(self, tipo):
+        """
+        Tipo de equipo para el grupo Equipo del PASE: es un catalog-select del catálogo
+        de tipos de equipo, se guarda tal cual viene del catálogo (no en minúsculas).
+        """
+        tipo = (tipo or '').strip()
+        return {self.TIPO_DE_EQUIPO_OBJ_ID: {self.mf['tipo_equipo_pase']: tipo}} if tipo else {}
+
+    def _tipo_equipo_de_pase(self, equipo):
+        """Lee el tipo de un equipo del pase: catálogo nuevo o el campo viejo de bitácora."""
+        cat = equipo.get(self.TIPO_DE_EQUIPO_OBJ_ID) or {}
+        tipo = cat.get(self.mf['tipo_equipo_pase']) if isinstance(cat, dict) else None
+        return tipo or equipo.get('tipo_equipo_pase') or equipo.get(self.mf['tipo_equipo'], '')
 
     def _tipo_equipo_bitacora(self, tipo, nombre):
         """
@@ -1165,6 +1184,7 @@ class Accesos(OcrMixin, AccesosModel):
         tipo = (tipo or '').strip()
         slug = unicodedata.normalize('NFKD', tipo).encode('ascii', 'ignore').decode('ascii')
         slug = slug.lower().replace(' ', '_')
+        slug = self.SINONIMOS_TIPO_EQUIPO_BITACORA.get(slug, slug)
         if slug in self.TIPOS_EQUIPO_BITACORA:
             return slug, nombre
         return 'otra', nombre or tipo
@@ -3526,7 +3546,7 @@ class Accesos(OcrMixin, AccesosModel):
             row['marca'] = r.get('marca_articulo','') or r.get(self.mf['marca_articulo'],'') or ''
             row['serie'] = r.get('numero_serie','') or r.get(self.mf['numero_serie'],'') or''
             row['nombre'] = r.get('nombre_articulo','') or r.get(self.mf['nombre_articulo'],'') or ''
-            row['tipo'] = r.get('tipo_equipo','').title() or r.get(self.mf['tipo_equipo'],'') or ''
+            row['tipo'] = r.get('tipo_equipo_pase') or r.get('tipo_equipo','').title() or self._tipo_equipo_de_pase(r) or ''
             row['color'] = r.get('color_articulo','').title() or r.get(self.mf['color_articulo'],'') or ''
             row['foto_equipo'] = r.get('foto_equipo','') or []
             res.append(row)
@@ -5299,6 +5319,9 @@ class Accesos(OcrMixin, AccesosModel):
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
+            for equipo in x['grupo_equipos']:
+                if isinstance(equipo, dict) and equipo.get('tipo_equipo_pase'):
+                    equipo['tipo_equipo'] = equipo.pop('tipo_equipo_pase')
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
             ubicaciones_full_info = x.get('ubicaciones', [])
             x['ubicacion'] = [x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.Location.f['location']) for x in ubicaciones_full_info]
@@ -9306,7 +9329,7 @@ class Accesos(OcrMixin, AccesosModel):
                     modelo = item.get('modelo',item.get('modelo_articulo',''))
                     foto_equipo = item.get('foto_equipo','')
                     obj={
-                        self.mf['tipo_equipo']:tipo.lower(),
+                        **self._tipo_equipo_pase(tipo),
                         self.mf['nombre_articulo']:nombre,
                         self.mf['marca_articulo']:marca,
                         self.mf['numero_serie']:serie,
@@ -9514,14 +9537,14 @@ class Accesos(OcrMixin, AccesosModel):
                 if equipos:
                     list_equipos = []
                     for item in equipos:
-                        tipo = item.get('tipo_equipo', item.get('tipo', '')).lower().replace(' ', '_')
+                        tipo = item.get('tipo_equipo', item.get('tipo', ''))
                         nombre = item.get('nombre_articulo', item.get('nombre', ''))
                         marca = item.get('marca_articulo', item.get('marca', ''))
                         modelo = item.get('modelo_articulo', item.get('modelo', ''))
                         color = item.get('color_articulo', item.get('color', ''))
                         serie = item.get('numero_serie', item.get('serie', ''))
                         list_equipos.append({
-                            self.mf['tipo_equipo']:tipo,
+                            **self._tipo_equipo_pase(tipo),
                             self.mf['nombre_articulo']:nombre,
                             self.mf['marca_articulo']:marca,
                             self.mf['modelo_articulo']:modelo,
@@ -9816,14 +9839,14 @@ class Accesos(OcrMixin, AccesosModel):
                 if equipos:
                     list_equipos = []
                     for item in equipos:
-                        tipo = item.get('tipo_equipo','').lower().replace(' ', '_')
+                        tipo = item.get('tipo_equipo','')
                         nombre = item.get('nombre_articulo','')
                         marca = item.get('marca_articulo','')
                         modelo = item.get('modelo_articulo','')
                         color = item.get('color_articulo','')
                         serie = item.get('numero_serie','')
                         list_equipos.append({
-                            self.mf['tipo_equipo']:tipo,
+                            **self._tipo_equipo_pase(tipo),
                             self.mf['nombre_articulo']:nombre,
                             self.mf['marca_articulo']:marca,
                             self.mf['modelo_articulo']:modelo,
