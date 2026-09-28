@@ -356,7 +356,9 @@ class BaseModel(base.LKF_Base):
 
         self.envio_correo_fields.update({
             'phone_to': '699f302213e8f8740c465bfc',
-            'tipo_de_notificacion': '699dfe3b82be0dbe0319d38c'
+            'tipo_de_notificacion': '699dfe3b82be0dbe0319d38c',
+            # Radio general/transportista: la regla de correo del workflow exige 'general'.
+            'clase': '6a77cd140ad8005cec5d9700',
         })
 
         self.configuracion_area = {

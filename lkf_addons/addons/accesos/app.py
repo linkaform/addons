@@ -2330,7 +2330,19 @@ class Accesos(OcrMixin, AccesosModel):
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
-    def create_paquete(self, data_paquete):
+    def create_paquete(self, data_paquete, notificacion=None):
+        """
+        Crea el registro de Paquetería y, si se guardó, avisa al destinatario por los
+        canales de `notificacion` ({'canales': ['correo','sms'], 'email', 'telefono',
+        'no_guia', ...}). Un envío fallido no revierte el paquete: se reporta en
+        res['notificaciones'].
+        """
+        data_paquete = dict(data_paquete or {})
+        # Versiones anteriores del front mandaban esta llave dentro del paquete; no es
+        # un campo de la forma.
+        notificacion_legacy = data_paquete.pop('notificacion_paqueteria', None)
+        if not notificacion and notificacion_legacy:
+            notificacion = {'canales': notificacion_legacy}
         metadata = self.lkf_api.get_metadata(form_id=self.PAQUETERIA)
         metadata.update({
             "properties": {
@@ -2356,12 +2368,92 @@ class Accesos(OcrMixin, AccesosModel):
             elif key == 'quien_recibe_paqueteria':
                 answers[self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID] = {self.mf['nombre_empleado']:value}
             elif key == 'quien_recibe_otro':
-                answers[self.cons_f['quien_recibe_otro']] = value
-            else:
+                answers[self.paquetes_fields['quien_recibe_otro']] = value
+            elif key in self.paquetes_fields:
                 answers.update({f"{self.paquetes_fields[key]}":value})
         metadata.update({'answers':answers})
         res=self.lkf_api.post_forms_answers(metadata)
+        if notificacion and res.get('status_code') in (200, 201):
+            res['notificaciones'] = self._notificar_paquete_recibido(data_paquete, notificacion)
         return res
+
+    def get_destinatarios_paqueteria(self):
+        """
+        Empleados para el destinatario de Paquetería con su contacto, para que el front
+        llene solo el email y teléfono del aviso: [{'nombre', 'email', 'telefono'}].
+        """
+        def primero(emp, llaves):
+            for llave in llaves:
+                valor = emp.get(llave)
+                if isinstance(valor, list):
+                    valor = next((v for v in valor if v), None)
+                if valor:
+                    return str(valor).strip()
+            return ''
+
+        destinatarios = []
+        for emp in self.Employee.get_employee_data() or []:
+            nombre = emp.get('worker_name')
+            if not nombre:
+                continue
+            destinatarios.append({
+                'nombre': nombre,
+                # Primero el usuario ligado (catálogo de Usuarios); si no trae, el de la
+                # forma Empleados: Correo empresarial / Teléfono personal.
+                'email': primero(emp, ('usuario_email', 'correo_empresarial')),
+                'telefono': primero(emp, ('usuario_telefono', 'telefono1')),
+            })
+        return destinatarios
+
+    def _notificar_paquete_recibido(self, paquete, notificacion):
+        """Avisa al destinatario que llegó su paquete. Regresa {canal: {'ok', 'error'}}."""
+        canales = notificacion.get('canales') or []
+        nombre = (notificacion.get('destinatario') or paquete.get('quien_recibe_paqueteria')
+                  or paquete.get('quien_recibe_otro') or '').strip()
+        proveedor = paquete.get('proveedor') or 'paquetería'
+        guia = notificacion.get('no_guia')
+        lugar = ' – '.join(x for x in (paquete.get('ubicacion_paqueteria'), paquete.get('area_paqueteria')) if x)
+        locker = paquete.get('guardado_en_paqueteria')
+        resultado = {}
+
+        if 'correo' in canales:
+            email = (notificacion.get('email') or '').strip()
+            mensaje = (
+                f"Hola {nombre}, recibimos un paquete para ti de {proveedor}"
+                + (f" (guía {guia})" if guia else '')
+                + (f" en {lugar}" if lugar else '') + '.'
+                + (f" Está guardado en {locker}." if locker else '')
+                + " Puedes recogerlo en caseta."
+            )
+            if not email:
+                resultado['correo'] = {'ok': False, 'error': 'Sin email del destinatario'}
+            else:
+                try:
+                    r = self.send_email_notification({
+                        'tipo': 'email', 'nombre': nombre, 'email_to': email,
+                        'email_from': self.user.get('email', ''), 'mensaje': mensaje,
+                    }, 'Paquete recibido', 'Paquetería')
+                    ok = r.get('status_code') in (200, 201)
+                    resultado['correo'] = {'ok': ok, 'error': None if ok else f"status {r.get('status_code')}"}
+                except Exception as e:
+                    resultado['correo'] = {'ok': False, 'error': str(e)[:200]}
+
+        if 'sms' in canales:
+            telefono = re.sub(r'\D', '', str(notificacion.get('telefono') or ''))
+            texto = (
+                f"Clave10: tienes un paquete de {proveedor}"
+                + (f" en {lugar}" if lugar else '')
+                + (f", guardado en {locker}" if locker else '')
+                + ". Recógelo en caseta."
+            )
+            if len(telefono) < 10:
+                resultado['sms'] = {'ok': False, 'error': 'Sin teléfono válido del destinatario'}
+            else:
+                r = self.send_sms_masiv(telefono, texto) or {}
+                error = r.get('response') if r.get('statusCode') else None
+                resultado['sms'] = {'ok': not error, 'error': str(error)[:200] if error else None}
+
+        return resultado
 
     def upload_ics(self, id_forma_seleccionada, id_field, ics_content={}, meetings=[]):
         temp_dir = tempfile.gettempdir()  # Obtener el directorio temporal
@@ -7051,7 +7143,7 @@ class Accesos(OcrMixin, AccesosModel):
                 'estatus_paqueteria': f"$answers.{self.paquetes_fields['estatus_paqueteria']}",
                 'entregado_a_paqueteria': f"$answers.{self.paquetes_fields['entregado_a_paqueteria']}",
                 'proveedor': f"$answers.{self.paquetes_fields['proveedor_cat']}.{self.paquetes_fields['proveedor']}",
-                'quien_recibe_otro': f"$answers.{self.cons_f['quien_recibe_otro']}",
+                'quien_recibe_otro': f"$answers.{self.paquetes_fields['quien_recibe_otro']}",
             }},
             {'$sort':{'created_at':-1}},
         ]
@@ -7063,6 +7155,10 @@ class Accesos(OcrMixin, AccesosModel):
         for x in pr:
             status = x.get('estatus_paqueteria', [])
             x['estatus_paqueteria'] = status.pop() if status else ""
+            # Destinatario externo ("Otro"): va en un campo de texto, no en el catálogo de
+            # empleados; se expone en la misma llave para que el front lo muestre igual.
+            if not x.get('quien_recibe_paqueteria') and x.get('quien_recibe_otro'):
+                x['quien_recibe_paqueteria'] = x['quien_recibe_otro']
         return pr
 
     def get_pass_custom(self,qr_code):
@@ -10229,6 +10325,8 @@ class Accesos(OcrMixin, AccesosModel):
         })
         answers.update({
             f"{self.envio_correo_fields['tipo_de_notificacion']}": data['tipo'],
+            # Sin clase el workflow de Envío de notificaciones no manda el correo.
+            f"{self.envio_correo_fields['clase']}": data.get('clase', 'general'),
             f"{self.envio_correo_fields['titulo']}": asunto_email,
             f"{self.envio_correo_fields['nombre']}": data['nombre'],
             f"{self.envio_correo_fields['email_from']}": data['email_from'],
