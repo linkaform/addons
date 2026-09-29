@@ -851,7 +851,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'telefono_acompanante':'6a23408693202c1f1c149694',
             'foto_acompanante':'6a23408693202c1f1c149695',
             'habilitar_fotografia':'6a8f4aa6559440e39d89a1d8',
-            'habilitar_identificacion':'6a8f4aa6559440e39d89a1d9'
+            'habilitar_identificacion':'6a8f4aa6559440e39d89a1d9',
+            'auto_activacion':'6abc1395060aa01599a2f656',
         })
 
         self.conf_accesos_fields = {
@@ -1020,6 +1021,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'desc_condiciones_servicio':"6a4c673722f825e7b3e46468",
             'doc_condiciones_servicio':"6a4c673722f825e7b3e46469",
             'url_condiciones_servicio':"6a4c673722f825e7b3e4646a",
+            'auto_activacion':"6abbfa2ea034ae2596e7444c",
         })
 
         self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']

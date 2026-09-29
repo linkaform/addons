@@ -653,6 +653,29 @@ class Accesos(OcrMixin, AccesosModel):
                 res.append(visita_set)
         return res
 
+    def _status_auto_activacion(self, answers, requerimientos=None):
+        """
+        Estatus para un pase con auto activacion (toggle "Activar pase por
+        defecto" de pase-entrada). Regresa None si el pase no la trae, para que
+        el llamador siga su flujo normal.
+
+        - Se salta los requerimientos de foto/identificacion/autorizacion.
+        - Pase hijo (acompanante, trae url_padre): hereda la auto activacion del
+          titular, pero solo puede quedar activo si ya tiene nombre; si no,
+          se queda en proceso hasta que lo completen.
+        - La fecha tiene prioridad: si access_pass_set_status lo da por
+          vencido, se queda vencido.
+        """
+        auto = str(self.unlist(answers.get(self.pase_entrada_fields['auto_activacion'])) or '').strip().lower()
+        if auto not in ('sí', 'si'):
+            return None
+        es_hijo = bool(self.unlist(answers.get(self.pase_entrada_fields['url_padre'])))
+        nombre = str(self.unlist(answers.get(self.mf['nombre_pase'])) or '').strip()
+        if es_hijo and not nombre:
+            return 'proceso'
+        status = self.access_pass_set_status(answers, requerimientos=requerimientos)
+        return 'vencido' if status == 'vencido' else 'activo'
+
     def access_pass_set_status(self, answers, requerimientos=None):
         """
         Evalua criterios del pase y regresa el status del pase
@@ -3107,6 +3130,8 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',now_datetime)
         answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',now_datetime_out)
         answers[self.pase_entrada_fields['habilitar_vehiculo']]= access_pass.get('habilitar_vehiculo', 'no')
+        #---Toggle "Activar pase por defecto" de pase-entrada; si no viene, "no"
+        answers[self.pase_entrada_fields['auto_activacion']] = access_pass.get('auto_activacion', 'no')
         #---Sin default: si el pase no dice nada, que decida la config de la ubicacion
         #   (ver apply_habilitar_overrides), no forzar 'no' que la exentaria siempre.
         if access_pass.get('habilitar_fotografia') is not None:
@@ -3264,7 +3289,14 @@ class Accesos(OcrMixin, AccesosModel):
             access_pass.get('habilitar_fotografia') is not None or
             access_pass.get('habilitar_identificacion') is not None
         )
-        if created_from in ('nueva_visita', 'auto_registro') or (
+        #---Auto activacion (toggle "Activar pase por defecto" de pase-entrada):
+        #   con "sí" el pase nace activo y pasa por encima de los requerimientos
+        #   de foto/identificacion (ver _status_auto_activacion). Sin la key o
+        #   con "no" se sigue el flujo normal de abajo.
+        status_auto = self._status_auto_activacion(answers, requerimientos=requerimientos)
+        if status_auto:
+            answers[self.pase_entrada_fields['status_pase']] = status_auto
+        elif created_from in ('nueva_visita', 'auto_registro') or (
                 created_from in ('pase_de_entrada_app', 'pase_de_entrada_web') and admin_override_habilitar):
             answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
                 answers, requerimientos=requerimientos)
@@ -3339,7 +3371,12 @@ class Accesos(OcrMixin, AccesosModel):
             #   datos para que el invitado los complete despues. Misma regla que
             #   en la creacion del titular: nueva_visita/auto_registro se evaluan
             #   normal, web/app siempre arrancan en proceso.
-            if pass_answers.get(self.pase_entrada_fields['creado_desde']) in ('nueva_visita', 'auto_registro'):
+            #   Si el titular trae auto activacion (se hereda en pass_answers), el
+            #   acompanante queda activo solo si ya trae nombre; si no, en proceso.
+            status_auto = self._status_auto_activacion(pass_answers, requerimientos=requerimientos)
+            if status_auto:
+                pass_answers[self.pase_entrada_fields['status_pase']] = status_auto
+            elif pass_answers.get(self.pase_entrada_fields['creado_desde']) in ('nueva_visita', 'auto_registro'):
                 pass_answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
                     pass_answers, requerimientos=requerimientos)
             else:
@@ -4689,6 +4726,7 @@ class Accesos(OcrMixin, AccesosModel):
         requerimientos = set()
         envios = set()
         condiciones_servicio = {}
+        auto_activacion = False
         config, grupos = self.get_grupos_requisitos_ubicaciones(ubicaciones)
         logotipo_pase = self.unlist(config.get('logotipo_pase', [])) or ""
         for grupo in grupos:
@@ -4697,6 +4735,10 @@ class Accesos(OcrMixin, AccesosModel):
             condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
             condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
             condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
+
+            #---Auto activación: basta con que una de las ubicaciones la tenga en "sí"
+            if str(self.unlist(grupo.get('auto_activacion', '')) or '').strip().lower() in ('sí', 'si'):
+                auto_activacion = True
 
             requerimientos.update(self.get_datos_requeridos_grupo(grupo))
             envios = set()
@@ -4743,6 +4785,8 @@ class Accesos(OcrMixin, AccesosModel):
             "condiciones_servicio": condiciones_servicio,
             "permisos_certificaciones": permisos_certificaciones,
             "logotipo_pase": logotipo_pase,
+            # "sí"/"no": si pase-entrada muestra el toggle "Activar pase por defecto".
+            "auto_activacion": "sí" if auto_activacion else "no",
             "empresa": {
                 "nombre": company,
                 "email": empresa_email,
@@ -5066,7 +5110,10 @@ class Accesos(OcrMixin, AccesosModel):
                     'ubicacion': self._flatten_str_list(req.get('ubicacion')),
                     'prefijo_telefonico': self._flatten_scalar(req.get('prefijo_telefonico')),
                     'tolerancia_de_entrada_previa': self._flatten_scalar(req.get('tolerancia_de_entrada_previa')),
-                    'tolerancia_de_entrada_posterior': self._flatten_scalar(req.get('tolerancia_de_entrada_posterior'))
+                    'tolerancia_de_entrada_posterior': self._flatten_scalar(req.get('tolerancia_de_entrada_posterior')),
+                    # Radio "Auto Activacion" (sí/no): pase-entrada ofrece el toggle
+                    # "Activar pase por defecto" solo si la ubicación lo tiene en sí.
+                    'auto_activacion': self._flatten_scalar(req.get('auto_activacion')) or 'no',
                 })
             data.update({
                 'exclude_inputs': format_exclude_inputs,
@@ -9503,8 +9550,13 @@ class Accesos(OcrMixin, AccesosModel):
             requerimientos = self.get_requerimientos_pase(new_answers, access_pass=habilitar_context)
             # Si viene con estatus cancelado se salta la funcion de asignar estatus
             status_field = self.pase_entrada_fields['status_pase']
+            #---Pase con auto activacion: ver _status_auto_activacion (activo sin
+            #   foto/identificacion, hijo solo con nombre, vencido gana).
+            status_auto = self._status_auto_activacion(new_answers, requerimientos=requerimientos)
             if answers.get(status_field) == 'cancelado':
                 status = 'cancelado'
+            elif status_auto:
+                status = status_auto
             else:
                 status = self.access_pass_set_status(new_answers, requerimientos=requerimientos)
             answers[status_field] = status
@@ -9557,8 +9609,9 @@ class Accesos(OcrMixin, AccesosModel):
                 if child_stored and child_stored.get(status_field) != 'cancelado':
                     new_child_answers = deepcopy(child_stored)
                     new_child_answers.update(child_answers)
-                    child_answers[status_field] = self.access_pass_set_status(
-                        new_child_answers, requerimientos=requerimientos)
+                    child_answers[status_field] = self._status_auto_activacion(
+                        new_child_answers, requerimientos=requerimientos
+                    ) or self.access_pass_set_status(new_child_answers, requerimientos=requerimientos)
             except Exception as e:
                 print(f"Error calculando status del pase de acompañante {item.get('qr_code')}: {e}")
             try:
