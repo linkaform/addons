@@ -1022,6 +1022,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'doc_condiciones_servicio':"6a4c673722f825e7b3e46469",
             'url_condiciones_servicio':"6a4c673722f825e7b3e4646a",
             'auto_activacion':"6abbfa2ea034ae2596e7444c",
+            'logo_por_ubicacion':"6abc34ba059be8a67a72dc0b",
         })
 
         self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']

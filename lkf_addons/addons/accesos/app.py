@@ -4728,13 +4728,19 @@ class Accesos(OcrMixin, AccesosModel):
         condiciones_servicio = {}
         auto_activacion = False
         config, grupos = self.get_grupos_requisitos_ubicaciones(ubicaciones)
+        #---Logo general de la forma; se reemplaza por el de la ubicación si trae
         logotipo_pase = self.unlist(config.get('logotipo_pase', [])) or ""
+        logo_ubicacion = ""
         for grupo in grupos:
             #---Condiciones de servicio (solo del grupo que coincide con la ubicación)
             condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio', '')
             condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
             condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
             condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
+
+            #---Logo por ubicación: gana el del primer grupo que traiga imagen
+            if not logo_ubicacion:
+                logo_ubicacion = self.unlist(grupo.get('logo_por_ubicacion', [])) or ""
 
             #---Auto activación: basta con que una de las ubicaciones la tenga en "sí"
             if str(self.unlist(grupo.get('auto_activacion', '')) or '').strip().lower() in ('sí', 'si'):
@@ -4750,6 +4756,9 @@ class Accesos(OcrMixin, AccesosModel):
                         envios.update(envs)
                     else:
                         envios.add(envs)
+
+        if logo_ubicacion:
+            logotipo_pase = logo_ubicacion
 
         tipos = self.get_tipos_de_pase(ubicaciones)
         permisos_certificaciones = self.get_permisos_por_perfil(tipo_de_pase) if tipo_de_pase else ""
