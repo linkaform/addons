@@ -659,18 +659,8 @@ class Base(BaseModel):
         leerlos de self.answers -- permite correrla para varios usuarios en paralelo
         (ThreadPoolExecutor) sin que un hilo pise el self.answers de otro.
         """
-        forms_needed = set()
-        catalogs_needed = set()
-        scripts_needed = set()
-        menus = {i.get('menu', '').lower().replace(' ', '_') for i in elementos}
-        menus = ['always'] + list(menus)
-        for menu in menus:
-            config = self.module_permits.get(menu, {})
-            if not config:
-                continue
-            forms_needed.update([x for x in config.get('forms',[]) if x])
-            catalogs_needed.update([x for x in config.get('catalogs') if x])
-            scripts_needed.update([x for x in config.get('scripts') if x])
+        needed = self._menu_permits_needed(elementos)
+        forms_needed, catalogs_needed, scripts_needed = needed['form'], needed['catalog'], needed['script']
         failed = []
         failed += self.set_item_permits(user_id, forms_needed, item_type='form')
         failed += self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
@@ -679,6 +669,134 @@ class Base(BaseModel):
             self.LKFException(f'Error al compartir permisos al usuario {user_id}: {failed}')
 
         return True
+
+    def _menu_permits_needed(self, elementos):
+        """
+        Formas/catálogos/scripts que requieren los menús asignados (module_permits de
+        base_utils), por tipo: {'form': set, 'catalog': set, 'script': set}.
+        """
+        needed = {'form': set(), 'catalog': set(), 'script': set()}
+        menus = ['always'] + list({i.get('menu', '').lower().replace(' ', '_') for i in elementos or []})
+        for menu in menus:
+            config = self.module_permits.get(menu, {})
+            needed['form'].update(x for x in config.get('forms', []) if x)
+            needed['catalog'].update(x for x in config.get('catalogs', []) if x)
+            needed['script'].update(x for x in config.get('scripts', []) if x)
+        return needed
+
+    def _menu_config_records(self, user_ids=None):
+        """Último registro de CONFIGURACION_MENUS por usuario (sin la cuenta padre)."""
+        match = {"form_id": self.MENUS_FORM, "deleted_at": {"$exists": False}}
+        user_field = f"answers.{self.USUARIOS_OBJ_ID}.{self.menu_form_fields['usuario_id']}"
+        if user_ids:
+            match[user_field] = {"$in": [int(u) for u in user_ids]}
+        records = self.cr.find(match, {"answers": 1}).sort("_id", -1)
+        by_user = {}
+        for record in records:
+            usuario = record['answers'].get(self.USUARIOS_OBJ_ID) or {}
+            user_id = self.unlist(usuario.get(self.menu_form_fields['usuario_id']))
+            if not user_id or str(user_id) == str(self.account_id) or user_id in by_user:
+                continue
+            data = self._labels(record['answers'], ids_label_dct=self.menu_form_fields)
+            by_user[user_id] = {
+                'user_id': user_id,
+                'username': self.unlist(usuario.get(self.menu_form_fields['username'])) or '',
+                'elementos': data.get('elementos', []),
+            }
+        return list(by_user.values())
+
+    def _menu_permission_status(self, user):
+        """
+        Compara lo que piden los menús del usuario con lo que tiene compartido hoy en
+        LinkaForm: {..user, 'faltan', 'sobran'} por tipo, o {'borrado': True} si el
+        usuario ya no existe (404).
+        """
+        getters = {
+            'form': self.lkf_api.get_user_forms,
+            'catalog': self.lkf_api.get_user_catalog,
+            'script': self.lkf_api.get_user_scripts,
+        }
+        nombres = {
+            item_type: {str(info.get('id')): name for name, info in (self.lkm.module_data.get(item_type) or {}).items()}
+            for item_type in getters
+        }
+        needed = self._menu_permits_needed(user['elementos'])
+        faltan, sobran = {}, {}
+        for item_type, getter in getters.items():
+            res = getter(user['user_id'])
+            if res.get('status_code') == 404:
+                return {**user, 'borrado': True}
+            shared = {item['id']: item.get('name') for item in (res.get('data') or []) if isinstance(item, dict)}
+            missing = sorted(needed[item_type] - set(shared))
+            if missing:
+                faltan[item_type] = [{'id': i, 'nombre': nombres[item_type].get(str(i), str(i))} for i in missing]
+            # Reaplicar también descomparte esto (igual que el workflow de menús).
+            extra = sorted(set(shared) - needed[item_type])
+            if extra:
+                sobran[item_type] = [{'id': i, 'nombre': shared[i] or str(i)} for i in extra]
+        return {**user, 'faltan': faltan, 'sobran': sobran}
+
+    def get_menu_permission_gaps(self):
+        """
+        Usuarios con configuración de menús a los que les falta algún permiso compartido
+        de los que piden sus menús. Los usuarios borrados en LinkaForm (404) solo se
+        cuentan aparte: no hay nada que compartirles.
+        """
+        con_faltantes, borrados, errores = [], 0, []
+        users = self._menu_config_records()
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = {executor.submit(self._menu_permission_status, u): u for u in users}
+            for future in as_completed(futures):
+                user = futures[future]
+                try:
+                    r = future.result()
+                except Exception as e:
+                    errores.append({'user_id': user['user_id'], 'error': str(e)[:200]})
+                    continue
+                if r.get('borrado'):
+                    borrados += 1
+                elif r['faltan']:
+                    r.pop('elementos', None)
+                    r['total'] = sum(len(v) for v in r['faltan'].values())
+                    r['total_sobran'] = sum(len(v) for v in r['sobran'].values())
+                    con_faltantes.append(r)
+        con_faltantes.sort(key=lambda u: -u['total'])
+        return {'usuarios': con_faltantes, 'revisados': len(users), 'borrados': borrados, 'errores': errores}
+
+    def reapply_menu_permissions(self, user_ids):
+        """
+        Vuelve a compartir los permisos de sus menús a los usuarios indicados, directo
+        (sin pasar por el workflow) y sin tocar su registro de CONFIGURACION_MENUS.
+        Al final vuelve a leer lo compartido: LinkaForm puede aceptar un share (201)
+        y no aplicarlo, así que solo es ok si ya no falta nada.
+        """
+        resultados = []
+
+        def aplicar(user):
+            self.apply_user_menu_permissions(user['user_id'], user['elementos'])
+            estado = self._menu_permission_status(user)
+            if estado.get('borrado'):
+                return {'user_id': user['user_id'], 'ok': False, 'error': 'Usuario borrado en LinkaForm'}
+            pendientes = [i['nombre'] for items in estado['faltan'].values() for i in items]
+            if pendientes:
+                return {'user_id': user['user_id'], 'ok': False,
+                        'error': f"LinkaForm aceptó los cambios pero siguen faltando {len(pendientes)}: {', '.join(pendientes)}"}
+            return {'user_id': user['user_id'], 'ok': True, 'error': None}
+
+        users = self._menu_config_records(user_ids)
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = {executor.submit(aplicar, u): u for u in users}
+            for future in as_completed(futures):
+                user = futures[future]
+                try:
+                    resultados.append(future.result())
+                except Exception as e:
+                    resultados.append({'user_id': user['user_id'], 'ok': False, 'error': str(e)[:300]})
+        encontrados = {r['user_id'] for r in resultados}
+        for uid in user_ids or []:
+            if int(uid) not in encontrados:
+                resultados.append({'user_id': int(uid), 'ok': False, 'error': 'Sin configuración de menús'})
+        return resultados
 
     def _get_user_menu_record(self, user_id):
         query = [
