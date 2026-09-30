@@ -7991,7 +7991,11 @@ class Accesos(OcrMixin, AccesosModel):
             access_pass['config_dia_de_acceso'] = access_pass.get('config_dia_de_acceso', "").replace("_", " ")
             total_entradas = self.get_count_ingresos(qr_code)
             access_pass['total_entradas'] = total_entradas.get('total_records') if total_entradas else "0"
-            access_pass['anfitrions_data'] = access_pass.get('visita_a_details', [])
+            # El front (credential.tsx) pinta "Visita a" con name/email/telefono;
+            # get_detail_access_pass ya arma esa info en visita_a.
+            access_pass['anfitrions_data'] = access_pass.get('visita_a_details') or [
+                {**v, 'name': v.get('nombre', '')} for v in access_pass.get('visita_a', [])
+            ]
 
             if access_pass.get('grupo_areas_acceso'):
                 for area in access_pass['grupo_areas_acceso']:
