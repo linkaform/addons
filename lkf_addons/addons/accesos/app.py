@@ -10404,6 +10404,38 @@ class Accesos(OcrMixin, AccesosModel):
 
         return total_deleted
 
+    def purge_deleted(self, batch_size=100):
+        """
+        Purga de CouchDB los tombstones (docs con _deleted) usando _changes + _purge.
+        _purge no se replica a bases externas (dispositivos moviles).
+        """
+        total_purged = 0
+        since = 0
+
+        while True:
+            changes = self.cr_db.changes(since=since, limit=1000)
+            results = changes.get('results', [])
+            if not results:
+                break
+            since = changes.get('last_seq', since)
+
+            to_purge = {}
+            for row in results:
+                if row.get('deleted'):
+                    to_purge[row['id']] = [row['changes'][0]['rev']]
+
+            ids = list(to_purge.keys())
+            for i in range(0, len(ids), batch_size):
+                batch = {_id: to_purge[_id] for _id in ids[i:i + batch_size]}
+                self.cr_db.resource('_purge').post_json(body=batch)
+                total_purged += len(batch)
+                print(f"Batch purgado: {len(batch)} | Total: {total_purged}")
+
+            if len(results) < 1000:
+                break
+
+        return total_purged
+
     def complete_rondines(self, records):
         status = {}
         answers = {}
