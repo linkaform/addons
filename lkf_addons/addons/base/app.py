@@ -473,11 +473,13 @@ class Base(BaseModel):
 
             item_key = item.get('key') or self.slugify(item.get('elemento', ''), '_')
             if item_key not in submodules[seccion_key]['items']:
+                item_order = item.get('item_order')
                 item_data = {
                     'key':   item_key,
                     'label': item.get('elemento', ''),
                     'type':  item.get('type', 'link'),
-                    'order': item.get('item_order') or len(submodules[seccion_key]['items']) + 1,
+                    # 0 es un orden valido (ej. nuevo_rondin va antes que "Todos")
+                    'order': item_order if item_order is not None else len(submodules[seccion_key]['items']) + 1,
                     'icon':  item.get('item_icon') or '',
                 }
                 item_route = item.get('route_mobile')
@@ -490,7 +492,19 @@ class Base(BaseModel):
             submodules = sorted(module['submodules'].values(), key=lambda s: s['order'])
             for s in submodules:
                 s['items'] = sorted(s['items'].values(), key=lambda i: i['order'])
-            modules.append({**module, 'submodules': submodules})
+                # Un submodulo cuyo unico item es 'link' navega directo: la app
+                # espera el route en el submodulo y items vacio.
+                if len(s['items']) == 1 and s['items'][0].get('type') == 'link':
+                    link = s['items'].pop()
+                    if link.get('route'):
+                        s['route'] = link['route']
+            module = {**module, 'submodules': submodules}
+            # Modulo con un solo submodulo de navegacion directa (ej. Turnos):
+            # la app navega desde la card del Home, sin bottom sheet.
+            if len(submodules) == 1 and not submodules[0]['items'] and submodules[0].get('route'):
+                module['route'] = submodules[0]['route']
+                del module['submodules']
+            modules.append(module)
 
         return {'menu': sorted(modules, key=lambda m: m['order'])}
 
