@@ -12873,11 +12873,15 @@ class Accesos(OcrMixin, AccesosModel):
 
         return answers
 
-    def get_record_ubicacion(self, ubicacion=None, area=None, tag_id_area=None):
+    def get_record_ubicacion(self, ubicacion=None, area=None, tag_id_area=None, record_id=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.AREAS_DE_LAS_UBICACIONES,
         }
+        if record_id:
+            if not ObjectId.is_valid(str(record_id)):
+                return {}
+            match_query.update({'_id': ObjectId(str(record_id))})
         if ubicacion:
             match_query.update({
             f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.configuracion_area['ubicacion']}": ubicacion
@@ -12919,12 +12923,20 @@ class Accesos(OcrMixin, AccesosModel):
         res = self.unlist(res)
         return res
 
-    def update_area(self, data):
+    def update_area(self, data, record_id=None):
+        """
+        Actualiza un area de "Areas de las Ubicaciones". Por default la busca por
+        ubicacion+nombre; con record_id la busca por _id, lo que permite renombrarla
+        (el nombre nuevo llega en data['nombre_nueva_area']).
+        """
         ubicacion = data.get('ubicacion', '')
         area = data.get('area', '')
         if not ubicacion:
             return {'status_code': 400, 'type': 'error', 'msg': 'La ubicacion no puede estar vacia.', 'data': {}}
-        area_ubicacion_data = self.get_record_ubicacion(ubicacion=ubicacion, area=area)
+        if record_id:
+            area_ubicacion_data = self.get_record_ubicacion(record_id=record_id)
+        else:
+            area_ubicacion_data = self.get_record_ubicacion(ubicacion=ubicacion, area=area)
         if not area_ubicacion_data:
             return {'status_code': 400, 'type': 'error', 'msg': 'No se encontro el area especificada.', 'data': {}}
         folio = area_ubicacion_data.get('folio', '')
@@ -12938,6 +12950,8 @@ class Accesos(OcrMixin, AccesosModel):
 
         for key, value in area_ubicacion_data.items():
             if key == 'area':
+                if record_id:
+                    value = data.get('nombre_nueva_area') or value
                 answers[self.configuracion_area['area']] = value # type: ignore
             elif key == 'ubicacion':
                 answers[self.UBICACIONES_CAT_OBJ_ID] = {
@@ -13150,9 +13164,17 @@ class Accesos(OcrMixin, AccesosModel):
                 'longitude': record['geolocation'].get('long'),
             }
 
-        # La unica forma confiable de saber si es una edicion es revisar si el area ya
-        # existe (por ubicacion+nombre) -- el campo que manda la app no distingue esto.
-        if self.exists_area(ubicacion, nombre_area):
+        # Edicion: el _id del doc de couch ya existe en Areas de las Ubicaciones (el area
+        # se creo con force_id o la app reusa el _id del catalogo). Se actualiza por _id
+        # porque buscar por nombre falla cuando el usuario renombro el area.
+        if self.get_record_ubicacion(record_id=_id):
+            otra_area = self.get_record_ubicacion(ubicacion=ubicacion, area=nombre_area)
+            if otra_area and str(otra_area.get('_id')) != str(_id):
+                res = {'status_code': 400, 'msg': f'Ya existe otra area "{nombre_area}" en {ubicacion}'}
+            else:
+                res = self.update_area(data, record_id=_id)
+        # Sin _id previo, se revisa si ya existe un area con ese nombre en la ubicacion.
+        elif self.exists_area(ubicacion, nombre_area):
             res = self.update_area(data)
         else:
             # Area nueva: se fuerza que el _id en Mongo coincida con el _id de CouchDB.
