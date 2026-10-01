@@ -10825,8 +10825,23 @@ class Accesos(OcrMixin, AccesosModel):
     def get_user_catalogs(self):
 
         dbs = {}
+        # Varios nombres de self.f apuntan al mismo field_id; al invertirlo gana el ultimo
+        # que se cargo, y si cambia el orden de carga la app recibe otro nombre y deja de
+        # encontrar el campo. Estos quedan fijos con el nombre que la app ya lee.
+        labels_fijos = {
+            '663e5d44f5b8a7ce8211ed0f': 'note_booth',
+            '663e5c57f5b8a7ce8211ed0b': 'ubicacion',
+            '6654187fc85ce22aaf8bb070': 'new_city',
+            '638a9a99616398d2e392a9f5': 'id_usuario',
+            '62c5ff407febce07043024dd': 'note_guard',
+            '663bc4ed8a6b120eab4d7f1e': 'worker_department',
+            '663bc4c79b8046ce89e97cf4': 'worker_position',
+            '663bd36eb19b7fb7d9e97ccb': 'note_guard_close',
+            '663fb45992f2c5afcfe97ca8': 'nombre_area_salida',
+        }
         try:
             fields_invertido = {v: k for k, v in self.f.items()}
+            fields_invertido.update(labels_fijos)
             for catalog_id in self.clave10_catalogs:
                 item = {}
                 version = "00.00"
