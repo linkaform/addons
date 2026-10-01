@@ -64,6 +64,11 @@ RUN rm /tmp/*.tar.gz
 COPY ./lkf_addons/bin/lkfaddons.py /usr/local/bin/lkfaddons
 RUN chmod a+x /usr/local/bin/lkfaddons
 
+# Lectura de fotos HEIC (galeria de iPhone) para convertirlas a JPG antes de subir a LKF,
+# que no acepta .heic. Va aqui y no en requires.txt porque develop/prod parten de
+# linkaform/addons:base ya publicada.
+RUN pip install pillow-heif==1.8.0
+
 
 RUN adduser --home /srv/scripts/ --uid 1000 --disabled-password nonroot
 RUN mkdir -p /srv/scripts/addons/modules

@@ -10923,7 +10923,28 @@ class Accesos(OcrMixin, AccesosModel):
                 else:
                     return {'status_code': 462, 'type': 'error', 'msg': 'Revision not yet propagated', 'data': {}}
 
+    def heic_to_jpg(self, image_data, attachment_name):
+        """
+        LKF rechaza .heic (UPLOAD_FILE_INVALID_FORMAT), que es como llegan las fotos de la
+        galeria del iPhone. Las convierte a JPG; si no se puede, regresa el archivo tal cual.
+        """
+        if self.get_extension(attachment_name) not in ('.heic', '.heif'):
+            return image_data, attachment_name
+        try:
+            import io
+            import pillow_heif
+            from PIL import Image
+            pillow_heif.register_heif_opener()
+            img = Image.open(io.BytesIO(image_data))
+            buffer = io.BytesIO()
+            img.convert('RGB').save(buffer, format='JPEG', quality=85)
+            return buffer.getvalue(), f"{os.path.splitext(attachment_name)[0]}.jpg"
+        except Exception as e:
+            print('No se pudo convertir HEIC a JPG:', attachment_name, e)
+            return image_data, attachment_name
+
     def upload_file_from_couchdb(self, image_data, attachment_name, id_forma_seleccionada, id_field):
+        image_data, attachment_name = self.heic_to_jpg(image_data, attachment_name)
         temp_dir = tempfile.gettempdir()
         temp_file_path = os.path.join(temp_dir, attachment_name)
 
