@@ -10946,9 +10946,11 @@ class Accesos(OcrMixin, AccesosModel):
         try:
             file_url = upload_url['data']['file']
             update_file = {'file_name': attachment_name, 'file_url': file_url}
-        except KeyError:
-            print('No se pudo obtener la URL del archivo')
-            update_file = {"error": "Fallo al obtener la URL del archivo"}
+        except (KeyError, TypeError):
+            # Si LKF rechaza el archivo (ej. UPLOAD_FILE_INVALID_FORMAT con .heic), 'data'
+            # llega como texto y no como dict.
+            print('No se pudo obtener la URL del archivo', upload_url)
+            update_file = {"error": f"Fallo al obtener la URL del archivo: {upload_url.get('json') or upload_url.get('data')}"}
         finally:
             os.remove(temp_file_path)
         return update_file
@@ -13164,12 +13166,19 @@ class Accesos(OcrMixin, AccesosModel):
             self.cr_db.save(record)
             return {'status_code': 400, 'type': 'error', 'msg': msg, 'data': {}}
 
+        # Una foto nueva llega como attachment del doc de couch, con file_path local y sin
+        # file_url. do_attachments la sube y le pone el file_url en el mismo nodo; las que
+        # no se pudieron subir se descartan para no guardar en LKF una ruta file:// del
+        # telefono (update_area conserva entonces la foto que ya tenia el area).
+        self.do_attachments(record)
+        foto_area = [f for f in data_couch.get('area_foto', []) if self.is_valid_url(f.get('file_url', ''))]
+
         data = {
             'ubicacion': ubicacion,
             'area': nombre_area,
             'nombre_nueva_area': nombre_area,
             'tipo_de_area': data_couch.get('tipo_area', ''),
-            'foto_area': data_couch.get('area_foto', []),
+            'foto_area': foto_area,
             'qr_area': data_couch.get('area_tag_id', ''),
         }
 
