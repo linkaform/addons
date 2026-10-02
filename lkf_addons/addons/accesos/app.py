@@ -7141,6 +7141,9 @@ class Accesos(OcrMixin, AccesosModel):
     def get_pdf_multi(self, record_ids, name_pdf=''):
         templates = self.lkf_api.get_pdf_templates(self.PASE_ENTRADA) or []
         template_id = next((t.get('id') for t in templates if t.get('_type') == 'multiple-records'), None)
+        # Sin plantilla multiple-records LinkaForm regresa un ZIP con PDFs sueltos
+        if not template_id:
+            return {'error': 'El PDF de pases con acompañantes no está configurado en esta cuenta. Contacta al administrador.'}
         records_uri = ['/api/infosync/form_answer/{}/'.format(rid) for rid in record_ids]
         res = self.lkf_api.get_pdf_record(records_uri, template_id=template_id, name_pdf=name_pdf)
         if res:
