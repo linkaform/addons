@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.catalogo_de_items.id }}</form_id>
+    <id>6ac4374023228538f3b6f88b</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>6ac4374023228538f3b6f884</_id>
+                    <action_id>12</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <synched_catalogs>
+                            <item>
+                                <couch_id>{{ catalog.catalogo_de_formas.obj_id }}</couch_id>
+                                <id>{{ catalog.catalogo_de_formas.id }}</id>
+                                <name>Catalogo de formas</name>
+                            </item>
+                        </synched_catalogs>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>6ac4374023228538f3b6f885</id>
+            <name>None</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2026-10-06T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2026-10-05T23:47:49.871Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>True</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>
