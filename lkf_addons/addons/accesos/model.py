@@ -53,6 +53,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.VISITA_AUTORIZADA = self.lkm.form_id('visita_autorizada','id')
         self.CONF_ACCESOS = self.lkm.form_id('configuracion_accesos','id')
         self.CONF_MODULO_SEGURIDAD = self.lkm.form_id('configuracion_modulo_seguridad','id')
+        self.ACCESOS_PARQUE_INDUSTRIAL = self.lkm.form_id('accesos_parque_industrial','id')
         self.PAQUETERIA = self.lkm.form_id('paqueteria','id')
         self.BITACORA_RONDINES = self.lkm.form_id('bitacora_rondines','id')
         self.CHECK_UBICACIONES = self.lkm.form_id('check_ubicaciones','id')
@@ -363,7 +364,9 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'tipo_equipo': '663e4730724f688b3059eb38',
             'tipo_locker': '66ccfec6acaa16b31e5593a3',
             'tipo_registro': '66358a5e50e5c61267832f90',
-            #'tipo_equipo':'6639a9d9d38959539f59eb9f',
+            # En el PASE el tipo es un catalog-select (catálogo de tipos de equipo);
+            # 'tipo_equipo' es el radio de la BITACORA, otro campo.
+            'tipo_equipo_pase': '6639a9d9d38959539f59eb9f',
             'tipo_vehiculo': '65f22098d1dc5e0b9529e89a',
             'tipo_visita_pase': '662c304fad7432d296d92581',
             'ubicacion': '663e5c57f5b8a7ce8211ed0b',
@@ -488,6 +491,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'categoria_equipo_concesion':  f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.66ce23efc5c4d148311adf86",
             '_categoria_equipo_concesion': '66ce23efc5c4d148311adf86',
             'comentario_entrega': '69799523aa75e6a4c99c4d41',
+            'comentario_prestamo': '6ab5a7ffcd0d2b2a515bca06',
             'costo_equipo_concesion': f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.697991fffd83f49bb9fe074e",
             '_costo_equipo_concesion': "697991fffd83f49bb9fe074e",
             'entregado_por': '6979962e6eac7e391dbb2450',
@@ -497,6 +501,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'evidencia': '6970914a3059168605ce10c8',
             'evidencia_devolucion': '6979962e6eac7e391dbb2444',
             'evidencia_entrega': '6979962e6eac7e391dbb2453',
+            'evidencia_prestamo': '6ab5a7ffcd0d2b2a515bca05',
             'fecha_cierre_concesion': '66469f47c0580e5ead07e39b',
             'fecha_concesion': '66469ef8c9d58517f85d035f',
             'fecha_devolucion_concesion': '699fed207a15d39b937d805c',
@@ -846,7 +851,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'telefono_acompanante':'6a23408693202c1f1c149694',
             'foto_acompanante':'6a23408693202c1f1c149695',
             'habilitar_fotografia':'6a8f4aa6559440e39d89a1d8',
-            'habilitar_identificacion':'6a8f4aa6559440e39d89a1d9'
+            'habilitar_identificacion':'6a8f4aa6559440e39d89a1d9',
+            'auto_activacion':'6abc1395060aa01599a2f656',
         })
 
         self.conf_accesos_fields = {
@@ -956,6 +962,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.f.update(self.checkin_fields)
         self.f.update({
             'areas_del_rondin': '66462aa5d4a4af2eea07e0d1',
+            'parque_industrial_ubicaciones': '6ab3fb87108a47cbae506b6a',
             'duracion_rondin':'6639b47565d8e5c06fe97cf3',
             'duracion_traslado_area':'6760a9581e31b10a38a22f1f',
             'porcentaje_obtenido_bitacora': '689a7ecfbf2b4be31039388e',
@@ -1014,6 +1021,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'desc_condiciones_servicio':"6a4c673722f825e7b3e46468",
             'doc_condiciones_servicio':"6a4c673722f825e7b3e46469",
             'url_condiciones_servicio':"6a4c673722f825e7b3e4646a",
+            'auto_activacion':"6abbfa2ea034ae2596e7444c",
+            'logo_por_ubicacion':"6abc34ba059be8a67a72dc0b",
         })
 
         self.INSPECTION_ACCEPTED_TYPES = ['radio', 'checkbox', 'decimal', 'integer', 'text', 'slider']
