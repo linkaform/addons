@@ -157,8 +157,8 @@ def do_load_modules(load_modules, **kwargs):
                 ### catalog
                 catalog_resource.install_catalogs(catalog_dict, **kwargs)
             
-            ### Forms
-            if load_form:
+            ### Forms (y sus data, que viven en <modulo>/data/)
+            if load_form or load_data:
                 forms = importlib.import_module('{}.items.forms'.format(module))
                 form_resource = forms.FormResource(
                     path=forms.__path__[0], 
@@ -168,17 +168,20 @@ def do_load_modules(load_modules, **kwargs):
                     load_data=load_data, 
                     **kwargs
                     )
-                try:
-                    install_order = forms.install_order
-                except:
-                    install_order = []
-                if install_order:
-                    print(f'Configured Install Order ({len(install_order)}):')
-                    for i, name in enumerate(install_order, 1):
-                        print(f'  {i:3}. {name}')
-                form_dict = form_resource.instalable_forms(install_order, **kwargs)
-                ###forms
-                response += form_resource.install_forms(form_dict, **kwargs)
+                if load_form:
+                    try:
+                        install_order = forms.install_order
+                    except:
+                        install_order = []
+                    if install_order:
+                        print(f'Configured Install Order ({len(install_order)}):')
+                        for i, name in enumerate(install_order, 1):
+                            print(f'  {i:3}. {name}')
+                    form_dict = form_resource.instalable_forms(install_order, **kwargs)
+                    ###forms
+                    response += form_resource.install_forms(form_dict, **kwargs)
+                if load_data:
+                    form_resource.install_data()
 
             ### Reports
             if load_reports:
