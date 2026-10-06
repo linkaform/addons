@@ -131,7 +131,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         self.CATEGORIAS_INCIDENCIAS_ID = self.CATEGORIAS_INCIDENCIAS.get('id')
         self.CATEGORIAS_INCIDENCIAS_OBJ_ID = self.CATEGORIAS_INCIDENCIAS.get('obj_id')
     
-        self.CATALOGO_FORMAS = self.lkm.catalog_id('catalogo_de_formas')
+        self.CATALOGO_FORMAS = self.lkm.catalog_id('catalogo_de_items')
         self.CATALOGO_FORMAS_CAT_ID = self.CATALOGO_FORMAS.get('id')
         self.CATALOGO_FORMAS_OBJ_ID = self.CATALOGO_FORMAS.get('obj_id')
 

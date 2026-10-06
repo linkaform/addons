@@ -111,12 +111,12 @@ class FormResource(items.Items):
                 continue
             file_url = upload_data['file']
             answers = {FIELD_ID_XLS_CARGA_UNIVERSAL: {'file_name': local_xlsx.split('/')[-1], 'file_url': file_url}}
-            # Carga Universal Module exige "Forma" (catalogo_de_formas, cuyo field_id
+            # Carga Universal Module exige "Forma" (catalogo_de_items, cuyo field_id
             # es el obj_id del catalogo en cada cuenta) y "Nombre de la forma"
             # (catalog-select hijo de ese catalogo): sin ellos el post da 400.
-            catalogo_formas_obj_id = (self.lkf.catalog_id('catalogo_de_formas') or {}).get('obj_id')
+            catalogo_formas_obj_id = (self.lkf.catalog_id('catalogo_de_items') or {}).get('obj_id')
             if not catalogo_formas_obj_id:
-                print("No se encontro el catalogo 'catalogo_de_formas' en esta cuenta, se salta", full_file_name)
+                print("No se encontro el catalogo 'catalogo_de_items' en esta cuenta, se salta", full_file_name)
                 continue
             # catalog-select va como string (nombre completo de la forma, el que
             # muestra el catalogo); los campos de detalle del catalogo van en lista.

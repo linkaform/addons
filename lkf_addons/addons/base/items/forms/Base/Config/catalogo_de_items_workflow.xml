@@ -12,9 +12,9 @@
                     <configuration>
                         <synched_catalogs>
                             <item>
-                                <couch_id>{{ catalog.catalogo_de_formas.obj_id }}</couch_id>
-                                <id>{{ catalog.catalogo_de_formas.id }}</id>
-                                <name>Catalogo de formas</name>
+                                <couch_id>{{ catalog.catalogo_de_items.obj_id }}</couch_id>
+                                <id>{{ catalog.catalogo_de_items.id }}</id>
+                                <name>Catalogo de Items</name>
                             </item>
                         </synched_catalogs>
                     </configuration>
