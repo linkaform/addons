@@ -11545,16 +11545,18 @@ class Accesos(OcrMixin, AccesosModel):
             res = self.lkf_api.post_forms_answers(metadata)
         except Exception as e:
             print(f"  [create_bitacora_rondin] EXCEPTION creando bitácora para rondin_id={rondin_id}: {e}")
-            return None
+            # Otro sync concurrente (la app dispara uno por cada check/pausa/reanudación, y
+            # al reconectar se van varios juntos) pudo haberla creado con el mismo _id.
+            return self.get_bitacora_by_id(rondin_id) or None
 
         if res.get('status_code') not in (200, 201, 202):
             print(f"  [create_bitacora_rondin] ERROR creando bitácora para rondin_id={rondin_id}: {res}")
-            return None
+            return self.get_bitacora_by_id(rondin_id) or None
 
         print(f"  [create_bitacora_rondin] bitácora creada para rondin_id={rondin_id}")
         return self.get_bitacora_by_id(rondin_id)
 
-    def sync_rondin_to_lkf(self, rondin_id, rondin_record={}):
+    def sync_rondin_to_lkf(self, rondin_id, rondin_record=None):
         """
         Sincroniza la bitácora del rondín hacia Linkaform ya sea usando checks ya procesados. O
         Actualizar o cerrar el rondin en linkaform.
@@ -11566,6 +11568,12 @@ class Accesos(OcrMixin, AccesosModel):
         """
         print(f"\n  [sync_rondin] rondin_id={rondin_id}")
         status = {}
+        if not rondin_record:
+            # Este sync se disparó solo por un check de área suelto (Stage 3), sin el
+            # documento 'rondin' en el mismo batch. Se lee el estado real en CouchDB antes
+            # de buscar la bitácora: un rondín libre en proceso necesita su inbox=False
+            # para que se le cree la bitácora, y para saber si ya se finalizó (o canceló).
+            rondin_record = self.cr_db.get(rondin_id) or {}
         bitacora_in_lkf = self.get_bitacora_by_id(rondin_id)
         if not bitacora_in_lkf and rondin_record.get('inbox') is False:
             # Rondín iniciado desde la app (libre o desde catálogo): nunca existió una
@@ -11573,9 +11581,12 @@ class Accesos(OcrMixin, AccesosModel):
             bitacora_in_lkf = self.create_bitacora_rondin(rondin_id, rondin_record)
         if not bitacora_in_lkf:
             print(f"  [sync_rondin] ERROR: bitácora no encontrada en LKF para rondin_id={rondin_id}")
-            rondin_record['status'] = 'not_found'
-            rondin_record['last_error'] = 'Rondin record not found on users database.'
-            self.cr_db.save(rondin_record)
+            # Sin _id (rondin_id 'unknown' o doc borrado del dispositivo) el save crearía
+            # un doc nuevo sin type en CouchDB.
+            if rondin_record.get('_id'):
+                rondin_record['status'] = 'not_found'
+                rondin_record['last_error'] = 'Rondin record not found on users database.'
+                self.cr_db.save(rondin_record)
             return {
                 'status_code': 404,
                 'type': 'error',
@@ -11587,13 +11598,6 @@ class Accesos(OcrMixin, AccesosModel):
         incidencia_for_rondin = []
         # Obtiene los checks que se han contestado del rondin de Mongodb
         checks_for_rondin = self.get_rondin_checks(rondin_id)
-
-        if not rondin_record:
-            # Este sync se disparó solo por un check de área suelto (Stage 3), sin el
-            # documento 'rondin' en el mismo batch. Para saber si en realidad ya se
-            # finalizó (o canceló) el rondín -- y no depender de qué documento llegó en
-            # este sync en particular -- hay que leer el estado real y actual en CouchDB.
-            rondin_record = self.cr_db.get(rondin_id) or {}
 
         # Enriquecer checks con checked_at del doc CouchDB (que tiene la hora local real por área)
         couch_dates = {
