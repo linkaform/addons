@@ -199,8 +199,6 @@ class FormResource(items.Items):
                 this_path = '{}/{}'.format(self.path, detail['path'])
             else:
                 this_path = self.path
-            form_model = self.load_module_template_file(this_path, form_name)
-            self.this_path = this_path
             item_info = {
                 # 'created_by' : user,
                 'module': self.module,
@@ -209,10 +207,14 @@ class FormResource(items.Items):
                 'item_name':form_name,
             }
             item = self.lkf.serach_module_item(item_info)
+            # Filtrar por -id antes de renderizar: una forma ajena que no renderiza
+            # en la cuenta (catalogo faltante) no debe tumbar la instalacion.
             if kwargs.get('item_ids'):
-                if item and item['item_id'] not in [int(x) for x in kwargs.get('item_ids',[])]:
-                    continue    
-            res = self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'), **kwargs)
+                if not item or item['item_id'] not in [int(x) for x in kwargs.get('item_ids',[])]:
+                    continue
+            form_model = self.load_module_template_file(this_path, form_name)
+            self.this_path = this_path
+            res =self.lkf.install_forms(self.module, form_name, form_model, local_path=detail.get('path'), **kwargs)
             if res.get('status') in ('update','create'):
                 print('Installing Form: ' ,form_name)
             response.append(
