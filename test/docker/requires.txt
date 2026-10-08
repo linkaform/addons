@@ -26,7 +26,7 @@ pandas
 opencv-python-headless==4.13.0.90
 pdf2image
 pdf2pptx
-psycopg2==2.9.3
+psycopg2==2.9.9
 pydantic==1.10.2
 pyexcel==0.7.0
 pyexcel-ods==0.6.0

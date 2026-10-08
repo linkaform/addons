@@ -16,8 +16,12 @@ numpy==2.2.6
 openpyxl==3.0.10
 opencv-python-headless==4.13.0.90
 pdf2image==1.17.0
-pdf2pptx==1.0.5
-psycopg2==2.9.3
+# pdf2pptx se instala aparte con --no-deps (fija pymupdf==1.20.1, sin wheel para 3.12)
+pymupdf>=1.24
+python-pptx
+click
+tqdm
+psycopg2==2.9.9
 pydantic==1.10.2
 pyexcel==0.7.0
 pyexcel-ods==0.6.0

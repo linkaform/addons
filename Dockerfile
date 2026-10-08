@@ -2,7 +2,8 @@
 # Image for develop                #
 ####################################
 #FROM python:3.7-slim-bullseye as addons-base
-FROM python:3.10.14-bullseye AS addons-base
+#FROM python:3.10.14-bullseye AS addons-base
+FROM python:3.12.12-slim-trixie AS addons-base
 
 
 LABEL maintainer="Linkaform"
@@ -22,26 +23,28 @@ RUN apt-get update && \
     time \
     vim 
 
-#mongo 5.0 tools
-RUN curl -fsSL https://pgp.mongodb.com/server-5.0.asc | gpg -o /usr/share/keyrings/mongodb-server-5.0.gpg --dearmor
-RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-5.0.gpg] http://repo.mongodb.org/apt/debian bullseye/mongodb-org/5.0 main" | tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+#mongo 6.0 tools
+RUN curl -fsSL https://pgp.mongodb.com/server-6.0.asc | gpg -o /usr/share/keyrings/mongodb-server-6.0.gpg --dearmor
+# trusted=yes: la clave de firma de MongoDB usa una firma SHA1 que Debian trixie rechaza (sqv) desde 2026-02-01
+RUN echo "deb [ trusted=yes signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg] http://repo.mongodb.org/apt/debian bullseye/mongodb-org/6.0 main" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
 
 RUN apt-get update && \
     apt-get -y install \
-    python3-psycopg2 \
-    libpq-dev \
-    poppler-utils \
     mongodb-org-shell \
     mongodb-org-tools
 
 
 COPY ./docker/requires.txt /tmp/
 RUN pip install --upgrade pip
+# cx-Oracle 8.3.0 importa pkg_resources en setup.py; setuptools>=81 ya no lo trae
+RUN pip install "setuptools<81" wheel && \
+    pip install --no-build-isolation cx-Oracle==8.3.0
 RUN pip install -r /tmp/requires.txt
+RUN pip install --no-deps pdf2pptx==1.0.5
 RUN pip install twilio
 RUN pip install git+https://github.com/Bastian-Kuhn/wallet.git
 COPY ./secrets/lkf_jwt_key.pub /etc/ssl/certs/lkf_jwt_key.pub
-COPY ./lkfpwd.py /usr/local/lib/python3.10
+COPY ./lkfpwd.py /usr/local/lib/python3.12
 COPY ./docker/main_entrypoint.sh /docker/
 RUN chmod +x /docker/main_entrypoint.sh
 
@@ -109,7 +112,7 @@ RUN pip install linkaform_api-3.0.tar.gz
 
 #COPY ./docker/requires.txt /tmp/
 # TODO COPIAR TODO ADDONS Y HACER IMAGEN.... AQUI O EN SCIRPTS?
-COPY /lkf_addons /usr/local/lib/python3.10/site-packages/lkf_addons/
+COPY /lkf_addons /usr/local/lib/python3.12/site-packages/lkf_addons/
 COPY ./config /srv/scripts/addons/config
 
 RUN chown -R 33:33 /srv/scripts

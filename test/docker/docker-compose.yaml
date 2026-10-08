@@ -6,9 +6,9 @@ services:
     image: linkaform/lkf_test:develop
     volumes:
       - ../../secrets/lkf_jwt_key.pub:/etc/ssl/certs/lkf_jwt_key.pub
-      - ~/clave10-sdk/linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/
-      - ../../lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons/
-      - ../../modules:/usr/local/lib/python3.10/site-packages/lkf_modules/
+      - ~/clave10-sdk/linkaform_api/linkaform_api:/usr/local/lib/python3.12/site-packages/linkaform_api/
+      - ../../lkf_addons:/usr/local/lib/python3.12/site-packages/lkf_addons/
+      - ../../modules:/usr/local/lib/python3.12/site-packages/lkf_modules/
       - ../:/srv/lkf_test/
       - ../../config/:/srv/scripts/addons/config/
       - ../../secrets:/srv/scripts/addons/secrets
@@ -29,9 +29,9 @@ services:
       - ../:/srv/lkf_test/
       # - ../../config/:/srv/config
       - ../../secrets/lkf_jwt_key.pub:/etc/ssl/certs/lkf_jwt_key.pub
-      - ~/clave10-sdk/linkaform_api/linkaform_api:/usr/local/lib/python3.10/site-packages/linkaform_api/
-      - ../../lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons/
-      - ../../modules:/usr/local/lib/python3.10/site-packages/lkf_modules/
+      - ~/clave10-sdk/linkaform_api/linkaform_api:/usr/local/lib/python3.12/site-packages/linkaform_api/
+      - ../../lkf_addons:/usr/local/lib/python3.12/site-packages/lkf_addons/
+      - ../../modules:/usr/local/lib/python3.12/site-packages/lkf_modules/
       - ../../config:/srv/scripts/addons/config
       - ../../secrets:/srv/scripts/addons/secrets
       #- ../:/srv/addons

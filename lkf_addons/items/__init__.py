@@ -9,7 +9,7 @@ from collections import defaultdict
 from linkaform_api import utils, lkf_models
 from linkaform_api.lkf_object import LKFBase 
 
-ADDONS_PATH = '/usr/local/lib/python3.10/site-packages/lkf_addons/addons'
+ADDONS_PATH = '/usr/local/lib/python3.12/site-packages/lkf_addons/addons'
 MODULES_PATH = '/srv/scripts/addons/modules'
 
 default_image = 'linkaform/addons:latest'
