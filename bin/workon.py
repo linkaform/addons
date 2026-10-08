@@ -29,7 +29,7 @@ DEFAULT_ENV = 'local'
 # Solo para mostrar a donde apunta cada environment. La configuracion de verdad la
 # arma config/enviorment.py; si cambias un HOST alla, actualizalo aqui tambien.
 DESTINOS = {
-    'local': '192.168.1.25:8000',
+    'local': '192.168.100.30:8000',
     'preprod': 'preprod.linkaform.com',
     'prod': 'app.linkaform.com',
 }

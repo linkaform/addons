@@ -56,6 +56,10 @@ WORKDIR /srv/scripts/addons/modules
 ####################################
 FROM linkaform/addons:base AS develop
 
+# couchdb/__init__.py hace import pkg_resources y setuptools lo avisa por stderr; el backend
+# de LinkaForm toma cualquier cosa en stderr como error y marca el script como fallido.
+ENV PYTHONWARNINGS="ignore:pkg_resources is deprecated as an API:UserWarning"
+
 WORKDIR /tmp/
 ADD https://f001.backblazeb2.com/file/lkf-resources/backblaze_utils-0.1.tar.gz ./backblaze_utils-0.1.tar.gz 
 RUN pip install backblaze_utils-0.1.tar.gz
@@ -84,11 +88,14 @@ WORKDIR /srv/scripts/addons/modules
 ###
 WORKDIR /opt/oracle
 ADD https://f001.backblazeb2.com/file/app-linkaform/public-client-126/71202/6650c41a967ad190e6a76dd3/66b5974cae333f423347115c.zip  66b5974cae333f423347115c.zip
+# slim-trixie no trae unzip; en trixie libaio1 se llama libaio1t64 y el instantclient busca libaio.so.1
+RUN apt-get update && apt-get install -y --no-install-recommends unzip libaio1t64 && \
+    ln -sf /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1 && \
+    rm -rf /var/lib/apt/lists/*
 RUN unzip 66b5974cae333f423347115c.zip
 RUN cd /opt/oracle/instantclient_12_2/
-ENV LD_LIBRARY_PATH=/opt/oracle/instantclient:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/opt/oracle/instantclient:${LD_LIBRARY_PATH:-}
 
-RUN apt-get install libaio1
 RUN echo /opt/oracle/instantclient_12_2 > /etc/ld.so.conf.d/oracle-instantclient.conf
 RUN ldconfig
 

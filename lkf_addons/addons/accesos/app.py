@@ -45,7 +45,6 @@ from datetime import datetime, timedelta, time, date
 from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 from pdf2image import convert_from_bytes
-from tkinter import NO
 from zipfile import ZipFile
 
 from linkaform_api import base, generar_qr
