@@ -40,4 +40,4 @@ typing==3.7.4.3
 vobject==0.9.8
 wget==3.2
 xlrd==2.0.1
-
+zxing-cpp==2.3.0
