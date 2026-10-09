@@ -5721,78 +5721,283 @@ class Accesos(OcrMixin, AccesosModel):
         return self.format_cr(res, get_one=True)
         # return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_list_article_lost(self, location, area, status=None, dateFrom="", dateTo="", filterDate=""):
+    def perdidos_search_fields(self):
+        pf = self.perdidos_fields
+        estatus = f"answers.{pf['estatus_perdido']}"
+        # Llaves = las del panel de filtros (filters.py).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'articulo_perdido': {'label': 'Nombre', 'paths': [f"answers.{pf['articulo_perdido']}"]},
+            'articulo': {'label': 'Artículo', 'paths': [f"answers.{pf['articulo_seleccion_catalog']}.{pf['articulo_seleccion']}"]},
+            'categoria': {'label': 'Categoría', 'paths': [f"answers.{pf['tipo_articulo_catalog']}.{pf['tipo_articulo_perdido']}"]},
+            'estatus_p': {
+                'label': 'Estatus',
+                'paths': [estatus],
+                'options': lambda: self.facet_distinct_options(self.BITACORA_OBJETOS_PERDIDOS, estatus),
+            },
+            'color': {'label': 'Color', 'paths': [f"answers.{pf['color_perdido']}"]},
+            'area_paqueteria': {'label': 'Área', 'paths': [f"answers.{pf['area_catalog']}.{pf['area_perdido']}"]},
+            'descripcion': {'label': 'Descripción', 'paths': [f"answers.{pf['descripcion']}"]},
+        }
+
+    def perdidos_base_match(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[]):
+        ubicacion = f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['ubicacion']}"
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_OBJETOS_PERDIDOS,
         }
         if location:
-             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['ubicacion']}"] = location
+            match_query[ubicacion] = location
+        if locations:
+            match_query[ubicacion] = {"$in": locations}
         if area:
-             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
+            match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
         if status:
-             match_query[f"answers.{self.perdidos_fields['estatus_perdido']}"] = status
+            match_query[f"answers.{self.perdidos_fields['estatus_perdido']}"] = status
+        return self.facet_date_match(match_query, f"answers.{self.perdidos_fields['date_hallazgo_perdido']}", dateFrom, dateTo, filterDate)
 
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
+    def get_search_fields_perdidos(self):
+        return self.search_fields_config(self.perdidos_search_fields())
 
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
+    def get_search_counts_perdidos(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
+        base_match = self.perdidos_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        return self.count_facet_candidates(base_match, self.perdidos_search_fields(), facets, candidates)
 
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.perdidos_fields['date_hallazgo_perdido']}": {"$gte": dateFrom,"$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.perdidos_fields['date_hallazgo_perdido']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.perdidos_fields['date_hallazgo_perdido']}": {"$lte": dateTo}
-            })
+    def get_list_article_lost(self, location, area, status=None, dateFrom="", dateTo="", filterDate="", limit=None, skip=0, locations=[], facets=[]):
+        match_query = self.perdidos_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        facet_conditions = self.build_facets_match(self.perdidos_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
+        project = {
+            "folio":"$folio",
+            'created_at':'$created_at',
+            'estatus_perdido':f"$answers.{self.perdidos_fields['estatus_perdido']}",
+            'date_hallazgo_perdido':f"$answers.{self.perdidos_fields['date_hallazgo_perdido']}",
+            'ubicacion_perdido':f"$answers.{self.perdidos_fields['ubicacion_catalog']}.{self.perdidos_fields['ubicacion_perdido']}",
+            'area_perdido': f"$answers.{self.perdidos_fields['area_catalog']}.{self.perdidos_fields['area_perdido']}",
+            'color_perdido':f"$answers.{self.perdidos_fields['color_perdido']}",
+            'articulo_perdido':f"$answers.{self.perdidos_fields['articulo_perdido']}",
+            'tipo_articulo_perdido':f"$answers.{self.perdidos_fields['tipo_articulo_catalog']}.{self.perdidos_fields['tipo_articulo_perdido']}",
+            'articulo_seleccion':f"$answers.{self.perdidos_fields['articulo_seleccion_catalog']}.{self.perdidos_fields['articulo_seleccion']}",
+            'foto_perdido':f"$answers.{self.perdidos_fields['foto_perdido']}",
+            'descripcion':f"$answers.{self.perdidos_fields['descripcion']}",
+            'comentario_perdido':f"$answers.{self.perdidos_fields['comentario_perdido']}",
+            'quien_entrega_interno':f"$answers.{self.perdidos_fields['quien_entrega_catalog']}.{self.perdidos_fields['quien_entrega_interno']}",
+            'quien_entrega':f"$answers.{self.perdidos_fields['quien_entrega']}",
+            'quien_entrega_externo':f"$answers.{self.perdidos_fields['quien_entrega_externo']}",
+            'recibe_perdido':f"$answers.{self.perdidos_fields['recibe_perdido']}",
+            'telefono_recibe_perdido':f"$answers.{self.perdidos_fields['telefono_recibe_perdido']}",
+            'identificacion_recibe_perdido':f"$answers.{self.perdidos_fields['identificacion_recibe_perdido']}",
+            'foto_recibe_perdido':f"$answers.{self.perdidos_fields['foto_recibe_perdido']}",
+            'date_entrega_perdido':f"$answers.{self.perdidos_fields['date_entrega_perdido']}",
+            'locker_perdido':f"$answers.{self.perdidos_fields['locker_catalog']}.{self.perdidos_fields['locker_perdido']}",
+        }
 
+        if limit is not None:
+            return self.facet_paginated(match_query, project, limit, skip)
+
+        # Formato anterior (lista; sin fecha, solo los últimos 25) para quien
+        # todavía no pagina: front desplegado y app móvil.
         query = [
             {'$match': match_query },
-            #{'$project': self.proyect_format(self.perdidos_fields)},
-            {'$project': {
-                "folio":"$folio",
-                'created_at':'$created_at',
-                'estatus_perdido':f"$answers.{self.perdidos_fields['estatus_perdido']}",
-                'date_hallazgo_perdido':f"$answers.{self.perdidos_fields['date_hallazgo_perdido']}",
-                'ubicacion_perdido':f"$answers.{self.perdidos_fields['ubicacion_catalog']}.{self.perdidos_fields['ubicacion_perdido']}",
-                'area_perdido': f"$answers.{self.perdidos_fields['area_catalog']}.{self.perdidos_fields['area_perdido']}",
-                'color_perdido':f"$answers.{self.perdidos_fields['color_perdido']}",
-                'articulo_perdido':f"$answers.{self.perdidos_fields['articulo_perdido']}",
-                'tipo_articulo_perdido':f"$answers.{self.perdidos_fields['tipo_articulo_catalog']}.{self.perdidos_fields['tipo_articulo_perdido']}",
-                'articulo_seleccion':f"$answers.{self.perdidos_fields['articulo_seleccion_catalog']}.{self.perdidos_fields['articulo_seleccion']}",
-                'foto_perdido':f"$answers.{self.perdidos_fields['foto_perdido']}",
-                'descripcion':f"$answers.{self.perdidos_fields['descripcion']}",
-                'comentario_perdido':f"$answers.{self.perdidos_fields['comentario_perdido']}",
-                'quien_entrega_interno':f"$answers.{self.perdidos_fields['quien_entrega_catalog']}.{self.perdidos_fields['quien_entrega_interno']}",
-                'quien_entrega':f"$answers.{self.perdidos_fields['quien_entrega']}",
-                'quien_entrega_externo':f"$answers.{self.perdidos_fields['quien_entrega_externo']}",
-                'recibe_perdido':f"$answers.{self.perdidos_fields['recibe_perdido']}",
-                'telefono_recibe_perdido':f"$answers.{self.perdidos_fields['telefono_recibe_perdido']}",
-                'identificacion_recibe_perdido':f"$answers.{self.perdidos_fields['identificacion_recibe_perdido']}",
-                'foto_recibe_perdido':f"$answers.{self.perdidos_fields['foto_recibe_perdido']}",
-                'date_entrega_perdido':f"$answers.{self.perdidos_fields['date_entrega_perdido']}",
-                'locker_perdido':f"$answers.{self.perdidos_fields['locker_catalog']}.{self.perdidos_fields['locker_perdido']}"
-            }},
+            {'$project': project},
             {'$sort':{'created_at':-1}},
         ]
         if not filterDate:
             query.append(
                 {"$limit":25}
             )
-        pr= self.format_cr_result(self.cr.aggregate(query))
         return self.format_cr_result(self.cr.aggregate(query))
 
-    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", limit=25, skip=0, locations=[], search="", search_fields=[]):
+    # ---------------------------------------------------------------------
+    # Buscador avanzado (facets). Cada vista define sus campos buscables como
+    # {key: {label, paths, options?}}; el front recibe esa config y manda
+    # facets = [{key, values, exact}]. AND entre facets, OR entre valores y
+    # entre las rutas de un mismo campo. Con options el campo es tipo "enum".
+    # ---------------------------------------------------------------------
+    FACET_ACCENTS = {
+        'a': 'aáàäâAÁÀÄÂ', 'e': 'eéèëêEÉÈËÊ', 'i': 'iíìïîIÍÌÏÎ',
+        'o': 'oóòöôOÓÒÖÔ', 'u': 'uúùüûUÚÙÜÛ', 'n': 'nñNÑ',
+    }
+
+    def facet_regex(self, value):
+        """Patrón contains que ignora acentos ("lucia" encuentra "Lucía")."""
+        base = unicodedata.normalize('NFD', str(value).strip().lower())
+        base = ''.join(c for c in base if unicodedata.category(c) != 'Mn')
+        # "_" y espacio son equivalentes (muchos valores se guardan como "dia_de_la_semana").
+        return ''.join(
+            f"[{self.FACET_ACCENTS[c]}]" if c in self.FACET_ACCENTS
+            else "[ _]" if c in " _"
+            else re.escape(c)
+            for c in base
+        )
+
+    def build_facets_match(self, fields_def, facets):
+        """Regresa la lista de condiciones (para un $and) de los facets válidos."""
+        conditions = []
+        for facet in facets or []:
+            field = fields_def.get(facet.get('key'))
+            values = [v for v in (facet.get('values') or []) if str(v).strip()]
+            if not field or not values:
+                continue
+            # exact = el valor completo (opciones del panel o de un enum), sin
+            # importar mayúsculas ni acentos; si no, "contiene".
+            # 'value_match': condición propia por valor exacto (ej. "con incidencias" Si/No).
+            value_match = field.get('value_match')
+            if facet.get('exact') and value_match:
+                conds = [value_match[str(v).strip().lower()] for v in values if str(v).strip().lower() in value_match]
+                if conds:
+                    conditions.append(conds[0] if len(conds) == 1 else {'$or': conds})
+                continue
+            wrap = (lambda p: f"^{p}$") if facet.get('exact') else (lambda p: p)
+            ors = [
+                {path: {'$regex': wrap(self.facet_regex(v)), '$options': 'i'}}
+                for path in field['paths'] for v in values
+            ]
+            # 'missing': valor que el listado muestra cuando el campo viene vacío
+            # (ej. tipo_rondin vacío = "qr"); al filtrar por él también cuentan los vacíos.
+            missing = field.get('missing')
+            if facet.get('exact') and missing and any(self.facet_regex(v) == self.facet_regex(missing) for v in values):
+                ors += [{path: {'$in': [None, '']}} for path in field['paths']]
+            conditions.append(ors[0] if len(ors) == 1 else {'$or': ors})
+        return conditions
+
+    def search_fields_config(self, fields_def):
+        """Config pública de los campos para el front (sin las rutas de Mongo)."""
+        config = []
+        for key, field in fields_def.items():
+            options = field.get('options')
+            if callable(options):
+                options = options()
+            item = {'key': key, 'label': field['label'], 'type': 'enum' if options else 'text'}
+            if options:
+                item['options'] = options
+            config.append(item)
+        return config
+
+    def facet_distinct_options(self, form_id, path, labels=None, order=None):
+        """Opciones de un campo enum a partir de los valores que ya existen en la forma.
+        labels: etiqueta por valor (si no, capitalizado); order: valores que van primero."""
+        values = self.cr.distinct(path, {'form_id': form_id, 'deleted_at': {'$exists': False}})
+        values = sorted({str(v) for v in values if v not in (None, '')})
+        if order:
+            values.sort(key=lambda v: (order.index(v) if v in order else len(order), v))
+        labels = labels or {}
+        return [{'value': v, 'label': labels.get(v, v.capitalize().replace('_', ' '))} for v in values]
+
+    def facet_list_page(self, match_query, project, sort, limit, skip, format_record=None):
+        """Igual que facet_paginated pero con orden propio y formato por registro."""
+        limit = int(limit) or 25
+        skip = int(skip or 0)
+        count = list(self.cr.aggregate([{'$match': match_query}, {'$count': 'total'}]))
+        total = count[0]['total'] if count else 0
+        records = self.format_cr_result(self.cr.aggregate([
+            {'$match': match_query}, {'$project': project}, {'$sort': sort},
+            {'$skip': skip}, {'$limit': limit},
+        ]))
+        if format_record:
+            records = [format_record(r) for r in records]
+        return {
+            'records': records,
+            'total_records': total,
+            'total_pages': ceil(total / limit) if limit else 1,
+            'actual_page': (skip // limit) + 1,
+            'records_on_page': len(records),
+        }
+
+    def facet_date_match(self, match_query, path, dateFrom="", dateTo="", filterDate="", zona=None):
+        """Mismo criterio de fechas que los listados: filterDate != "range" usa el
+        periodo (today, this_week...) en la zona del usuario; "" = sin fecha.
+        Las fechas se guardan como "AAAA-MM-DD HH:MM:SS" y se comparan como texto:
+        un dateTo de solo día ("AAAA-MM-DD") se extiende al final de ese día."""
+        if filterDate != "range":
+            dateFrom, dateTo = None, None
+            if filterDate:
+                if not zona:
+                    user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
+                    zona = user_data.get('timezone', 'America/Monterrey')
+                dateFrom, dateTo = self.get_range_dates(filterDate, zona)
+            dateFrom = str(dateFrom) if dateFrom else ""
+            dateTo = str(dateTo) if dateTo else ""
+        elif dateTo and len(dateTo) == 10:
+            dateTo = f"{dateTo} 23:59:59"
+        if dateFrom and dateTo:
+            match_query[path] = {"$gte": dateFrom, "$lte": dateTo}
+        elif dateFrom:
+            match_query[path] = {"$gte": dateFrom}
+        elif dateTo:
+            match_query[path] = {"$lte": dateTo}
+        return match_query
+
+    def facet_paginated(self, match_query, project, limit, skip, format_record=None):
+        """Listado paginado con total, ordenado del más reciente al más viejo."""
+        limit = int(limit) or 25
+        skip = int(skip or 0)
+        count = list(self.cr.aggregate([{'$match': match_query}, {'$count': 'total'}]))
+        total = count[0]['total'] if count else 0
+        records = self.format_cr_result(self.cr.aggregate([
+            {'$match': match_query},
+            {'$project': project},
+            {'$sort': {'created_at': -1}},
+            {'$skip': skip},
+            {'$limit': limit},
+        ]))
+        if format_record:
+            records = [format_record(r) for r in records]
+        return {
+            'records': records,
+            'total_records': total,
+            'total_pages': ceil(total / limit) if limit else 1,
+            'actual_page': (skip // limit) + 1,
+            'records_on_page': len(records),
+        }
+
+    def count_facet_candidates(self, base_match, fields_def, facets, candidates):
+        """Cuántos registros daría agregar cada candidato {key, value, exact} a
+        los facets actuales. Un solo aggregate con un $count por candidato."""
+        if not candidates:
+            return []
+        branches = {}
+        for i, cand in enumerate(candidates):
+            extra = {'key': cand.get('key'), 'values': [cand.get('value')], 'exact': cand.get('exact')}
+            conditions = self.build_facets_match(fields_def, list(facets or []) + [extra])
+            branches[f"c{i}"] = [{'$match': {'$and': conditions} if conditions else {}}, {'$count': 'n'}]
+        result = list(self.cr.aggregate([{'$match': base_match}, {'$facet': branches}]))
+        row = result[0] if result else {}
+        return [(row.get(f"c{i}") or [{}])[0].get('n', 0) for i in range(len(candidates))]
+
+    def concesionados_search_fields(self):
+        grupo = self.cons_f['grupo_equipos']
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'nombre_equipo': {'label': 'Nombre del equipo', 'paths': [f"answers.{grupo}.{self.cons_f['nombre_equipo']}"]},
+            'categoria_equipo_concesion': {'label': 'Categoría', 'paths': [f"answers.{grupo}.{self.cons_f['categoria_equipo_concesion']}"]},
+            'status_concesion': {
+                'label': 'Estado',
+                'paths': [f"answers.{self.cons_f['status_concesion']}"],
+                'options': [
+                    {'value': 'abierto', 'label': 'Abierto', 'color': '#DC2626'},
+                    {'value': 'parcial', 'label': 'Parcial', 'color': '#F59E0B'},
+                    {'value': 'devuelto', 'label': 'Devuelto', 'color': '#16A34A'},
+                ],
+            },
+            'persona_nombre_concesion': {'label': 'Empleado', 'paths': [
+                f"answers.{self.cons_f['persona_nombre_concesion']}",
+                f"answers.{self.cons_f['persona_nombre_otro']}",
+            ]},
+            'created_by': {'label': 'Creado por', 'paths': ['user_name']},
+            # La llave es la que usa el panel de filtros (filters.py).
+            'area_paqueteria': {'label': 'Área', 'paths': [f"answers.{self.cons_f['caseta_concesion']}"]},
+        }
+
+    def get_search_fields_concesionados(self):
+        return self.search_fields_config(self.concesionados_search_fields())
+
+    def get_search_counts_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
+        base_match = self.concesionados_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        return self.count_facet_candidates(base_match, self.concesionados_search_fields(), facets, candidates)
+
+    def concesionados_base_match(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[]):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
@@ -5805,11 +6010,22 @@ class Accesos(OcrMixin, AccesosModel):
              match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
         if status:
              match_query[f"answers.{self.cons_f['status_concesion']}"] = status
+        return self.facet_date_match(match_query, f"answers.{self.cons_f['fecha_concesion']}", dateFrom, dateTo, filterDate)
+
+    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", limit=25, skip=0, locations=[], search="", search_fields=[], facets=[]):
+        match_query = self.concesionados_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        # Buscador avanzado: facets. search/search_fields se queda mientras el
+        # front desplegado siga usando el buscador anterior.
+        facet_conditions = self.build_facets_match(self.concesionados_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
         if search:
             pattern = re.escape(search.strip())
             searchable_fields = {
                 "folio": "folio",
                 "user_name": "user_name",
+                "creado_por": "user_name",
+                "status_concesion": f"answers.{self.cons_f['status_concesion']}",
                 "nombre_equipo": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['nombre_equipo']}",
                 "marca_equipo_concesion": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['marca_equipo_concesion']}",
                 "categoria_equipo_concesion": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['categoria_equipo_concesion']}",
@@ -5817,33 +6033,13 @@ class Accesos(OcrMixin, AccesosModel):
                 "persona_nombre_otro": f"answers.{self.cons_f['persona_nombre_otro']}",
                 "observacion_concesion": f"answers.{self.cons_f['observacion_concesion']}",
             }
-            if search_fields:
-                fields_to_search = [searchable_fields[f] for f in search_fields if f in searchable_fields]
-            else:
+            # Llaves desconocidas se ignoran; si no queda ninguna válida se busca
+            # en todos los campos (un $or vacío lo rechaza Mongo).
+            fields_to_search = [searchable_fields[f] for f in search_fields if f in searchable_fields]
+            if not fields_to_search:
                 fields_to_search = list(searchable_fields.values())
             match_query["$or"] = [{field: {"$regex": pattern, "$options": "i"}} for field in fields_to_search]
 
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
-
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.cons_f['fecha_concesion']}": {"$gte": dateFrom,"$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.cons_f['fecha_concesion']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.cons_f['fecha_concesion']}": {"$lte": dateTo}
-            })
 
         count_result = self.format_cr(self.cr.aggregate([
             {'$match': match_query},
@@ -5878,7 +6074,6 @@ class Accesos(OcrMixin, AccesosModel):
                 item['firma']['file_url'] = item.pop('file_url')
             if item.get('file_name'):
                 item['firma']['file_name'] = item.pop('file_name')
-        print("QUE PASA",simplejson.dumps(result,indent=4))
         return {
             'records': result,
             'total_records': total_count,
@@ -6052,7 +6247,34 @@ class Accesos(OcrMixin, AccesosModel):
         print("rondines", simplejson.dumps( records,indent=4))
         return  records
 
-    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}, limit=20, offset=0):
+    def bitacora_search_fields(self):
+        pase = f"answers.{self.PASE_ENTRADA_OBJ_ID}"
+        status = f"answers.{self.mf['tipo_registro']}"
+        # Llaves = las del panel de filtros (filters.py, option in_and_out).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'nombre_visitante': {'label': 'Visitante', 'paths': [f"{pase}.{self.mf['nombre_visita']}"]},
+            'contratista': {'label': 'Empresa', 'paths': [f"{pase}.{self.mf['empresa']}"]},
+            'status': {
+                'label': 'Estatus',
+                'paths': [status],
+                'options': lambda: self.facet_distinct_options(self.BITACORA_ACCESOS, status),
+            },
+            'perfil_visita': {'label': 'Perfil', 'paths': [f"{pase}.{self.mf['nombre_perfil']}"]},
+            'visita_a': {'label': 'Visita a', 'paths': [
+                f"answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}"]},
+            'caseta': {'label': 'Caseta', 'paths': [f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}"]},
+        }
+
+    def get_search_fields_bitacora(self):
+        return self.search_fields_config(self.bitacora_search_fields())
+
+    def get_search_counts_bitacora(self, location=None, area=None, dateFrom='', dateTo='', filterDate="", facets=[], candidates=[]):
+        # Los filtros del panel llegan como facets exactos (no como dynamic_filters).
+        base_match = self.bitacora_base_match(location, area, dateFrom=dateFrom, dateTo=dateTo, filterDate=filterDate)
+        return self.count_facet_candidates(base_match, self.bitacora_search_fields(), facets, candidates)
+
+    def bitacora_base_match(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ACCESOS
@@ -6081,25 +6303,13 @@ class Accesos(OcrMixin, AccesosModel):
                     continue
 
         zona = self.user.get('timezone','America/Monterrey')
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate, zona)
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
+        return self.facet_date_match(match_query, f"answers.{self.mf['fecha_entrada']}", dateFrom, dateTo, filterDate, zona=zona)
 
-        if dateFrom and dateTo:
-           match_query.update({
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom, "$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.mf['fecha_entrada']}": {"$lte": dateTo}
-            })
+    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}, limit=20, offset=0, facets=[]):
+        match_query = self.bitacora_base_match(location, area, prioridades, dateFrom, dateTo, filterDate, dynamic_filters)
+        facet_conditions = self.build_facets_match(self.bitacora_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
 
         proyect_fields ={
             '_id': 1,
@@ -6276,7 +6486,24 @@ class Accesos(OcrMixin, AccesosModel):
         }
         return self.format_lockers(self.lkf_api.search_catalog( self.LOCKERS_CAT_ID, mango_query))
 
-    def get_list_fallas(self, location=None, area=None,status=None, folio=None, dateFrom="", dateTo="", filterDate=""):
+    def fallas_search_fields(self):
+        ff = self.fallas_fields
+        estatus = f"answers.{ff['falla_estatus']}"
+        # Llaves = las del panel de filtros (filters.py, option fallas).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'tipo_falla': {'label': 'Falla', 'paths': [f"answers.{self.LISTA_FALLAS_CAT_OBJ_ID}.{ff['falla']}"]},
+            'estatus_falla': {
+                'label': 'Estatus',
+                'paths': [estatus],
+                'options': lambda: self.facet_distinct_options(self.BITACORA_FALLAS, estatus),
+            },
+            'reportado_por': {'label': 'Reportado por', 'paths': [f"answers.{ff['falla_reporta_catalog']}.{ff['falla_reporta_nombre']}"]},
+            'area': {'label': 'Área', 'paths': [f"answers.{ff['falla_ubicacion_catalog']}.{ff['falla_caseta']}"]},
+            'falla_comentarios': {'label': 'Comentarios', 'paths': [f"answers.{ff['falla_comentarios']}"]},
+        }
+
+    def fallas_base_match(self, location=None, area=None, status=None, folio=None, dateFrom="", dateTo="", filterDate=""):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_FALLAS,
@@ -6292,34 +6519,21 @@ class Accesos(OcrMixin, AccesosModel):
             match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
         if folio:
             match_query.update({"folio":folio})
+        return self.facet_date_match(match_query, f"answers.{self.fallas_fields['falla_fecha_hora']}", dateFrom, dateTo, filterDate)
 
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
+    def get_search_fields_fallas(self):
+        return self.search_fields_config(self.fallas_search_fields())
 
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
+    def get_search_counts_fallas(self, location=None, area=None, status=None, dateFrom="", dateTo="", filterDate="", facets=[], candidates=[]):
+        base_match = self.fallas_base_match(location, area, status, dateFrom=dateFrom, dateTo=dateTo, filterDate=filterDate)
+        return self.count_facet_candidates(base_match, self.fallas_search_fields(), facets, candidates)
 
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
-
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.fallas_fields['falla_fecha_hora']}": {"$gte": dateFrom, "$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.fallas_fields['falla_fecha_hora']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.fallas_fields['falla_fecha_hora']}": {"$lte": dateTo}
-            })
-
-        query = [
-            {'$match': match_query },
-            {'$project': {
+    def get_list_fallas(self, location=None, area=None,status=None, folio=None, dateFrom="", dateTo="", filterDate="", limit=None, skip=0, facets=[]):
+        match_query = self.fallas_base_match(location, area, status, folio, dateFrom, dateTo, filterDate)
+        facet_conditions = self.build_facets_match(self.fallas_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
+        project = {
                 "folio": "$folio",
                 'created_at':'$created_at',
                 'falla_estatus': f"$answers.{self.fallas_fields['falla_estatus']}",
@@ -6341,17 +6555,54 @@ class Accesos(OcrMixin, AccesosModel):
                 'falla_documento_solucion':f"$answers.{self.fallas_fields['falla_documento_solucion']}",
                 # 'falla_fecha_hora_solucion':f"$answers.{self.fallas_fields['falla_fecha_hora_solucion']}",
                 'falla_grupo_seguimiento':f"$answers.{self.fallas_fields['falla_grupo_seguimiento']}",
-            }},
-            {'$sort':{'created_at':-1}},
-        ]
-        result = self.format_cr_result(self.cr.aggregate(query))
-        for r in result:
+            }
+
+        def format_falla(r):
             if r:
                 r['falla_grupo_seguimiento_formated'] = self.format_seguimiento_fallas(r.get('falla_grupo_seguimiento',[]))
                 r.pop('falla_grupo_seguimiento', None)
-        return result
+            return r
 
-    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None, status=None):
+        if limit is not None:
+            return self.facet_list_page(match_query, project, {'created_at': -1}, limit, skip, format_falla)
+
+        # Formato anterior (lista completa) para quien todavía no pagina:
+        # front desplegado, app móvil y get_failure_by_folio.
+        query = [
+            {'$match': match_query },
+            {'$project': project},
+            {'$sort':{'created_at':-1}},
+        ]
+        return [format_falla(r) for r in self.format_cr_result(self.cr.aggregate(query))]
+
+
+    def incidencias_search_fields(self):
+        f = self.incidence_fields
+        estatus = f"answers.{f['estatus']}"
+        prioridad = f"answers.{f['prioridad_incidencia']}"
+        # Llaves = las del panel de filtros (filters.py, option incidencias).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'tipo_incidencia': {'label': 'Incidente', 'paths': [
+                f"answers.{f['incidencia_catalog']}.{f['incidencia']}", f"answers.{f['incidencia']}"]},
+            'estatus_incidencia': {
+                'label': 'Estatus',
+                'paths': [estatus],
+                'options': lambda: self.facet_distinct_options(self.BITACORA_INCIDENCIAS, estatus),
+            },
+            'prioridad_incidencia': {
+                'label': 'Gravedad',
+                'paths': [prioridad],
+                'options': lambda: self.facet_distinct_options(
+                    self.BITACORA_INCIDENCIAS, prioridad,
+                    labels={'critica': 'Crítica'}, order=['leve', 'moderada', 'critica']),
+            },
+            'reportado_por': {'label': 'Reportado por', 'paths': [f"answers.{f['reporta_incidencia_catalog']}.{f['reporta_incidencia']}"]},
+            'area': {'label': 'Lugar del incidente', 'paths': [f"answers.{f['area_incidencia_catalog']}.{f['area_incidencia']}"]},
+            'comentario_incidencia': {'label': 'Descripción', 'paths': [f"answers.{f['comentario_incidencia']}"]},
+        }
+
+    def incidencias_base_match(self, location=None, area=None, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None, status=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_INCIDENCIAS,
@@ -6372,33 +6623,21 @@ class Accesos(OcrMixin, AccesosModel):
         if status:
             match_query.update({f"answers.{self.incidence_fields['estatus']}": self.clean_text(status)})
 
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
+        return self.facet_date_match(match_query, f"answers.{self.incidence_fields['fecha_hora_incidencia']}", dateFrom, dateTo, filterDate)
 
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
+    def get_search_fields_incidencias(self):
+        return self.search_fields_config(self.incidencias_search_fields())
 
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
+    def get_search_counts_incidencias(self, location=None, area=None, dateFrom="", dateTo="", filterDate="", status=None, facets=[], candidates=[]):
+        base_match = self.incidencias_base_match(location, area, dateFrom=dateFrom, dateTo=dateTo, filterDate=filterDate, status=status)
+        return self.count_facet_candidates(base_match, self.incidencias_search_fields(), facets, candidates)
 
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": dateFrom,"$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$lte": dateTo}
-            })
-
-        query = [
-            {'$match': match_query },
-            {'$project': {
+    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None, status=None, limit=None, skip=0, facets=[]):
+        match_query = self.incidencias_base_match(location, area, prioridades, dateFrom, dateTo, filterDate, folio, status)
+        facet_conditions = self.build_facets_match(self.incidencias_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
+        project = {
                 'folio': '$folio',
                 'reporta_incidencia': f"$answers.{self.incidence_fields['reporta_incidencia_catalog']}.{self.incidence_fields['reporta_incidencia']}",
                 'fecha_hora_incidencia':f"$answers.{self.incidence_fields['fecha_hora_incidencia']}",
@@ -6454,13 +6693,9 @@ class Accesos(OcrMixin, AccesosModel):
                 'afectacion_patrimonial_incidencia':f"$answers.{self.incidence_fields['afectacion_patrimonial_incidencia']}",
                 'acciones_tomadas_incidencia':f"$answers.{self.incidence_fields['acciones_tomadas_incidencia']}",
                 'seguimientos_incidencia':f"$answers.{self.incidence_fields['seguimientos_incidencia']}",
-                }
-            },
-            {'$sort':{'folio':-1}}
-        ]
-        result = self.format_cr_result(self.cr.aggregate(query))
-        result = self.format_cr(result)
-        for r in result:
+        }
+
+        def format_incidencia(r):
             r['personas_involucradas_incidencia'] = self.format_personas_involucradas(r.get('personas_involucradas_incidencia',[]))
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
             r['afectacion_patrimonial_incidencia'] = self.format_afectacion_patrimonial(r.get('afectacion_patrimonial_incidencia',[]))
@@ -6470,26 +6705,61 @@ class Accesos(OcrMixin, AccesosModel):
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
             r['color_piel'] = r.get('color_piel',"").capitalize().replace("_", " ")
             r['estatus'] = r.get('estatus',"").capitalize()
-        print("resultados", simplejson.dumps(result, indent=4))
-        return result
+            return r
 
-    def get_list_notes(self, location, area, status=None, limit=10, offset=0, dateFrom="", dateTo=""):
-        '''
-        Función para obtener las notas, puedes pasarle un area, una ubicacion, un estatus, una fecha desde
-        y una fecha hasta
-        '''
-        response = []
+        if limit is not None:
+            page = self.facet_list_page(match_query, project, {'folio': -1}, limit, skip)
+            page['records'] = [format_incidencia(r) for r in self.format_cr(page['records'])]
+            return page
+
+        # Formato anterior (lista completa) para quien todavía no pagina.
+        query = [
+            {'$match': match_query },
+            {'$project': project},
+            {'$sort':{'folio':-1}}
+        ]
+        result = self.format_cr_result(self.cr.aggregate(query))
+        return [format_incidencia(r) for r in self.format_cr(result)]
+
+    def notas_search_fields(self):
+        nf = self.notes_fields
+        estatus = f"answers.{nf['note_status']}"
+        # Llaves = las del panel de filtros (filters.py, option notas; "creador_por" tal cual).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'note': {'label': 'Nota', 'paths': [f"answers.{nf['note']}"]},
+            'estatus': {
+                'label': 'Estatus',
+                'paths': [estatus],
+                'options': lambda: self.facet_distinct_options(self.ACCESOS_NOTAS, estatus),
+            },
+            'creador_por': {'label': 'Creado por', 'paths': ['created_by_name']},
+            'note_guard': {'label': 'Guardia', 'paths': [f"answers.{nf['note_catalog_guard']}.{nf['note_guard']}"]},
+            'note_booth': {'label': 'Caseta', 'paths': [f"answers.{nf['note_catalog_booth']}.{nf['note_booth']}"]},
+        }
+
+    def notas_base_match(self, location=None, area=None, status=None, dateFrom="", dateTo="", filterDate="", locations=[]):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.ACCESOS_NOTAS,
-            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location
         }
+        ubicacion = f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}"
+        if locations:
+            match_query[ubicacion] = {"$in": locations}
+        elif isinstance(location, list):
+            match_query[ubicacion] = {"$in": location}
+        else:
+            # Comportamiento de siempre: una ubicación (también vacía) por igualdad.
+            match_query[ubicacion] = location
         if area and not area == 'todas':
             match_query.update({
                 f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}":area
             })
-        if status != 'dia':
+        # status "dia" (desde turnos) = sin filtro de estatus; "" = sin filtro (buscador nuevo).
+        if status and status != 'dia':
             match_query.update({f"answers.{self.notes_fields['note_status']}":status})
+        if filterDate:
+            return self.facet_date_match(match_query, f"answers.{self.notes_fields['note_open_date']}", dateFrom, dateTo, filterDate)
         if dateFrom and dateTo:
             if dateFrom == dateTo:
                 if "T" not in dateFrom:
@@ -6516,6 +6786,24 @@ class Accesos(OcrMixin, AccesosModel):
             match_query.update({
                 f"answers.{self.notes_fields['note_open_date']}": {"$lte": dateTo}
             })
+        return match_query
+
+    def get_search_fields_notas(self):
+        return self.search_fields_config(self.notas_search_fields())
+
+    def get_search_counts_notas(self, location=None, area=None, status=None, dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
+        base_match = self.notas_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        return self.count_facet_candidates(base_match, self.notas_search_fields(), facets, candidates)
+
+    def get_list_notes(self, location, area, status=None, limit=10, offset=0, dateFrom="", dateTo="", filterDate="", locations=[], facets=[]):
+        '''
+        Función para obtener las notas, puedes pasarle un area, una ubicacion, un estatus, una fecha desde
+        y una fecha hasta
+        '''
+        match_query = self.notas_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        facet_conditions = self.build_facets_match(self.notas_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
         query = [
             {'$match': match_query },
             {'$project': {
@@ -6813,7 +7101,38 @@ class Accesos(OcrMixin, AccesosModel):
                 if qr in pases_info:
                     acompanante.update(pases_info[qr])
 
-    def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
+    def pases_search_fields(self):
+        status = f"answers.{self.pase_entrada_fields['status_pase']}"
+        visita = f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}"
+        # Llaves = las del panel de filtros (filters.py, option pases).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'nombre': {'label': 'Visitante', 'paths': [
+                f"{visita}.{self.mf['nombre_visita']}", f"answers.{self.mf['nombre_pase']}"]},
+            'empresa': {'label': 'Empresa', 'paths': [
+                f"{visita}.{self.mf['empresa']}", f"answers.{self.mf['empresa_pase']}"]},
+            'email': {'label': 'Email', 'paths': [
+                f"{visita}.{self.mf['email_vista']}", f"answers.{self.mf['email_pase']}"]},
+            'status': {
+                'label': 'Estatus',
+                'paths': [status],
+                'options': lambda: self.facet_distinct_options(self.PASE_ENTRADA, status),
+            },
+            'perfil_visita': {'label': 'Perfil', 'paths': [f"answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}"]},
+            'visita_a': {'label': 'Visita a', 'paths': [
+                f"answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}"]},
+        }
+
+    def get_search_fields_pases(self):
+        return self.search_fields_config(self.pases_search_fields())
+
+    def get_search_counts_pases(self, tab_status="", location=None, dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
+        base_match = self.pases_base_match(tab_status=tab_status, location=location, dateFrom=dateFrom, dateTo=dateTo, filterDate=filterDate, locations=locations)
+        return self.count_facet_candidates(base_match, self.pases_search_fields(), facets, candidates)
+
+    def pases_base_match(self, tab_status="", search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
+        """Filtro de "mis pases" (visita_a = yo o creado por mí) + pestaña,
+        búsqueda, ubicación, filtros del panel y fecha. Sin facets."""
         employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
         fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_local = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0)
@@ -6872,25 +7191,13 @@ class Accesos(OcrMixin, AccesosModel):
                     continue
 
         zona = self.user.get('timezone','America/Monterrey')
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate, zona)
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
+        return self.facet_date_match(match_query, f"answers.{self.mf['fecha_desde_visita']}", dateFrom, dateTo, filterDate, zona=zona)
 
-        if dateFrom and dateTo:
-           match_query.update({
-                f"answers.{self.mf['fecha_desde_visita']}": {"$gte": dateFrom, "$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.mf['fecha_desde_visita']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.mf['fecha_desde_visita']}": {"$lte": dateTo}
-            })
+    def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[], facets=[]):
+        match_query = self.pases_base_match(tab_status, search_name, location, dynamic_filters, dateFrom, dateTo, filterDate, locations)
+        facet_conditions = self.build_facets_match(self.pases_search_fields(), facets)
+        if facet_conditions:
+            match_query.setdefault("$and", []).extend(facet_conditions)
 
         # Conteo total de registros
         count_query = [
@@ -7153,75 +7460,98 @@ class Accesos(OcrMixin, AccesosModel):
             res['_id'] = str(res.get('_id', ''))
         return res
 
-    def get_paquetes(self, location= "", area="", status="", dateFrom="", dateTo="", filterDate=""):
+    def paqueteria_search_fields(self):
+        qf = self.paquetes_fields
+        estatus = f"answers.{qf['estatus_paqueteria']}"
+        # Llaves = las del panel de filtros (filters.py).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'quien_recibe_paqueteria': {'label': 'Destinatario', 'paths': [
+                f"answers.{qf['quien_recibe_cat']}.{qf['quien_recibe_paqueteria']}",
+                f"answers.{qf['quien_recibe_otro']}",
+            ]},
+            'proveedor': {'label': 'Proveedor', 'paths': [f"answers.{qf['proveedor_cat']}.{qf['proveedor']}"]},
+            'estatus_paqueteria': {
+                'label': 'Estatus',
+                'paths': [estatus],
+                'options': lambda: self.facet_distinct_options(self.PAQUETERIA, estatus),
+            },
+            'locker': {'label': 'Locker', 'paths': [f"answers.{qf['guardado_en_paqueteria']}"]},
+            'area_paqueteria': {'label': 'Área', 'paths': [f"answers.{qf['area_paqueteria']}"]},
+            'descripcion_paqueteria': {'label': 'Descripción', 'paths': [f"answers.{qf['descripcion_paqueteria']}"]},
+        }
+
+    def paqueteria_base_match(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[]):
+        qf = self.paquetes_fields
         match_query = {
-            "deleted_at":{"$exists":False},
+            "deleted_at": {"$exists": False},
             "form_id": self.PAQUETERIA,
         }
         if location:
-             match_query[f"answers.{self.paquetes_fields['ubicacion_paqueteria']}"] = location
+            match_query[f"answers.{qf['ubicacion_paqueteria']}"] = location
+        if locations:
+            match_query[f"answers.{qf['ubicacion_paqueteria']}"] = {"$in": locations}
         if area:
-             match_query[f"answers.{self.paquetes_fields['area_paqueteria']}"] = area
+            match_query[f"answers.{qf['area_paqueteria']}"] = area
         if status:
-             match_query[f"answers.{self.paquetes_fields['estatus_paqueteria']}"] = status
+            match_query[f"answers.{qf['estatus_paqueteria']}"] = status
+        return self.facet_date_match(match_query, f"answers.{qf['fecha_recibido_paqueteria']}", dateFrom, dateTo, filterDate)
 
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
+    def get_search_fields_paqueteria(self):
+        return self.search_fields_config(self.paqueteria_search_fields())
 
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
+    def get_search_counts_paqueteria(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
+        base_match = self.paqueteria_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        return self.count_facet_candidates(base_match, self.paqueteria_search_fields(), facets, candidates)
 
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$gte": dateFrom, "$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-           match_query.update({
-                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$lte": dateTo}
-            })
-        print("HOLAA")
-        query = [
-            {'$match': match_query },
-            {'$project': {
-                "folio":"$folio",
-                "_id":"$_id",
-                'created_at':'$created_at',
-                'ubicacion_paqueteria':f"$answers.{self.paquetes_fields['ubicacion_paqueteria']}",
-                'area_paqueteria': f"$answers.{self.paquetes_fields['area_paqueteria']}",
-                'fotografia_paqueteria':f"$answers.{self.paquetes_fields['fotografia_paqueteria']}",
-                'descripcion_paqueteria':f"$answers.{self.paquetes_fields['descripcion_paqueteria']}",
-                'quien_recibe_paqueteria':f"$answers.{self.paquetes_fields['quien_recibe_cat']}.{self.paquetes_fields['quien_recibe_paqueteria']}",
-                'guardado_en_paqueteria': f"$answers.{self.paquetes_fields['guardado_en_paqueteria']}",
-                'fecha_recibido_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
-                'fecha_entregado_paqueteria': f"$answers.{self.paquetes_fields['fecha_entregado_paqueteria']}",
-                'estatus_paqueteria': f"$answers.{self.paquetes_fields['estatus_paqueteria']}",
-                'entregado_a_paqueteria': f"$answers.{self.paquetes_fields['entregado_a_paqueteria']}",
-                'proveedor': f"$answers.{self.paquetes_fields['proveedor_cat']}.{self.paquetes_fields['proveedor']}",
-                'quien_recibe_otro': f"$answers.{self.paquetes_fields['quien_recibe_otro']}",
-            }},
-            {'$sort':{'created_at':-1}},
-        ]
-        if not filterDate:
-            query.append(
-                {"$limit":25}
-            )
-        pr= self.format_cr_result(self.cr.aggregate(query))
-        for x in pr:
+    def get_paquetes(self, location= "", area="", status="", dateFrom="", dateTo="", filterDate="", limit=None, skip=0, locations=[], facets=[]):
+        qf = self.paquetes_fields
+        match_query = self.paqueteria_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        facet_conditions = self.build_facets_match(self.paqueteria_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
+        project = {
+            "folio":"$folio",
+            "_id":"$_id",
+            'created_at':'$created_at',
+            'ubicacion_paqueteria':f"$answers.{qf['ubicacion_paqueteria']}",
+            'area_paqueteria': f"$answers.{qf['area_paqueteria']}",
+            'fotografia_paqueteria':f"$answers.{qf['fotografia_paqueteria']}",
+            'descripcion_paqueteria':f"$answers.{qf['descripcion_paqueteria']}",
+            'quien_recibe_paqueteria':f"$answers.{qf['quien_recibe_cat']}.{qf['quien_recibe_paqueteria']}",
+            'guardado_en_paqueteria': f"$answers.{qf['guardado_en_paqueteria']}",
+            'fecha_recibido_paqueteria': f"$answers.{qf['fecha_recibido_paqueteria']}",
+            'fecha_entregado_paqueteria': f"$answers.{qf['fecha_entregado_paqueteria']}",
+            'estatus_paqueteria': f"$answers.{qf['estatus_paqueteria']}",
+            'entregado_a_paqueteria': f"$answers.{qf['entregado_a_paqueteria']}",
+            'proveedor': f"$answers.{qf['proveedor_cat']}.{qf['proveedor']}",
+            'quien_recibe_otro': f"$answers.{qf['quien_recibe_otro']}",
+        }
+
+        def format_paquete(x):
             status = x.get('estatus_paqueteria', [])
             x['estatus_paqueteria'] = status.pop() if status else ""
             # Destinatario externo ("Otro"): va en un campo de texto, no en el catálogo de
             # empleados; se expone en la misma llave para que el front lo muestre igual.
             if not x.get('quien_recibe_paqueteria') and x.get('quien_recibe_otro'):
                 x['quien_recibe_paqueteria'] = x['quien_recibe_otro']
-        return pr
+            return x
+
+        if limit is not None:
+            return self.facet_paginated(match_query, project, limit, skip, format_paquete)
+
+        # Formato anterior (lista; sin fecha, solo los últimos 25) para quien
+        # todavía no pagina: front desplegado y app móvil.
+        query = [
+            {'$match': match_query },
+            {'$project': project},
+            {'$sort':{'created_at':-1}},
+        ]
+        if not filterDate:
+            query.append(
+                {"$limit":25}
+            )
+        return [format_paquete(x) for x in self.format_cr_result(self.cr.aggregate(query))]
 
     def get_pass_custom(self,qr_code):
         pass_selected= self.get_detail_access_pass(qr_code=qr_code)
