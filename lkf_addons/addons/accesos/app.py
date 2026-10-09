@@ -6846,12 +6846,16 @@ class Accesos(OcrMixin, AccesosModel):
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'proceso'})
 
         if search_name:
-            match_query.update({
-                f"$or": [
-                    {f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}": {"$regex": search_name, "$options": "i"}},
-                    {f"answers.{self.mf['nombre_pase']}": {"$regex": search_name, "$options": "i"}}
-                ]
-            })
+            # La búsqueda se suma al $or de "mis pases" (visita_a = yo o creado por
+            # mí) en un $and; si lo reemplazara, se verían pases de otros usuarios.
+            pattern = re.escape(search_name.strip())
+            match_query["$and"] = [
+                {"$or": match_query.pop("$or")},
+                {"$or": [
+                    {f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}": {"$regex": pattern, "$options": "i"}},
+                    {f"answers.{self.mf['nombre_pase']}": {"$regex": pattern, "$options": "i"}}
+                ]},
+            ]
         if location:
             match_query[f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}"] = location
         if locations:
