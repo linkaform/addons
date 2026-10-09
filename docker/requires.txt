@@ -1,5 +1,5 @@
 b2==1.4.2
-CouchDB-Linkaform
+CouchDB @ git+https://github.com/linkaform/couchdb-python.git@043e9bfa005e8e661514928606018818548649ea
 -e git+https://github.com/linkaform/backblaze_utils.git#egg=backblaze_utils
 
 charset-normalizer==3.4.4

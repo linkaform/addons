@@ -56,10 +56,6 @@ WORKDIR /srv/scripts/addons/modules
 ####################################
 FROM linkaform/addons:base AS develop
 
-# couchdb/__init__.py hace import pkg_resources y setuptools lo avisa por stderr; el backend
-# de LinkaForm toma cualquier cosa en stderr como error y marca el script como fallido.
-ENV PYTHONWARNINGS="ignore:pkg_resources is deprecated as an API:UserWarning"
-
 WORKDIR /tmp/
 ADD https://f001.backblazeb2.com/file/lkf-resources/backblaze_utils-0.1.tar.gz ./backblaze_utils-0.1.tar.gz 
 RUN pip install backblaze_utils-0.1.tar.gz
