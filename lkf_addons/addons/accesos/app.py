@@ -6305,11 +6305,24 @@ class Accesos(OcrMixin, AccesosModel):
         zona = self.user.get('timezone','America/Monterrey')
         return self.facet_date_match(match_query, f"answers.{self.mf['fecha_entrada']}", dateFrom, dateTo, filterDate, zona=zona)
 
-    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}, limit=20, offset=0, facets=[]):
+    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}, limit=20, offset=0, facets=[], desglose=''):
+        # desglose='vehiculos' | 'equipos': una fila por vehiculo/equipo (pestañas de
+        # Bitácoras), con total y paginación sobre esas filas. Vacío = una por bitácora.
         match_query = self.bitacora_base_match(location, area, prioridades, dateFrom, dateTo, filterDate, dynamic_filters)
         facet_conditions = self.build_facets_match(self.bitacora_search_fields(), facets)
         if facet_conditions:
             match_query["$and"] = facet_conditions
+
+        desglose_stages = []
+        grupo = {'vehiculos': self.mf['grupo_vehiculos'], 'equipos': self.mf['grupo_equipos']}.get(desglose)
+        if grupo:
+            match_query[f"answers.{grupo}.0"] = {"$exists": True}
+            desglose_stages.append({'$unwind': {'path': f"$answers.{grupo}", 'includeArrayIndex': 'item_index'}})
+            if desglose == 'vehiculos':
+                # Vehículos sin tipo son renglones vacíos del grupo; el front ya los omitía.
+                desglose_stages.append({'$match': {
+                    f"answers.{grupo}.{self.TIPO_DE_VEHICULO_OBJ_ID}.{self.mf['tipo_vehiculo']}": {"$nin": ["", None]}
+                }})
 
         proyect_fields ={
             '_id': 1,
@@ -6342,6 +6355,10 @@ class Accesos(OcrMixin, AccesosModel):
             'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
             'visita_a': f"$answers.{self.mf['grupo_visitados']}"
         }
+        if grupo:
+            # Tras el $unwind el grupo es un objeto; se envuelve en lista para format_vehiculos/equipos.
+            proyect_fields[desglose] = [f"$answers.{grupo}"]
+            proyect_fields['item_index'] = 1
 
         lookup = {
             'from': 'form_answer',
@@ -6363,13 +6380,15 @@ class Accesos(OcrMixin, AccesosModel):
 
         query = [
             {'$match': match_query },
+            *desglose_stages,
             {'$project': proyect_fields},
             {'$lookup': lookup},
-            {'$sort':{'created_at':-1}},
+            {'$sort': {'created_at': -1, '_id': -1, 'item_index': 1} if grupo else {'created_at':-1}},
         ]
 
         count_query = [
             {"$match": match_query},
+            *desglose_stages,
             {"$count": "total"}
         ]
 
