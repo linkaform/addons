@@ -11,10 +11,10 @@ hace exactamente eso, pero contra el contenedor `lkf-addons` que ya usas para
 desarrollar.
 
 ```
-front (localhost:3000)
+front (localhost:3010)
    |  POST /api/infosync/scripts/run/
    v
-mini-back (localhost:8000)          <- este servicio
+mini-back (localhost:8014)          <- este servicio
    |
    +-- script_name termina en _sdk.py ?
    |
@@ -30,7 +30,7 @@ mini-back (localhost:8000)          <- este servicio
 ```bash
 cd ~/lkf/addons
 docker compose -f docker/docker-compose.miniback.yml up -d --build
-curl localhost:8000/api/health
+curl localhost:8014/api/health
 ```
 
 ```json
@@ -62,13 +62,13 @@ En `clave10`, en `docker/docker-compose.yml`:
 
 ```yaml
 environment:
-  NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api
+  NEXT_PUBLIC_API_BASE_URL: http://localhost:8014/api
 ```
 
 ## Probarlo con curl
 
 ```bash
-curl -s -X POST localhost:8000/api/infosync/scripts/run/ \
+curl -s -X POST localhost:8014/api/infosync/scripts/run/ \
   -H 'Content-Type: application/json' \
   -H "Authorization: Bearer $JWT" \
   -d '{"script_name": "script_turnos.py", "option": "get_user_menu"}'
@@ -81,7 +81,7 @@ curl -s -X POST localhost:8000/api/infosync/scripts/run/ \
 `GET` tambien funciona, util para probar desde el navegador:
 
 ```
-localhost:8000/api/infosync/scripts/run/?script_name=script_turnos.py&option=get_user_menu
+localhost:8014/api/infosync/scripts/run/?script_name=script_turnos.py&option=get_user_menu
 ```
 
 Cada corrida deja en el log el `docker exec` exacto. Copialo y pegalo en una
@@ -112,7 +112,7 @@ que necesitan para resolver `from account_settings import *` y
 ### Los _sdk.py necesitan la app Sanic sirviendo
 
 No son scripts autonomos: `dispatch()` (`app/middleware/auth.py`) le pega a
-`http://0.0.0.0:8000/{modulo}/{endpoint}` **dentro de su propio contenedor**.
+`http://0.0.0.0:$PORT/{modulo}/{endpoint}` **dentro de su propio contenedor**.
 No basta con que `lkf-sanic-app` exista o este levantado con `sleep infinity`:
 la app tiene que estar respondiendo en el puerto 8000 interno.
 
@@ -124,7 +124,7 @@ en ese destino y sigue sirviendo el otro con normalidad.
 
 | Variable               | Default                       | Para que                                                        |
 | ---------------------- | ----------------------------- | --------------------------------------------------------------- |
-| `MINIBACK_PORT`        | `8000`                        | Puerto publicado en el host.                                     |
+| `MINIBACK_PORT`        | `8014`                        | Puerto publicado en el host.                                     |
 | `LKF_ADDONS_CONTAINER` | `lkf-addons`                  | Contenedor destino del `docker exec`.                            |
 | `LKF_MODULES_PATH`     | `/srv/scripts/addons/modules` | Raiz del indice de addons, dentro de su contenedor.              |
 | `LKF_SANIC_CONTAINER`  | `lkf-sanic-app`               | Contenedor destino de los `*_sdk.py`.                            |
@@ -169,7 +169,7 @@ Si tienes el `infosync-api` real corriendo, ya tiene el 8000. Levanta el
 mini-back en otro puerto y apunta el front ahi:
 
 ```bash
-MINIBACK_PORT=8010 docker compose -f docker/docker-compose.miniback.yml up -d
+MINIBACK_PORT=8015 docker compose -f docker/docker-compose.miniback.yml up -d
 ```
 
 ### Cuenta activa

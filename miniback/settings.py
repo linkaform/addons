@@ -23,7 +23,7 @@ ADDONS = {
 }
 
 # Los *_sdk.py son wrappers CLI que le pegan por HTTP a la app Sanic de su
-# propio contenedor (app/middleware/auth.py, dispatch -> 0.0.0.0:8000), asi
+# propio contenedor (app/middleware/auth.py, dispatch -> 0.0.0.0:$PORT), asi
 # que ahi no basta con que el contenedor exista: la app tiene que estar
 # sirviendo. El PYTHONPATH es necesario porque `from account_settings import *`
 # pide config/ en el path y `from middleware.auth import ...` pide su padre.
@@ -68,7 +68,7 @@ MAX_CONCURRENT = int(os.environ.get('MINIBACK_MAX_CONCURRENT', 0))
 
 # Puerto dentro del contenedor. El puerto publicado en el host lo decide
 # MINIBACK_PORT en docker-compose.miniback.yml, no esta variable.
-LISTEN_PORT = int(os.environ.get('MINIBACK_LISTEN_PORT', 8000))
+LISTEN_PORT = int(os.environ.get('MINIBACK_LISTEN_PORT', 8014))
 
 
 def _account_id_de_secrets():

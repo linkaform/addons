@@ -14,7 +14,7 @@ services:
     hostname: lkf-addons
     image: linkaform/addons:base
     ports:
-      - "5001:5000"
+      - "5010:5010"
     build:    
      context: ../
      dockerfile: ./Dockerfile
@@ -43,7 +43,7 @@ services:
     networks:
      linkaform:
     ports:
-      - "5001:5000"
+      - "5010:5010"
     build:    
      context: ../
      dockerfile: ./Dockerfile

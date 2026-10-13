@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir sanic==23.12.1 httpx==0.27.2
 WORKDIR /srv/miniback
 COPY . /srv/miniback
 
-EXPOSE 8000
+EXPOSE 8014
 
 # -u: stdout sin buffer, para que los logs de cada corrida salgan en vivo
 # en `docker compose logs -f miniback`.
