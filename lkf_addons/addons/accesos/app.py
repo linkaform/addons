@@ -1191,6 +1191,49 @@ class Accesos(OcrMixin, AccesosModel):
         tipo = (tipo or '').strip()
         return {self.TIPO_DE_EQUIPO_OBJ_ID: {self.mf['tipo_equipo_pase']: tipo}} if tipo else {}
 
+    def _answers_vehiculos_pase(self, vehiculos):
+        """
+        Grupo repetitivo de vehiculos del PASE (no el de bitacora, ver
+        _answers_vehiculos). Acepta las llaves del front (tipo, marca, ...) o las
+        largas (tipo_vehiculo, marca_vehiculo, ...). Lo usan create_access_pass y
+        update_pass.
+        """
+        grupo = []
+        for item in vehiculos or []:
+            grupo.append({
+                self.TIPO_DE_VEHICULO_OBJ_ID: {
+                    self.mf['tipo_vehiculo']: item.get('tipo', item.get('tipo_vehiculo', '')),
+                    self.mf['marca_vehiculo']: item.get('marca', item.get('marca_vehiculo', '')),
+                    self.mf['modelo_vehiculo']: item.get('modelo', item.get('modelo_vehiculo', '')),
+                },
+                self.ESTADO_OBJ_ID: {
+                    self.mf['nombre_estado']: item.get('estado', item.get('nombre_estado', '')),
+                },
+                self.mf['placas_vehiculo']: item.get('placas', item.get('placas_vehiculo', '')),
+                self.mf['color_vehiculo']: item.get('color', item.get('color_vehiculo', '')),
+                self.f['foto_vehiculo']: item.get('foto_vehiculo', ''),
+            })
+        return grupo
+
+    def _answers_equipos_pase(self, equipos):
+        """
+        Grupo repetitivo de equipos del PASE (no el de bitacora, ver
+        _answers_equipos): el tipo va al catalogo de tipos de equipo
+        (_tipo_equipo_pase). Lo usan create_access_pass y update_pass.
+        """
+        grupo = []
+        for item in equipos or []:
+            grupo.append({
+                **self._tipo_equipo_pase(item.get('tipo', item.get('tipo_equipo', ''))),
+                self.mf['nombre_articulo']: item.get('nombre', item.get('nombre_articulo', '')),
+                self.mf['marca_articulo']: item.get('marca', item.get('marca_articulo', '')),
+                self.mf['numero_serie']: item.get('serie', item.get('numero_serie', '')),
+                self.mf['color_articulo']: item.get('color', item.get('color_articulo', '')),
+                self.mf['modelo_articulo']: item.get('modelo', item.get('modelo_articulo', '')),
+                self.f['foto_equipo']: item.get('foto_equipo', ''),
+            })
+        return grupo
+
     def _tipo_equipo_de_pase(self, equipo):
         """Lee el tipo de un equipo del pase: catálogo nuevo o el campo viejo de bitácora."""
         cat = equipo.get(self.TIPO_DE_EQUIPO_OBJ_ID) or {}
@@ -3131,6 +3174,14 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['habilitar_vehiculo']]= access_pass.get('habilitar_vehiculo', 'no')
         #---Toggle "Activar pase por defecto" de pase-entrada; si no viene, "no"
         answers[self.pase_entrada_fields['auto_activacion']] = access_pass.get('auto_activacion', 'no')
+        #---Vehiculos/equipos capturados desde la creacion (pase-entrada con
+        #   "Activar pase por defecto"); vacios no se guardan.
+        grupo_vehiculos = self._answers_vehiculos_pase(access_pass.get('grupo_vehiculos'))
+        if grupo_vehiculos:
+            answers[self.mf['grupo_vehiculos']] = grupo_vehiculos
+        grupo_equipos = self._answers_equipos_pase(access_pass.get('grupo_equipos'))
+        if grupo_equipos:
+            answers[self.mf['grupo_equipos']] = grupo_equipos
         #---Sin default: si el pase no dice nada, que decida la config de la ubicacion
         #   (ver apply_habilitar_overrides), no forzar 'no' que la exentaria siempre.
         if access_pass.get('habilitar_fotografia') is not None:
@@ -9805,51 +9856,9 @@ class Accesos(OcrMixin, AccesosModel):
                     replace_groups[self.pase_entrada_fields['acompanantes_grupo']] = nuevo_grupo_acompanantes
                 continue
             if key == 'grupo_vehiculos':
-                nuevo_grupo_vehiculos = []
-                for item in access_pass.get('grupo_vehiculos',[]):
-                    tipo = item.get('tipo',item.get('tipo_vehiculo',''))
-                    marca = item.get('marca',item.get('marca_vehiculo',''))
-                    modelo = item.get('modelo',item.get('modelo_vehiculo',''))
-                    estado = item.get('estado',item.get('nombre_estado',''))
-                    placas = item.get('placas',item.get('placas_vehiculo',''))
-                    color = item.get('color',item.get('color_vehiculo',''))
-                    foto_vehiculo = item.get('foto_vehiculo','')
-                    obj={
-                        self.TIPO_DE_VEHICULO_OBJ_ID:{
-                            self.mf['tipo_vehiculo']:tipo,
-                            self.mf['marca_vehiculo']:marca,
-                            self.mf['modelo_vehiculo']:modelo,
-                        },
-                        self.ESTADO_OBJ_ID:{
-                            self.mf['nombre_estado']:estado,
-                        },
-                        self.mf['placas_vehiculo']:placas,
-                        self.mf['color_vehiculo']:color,
-                        self.f['foto_vehiculo']:foto_vehiculo,
-                    }
-                    nuevo_grupo_vehiculos.append(obj)
-                replace_groups[self.mf['grupo_vehiculos']] = nuevo_grupo_vehiculos
+                replace_groups[self.mf['grupo_vehiculos']] = self._answers_vehiculos_pase(value)
             elif key == 'grupo_equipos':
-                nuevo_grupo_equipos = []
-                for item in value:
-                    nombre = item.get('nombre',item.get('nombre_articulo',''))
-                    marca = item.get('marca',item.get('marca_articulo',''))
-                    color = item.get('color',item.get('color_articulo',''))
-                    tipo = item.get('tipo',item.get('tipo_equipo',''))
-                    serie = item.get('serie',item.get('numero_serie',''))
-                    modelo = item.get('modelo',item.get('modelo_articulo',''))
-                    foto_equipo = item.get('foto_equipo','')
-                    obj={
-                        **self._tipo_equipo_pase(tipo),
-                        self.mf['nombre_articulo']:nombre,
-                        self.mf['marca_articulo']:marca,
-                        self.mf['numero_serie']:serie,
-                        self.mf['color_articulo']:color,
-                        self.mf['modelo_articulo']:modelo,
-                        self.f['foto_equipo']:foto_equipo,
-                    }
-                    nuevo_grupo_equipos.append(obj)
-                replace_groups[self.mf['grupo_equipos']] = nuevo_grupo_equipos
+                replace_groups[self.mf['grupo_equipos']] = self._answers_equipos_pase(value)
             elif key == 'visita_a':
                 for index, item in enumerate(access_pass.get('visita_a',[])):
                     answers[self.mf['grupo_visitados']] = answers.get(self.mf['grupo_visitados'],{})
