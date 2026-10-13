@@ -7207,7 +7207,6 @@ class Accesos(OcrMixin, AccesosModel):
         fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_local = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0)
         fecha_utc = fecha_local.astimezone(pytz.utc).replace(tzinfo=None, microsecond=0)
-
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
         match_query = {
             'form_id':self.PASE_ENTRADA,
@@ -7221,6 +7220,7 @@ class Accesos(OcrMixin, AccesosModel):
             }
         ]
         }
+
         if not tab_status:
             tab_status = ""
         if tab_status.strip().lower() == "favoritos":
@@ -7263,9 +7263,13 @@ class Accesos(OcrMixin, AccesosModel):
         zona = self.user.get('timezone','America/Monterrey')
         return self.facet_date_match(match_query, f"answers.{self.mf['fecha_desde_visita']}", dateFrom, dateTo, filterDate, zona=zona)
 
-    def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[], facets=[]):
+    def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[], facets=[], **kwargs):
+        users = self.lkf_api.get_all_users()
+        user_ids = [u['id'] for u in users]
+        kwargs = {'created_by_id':user_ids}
         match_query = self.pases_base_match(tab_status, search_name, location, dynamic_filters, dateFrom, dateTo, filterDate, locations)
         facet_conditions = self.build_facets_match(self.pases_search_fields(), facets)
+        match_query = self.match_update(match_query, **kwargs)
         if facet_conditions:
             match_query.setdefault("$and", []).extend(facet_conditions)
 
@@ -7279,6 +7283,9 @@ class Accesos(OcrMixin, AccesosModel):
         current_page = (skip // limit) + 1
         total_pages = ceil(total_count / limit) if limit else 1
 
+        print('match_query',match_query)
+        print('user_ids',user_ids)
+        print('count_result',count_result)
         query = [
             {"$match":match_query},
             {'$project':
