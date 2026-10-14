@@ -871,6 +871,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'prefijo_telefonico':'6a221532db633d0cf4faf12f',
             'tolerancia_de_entrada_previa':"6a2835444172819eb764943b",
             'tolerancia_de_entrada_posterior':"6a22155492b193f057990682",
+            'acompanantes_requeridos':'6acebdd120f8bb307d738267'
         }
 
         self.paquetes_fields = {
@@ -1022,6 +1023,7 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'doc_condiciones_servicio':"6a4c673722f825e7b3e46469",
             'url_condiciones_servicio':"6a4c673722f825e7b3e4646a",
             'auto_activacion':"6abbfa2ea034ae2596e7444c",
+            'acompanantes_requeridos':"6acebdd120f8bb307d738267",
             'logo_por_ubicacion':"6abc34ba059be8a67a72dc0b",
         })
 

@@ -4777,6 +4777,7 @@ class Accesos(OcrMixin, AccesosModel):
         envios = set()
         condiciones_servicio = {}
         auto_activacion = False
+        acompanantes_requeridos = False
         config, grupos = self.get_grupos_requisitos_ubicaciones(ubicaciones)
         #---Logo general de la forma; se reemplaza por el de la ubicación si trae
         logotipo_pase = self.unlist(config.get('logotipo_pase', [])) or ""
@@ -4795,6 +4796,10 @@ class Accesos(OcrMixin, AccesosModel):
             #---Auto activación: basta con que una de las ubicaciones la tenga en "sí"
             if str(self.unlist(grupo.get('auto_activacion', '')) or '').strip().lower() in ('sí', 'si'):
                 auto_activacion = True
+
+            #---Acompañantes requeridos: igual, basta con una ubicación en "sí"
+            if str(self.unlist(grupo.get('acompanantes_requeridos', '')) or '').strip().lower() in ('sí', 'si'):
+                acompanantes_requeridos = True
 
             requerimientos.update(self.get_datos_requeridos_grupo(grupo))
             envios = set()
@@ -4846,6 +4851,7 @@ class Accesos(OcrMixin, AccesosModel):
             "logotipo_pase": logotipo_pase,
             # "sí"/"no": si pase-entrada muestra el toggle "Activar pase por defecto".
             "auto_activacion": "sí" if auto_activacion else "no",
+            "acompanantes_requeridos": "sí" if acompanantes_requeridos else "no",
             "empresa": {
                 "nombre": company,
                 "email": empresa_email,
@@ -5173,6 +5179,8 @@ class Accesos(OcrMixin, AccesosModel):
                     # Radio "Auto Activacion" (sí/no): pase-entrada ofrece el toggle
                     # "Activar pase por defecto" solo si la ubicación lo tiene en sí.
                     'auto_activacion': self._flatten_scalar(req.get('auto_activacion')) or 'no',
+                    # Radio "Acompañantes Requeridos" (sí/no), por ubicación.
+                    'acompanantes_requeridos': self._flatten_scalar(req.get('acompanantes_requeridos')) or 'no',
                 })
             data.update({
                 'exclude_inputs': format_exclude_inputs,
