@@ -7314,18 +7314,7 @@ class Accesos(OcrMixin, AccesosModel):
         if facet_conditions:
             match_query.setdefault("$and", []).extend(facet_conditions)
 
-        # Conteo total de registros
-        count_query = [
-            {"$match": match_query},
-            {"$count": "total"}
-        ]
-        count_result = self.format_cr(self.cr.aggregate(count_query))
-        total_count = count_result[0]['total'] if count_result else 0
-        current_page = (skip // limit) + 1
-        total_pages = ceil(total_count / limit) if limit else 1
-
-        query = [
-            {"$match":match_query},
+        project = [
             {'$project':
                 {
                     '_id': 1,
@@ -7405,11 +7394,21 @@ class Accesos(OcrMixin, AccesosModel):
                     'created_by':"$user_name"
                 }
             },
-            {'$sort':{'_id':-1}},
         ]
-        query.append({'$skip': skip})
-        query.append({'$limit': limit})
-        records = self.format_cr(self.cr.aggregate(query))
+        # Conteo total y pagina en una sola pasada; se ordena y pagina antes del $project
+        query = [
+            {"$match": match_query},
+            {'$sort': {'_id': -1}},
+            {'$facet': {
+                'total': [{'$count': 'n'}],
+                'records': [{'$skip': skip}, {'$limit': limit}] + project,
+            }},
+        ]
+        result = (list(self.cr.aggregate(query)) or [{}])[0]
+        total_count = (result.get('total') or [{}])[0].get('n', 0)
+        current_page = (skip // limit) + 1
+        total_pages = ceil(total_count / limit) if limit else 1
+        records = self.format_cr(result.get('records', []))
         # print("RECORDS",  simplejson.dumps(records, indent=4))
         self._hidratar_acompanantes(records)
         ingresos = self.get_count_ingresos_many([x.get('_id') for x in records])
