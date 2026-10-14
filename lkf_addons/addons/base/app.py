@@ -367,7 +367,7 @@ class Base(BaseModel):
         """ Acutaliza el match de un query reemplaza llaves de busqueda por llaves dentro de kwargs"""
         match_keys = list(match.keys())
         for k in match_keys:
-            if k == '$or':
+            if k in ('$or', '$and'):
                 or_keys = match[k]
                 for ids, o in enumerate(or_keys):
                     match[k][ids] = self.match_update(o, **kwargs)
@@ -378,6 +378,21 @@ class Base(BaseModel):
                 else:
                     match.update({k:value})
         return match
+
+    def get_visible_user_ids(self):
+        """ Ids de los usuarios cuyos registros puede ver el usuario actual.
+        Admin (can_manage_users) ve a todos los usuarios de la cuenta; supervisor
+        de grupo ve a sus supervisados y a si mismo. Lista vacia = solo lo suyo."""
+        user_id = self.user.get('user_id')
+        user = self.lkf_api.get_user_by_id(user_id)
+        if isinstance(user, dict) and 'can_manage_users' in (user.get('permissions') or []):
+            return [u['id'] for u in self.lkf_api.get_all_users()]
+        supervised = self.lkf_api.get_supervised_users()
+        if not isinstance(supervised, list) or not supervised:
+            return []
+        user_ids = {s['user_id'] for s in supervised}
+        user_ids.add(user_id)
+        return list(user_ids)
 
     def send_email_by_form_answers(self, data):
         answers = {}

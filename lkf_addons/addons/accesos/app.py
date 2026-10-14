@@ -7198,6 +7198,9 @@ class Accesos(OcrMixin, AccesosModel):
 
     def get_search_counts_pases(self, tab_status="", location=None, dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
         base_match = self.pases_base_match(tab_status=tab_status, location=location, dateFrom=dateFrom, dateTo=dateTo, filterDate=filterDate, locations=locations)
+        user_ids = self.get_visible_user_ids()
+        if user_ids:
+            base_match = self.match_update(base_match, created_by_id=user_ids)
         return self.count_facet_candidates(base_match, self.pases_search_fields(), facets, candidates)
 
     def pases_base_match(self, tab_status="", search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
@@ -7264,12 +7267,11 @@ class Accesos(OcrMixin, AccesosModel):
         return self.facet_date_match(match_query, f"answers.{self.mf['fecha_desde_visita']}", dateFrom, dateTo, filterDate, zona=zona)
 
     def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[], facets=[], **kwargs):
-        users = self.lkf_api.get_all_users()
-        user_ids = [u['id'] for u in users]
-        kwargs = {'created_by_id':user_ids}
+        user_ids = self.get_visible_user_ids()
         match_query = self.pases_base_match(tab_status, search_name, location, dynamic_filters, dateFrom, dateTo, filterDate, locations)
         facet_conditions = self.build_facets_match(self.pases_search_fields(), facets)
-        match_query = self.match_update(match_query, **kwargs)
+        if user_ids:
+            match_query = self.match_update(match_query, created_by_id=user_ids)
         if facet_conditions:
             match_query.setdefault("$and", []).extend(facet_conditions)
 
@@ -7283,9 +7285,6 @@ class Accesos(OcrMixin, AccesosModel):
         current_page = (skip // limit) + 1
         total_pages = ceil(total_count / limit) if limit else 1
 
-        print('match_query',match_query)
-        print('user_ids',user_ids)
-        print('count_result',count_result)
         query = [
             {"$match":match_query},
             {'$project':
