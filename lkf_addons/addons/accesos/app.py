@@ -5359,6 +5359,30 @@ class Accesos(OcrMixin, AccesosModel):
         ]
         return {r['_id']: r['total'] for r in self.cr.aggregate(query)}
 
+    def get_pases_padre_many(self, padre_ids):
+        """ Datos del pase padre de varios pases en una sola consulta: {padre_id: {...}}."""
+        padre_ids = [i for i in set(padre_ids) if i and ObjectId.is_valid(i)]
+        if not padre_ids:
+            return {}
+        visita = self.VISITA_AUTORIZADA_CAT_OBJ_ID
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.PASE_ENTRADA,
+                "_id": {"$in": [ObjectId(i) for i in padre_ids]},
+            }},
+            {'$project': {
+                'nombre': {"$ifNull": [f"$answers.{visita}.{self.mf['nombre_visita']}", f"$answers.{self.mf['nombre_pase']}"]},
+                'estatus': f"$answers.{self.pase_entrada_fields['status_pase']}",
+                'email': {"$ifNull": [f"$answers.{visita}.{self.mf['email_vista']}", f"$answers.{self.mf['email_pase']}"]},
+                'telefono': {"$ifNull": [f"$answers.{visita}.{self.mf['telefono']}", f"$answers.{self.mf['telefono_pase']}"]},
+                'foto': {'$ifNull': [f"$answers.{visita}.{self.mf['foto']}", f"$answers.{self.pase_entrada_fields['walkin_fotografia']}"]},
+                'identificacion': {'$ifNull': [f"$answers.{visita}.{self.mf['identificacion']}", f"$answers.{self.pase_entrada_fields['walkin_identificacion']}"]},
+            }},
+        ]
+        campos = ('foto', 'identificacion', 'nombre', 'estatus', 'telefono', 'email')
+        return {str(p['_id']): {c: self.unlist(p.get(c, '')) for c in campos} for p in self.cr.aggregate(query)}
+
     def get_detail_access_pass(self, qr_code, get_answers=False):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -7389,6 +7413,7 @@ class Accesos(OcrMixin, AccesosModel):
         # print("RECORDS",  simplejson.dumps(records, indent=4))
         self._hidratar_acompanantes(records)
         ingresos = self.get_count_ingresos_many([x.get('_id') for x in records])
+        padres = self.get_pases_padre_many([self.extraer_id_padre(x) for x in records if x.get('url_padre')])
         for x in records:
             x['total_entradas'] = ingresos.get(x.get('_id'), 0)
             visita_a =[]
@@ -7449,19 +7474,7 @@ class Accesos(OcrMixin, AccesosModel):
             if x['url_padre']:
                 padre_id = self.extraer_id_padre(x)
                 if padre_id:
-                    try:
-                        detalle_padre = self.get_detail_access_pass(padre_id) or {}
-                        x['pase_padre'] = {
-                            'foto': self.unlist(detalle_padre.get('foto', '')),
-                            'identificacion': self.unlist(detalle_padre.get('identificacion', '')),
-                            'nombre': self.unlist(detalle_padre.get('nombre', '')),
-                            'estatus': self.unlist(detalle_padre.get('estatus', '')),
-                            'telefono': self.unlist(detalle_padre.get('telefono', '')),
-                            'email': self.unlist(detalle_padre.get('email', '')),
-                        } if detalle_padre else {}
-                    except Exception as e:
-                        print(f"Error obteniendo pase padre {padre_id}: {e}")
-                        x['pase_padre'] = {}
+                    x['pase_padre'] = padres.get(padre_id, {})
             x['grupo_vehiculos'] = self.format_vehiculos_simple(x.pop('grupo_vehiculos',[]))
             x['grupo_equipos'] = self.format_equipos_simple(x.pop('grupo_equipos',[]))
             x['comentarios'] = x['grupo_instrucciones_pase']
