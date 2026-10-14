@@ -87,7 +87,7 @@ def main(argv):
         raise Error('No existe %s' % SECRETS)
     with open(CURRENT_ENV, 'w', encoding='utf-8') as fh:
         fh.write(env + '\n')
-    os.chmod(CURRENT_ENV, 0o600)
+    os.chmod(CURRENT_ENV, 0o644)
 
     print('workon %s' % env)
     print('  environment   : %s' % descripcion(env))

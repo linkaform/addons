@@ -228,7 +228,7 @@ def main(argv):
     # quedas con las credenciales de una cuenta y la rama de otra.
     with open(CURRENT, 'w', encoding='utf-8') as fh:
         fh.write(domain + '\n')
-    os.chmod(CURRENT, 0o600)
+    os.chmod(CURRENT, 0o644)
     print('  cuenta activa : %s' % domain)
 
     if choques:

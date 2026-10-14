@@ -363,6 +363,37 @@ class Base(BaseModel):
             if module not in self.kwargs['MODULES']:
                 self.kwargs['MODULES'].append(module)
 
+    def match_update(self, match, **kwargs):
+        """ Acutaliza el match de un query reemplaza llaves de busqueda por llaves dentro de kwargs"""
+        match_keys = list(match.keys())
+        for k in match_keys:
+            if k in ('$or', '$and'):
+                or_keys = match[k]
+                for ids, o in enumerate(or_keys):
+                    match[k][ids] = self.match_update(o, **kwargs)
+            if k in kwargs:
+                value = kwargs[k]
+                if type(value) in (list, tuple):
+                    match.update({k:{'$in':value}})
+                else:
+                    match.update({k:value})
+        return match
+
+    def get_visible_user_ids(self):
+        """ Ids de los usuarios cuyos registros puede ver el usuario actual.
+        Admin (can_manage_users) ve a todos los usuarios de la cuenta; supervisor
+        de grupo ve a sus supervisados y a si mismo. Lista vacia = solo lo suyo."""
+        user_id = self.user.get('user_id')
+        user = self.lkf_api.get_user_by_id(user_id)
+        if isinstance(user, dict) and 'can_manage_users' in (user.get('permissions') or []):
+            return [u['id'] for u in self.lkf_api.get_all_users()]
+        supervised = self.lkf_api.get_supervised_users()
+        if not isinstance(supervised, list) or not supervised:
+            return []
+        user_ids = {s['user_id'] for s in supervised}
+        user_ids.add(user_id)
+        return list(user_ids)
+
     def send_email_by_form_answers(self, data):
         answers = {}
         if isinstance(data.get('email_to'), list):
@@ -1065,6 +1096,7 @@ class Base(BaseModel):
         text = re.sub(r'[^\w\s-]', '', text.lower().strip())
         return re.sub(r'[\s_-]+', sep, text)
 
+
 from linkaform_api import  upload_file
 
 #fields_no_update = ['post_status', 'next_cut_week', 'cut_week', 'cycle_group', 'ready_year_week']
@@ -1635,8 +1667,12 @@ class CargaUniversal(Base):
             print('self.field_id_catalog_form', self.field_id_catalog_form)
             print('self.field_id_catalog_form_detail', self.field_id_catalog_form_detail)
             if not form_id_to_load:
-                field_forma = self.answers[self.field_id_catalog_form]
-                id_forma_seleccionada = field_forma[self.field_id_catalog_form_detail][0]
+                field_forma = self.answers.get(self.field_id_catalog_form, {})
+                ids_forma = field_forma.get(self.field_id_catalog_form_detail) or []
+                if not ids_forma:
+                    return self.update_status_record('error', msg_comentarios=
+                        'La forma seleccionada en el catalogo (%s) no tiene un id de forma asociado. Revisa el registro en el catalogo de items.' % (field_forma,))
+                id_forma_seleccionada = ids_forma[0]
             else:
                 id_forma_seleccionada = form_id_to_load
             form_fields = self.lkf_api.get_form_id_fields(id_forma_seleccionada)

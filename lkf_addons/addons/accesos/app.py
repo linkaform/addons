@@ -5352,6 +5352,45 @@ class Accesos(OcrMixin, AccesosModel):
             total_entradas = total_entradas.pop()
         return total_entradas
 
+    def get_count_ingresos_many(self, qr_codes):
+        """ Ingresos por pase en una sola consulta: {qr_code: total}. Los que no tienen ingresos no aparecen."""
+        if not qr_codes:
+            return {}
+        qr_field = f"answers.{self.mf['codigo_qr']}"
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.BITACORA_ACCESOS,
+                qr_field: {"$in": list(qr_codes)},
+            }},
+            {'$group': {'_id': f"${qr_field}", 'total': {'$sum': 1}}},
+        ]
+        return {r['_id']: r['total'] for r in self.cr.aggregate(query)}
+
+    def get_pases_padre_many(self, padre_ids):
+        """ Datos del pase padre de varios pases en una sola consulta: {padre_id: {...}}."""
+        padre_ids = [i for i in set(padre_ids) if i and ObjectId.is_valid(i)]
+        if not padre_ids:
+            return {}
+        visita = self.VISITA_AUTORIZADA_CAT_OBJ_ID
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.PASE_ENTRADA,
+                "_id": {"$in": [ObjectId(i) for i in padre_ids]},
+            }},
+            {'$project': {
+                'nombre': {"$ifNull": [f"$answers.{visita}.{self.mf['nombre_visita']}", f"$answers.{self.mf['nombre_pase']}"]},
+                'estatus': f"$answers.{self.pase_entrada_fields['status_pase']}",
+                'email': {"$ifNull": [f"$answers.{visita}.{self.mf['email_vista']}", f"$answers.{self.mf['email_pase']}"]},
+                'telefono': {"$ifNull": [f"$answers.{visita}.{self.mf['telefono']}", f"$answers.{self.mf['telefono_pase']}"]},
+                'foto': {'$ifNull': [f"$answers.{visita}.{self.mf['foto']}", f"$answers.{self.pase_entrada_fields['walkin_fotografia']}"]},
+                'identificacion': {'$ifNull': [f"$answers.{visita}.{self.mf['identificacion']}", f"$answers.{self.pase_entrada_fields['walkin_identificacion']}"]},
+            }},
+        ]
+        campos = ('foto', 'identificacion', 'nombre', 'estatus', 'telefono', 'email')
+        return {str(p['_id']): {c: self.unlist(p.get(c, '')) for c in campos} for p in self.cr.aggregate(query)}
+
     def get_detail_access_pass(self, qr_code, get_answers=False):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -7206,6 +7245,9 @@ class Accesos(OcrMixin, AccesosModel):
 
     def get_search_counts_pases(self, tab_status="", location=None, dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
         base_match = self.pases_base_match(tab_status=tab_status, location=location, dateFrom=dateFrom, dateTo=dateTo, filterDate=filterDate, locations=locations)
+        user_ids = self.get_visible_user_ids()
+        if user_ids:
+            base_match = self.match_update(base_match, created_by_id=user_ids)
         return self.count_facet_candidates(base_match, self.pases_search_fields(), facets, candidates)
 
     def pases_base_match(self, tab_status="", search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
@@ -7215,7 +7257,6 @@ class Accesos(OcrMixin, AccesosModel):
         fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_local = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0)
         fecha_utc = fecha_local.astimezone(pytz.utc).replace(tzinfo=None, microsecond=0)
-
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
         match_query = {
             'form_id':self.PASE_ENTRADA,
@@ -7229,6 +7270,7 @@ class Accesos(OcrMixin, AccesosModel):
             }
         ]
         }
+
         if not tab_status:
             tab_status = ""
         if tab_status.strip().lower() == "favoritos":
@@ -7271,31 +7313,22 @@ class Accesos(OcrMixin, AccesosModel):
         zona = self.user.get('timezone','America/Monterrey')
         return self.facet_date_match(match_query, f"answers.{self.mf['fecha_desde_visita']}", dateFrom, dateTo, filterDate, zona=zona)
 
-    def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[], facets=[]):
+    def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[], facets=[], **kwargs):
+        user_ids = self.get_visible_user_ids()
         match_query = self.pases_base_match(tab_status, search_name, location, dynamic_filters, dateFrom, dateTo, filterDate, locations)
         facet_conditions = self.build_facets_match(self.pases_search_fields(), facets)
+        if user_ids:
+            match_query = self.match_update(match_query, created_by_id=user_ids)
         if facet_conditions:
             match_query.setdefault("$and", []).extend(facet_conditions)
 
-        # Conteo total de registros
-        count_query = [
-            {"$match": match_query},
-            {"$count": "total"}
-        ]
-        count_result = self.format_cr(self.cr.aggregate(count_query))
-        total_count = count_result[0]['total'] if count_result else 0
-        current_page = (skip // limit) + 1
-        total_pages = ceil(total_count / limit) if limit else 1
-
-        query = [
-            {"$match":match_query},
+        project = [
             {'$project':
                 {
                     '_id': 1,
                     'folio': "$folio",
                     'favoritos':f"$answers.{self.pase_entrada_fields['favoritos']}",
                     'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
-                    # 'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
                     'nombre': {"$ifNull":[
                         f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
                         f"$answers.{self.mf['nombre_pase']}"]},
@@ -7337,11 +7370,7 @@ class Accesos(OcrMixin, AccesosModel):
                     'tipo_visita': f"$answers.{self.pase_entrada_fields['tipo_visita']}",
                     'limite_de_acceso': f"$answers.{self.mf['config_limitar_acceso']}",
                     'config_dia_de_acceso': f"$answers.{self.mf['config_dia_de_acceso']}",
-                    'identificacion': {'$ifNull':[
-                        f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['identificacion']}",
-                        f"$answers.{self.pase_entrada_fields['walkin_identificacion']}"]},
                     'limitado_a_dias':f"$answers.{self.mf['config_dias_acceso']}",
-                    'perfil_pase':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}",
                     'tipo_de_comentario': f"$answers.{self.mf['tipo_de_comentario']}",
                     'tipo_fechas_pase': f"$answers.{self.mf['tipo_visita_pase']}",
                     'enviar_correo_pre_registro': f"$answers.{self.pase_entrada_fields['enviar_correo_pre_registro']}",
@@ -7368,20 +7397,26 @@ class Accesos(OcrMixin, AccesosModel):
                     'created_by':"$user_name"
                 }
             },
-            {'$sort':{'_id':-1}},
         ]
-        query.append({'$skip': skip})
-        query.append({'$limit': limit})
-        records = self.format_cr(self.cr.aggregate(query))
-        # print("RECORDS",  simplejson.dumps(records, indent=4))
+        # Conteo total y pagina en una sola pasada; se ordena y pagina antes del $project
+        query = [
+            {"$match": match_query},
+            {'$sort': {'_id': -1}},
+            {'$facet': {
+                'total': [{'$count': 'n'}],
+                'records': [{'$skip': skip}, {'$limit': limit}] + project,
+            }},
+        ]
+        result = (list(self.cr.aggregate(query)) or [{}])[0]
+        total_count = (result.get('total') or [{}])[0].get('n', 0)
+        current_page = (skip // limit) + 1
+        total_pages = ceil(total_count / limit) if limit else 1
+        records = self.format_cr(result.get('records', []))
         self._hidratar_acompanantes(records)
+        ingresos = self.get_count_ingresos_many([x.get('_id') for x in records])
+        padres = self.get_pases_padre_many([self.extraer_id_padre(x) for x in records if x.get('url_padre')])
         for x in records:
-            qr_code = x.get('_id')
-            total_entradas = self.get_count_ingresos(qr_code)
-            if total_entradas:
-                x['total_entradas'] = total_entradas.get('total_records')
-            else:
-                x['total_entradas'] = 0
+            x['total_entradas'] = ingresos.get(x.get('_id'), 0)
             visita_a =[]
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
             d = x.get('visita_a_departamento',[])
@@ -7396,30 +7431,12 @@ class Accesos(OcrMixin, AccesosModel):
                 emp['user_id'] = e[idx] if idx < len(e) and e[idx] else [""]
                 emp['email'] = u[idx] if idx < len(u) and u[idx] else [""]
                 visita_a.append(emp)
-            if x['tipo_de_pase'] == 'Visita General' or x['tipo_de_pase'] == 'visita general':
-                x['visita_a'] = visita_a
-                x['favoritos'] = x.get('favoritos', [""]) if x.get('favoritos') else ""
-                x['motivo_visita'] = x.get('motivo_visita', [""]) if x.get('motivo_visita') else ""
-                x['email'] = x.get('email', [""]) if x.get('email') else ""
-                x['empresa'] = x.get('empresa', [""]) if x.get('empresa') else ""
-                x['telefono'] = x.get('telefono', [""]) if x.get('telefono') else ""
-                # x['pdf'] = self.lkf_api.get_pdf_record(x['_id'], template_id = 447, name_pdf='Pase de Entrada', send_url=True)
-            else:
-
-                x['visita_a'] = visita_a
-                x['favoritos'] = x.get('favoritos') or ""
-                x['motivo_visita'] =x.get('motivo_visita') or ""
-                x['email']= x.get('email') or ""
-                x['empresa']= x.get('empresa') or ""
-                x['telefono']= x.get('telefono') or ""
-                # x['pdf'] = self.lkf_api.get_pdf_record(x[' # for idx, dic in enumerate(x['grupo_areas_acceso']):
-            # x['comentario_area_pase']=x.pop('comentario_area_pase',[])
-
-
-                # for key in list(item.keys()):
-                #     if key in id_to_name_mapping:
-                #         # Reemplaza el id hexadecimal por su nombre en el diccionario
-                #         item[self.pase_entrada_fields['commentario_area']] = item.pop(key)
+            x['visita_a'] = visita_a
+            x['favoritos'] = x.get('favoritos') or ""
+            x['motivo_visita'] = x.get('motivo_visita') or ""
+            x['email'] = x.get('email') or ""
+            x['empresa'] = x.get('empresa') or ""
+            x['telefono'] = x.get('telefono') or ""
 
             for visita in x.get('visita_a', []):
                 visita['departamento'] = visita['departamento'][0] if isinstance(visita.get('departamento'), list) and visita.get('departamento') else visita.get('departamento', "")
@@ -7427,7 +7444,6 @@ class Accesos(OcrMixin, AccesosModel):
                 visita['user_id'] = visita['user_id'][0] if isinstance(visita.get('user_id'), list) and visita.get('user_id') else visita.get('user_id', "")
                 visita['email'] = visita['email'][0] if isinstance(visita.get('email'), list) and visita.get('email') else visita.get('email', "")
 
-            visitas = x.get('visita_a', [])
             x['status_pase'] = x.get('estatus', "")
             x['autorizado_por'] = x.get('autorizado_por', "")
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
@@ -7440,19 +7456,7 @@ class Accesos(OcrMixin, AccesosModel):
             if x['url_padre']:
                 padre_id = self.extraer_id_padre(x)
                 if padre_id:
-                    try:
-                        detalle_padre = self.get_detail_access_pass(padre_id) or {}
-                        x['pase_padre'] = {
-                            'foto': self.unlist(detalle_padre.get('foto', '')),
-                            'identificacion': self.unlist(detalle_padre.get('identificacion', '')),
-                            'nombre': self.unlist(detalle_padre.get('nombre', '')),
-                            'estatus': self.unlist(detalle_padre.get('estatus', '')),
-                            'telefono': self.unlist(detalle_padre.get('telefono', '')),
-                            'email': self.unlist(detalle_padre.get('email', '')),
-                        } if detalle_padre else {}
-                    except Exception as e:
-                        print(f"Error obteniendo pase padre {padre_id}: {e}")
-                        x['pase_padre'] = {}
+                    x['pase_padre'] = padres.get(padre_id, {})
             x['grupo_vehiculos'] = self.format_vehiculos_simple(x.pop('grupo_vehiculos',[]))
             x['grupo_equipos'] = self.format_equipos_simple(x.pop('grupo_equipos',[]))
             x['comentarios'] = x['grupo_instrucciones_pase']
@@ -7472,7 +7476,6 @@ class Accesos(OcrMixin, AccesosModel):
             x.pop('visita_a_puesto', None)
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
-        # print("data", simplejson.dumps(records, indent=4))
         return  {
             "records": records,
             "total_records": total_count,
