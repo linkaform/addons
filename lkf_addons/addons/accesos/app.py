@@ -5344,6 +5344,21 @@ class Accesos(OcrMixin, AccesosModel):
             total_entradas = total_entradas.pop()
         return total_entradas
 
+    def get_count_ingresos_many(self, qr_codes):
+        """ Ingresos por pase en una sola consulta: {qr_code: total}. Los que no tienen ingresos no aparecen."""
+        if not qr_codes:
+            return {}
+        qr_field = f"answers.{self.mf['codigo_qr']}"
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.BITACORA_ACCESOS,
+                qr_field: {"$in": list(qr_codes)},
+            }},
+            {'$group': {'_id': f"${qr_field}", 'total': {'$sum': 1}}},
+        ]
+        return {r['_id']: r['total'] for r in self.cr.aggregate(query)}
+
     def get_detail_access_pass(self, qr_code, get_answers=False):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -7373,13 +7388,9 @@ class Accesos(OcrMixin, AccesosModel):
         records = self.format_cr(self.cr.aggregate(query))
         # print("RECORDS",  simplejson.dumps(records, indent=4))
         self._hidratar_acompanantes(records)
+        ingresos = self.get_count_ingresos_many([x.get('_id') for x in records])
         for x in records:
-            qr_code = x.get('_id')
-            total_entradas = self.get_count_ingresos(qr_code)
-            if total_entradas:
-                x['total_entradas'] = total_entradas.get('total_records')
-            else:
-                x['total_entradas'] = 0
+            x['total_entradas'] = ingresos.get(x.get('_id'), 0)
             visita_a =[]
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
             d = x.get('visita_a_departamento',[])
