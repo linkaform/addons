@@ -188,9 +188,13 @@ def mostrar_estado(cat):
     except Error:
         pass
     print('\ndominios disponibles (%d):' % len(dominios(cat)))
-    disp = sorted(dominios(cat))
-    for i in range(0, len(disp), 4):
-        print('  ' + '  '.join('%-22s' % d for d in disp[i:i + 4]).rstrip())
+    disp = sorted(dominios(cat), key=str.lower)
+    # Se llena por columnas (como ls): leido de arriba abajo y de izquierda a derecha
+    # sale alfabetico. Por filas el orden era el mismo, pero no se notaba.
+    cols = 4
+    filas = -(-len(disp) // cols)
+    for r in range(filas):
+        print('  ' + '  '.join('%-22s' % d for d in disp[r::filas]).rstrip())
 
 
 def main(argv):
@@ -205,7 +209,7 @@ def main(argv):
 
     domain = argv[1].strip()
     if not cat.has_section(domain):
-        sug = [d for d in dominios(cat) if domain.lower() in d.lower()]
+        sug = sorted((d for d in dominios(cat) if domain.lower() in d.lower()), key=str.lower)
         msg = 'El dominio "%s" no esta en %s.' % (domain, ACCOUNTS)
         if sug:
             msg += '\n\n¿Quisiste decir?  %s' % ', '.join(sug)

@@ -37,7 +37,7 @@ Si tienes más de una aplicación, puedes:
 
 # Importaciones necesarias
 import simplejson, importlib
-import re, os, time, zipfile, wget, random, shutil, datetime, unicodedata
+import hashlib, re, os, time, zipfile, wget, random, shutil, datetime, unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from bson.objectid import ObjectId
 from datetime import timedelta
@@ -728,6 +728,45 @@ class Base(BaseModel):
 
         modules = self.get_structured_web_menu(data)
         return modules
+
+    def set_comment_metadata(self, data):
+        return {
+            'created_by_username': self.user['username'],
+            'created_by_id': self.user['user_id'],
+            'created_by_name': self.user.get('name'),
+            'created_at': time.time(),
+            'data': data
+        }
+
+    def set_media_metadata(self, data):
+        return {
+            'created_by_username': self.user['username'],
+            'created_by_id': self.user['user_id'],
+            'created_by_name': self.user.get('name'),
+            'created_at': time.time(),
+            'data': data
+        }
+
+    def get_valid_object_id(self, value):
+        """
+        Regresa siempre un ObjectId valido a partir de `value`.
+        - ObjectId o string de 24 hex: se respeta tal cual.
+        - String hex mas largo (ej. uuid de 32, con o sin guiones): se recorta a 24.
+        - Cualquier otra cosa (hex corto, texto): se deriva de forma determinista
+          con md5, asi el mismo valor siempre da el mismo ObjectId.
+        - Vacio o None: ObjectId nuevo.
+        """
+        if isinstance(value, ObjectId):
+            return value
+        if value is None or str(value).strip() == '':
+            return ObjectId()
+        raw = str(value).strip()
+        if ObjectId.is_valid(raw):
+            return ObjectId(raw)
+        clean = raw.replace('-', '')
+        if len(clean) > 24 and re.fullmatch(r'[0-9a-fA-F]+', clean):
+            return ObjectId(clean[:24])
+        return ObjectId(hashlib.md5(raw.encode('utf-8')).hexdigest()[:24])
 
     def set_item_permits(self, user_id, item_needed, item_type):
         """

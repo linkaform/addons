@@ -11321,6 +11321,8 @@ class Accesos(OcrMixin, AccesosModel):
         for item in data:
             area_name = item.get(self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID,{}).get(self.f['nombre_area'])
             for _, value in item.items():
+                if not value:
+                    continue
                 form_id = self.unlist(value.get(self.f['form_id'] ))
                 if form_id:
                     result['areas'][area_name] = form_id
@@ -11517,13 +11519,17 @@ class Accesos(OcrMixin, AccesosModel):
         inspeccion = record.get('inspeccion', {})
         inspeccion_form_id = record.get('inspeccion_form_id', '')
         if inspeccion_form_id and inspeccion:
-            response_inspeccion = self.create_inspeccion(complete_record, inspeccion_form_id)
+            response_inspeccion, metadata = self.create_inspeccion(complete_record, inspeccion_form_id)
             inspeccion_id = response_inspeccion.get('json', {}).get('id', '')
             complete_record['record']['inspeccion_record_id'] = inspeccion_id
             #TODO: EN CASO DE ERROR QUE SUCEDE?
-            self.insert_images_and_comments_into_inspeccion(complete_record, inspeccion_form_id, inspeccion_id)
+            if not inspeccion_id:
+                raise self.LKFException({
+                    'msg': f"No se pudo crear la inspeccion: {response_inspeccion.get('json', response_inspeccion)}",
+                    'status_code': response_inspeccion.get('status_code', 400),
+                })
+            self.insert_images_and_comments_into_inspeccion(metadata, inspeccion_form_id, inspeccion_id)
         response = self.create_check_area(complete_record)
-        print('response del check de area', response)
         if response.get('status_code') in [200, 201, 202, 208,]:
             complete_record['status'] = 'received'
             #TODO delete backward compatibility
@@ -11548,7 +11554,6 @@ class Accesos(OcrMixin, AccesosModel):
                 complete_record['status'] = 'error'
                 complete_record['last_error'] = last_error
         res = self.cr_db.save(complete_record)
-        print('status', status)
         return status
 
     def find_check_area_in_rondines(self, check_area_id):
@@ -11588,7 +11593,6 @@ class Accesos(OcrMixin, AccesosModel):
 
         res = self.sync_check_area_to_lkf(complete_record=rec)
         print(f"  [check] resultado sync → status_code={res.get('status_code')} msg={res.get('msg','')}")
-
         check_info = {
             "check_id": _id,
             "status_code": res.get('status_code'),
@@ -11609,7 +11613,7 @@ class Accesos(OcrMixin, AccesosModel):
             "raw_result": res
         }
 
-    def process_check_area_stage(self, check_records):
+    def process_check_area_stage(self, check_records, threading=True):
         """
         Procesa todos los checks en paralelo.
         Cuando terminan, los agrupa por rondin_id.
@@ -11619,44 +11623,45 @@ class Accesos(OcrMixin, AccesosModel):
             return checks_by_rondin
 
         # Tetsting purposes...
-        # self.process_single_check_for_rondin(check_records[0])
+        if not threading:
+            self.process_single_check_for_rondin(check_records[0])
+        else:
+            with ThreadPoolExecutor(max_workers=20) as executor:
+                futures = {
+                    executor.submit(self.process_single_check_for_rondin, rec): rec
+                    for rec in check_records
+                }
 
-        with ThreadPoolExecutor(max_workers=20) as executor:
-            futures = {
-                executor.submit(self.process_single_check_for_rondin, rec): rec
-                for rec in check_records
-            }
+                for future in as_completed(futures):
+                    rec = futures[future]
 
-            for future in as_completed(futures):
-                rec = futures[future]
+                    try:
+                        result = future.result()
+                        rondin_id = result.get('rondin_id') or 'unknown'
 
-                try:
-                    result = future.result()
-                    rondin_id = result.get('rondin_id') or 'unknown'
+                        checks_by_rondin.setdefault(rondin_id, []).append(result['check'])
 
-                    checks_by_rondin.setdefault(rondin_id, []).append(result['check'])
+                        with self.results_lock:
+                            self.results["result"].append(result["raw_result"])
+                            if result["check"]["ok"]:
+                                self.results["success"] += 1
+                            else:
+                                self.results["failed"] += 1
+                                self.results["errors"].append({
+                                    "id": rec.get('_id'),
+                                    "error": result["raw_result"].get("msg")
+                                })
 
-                    with self.results_lock:
-                        self.results["result"].append(result["raw_result"])
-                        if result["check"]["ok"]:
-                            self.results["success"] += 1
-                        else:
+                    except Exception as e:
+                        import traceback
+                        print(f"  [check ERROR] _id={rec.get('_id')} error={e}")
+                        print(traceback.format_exc())
+                        with self.results_lock:
                             self.results["failed"] += 1
                             self.results["errors"].append({
                                 "id": rec.get('_id'),
-                                "error": result["raw_result"].get("msg")
+                                "error": str(e)
                             })
-
-                except Exception as e:
-                    import traceback
-                    print(f"  [check ERROR] _id={rec.get('_id')} error={e}")
-                    print(traceback.format_exc())
-                    with self.results_lock:
-                        self.results["failed"] += 1
-                        self.results["errors"].append({
-                            "id": rec.get('_id'),
-                            "error": str(e)
-                        })
 
         return checks_by_rondin
 
@@ -11887,7 +11892,7 @@ class Accesos(OcrMixin, AccesosModel):
         try:
             metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_RONDINES)
             metadata.update({
-                'id': rondin_id,
+                'id': str(self.get_valid_object_id(rondin_id)),
                 "properties": {
                     "device_properties": {
                         "System": "Script",
@@ -12144,7 +12149,7 @@ class Accesos(OcrMixin, AccesosModel):
                 {"$match": {
                     "deleted_at": {"$exists": False},
                     "form_id": self.BITACORA_RONDINES,
-                    "connection_record_id": ObjectId(record_id)
+                    "connection_record_id": self.get_valid_object_id(record_id)
                 }},
                 {"$sort": {"updated_at": -1}},
                 {"$limit": 1},
@@ -12340,7 +12345,8 @@ class Accesos(OcrMixin, AccesosModel):
                 }
             },
         })
-        metadata.update({"id": data.id})
+        # LinkaForm usa este id como _id de mongo, debe ser un ObjectId valido (24 hex)
+        metadata.update({"id": str(self.get_valid_object_id(data.id))})
         if isinstance(data.get('geolocation'), dict):
             metadata.update({'geolocation': [data.get('geolocation').get('long'), data.get('geolocation').get('lat')]})
 
@@ -12413,7 +12419,7 @@ class Accesos(OcrMixin, AccesosModel):
     def create_inspeccion(self, data, form_id):
         record = data.get('record',{})
         answers = {}
-        metadata = self.lkf_api.get_metadata(form_id=form_id)
+        metadata = self.lkf_api.get_metaq data(form_id=form_id)
         metadata.update({
             "properties": {
                 "device_properties":{
@@ -12441,7 +12447,8 @@ class Accesos(OcrMixin, AccesosModel):
             self.mf['ubicacion']: ubicacion,
             self.mf['nombre_area']: area
         }
-
+        comments = {}
+        media = {}
 
         for item in inspeccion:
             field_id = item.get('field_id')
@@ -12451,44 +12458,59 @@ class Accesos(OcrMixin, AccesosModel):
                 for idx, item in enumerate(value) if isinstance(value, list) else []:
                     value[idx] = item.lower().replace(' ', '_')
             elif field_type == 'radio':
-                value = value.lower().replace(' ', '_')
+                if value:
+                    value = value.lower().replace(' ', '_')
             answers[field_id] = value
+            answers[field_id] = value
+            #sets comments
+            comentario = item.get('comentario',[])
+            if comentario:
+                if type(comentario) == list:
+                    comments[field_id] = [self.set_comment_metadata(x) for x in comentario]
+                else:            
+                    comments[field_id] = [self.set_comment_metadata(comentario), ]
+            #sets media
+            foto = item.get('foto',[])
+            if foto:
+                media[field_id] = self.set_media_metadata(foto) 
 
         metadata.update({'answers':answers})
-        res = self.lkf_api.post_forms_answers(metadata)
-        return res
+        if comments:
+            metadata.update({'comments':comments})
+        if media:
+            metadata.update({'media':media})
 
-    def insert_images_and_comments_into_inspeccion(self, record, form_id, record_id):
+        print('va a crear la inpseccion...')
+        res = self.lkf_api.post_forms_answers(metadata)
+        return res, metadata
+
+    def insert_images_and_comments_into_inspeccion(self, metadata, form_id, record_id):
         """
         Insert images and comments into inspeccion
         """
-        images = {}
-        comments = {}
-        data = record.get('record', {})
-        inspection = data.get('inspeccion', [])
-        for question in inspection:
-            if question.get('field_id'):
-                if question.get('foto'):
-                    images.update({
-                        question.get('field_id'): question.get('foto')
-                    })
-                if question.get('comentario'):
-                    comments.update({
-                        question.get('field_id'): question.get('comentario')
-                    })
-
-        if not images and not comments:
+        media = metadata.get('media')
+        comments = metadata.get('comments')
+        if not media and not comments:
             return False
 
-        update_fields = {
-            "images": images,
-            "comments": comments
-        }
-        update_db = self.cr.update_one({
+        query = {
             '_id': ObjectId(record_id),
             'form_id': form_id,
             'deleted_at': {'$exists': False}
-        },{'$set':update_fields})
+        }
+        # Primero se revisa si el back ya guardo el media y los comments
+        current = self.cr.find_one(query, {'media': 1, 'comments': 1}) or {}
+        update_fields = {}
+        if media and not current.get('media'):
+            update_fields['media'] = media
+        if comments and not current.get('comments'):
+            update_fields['comments'] = comments
+
+        if not update_fields:
+            print('inspeccion ya tiene media y comments, no se actualiza')
+            return True
+
+        update_db = self.cr.update_one(query, {'$set': update_fields})
 
         db_res = update_db.raw_result
         print('db_res_inspeccion=',db_res)
@@ -13249,9 +13271,7 @@ class Accesos(OcrMixin, AccesosModel):
             "form_id": self.AREAS_DE_LAS_UBICACIONES,
         }
         if record_id:
-            if not ObjectId.is_valid(str(record_id)):
-                return {}
-            match_query.update({'_id': ObjectId(str(record_id))})
+            match_query.update({'_id': self.get_valid_object_id(record_id)})
         if ubicacion:
             match_query.update({
             f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.configuracion_area['ubicacion']}": ubicacion
@@ -13484,7 +13504,7 @@ class Accesos(OcrMixin, AccesosModel):
             },
         })
         if force_id:
-            metadata.update({'id': force_id})
+            metadata.update({'id': str(self.get_valid_object_id(force_id))})
         metadata.update({'answers':answers})
         response = self.lkf_api.post_forms_answers(metadata)
         return response
@@ -13731,7 +13751,7 @@ class Accesos(OcrMixin, AccesosModel):
             self.process_area_record,
             max_workers=10
         )
-        print(f"[sync_records] Areas procesadas: {len(area_results)}")
+        print(f"[sync_areas] Areas procesadas: {len(area_results)}")
 
         #todo
         if grouped_records.get('incidencia'):
@@ -13739,8 +13759,8 @@ class Accesos(OcrMixin, AccesosModel):
 
         # 1. primero checks
         check_records = grouped_records.get('check_area', [])
-        print(f"\n[sync_records] --- STAGE 1: check_area ({len(check_records)} registros) ---")
-        checks_by_rondin = self.process_check_area_stage(check_records)
+        print(f"\n[sync_areas] --- STAGE 1: check_area ({len(check_records)} registros) ---")
+        checks_by_rondin = self.process_check_area_stage(check_records, threading=True)
         print(f"[sync_records] checks_by_rondin keys: {list(checks_by_rondin.keys())}")
         for rid, cks in checks_by_rondin.items():
             ok = [c for c in cks if c.get('ok')]
