@@ -12419,7 +12419,7 @@ class Accesos(OcrMixin, AccesosModel):
     def create_inspeccion(self, data, form_id):
         record = data.get('record',{})
         answers = {}
-        metadata = self.lkf_api.get_metaq data(form_id=form_id)
+        metadata = self.lkf_api.get_metadata(form_id=form_id)
         metadata.update({
             "properties": {
                 "device_properties":{
@@ -12472,7 +12472,7 @@ class Accesos(OcrMixin, AccesosModel):
             #sets media
             foto = item.get('foto',[])
             if foto:
-                media[field_id] = self.set_media_metadata(foto) 
+                media[field_id] = [self.set_media_metadata(foto), ]
 
         metadata.update({'answers':answers})
         if comments:
@@ -12498,19 +12498,26 @@ class Accesos(OcrMixin, AccesosModel):
             'form_id': form_id,
             'deleted_at': {'$exists': False}
         }
-        # Primero se revisa si el back ya guardo el media y los comments
+        # Primero se revisa que ya tenga el back guardado. media y comments son
+        # {field_id: [entrada, ...]}, una entrada por usuario/fecha, asi que se
+        # compara por campo y solo se agregan las entradas (por su `data`) que falten.
         current = self.cr.find_one(query, {'media': 1, 'comments': 1}) or {}
-        update_fields = {}
-        if media and not current.get('media'):
-            update_fields['media'] = media
-        if comments and not current.get('comments'):
-            update_fields['comments'] = comments
+        push_fields = {}
+        for key, sent in (('media', media), ('comments', comments)):
+            for field_id, entries in (sent or {}).items():
+                saved = (current.get(key) or {}).get(field_id) or []
+                if isinstance(saved, dict):
+                    saved = [saved]
+                saved_data = [x.get('data') for x in saved]
+                missing = [x for x in entries if x.get('data') not in saved_data]
+                if missing:
+                    push_fields[f'{key}.{field_id}'] = {'$each': missing}
 
-        if not update_fields:
+        if not push_fields:
             print('inspeccion ya tiene media y comments, no se actualiza')
             return True
 
-        update_db = self.cr.update_one(query, {'$set': update_fields})
+        update_db = self.cr.update_one(query, {'$push': push_fields})
 
         db_res = update_db.raw_result
         print('db_res_inspeccion=',db_res)
