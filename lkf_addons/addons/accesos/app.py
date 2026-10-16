@@ -7510,16 +7510,20 @@ class Accesos(OcrMixin, AccesosModel):
         return data
 
     def get_pass_img(self, qr_code):
-        answers = {}
         pdf_to_img = self.update_pass_img(qr_code)
         if pdf_to_img:
-            answers.update({self.pase_entrada_fields['pdf_to_img']: pdf_to_img})
-            response = self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
-            if response.get('status_code') in [200, 201, 202]:
+            #---$set directo a Mongo y no patch_multi_record: el patch cuenta como
+            #   edicion y vuelve a disparar los flujos de correo/SMS del pase
+            #   (pre registro con el pase en proceso) -> doble correo (2610-1398).
+            res = self.cr.update_one(
+                {'_id': ObjectId(qr_code), 'form_id': self.PASE_ENTRADA, 'deleted_at': {'$exists': False}},
+                {'$set': {f"answers.{self.pase_entrada_fields['pdf_to_img']}": pdf_to_img}}
+            )
+            if res.matched_count:
                 url = self.unlist(pdf_to_img).get('file_url') if len(pdf_to_img) > 0 else ''
                 return url
             else:
-                print('=============', response)
+                print('=============', qr_code)
                 self.LKFException({'title': 'Error', 'msg': 'Hubo un error al actualizar los registros.'})
         return False
 
