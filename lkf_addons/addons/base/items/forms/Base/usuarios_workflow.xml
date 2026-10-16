@@ -88,7 +88,7 @@
             margin: 0;
             padding: 0;
         }
-        .container-main-soter {
+        .container-main-clave10 {
             max-width: 600px;
             margin: 20px auto;
             background: #ffffff;
@@ -153,21 +153,20 @@
 &lt;/head&gt;
 &lt;body&gt;
     &lt;div class="contenedor-principal"&gt;
-        &lt;div class="container-main-soter"&gt;
+        &lt;div class="container-main-clave10"&gt;
             &lt;!-- Encabezado --&gt;
             &lt;div class="header"&gt;
-                &lt;h1&gt;¡Bienvenido a Soter! 🎉&lt;/h1&gt;
+                &lt;h1&gt;¡Bienvenido a Clave10! 🎉&lt;/h1&gt;
             &lt;/div&gt;
 
             &lt;!-- Contenido --&gt;
             &lt;div class="content"&gt;
-                &lt;p&gt;¡Nos alegra darte la bienvenida a &lt;a href="https://www.soter.mx/" target="_blank"&gt;Soter&lt;/a&gt;, tu sistema de seguridad patrimonial! Para activar tu cuenta, por favor cambia tu contraseña e inicia sesión en el siguiente enlace:&lt;/p&gt;
-                &lt;a href="https://app.soter.mx/update_pass.html?userUsername={{ record.answers.6759e4a7a9a6e13c7b26da33 }}" target="_blank" class="cta-button"&gt;Activar Cuenta&lt;/a&gt;
+                &lt;p&gt;¡Nos alegra darte la bienvenida a &lt;a href="https://www.clave10.com/" target="_blank"&gt;Clave10&lt;/a&gt;, tu sistema de seguridad patrimonial! Para activar tu cuenta, crea tu contraseña en el siguiente enlace:&lt;/p&gt;
+                &lt;a href="{{ record.answers.6a2f1c0e5b3d4a7c9e8f1a02 }}" target="_blank" class="cta-button"&gt;Activar Cuenta&lt;/a&gt;
                 &lt;br&gt;
-                &lt;p style="text-align: left; margin: 0;"&gt;Tus credenciales de accesos son:&lt;/p&gt;
+                &lt;p style="text-align: left; margin: 0;"&gt;Tu usuario es:&lt;/p&gt;
                 &lt;br&gt;
                 &lt;p style="text-align: left; margin: 0;"&gt;&lt;b&gt;Usuario:&lt;/b&gt; {{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/p&gt;
-                &lt;p style="text-align: left; margin: 0;"&gt;&lt;b&gt;Contraseña Temporal:&lt;/b&gt; {{ record.answers.67be0b7896e72a692b4fa660 }}&lt;/p&gt;
                 
                 &lt;p&gt;Para ayudarte a familiarizarte con la plataforma, hemos preparado un manual de usuario. Puedes revisarlo &lt;a href="https://docs.linkaform.com/Soter/App/index.html" target="_blank" style="color: #021d49; font-weight: bold; text-decoration: none"&gt;aquí&lt;/a&gt;.&lt;/p&gt;
                 &lt;p&gt;Si tienes alguna duda, nuestro equipo está listo para ayudarte.&lt;/p&gt;
@@ -176,7 +175,7 @@
 
             &lt;!-- Pie de página --&gt;
             &lt;div class="footer"&gt;
-                &lt;p&gt;&amp;copy; 2024 &lt;a href="https://www.soter.mx/" target="_blank"&gt;Soter&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
+                &lt;p&gt;&amp;copy; 2024 &lt;a href="https://www.clave10.com/" target="_blank"&gt;Clave10&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
             &lt;/div&gt;
         &lt;/div&gt;
     &lt;/div&gt;
@@ -196,8 +195,8 @@
                         <resend>RESEND</resend>
                         <send_attachments>False</send_attachments>
                         <send_pdf>False</send_pdf>
-                        <sender>donotreply@soter.mx</sender>
-                        <subject>{% raw %} 📢 ¡Bienvenido! Empieza a usar Soter hoy mismo. {% endraw %}</subject>
+                        <sender>donotreply@clave10.com</sender>
+                        <subject>{% raw %} 📢 ¡Bienvenido! Empieza a usar Clave10 hoy mismo. {% endraw %}</subject>
                         <timer_config>
                             <seconds_to_expire>None</seconds_to_expire>
                         </timer_config>
@@ -228,8 +227,8 @@
                 <record>
                     <created>True</created>
                     <deleted>False</deleted>
-                    <edited>True</edited>
-                    <run_multiple_times>True</run_multiple_times>
+                    <edited>False</edited>
+                    <run_multiple_times>False</run_multiple_times>
                     <runtime>after</runtime>
                 </record>
                 <wf_fields>
@@ -247,7 +246,7 @@
                                 <label>Estatus</label>
                                 <type>select</type>
                             </trigger_field>
-                            <value>crear</value>
+                            <value>creado</value>
                         </item>
                     </triggers>
                 </wf_fields>

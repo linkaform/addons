@@ -37,7 +37,7 @@ Si tienes más de una aplicación, puedes:
 
 # Importaciones necesarias
 import simplejson, importlib
-import hashlib, re, os, time, zipfile, wget, random, shutil, datetime, unicodedata
+import hashlib, re, os, time, secrets, zipfile, wget, random, shutil, datetime, unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from bson.objectid import ObjectId
 from datetime import timedelta
@@ -63,18 +63,23 @@ month_dict = {
 
 class Base(BaseModel):
 
+    WEB_URL = 'https://web.clave10.com'
+
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
     def create_user_account(self, user_data):
-        if user_data.get(self.f['new_user_status']) == 'creado':
+        if user_data.get(self.f['new_user_status']) in ('creado', 'activado'):
             return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
 
         complete_name = user_data.get(self.f['new_user_complete_name'])
         email = user_data.get(self.f['new_user_email'])
         username = user_data.get(self.f['new_user_username'])
         phone = user_data.get(self.f['new_user_phone'])
-        password = user_data.get(self.f['new_user_temp_password'])
+        # La contraseña la fija el propio usuario con el enlace del correo
+        # (set_user_password en lkf-sanic-apps). Aqui solo se crea una
+        # aleatoria que nadie ve, porque create_user la exige.
+        password = secrets.token_urlsafe(24)
         position = user_data.get(self.f['new_user_position'], '')
 
         body_request = {
@@ -109,8 +114,27 @@ class Base(BaseModel):
             recent_users = self.lkf_api.get_updated_users(created_epoch)
             new_user_id = next((u.get('id') for u in recent_users if u.get('username') == username), None)
             if new_user_id:
+                # Token de un solo uso para fijar la contraseña. El enlace lleva
+                # record_id y token; el script que lo recibe activa al usuario,
+                # borra el token y pasa el registro a 'activado'. user=<parent_id> es la cuenta
+                # con la que corre el flujo publico (igual que los pases).
+                token = secrets.token_urlsafe(32)
                 user_data[self.f['new_user_id']] = new_user_id
+                user_data[self.f['new_user_token']] = token
+                user_data[self.f['new_user_link']] = (
+                    f"{self.WEB_URL}/auth/set-password?record_id={self.record_id}"
+                    f"&user={self.user.get('parent_id')}&token={token}")
                 user_data[self.f['new_user_status']] = 'creado'
+        else:
+            # Antes el fallo se tragaba en silencio: el script regresaba 101,
+            # el registro se guardaba y el workflow de correo (runtime "after",
+            # disparado por estatus "crear") mandaba el mail de bienvenida de
+            # un usuario que nunca se creo. Lanzar la excepcion aborta el guardado.
+            self.LKFException({
+                'title': 'No se pudo crear el usuario',
+                'msg': f"LinkaForm respondio {response.get('status_code')}: {response.get('data') or response}",
+                'status_code': response.get('status_code') or 400,
+            })
         return response
 
     def get_couch_user_db(self, db_name):

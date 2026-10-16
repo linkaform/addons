@@ -57,14 +57,6 @@
             <fields_ruled>
                 <item>
                     <catalog_id>None</catalog_id>
-                    <field_id>67be0b7896e72a692b4fa660</field_id>
-                    <group_id>None</group_id>
-                    <id>67be0b7896e72a692b4fa660</id>
-                    <label>Contraseña Temporal</label>
-                    <type>password</type>
-                </item>
-                <item>
-                    <catalog_id>None</catalog_id>
                     <field_id>67be0c43a31e5161c47f2bba</field_id>
                     <group_id>None</group_id>
                     <id>67be0c43a31e5161c47f2bba</id>
@@ -84,6 +76,72 @@
             <name>Regla 2</name>
             <operator>and</operator>
             <rule_id>d956212371189a</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>679d023876ad7f5ba642f4ed</field_id>
+                        <group_id>None</group_id>
+                        <id>679d023876ad7f5ba642f4ed</id>
+                        <label>Estatus</label>
+                        <type>select</type>
+                    </field>
+                    <value>crear</value>
+                </item>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>679d023876ad7f5ba642f4ed</field_id>
+                        <group_id>None</group_id>
+                        <id>679d023876ad7f5ba642f4ed</id>
+                        <label>Estatus</label>
+                        <type>select</type>
+                    </field>
+                    <value>creado</value>
+                </item>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>679d023876ad7f5ba642f4ed</field_id>
+                        <group_id>None</group_id>
+                        <id>679d023876ad7f5ba642f4ed</id>
+                        <label>Estatus</label>
+                        <type>select</type>
+                    </field>
+                    <value>activado</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6a2f1c0e5b3d4a7c9e8f1a01</field_id>
+                    <group_id>None</group_id>
+                    <id>6a2f1c0e5b3d4a7c9e8f1a01</id>
+                    <label>Token de activacion</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6a2f1c0e5b3d4a7c9e8f1a02</field_id>
+                    <group_id>None</group_id>
+                    <id>6a2f1c0e5b3d4a7c9e8f1a02</id>
+                    <label>Enlace de activacion</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 3</name>
+            <operator>or</operator>
+            <rule_id>a3f9c27d51e08b4</rule_id>
             <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
