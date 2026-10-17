@@ -145,5 +145,39 @@
             <rule_type>invisible</rule_type>
             <user_conditions>{}</user_conditions>
         </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6a30a1b2c3d4e5f607182901</field_id>
+                        <group_id>None</group_id>
+                        <id>6a30a1b2c3d4e5f607182901</id>
+                        <label>Empleado</label>
+                        <type>select</type>
+                    </field>
+                    <value>ligar_empleado</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6a30a1b2c3d4e5f607182902</field_id>
+                    <group_id>None</group_id>
+                    <id>6a30a1b2c3d4e5f607182902</id>
+                    <label>Nombre del empleado a ligar</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Regla 4</name>
+            <operator>and</operator>
+            <rule_id>b7d2e4f60a1c93e</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
     </rules>
 </lkf>

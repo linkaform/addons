@@ -123,6 +123,8 @@ class BaseModel(base.LKF_Base):
             'grupo_roles':'6a46f1d3b89f9975dfd0bae8',
             'new_user_complete_name':'638a9a7767c332f5d459fc81',
             'new_user_email':'638a9a7767c332f5d459fc82',
+            'new_user_empleado':'6a30a1b2c3d4e5f607182901',
+            'new_user_empleado_nombre':'6a30a1b2c3d4e5f607182902',
             'new_user_link':'6a2f1c0e5b3d4a7c9e8f1a02',
             'new_user_id':'638a9a99616398d2e392a9f5',
             'new_user_phone':'67be0c43a31e5161c47f2bba',

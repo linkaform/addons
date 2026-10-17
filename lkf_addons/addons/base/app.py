@@ -65,6 +65,10 @@ class Base(BaseModel):
 
     WEB_URL = 'https://web.clave10.com'
 
+    # Opciones del campo "Empleado" del form Usuarios
+    EMPLEADO_CREAR = 'crear_empleado'
+    EMPLEADO_LIGAR = 'ligar_empleado'
+
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
@@ -75,6 +79,16 @@ class Base(BaseModel):
         complete_name = user_data.get(self.f['new_user_complete_name'])
         email = user_data.get(self.f['new_user_email'])
         username = user_data.get(self.f['new_user_username'])
+        empleado_opt = user_data.get(self.f['new_user_empleado'])
+        # Si hay que ligar a un empleado existente se valida ANTES de crear el
+        # usuario: si no existe (o hay varios) no debe quedar un usuario huerfano.
+        # El empleado y Configuracion Accesos se crean DESPUES (fase 2, ver
+        # setup_user_employee, al activarse el usuario): el bloque Usuario de esos
+        # forms es un catalogo y LinkaForm rechaza ("No es una respuesta valida")
+        # valores que aun no estan en el, y el catalogo se llena desde el registro
+        # de Usuarios una vez guardado.
+        if empleado_opt == self.EMPLEADO_LIGAR:
+            self._find_employee_to_link(user_data.get(self.f['new_user_empleado_nombre']))
         phone = user_data.get(self.f['new_user_phone'])
         # La contraseña la fija el propio usuario con el enlace del correo
         # (set_user_password en lkf-sanic-apps). Aqui solo se crea una
@@ -136,6 +150,135 @@ class Base(BaseModel):
                 'status_code': response.get('status_code') or 400,
             })
         return response
+
+    def _ensure_employee_modules(self):
+        """ self.Employee/self.Accesos los carga base_utils; si el script no los
+        cargo, se cargan aqui. """
+        if not getattr(self, 'Accesos', None):
+            self.load(module='Accesos', **self.kwargs)
+        if not getattr(self, 'Employee', None):
+            self.load(module='Employee', **self.kwargs)
+
+    def _find_employee_to_link(self, name):
+        """ Empleado existente que se va a ligar al usuario nuevo. Se busca por
+        nombre EXACTO; sin coincidencia o con varias se detiene el alta. """
+        self._ensure_employee_modules()
+        name = (name or '').strip()
+        if not name:
+            self.LKFException({'title': 'Empleado', 'status_code': 400,
+                'msg': 'Escribe el nombre completo del empleado a ligar.'})
+        found = self.Employee.get_employee_data(name=name, active=False) or []
+        if not found:
+            self.LKFException({'title': 'Empleado', 'status_code': 400,
+                'msg': f'No existe un empleado con el nombre "{name}". Debe coincidir exactamente.'})
+        if len(found) > 1:
+            self.LKFException({'title': 'Empleado', 'status_code': 400,
+                'msg': f'Hay {len(found)} empleados con el nombre "{name}"; no se puede ligar sin ambigüedad.'})
+        return found[0]
+
+    def _employee_user_answers(self, name, email, username, user_id):
+        """ Bloque del catalogo Usuarios dentro del form Empleados.
+
+        Forma que guarda LinkaForm en los empleados reales: el Nombre (el
+        catalog-select) va como texto y los catalog-detail (Email, Username, Id)
+        como LISTA. Mandar Email/Username como texto se rechaza con "No es una
+        respuesta valida". """
+        return {
+            self.USUARIOS_OBJ_ID: {
+                self.f['new_user_complete_name']: name,
+                self.f['new_user_email']: [email],
+                self.f['new_user_username']: [username],
+                self.f['new_user_id']: [user_id],
+            }
+        }
+
+    CATALOG_NOT_READY = 'No es una respuesta valida'
+    CATALOG_RETRIES = 3
+    CATALOG_WAIT = 3
+
+    def _retry_catalog(self, call):
+        """ Reintenta mientras LinkaForm diga que el valor de catalogo aun no
+        existe: el catalogo se sincroniza con un workflow asincrono tras guardar
+        el registro origen. """
+        res = {}
+        for attempt in range(self.CATALOG_RETRIES):
+            res = call()
+            if res.get('status_code') in (200, 201, 202):
+                return res
+            detail = str(res.get('json') or res.get('data') or '')
+            if self.CATALOG_NOT_READY not in detail:
+                return res
+            time.sleep(self.CATALOG_WAIT)
+        return res
+
+    def setup_user_employee(self, user_data):
+        """ Fase 2 del alta (workflow "after" cuando el usuario fija su contraseña
+        y el registro pasa a 'activado'): crea o liga el empleado y crea su
+        Configuracion Accesos. Hasta entonces el registro de Usuarios lleva
+        tiempo guardado y su catalogo ya esta sincronizado. """
+        option = user_data.get(self.f['new_user_empleado'])
+        if user_data.get(self.f['new_user_status']) != 'activado' or \
+                option not in (self.EMPLEADO_CREAR, self.EMPLEADO_LIGAR):
+            return {'skipped': True}
+        employee = None
+        if option == self.EMPLEADO_LIGAR:
+            employee = self._find_employee_to_link(user_data.get(self.f['new_user_empleado_nombre']))
+        self._setup_employee_and_access(
+            option, employee,
+            user_data.get(self.f['new_user_complete_name']),
+            user_data.get(self.f['new_user_email']),
+            user_data.get(self.f['new_user_username']),
+            self.unlist(user_data.get(self.f['new_user_id'])))
+        return {'skipped': False}
+
+    def _setup_employee_and_access(self, option, employee, name, email, username, user_id):
+        """ Crea (o liga) el registro de Empleados del usuario nuevo y su
+        Configuracion Accesos con todos los permisos.
+
+        Corre en la fase 2, con el usuario y su registro ya guardados; si algo
+        falla se avisa con su user_id para completarlo a mano.
+        """
+        self._ensure_employee_modules()
+        emp_f = self.Employee.employee_fields
+        user_answers = self._employee_user_answers(name, email, username, user_id)
+
+        def fail(step, res):
+            self.LKFException({
+                'title': 'Usuario creado, falta completarlo', 'status_code': 400,
+                'msg': f'El usuario {username} (id {user_id}) se creó en LinkaForm, pero falló '
+                       f'{step}: {res.get("status_code")} {res.get("json") or res.get("data")}'})
+
+        if option == self.EMPLEADO_CREAR:
+            metadata = self.lkf_api.get_metadata(form_id=self.Employee.EMPLEADOS)
+            answers = {
+                emp_f['worker_name']: name,
+                # get_employee_data solo trae empleados 'activo' por default
+                emp_f['estatus_dentro_empresa']: 'activo',
+            }
+            answers.update(user_answers)
+            metadata.update({'answers': answers})
+            res = self._retry_catalog(lambda: self.lkf_api.post_forms_answers(metadata))
+            if res.get('status_code') not in (200, 201, 202):
+                fail('la creación del registro de empleado', res)
+        else:
+            employee_id = employee.get('_id') or employee.get('record_id')
+            res = self._retry_catalog(lambda: self.lkf_api.patch_multi_record(
+                answers=user_answers, form_id=self.Employee.EMPLEADOS, record_id=[str(employee_id)]))
+            if res.get('status_code') not in (200, 201, 202):
+                fail('la actualización del empleado existente', res)
+
+        # Configuracion Accesos: con empleado y con TODOS los menus (los 9 del form).
+        metadata = self.lkf_api.get_metadata(form_id=self.Accesos.CONF_ACCESOS)
+        metadata.update({'answers': {
+            self.Accesos.EMPLOYEE_OBJ_ID: {
+                self.Accesos.mf['username']: username,
+                self.Accesos.mf['id_usuario']: [user_id],
+            },
+            self.Accesos.conf_accesos_fields['menus']: list(self.Accesos.PERMISSION_MODULE_MAP.keys()),
+        }})
+        res = self._retry_catalog(lambda: self.lkf_api.post_forms_answers(metadata))
+        if res.get('status_code') not in (200, 201, 202):
+            fail('la creación de Configuración Accesos', res)
 
     def get_couch_user_db(self, db_name):
         """
