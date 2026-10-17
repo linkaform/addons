@@ -169,14 +169,26 @@ class FormResource(items.Items):
             file_name = file_name.split('.')[0]
             rules_model = self.load_module_template_file(path, file_name)
             print('Installing Rules: ',file_name )
+            res = {}
             # res = self.lkf.install_workflows(module, workflow_model, 'update')
             if action == 'create':
                 res = self.lkf_api.upload_rules(rules_model, 'POST')
             elif action =='update':
-                #TODO porque da un 500?? dice como que form_id esta repetido
+                # El <id> del XML es el del documento de reglas de la cuenta donde se
+                # creo; en las demas el POST genera otro id. El PATCH con el id del XML
+                # da 404, el fallback a POST da 500 (form_id repetido) y las reglas
+                # nunca se actualizaban, sin ningun aviso. Se usa el id que ya tiene
+                # el form en esta cuenta.
+                existing = self.lkf_api.get_form_rules(rules_model.get('form_id'))
+                if isinstance(existing, list) and existing:
+                    existing_id = existing[0].get('id') or existing[0].get('_id')
+                    if existing_id:
+                        rules_model['id'] = existing_id
                 res = self.lkf_api.upload_rules(rules_model, 'PATCH')
                 if res.get('status_code') == 404:
                     res = self.lkf_api.upload_rules(rules_model, 'POST')
+            if res.get('status_code') not in (200, 201, 202, 204):
+                print(f'Error subiendo las reglas {file_name}: status={res.get("status_code")} {res.get("data") or res.get("json")}')
             #res = self.lkf_api.upload_rules(rules_model, 'PATCH')
 
     def install_forms(self, instalable_forms, **kwargs):
