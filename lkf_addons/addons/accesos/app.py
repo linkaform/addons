@@ -9975,6 +9975,11 @@ class Accesos(OcrMixin, AccesosModel):
                 status = status_auto
             else:
                 status = self.access_pass_set_status(new_answers, requerimientos=requerimientos)
+            #---Editar un pase activo (agregar equipo, vehiculo, etc.) no lo regresa a
+            #   proceso: ya se valido al activarse. Solo la fecha lo puede vencer.
+            estatus_previo = str(self.unlist(pass_selected['answers'].get(status_field)) or '').strip().lower()
+            if estatus_previo == 'activo' and status == 'proceso':
+                status = 'activo'
             answers[status_field] = status
 
             print("DEBUG UPDATE_PASS payload a enviar:", answers)
