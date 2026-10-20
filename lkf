@@ -196,6 +196,17 @@ _start_addons(){
 
 }
 
+_pull_base(){
+  # Solo baja la base si no existe local o si se fuerza con PULL_BASE=1. Un pull
+  # incondicional pisa la base recien construida con `build base` por la publicada
+  # en Docker Hub (que puede ser de otra version de Python).
+  if [ "${PULL_BASE:-0}" = "1" ] || ! docker image inspect linkaform/addons:base >/dev/null 2>&1; then
+    docker pull linkaform/addons:base
+  else
+    echo "Usando linkaform/addons:base local (PULL_BASE=1 para bajarla de Docker Hub)"
+  fi
+}
+
 _build(){
   echo "Environment: " $1
 
@@ -203,9 +214,9 @@ _build(){
     base)
       cd docker
       if [ "$NOCACHE" = "1" ]; then
-        docker compose build lkf-addons-base
-      else
         docker compose build --no-cache lkf-addons-base
+      else
+        docker compose build lkf-addons-base
       fi
      if [ "$UPLOAD" = "1" ]; then
         docker push linkaform/addons:base
@@ -213,7 +224,7 @@ _build(){
     ;;
     dev)
       cd docker
-      docker pull linkaform/addons:base
+      _pull_base
       if [ "$NOCACHE" = "1" ]; then
         docker compose build --no-cache lkf-addons
       else
@@ -225,17 +236,16 @@ _build(){
     ;;
     local)
       cd docker
-      docker pull linkaform/addons:base
+      _pull_base
       if [ "$NOCACHE" = "1" ]; then
         docker compose -f docker-prod.yml build --no-cache
       else
         docker compose -f docker-prod.yml build
+      fi
       docker tag linkaform/addons:latest linkaform/addons:develop
       if [ "$UPLOAD" = "1" ]; then
         echo 'UPLOADING IMAGE: linkaform/addons:develop'
         docker push linkaform/addons:develop
-      fi  
-
       fi
       for CONTAINER_ID in $(docker ps | grep addons | awk '{print $1}') 
       do
@@ -247,10 +257,10 @@ _build(){
       #docker pull linkaform/addons:develop
       git pull origin master
       cd docker
-      if [ "$NOCACHE" != "0" ]; then
-        docker compose -f docker-prod.yml build
-      else
+      if [ "$NOCACHE" = "1" ]; then
         docker compose -f docker-prod.yml build --no-cache
+      else
+        docker compose -f docker-prod.yml build
       fi
       if [ "$UPLOAD" = "1" ]; then
         docker push linkaform/addons:latest
@@ -259,10 +269,10 @@ _build(){
     preprod)
       #docker pull linkaform/addons:develop
       cd docker
-      if [ "$NOCACHE" != "0" ]; then
-        docker compose -f docker-prod.yml build
-      else
+      if [ "$NOCACHE" = "1" ]; then
         docker compose -f docker-prod.yml build --no-cache
+      else
+        docker compose -f docker-prod.yml build
       fi
       echo "Nameing image:  linkaform/addons:develop"
       docker tag linkaform/addons:latest linkaform/addons:develop
@@ -274,9 +284,9 @@ _build(){
     test)
       cd test/docker
       if [ "$NOCACHE" = "1" ]; then
-        docker compose build lkf-test
-      else
         docker compose build --no-cache lkf-test
+      else
+        docker compose build lkf-test
       fi
      if [ "$UPLOAD" = "1" ]; then
         docker push linkaform/lkf_test:develop

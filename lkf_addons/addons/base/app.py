@@ -37,7 +37,7 @@ Si tienes más de una aplicación, puedes:
 
 # Importaciones necesarias
 import simplejson, importlib
-import re, os, time, zipfile, wget, random, shutil, datetime, unicodedata
+import hashlib, re, os, time, secrets, zipfile, wget, random, shutil, datetime, unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from bson.objectid import ObjectId
 from datetime import timedelta
@@ -63,18 +63,37 @@ month_dict = {
 
 class Base(BaseModel):
 
+    WEB_URL = 'https://web.clave10.com'
+
+    # Opciones del campo "Empleado" del form Usuarios
+    EMPLEADO_CREAR = 'crear_empleado'
+    EMPLEADO_LIGAR = 'ligar_empleado'
+
     def __init__(self, settings, folio_solicitud=None, sys_argv=None, use_api=False, **kwargs):
        super().__init__(settings, sys_argv=sys_argv, use_api=use_api, **kwargs)
 
     def create_user_account(self, user_data):
-        if user_data.get(self.f['new_user_status']) == 'creado':
+        if user_data.get(self.f['new_user_status']) in ('creado', 'activado'):
             return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
 
         complete_name = user_data.get(self.f['new_user_complete_name'])
         email = user_data.get(self.f['new_user_email'])
         username = user_data.get(self.f['new_user_username'])
+        empleado_opt = user_data.get(self.f['new_user_empleado'])
+        # Si hay que ligar a un empleado existente se valida ANTES de crear el
+        # usuario: si no existe (o hay varios) no debe quedar un usuario huerfano.
+        # El empleado y Configuracion Accesos se crean DESPUES (fase 2, ver
+        # setup_user_employee, al activarse el usuario): el bloque Usuario de esos
+        # forms es un catalogo y LinkaForm rechaza ("No es una respuesta valida")
+        # valores que aun no estan en el, y el catalogo se llena desde el registro
+        # de Usuarios una vez guardado.
+        if empleado_opt == self.EMPLEADO_LIGAR:
+            self._find_employee_to_link(user_data.get(self.f['new_user_empleado_nombre']))
         phone = user_data.get(self.f['new_user_phone'])
-        password = user_data.get(self.f['new_user_temp_password'])
+        # La contraseña la fija el propio usuario con el enlace del correo
+        # (set_user_password en lkf-sanic-apps). Aqui solo se crea una
+        # aleatoria que nadie ve, porque create_user la exige.
+        password = secrets.token_urlsafe(24)
         position = user_data.get(self.f['new_user_position'], '')
 
         body_request = {
@@ -109,9 +128,157 @@ class Base(BaseModel):
             recent_users = self.lkf_api.get_updated_users(created_epoch)
             new_user_id = next((u.get('id') for u in recent_users if u.get('username') == username), None)
             if new_user_id:
+                # Token de un solo uso para fijar la contraseña. El enlace lleva
+                # record_id y token; el script que lo recibe activa al usuario,
+                # borra el token y pasa el registro a 'activado'. user=<parent_id> es la cuenta
+                # con la que corre el flujo publico (igual que los pases).
+                token = secrets.token_urlsafe(32)
                 user_data[self.f['new_user_id']] = new_user_id
+                user_data[self.f['new_user_token']] = token
+                user_data[self.f['new_user_link']] = (
+                    f"{self.WEB_URL}/auth/set-password?record_id={self.record_id}"
+                    f"&user={self.user.get('parent_id')}&token={token}")
                 user_data[self.f['new_user_status']] = 'creado'
+        else:
+            # Antes el fallo se tragaba en silencio: el script regresaba 101,
+            # el registro se guardaba y el workflow de correo (runtime "after",
+            # disparado por estatus "crear") mandaba el mail de bienvenida de
+            # un usuario que nunca se creo. Lanzar la excepcion aborta el guardado.
+            self.LKFException({
+                'title': 'No se pudo crear el usuario',
+                'msg': f"LinkaForm respondio {response.get('status_code')}: {response.get('data') or response}",
+                'status_code': response.get('status_code') or 400,
+            })
         return response
+
+    def _ensure_employee_modules(self):
+        """ self.Employee/self.Accesos los carga base_utils; si el script no los
+        cargo, se cargan aqui. """
+        if not getattr(self, 'Accesos', None):
+            self.load(module='Accesos', **self.kwargs)
+        if not getattr(self, 'Employee', None):
+            self.load(module='Employee', **self.kwargs)
+
+    def _find_employee_to_link(self, name):
+        """ Empleado existente que se va a ligar al usuario nuevo. Se busca por
+        nombre EXACTO; sin coincidencia o con varias se detiene el alta. """
+        self._ensure_employee_modules()
+        name = (name or '').strip()
+        if not name:
+            self.LKFException({'title': 'Empleado', 'status_code': 400,
+                'msg': 'Escribe el nombre completo del empleado a ligar.'})
+        found = self.Employee.get_employee_data(name=name, active=False) or []
+        if not found:
+            self.LKFException({'title': 'Empleado', 'status_code': 400,
+                'msg': f'No existe un empleado con el nombre "{name}". Debe coincidir exactamente.'})
+        if len(found) > 1:
+            self.LKFException({'title': 'Empleado', 'status_code': 400,
+                'msg': f'Hay {len(found)} empleados con el nombre "{name}"; no se puede ligar sin ambigüedad.'})
+        return found[0]
+
+    def _employee_user_answers(self, name, email, username, user_id):
+        """ Bloque del catalogo Usuarios dentro del form Empleados.
+
+        Forma que guarda LinkaForm en los empleados reales: el Nombre (el
+        catalog-select) va como texto y los catalog-detail (Email, Username, Id)
+        como LISTA. Mandar Email/Username como texto se rechaza con "No es una
+        respuesta valida". """
+        return {
+            self.USUARIOS_OBJ_ID: {
+                self.f['new_user_complete_name']: name,
+                self.f['new_user_email']: [email],
+                self.f['new_user_username']: [username],
+                self.f['new_user_id']: [user_id],
+            }
+        }
+
+    CATALOG_NOT_READY = 'No es una respuesta valida'
+    CATALOG_RETRIES = 3
+    CATALOG_WAIT = 3
+
+    def _retry_catalog(self, call):
+        """ Reintenta mientras LinkaForm diga que el valor de catalogo aun no
+        existe: el catalogo se sincroniza con un workflow asincrono tras guardar
+        el registro origen. """
+        res = {}
+        for attempt in range(self.CATALOG_RETRIES):
+            res = call()
+            if res.get('status_code') in (200, 201, 202):
+                return res
+            detail = str(res.get('json') or res.get('data') or '')
+            if self.CATALOG_NOT_READY not in detail:
+                return res
+            time.sleep(self.CATALOG_WAIT)
+        return res
+
+    def setup_user_employee(self, user_data):
+        """ Fase 2 del alta (workflow "after" cuando el usuario fija su contraseña
+        y el registro pasa a 'activado'): crea o liga el empleado y crea su
+        Configuracion Accesos. Hasta entonces el registro de Usuarios lleva
+        tiempo guardado y su catalogo ya esta sincronizado. """
+        option = user_data.get(self.f['new_user_empleado'])
+        if user_data.get(self.f['new_user_status']) != 'activado' or \
+                option not in (self.EMPLEADO_CREAR, self.EMPLEADO_LIGAR):
+            return {'skipped': True}
+        employee = None
+        if option == self.EMPLEADO_LIGAR:
+            employee = self._find_employee_to_link(user_data.get(self.f['new_user_empleado_nombre']))
+        self._setup_employee_and_access(
+            option, employee,
+            user_data.get(self.f['new_user_complete_name']),
+            user_data.get(self.f['new_user_email']),
+            user_data.get(self.f['new_user_username']),
+            self.unlist(user_data.get(self.f['new_user_id'])))
+        return {'skipped': False}
+
+    def _setup_employee_and_access(self, option, employee, name, email, username, user_id):
+        """ Crea (o liga) el registro de Empleados del usuario nuevo y su
+        Configuracion Accesos con todos los permisos.
+
+        Corre en la fase 2, con el usuario y su registro ya guardados; si algo
+        falla se avisa con su user_id para completarlo a mano.
+        """
+        self._ensure_employee_modules()
+        emp_f = self.Employee.employee_fields
+        user_answers = self._employee_user_answers(name, email, username, user_id)
+
+        def fail(step, res):
+            self.LKFException({
+                'title': 'Usuario creado, falta completarlo', 'status_code': 400,
+                'msg': f'El usuario {username} (id {user_id}) se creó en LinkaForm, pero falló '
+                       f'{step}: {res.get("status_code")} {res.get("json") or res.get("data")}'})
+
+        if option == self.EMPLEADO_CREAR:
+            metadata = self.lkf_api.get_metadata(form_id=self.Employee.EMPLEADOS)
+            answers = {
+                emp_f['worker_name']: name,
+                # get_employee_data solo trae empleados 'activo' por default
+                emp_f['estatus_dentro_empresa']: 'activo',
+            }
+            answers.update(user_answers)
+            metadata.update({'answers': answers})
+            res = self._retry_catalog(lambda: self.lkf_api.post_forms_answers(metadata))
+            if res.get('status_code') not in (200, 201, 202):
+                fail('la creación del registro de empleado', res)
+        else:
+            employee_id = employee.get('_id') or employee.get('record_id')
+            res = self._retry_catalog(lambda: self.lkf_api.patch_multi_record(
+                answers=user_answers, form_id=self.Employee.EMPLEADOS, record_id=[str(employee_id)]))
+            if res.get('status_code') not in (200, 201, 202):
+                fail('la actualización del empleado existente', res)
+
+        # Configuracion Accesos: con empleado y con TODOS los menus (los 9 del form).
+        metadata = self.lkf_api.get_metadata(form_id=self.Accesos.CONF_ACCESOS)
+        metadata.update({'answers': {
+            self.Accesos.EMPLOYEE_OBJ_ID: {
+                self.Accesos.mf['username']: username,
+                self.Accesos.mf['id_usuario']: [user_id],
+            },
+            self.Accesos.conf_accesos_fields['menus']: list(self.Accesos.PERMISSION_MODULE_MAP.keys()),
+        }})
+        res = self._retry_catalog(lambda: self.lkf_api.post_forms_answers(metadata))
+        if res.get('status_code') not in (200, 201, 202):
+            fail('la creación de Configuración Accesos', res)
 
     def get_couch_user_db(self, db_name):
         """
@@ -135,6 +302,97 @@ class Base(BaseModel):
 
         return db
 
+    def clean_db(self, status='received', batch_size=300):
+        """
+        Borra todos los registros con status 'received' en batches
+        """
+        total_deleted = 0
+
+        while True:
+            mango_query = {
+                "selector": {
+                    "status": status
+                },
+                "limit": batch_size,
+                "fields": ["_id", "_rev"]
+            }
+            if status == 'all':
+                mango_query = {
+                    "selector": {
+                        "_id": {"$gt":None}
+                    },
+                    "limit": batch_size,
+                    "fields": ["_id", "_rev"]
+                }
+            result = self.cr_db.find(mango_query)
+
+            docs = list(result)  # 🔥 FIX AQUÍ
+
+            if not docs:
+                print("No hay más registros para borrar")
+                break
+
+            to_delete = [
+                {
+                    "_id": doc["_id"],
+                    "_rev": doc["_rev"],
+                    "_deleted": True
+                }
+                for doc in docs
+            ]
+
+            response = self.cr_db.update(to_delete)
+
+            total_deleted += len(to_delete)
+
+            print(f"Batch eliminado: {len(to_delete)} | Total: {total_deleted}")
+
+        return total_deleted
+
+    def purge_deleted(self, batch_size=100):
+        """
+        Purga de CouchDB los tombstones (docs con _deleted) usando _changes + _purge.
+        _purge no se replica a bases externas (dispositivos moviles).
+        """
+        total_purged = 0
+        since = 0
+
+        while True:
+            changes = self.cr_db.changes(since=since, limit=1000)
+            results = changes.get('results', [])
+            if not results:
+                break
+            since = changes.get('last_seq', since)
+
+            to_purge = {}
+            for row in results:
+                if row.get('deleted'):
+                    to_purge[row['id']] = [row['changes'][0]['rev']]
+
+            ids = list(to_purge.keys())
+            for i in range(0, len(ids), batch_size):
+                batch = {_id: to_purge[_id] for _id in ids[i:i + batch_size]}
+                self.cr_db.resource('_purge').post_json(body=batch)
+                total_purged += len(batch)
+                print(f"Batch purgado: {len(batch)} | Total: {total_purged}")
+
+            if len(results) < 1000:
+                break
+
+        return total_purged
+
+    def clean_and_purge_db(self, status='received'):
+        """
+        Borra los registros con el status dado y purga los tombstones resultantes.
+        """
+        deleted = self.clean_db(status=status)
+        purged = self.purge_deleted()
+        return {
+            'status_code': 200,
+            'type': 'success',
+            'msg': f'{deleted} registros eliminados, {purged} purgados',
+            'data': {'deleted': deleted, 'purged': purged},
+        }
 
     def get_epoch(self, value):
         # si ya es epoch (int o float), lo regresa igual
@@ -187,20 +445,46 @@ class Base(BaseModel):
 
     def share_menus_script(self, user_id):
         """
-        Comparte unicamente el script de menus (self.SCRIPT_MENUS) con el
-        usuario -- bootstrap para un usuario recien creado en la forma
-        Usuarios, antes de que tenga cualquier otro permiso de modulo (no
-        depende de un registro en CONFIGURACION_MENUS todavia).
+        Bootstrap de menus: comparte el script de menus (self.SCRIPT_MENUS) y el
+        catalogo ELEMENTOS_MENU (self.MENUS_CATALOG_ID) con el usuario. Sin
+        cualquiera de los dos el usuario no puede obtener sus menus, asi que no
+        dependen del workflow de CONFIGURACION_MENUS. Solo agrega (no descomparte)
+        y omite lo que el usuario ya tiene.
+        No lanza excepcion: regresa {'ok': bool, 'errors': [...]} para no frenar
+        a quien lo llama.
         """
-        data_to_share = {
-            "file_shared": f"/api/infosync/get_scripts/{self.SCRIPT_MENUS}/",
-            "owner": f"/api/infosync/user/{user_id}/",
-            "perm": "can_read_item",
-        }
-        res = self.lkf_api.share_script(data_to_share)
-        if res['status_code'] != 201:
-            self.LKFException(f'Error al compartir script de menus: {data_to_share}')
-        return res
+        errors = []
+        owner = f"/api/infosync/user/{user_id}/"
+
+        user_scripts = self.lkf_api.get_user_scripts(user_id).get('data', [])
+        if isinstance(user_scripts, dict):
+            user_scripts = []
+        if self.SCRIPT_MENUS and self.SCRIPT_MENUS not in {s['id'] for s in user_scripts}:
+            data_to_share = {
+                "file_shared": f"/api/infosync/get_scripts/{self.SCRIPT_MENUS}/",
+                "owner": owner,
+                "perm": "can_read_item",
+            }
+            res = self.lkf_api.share_script(data_to_share)
+            if res.get('status_code') != 201:
+                errors.append({'script': self.SCRIPT_MENUS, 'res': res})
+
+        user_catalogs = self.lkf_api.get_user_catalog(user_id).get('data', [])
+        if isinstance(user_catalogs, dict):
+            user_catalogs = []
+        if self.MENUS_CATALOG_ID and self.MENUS_CATALOG_ID not in {c['id'] for c in user_catalogs}:
+            data_to_share = {
+                "file_shared": f"/api/infosync/item/{self.MENUS_CATALOG_ID}/",
+                "owner": owner,
+                "perm": "can_read_item",
+            }
+            res = self.lkf_api.share_form(data_to_share)
+            if res.get('status_code') != 201:
+                errors.append({'catalog': self.MENUS_CATALOG_ID, 'res': res})
+
+        if errors:
+            print('Error al compartir bootstrap de menus', user_id, errors)
+        return {'ok': not errors, 'errors': errors}
 
     def _project_format(self, data):
         return self.project_format(data)
@@ -245,6 +529,37 @@ class Base(BaseModel):
             setattr(self, import_as, AddonsClass(self.settings, sys_argv=self.sys_argv, use_api=self.use_api, **self.kwargs))
             if module not in self.kwargs['MODULES']:
                 self.kwargs['MODULES'].append(module)
+
+    def match_update(self, match, **kwargs):
+        """ Acutaliza el match de un query reemplaza llaves de busqueda por llaves dentro de kwargs"""
+        match_keys = list(match.keys())
+        for k in match_keys:
+            if k in ('$or', '$and'):
+                or_keys = match[k]
+                for ids, o in enumerate(or_keys):
+                    match[k][ids] = self.match_update(o, **kwargs)
+            if k in kwargs:
+                value = kwargs[k]
+                if type(value) in (list, tuple):
+                    match.update({k:{'$in':value}})
+                else:
+                    match.update({k:value})
+        return match
+
+    def get_visible_user_ids(self):
+        """ Ids de los usuarios cuyos registros puede ver el usuario actual.
+        Admin (can_manage_users) ve a todos los usuarios de la cuenta; supervisor
+        de grupo ve a sus supervisados y a si mismo. Lista vacia = solo lo suyo."""
+        user_id = self.user.get('user_id')
+        user = self.lkf_api.get_user_by_id(user_id)
+        if isinstance(user, dict) and 'can_manage_users' in (user.get('permissions') or []):
+            return [u['id'] for u in self.lkf_api.get_all_users()]
+        supervised = self.lkf_api.get_supervised_users()
+        if not isinstance(supervised, list) or not supervised:
+            return []
+        user_ids = {s['user_id'] for s in supervised}
+        user_ids.add(user_id)
+        return list(user_ids)
 
     def send_email_by_form_answers(self, data):
         answers = {}
@@ -447,11 +762,13 @@ class Base(BaseModel):
 
             item_key = item.get('key') or self.slugify(item.get('elemento', ''), '_')
             if item_key not in submodules[seccion_key]['items']:
+                item_order = item.get('item_order')
                 item_data = {
                     'key':   item_key,
                     'label': item.get('elemento', ''),
                     'type':  item.get('type', 'link'),
-                    'order': item.get('item_order') or len(submodules[seccion_key]['items']) + 1,
+                    # 0 es un orden valido (ej. nuevo_rondin va antes que "Todos")
+                    'order': item_order if item_order is not None else len(submodules[seccion_key]['items']) + 1,
                     'icon':  item.get('item_icon') or '',
                 }
                 item_route = item.get('route_mobile')
@@ -464,7 +781,19 @@ class Base(BaseModel):
             submodules = sorted(module['submodules'].values(), key=lambda s: s['order'])
             for s in submodules:
                 s['items'] = sorted(s['items'].values(), key=lambda i: i['order'])
-            modules.append({**module, 'submodules': submodules})
+                # Un submodulo cuyo unico item es 'link' navega directo: la app
+                # espera el route en el submodulo y items vacio.
+                if len(s['items']) == 1 and s['items'][0].get('type') == 'link':
+                    link = s['items'].pop()
+                    if link.get('route'):
+                        s['route'] = link['route']
+            module = {**module, 'submodules': submodules}
+            # Modulo con un solo submodulo de navegacion directa (ej. Turnos):
+            # la app navega desde la card del Home, sin bottom sheet.
+            if len(submodules) == 1 and not submodules[0]['items'] and submodules[0].get('route'):
+                module['route'] = submodules[0]['route']
+                del module['submodules']
+            modules.append(module)
 
         return {'menu': sorted(modules, key=lambda m: m['order'])}
 
@@ -567,9 +896,50 @@ class Base(BaseModel):
         modules = self.get_structured_web_menu(data)
         return modules
 
+    def set_comment_metadata(self, data):
+        return {
+            'created_by_username': self.user['username'],
+            'created_by_id': self.user['user_id'],
+            'created_by_name': self.user.get('name'),
+            'created_at': time.time(),
+            'data': data
+        }
+
+    def set_media_metadata(self, data):
+        return {
+            'created_by_username': self.user['username'],
+            'created_by_id': self.user['user_id'],
+            'created_by_name': self.user.get('name'),
+            'created_at': time.time(),
+            'data': data
+        }
+
+    def get_valid_object_id(self, value):
+        """
+        Regresa siempre un ObjectId valido a partir de `value`.
+        - ObjectId o string de 24 hex: se respeta tal cual.
+        - String hex mas largo (ej. uuid de 32, con o sin guiones): se recorta a 24.
+        - Cualquier otra cosa (hex corto, texto): se deriva de forma determinista
+          con md5, asi el mismo valor siempre da el mismo ObjectId.
+        - Vacio o None: ObjectId nuevo.
+        """
+        if isinstance(value, ObjectId):
+            return value
+        if value is None or str(value).strip() == '':
+            return ObjectId()
+        raw = str(value).strip()
+        if ObjectId.is_valid(raw):
+            return ObjectId(raw)
+        clean = raw.replace('-', '')
+        if len(clean) > 24 and re.fullmatch(r'[0-9a-fA-F]+', clean):
+            return ObjectId(clean[:24])
+        return ObjectId(hashlib.md5(raw.encode('utf-8')).hexdigest()[:24])
+
     def set_item_permits(self, user_id, item_needed, item_type):
         """
-        Comparte los items necesarios para el usuario
+        Comparte los items necesarios para el usuario.
+        Regresa la lista de items que no se pudieron compartir; un share fallido
+        no corta los demas.
         """
         permissions = 'can_read_item'
         share_data = {
@@ -606,12 +976,13 @@ class Base(BaseModel):
 
         user_item_ids = {item['id'] for item in user_item}
         items_to_share = item_needed - user_item_ids
+        failed = []
         for item_id in items_to_share:
             share_data["file_shared"]=  f"/api/infosync/item/{item_id}/"
             res = self.lkf_api.share_form(share_data)
-            if res['status_code'] != 201:
-                self.LKFException(f'Error al compartir scritp: {share_data}')
-        return res
+            if res.get('status_code') != 201:
+                failed.append({'type': item_type, 'id': item_id, 'status_code': res.get('status_code')})
+        return failed
 
     def set_user_permissions(self):
         """
@@ -630,23 +1001,144 @@ class Base(BaseModel):
         leerlos de self.answers -- permite correrla para varios usuarios en paralelo
         (ThreadPoolExecutor) sin que un hilo pise el self.answers de otro.
         """
-        forms_needed = set()
-        catalogs_needed = set()
-        scripts_needed = set()
-        menus = {i.get('menu', '').lower().replace(' ', '_') for i in elementos}
-        menus = ['always'] + list(menus)
-        for menu in menus:
-            config = self.module_permits.get(menu, {})
-            if not config:
-                continue
-            forms_needed.update([x for x in config.get('forms',[]) if x])
-            catalogs_needed.update([x for x in config.get('catalogs') if x])
-            scripts_needed.update([x for x in config.get('scripts') if x])
-        self.set_item_permits(user_id, forms_needed, item_type='form')
-        self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
-        self.set_item_permits(user_id, scripts_needed,  item_type='script')
+        needed = self._menu_permits_needed(elementos)
+        forms_needed, catalogs_needed, scripts_needed = needed['form'], needed['catalog'], needed['script']
+        failed = []
+        failed += self.set_item_permits(user_id, forms_needed, item_type='form')
+        failed += self.set_item_permits(user_id, catalogs_needed, item_type='catalog')
+        failed += self.set_item_permits(user_id, scripts_needed,  item_type='script')
+        if failed:
+            self.LKFException(f'Error al compartir permisos al usuario {user_id}: {failed}')
 
         return True
+
+    def _menu_permits_needed(self, elementos):
+        """
+        Formas/catálogos/scripts que requieren los menús asignados (module_permits de
+        base_utils), por tipo: {'form': set, 'catalog': set, 'script': set}.
+        """
+        needed = {'form': set(), 'catalog': set(), 'script': set()}
+        menus = ['always'] + list({i.get('menu', '').lower().replace(' ', '_') for i in elementos or []})
+        for menu in menus:
+            config = self.module_permits.get(menu, {})
+            needed['form'].update(x for x in config.get('forms', []) if x)
+            needed['catalog'].update(x for x in config.get('catalogs', []) if x)
+            needed['script'].update(x for x in config.get('scripts', []) if x)
+        return needed
+
+    def _menu_config_records(self, user_ids=None):
+        """Último registro de CONFIGURACION_MENUS por usuario (sin la cuenta padre)."""
+        match = {"form_id": self.MENUS_FORM, "deleted_at": {"$exists": False}}
+        user_field = f"answers.{self.USUARIOS_OBJ_ID}.{self.menu_form_fields['usuario_id']}"
+        if user_ids:
+            match[user_field] = {"$in": [int(u) for u in user_ids]}
+        records = self.cr.find(match, {"answers": 1}).sort("_id", -1)
+        by_user = {}
+        for record in records:
+            usuario = record['answers'].get(self.USUARIOS_OBJ_ID) or {}
+            user_id = self.unlist(usuario.get(self.menu_form_fields['usuario_id']))
+            if not user_id or str(user_id) == str(self.account_id) or user_id in by_user:
+                continue
+            data = self._labels(record['answers'], ids_label_dct=self.menu_form_fields)
+            by_user[user_id] = {
+                'user_id': user_id,
+                'username': self.unlist(usuario.get(self.menu_form_fields['username'])) or '',
+                'elementos': data.get('elementos', []),
+            }
+        return list(by_user.values())
+
+    def _menu_permission_status(self, user):
+        """
+        Compara lo que piden los menús del usuario con lo que tiene compartido hoy en
+        LinkaForm: {..user, 'faltan', 'sobran'} por tipo, o {'borrado': True} si el
+        usuario ya no existe (404).
+        """
+        getters = {
+            'form': self.lkf_api.get_user_forms,
+            'catalog': self.lkf_api.get_user_catalog,
+            'script': self.lkf_api.get_user_scripts,
+        }
+        nombres = {
+            item_type: {str(info.get('id')): name for name, info in (self.lkm.module_data.get(item_type) or {}).items()}
+            for item_type in getters
+        }
+        needed = self._menu_permits_needed(user['elementos'])
+        faltan, sobran = {}, {}
+        for item_type, getter in getters.items():
+            res = getter(user['user_id'])
+            if res.get('status_code') == 404:
+                return {**user, 'borrado': True}
+            shared = {item['id']: item.get('name') for item in (res.get('data') or []) if isinstance(item, dict)}
+            missing = sorted(needed[item_type] - set(shared))
+            if missing:
+                faltan[item_type] = [{'id': i, 'nombre': nombres[item_type].get(str(i), str(i))} for i in missing]
+            # Reaplicar también descomparte esto (igual que el workflow de menús).
+            extra = sorted(set(shared) - needed[item_type])
+            if extra:
+                sobran[item_type] = [{'id': i, 'nombre': shared[i] or str(i)} for i in extra]
+        return {**user, 'faltan': faltan, 'sobran': sobran}
+
+    def get_menu_permission_gaps(self):
+        """
+        Usuarios con configuración de menús a los que les falta algún permiso compartido
+        de los que piden sus menús. Los usuarios borrados en LinkaForm (404) solo se
+        cuentan aparte: no hay nada que compartirles.
+        """
+        con_faltantes, borrados, errores = [], 0, []
+        users = self._menu_config_records()
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = {executor.submit(self._menu_permission_status, u): u for u in users}
+            for future in as_completed(futures):
+                user = futures[future]
+                try:
+                    r = future.result()
+                except Exception as e:
+                    errores.append({'user_id': user['user_id'], 'error': str(e)[:200]})
+                    continue
+                if r.get('borrado'):
+                    borrados += 1
+                elif r['faltan']:
+                    r.pop('elementos', None)
+                    r['total'] = sum(len(v) for v in r['faltan'].values())
+                    r['total_sobran'] = sum(len(v) for v in r['sobran'].values())
+                    con_faltantes.append(r)
+        con_faltantes.sort(key=lambda u: -u['total'])
+        return {'usuarios': con_faltantes, 'revisados': len(users), 'borrados': borrados, 'errores': errores}
+
+    def reapply_menu_permissions(self, user_ids):
+        """
+        Vuelve a compartir los permisos de sus menús a los usuarios indicados, directo
+        (sin pasar por el workflow) y sin tocar su registro de CONFIGURACION_MENUS.
+        Al final vuelve a leer lo compartido: LinkaForm puede aceptar un share (201)
+        y no aplicarlo, así que solo es ok si ya no falta nada.
+        """
+        resultados = []
+
+        def aplicar(user):
+            self.apply_user_menu_permissions(user['user_id'], user['elementos'])
+            estado = self._menu_permission_status(user)
+            if estado.get('borrado'):
+                return {'user_id': user['user_id'], 'ok': False, 'error': 'Usuario borrado en LinkaForm'}
+            pendientes = [i['nombre'] for items in estado['faltan'].values() for i in items]
+            if pendientes:
+                return {'user_id': user['user_id'], 'ok': False,
+                        'error': f"LinkaForm aceptó los cambios pero siguen faltando {len(pendientes)}: {', '.join(pendientes)}"}
+            return {'user_id': user['user_id'], 'ok': True, 'error': None}
+
+        users = self._menu_config_records(user_ids)
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = {executor.submit(aplicar, u): u for u in users}
+            for future in as_completed(futures):
+                user = futures[future]
+                try:
+                    resultados.append(future.result())
+                except Exception as e:
+                    resultados.append({'user_id': user['user_id'], 'ok': False, 'error': str(e)[:300]})
+        encontrados = {r['user_id'] for r in resultados}
+        for uid in user_ids or []:
+            if int(uid) not in encontrados:
+                resultados.append({'user_id': int(uid), 'ok': False, 'error': 'Sin configuración de menús'})
+        return resultados
 
     def _get_user_menu_record(self, user_id):
         query = [
@@ -809,6 +1301,7 @@ class Base(BaseModel):
         text = unicodedata.normalize('NFKD', str(text)).encode('ascii', 'ignore').decode('ascii')
         text = re.sub(r'[^\w\s-]', '', text.lower().strip())
         return re.sub(r'[\s_-]+', sep, text)
+
 
 from linkaform_api import  upload_file
 
@@ -1380,8 +1873,12 @@ class CargaUniversal(Base):
             print('self.field_id_catalog_form', self.field_id_catalog_form)
             print('self.field_id_catalog_form_detail', self.field_id_catalog_form_detail)
             if not form_id_to_load:
-                field_forma = self.answers[self.field_id_catalog_form]
-                id_forma_seleccionada = field_forma[self.field_id_catalog_form_detail][0]
+                field_forma = self.answers.get(self.field_id_catalog_form, {})
+                ids_forma = field_forma.get(self.field_id_catalog_form_detail) or []
+                if not ids_forma:
+                    return self.update_status_record('error', msg_comentarios=
+                        'La forma seleccionada en el catalogo (%s) no tiene un id de forma asociado. Revisa el registro en el catalogo de items.' % (field_forma,))
+                id_forma_seleccionada = ids_forma[0]
             else:
                 id_forma_seleccionada = form_id_to_load
             form_fields = self.lkf_api.get_form_id_fields(id_forma_seleccionada)

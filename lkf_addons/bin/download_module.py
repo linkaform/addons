@@ -11,7 +11,7 @@ from linkaform_api import utils
 
 
 MODULES_PATH = '/srv/scripts/addons/modules'
-ADDONS_PATH = '/usr/local/lib/python3.10/site-packages/lkf_addons/addons'
+ADDONS_PATH = '/usr/local/lib/python3.12/site-packages/lkf_addons/addons'
 if ADDONS_PATH not in sys.path:
     sys.path.append(ADDONS_PATH)
 if '/srv/scripts/addons/config/' not in sys.path:

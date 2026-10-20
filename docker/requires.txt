@@ -1,5 +1,5 @@
 b2==1.4.2
-CouchDB-Linkaform
+CouchDB @ git+https://github.com/linkaform/couchdb-python.git@043e9bfa005e8e661514928606018818548649ea
 -e git+https://github.com/linkaform/backblaze_utils.git#egg=backblaze_utils
 
 charset-normalizer==3.4.4
@@ -16,8 +16,12 @@ numpy==2.2.6
 openpyxl==3.0.10
 opencv-python-headless==4.13.0.90
 pdf2image==1.17.0
-pdf2pptx==1.0.5
-psycopg2==2.9.3
+# pdf2pptx se instala aparte con --no-deps (fija pymupdf==1.20.1, sin wheel para 3.12)
+pymupdf>=1.24
+python-pptx
+click
+tqdm
+psycopg2==2.9.9
 pydantic==1.10.2
 pyexcel==0.7.0
 pyexcel-ods==0.6.0
@@ -40,4 +44,4 @@ typing==3.7.4.3
 vobject==0.9.8
 wget==3.2
 xlrd==2.0.1
-
+zxing-cpp==2.3.0

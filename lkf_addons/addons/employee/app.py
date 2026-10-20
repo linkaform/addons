@@ -81,6 +81,7 @@ class Employee(Base):
             'city': '6654187fc85ce22aaf8bb070',
             'company': f"{self.COMPANY_OBJ_ID}.663a8153e48382c5b1230918",
             'curp': '663bcbe2274189281359eb72',
+            'correo_empresarial': '663bd32d7fb8869bbc4d7f70',
             'department_code': '670f571af57af9032464176e',
             'email': '6653f3709c6d89925dc04b2f',
             'estatus_dentro_empresa': '663bcbe2274189281359eb77',

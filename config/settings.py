@@ -5,7 +5,7 @@ import os
 from linkaform_api import settings
 
 MODULES_PATH = '/srv/scripts/addons/modules'
-ADDONS_PATH = '/usr/local/lib/python3.10/site-packages/lkf_addons/addons'
+ADDONS_PATH = '/usr/local/lib/python3.12/site-packages/lkf_addons/addons'
 
 # Raiz de secrets/ (accounts.ini, current_domain, current_env). Se resuelve relativo
 # a este archivo en vez de hardcodearse, para que de lo mismo correr en el host que

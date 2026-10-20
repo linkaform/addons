@@ -67,6 +67,7 @@ class Location(Base):
             'area_status':'663e5e4bf5b8a7ce8211ed15',
             'location':'663e5c57f5b8a7ce8211ed0b',
             'location_id':'68101945f4996c72247baac4',
+            'multiple_ubicacion':'6ab3fced40b43d0734afd473',
             'new_city': '6654187fc85ce22aaf8bb070',
             'tipo_de_area':'663e5e68f5b8a7ce8211ed18',
             'utilizar_area_en':'6a9756e4faa39a6f6edeeb82'

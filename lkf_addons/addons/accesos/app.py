@@ -45,7 +45,6 @@ from datetime import datetime, timedelta, time, date
 from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 from pdf2image import convert_from_bytes
-from tkinter import NO
 from zipfile import ZipFile
 
 from linkaform_api import base, generar_qr
@@ -331,52 +330,12 @@ class Accesos(OcrMixin, AccesosModel):
             f"{self.mf['codigo_qr']}": str(access_pass['_id']),
             f"{self.mf['fecha_entrada']}":self.today_str(employee.get('timezone', 'America/Monterrey'), date_format='datetime'),
         }
-        vehiculos = data.get('vehiculo',[])
-        if vehiculos:
-            list_vehiculos = []
-            for item in vehiculos:
-                if item:
-                    tipo = item.get('tipo','')
-                    marca = item.get('marca','')
-                    modelo = item.get('modelo','')
-                    estado = item.get('estado','')
-                    placas = item.get('placas','')
-                    color = item.get('color','')
-                    list_vehiculos.append({
-                        self.TIPO_DE_VEHICULO_OBJ_ID:{
-                            self.mf['tipo_vehiculo']:tipo,
-                            self.mf['marca_vehiculo']:marca,
-                            self.mf['modelo_vehiculo']:modelo,
-                        },
-                        self.ESTADO_OBJ_ID:{
-                            self.mf['nombre_estado']:estado,
-                        },
-                        self.mf['placas_vehiculo']:placas,
-                        self.mf['color_vehiculo']:color,
-                        self.mf['foto_vehiculo']:item.get('foto_vehiculo',[])
-                    })
+        list_vehiculos = self._answers_vehiculos(data.get('vehiculo', []))
+        if list_vehiculos:
             answers[self.mf['grupo_vehiculos']] = list_vehiculos
 
-        equipos = data.get('equipo',[])
-
-        if equipos:
-            list_equipos = []
-            for item in equipos:
-                tipo = item.get('tipo','').lower().replace(' ', '_')
-                nombre = item.get('nombre','')
-                marca = item.get('marca','')
-                modelo = item.get('modelo','')
-                color = item.get('color','')
-                serie = item.get('serie','')
-                list_equipos.append({
-                    self.mf['tipo_equipo']:tipo,
-                    self.mf['nombre_articulo']:nombre,
-                    self.mf['marca_articulo']:marca,
-                    self.mf['modelo_articulo']:modelo,
-                    self.mf['color_articulo']:color,
-                    self.mf['numero_serie']:serie,
-                    self.mf['foto_equipo']:item.get('foto_equipo',[])
-                })
+        list_equipos = self._answers_equipos(data.get('equipo', []))
+        if list_equipos:
             answers[self.mf['grupo_equipos']] = list_equipos
 
         gafete = data.get('gafete',{})
@@ -692,6 +651,29 @@ class Accesos(OcrMixin, AccesosModel):
                 self.mf['nombre_empleado'] : visita}}
                 res.append(visita_set)
         return res
+
+    def _status_auto_activacion(self, answers, requerimientos=None):
+        """
+        Estatus para un pase con auto activacion (toggle "Activar pase por
+        defecto" de pase-entrada). Regresa None si el pase no la trae, para que
+        el llamador siga su flujo normal.
+
+        - Se salta los requerimientos de foto/identificacion/autorizacion.
+        - Pase hijo (acompanante, trae url_padre): hereda la auto activacion del
+          titular, pero solo puede quedar activo si ya tiene nombre; si no,
+          se queda en proceso hasta que lo completen.
+        - La fecha tiene prioridad: si access_pass_set_status lo da por
+          vencido, se queda vencido.
+        """
+        auto = str(self.unlist(answers.get(self.pase_entrada_fields['auto_activacion'])) or '').strip().lower()
+        if auto not in ('sí', 'si'):
+            return None
+        es_hijo = bool(self.unlist(answers.get(self.pase_entrada_fields['url_padre'])))
+        nombre = str(self.unlist(answers.get(self.mf['nombre_pase'])) or '').strip()
+        if es_hijo and not nombre:
+            return 'proceso'
+        status = self.access_pass_set_status(answers, requerimientos=requerimientos)
+        return 'vencido' if status == 'vencido' else 'activo'
 
     def access_pass_set_status(self, answers, requerimientos=None):
         """
@@ -1069,6 +1051,11 @@ class Accesos(OcrMixin, AccesosModel):
         if fecha_caducidad_con_margen < fecha_actual:
             self.LKFException({'msg':"El pase esta vencido, ya paso su fecha de vigencia.","title":'Advertencia'})
 
+        # Casetas multiubicación: el pase vale si incluye cualquiera de las ubicaciones de la
+        # caseta, y la entrada se registra en la que coincidió (la base gana si también está).
+        booth_locations = self.get_booth_locations(area, location)
+        location = next((loc for loc in booth_locations if loc in access_pass.get("ubicacion", [])), location)
+
         # Validación de tolerancia de entrada para pases de fecha fija
         fecha_visita = access_pass.get('fecha_de_expedicion')
         if fecha_visita:
@@ -1109,7 +1096,8 @@ class Accesos(OcrMixin, AccesosModel):
                     })
 
         if location not in access_pass.get("ubicacion",[]):
-            msg = f"La ubicación {location}, no se encuentra en el pase. Pase valido para las siguientes ubicaciones: {access_pass.get('ubicacion',[])}."
+            ubicaciones_caseta = ', '.join(booth_locations) if len(booth_locations) > 1 else location
+            msg = f"La ubicación {ubicaciones_caseta}, no se encuentra en el pase. Pase valido para las siguientes ubicaciones: {access_pass.get('ubicacion',[])}."
             self.LKFException({'msg':msg,"title":'Revisa la Configuración'})
 
         if self.validate_access_pass_location(qr_code, location):
@@ -1134,7 +1122,165 @@ class Accesos(OcrMixin, AccesosModel):
             return self._do_access_grupo(access_pass, qr_code, location, area, data, selected_passes)
 
         res = self._do_access(access_pass, location, area, data)
+        if not self._acceso_guardado(res):
+            self.LKFException({'title': 'Error al registrar el acceso', 'msg': self._error_bitacora(res)})
         return res
+
+    def _answers_vehiculos(self, vehiculos):
+        """Vehiculos en formato de la bitacora (grupo_vehiculos)."""
+        list_vehiculos = []
+        for item in vehiculos or []:
+            if item:
+                list_vehiculos.append({
+                    self.TIPO_DE_VEHICULO_OBJ_ID:{
+                        self.mf['tipo_vehiculo']:item.get('tipo',''),
+                        self.mf['marca_vehiculo']:item.get('marca',''),
+                        self.mf['modelo_vehiculo']:item.get('modelo',''),
+                    },
+                    self.ESTADO_OBJ_ID:{
+                        self.mf['nombre_estado']:item.get('estado',''),
+                    },
+                    self.mf['placas_vehiculo']:item.get('placas',''),
+                    self.mf['color_vehiculo']:item.get('color',''),
+                    self.mf['foto_vehiculo']:item.get('foto_vehiculo',[])
+                })
+        return list_vehiculos
+
+    def _answers_equipos(self, equipos):
+        """Equipos en formato de la bitacora (grupo_equipos)."""
+        list_equipos = []
+        for item in equipos or []:
+            if item:
+                tipo, nombre = self._tipo_equipo_bitacora(item.get('tipo', ''), item.get('nombre', ''))
+                list_equipos.append({
+                    self.mf['tipo_equipo']:tipo,
+                    self.mf['nombre_articulo']:nombre,
+                    self.mf['marca_articulo']:item.get('marca',''),
+                    self.mf['modelo_articulo']:item.get('modelo',''),
+                    self.mf['color_articulo']:item.get('color',''),
+                    self.mf['numero_serie']:item.get('serie',''),
+                    self.mf['foto_equipo']:item.get('foto_equipo',[])
+                })
+        return list_equipos
+
+    def _data_acompanante(self, data, companion_pass):
+        """
+        Datos de acceso para un acompanante: comparte ubicacion, comentarios y
+        visita con el titular, pero el equipo y vehiculo son los de su propio pase.
+        """
+        data_acompanante = dict(data)
+        data_acompanante['equipo'] = self.format_equipos_simple(companion_pass.get('grupo_equipos') or [])
+        data_acompanante['vehiculo'] = self.format_vehiculos_simple(companion_pass.get('grupo_vehiculos') or [])
+        return data_acompanante
+
+    # Opciones del radio "Tipo de equipo" en la Bitacora de entradas y salidas.
+    # En el Pase de entrada el tipo es un catalogo opcional, asi que puede venir
+    # vacio o con un valor que el radio no acepta.
+    TIPOS_EQUIPO_BITACORA = ('herramienta', 'computo', 'tablet', 'otra')
+    # Tipos del catálogo de la cuenta que equivalen a una opción del radio de la bitácora.
+    SINONIMOS_TIPO_EQUIPO_BITACORA = {
+        'computadora': 'computo', 'laptop': 'computo', 'lap_top': 'computo', 'pc': 'computo',
+        'computadora_portatil': 'computo', 'herramientas': 'herramienta', 'ipad': 'tablet',
+    }
+
+    def _tipo_equipo_pase(self, tipo):
+        """
+        Tipo de equipo para el grupo Equipo del PASE: es un catalog-select del catálogo
+        de tipos de equipo, se guarda tal cual viene del catálogo (no en minúsculas).
+        """
+        tipo = (tipo or '').strip()
+        return {self.TIPO_DE_EQUIPO_OBJ_ID: {self.mf['tipo_equipo_pase']: tipo}} if tipo else {}
+
+    def _answers_vehiculos_pase(self, vehiculos):
+        """
+        Grupo repetitivo de vehiculos del PASE (no el de bitacora, ver
+        _answers_vehiculos). Acepta las llaves del front (tipo, marca, ...) o las
+        largas (tipo_vehiculo, marca_vehiculo, ...). Lo usan create_access_pass y
+        update_pass.
+        """
+        grupo = []
+        for item in vehiculos or []:
+            grupo.append({
+                self.TIPO_DE_VEHICULO_OBJ_ID: {
+                    self.mf['tipo_vehiculo']: item.get('tipo', item.get('tipo_vehiculo', '')),
+                    self.mf['marca_vehiculo']: item.get('marca', item.get('marca_vehiculo', '')),
+                    self.mf['modelo_vehiculo']: item.get('modelo', item.get('modelo_vehiculo', '')),
+                },
+                self.ESTADO_OBJ_ID: {
+                    self.mf['nombre_estado']: item.get('estado', item.get('nombre_estado', '')),
+                },
+                self.mf['placas_vehiculo']: item.get('placas', item.get('placas_vehiculo', '')),
+                self.mf['color_vehiculo']: item.get('color', item.get('color_vehiculo', '')),
+                self.f['foto_vehiculo']: item.get('foto_vehiculo', ''),
+            })
+        return grupo
+
+    def _answers_equipos_pase(self, equipos):
+        """
+        Grupo repetitivo de equipos del PASE (no el de bitacora, ver
+        _answers_equipos): el tipo va al catalogo de tipos de equipo
+        (_tipo_equipo_pase). Lo usan create_access_pass y update_pass.
+        """
+        grupo = []
+        for item in equipos or []:
+            grupo.append({
+                **self._tipo_equipo_pase(item.get('tipo', item.get('tipo_equipo', ''))),
+                self.mf['nombre_articulo']: item.get('nombre', item.get('nombre_articulo', '')),
+                self.mf['marca_articulo']: item.get('marca', item.get('marca_articulo', '')),
+                self.mf['numero_serie']: item.get('serie', item.get('numero_serie', '')),
+                self.mf['color_articulo']: item.get('color', item.get('color_articulo', '')),
+                self.mf['modelo_articulo']: item.get('modelo', item.get('modelo_articulo', '')),
+                self.f['foto_equipo']: item.get('foto_equipo', ''),
+            })
+        return grupo
+
+    def _tipo_equipo_de_pase(self, equipo):
+        """Lee el tipo de un equipo del pase: catálogo nuevo o el campo viejo de bitácora."""
+        cat = equipo.get(self.TIPO_DE_EQUIPO_OBJ_ID) or {}
+        tipo = cat.get(self.mf['tipo_equipo_pase']) if isinstance(cat, dict) else None
+        return tipo or equipo.get('tipo_equipo_pase') or equipo.get(self.mf['tipo_equipo'], '')
+
+    def _tipo_equipo_bitacora(self, tipo, nombre):
+        """
+        Regresa (tipo, nombre) validos para la bitacora: si el tipo del pase no es
+        una opcion del radio se usa 'otra' y el tipo original se conserva en el
+        nombre del articulo si este viene vacio.
+        """
+        tipo = (tipo or '').strip()
+        slug = unicodedata.normalize('NFKD', tipo).encode('ascii', 'ignore').decode('ascii')
+        slug = slug.lower().replace(' ', '_')
+        slug = self.SINONIMOS_TIPO_EQUIPO_BITACORA.get(slug, slug)
+        if slug in self.TIPOS_EQUIPO_BITACORA:
+            return slug, nombre
+        return 'otra', nombre or tipo
+
+    def _acceso_guardado(self, response):
+        return isinstance(response, dict) and response.get('status_code') in (200, 201)
+
+    def _error_bitacora(self, response):
+        """
+        Convierte la respuesta de error de post_forms_answers en texto legible,
+        ej. 'Equipo > Tipo de equipo: Este campo es requerido'.
+        """
+        errores = []
+
+        def recorrer(nodo, ruta):
+            if not isinstance(nodo, dict):
+                return
+            label = nodo.get('label')
+            msgs = nodo.get('msg')
+            if label and msgs:
+                errores.append(f"{' > '.join(ruta + [label])}: {', '.join(msgs)}")
+            grupo = nodo.get('group', {})
+            ruta_hijos = ruta + [grupo['label']] if isinstance(grupo, dict) and grupo.get('label') else ruta
+            for k, v in nodo.items():
+                if k not in ('group', 'msg', 'label', 'error'):
+                    recorrer(v, ruta_hijos)
+
+        recorrer((response or {}).get('json') or {}, [])
+        if errores:
+            return '; '.join(errores)
+        return f"No se pudo guardar el registro (status {(response or {}).get('status_code')})"
 
     def _pase_alcanzo_limite_entradas(self, total_entradas, limite_acceso):
         '''
@@ -1156,7 +1302,7 @@ class Accesos(OcrMixin, AccesosModel):
         propio de cada qr_code. Un acompañante que no pase esa validación se omite
         y se reporta como error, sin afectar al resto del grupo.
         '''
-        pases_a_procesar = [(str(qr_code), access_pass)]
+        pases_a_procesar = [(str(qr_code), access_pass, data)]
         resultados = []
         qr_codes_vistos = {str(qr_code)}
 
@@ -1175,18 +1321,21 @@ class Accesos(OcrMixin, AccesosModel):
             if self._pase_alcanzo_limite_entradas(total_entradas_companion, companion_pass.get('limite_de_acceso')):
                 resultados.append({'qr_code': companion_qr, 'status': 'error', 'msg': 'Se ha completado el limite de entradas disponibles para este pase.'})
                 continue
-            pases_a_procesar.append((companion_qr, companion_pass))
+            pases_a_procesar.append((companion_qr, companion_pass, self._data_acompanante(data, companion_pass)))
 
         with ThreadPoolExecutor(max_workers=10) as executor:
             futures = {
-                executor.submit(self._do_access, pase, location, area, data): qr
-                for qr, pase in pases_a_procesar
+                executor.submit(self._do_access, pase, location, area, data_pase): qr
+                for qr, pase, data_pase in pases_a_procesar
             }
             for future in as_completed(futures):
                 qr = futures[future]
                 try:
                     response = future.result()
-                    resultados.append({'qr_code': qr, 'status': 'success', 'response': response})
+                    if self._acceso_guardado(response):
+                        resultados.append({'qr_code': qr, 'status': 'success', 'response': response})
+                    else:
+                        resultados.append({'qr_code': qr, 'status': 'error', 'msg': self._error_bitacora(response), 'response': response})
                 except Exception as e:
                     resultados.append({'qr_code': qr, 'status': 'error', 'msg': str(e)})
 
@@ -1565,8 +1714,8 @@ class Accesos(OcrMixin, AccesosModel):
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
         if not area:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar el area de donde se realizara la salida."})
-        if last_check_out.get('ubicacion_entrada') != location:
-            self.LKFException({"status_code":400, "msg":f"Este usuario ingreso en {location} y no puede salir en {last_check_out.get('ubicacion_entrada')}."})
+        if last_check_out.get('ubicacion_entrada') not in self.get_booth_locations(area, location):
+            self.LKFException({"status_code":400, "msg":f"Este usuario ingreso en {last_check_out.get('ubicacion_entrada')} y no puede salir en {location}."})
         if last_check_out.get('folio'):
             folio = last_check_out.get('folio',0)
             checkin_date_str = last_check_out.get('checkin_date')
@@ -2105,12 +2254,27 @@ class Accesos(OcrMixin, AccesosModel):
             else:
                 answers[self.cons_f[key]] = value
 
-        if self.cons_f['persona_nombre_concesion'] in answers:
+        # persona_nombre_concesion es una ruta de catalogo ("catalogo.campo") y en answers
+        # queda anidada, asi que se revisa el dato recibido y no la llave de answers.
+        if data_articles.get('persona_nombre_concesion'):
             answers[self.cons_f['tipo_persona_solicita']] = 'empleado'
         else:
             answers[self.cons_f['tipo_persona_solicita']] = 'otro'
 
         answers[self.cons_f['grupo_equipos']] = []
+        # Solo se guardan en el equipo los campos del grupo "equipos en prestamo";
+        # cualquier otro id quedaria en Mongo pero LKF no lo mostraria.
+        campos_grupo_equipos = (
+            'nombre_equipo', 'categoria_equipo_concesion', 'costo_equipo_concesion',
+            'imagen_equipo_concesion', 'cantidad_equipo_concesion', 'subotal_concesion_equipo',
+            'id_movimiento', 'evidencia_prestamo', 'comentario_prestamo',
+        )
+        # Los fronts mandan la foto y el comentario del prestamo con los nombres
+        # de los campos de Devoluciones; se traducen a los del prestamo.
+        renombrar_prestamo = {
+            'evidencia_entrega': 'evidencia_prestamo',
+            'comentario_entrega': 'comentario_prestamo',
+        }
         # Equipo
         for equipo in equipos:
             if equipo.get('id_movimiento') and ObjectId.is_valid(equipo['id_movimiento']):
@@ -2122,6 +2286,9 @@ class Accesos(OcrMixin, AccesosModel):
                 self.cons_f['id_movimiento'] : str(ObjectId())
             }
             for key, value in equipo.items():
+                key = renombrar_prestamo.get(key, key)
+                if key not in campos_grupo_equipos:
+                    continue
                 if '.' in self.cons_f[key]:
                     catalog_id, field_id = self.cons_f[key].split('.')
                     eq[catalog_id] = eq.get(catalog_id,{})
@@ -2228,7 +2395,19 @@ class Accesos(OcrMixin, AccesosModel):
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
 
-    def create_paquete(self, data_paquete):
+    def create_paquete(self, data_paquete, notificacion=None):
+        """
+        Crea el registro de Paquetería y, si se guardó, avisa al destinatario por los
+        canales de `notificacion` ({'canales': ['correo','sms'], 'email', 'telefono',
+        'no_guia', ...}). Un envío fallido no revierte el paquete: se reporta en
+        res['notificaciones'].
+        """
+        data_paquete = dict(data_paquete or {})
+        # Versiones anteriores del front mandaban esta llave dentro del paquete; no es
+        # un campo de la forma.
+        notificacion_legacy = data_paquete.pop('notificacion_paqueteria', None)
+        if not notificacion and notificacion_legacy:
+            notificacion = {'canales': notificacion_legacy}
         metadata = self.lkf_api.get_metadata(form_id=self.PAQUETERIA)
         metadata.update({
             "properties": {
@@ -2254,12 +2433,92 @@ class Accesos(OcrMixin, AccesosModel):
             elif key == 'quien_recibe_paqueteria':
                 answers[self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID] = {self.mf['nombre_empleado']:value}
             elif key == 'quien_recibe_otro':
-                answers[self.cons_f['quien_recibe_otro']] = value
-            else:
+                answers[self.paquetes_fields['quien_recibe_otro']] = value
+            elif key in self.paquetes_fields:
                 answers.update({f"{self.paquetes_fields[key]}":value})
         metadata.update({'answers':answers})
         res=self.lkf_api.post_forms_answers(metadata)
+        if notificacion and res.get('status_code') in (200, 201):
+            res['notificaciones'] = self._notificar_paquete_recibido(data_paquete, notificacion)
         return res
+
+    def get_destinatarios_paqueteria(self):
+        """
+        Empleados para el destinatario de Paquetería con su contacto, para que el front
+        llene solo el email y teléfono del aviso: [{'nombre', 'email', 'telefono'}].
+        """
+        def primero(emp, llaves):
+            for llave in llaves:
+                valor = emp.get(llave)
+                if isinstance(valor, list):
+                    valor = next((v for v in valor if v), None)
+                if valor:
+                    return str(valor).strip()
+            return ''
+
+        destinatarios = []
+        for emp in self.Employee.get_employee_data() or []:
+            nombre = emp.get('worker_name')
+            if not nombre:
+                continue
+            destinatarios.append({
+                'nombre': nombre,
+                # Primero el usuario ligado (catálogo de Usuarios); si no trae, el de la
+                # forma Empleados: Correo empresarial / Teléfono personal.
+                'email': primero(emp, ('usuario_email', 'correo_empresarial')),
+                'telefono': primero(emp, ('usuario_telefono', 'telefono1')),
+            })
+        return destinatarios
+
+    def _notificar_paquete_recibido(self, paquete, notificacion):
+        """Avisa al destinatario que llegó su paquete. Regresa {canal: {'ok', 'error'}}."""
+        canales = notificacion.get('canales') or []
+        nombre = (notificacion.get('destinatario') or paquete.get('quien_recibe_paqueteria')
+                  or paquete.get('quien_recibe_otro') or '').strip()
+        proveedor = paquete.get('proveedor') or 'paquetería'
+        guia = notificacion.get('no_guia')
+        lugar = ' – '.join(x for x in (paquete.get('ubicacion_paqueteria'), paquete.get('area_paqueteria')) if x)
+        locker = paquete.get('guardado_en_paqueteria')
+        resultado = {}
+
+        if 'correo' in canales:
+            email = (notificacion.get('email') or '').strip()
+            mensaje = (
+                f"Hola {nombre}, recibimos un paquete para ti de {proveedor}"
+                + (f" (guía {guia})" if guia else '')
+                + (f" en {lugar}" if lugar else '') + '.'
+                + (f" Está guardado en {locker}." if locker else '')
+                + " Puedes recogerlo en caseta."
+            )
+            if not email:
+                resultado['correo'] = {'ok': False, 'error': 'Sin email del destinatario'}
+            else:
+                try:
+                    r = self.send_email_notification({
+                        'tipo': 'email', 'nombre': nombre, 'email_to': email,
+                        'email_from': self.user.get('email', ''), 'mensaje': mensaje,
+                    }, 'Paquete recibido', 'Paquetería')
+                    ok = r.get('status_code') in (200, 201)
+                    resultado['correo'] = {'ok': ok, 'error': None if ok else f"status {r.get('status_code')}"}
+                except Exception as e:
+                    resultado['correo'] = {'ok': False, 'error': str(e)[:200]}
+
+        if 'sms' in canales:
+            telefono = re.sub(r'\D', '', str(notificacion.get('telefono') or ''))
+            texto = (
+                f"Clave10: tienes un paquete de {proveedor}"
+                + (f" en {lugar}" if lugar else '')
+                + (f", guardado en {locker}" if locker else '')
+                + ". Recógelo en caseta."
+            )
+            if len(telefono) < 10:
+                resultado['sms'] = {'ok': False, 'error': 'Sin teléfono válido del destinatario'}
+            else:
+                r = self.send_sms_masiv(telefono, texto) or {}
+                error = r.get('response') if r.get('statusCode') else None
+                resultado['sms'] = {'ok': not error, 'error': str(error)[:200] if error else None}
+
+        return resultado
 
     def upload_ics(self, id_forma_seleccionada, id_field, ics_content={}, meetings=[]):
         temp_dir = tempfile.gettempdir()  # Obtener el directorio temporal
@@ -2913,6 +3172,16 @@ class Accesos(OcrMixin, AccesosModel):
         answers[self.pase_entrada_fields['fecha_desde_visita']] = access_pass.get('fecha_desde_visita',now_datetime)
         answers[self.pase_entrada_fields['fecha_desde_hasta']] = access_pass.get('fecha_desde_hasta',now_datetime_out)
         answers[self.pase_entrada_fields['habilitar_vehiculo']]= access_pass.get('habilitar_vehiculo', 'no')
+        #---Toggle "Activar pase por defecto" de pase-entrada; si no viene, "no"
+        answers[self.pase_entrada_fields['auto_activacion']] = access_pass.get('auto_activacion', 'no')
+        #---Vehiculos/equipos capturados desde la creacion (pase-entrada con
+        #   "Activar pase por defecto"); vacios no se guardan.
+        grupo_vehiculos = self._answers_vehiculos_pase(access_pass.get('grupo_vehiculos'))
+        if grupo_vehiculos:
+            answers[self.mf['grupo_vehiculos']] = grupo_vehiculos
+        grupo_equipos = self._answers_equipos_pase(access_pass.get('grupo_equipos'))
+        if grupo_equipos:
+            answers[self.mf['grupo_equipos']] = grupo_equipos
         #---Sin default: si el pase no dice nada, que decida la config de la ubicacion
         #   (ver apply_habilitar_overrides), no forzar 'no' que la exentaria siempre.
         if access_pass.get('habilitar_fotografia') is not None:
@@ -3070,7 +3339,14 @@ class Accesos(OcrMixin, AccesosModel):
             access_pass.get('habilitar_fotografia') is not None or
             access_pass.get('habilitar_identificacion') is not None
         )
-        if created_from in ('nueva_visita', 'auto_registro') or (
+        #---Auto activacion (toggle "Activar pase por defecto" de pase-entrada):
+        #   con "sí" el pase nace activo y pasa por encima de los requerimientos
+        #   de foto/identificacion (ver _status_auto_activacion). Sin la key o
+        #   con "no" se sigue el flujo normal de abajo.
+        status_auto = self._status_auto_activacion(answers, requerimientos=requerimientos)
+        if status_auto:
+            answers[self.pase_entrada_fields['status_pase']] = status_auto
+        elif created_from in ('nueva_visita', 'auto_registro') or (
                 created_from in ('pase_de_entrada_app', 'pase_de_entrada_web') and admin_override_habilitar):
             answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
                 answers, requerimientos=requerimientos)
@@ -3121,6 +3397,22 @@ class Accesos(OcrMixin, AccesosModel):
         return res
 
 
+    def _archivos_pase(self, archivos):
+        """ Foto/identificacion de un acompañante como las acepta LinkaForm: el
+        front las manda con file_name "foto"/"identificacion" (sin extension) y
+        LinkaForm las rechaza ("El nombre del archivo no es valido"); en ese
+        caso se usa el nombre del final de la URL. Sin archivos regresa None. """
+        res = []
+        for archivo in archivos or []:
+            if not isinstance(archivo, dict) or not archivo.get('file_url'):
+                continue
+            file_url = archivo['file_url']
+            file_name = archivo.get('file_name') or ''
+            if '.' not in file_name:
+                file_name = file_url.split('?')[0].rstrip('/').rsplit('/', 1)[-1]
+            res.append({'file_name': file_name, 'file_url': file_url})
+        return res or None
+
     def create_multiple_pass_threads(self, answers, acompanantes_grupo, parent_id, requerimientos=None):
         """
         Creates individual passes for each member of acompanantes_grupo in parallel threads.
@@ -3140,12 +3432,23 @@ class Accesos(OcrMixin, AccesosModel):
             pass_answers[self.pase_entrada_fields['link']] = pass_answers[self.pase_entrada_fields['link']].replace(str(parent_id), str(record_id))
             pass_answers[self.pase_entrada_fields['email']] = acompanante.get('email', '')
             pass_answers[self.mf['telefono_pase']] = acompanante.get('telefono', '')
+            #---Foto e identificacion son las del acompanante, no las del titular
+            #   (venian en la copia de answers). Van antes del status: la auto
+            #   activacion puede pedirlas. Sin archivo va None, igual que en el
+            #   titular: LinkaForm no acepta una lista vacia en estos campos.
+            pass_answers[self.pase_entrada_fields['walkin_fotografia']] = self._archivos_pase(acompanante.get('foto'))
+            pass_answers[self.pase_entrada_fields['walkin_identificacion']] = self._archivos_pase(acompanante.get('identificacion'))
             pass_answers[self.pase_entrada_fields['url_padre']] = parent_url
             #---El status no se hereda del titular, el acompanante puede venir sin
             #   datos para que el invitado los complete despues. Misma regla que
             #   en la creacion del titular: nueva_visita/auto_registro se evaluan
             #   normal, web/app siempre arrancan en proceso.
-            if pass_answers.get(self.pase_entrada_fields['creado_desde']) in ('nueva_visita', 'auto_registro'):
+            #   Si el titular trae auto activacion (se hereda en pass_answers), el
+            #   acompanante queda activo solo si ya trae nombre; si no, en proceso.
+            status_auto = self._status_auto_activacion(pass_answers, requerimientos=requerimientos)
+            if status_auto:
+                pass_answers[self.pase_entrada_fields['status_pase']] = status_auto
+            elif pass_answers.get(self.pase_entrada_fields['creado_desde']) in ('nueva_visita', 'auto_registro'):
                 pass_answers[self.pase_entrada_fields['status_pase']] = self.access_pass_set_status(
                     pass_answers, requerimientos=requerimientos)
             else:
@@ -3185,6 +3488,8 @@ class Accesos(OcrMixin, AccesosModel):
                     if child_id:
                         child_url = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{child_id}"
                         url_by_index[idx] = child_url
+                    else:
+                        print(f"Error creating pass for {acompanante.get('nombre')}: {str(result)[:500]}")
                 except Exception as e:
                     print(f"Error creating pass for {acompanante.get('nombre')}: {e}")
 
@@ -3444,7 +3749,7 @@ class Accesos(OcrMixin, AccesosModel):
             row['marca'] = r.get('marca_articulo','') or r.get(self.mf['marca_articulo'],'') or ''
             row['serie'] = r.get('numero_serie','') or r.get(self.mf['numero_serie'],'') or''
             row['nombre'] = r.get('nombre_articulo','') or r.get(self.mf['nombre_articulo'],'') or ''
-            row['tipo'] = r.get('tipo_equipo','').title() or r.get(self.mf['tipo_equipo'],'') or ''
+            row['tipo'] = r.get('tipo_equipo_pase') or r.get('tipo_equipo','').title() or self._tipo_equipo_de_pase(r) or ''
             row['color'] = r.get('color_articulo','').title() or r.get(self.mf['color_articulo'],'') or ''
             row['foto_equipo'] = r.get('foto_equipo','') or []
             res.append(row)
@@ -3968,10 +4273,17 @@ class Accesos(OcrMixin, AccesosModel):
                 date_floor, date_ceiling = f"{today} 00:00:00", f"{today} 23:59:59"
                 salida_floor, salida_ceiling = f"{today} 00:00:00", None
 
+            # Bitácoras manda una lista de ubicaciones (selector del header); Accesos manda la de
+            # la caseta, que si es multiubicación incluye también sus ubicaciones extra.
+            stats_locations = location if isinstance(location, list) else [location]
+            stats_locations = [loc for loc in stats_locations if loc]
+            if page == 'Accesos' and len(stats_locations) == 1 and booth_area and booth_area != 'todas':
+                stats_locations = self.get_booth_locations(booth_area, stats_locations[0])
+
             match_query_one = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.bitacora_fields['ubicacion']}": location,
+                f"answers.{self.bitacora_fields['ubicacion']}": {"$in": stats_locations},
             }
             if dateFrom and dateTo:
                 match_query_one[f"answers.{self.mf['fecha_entrada']}"] = {"$gte": dateFrom, "$lte": dateTo}
@@ -3982,7 +4294,7 @@ class Accesos(OcrMixin, AccesosModel):
             match_query_two = {
                 "deleted_at": {"$exists": False},
                 "form_id": self.BITACORA_ACCESOS,
-                f"answers.{self.bitacora_fields['ubicacion']}": location,
+                f"answers.{self.bitacora_fields['ubicacion']}": {"$in": stats_locations},
                 f"answers.{self.mf['fecha_entrada']}": {"$gte": date_floor, "$lte": date_ceiling}
             }
             if not (dateFrom and dateTo):
@@ -4488,14 +4800,30 @@ class Accesos(OcrMixin, AccesosModel):
         requerimientos = set()
         envios = set()
         condiciones_servicio = {}
+        auto_activacion = False
+        acompanantes_requeridos = False
         config, grupos = self.get_grupos_requisitos_ubicaciones(ubicaciones)
+        #---Logo general de la forma; se reemplaza por el de la ubicación si trae
         logotipo_pase = self.unlist(config.get('logotipo_pase', [])) or ""
+        logo_ubicacion = ""
         for grupo in grupos:
             #---Condiciones de servicio (solo del grupo que coincide con la ubicación)
             condiciones_servicio["opcion_condiciones_servicio"] = grupo.get('opcion_condiciones_servicio', '')
             condiciones_servicio["desc_condiciones_servicio"] = grupo.get('desc_condiciones_servicio', '')
             condiciones_servicio["doc_condiciones_servicio"] = grupo.get('doc_condiciones_servicio', '')
             condiciones_servicio["url_condiciones_servicio"] = grupo.get('url_condiciones_servicio', '')
+
+            #---Logo por ubicación: gana el del primer grupo que traiga imagen
+            if not logo_ubicacion:
+                logo_ubicacion = self.unlist(grupo.get('logo_por_ubicacion', [])) or ""
+
+            #---Auto activación: basta con que una de las ubicaciones la tenga en "sí"
+            if str(self.unlist(grupo.get('auto_activacion', '')) or '').strip().lower() in ('sí', 'si'):
+                auto_activacion = True
+
+            #---Acompañantes requeridos: igual, basta con una ubicación en "sí"
+            if str(self.unlist(grupo.get('acompanantes_requeridos', '')) or '').strip().lower() in ('sí', 'si'):
+                acompanantes_requeridos = True
 
             requerimientos.update(self.get_datos_requeridos_grupo(grupo))
             envios = set()
@@ -4507,6 +4835,9 @@ class Accesos(OcrMixin, AccesosModel):
                         envios.update(envs)
                     else:
                         envios.add(envs)
+
+        if logo_ubicacion:
+            logotipo_pase = logo_ubicacion
 
         tipos = self.get_tipos_de_pase(ubicaciones)
         permisos_certificaciones = self.get_permisos_por_perfil(tipo_de_pase) if tipo_de_pase else ""
@@ -4542,6 +4873,9 @@ class Accesos(OcrMixin, AccesosModel):
             "condiciones_servicio": condiciones_servicio,
             "permisos_certificaciones": permisos_certificaciones,
             "logotipo_pase": logotipo_pase,
+            # "sí"/"no": si pase-entrada muestra el toggle "Activar pase por defecto".
+            "auto_activacion": "sí" if auto_activacion else "no",
+            "acompanantes_requeridos": "sí" if acompanantes_requeridos else "no",
             "empresa": {
                 "nombre": company,
                 "email": empresa_email,
@@ -4865,7 +5199,12 @@ class Accesos(OcrMixin, AccesosModel):
                     'ubicacion': self._flatten_str_list(req.get('ubicacion')),
                     'prefijo_telefonico': self._flatten_scalar(req.get('prefijo_telefonico')),
                     'tolerancia_de_entrada_previa': self._flatten_scalar(req.get('tolerancia_de_entrada_previa')),
-                    'tolerancia_de_entrada_posterior': self._flatten_scalar(req.get('tolerancia_de_entrada_posterior'))
+                    'tolerancia_de_entrada_posterior': self._flatten_scalar(req.get('tolerancia_de_entrada_posterior')),
+                    # Radio "Auto Activacion" (sí/no): pase-entrada ofrece el toggle
+                    # "Activar pase por defecto" solo si la ubicación lo tiene en sí.
+                    'auto_activacion': self._flatten_scalar(req.get('auto_activacion')) or 'no',
+                    # Radio "Acompañantes Requeridos" (sí/no), por ubicación.
+                    'acompanantes_requeridos': self._flatten_scalar(req.get('acompanantes_requeridos')) or 'no',
                 })
             data.update({
                 'exclude_inputs': format_exclude_inputs,
@@ -5036,6 +5375,45 @@ class Accesos(OcrMixin, AccesosModel):
         if total_entradas:
             total_entradas = total_entradas.pop()
         return total_entradas
+
+    def get_count_ingresos_many(self, qr_codes):
+        """ Ingresos por pase en una sola consulta: {qr_code: total}. Los que no tienen ingresos no aparecen."""
+        if not qr_codes:
+            return {}
+        qr_field = f"answers.{self.mf['codigo_qr']}"
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.BITACORA_ACCESOS,
+                qr_field: {"$in": list(qr_codes)},
+            }},
+            {'$group': {'_id': f"${qr_field}", 'total': {'$sum': 1}}},
+        ]
+        return {r['_id']: r['total'] for r in self.cr.aggregate(query)}
+
+    def get_pases_padre_many(self, padre_ids):
+        """ Datos del pase padre de varios pases en una sola consulta: {padre_id: {...}}."""
+        padre_ids = [i for i in set(padre_ids) if i and ObjectId.is_valid(i)]
+        if not padre_ids:
+            return {}
+        visita = self.VISITA_AUTORIZADA_CAT_OBJ_ID
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.PASE_ENTRADA,
+                "_id": {"$in": [ObjectId(i) for i in padre_ids]},
+            }},
+            {'$project': {
+                'nombre': {"$ifNull": [f"$answers.{visita}.{self.mf['nombre_visita']}", f"$answers.{self.mf['nombre_pase']}"]},
+                'estatus': f"$answers.{self.pase_entrada_fields['status_pase']}",
+                'email': {"$ifNull": [f"$answers.{visita}.{self.mf['email_vista']}", f"$answers.{self.mf['email_pase']}"]},
+                'telefono': {"$ifNull": [f"$answers.{visita}.{self.mf['telefono']}", f"$answers.{self.mf['telefono_pase']}"]},
+                'foto': {'$ifNull': [f"$answers.{visita}.{self.mf['foto']}", f"$answers.{self.pase_entrada_fields['walkin_fotografia']}"]},
+                'identificacion': {'$ifNull': [f"$answers.{visita}.{self.mf['identificacion']}", f"$answers.{self.pase_entrada_fields['walkin_identificacion']}"]},
+            }},
+        ]
+        campos = ('foto', 'identificacion', 'nombre', 'estatus', 'telefono', 'email')
+        return {str(p['_id']): {c: self.unlist(p.get(c, '')) for c in campos} for p in self.cr.aggregate(query)}
 
     def get_detail_access_pass(self, qr_code, get_answers=False):
         match_query = {
@@ -5210,6 +5588,9 @@ class Accesos(OcrMixin, AccesosModel):
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
             x['grupo_instrucciones_pase'] = self._labels_list(x.pop('grupo_instrucciones_pase',[]), self.mf)
             x['grupo_equipos'] = self._labels_list(x.pop('grupo_equipos',[]), self.mf)
+            for equipo in x['grupo_equipos']:
+                if isinstance(equipo, dict) and equipo.get('tipo_equipo_pase'):
+                    equipo['tipo_equipo'] = equipo.pop('tipo_equipo_pase')
             x['grupo_vehiculos'] = self._labels_list(x.pop('grupo_vehiculos',[]), self.mf)
             ubicaciones_full_info = x.get('ubicaciones', [])
             x['ubicacion'] = [x.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(self.Location.f['location']) for x in ubicaciones_full_info]
@@ -5462,78 +5843,283 @@ class Accesos(OcrMixin, AccesosModel):
         return self.format_cr(res, get_one=True)
         # return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
-    def get_list_article_lost(self, location, area, status=None, dateFrom="", dateTo="", filterDate=""):
+    def perdidos_search_fields(self):
+        pf = self.perdidos_fields
+        estatus = f"answers.{pf['estatus_perdido']}"
+        # Llaves = las del panel de filtros (filters.py).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'articulo_perdido': {'label': 'Nombre', 'paths': [f"answers.{pf['articulo_perdido']}"]},
+            'articulo': {'label': 'Artículo', 'paths': [f"answers.{pf['articulo_seleccion_catalog']}.{pf['articulo_seleccion']}"]},
+            'categoria': {'label': 'Categoría', 'paths': [f"answers.{pf['tipo_articulo_catalog']}.{pf['tipo_articulo_perdido']}"]},
+            'estatus_p': {
+                'label': 'Estatus',
+                'paths': [estatus],
+                'options': lambda: self.facet_distinct_options(self.BITACORA_OBJETOS_PERDIDOS, estatus),
+            },
+            'color': {'label': 'Color', 'paths': [f"answers.{pf['color_perdido']}"]},
+            'area_paqueteria': {'label': 'Área', 'paths': [f"answers.{pf['area_catalog']}.{pf['area_perdido']}"]},
+            'descripcion': {'label': 'Descripción', 'paths': [f"answers.{pf['descripcion']}"]},
+        }
+
+    def perdidos_base_match(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[]):
+        ubicacion = f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['ubicacion']}"
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_OBJETOS_PERDIDOS,
         }
         if location:
-             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['ubicacion']}"] = location
+            match_query[ubicacion] = location
+        if locations:
+            match_query[ubicacion] = {"$in": locations}
         if area:
-             match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
+            match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_SALIDA_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
         if status:
-             match_query[f"answers.{self.perdidos_fields['estatus_perdido']}"] = status
+            match_query[f"answers.{self.perdidos_fields['estatus_perdido']}"] = status
+        return self.facet_date_match(match_query, f"answers.{self.perdidos_fields['date_hallazgo_perdido']}", dateFrom, dateTo, filterDate)
 
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
+    def get_search_fields_perdidos(self):
+        return self.search_fields_config(self.perdidos_search_fields())
 
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
+    def get_search_counts_perdidos(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
+        base_match = self.perdidos_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        return self.count_facet_candidates(base_match, self.perdidos_search_fields(), facets, candidates)
 
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.perdidos_fields['date_hallazgo_perdido']}": {"$gte": dateFrom,"$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.perdidos_fields['date_hallazgo_perdido']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.perdidos_fields['date_hallazgo_perdido']}": {"$lte": dateTo}
-            })
+    def get_list_article_lost(self, location, area, status=None, dateFrom="", dateTo="", filterDate="", limit=None, skip=0, locations=[], facets=[]):
+        match_query = self.perdidos_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        facet_conditions = self.build_facets_match(self.perdidos_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
+        project = {
+            "folio":"$folio",
+            'created_at':'$created_at',
+            'estatus_perdido':f"$answers.{self.perdidos_fields['estatus_perdido']}",
+            'date_hallazgo_perdido':f"$answers.{self.perdidos_fields['date_hallazgo_perdido']}",
+            'ubicacion_perdido':f"$answers.{self.perdidos_fields['ubicacion_catalog']}.{self.perdidos_fields['ubicacion_perdido']}",
+            'area_perdido': f"$answers.{self.perdidos_fields['area_catalog']}.{self.perdidos_fields['area_perdido']}",
+            'color_perdido':f"$answers.{self.perdidos_fields['color_perdido']}",
+            'articulo_perdido':f"$answers.{self.perdidos_fields['articulo_perdido']}",
+            'tipo_articulo_perdido':f"$answers.{self.perdidos_fields['tipo_articulo_catalog']}.{self.perdidos_fields['tipo_articulo_perdido']}",
+            'articulo_seleccion':f"$answers.{self.perdidos_fields['articulo_seleccion_catalog']}.{self.perdidos_fields['articulo_seleccion']}",
+            'foto_perdido':f"$answers.{self.perdidos_fields['foto_perdido']}",
+            'descripcion':f"$answers.{self.perdidos_fields['descripcion']}",
+            'comentario_perdido':f"$answers.{self.perdidos_fields['comentario_perdido']}",
+            'quien_entrega_interno':f"$answers.{self.perdidos_fields['quien_entrega_catalog']}.{self.perdidos_fields['quien_entrega_interno']}",
+            'quien_entrega':f"$answers.{self.perdidos_fields['quien_entrega']}",
+            'quien_entrega_externo':f"$answers.{self.perdidos_fields['quien_entrega_externo']}",
+            'recibe_perdido':f"$answers.{self.perdidos_fields['recibe_perdido']}",
+            'telefono_recibe_perdido':f"$answers.{self.perdidos_fields['telefono_recibe_perdido']}",
+            'identificacion_recibe_perdido':f"$answers.{self.perdidos_fields['identificacion_recibe_perdido']}",
+            'foto_recibe_perdido':f"$answers.{self.perdidos_fields['foto_recibe_perdido']}",
+            'date_entrega_perdido':f"$answers.{self.perdidos_fields['date_entrega_perdido']}",
+            'locker_perdido':f"$answers.{self.perdidos_fields['locker_catalog']}.{self.perdidos_fields['locker_perdido']}",
+        }
 
+        if limit is not None:
+            return self.facet_paginated(match_query, project, limit, skip)
+
+        # Formato anterior (lista; sin fecha, solo los últimos 25) para quien
+        # todavía no pagina: front desplegado y app móvil.
         query = [
             {'$match': match_query },
-            #{'$project': self.proyect_format(self.perdidos_fields)},
-            {'$project': {
-                "folio":"$folio",
-                'created_at':'$created_at',
-                'estatus_perdido':f"$answers.{self.perdidos_fields['estatus_perdido']}",
-                'date_hallazgo_perdido':f"$answers.{self.perdidos_fields['date_hallazgo_perdido']}",
-                'ubicacion_perdido':f"$answers.{self.perdidos_fields['ubicacion_catalog']}.{self.perdidos_fields['ubicacion_perdido']}",
-                'area_perdido': f"$answers.{self.perdidos_fields['area_catalog']}.{self.perdidos_fields['area_perdido']}",
-                'color_perdido':f"$answers.{self.perdidos_fields['color_perdido']}",
-                'articulo_perdido':f"$answers.{self.perdidos_fields['articulo_perdido']}",
-                'tipo_articulo_perdido':f"$answers.{self.perdidos_fields['tipo_articulo_catalog']}.{self.perdidos_fields['tipo_articulo_perdido']}",
-                'articulo_seleccion':f"$answers.{self.perdidos_fields['articulo_seleccion_catalog']}.{self.perdidos_fields['articulo_seleccion']}",
-                'foto_perdido':f"$answers.{self.perdidos_fields['foto_perdido']}",
-                'descripcion':f"$answers.{self.perdidos_fields['descripcion']}",
-                'comentario_perdido':f"$answers.{self.perdidos_fields['comentario_perdido']}",
-                'quien_entrega_interno':f"$answers.{self.perdidos_fields['quien_entrega_catalog']}.{self.perdidos_fields['quien_entrega_interno']}",
-                'quien_entrega':f"$answers.{self.perdidos_fields['quien_entrega']}",
-                'quien_entrega_externo':f"$answers.{self.perdidos_fields['quien_entrega_externo']}",
-                'recibe_perdido':f"$answers.{self.perdidos_fields['recibe_perdido']}",
-                'telefono_recibe_perdido':f"$answers.{self.perdidos_fields['telefono_recibe_perdido']}",
-                'identificacion_recibe_perdido':f"$answers.{self.perdidos_fields['identificacion_recibe_perdido']}",
-                'foto_recibe_perdido':f"$answers.{self.perdidos_fields['foto_recibe_perdido']}",
-                'date_entrega_perdido':f"$answers.{self.perdidos_fields['date_entrega_perdido']}",
-                'locker_perdido':f"$answers.{self.perdidos_fields['locker_catalog']}.{self.perdidos_fields['locker_perdido']}"
-            }},
+            {'$project': project},
             {'$sort':{'created_at':-1}},
         ]
         if not filterDate:
             query.append(
                 {"$limit":25}
             )
-        pr= self.format_cr_result(self.cr.aggregate(query))
         return self.format_cr_result(self.cr.aggregate(query))
 
-    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", limit=25, skip=0, locations=[], search="", search_fields=[]):
+    # ---------------------------------------------------------------------
+    # Buscador avanzado (facets). Cada vista define sus campos buscables como
+    # {key: {label, paths, options?}}; el front recibe esa config y manda
+    # facets = [{key, values, exact}]. AND entre facets, OR entre valores y
+    # entre las rutas de un mismo campo. Con options el campo es tipo "enum".
+    # ---------------------------------------------------------------------
+    FACET_ACCENTS = {
+        'a': 'aáàäâAÁÀÄÂ', 'e': 'eéèëêEÉÈËÊ', 'i': 'iíìïîIÍÌÏÎ',
+        'o': 'oóòöôOÓÒÖÔ', 'u': 'uúùüûUÚÙÜÛ', 'n': 'nñNÑ',
+    }
+
+    def facet_regex(self, value):
+        """Patrón contains que ignora acentos ("lucia" encuentra "Lucía")."""
+        base = unicodedata.normalize('NFD', str(value).strip().lower())
+        base = ''.join(c for c in base if unicodedata.category(c) != 'Mn')
+        # "_" y espacio son equivalentes (muchos valores se guardan como "dia_de_la_semana").
+        return ''.join(
+            f"[{self.FACET_ACCENTS[c]}]" if c in self.FACET_ACCENTS
+            else "[ _]" if c in " _"
+            else re.escape(c)
+            for c in base
+        )
+
+    def build_facets_match(self, fields_def, facets):
+        """Regresa la lista de condiciones (para un $and) de los facets válidos."""
+        conditions = []
+        for facet in facets or []:
+            field = fields_def.get(facet.get('key'))
+            values = [v for v in (facet.get('values') or []) if str(v).strip()]
+            if not field or not values:
+                continue
+            # exact = el valor completo (opciones del panel o de un enum), sin
+            # importar mayúsculas ni acentos; si no, "contiene".
+            # 'value_match': condición propia por valor exacto (ej. "con incidencias" Si/No).
+            value_match = field.get('value_match')
+            if facet.get('exact') and value_match:
+                conds = [value_match[str(v).strip().lower()] for v in values if str(v).strip().lower() in value_match]
+                if conds:
+                    conditions.append(conds[0] if len(conds) == 1 else {'$or': conds})
+                continue
+            wrap = (lambda p: f"^{p}$") if facet.get('exact') else (lambda p: p)
+            ors = [
+                {path: {'$regex': wrap(self.facet_regex(v)), '$options': 'i'}}
+                for path in field['paths'] for v in values
+            ]
+            # 'missing': valor que el listado muestra cuando el campo viene vacío
+            # (ej. tipo_rondin vacío = "qr"); al filtrar por él también cuentan los vacíos.
+            missing = field.get('missing')
+            if facet.get('exact') and missing and any(self.facet_regex(v) == self.facet_regex(missing) for v in values):
+                ors += [{path: {'$in': [None, '']}} for path in field['paths']]
+            conditions.append(ors[0] if len(ors) == 1 else {'$or': ors})
+        return conditions
+
+    def search_fields_config(self, fields_def):
+        """Config pública de los campos para el front (sin las rutas de Mongo)."""
+        config = []
+        for key, field in fields_def.items():
+            options = field.get('options')
+            if callable(options):
+                options = options()
+            item = {'key': key, 'label': field['label'], 'type': 'enum' if options else 'text'}
+            if options:
+                item['options'] = options
+            config.append(item)
+        return config
+
+    def facet_distinct_options(self, form_id, path, labels=None, order=None):
+        """Opciones de un campo enum a partir de los valores que ya existen en la forma.
+        labels: etiqueta por valor (si no, capitalizado); order: valores que van primero."""
+        values = self.cr.distinct(path, {'form_id': form_id, 'deleted_at': {'$exists': False}})
+        values = sorted({str(v) for v in values if v not in (None, '')})
+        if order:
+            values.sort(key=lambda v: (order.index(v) if v in order else len(order), v))
+        labels = labels or {}
+        return [{'value': v, 'label': labels.get(v, v.capitalize().replace('_', ' '))} for v in values]
+
+    def facet_list_page(self, match_query, project, sort, limit, skip, format_record=None):
+        """Igual que facet_paginated pero con orden propio y formato por registro."""
+        limit = int(limit) or 25
+        skip = int(skip or 0)
+        count = list(self.cr.aggregate([{'$match': match_query}, {'$count': 'total'}]))
+        total = count[0]['total'] if count else 0
+        records = self.format_cr_result(self.cr.aggregate([
+            {'$match': match_query}, {'$project': project}, {'$sort': sort},
+            {'$skip': skip}, {'$limit': limit},
+        ]))
+        if format_record:
+            records = [format_record(r) for r in records]
+        return {
+            'records': records,
+            'total_records': total,
+            'total_pages': ceil(total / limit) if limit else 1,
+            'actual_page': (skip // limit) + 1,
+            'records_on_page': len(records),
+        }
+
+    def facet_date_match(self, match_query, path, dateFrom="", dateTo="", filterDate="", zona=None):
+        """Mismo criterio de fechas que los listados: filterDate != "range" usa el
+        periodo (today, this_week...) en la zona del usuario; "" = sin fecha.
+        Las fechas se guardan como "AAAA-MM-DD HH:MM:SS" y se comparan como texto:
+        un dateTo de solo día ("AAAA-MM-DD") se extiende al final de ese día."""
+        if filterDate != "range":
+            dateFrom, dateTo = None, None
+            if filterDate:
+                if not zona:
+                    user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
+                    zona = user_data.get('timezone', 'America/Monterrey')
+                dateFrom, dateTo = self.get_range_dates(filterDate, zona)
+            dateFrom = str(dateFrom) if dateFrom else ""
+            dateTo = str(dateTo) if dateTo else ""
+        elif dateTo and len(dateTo) == 10:
+            dateTo = f"{dateTo} 23:59:59"
+        if dateFrom and dateTo:
+            match_query[path] = {"$gte": dateFrom, "$lte": dateTo}
+        elif dateFrom:
+            match_query[path] = {"$gte": dateFrom}
+        elif dateTo:
+            match_query[path] = {"$lte": dateTo}
+        return match_query
+
+    def facet_paginated(self, match_query, project, limit, skip, format_record=None):
+        """Listado paginado con total, ordenado del más reciente al más viejo."""
+        limit = int(limit) or 25
+        skip = int(skip or 0)
+        count = list(self.cr.aggregate([{'$match': match_query}, {'$count': 'total'}]))
+        total = count[0]['total'] if count else 0
+        records = self.format_cr_result(self.cr.aggregate([
+            {'$match': match_query},
+            {'$project': project},
+            {'$sort': {'created_at': -1}},
+            {'$skip': skip},
+            {'$limit': limit},
+        ]))
+        if format_record:
+            records = [format_record(r) for r in records]
+        return {
+            'records': records,
+            'total_records': total,
+            'total_pages': ceil(total / limit) if limit else 1,
+            'actual_page': (skip // limit) + 1,
+            'records_on_page': len(records),
+        }
+
+    def count_facet_candidates(self, base_match, fields_def, facets, candidates):
+        """Cuántos registros daría agregar cada candidato {key, value, exact} a
+        los facets actuales. Un solo aggregate con un $count por candidato."""
+        if not candidates:
+            return []
+        branches = {}
+        for i, cand in enumerate(candidates):
+            extra = {'key': cand.get('key'), 'values': [cand.get('value')], 'exact': cand.get('exact')}
+            conditions = self.build_facets_match(fields_def, list(facets or []) + [extra])
+            branches[f"c{i}"] = [{'$match': {'$and': conditions} if conditions else {}}, {'$count': 'n'}]
+        result = list(self.cr.aggregate([{'$match': base_match}, {'$facet': branches}]))
+        row = result[0] if result else {}
+        return [(row.get(f"c{i}") or [{}])[0].get('n', 0) for i in range(len(candidates))]
+
+    def concesionados_search_fields(self):
+        grupo = self.cons_f['grupo_equipos']
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'nombre_equipo': {'label': 'Nombre del equipo', 'paths': [f"answers.{grupo}.{self.cons_f['nombre_equipo']}"]},
+            'categoria_equipo_concesion': {'label': 'Categoría', 'paths': [f"answers.{grupo}.{self.cons_f['categoria_equipo_concesion']}"]},
+            'status_concesion': {
+                'label': 'Estado',
+                'paths': [f"answers.{self.cons_f['status_concesion']}"],
+                'options': [
+                    {'value': 'abierto', 'label': 'Abierto', 'color': '#DC2626'},
+                    {'value': 'parcial', 'label': 'Parcial', 'color': '#F59E0B'},
+                    {'value': 'devuelto', 'label': 'Devuelto', 'color': '#16A34A'},
+                ],
+            },
+            'persona_nombre_concesion': {'label': 'Empleado', 'paths': [
+                f"answers.{self.cons_f['persona_nombre_concesion']}",
+                f"answers.{self.cons_f['persona_nombre_otro']}",
+            ]},
+            'created_by': {'label': 'Creado por', 'paths': ['user_name']},
+            # La llave es la que usa el panel de filtros (filters.py).
+            'area_paqueteria': {'label': 'Área', 'paths': [f"answers.{self.cons_f['caseta_concesion']}"]},
+        }
+
+    def get_search_fields_concesionados(self):
+        return self.search_fields_config(self.concesionados_search_fields())
+
+    def get_search_counts_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
+        base_match = self.concesionados_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        return self.count_facet_candidates(base_match, self.concesionados_search_fields(), facets, candidates)
+
+    def concesionados_base_match(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[]):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONCESSIONED_ARTICULOS,
@@ -5546,11 +6132,22 @@ class Accesos(OcrMixin, AccesosModel):
              match_query[f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area_salida']}"] = area
         if status:
              match_query[f"answers.{self.cons_f['status_concesion']}"] = status
+        return self.facet_date_match(match_query, f"answers.{self.cons_f['fecha_concesion']}", dateFrom, dateTo, filterDate)
+
+    def get_list_articulos_concesionados(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", limit=25, skip=0, locations=[], search="", search_fields=[], facets=[]):
+        match_query = self.concesionados_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        # Buscador avanzado: facets. search/search_fields se queda mientras el
+        # front desplegado siga usando el buscador anterior.
+        facet_conditions = self.build_facets_match(self.concesionados_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
         if search:
             pattern = re.escape(search.strip())
             searchable_fields = {
                 "folio": "folio",
                 "user_name": "user_name",
+                "creado_por": "user_name",
+                "status_concesion": f"answers.{self.cons_f['status_concesion']}",
                 "nombre_equipo": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['nombre_equipo']}",
                 "marca_equipo_concesion": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['marca_equipo_concesion']}",
                 "categoria_equipo_concesion": f"answers.{self.cons_f['grupo_equipos']}.{self.cons_f['categoria_equipo_concesion']}",
@@ -5558,33 +6155,13 @@ class Accesos(OcrMixin, AccesosModel):
                 "persona_nombre_otro": f"answers.{self.cons_f['persona_nombre_otro']}",
                 "observacion_concesion": f"answers.{self.cons_f['observacion_concesion']}",
             }
-            if search_fields:
-                fields_to_search = [searchable_fields[f] for f in search_fields if f in searchable_fields]
-            else:
+            # Llaves desconocidas se ignoran; si no queda ninguna válida se busca
+            # en todos los campos (un $or vacío lo rechaza Mongo).
+            fields_to_search = [searchable_fields[f] for f in search_fields if f in searchable_fields]
+            if not fields_to_search:
                 fields_to_search = list(searchable_fields.values())
             match_query["$or"] = [{field: {"$regex": pattern, "$options": "i"}} for field in fields_to_search]
 
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
-
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.cons_f['fecha_concesion']}": {"$gte": dateFrom,"$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.cons_f['fecha_concesion']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.cons_f['fecha_concesion']}": {"$lte": dateTo}
-            })
 
         count_result = self.format_cr(self.cr.aggregate([
             {'$match': match_query},
@@ -5619,7 +6196,6 @@ class Accesos(OcrMixin, AccesosModel):
                 item['firma']['file_url'] = item.pop('file_url')
             if item.get('file_name'):
                 item['firma']['file_name'] = item.pop('file_name')
-        print("QUE PASA",simplejson.dumps(result,indent=4))
         return {
             'records': result,
             'total_records': total_count,
@@ -5635,10 +6211,10 @@ class Accesos(OcrMixin, AccesosModel):
             f"answers.{self.cons_f['status_concesion']}": {"$in": ["abierto", "parcial"]},
         }
         if tipo:
-            pattern = re.escape(tipo.strip())
+            # Igualdad exacta: el nombre del equipo debe coincidir tal cual (incluye mayusculas)
             match_query[f"answers.{self.cons_f['grupo_equipos']}"] = {
                 "$elemMatch": {
-                    self.cons_f['nombre_equipo']: {"$regex": pattern, "$options": "i"},
+                    self.cons_f['nombre_equipo']: tipo.strip(),
                     self.cons_f['status_concesion_equipo']: {"$ne": "devuelto"},
                 }
             }
@@ -5793,7 +6369,34 @@ class Accesos(OcrMixin, AccesosModel):
         print("rondines", simplejson.dumps( records,indent=4))
         return  records
 
-    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}, limit=20, offset=0):
+    def bitacora_search_fields(self):
+        pase = f"answers.{self.PASE_ENTRADA_OBJ_ID}"
+        status = f"answers.{self.mf['tipo_registro']}"
+        # Llaves = las del panel de filtros (filters.py, option in_and_out).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'nombre_visitante': {'label': 'Visitante', 'paths': [f"{pase}.{self.mf['nombre_visita']}"]},
+            'contratista': {'label': 'Empresa', 'paths': [f"{pase}.{self.mf['empresa']}"]},
+            'status': {
+                'label': 'Estatus',
+                'paths': [status],
+                'options': lambda: self.facet_distinct_options(self.BITACORA_ACCESOS, status),
+            },
+            'perfil_visita': {'label': 'Perfil', 'paths': [f"{pase}.{self.mf['nombre_perfil']}"]},
+            'visita_a': {'label': 'Visita a', 'paths': [
+                f"answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}"]},
+            'caseta': {'label': 'Caseta', 'paths': [f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['nombre_area']}"]},
+        }
+
+    def get_search_fields_bitacora(self):
+        return self.search_fields_config(self.bitacora_search_fields())
+
+    def get_search_counts_bitacora(self, location=None, area=None, dateFrom='', dateTo='', filterDate="", facets=[], candidates=[]):
+        # Los filtros del panel llegan como facets exactos (no como dynamic_filters).
+        base_match = self.bitacora_base_match(location, area, dateFrom=dateFrom, dateTo=dateTo, filterDate=filterDate)
+        return self.count_facet_candidates(base_match, self.bitacora_search_fields(), facets, candidates)
+
+    def bitacora_base_match(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_ACCESOS
@@ -5822,25 +6425,26 @@ class Accesos(OcrMixin, AccesosModel):
                     continue
 
         zona = self.user.get('timezone','America/Monterrey')
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate, zona)
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
+        return self.facet_date_match(match_query, f"answers.{self.mf['fecha_entrada']}", dateFrom, dateTo, filterDate, zona=zona)
 
-        if dateFrom and dateTo:
-           match_query.update({
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom, "$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.mf['fecha_entrada']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.mf['fecha_entrada']}": {"$lte": dateTo}
-            })
+    def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}, limit=20, offset=0, facets=[], desglose=''):
+        # desglose='vehiculos' | 'equipos': una fila por vehiculo/equipo (pestañas de
+        # Bitácoras), con total y paginación sobre esas filas. Vacío = una por bitácora.
+        match_query = self.bitacora_base_match(location, area, prioridades, dateFrom, dateTo, filterDate, dynamic_filters)
+        facet_conditions = self.build_facets_match(self.bitacora_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
+
+        desglose_stages = []
+        grupo = {'vehiculos': self.mf['grupo_vehiculos'], 'equipos': self.mf['grupo_equipos']}.get(desglose)
+        if grupo:
+            match_query[f"answers.{grupo}.0"] = {"$exists": True}
+            desglose_stages.append({'$unwind': {'path': f"$answers.{grupo}", 'includeArrayIndex': 'item_index'}})
+            if desglose == 'vehiculos':
+                # Vehículos sin tipo son renglones vacíos del grupo; el front ya los omitía.
+                desglose_stages.append({'$match': {
+                    f"answers.{grupo}.{self.TIPO_DE_VEHICULO_OBJ_ID}.{self.mf['tipo_vehiculo']}": {"$nin": ["", None]}
+                }})
 
         proyect_fields ={
             '_id': 1,
@@ -5873,6 +6477,10 @@ class Accesos(OcrMixin, AccesosModel):
             'vehiculos':f"$answers.{self.mf['grupo_vehiculos']}",
             'visita_a': f"$answers.{self.mf['grupo_visitados']}"
         }
+        if grupo:
+            # Tras el $unwind el grupo es un objeto; se envuelve en lista para format_vehiculos/equipos.
+            proyect_fields[desglose] = [f"$answers.{grupo}"]
+            proyect_fields['item_index'] = 1
 
         lookup = {
             'from': 'form_answer',
@@ -5894,13 +6502,15 @@ class Accesos(OcrMixin, AccesosModel):
 
         query = [
             {'$match': match_query },
+            *desglose_stages,
             {'$project': proyect_fields},
             {'$lookup': lookup},
-            {'$sort':{'created_at':-1}},
+            {'$sort': {'created_at': -1, '_id': -1, 'item_index': 1} if grupo else {'created_at':-1}},
         ]
 
         count_query = [
             {"$match": match_query},
+            *desglose_stages,
             {"$count": "total"}
         ]
 
@@ -5948,6 +6558,15 @@ class Accesos(OcrMixin, AccesosModel):
         devoluciones_totales = item.get('grupo_equipos_devolucion', [])
 
         for equipo in equipos:
+            # Foto y comentario del prestamo. Los registros viejos los tienen guardados
+            # con los ids de Devoluciones (evidencia_entrega/comentario_entrega) dentro del equipo.
+            equipo['evidencia_prestamo'] = equipo.get('evidencia_prestamo') or equipo.get('evidencia_entrega') or []
+            equipo['comentario_prestamo'] = equipo.get('comentario_prestamo') or equipo.get('comentario_entrega') or ""
+            # TODO: alias temporal para la app movil publicada, que aun lee estos nombres
+            # del equipo. Quitar cuando salga la version que lee evidencia_prestamo.
+            equipo['evidencia_entrega'] = equipo['evidencia_prestamo']
+            equipo['comentario_entrega'] = equipo['comentario_prestamo']
+
             # Obtenemos el ID que identifica el movimiento del equipo
             id_mov = equipo.get('id_movimiento')
 
@@ -6008,7 +6627,24 @@ class Accesos(OcrMixin, AccesosModel):
         }
         return self.format_lockers(self.lkf_api.search_catalog( self.LOCKERS_CAT_ID, mango_query))
 
-    def get_list_fallas(self, location=None, area=None,status=None, folio=None, dateFrom="", dateTo="", filterDate=""):
+    def fallas_search_fields(self):
+        ff = self.fallas_fields
+        estatus = f"answers.{ff['falla_estatus']}"
+        # Llaves = las del panel de filtros (filters.py, option fallas).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'tipo_falla': {'label': 'Falla', 'paths': [f"answers.{self.LISTA_FALLAS_CAT_OBJ_ID}.{ff['falla']}"]},
+            'estatus_falla': {
+                'label': 'Estatus',
+                'paths': [estatus],
+                'options': lambda: self.facet_distinct_options(self.BITACORA_FALLAS, estatus),
+            },
+            'reportado_por': {'label': 'Reportado por', 'paths': [f"answers.{ff['falla_reporta_catalog']}.{ff['falla_reporta_nombre']}"]},
+            'area': {'label': 'Área', 'paths': [f"answers.{ff['falla_ubicacion_catalog']}.{ff['falla_caseta']}"]},
+            'falla_comentarios': {'label': 'Comentarios', 'paths': [f"answers.{ff['falla_comentarios']}"]},
+        }
+
+    def fallas_base_match(self, location=None, area=None, status=None, folio=None, dateFrom="", dateTo="", filterDate=""):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_FALLAS,
@@ -6024,34 +6660,21 @@ class Accesos(OcrMixin, AccesosModel):
             match_query[f"answers.{self.fallas_fields['falla_estatus']}"] = status
         if folio:
             match_query.update({"folio":folio})
+        return self.facet_date_match(match_query, f"answers.{self.fallas_fields['falla_fecha_hora']}", dateFrom, dateTo, filterDate)
 
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
+    def get_search_fields_fallas(self):
+        return self.search_fields_config(self.fallas_search_fields())
 
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
+    def get_search_counts_fallas(self, location=None, area=None, status=None, dateFrom="", dateTo="", filterDate="", facets=[], candidates=[]):
+        base_match = self.fallas_base_match(location, area, status, dateFrom=dateFrom, dateTo=dateTo, filterDate=filterDate)
+        return self.count_facet_candidates(base_match, self.fallas_search_fields(), facets, candidates)
 
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
-
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.fallas_fields['falla_fecha_hora']}": {"$gte": dateFrom, "$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.fallas_fields['falla_fecha_hora']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.fallas_fields['falla_fecha_hora']}": {"$lte": dateTo}
-            })
-
-        query = [
-            {'$match': match_query },
-            {'$project': {
+    def get_list_fallas(self, location=None, area=None,status=None, folio=None, dateFrom="", dateTo="", filterDate="", limit=None, skip=0, facets=[]):
+        match_query = self.fallas_base_match(location, area, status, folio, dateFrom, dateTo, filterDate)
+        facet_conditions = self.build_facets_match(self.fallas_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
+        project = {
                 "folio": "$folio",
                 'created_at':'$created_at',
                 'falla_estatus': f"$answers.{self.fallas_fields['falla_estatus']}",
@@ -6073,26 +6696,62 @@ class Accesos(OcrMixin, AccesosModel):
                 'falla_documento_solucion':f"$answers.{self.fallas_fields['falla_documento_solucion']}",
                 # 'falla_fecha_hora_solucion':f"$answers.{self.fallas_fields['falla_fecha_hora_solucion']}",
                 'falla_grupo_seguimiento':f"$answers.{self.fallas_fields['falla_grupo_seguimiento']}",
-            }},
-            {'$sort':{'created_at':-1}},
-        ]
-        result = self.format_cr_result(self.cr.aggregate(query))
-        for r in result:
+            }
+
+        def format_falla(r):
             if r:
                 r['falla_grupo_seguimiento_formated'] = self.format_seguimiento_fallas(r.get('falla_grupo_seguimiento',[]))
                 r.pop('falla_grupo_seguimiento', None)
-        return result
+            return r
 
-    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None, status=None):
+        if limit is not None:
+            return self.facet_list_page(match_query, project, {'created_at': -1}, limit, skip, format_falla)
+
+        # Formato anterior (lista completa) para quien todavía no pagina:
+        # front desplegado, app móvil y get_failure_by_folio.
+        query = [
+            {'$match': match_query },
+            {'$project': project},
+            {'$sort':{'created_at':-1}},
+        ]
+        return [format_falla(r) for r in self.format_cr_result(self.cr.aggregate(query))]
+
+
+    def incidencias_search_fields(self):
+        f = self.incidence_fields
+        estatus = f"answers.{f['estatus']}"
+        prioridad = f"answers.{f['prioridad_incidencia']}"
+        # Llaves = las del panel de filtros (filters.py, option incidencias).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'tipo_incidencia': {'label': 'Incidente', 'paths': [
+                f"answers.{f['incidencia_catalog']}.{f['incidencia']}", f"answers.{f['incidencia']}"]},
+            'estatus_incidencia': {
+                'label': 'Estatus',
+                'paths': [estatus],
+                'options': lambda: self.facet_distinct_options(self.BITACORA_INCIDENCIAS, estatus),
+            },
+            'prioridad_incidencia': {
+                'label': 'Gravedad',
+                'paths': [prioridad],
+                'options': lambda: self.facet_distinct_options(
+                    self.BITACORA_INCIDENCIAS, prioridad,
+                    labels={'critica': 'Crítica'}, order=['leve', 'moderada', 'critica']),
+            },
+            'reportado_por': {'label': 'Reportado por', 'paths': [f"answers.{f['reporta_incidencia_catalog']}.{f['reporta_incidencia']}"]},
+            'area': {'label': 'Lugar del incidente', 'paths': [f"answers.{f['area_incidencia_catalog']}.{f['area_incidencia']}"]},
+            'comentario_incidencia': {'label': 'Descripción', 'paths': [f"answers.{f['comentario_incidencia']}"]},
+        }
+
+    def incidencias_base_match(self, location=None, area=None, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None, status=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.BITACORA_INCIDENCIAS,
         }
-        # El front manda una lista de ubicaciones; otros callers mandan un string.
-        locations = location if isinstance(location, list) else [location]
-        locations = [loc for loc in locations if loc]
-        if locations:
-             match_query[f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}"] = {"$in": locations}
+        if location:
+             # El front puede mandar una ubicacion (str) o varias (list) desde el selector del header
+             ubicacion_key = f"answers.{self.incidence_fields['ubicacion_incidencia_catalog']}.{self.incidence_fields['ubicacion_incidencia']}"
+             match_query[ubicacion_key] = {"$in": location} if isinstance(location, list) else location
         if area:
              match_query[f"answers.{self.incidence_fields['area_incidencia_catalog']}.{self.incidence_fields['area_incidencia']}"] = area
         # Prioridad y estatus se guardan normalizados (ej. 'critica', 'abierto'); se acepta
@@ -6105,33 +6764,21 @@ class Accesos(OcrMixin, AccesosModel):
         if status:
             match_query.update({f"answers.{self.incidence_fields['estatus']}": self.clean_text(status)})
 
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
+        return self.facet_date_match(match_query, f"answers.{self.incidence_fields['fecha_hora_incidencia']}", dateFrom, dateTo, filterDate)
 
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
+    def get_search_fields_incidencias(self):
+        return self.search_fields_config(self.incidencias_search_fields())
 
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
+    def get_search_counts_incidencias(self, location=None, area=None, dateFrom="", dateTo="", filterDate="", status=None, facets=[], candidates=[]):
+        base_match = self.incidencias_base_match(location, area, dateFrom=dateFrom, dateTo=dateTo, filterDate=filterDate, status=status)
+        return self.count_facet_candidates(base_match, self.incidencias_search_fields(), facets, candidates)
 
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": dateFrom,"$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.incidence_fields['fecha_hora_incidencia']}": {"$lte": dateTo}
-            })
-
-        query = [
-            {'$match': match_query },
-            {'$project': {
+    def get_list_incidences(self, location, area, prioridades=[], dateFrom="", dateTo="", filterDate="", folio=None, status=None, limit=None, skip=0, facets=[]):
+        match_query = self.incidencias_base_match(location, area, prioridades, dateFrom, dateTo, filterDate, folio, status)
+        facet_conditions = self.build_facets_match(self.incidencias_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
+        project = {
                 'folio': '$folio',
                 'reporta_incidencia': f"$answers.{self.incidence_fields['reporta_incidencia_catalog']}.{self.incidence_fields['reporta_incidencia']}",
                 'fecha_hora_incidencia':f"$answers.{self.incidence_fields['fecha_hora_incidencia']}",
@@ -6187,13 +6834,9 @@ class Accesos(OcrMixin, AccesosModel):
                 'afectacion_patrimonial_incidencia':f"$answers.{self.incidence_fields['afectacion_patrimonial_incidencia']}",
                 'acciones_tomadas_incidencia':f"$answers.{self.incidence_fields['acciones_tomadas_incidencia']}",
                 'seguimientos_incidencia':f"$answers.{self.incidence_fields['seguimientos_incidencia']}",
-                }
-            },
-            {'$sort':{'folio':-1}}
-        ]
-        result = self.format_cr_result(self.cr.aggregate(query))
-        result = self.format_cr(result)
-        for r in result:
+        }
+
+        def format_incidencia(r):
             r['personas_involucradas_incidencia'] = self.format_personas_involucradas(r.get('personas_involucradas_incidencia',[]))
             r['acciones_tomadas_incidencia'] = self.format_acciones(r.get('acciones_tomadas_incidencia',[]))
             r['afectacion_patrimonial_incidencia'] = self.format_afectacion_patrimonial(r.get('afectacion_patrimonial_incidencia',[]))
@@ -6203,26 +6846,61 @@ class Accesos(OcrMixin, AccesosModel):
             r['prioridad_incidencia'] = r.get('prioridad_incidencia',[]).title()
             r['color_piel'] = r.get('color_piel',"").capitalize().replace("_", " ")
             r['estatus'] = r.get('estatus',"").capitalize()
-        print("resultados", simplejson.dumps(result, indent=4))
-        return result
+            return r
 
-    def get_list_notes(self, location, area, status=None, limit=10, offset=0, dateFrom="", dateTo=""):
-        '''
-        Función para obtener las notas, puedes pasarle un area, una ubicacion, un estatus, una fecha desde
-        y una fecha hasta
-        '''
-        response = []
+        if limit is not None:
+            page = self.facet_list_page(match_query, project, {'folio': -1}, limit, skip)
+            page['records'] = [format_incidencia(r) for r in self.format_cr(page['records'])]
+            return page
+
+        # Formato anterior (lista completa) para quien todavía no pagina.
+        query = [
+            {'$match': match_query },
+            {'$project': project},
+            {'$sort':{'folio':-1}}
+        ]
+        result = self.format_cr_result(self.cr.aggregate(query))
+        return [format_incidencia(r) for r in self.format_cr(result)]
+
+    def notas_search_fields(self):
+        nf = self.notes_fields
+        estatus = f"answers.{nf['note_status']}"
+        # Llaves = las del panel de filtros (filters.py, option notas; "creador_por" tal cual).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'note': {'label': 'Nota', 'paths': [f"answers.{nf['note']}"]},
+            'estatus': {
+                'label': 'Estatus',
+                'paths': [estatus],
+                'options': lambda: self.facet_distinct_options(self.ACCESOS_NOTAS, estatus),
+            },
+            'creador_por': {'label': 'Creado por', 'paths': ['created_by_name']},
+            'note_guard': {'label': 'Guardia', 'paths': [f"answers.{nf['note_catalog_guard']}.{nf['note_guard']}"]},
+            'note_booth': {'label': 'Caseta', 'paths': [f"answers.{nf['note_catalog_booth']}.{nf['note_booth']}"]},
+        }
+
+    def notas_base_match(self, location=None, area=None, status=None, dateFrom="", dateTo="", filterDate="", locations=[]):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.ACCESOS_NOTAS,
-            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}":location
         }
+        ubicacion = f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['location']}"
+        if locations:
+            match_query[ubicacion] = {"$in": locations}
+        elif isinstance(location, list):
+            match_query[ubicacion] = {"$in": location}
+        else:
+            # Comportamiento de siempre: una ubicación (también vacía) por igualdad.
+            match_query[ubicacion] = location
         if area and not area == 'todas':
             match_query.update({
                 f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.f['area']}":area
             })
-        if status != 'dia':
+        # status "dia" (desde turnos) = sin filtro de estatus; "" = sin filtro (buscador nuevo).
+        if status and status != 'dia':
             match_query.update({f"answers.{self.notes_fields['note_status']}":status})
+        if filterDate:
+            return self.facet_date_match(match_query, f"answers.{self.notes_fields['note_open_date']}", dateFrom, dateTo, filterDate)
         if dateFrom and dateTo:
             if dateFrom == dateTo:
                 if "T" not in dateFrom:
@@ -6249,6 +6927,24 @@ class Accesos(OcrMixin, AccesosModel):
             match_query.update({
                 f"answers.{self.notes_fields['note_open_date']}": {"$lte": dateTo}
             })
+        return match_query
+
+    def get_search_fields_notas(self):
+        return self.search_fields_config(self.notas_search_fields())
+
+    def get_search_counts_notas(self, location=None, area=None, status=None, dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
+        base_match = self.notas_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        return self.count_facet_candidates(base_match, self.notas_search_fields(), facets, candidates)
+
+    def get_list_notes(self, location, area, status=None, limit=10, offset=0, dateFrom="", dateTo="", filterDate="", locations=[], facets=[]):
+        '''
+        Función para obtener las notas, puedes pasarle un area, una ubicacion, un estatus, una fecha desde
+        y una fecha hasta
+        '''
+        match_query = self.notas_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        facet_conditions = self.build_facets_match(self.notas_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
         query = [
             {'$match': match_query },
             {'$project': {
@@ -6295,8 +6991,10 @@ class Accesos(OcrMixin, AccesosModel):
 
         return notes
 
-    def get_lista_pase(self, location, status='activo', inActive="true"):
+    def get_lista_pase(self, location, status='activo', inActive="true", area=None):
         status_value = self.pase_entrada_fields.get('status_pase', '')
+        # Con caseta multiubicación se listan los pases de cualquiera de sus ubicaciones.
+        locations = self.get_booth_locations(area, location)
         match_query = {
             "deleted_at": {"$exists": False},
             "form_id": self.PASE_ENTRADA,
@@ -6351,14 +7049,18 @@ class Accesos(OcrMixin, AccesosModel):
 
         query = [
             {'$match': match_query},
-            {'$unwind': f"$answers.{self.mf['grupo_ubicaciones_pase']}"},
-            {'$match': {f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": location}},
+            # Sin $unwind: un pase con varias de las ubicaciones saldría repetido.
+            {'$match': {f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}": {"$in": locations}}},
             {'$project': proyect_fields},
             {'$sort': {'_id': -1}},
         ]
 
         records = self.format_cr(self.cr.aggregate(query))
         for rec in records:
+            # 'ubicacion' sigue siendo un string: la ubicación de la caseta que coincide con el pase.
+            ubicaciones_pase = rec.get('ubicacion') or []
+            ubicaciones_pase = ubicaciones_pase if isinstance(ubicaciones_pase, list) else [ubicaciones_pase]
+            rec['ubicacion'] = next((loc for loc in locations if loc in ubicaciones_pase), self.unlist(ubicaciones_pase))
             rec['qr_code'] = rec['_id']
             rec['empresa'] = self.unlist(rec.get('empresa', []))
         return records
@@ -6540,12 +7242,45 @@ class Accesos(OcrMixin, AccesosModel):
                 if qr in pases_info:
                     acompanante.update(pases_info[qr])
 
-    def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
+    def pases_search_fields(self):
+        status = f"answers.{self.pase_entrada_fields['status_pase']}"
+        visita = f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}"
+        # Llaves = las del panel de filtros (filters.py, option pases).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'nombre': {'label': 'Visitante', 'paths': [
+                f"{visita}.{self.mf['nombre_visita']}", f"answers.{self.mf['nombre_pase']}"]},
+            'empresa': {'label': 'Empresa', 'paths': [
+                f"{visita}.{self.mf['empresa']}", f"answers.{self.mf['empresa_pase']}"]},
+            'email': {'label': 'Email', 'paths': [
+                f"{visita}.{self.mf['email_vista']}", f"answers.{self.mf['email_pase']}"]},
+            'status': {
+                'label': 'Estatus',
+                'paths': [status],
+                'options': lambda: self.facet_distinct_options(self.PASE_ENTRADA, status),
+            },
+            'perfil_visita': {'label': 'Perfil', 'paths': [f"answers.{self.CONFIG_PERFILES_OBJ_ID}.{self.mf['nombre_perfil']}"]},
+            'visita_a': {'label': 'Visita a', 'paths': [
+                f"answers.{self.mf['grupo_visitados']}.{self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID}.{self.mf['nombre_empleado']}"]},
+        }
+
+    def get_search_fields_pases(self):
+        return self.search_fields_config(self.pases_search_fields())
+
+    def get_search_counts_pases(self, tab_status="", location=None, dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
+        base_match = self.pases_base_match(tab_status=tab_status, location=location, dateFrom=dateFrom, dateTo=dateTo, filterDate=filterDate, locations=locations)
+        user_ids = self.get_visible_user_ids()
+        if user_ids:
+            base_match = self.match_update(base_match, created_by_id=user_ids)
+        return self.count_facet_candidates(base_match, self.pases_search_fields(), facets, candidates)
+
+    def pases_base_match(self, tab_status="", search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[]):
+        """Filtro de "mis pases" (visita_a = yo o creado por mí) + pestaña,
+        búsqueda, ubicación, filtros del panel y fecha. Sin facets."""
         employee = self.get_employee_data(user_id=self.user.get('user_id'), get_one=True)
         fecha_hoy = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0).astimezone(pytz.utc).replace(tzinfo=None)
         fecha_local = datetime.now(pytz.timezone(self.user['timezone'])).replace(microsecond=0)
         fecha_utc = fecha_local.astimezone(pytz.utc).replace(tzinfo=None, microsecond=0)
-
         fecha_hoy_formateada = fecha_hoy.strftime('%Y-%m-%d %H:%M:%S')
         match_query = {
             'form_id':self.PASE_ENTRADA,
@@ -6559,6 +7294,7 @@ class Accesos(OcrMixin, AccesosModel):
             }
         ]
         }
+
         if not tab_status:
             tab_status = ""
         if tab_status.strip().lower() == "favoritos":
@@ -6573,12 +7309,16 @@ class Accesos(OcrMixin, AccesosModel):
             match_query.update({f"answers.{self.pase_entrada_fields['status_pase']}":'proceso'})
 
         if search_name:
-            match_query.update({
-                f"$or": [
-                    {f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}": {"$regex": search_name, "$options": "i"}},
-                    {f"answers.{self.mf['nombre_pase']}": {"$regex": search_name, "$options": "i"}}
-                ]
-            })
+            # La búsqueda se suma al $or de "mis pases" (visita_a = yo o creado por
+            # mí) en un $and; si lo reemplazara, se verían pases de otros usuarios.
+            pattern = re.escape(search_name.strip())
+            match_query["$and"] = [
+                {"$or": match_query.pop("$or")},
+                {"$or": [
+                    {f"answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}": {"$regex": pattern, "$options": "i"}},
+                    {f"answers.{self.mf['nombre_pase']}": {"$regex": pattern, "$options": "i"}}
+                ]},
+            ]
         if location:
             match_query[f"answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}"] = location
         if locations:
@@ -6595,45 +7335,24 @@ class Accesos(OcrMixin, AccesosModel):
                     continue
 
         zona = self.user.get('timezone','America/Monterrey')
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate, zona)
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
+        return self.facet_date_match(match_query, f"answers.{self.mf['fecha_desde_visita']}", dateFrom, dateTo, filterDate, zona=zona)
 
-        if dateFrom and dateTo:
-           match_query.update({
-                f"answers.{self.mf['fecha_desde_visita']}": {"$gte": dateFrom, "$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.mf['fecha_desde_visita']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-            match_query.update({
-                f"answers.{self.mf['fecha_desde_visita']}": {"$lte": dateTo}
-            })
+    def get_my_pases(self, tab_status="", limit=10, skip=0, search_name=None, location=None, dynamic_filters=[], dateFrom="", dateTo="", filterDate="", locations=[], facets=[], **kwargs):
+        user_ids = self.get_visible_user_ids()
+        match_query = self.pases_base_match(tab_status, search_name, location, dynamic_filters, dateFrom, dateTo, filterDate, locations)
+        facet_conditions = self.build_facets_match(self.pases_search_fields(), facets)
+        if user_ids:
+            match_query = self.match_update(match_query, created_by_id=user_ids)
+        if facet_conditions:
+            match_query.setdefault("$and", []).extend(facet_conditions)
 
-        # Conteo total de registros
-        count_query = [
-            {"$match": match_query},
-            {"$count": "total"}
-        ]
-        count_result = self.format_cr(self.cr.aggregate(count_query))
-        total_count = count_result[0]['total'] if count_result else 0
-        current_page = (skip // limit) + 1
-        total_pages = ceil(total_count / limit) if limit else 1
-
-        query = [
-            {"$match":match_query},
+        project = [
             {'$project':
                 {
                     '_id': 1,
                     'folio': "$folio",
                     'favoritos':f"$answers.{self.pase_entrada_fields['favoritos']}",
                     'ubicacion': f"$answers.{self.mf['grupo_ubicaciones_pase']}.{self.UBICACIONES_CAT_OBJ_ID}.{self.f['location']}",
-                    # 'ubicacion': f"$answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
                     'nombre': {"$ifNull":[
                         f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['nombre_visita']}",
                         f"$answers.{self.mf['nombre_pase']}"]},
@@ -6675,11 +7394,7 @@ class Accesos(OcrMixin, AccesosModel):
                     'tipo_visita': f"$answers.{self.pase_entrada_fields['tipo_visita']}",
                     'limite_de_acceso': f"$answers.{self.mf['config_limitar_acceso']}",
                     'config_dia_de_acceso': f"$answers.{self.mf['config_dia_de_acceso']}",
-                    'identificacion': {'$ifNull':[
-                        f"$answers.{self.VISITA_AUTORIZADA_CAT_OBJ_ID}.{self.mf['identificacion']}",
-                        f"$answers.{self.pase_entrada_fields['walkin_identificacion']}"]},
                     'limitado_a_dias':f"$answers.{self.mf['config_dias_acceso']}",
-                    'perfil_pase':f"$answers.{self.CONFIG_PERFILES_OBJ_ID}",
                     'tipo_de_comentario': f"$answers.{self.mf['tipo_de_comentario']}",
                     'tipo_fechas_pase': f"$answers.{self.mf['tipo_visita_pase']}",
                     'enviar_correo_pre_registro': f"$answers.{self.pase_entrada_fields['enviar_correo_pre_registro']}",
@@ -6706,20 +7421,26 @@ class Accesos(OcrMixin, AccesosModel):
                     'created_by':"$user_name"
                 }
             },
-            {'$sort':{'_id':-1}},
         ]
-        query.append({'$skip': skip})
-        query.append({'$limit': limit})
-        records = self.format_cr(self.cr.aggregate(query))
-        # print("RECORDS",  simplejson.dumps(records, indent=4))
+        # Conteo total y pagina en una sola pasada; se ordena y pagina antes del $project
+        query = [
+            {"$match": match_query},
+            {'$sort': {'_id': -1}},
+            {'$facet': {
+                'total': [{'$count': 'n'}],
+                'records': [{'$skip': skip}, {'$limit': limit}] + project,
+            }},
+        ]
+        result = (list(self.cr.aggregate(query)) or [{}])[0]
+        total_count = (result.get('total') or [{}])[0].get('n', 0)
+        current_page = (skip // limit) + 1
+        total_pages = ceil(total_count / limit) if limit else 1
+        records = self.format_cr(result.get('records', []))
         self._hidratar_acompanantes(records)
+        ingresos = self.get_count_ingresos_many([x.get('_id') for x in records])
+        padres = self.get_pases_padre_many([self.extraer_id_padre(x) for x in records if x.get('url_padre')])
         for x in records:
-            qr_code = x.get('_id')
-            total_entradas = self.get_count_ingresos(qr_code)
-            if total_entradas:
-                x['total_entradas'] = total_entradas.get('total_records')
-            else:
-                x['total_entradas'] = 0
+            x['total_entradas'] = ingresos.get(x.get('_id'), 0)
             visita_a =[]
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
             d = x.get('visita_a_departamento',[])
@@ -6734,30 +7455,12 @@ class Accesos(OcrMixin, AccesosModel):
                 emp['user_id'] = e[idx] if idx < len(e) and e[idx] else [""]
                 emp['email'] = u[idx] if idx < len(u) and u[idx] else [""]
                 visita_a.append(emp)
-            if x['tipo_de_pase'] == 'Visita General' or x['tipo_de_pase'] == 'visita general':
-                x['visita_a'] = visita_a
-                x['favoritos'] = x.get('favoritos', [""]) if x.get('favoritos') else ""
-                x['motivo_visita'] = x.get('motivo_visita', [""]) if x.get('motivo_visita') else ""
-                x['email'] = x.get('email', [""]) if x.get('email') else ""
-                x['empresa'] = x.get('empresa', [""]) if x.get('empresa') else ""
-                x['telefono'] = x.get('telefono', [""]) if x.get('telefono') else ""
-                # x['pdf'] = self.lkf_api.get_pdf_record(x['_id'], template_id = 447, name_pdf='Pase de Entrada', send_url=True)
-            else:
-
-                x['visita_a'] = visita_a
-                x['favoritos'] = x.get('favoritos') or ""
-                x['motivo_visita'] =x.get('motivo_visita') or ""
-                x['email']= x.get('email') or ""
-                x['empresa']= x.get('empresa') or ""
-                x['telefono']= x.get('telefono') or ""
-                # x['pdf'] = self.lkf_api.get_pdf_record(x[' # for idx, dic in enumerate(x['grupo_areas_acceso']):
-            # x['comentario_area_pase']=x.pop('comentario_area_pase',[])
-
-
-                # for key in list(item.keys()):
-                #     if key in id_to_name_mapping:
-                #         # Reemplaza el id hexadecimal por su nombre en el diccionario
-                #         item[self.pase_entrada_fields['commentario_area']] = item.pop(key)
+            x['visita_a'] = visita_a
+            x['favoritos'] = x.get('favoritos') or ""
+            x['motivo_visita'] = x.get('motivo_visita') or ""
+            x['email'] = x.get('email') or ""
+            x['empresa'] = x.get('empresa') or ""
+            x['telefono'] = x.get('telefono') or ""
 
             for visita in x.get('visita_a', []):
                 visita['departamento'] = visita['departamento'][0] if isinstance(visita.get('departamento'), list) and visita.get('departamento') else visita.get('departamento', "")
@@ -6765,7 +7468,6 @@ class Accesos(OcrMixin, AccesosModel):
                 visita['user_id'] = visita['user_id'][0] if isinstance(visita.get('user_id'), list) and visita.get('user_id') else visita.get('user_id', "")
                 visita['email'] = visita['email'][0] if isinstance(visita.get('email'), list) and visita.get('email') else visita.get('email', "")
 
-            visitas = x.get('visita_a', [])
             x['status_pase'] = x.get('estatus', "")
             x['autorizado_por'] = x.get('autorizado_por', "")
             x['grupo_areas_acceso'] = self._labels_list(x.pop('grupo_areas_acceso',[]), self.mf)
@@ -6778,19 +7480,7 @@ class Accesos(OcrMixin, AccesosModel):
             if x['url_padre']:
                 padre_id = self.extraer_id_padre(x)
                 if padre_id:
-                    try:
-                        detalle_padre = self.get_detail_access_pass(padre_id) or {}
-                        x['pase_padre'] = {
-                            'foto': self.unlist(detalle_padre.get('foto', '')),
-                            'identificacion': self.unlist(detalle_padre.get('identificacion', '')),
-                            'nombre': self.unlist(detalle_padre.get('nombre', '')),
-                            'estatus': self.unlist(detalle_padre.get('estatus', '')),
-                            'telefono': self.unlist(detalle_padre.get('telefono', '')),
-                            'email': self.unlist(detalle_padre.get('email', '')),
-                        } if detalle_padre else {}
-                    except Exception as e:
-                        print(f"Error obteniendo pase padre {padre_id}: {e}")
-                        x['pase_padre'] = {}
+                    x['pase_padre'] = padres.get(padre_id, {})
             x['grupo_vehiculos'] = self.format_vehiculos_simple(x.pop('grupo_vehiculos',[]))
             x['grupo_equipos'] = self.format_equipos_simple(x.pop('grupo_equipos',[]))
             x['comentarios'] = x['grupo_instrucciones_pase']
@@ -6810,7 +7500,6 @@ class Accesos(OcrMixin, AccesosModel):
             x.pop('visita_a_puesto', None)
             x.pop('visita_a_user_id', None)
             x.pop('visita_a_email', None)
-        # print("data", simplejson.dumps(records, indent=4))
         return  {
             "records": records,
             "total_records": total_count,
@@ -6845,16 +7534,20 @@ class Accesos(OcrMixin, AccesosModel):
         return data
 
     def get_pass_img(self, qr_code):
-        answers = {}
         pdf_to_img = self.update_pass_img(qr_code)
         if pdf_to_img:
-            answers.update({self.pase_entrada_fields['pdf_to_img']: pdf_to_img})
-            response = self.lkf_api.patch_multi_record( answers = answers, form_id=self.PASE_ENTRADA, record_id=[qr_code])
-            if response.get('status_code') in [200, 201, 202]:
+            #---$set directo a Mongo y no patch_multi_record: el patch cuenta como
+            #   edicion y vuelve a disparar los flujos de correo/SMS del pase
+            #   (pre registro con el pase en proceso) -> doble correo (2610-1398).
+            res = self.cr.update_one(
+                {'_id': ObjectId(qr_code), 'form_id': self.PASE_ENTRADA, 'deleted_at': {'$exists': False}},
+                {'$set': {f"answers.{self.pase_entrada_fields['pdf_to_img']}": pdf_to_img}}
+            )
+            if res.matched_count:
                 url = self.unlist(pdf_to_img).get('file_url') if len(pdf_to_img) > 0 else ''
                 return url
             else:
-                print('=============', response)
+                print('=============', qr_code)
                 self.LKFException({'title': 'Error', 'msg': 'Hubo un error al actualizar los registros.'})
         return False
 
@@ -6867,77 +7560,107 @@ class Accesos(OcrMixin, AccesosModel):
     def get_pdf_multi(self, record_ids, name_pdf=''):
         templates = self.lkf_api.get_pdf_templates(self.PASE_ENTRADA) or []
         template_id = next((t.get('id') for t in templates if t.get('_type') == 'multiple-records'), None)
+        # Sin plantilla multiple-records LinkaForm regresa un ZIP con PDFs sueltos
+        if not template_id:
+            return {'error': 'El PDF de pases con acompañantes no está configurado en esta cuenta. Contacta al administrador.'}
         records_uri = ['/api/infosync/form_answer/{}/'.format(rid) for rid in record_ids]
         res = self.lkf_api.get_pdf_record(records_uri, template_id=template_id, name_pdf=name_pdf)
         if res:
             res['_id'] = str(res.get('_id', ''))
         return res
 
-    def get_paquetes(self, location= "", area="", status="", dateFrom="", dateTo="", filterDate=""):
+    def paqueteria_search_fields(self):
+        qf = self.paquetes_fields
+        estatus = f"answers.{qf['estatus_paqueteria']}"
+        # Llaves = las del panel de filtros (filters.py).
+        return {
+            'folio': {'label': 'Folio', 'paths': ['folio']},
+            'quien_recibe_paqueteria': {'label': 'Destinatario', 'paths': [
+                f"answers.{qf['quien_recibe_cat']}.{qf['quien_recibe_paqueteria']}",
+                f"answers.{qf['quien_recibe_otro']}",
+            ]},
+            'proveedor': {'label': 'Proveedor', 'paths': [f"answers.{qf['proveedor_cat']}.{qf['proveedor']}"]},
+            'estatus_paqueteria': {
+                'label': 'Estatus',
+                'paths': [estatus],
+                'options': lambda: self.facet_distinct_options(self.PAQUETERIA, estatus),
+            },
+            'locker': {'label': 'Locker', 'paths': [f"answers.{qf['guardado_en_paqueteria']}"]},
+            'area_paqueteria': {'label': 'Área', 'paths': [f"answers.{qf['area_paqueteria']}"]},
+            'descripcion_paqueteria': {'label': 'Descripción', 'paths': [f"answers.{qf['descripcion_paqueteria']}"]},
+        }
+
+    def paqueteria_base_match(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[]):
+        qf = self.paquetes_fields
         match_query = {
-            "deleted_at":{"$exists":False},
+            "deleted_at": {"$exists": False},
             "form_id": self.PAQUETERIA,
         }
         if location:
-             match_query[f"answers.{self.paquetes_fields['ubicacion_paqueteria']}"] = location
+            match_query[f"answers.{qf['ubicacion_paqueteria']}"] = location
+        if locations:
+            match_query[f"answers.{qf['ubicacion_paqueteria']}"] = {"$in": locations}
         if area:
-             match_query[f"answers.{self.paquetes_fields['area_paqueteria']}"] = area
+            match_query[f"answers.{qf['area_paqueteria']}"] = area
         if status:
-             match_query[f"answers.{self.paquetes_fields['estatus_paqueteria']}"] = status
+            match_query[f"answers.{qf['estatus_paqueteria']}"] = status
+        return self.facet_date_match(match_query, f"answers.{qf['fecha_recibido_paqueteria']}", dateFrom, dateTo, filterDate)
 
-        user_data = self.lkf_api.get_user_by_id(self.user.get('user_id'))
-        zona = user_data.get('timezone','America/Monterrey')
+    def get_search_fields_paqueteria(self):
+        return self.search_fields_config(self.paqueteria_search_fields())
 
-        if filterDate != "range":
-            dateFrom, dateTo = self.get_range_dates(filterDate,zona)
+    def get_search_counts_paqueteria(self, location="", area="", status="", dateFrom="", dateTo="", filterDate="", locations=[], facets=[], candidates=[]):
+        base_match = self.paqueteria_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        return self.count_facet_candidates(base_match, self.paqueteria_search_fields(), facets, candidates)
 
-            if dateFrom:
-                dateFrom = str(dateFrom)
-            if dateTo:
-                dateTo = str(dateTo)
-        if dateFrom and dateTo:
-            match_query.update({
-                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$gte": dateFrom, "$lte": dateTo},
-            })
-        elif dateFrom:
-            match_query.update({
-                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$gte": dateFrom}
-            })
-        elif dateTo:
-           match_query.update({
-                f"answers.{self.paquetes_fields['fecha_recibido_paqueteria']}": {"$lte": dateTo}
-            })
-        print("HOLAA")
+    def get_paquetes(self, location= "", area="", status="", dateFrom="", dateTo="", filterDate="", limit=None, skip=0, locations=[], facets=[]):
+        qf = self.paquetes_fields
+        match_query = self.paqueteria_base_match(location, area, status, dateFrom, dateTo, filterDate, locations)
+        facet_conditions = self.build_facets_match(self.paqueteria_search_fields(), facets)
+        if facet_conditions:
+            match_query["$and"] = facet_conditions
+        project = {
+            "folio":"$folio",
+            "_id":"$_id",
+            'created_at':'$created_at',
+            'ubicacion_paqueteria':f"$answers.{qf['ubicacion_paqueteria']}",
+            'area_paqueteria': f"$answers.{qf['area_paqueteria']}",
+            'fotografia_paqueteria':f"$answers.{qf['fotografia_paqueteria']}",
+            'descripcion_paqueteria':f"$answers.{qf['descripcion_paqueteria']}",
+            'quien_recibe_paqueteria':f"$answers.{qf['quien_recibe_cat']}.{qf['quien_recibe_paqueteria']}",
+            'guardado_en_paqueteria': f"$answers.{qf['guardado_en_paqueteria']}",
+            'fecha_recibido_paqueteria': f"$answers.{qf['fecha_recibido_paqueteria']}",
+            'fecha_entregado_paqueteria': f"$answers.{qf['fecha_entregado_paqueteria']}",
+            'estatus_paqueteria': f"$answers.{qf['estatus_paqueteria']}",
+            'entregado_a_paqueteria': f"$answers.{qf['entregado_a_paqueteria']}",
+            'proveedor': f"$answers.{qf['proveedor_cat']}.{qf['proveedor']}",
+            'quien_recibe_otro': f"$answers.{qf['quien_recibe_otro']}",
+        }
+
+        def format_paquete(x):
+            status = x.get('estatus_paqueteria', [])
+            x['estatus_paqueteria'] = status.pop() if status else ""
+            # Destinatario externo ("Otro"): va en un campo de texto, no en el catálogo de
+            # empleados; se expone en la misma llave para que el front lo muestre igual.
+            if not x.get('quien_recibe_paqueteria') and x.get('quien_recibe_otro'):
+                x['quien_recibe_paqueteria'] = x['quien_recibe_otro']
+            return x
+
+        if limit is not None:
+            return self.facet_paginated(match_query, project, limit, skip, format_paquete)
+
+        # Formato anterior (lista; sin fecha, solo los últimos 25) para quien
+        # todavía no pagina: front desplegado y app móvil.
         query = [
             {'$match': match_query },
-            {'$project': {
-                "folio":"$folio",
-                "_id":"$_id",
-                'created_at':'$created_at',
-                'ubicacion_paqueteria':f"$answers.{self.paquetes_fields['ubicacion_paqueteria']}",
-                'area_paqueteria': f"$answers.{self.paquetes_fields['area_paqueteria']}",
-                'fotografia_paqueteria':f"$answers.{self.paquetes_fields['fotografia_paqueteria']}",
-                'descripcion_paqueteria':f"$answers.{self.paquetes_fields['descripcion_paqueteria']}",
-                'quien_recibe_paqueteria':f"$answers.{self.paquetes_fields['quien_recibe_cat']}.{self.paquetes_fields['quien_recibe_paqueteria']}",
-                'guardado_en_paqueteria': f"$answers.{self.paquetes_fields['guardado_en_paqueteria']}",
-                'fecha_recibido_paqueteria': f"$answers.{self.paquetes_fields['fecha_recibido_paqueteria']}",
-                'fecha_entregado_paqueteria': f"$answers.{self.paquetes_fields['fecha_entregado_paqueteria']}",
-                'estatus_paqueteria': f"$answers.{self.paquetes_fields['estatus_paqueteria']}",
-                'entregado_a_paqueteria': f"$answers.{self.paquetes_fields['entregado_a_paqueteria']}",
-                'proveedor': f"$answers.{self.paquetes_fields['proveedor_cat']}.{self.paquetes_fields['proveedor']}",
-                'quien_recibe_otro': f"$answers.{self.cons_f['quien_recibe_otro']}",
-            }},
+            {'$project': project},
             {'$sort':{'created_at':-1}},
         ]
         if not filterDate:
             query.append(
                 {"$limit":25}
             )
-        pr= self.format_cr_result(self.cr.aggregate(query))
-        for x in pr:
-            status = x.get('estatus_paqueteria', [])
-            x['estatus_paqueteria'] = status.pop() if status else ""
-        return pr
+        return [format_paquete(x) for x in self.format_cr_result(self.cr.aggregate(query))]
 
     def get_pass_custom(self,qr_code):
         pass_selected= self.get_detail_access_pass(qr_code=qr_code)
@@ -7057,7 +7780,70 @@ class Accesos(OcrMixin, AccesosModel):
                 booth_address.pop('folio')
                 booth.update(booth_address)
                 user_booths_with_area.append(booth)
+        extra_locations = self.get_areas_extra_locations([(b.get('area'), b.get('location')) for b in user_booths_with_area])
+        for booth in user_booths_with_area:
+            booth['extra_locations'] = extra_locations.get((booth.get('area'), booth.get('location')), [])
         return user_booths_with_area
+
+    def get_booth_locations(self, area, location):
+        '''
+        Ubicaciones en las que opera una caseta: la base y, si el área es multiubicación,
+        sus ubicaciones extra (Accesos Parque Industrial). La base siempre va primero.
+        '''
+        if not location:
+            return []
+        extra = self.get_areas_extra_locations([(area, location)]).get((area, location), []) if area else []
+        return [location] + extra
+
+    def get_areas_extra_locations(self, areas):
+        '''
+        Ubicaciones extra de las áreas configuradas como "Multiple Ubicacion" = si.
+        areas: lista de tuplas (area, ubicacion base).
+        Regresa {(area, ubicacion base): [ubicaciones extra]} solo para las áreas multiubicación;
+        las extra salen de "Accesos Parque Industrial" y no incluyen la ubicación base.
+        '''
+        areas = [(a, l) for a, l in areas if a and l]
+        if not areas:
+            return {}
+        loc_f = self.Location.f
+        area_names = list({a for a, _ in areas})
+        multi_areas = self.cr.find({
+            "deleted_at": {"$exists": False},
+            "form_id": self.Location.AREAS_DE_LAS_UBICACIONES,
+            f"answers.{loc_f['area']}": {"$in": area_names},
+            f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{loc_f['location']}": {"$in": list({l for _, l in areas})},
+            f"answers.{loc_f['multiple_ubicacion']}": "si",
+        }, {f"answers.{loc_f['area']}": 1, f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{loc_f['location']}": 1})
+        multi = set()
+        for rec in multi_areas:
+            ans = rec.get('answers', {})
+            multi.add((ans.get(loc_f['area']), self.unlist(ans.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(loc_f['location']))))
+        multi &= set(areas)
+        if not multi:
+            return {}
+
+        # "Accesos Parque Industrial" referencia el área solo por nombre (no puede traer también
+        # su ubicación: el catalog-detail choca con el id de la ubicación del grupo). Solo se
+        # consideran áreas multiubicación, así que un nombre repetido solo es ambiguo si ambas
+        # áreas están marcadas como multiubicación.
+        parque_records = self.cr.find({
+            "deleted_at": {"$exists": False},
+            "form_id": self.ACCESOS_PARQUE_INDUSTRIAL,
+            f"answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{loc_f['area']}": {"$in": list({a for a, _ in multi})},
+        }, {"answers": 1})
+        locations_by_area = {}
+        for rec in parque_records:
+            ans = rec.get('answers', {})
+            area = self.unlist(ans.get(self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID, {}).get(loc_f['area']))
+            for row in ans.get(self.f['parque_industrial_ubicaciones'], []) or []:
+                loc = self.unlist(row.get(self.UBICACIONES_CAT_OBJ_ID, {}).get(loc_f['location']))
+                if loc and loc not in locations_by_area.setdefault(area, []):
+                    locations_by_area[area].append(loc)
+
+        return {
+            (area, base): [loc for loc in locations_by_area.get(area, []) if loc != base]
+            for area, base in multi
+        }
 
     def get_user_contacts(self):
         user_id = self.user['user_id']
@@ -7411,6 +8197,7 @@ class Accesos(OcrMixin, AccesosModel):
             "city": booth_address.get('city'),
             "state": booth_address.get('state'),
             "address": booth_address.get('address'),
+            "extra_locations": self.get_areas_extra_locations([(booth_area, booth_location)]).get((booth_area, booth_location), []),
         }
 
         #! Si el último checkin está cerrado pero existe uno huérfano abierto,
@@ -7649,7 +8436,11 @@ class Accesos(OcrMixin, AccesosModel):
             access_pass['config_dia_de_acceso'] = access_pass.get('config_dia_de_acceso', "").replace("_", " ")
             total_entradas = self.get_count_ingresos(qr_code)
             access_pass['total_entradas'] = total_entradas.get('total_records') if total_entradas else "0"
-            access_pass['anfitrions_data'] = access_pass.get('visita_a_details', [])
+            # El front (credential.tsx) pinta "Visita a" con name/email/telefono;
+            # get_detail_access_pass ya arma esa info en visita_a.
+            access_pass['anfitrions_data'] = access_pass.get('visita_a_details') or [
+                {**v, 'name': v.get('nombre', '')} for v in access_pass.get('visita_a', [])
+            ]
 
             if access_pass.get('grupo_areas_acceso'):
                 for area in access_pass['grupo_areas_acceso']:
@@ -7996,13 +8787,21 @@ class Accesos(OcrMixin, AccesosModel):
                 #devolucion de equipos
                 dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
                 dev[self.cons_f['id_movimiento_devolucion']]  = eq[self.cons_f['id_movimiento']]
-                dev[self.cons_f['cantidad_devolucion']]  = self.get_cantidad_pendiente(rec, self.format_cr([eq],get_one=True, ids_label_dct=self.cons_f), status)
+                # get_cantidad_pendiente regresa lo que queda pendiente (en total siempre 0),
+                # se usa solo para validar; lo devuelto es lo que faltaba tras devoluciones parciales.
+                eq_fmt = self.format_cr([eq],get_one=True, ids_label_dct=self.cons_f)
+                self.get_cantidad_pendiente(rec, eq_fmt, status)
+                ya_devuelto = sum(
+                    d.get('cantidad_devolucion', 0) for d in rec.get('grupo_equipos_devolucion', [])
+                    if d.get('id_movimiento_devolucion') == eq_fmt['id_movimiento'])
+                dev[self.cons_f['cantidad_devolucion']]  = eq_fmt['cantidad_equipo_concesion'] - ya_devuelto
                 dev[self.cons_f['estatus_equipo']]  = self.status_equipo_dict[data.get('state')]
                 dev[self.cons_f['quien_entrega']] =  data.get('quien_entrega')
-                dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company')
+                dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company', data.get('company'))
                 dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
-                dev[self.cons_f['evidencia_entrega']] =  eq.get('evidencia',  eq.get('evidencia_entrega'))
-                dev[self.cons_f['comentario_entrega']] = data.get('comenario_entrega',data.get('comentarios'))
+                # En devolucion total la evidencia viene en la raiz del request, no en cada equipo
+                dev[self.cons_f['evidencia_entrega']] =  data.get('evidencia',  data.get('evidencia_entrega'))
+                dev[self.cons_f['comentario_entrega']] = data.get('comentario_entrega', data.get('comenario_entrega', data.get('comentarios')))
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
         else:
@@ -8034,11 +8833,11 @@ class Accesos(OcrMixin, AccesosModel):
                 dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
                 dev[self.cons_f['id_movimiento_devolucion']]  = eq['id_movimiento']
                 dev[self.cons_f['evidencia_entrega']] =  eq.get('evidencia',  eq.get('evidencia_entrega'))
-                dev[self.cons_f['comentario_entrega']] = eq.get('comenario_entrega',data.get('comentarios'))
+                dev[self.cons_f['comentario_entrega']] = eq.get('comentario_entrega') or eq.get('comenario_entrega') or data.get('comentario_entrega', data.get('comentarios'))
                 dev[self.cons_f['cantidad_devolucion']]  = cantidad_devuelta
                 dev[self.cons_f['estatus_equipo']]  = self.status_equipo_dict[eq['state']]
                 dev[self.cons_f['quien_entrega']] =  data.get('quien_entrega')
-                dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company')
+                dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company', data.get('company'))
                 dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
@@ -9096,51 +9895,9 @@ class Accesos(OcrMixin, AccesosModel):
                     replace_groups[self.pase_entrada_fields['acompanantes_grupo']] = nuevo_grupo_acompanantes
                 continue
             if key == 'grupo_vehiculos':
-                nuevo_grupo_vehiculos = []
-                for item in access_pass.get('grupo_vehiculos',[]):
-                    tipo = item.get('tipo',item.get('tipo_vehiculo',''))
-                    marca = item.get('marca',item.get('marca_vehiculo',''))
-                    modelo = item.get('modelo',item.get('modelo_vehiculo',''))
-                    estado = item.get('estado',item.get('nombre_estado',''))
-                    placas = item.get('placas',item.get('placas_vehiculo',''))
-                    color = item.get('color',item.get('color_vehiculo',''))
-                    foto_vehiculo = item.get('foto_vehiculo','')
-                    obj={
-                        self.TIPO_DE_VEHICULO_OBJ_ID:{
-                            self.mf['tipo_vehiculo']:tipo,
-                            self.mf['marca_vehiculo']:marca,
-                            self.mf['modelo_vehiculo']:modelo,
-                        },
-                        self.ESTADO_OBJ_ID:{
-                            self.mf['nombre_estado']:estado,
-                        },
-                        self.mf['placas_vehiculo']:placas,
-                        self.mf['color_vehiculo']:color,
-                        self.f['foto_vehiculo']:foto_vehiculo,
-                    }
-                    nuevo_grupo_vehiculos.append(obj)
-                replace_groups[self.mf['grupo_vehiculos']] = nuevo_grupo_vehiculos
+                replace_groups[self.mf['grupo_vehiculos']] = self._answers_vehiculos_pase(value)
             elif key == 'grupo_equipos':
-                nuevo_grupo_equipos = []
-                for item in value:
-                    nombre = item.get('nombre',item.get('nombre_articulo',''))
-                    marca = item.get('marca',item.get('marca_articulo',''))
-                    color = item.get('color',item.get('color_articulo',''))
-                    tipo = item.get('tipo',item.get('tipo_equipo',''))
-                    serie = item.get('serie',item.get('numero_serie',''))
-                    modelo = item.get('modelo',item.get('modelo_articulo',''))
-                    foto_equipo = item.get('foto_equipo','')
-                    obj={
-                        self.mf['tipo_equipo']:tipo.lower(),
-                        self.mf['nombre_articulo']:nombre,
-                        self.mf['marca_articulo']:marca,
-                        self.mf['numero_serie']:serie,
-                        self.mf['color_articulo']:color,
-                        self.mf['modelo_articulo']:modelo,
-                        self.f['foto_equipo']:foto_equipo,
-                    }
-                    nuevo_grupo_equipos.append(obj)
-                replace_groups[self.mf['grupo_equipos']] = nuevo_grupo_equipos
+                replace_groups[self.mf['grupo_equipos']] = self._answers_equipos_pase(value)
             elif key == 'visita_a':
                 for index, item in enumerate(access_pass.get('visita_a',[])):
                     answers[self.mf['grupo_visitados']] = answers.get(self.mf['grupo_visitados'],{})
@@ -9209,10 +9966,20 @@ class Accesos(OcrMixin, AccesosModel):
             requerimientos = self.get_requerimientos_pase(new_answers, access_pass=habilitar_context)
             # Si viene con estatus cancelado se salta la funcion de asignar estatus
             status_field = self.pase_entrada_fields['status_pase']
+            #---Pase con auto activacion: ver _status_auto_activacion (activo sin
+            #   foto/identificacion, hijo solo con nombre, vencido gana).
+            status_auto = self._status_auto_activacion(new_answers, requerimientos=requerimientos)
             if answers.get(status_field) == 'cancelado':
                 status = 'cancelado'
+            elif status_auto:
+                status = status_auto
             else:
                 status = self.access_pass_set_status(new_answers, requerimientos=requerimientos)
+            #---Editar un pase activo (agregar equipo, vehiculo, etc.) no lo regresa a
+            #   proceso: ya se valido al activarse. Solo la fecha lo puede vencer.
+            estatus_previo = str(self.unlist(pass_selected['answers'].get(status_field)) or '').strip().lower()
+            if estatus_previo == 'activo' and status == 'proceso':
+                status = 'activo'
             answers[status_field] = status
 
             print("DEBUG UPDATE_PASS payload a enviar:", answers)
@@ -9263,8 +10030,9 @@ class Accesos(OcrMixin, AccesosModel):
                 if child_stored and child_stored.get(status_field) != 'cancelado':
                     new_child_answers = deepcopy(child_stored)
                     new_child_answers.update(child_answers)
-                    child_answers[status_field] = self.access_pass_set_status(
-                        new_child_answers, requerimientos=requerimientos)
+                    child_answers[status_field] = self._status_auto_activacion(
+                        new_child_answers, requerimientos=requerimientos
+                    ) or self.access_pass_set_status(new_child_answers, requerimientos=requerimientos)
             except Exception as e:
                 print(f"Error calculando status del pase de acompañante {item.get('qr_code')}: {e}")
             try:
@@ -9291,6 +10059,136 @@ class Accesos(OcrMixin, AccesosModel):
         return [{'file_name': pass_img_file_name, 'file_url': pass_img_file_url}]
 
     # feature: update_pases
+    def _grupo_acompanantes_editado(self, answers, recibidos, parent_id):
+        """ Grupo de acompañantes del titular al editarlo (update_full_pass).
+        Los que ya tienen pase (su qr_code es el final de url_hijo) se conservan
+        con los datos que mande el front; solo los que no tienen pase se crean.
+        Regresa (grupo, por_actualizar): grupo es None si no hay grupo guardado
+        ni acompañantes que crear (el update sigue como antes); por_actualizar
+        son los pases de acompañantes en proceso cuyos datos cambiaron, para
+        _patch_acompanantes_pases. """
+        campo_grupo = self.pase_entrada_fields['acompanantes_grupo']
+        campo_url = self.pase_entrada_fields['url_hijo']
+        campos_datos = {
+            'nombre': self.pase_entrada_fields['nombre_acompanante'],
+            'email': self.pase_entrada_fields['email_acompanante'],
+            'telefono': self.pase_entrada_fields['telefono_acompanante'],
+        }
+        qr_de = lambda fila: (fila.get(campo_url) or '').rstrip('/').rsplit('/', 1)[-1]
+
+        guardado = []
+        if parent_id and ObjectId.is_valid(str(parent_id)):
+            registro = self.cr.find_one(
+                {'_id': ObjectId(str(parent_id))}, {f"answers.{campo_grupo}": 1}) or {}
+            guardado = registro.get('answers', {}).get(campo_grupo) or []
+        qrs_guardados = {qr_de(fila) for fila in guardado} - {''}
+
+        recibidos_por_qr = {}
+        nuevos = []
+        for acompanante in recibidos:
+            qr = acompanante.get('qr_code') or acompanante.get('id') or ''
+            if qr in qrs_guardados:
+                recibidos_por_qr[qr] = acompanante
+            else:
+                nuevos.append(acompanante)
+
+        if not guardado and not nuevos:
+            return None, []
+
+        grupo = []
+        por_actualizar = []
+        for fila in guardado:
+            fila = dict(fila)
+            qr = qr_de(fila)
+            acompanante = recibidos_por_qr.get(qr)
+            # Solo los que siguen en proceso se editan, en el grupo y en su pase:
+            # así los dos quedan con los mismos datos.
+            pase = self._pase_acompanante(qr) if acompanante else {}
+            if pase.get(self.pase_entrada_fields['status_pase']) == 'proceso':
+                cambio = False
+                for llave, campo in campos_datos.items():
+                    if llave in acompanante and (acompanante.get(llave) or '') != (fila.get(campo) or ''):
+                        fila[campo] = acompanante.get(llave) or ''
+                        cambio = True
+                item = self._acompanante_por_actualizar(qr, fila, acompanante, pase, cambio)
+                if item:
+                    por_actualizar.append(item)
+            grupo.append(fila)
+
+        if nuevos and parent_id:
+            grupo += self.create_multiple_pass_threads(answers, nuevos, parent_id)
+            # create_multiple_pass_threads deja en el titular solo los nuevos; se
+            # guarda el grupo completo por si el PATCH de abajo no llega a aplicarse.
+            self.cr.update_one(
+                {'_id': ObjectId(str(parent_id))},
+                {'$set': {f"answers.{campo_grupo}": grupo}}
+            )
+        return grupo, por_actualizar
+
+    # Campos de la visita que los acompañantes heredan del titular al editarlo.
+    CAMPOS_VISITA_ACOMPANANTES = (
+        'tipo_visita_pase', 'fecha_desde_visita', 'fecha_desde_hasta',
+        'config_dia_de_acceso', 'config_dias_acceso', 'config_limitar_acceso',
+    )
+
+    def _heredar_visita_acompanantes(self, parent_id, answers):
+        """ Al editar el titular, sus acompañantes en proceso o activos toman sus
+        fechas y limites de acceso. Sus demas datos (nombre, contacto, foto,
+        estatus) no se tocan. Solo se parchan los pases donde algo cambio. """
+        campos = [self.pase_entrada_fields[k] for k in self.CAMPOS_VISITA_ACOMPANANTES
+                  if self.pase_entrada_fields[k] in answers]
+        if not campos or not parent_id or not ObjectId.is_valid(str(parent_id)):
+            return
+        campo_grupo = self.pase_entrada_fields['acompanantes_grupo']
+        campo_url = self.pase_entrada_fields['url_hijo']
+        campo_status = self.pase_entrada_fields['status_pase']
+        titular = self.cr.find_one(
+            {'_id': ObjectId(str(parent_id))}, {f"answers.{campo_grupo}": 1}) or {}
+        grupo = titular.get('answers', {}).get(campo_grupo) or []
+        qrs = [(f.get(campo_url) or '').rstrip('/').rsplit('/', 1)[-1] for f in grupo]
+        qrs = [ObjectId(qr) for qr in qrs if ObjectId.is_valid(qr)]
+        if not qrs:
+            return
+        projection = {f"answers.{c}": 1 for c in campos + [campo_status]}
+        for pase in self.cr.find({'_id': {'$in': qrs}, 'deleted_at': {'$exists': False}}, projection):
+            guardado = pase.get('answers') or {}
+            if guardado.get(campo_status) not in ('proceso', 'activo'):
+                continue
+            cambios = {c: answers[c] for c in campos if guardado.get(c) != answers[c]}
+            if not cambios:
+                continue
+            try:
+                self.lkf_api.patch_multi_record(answers=cambios, form_id=self.PASE_ENTRADA, record_id=[str(pase['_id'])])
+            except Exception as e:
+                print(f"Error heredando la visita al pase de acompañante {pase['_id']}: {e}")
+
+    def _pase_acompanante(self, qr):
+        """ Estatus y foto guardados del pase de un acompañante (answers). """
+        if not ObjectId.is_valid(qr):
+            return {}
+        campo_status = self.pase_entrada_fields['status_pase']
+        campo_foto = self.pase_entrada_fields['walkin_fotografia']
+        pase = self.cr.find_one(
+            {'_id': ObjectId(qr), 'deleted_at': {'$exists': False}},
+            {f"answers.{campo_status}": 1, f"answers.{campo_foto}": 1}) or {}
+        return pase.get('answers') or {}
+
+    def _acompanante_por_actualizar(self, qr, fila, acompanante, pase, cambio_datos):
+        """ Datos para _patch_acompanantes_pases si cambió el nombre/email/teléfono
+        o la foto del acompañante. La foto solo se toca si el front la manda; si
+        no, se conserva la que ya tiene su pase. """
+        foto_guardada = pase.get(self.pase_entrada_fields['walkin_fotografia']) or []
+        foto = (self._archivos_pase(acompanante.get('foto')) or []) if 'foto' in acompanante else foto_guardada
+        if not cambio_datos and (foto or None) == (foto_guardada or None):
+            return None
+        return {
+            'qr_code': qr,
+            'nombre': fila.get(self.pase_entrada_fields['nombre_acompanante'], ''),
+            'email': fila.get(self.pase_entrada_fields['email_acompanante'], ''),
+            'telefono': fila.get(self.pase_entrada_fields['telefono_acompanante'], ''),
+            'foto': foto,
+        }
+
     def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
         answers = {}
         perfil_pase = access_pass.get('perfil_pase', 'Visita General')
@@ -9339,14 +10237,14 @@ class Accesos(OcrMixin, AccesosModel):
                 if equipos:
                     list_equipos = []
                     for item in equipos:
-                        tipo = item.get('tipo_equipo', item.get('tipo', '')).lower().replace(' ', '_')
+                        tipo = item.get('tipo_equipo', item.get('tipo', ''))
                         nombre = item.get('nombre_articulo', item.get('nombre', ''))
                         marca = item.get('marca_articulo', item.get('marca', ''))
                         modelo = item.get('modelo_articulo', item.get('modelo', ''))
                         color = item.get('color_articulo', item.get('color', ''))
                         serie = item.get('numero_serie', item.get('serie', ''))
                         list_equipos.append({
-                            self.mf['tipo_equipo']:tipo,
+                            **self._tipo_equipo_pase(tipo),
                             self.mf['nombre_articulo']:nombre,
                             self.mf['marca_articulo']:marca,
                             self.mf['modelo_articulo']:modelo,
@@ -9512,20 +10410,25 @@ class Accesos(OcrMixin, AccesosModel):
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
 
-        # --- Manejo de acompañantes nuevos ---
-        acompanantes_nuevos = access_pass.get('acompanantes_grupo', []) or []
-        acompanantes_total = len(acompanantes_nuevos)
-
-        if acompanantes_nuevos:
+        # --- Acompañantes ---
+        #   El front manda los acompañantes en proceso (cada uno con el id de su
+        #   pase) y los nuevos que se agreguen; los activos no los manda. Antes se
+        #   creaba un pase por cada uno en cada edicion y el grupo se reemplazaba
+        #   solo con esos: los pases anteriores quedaban sueltos (duplicados) y los
+        #   activos se desligaban del titular. Ahora solo se crean los nuevos y el
+        #   grupo conserva los que ya existian.
+        acompanantes_por_actualizar = []
+        parent_id = qr_code
+        if 'acompanantes_grupo' in access_pass:
             registro_actual = self.get_record_by_folio(
                 folio, self.PASE_ENTRADA, select_columns={'_id': 1}, limit=1
             ) or {}
             parent_id = registro_actual.get('_id') or qr_code
-
-            child_group_nuevo = self.create_multiple_pass_threads(answers, acompanantes_nuevos, parent_id) if parent_id else []
-
-            answers[self.pase_entrada_fields['acompanantes_grupo']] = child_group_nuevo
-            answers[self.pase_entrada_fields['acompanantes']] = acompanantes_total
+            grupo, acompanantes_por_actualizar = self._grupo_acompanantes_editado(
+                answers, access_pass.get('acompanantes_grupo') or [], parent_id)
+            if grupo is not None:
+                answers[self.pase_entrada_fields['acompanantes_grupo']] = grupo
+                answers[self.pase_entrada_fields['acompanantes']] = len(grupo)
 
         if answers or folio:
             metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
@@ -9545,6 +10448,18 @@ class Accesos(OcrMixin, AccesosModel):
                     '_id': qr_code
                 })
             res= self.net.patch_forms_answers(metadata)
+            #---Los acompañantes en proceso que se editaron desde el titular
+            #   tambien se actualizan en su propio pase (igual que update_active_pass).
+            if acompanantes_por_actualizar and res.get('status_code') in (200, 201, 202):
+                try:
+                    requerimientos = self.get_requerimientos_ubicaciones(access_pass.get('ubicacion', []))
+                except Exception as e:
+                    print(f"Error obteniendo requerimientos para acompañantes: {e}")
+                    requerimientos = None
+                self._patch_acompanantes_pases(acompanantes_por_actualizar, requerimientos=requerimientos)
+            #---Fechas y limites de acceso: los acompañantes los heredan del titular.
+            if res.get('status_code') in (200, 201, 202):
+                self._heredar_visita_acompanantes(parent_id, answers)
             link_pass = answers.get(self.pase_entrada_fields['link'])
             if link_pass and res.get('status_code') in (200, 201, 202):
                 res.setdefault('json', {})['link'] = link_pass
@@ -9641,14 +10556,14 @@ class Accesos(OcrMixin, AccesosModel):
                 if equipos:
                     list_equipos = []
                     for item in equipos:
-                        tipo = item.get('tipo_equipo','').lower().replace(' ', '_')
+                        tipo = item.get('tipo_equipo','')
                         nombre = item.get('nombre_articulo','')
                         marca = item.get('marca_articulo','')
                         modelo = item.get('modelo_articulo','')
                         color = item.get('color_articulo','')
                         serie = item.get('numero_serie','')
                         list_equipos.append({
-                            self.mf['tipo_equipo']:tipo,
+                            **self._tipo_equipo_pase(tipo),
                             self.mf['nombre_articulo']:nombre,
                             self.mf['marca_articulo']:marca,
                             self.mf['modelo_articulo']:modelo,
@@ -10031,6 +10946,8 @@ class Accesos(OcrMixin, AccesosModel):
         })
         answers.update({
             f"{self.envio_correo_fields['tipo_de_notificacion']}": data['tipo'],
+            # Sin clase el workflow de Envío de notificaciones no manda el correo.
+            f"{self.envio_correo_fields['clase']}": data.get('clase', 'general'),
             f"{self.envio_correo_fields['titulo']}": asunto_email,
             f"{self.envio_correo_fields['nombre']}": data['nombre'],
             f"{self.envio_correo_fields['email_from']}": data['email_from'],
@@ -10370,53 +11287,6 @@ class Accesos(OcrMixin, AccesosModel):
 
         return texto
 
-    def clean_db(self, status='received', batch_size=300):
-        """
-        Borra todos los registros con status 'received' en batches
-        """
-        total_deleted = 0
-
-        while True:
-            mango_query = {
-                "selector": {
-                    "status": status
-                },
-                "limit": batch_size,
-                "fields": ["_id", "_rev"]
-            }
-            if status == 'all':
-                mango_query = {
-                    "selector": {
-                        "_id": {"$gt":None}
-                    },
-                    "limit": batch_size,
-                    "fields": ["_id", "_rev"]
-                }
-            result = self.cr_db.find(mango_query)
-
-            docs = list(result)  # 🔥 FIX AQUÍ
-
-            if not docs:
-                print("No hay más registros para borrar")
-                break
-
-            to_delete = [
-                {
-                    "_id": doc["_id"],
-                    "_rev": doc["_rev"],
-                    "_deleted": True
-                }
-                for doc in docs
-            ]
-
-            response = self.cr_db.update(to_delete)
-
-            total_deleted += len(to_delete)
-
-            print(f"Batch eliminado: {len(to_delete)} | Total: {total_deleted}")
-
-        return total_deleted
-
     def complete_rondines(self, records):
         status = {}
         answers = {}
@@ -10463,8 +11333,23 @@ class Accesos(OcrMixin, AccesosModel):
     def get_user_catalogs(self):
 
         dbs = {}
+        # Varios nombres de self.f apuntan al mismo field_id; al invertirlo gana el ultimo
+        # que se cargo, y si cambia el orden de carga la app recibe otro nombre y deja de
+        # encontrar el campo. Estos quedan fijos con el nombre que la app ya lee.
+        labels_fijos = {
+            '663e5d44f5b8a7ce8211ed0f': 'note_booth',
+            '663e5c57f5b8a7ce8211ed0b': 'ubicacion',
+            '6654187fc85ce22aaf8bb070': 'new_city',
+            '638a9a99616398d2e392a9f5': 'id_usuario',
+            '62c5ff407febce07043024dd': 'note_guard',
+            '663bc4ed8a6b120eab4d7f1e': 'worker_department',
+            '663bc4c79b8046ce89e97cf4': 'worker_position',
+            '663bd36eb19b7fb7d9e97ccb': 'note_guard_close',
+            '663fb45992f2c5afcfe97ca8': 'nombre_area_salida',
+        }
         try:
             fields_invertido = {v: k for k, v in self.f.items()}
+            fields_invertido.update(labels_fijos)
             for catalog_id in self.clave10_catalogs:
                 item = {}
                 version = "00.00"
@@ -10546,7 +11431,28 @@ class Accesos(OcrMixin, AccesosModel):
                 else:
                     return {'status_code': 462, 'type': 'error', 'msg': 'Revision not yet propagated', 'data': {}}
 
+    def heic_to_jpg(self, image_data, attachment_name):
+        """
+        LKF rechaza .heic (UPLOAD_FILE_INVALID_FORMAT), que es como llegan las fotos de la
+        galeria del iPhone. Las convierte a JPG; si no se puede, regresa el archivo tal cual.
+        """
+        if self.get_extension(attachment_name) not in ('.heic', '.heif'):
+            return image_data, attachment_name
+        try:
+            import io
+            import pillow_heif
+            from PIL import Image
+            pillow_heif.register_heif_opener()
+            img = Image.open(io.BytesIO(image_data))
+            buffer = io.BytesIO()
+            img.convert('RGB').save(buffer, format='JPEG', quality=85)
+            return buffer.getvalue(), f"{os.path.splitext(attachment_name)[0]}.jpg"
+        except Exception as e:
+            print('No se pudo convertir HEIC a JPG:', attachment_name, e)
+            return image_data, attachment_name
+
     def upload_file_from_couchdb(self, image_data, attachment_name, id_forma_seleccionada, id_field):
+        image_data, attachment_name = self.heic_to_jpg(image_data, attachment_name)
         temp_dir = tempfile.gettempdir()
         temp_file_path = os.path.join(temp_dir, attachment_name)
 
@@ -10569,9 +11475,11 @@ class Accesos(OcrMixin, AccesosModel):
         try:
             file_url = upload_url['data']['file']
             update_file = {'file_name': attachment_name, 'file_url': file_url}
-        except KeyError:
-            print('No se pudo obtener la URL del archivo')
-            update_file = {"error": "Fallo al obtener la URL del archivo"}
+        except (KeyError, TypeError):
+            # Si LKF rechaza el archivo (ej. UPLOAD_FILE_INVALID_FORMAT con .heic), 'data'
+            # llega como texto y no como dict.
+            print('No se pudo obtener la URL del archivo', upload_url)
+            update_file = {"error": f"Fallo al obtener la URL del archivo: {upload_url.get('json') or upload_url.get('data')}"}
         finally:
             os.remove(temp_file_path)
         return update_file
@@ -10593,6 +11501,8 @@ class Accesos(OcrMixin, AccesosModel):
         for item in data:
             area_name = item.get(self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID,{}).get(self.f['nombre_area'])
             for _, value in item.items():
+                if not value:
+                    continue
                 form_id = self.unlist(value.get(self.f['form_id'] ))
                 if form_id:
                     result['areas'][area_name] = form_id
@@ -10789,13 +11699,17 @@ class Accesos(OcrMixin, AccesosModel):
         inspeccion = record.get('inspeccion', {})
         inspeccion_form_id = record.get('inspeccion_form_id', '')
         if inspeccion_form_id and inspeccion:
-            response_inspeccion = self.create_inspeccion(complete_record, inspeccion_form_id)
+            response_inspeccion, metadata = self.create_inspeccion(complete_record, inspeccion_form_id)
             inspeccion_id = response_inspeccion.get('json', {}).get('id', '')
             complete_record['record']['inspeccion_record_id'] = inspeccion_id
             #TODO: EN CASO DE ERROR QUE SUCEDE?
-            self.insert_images_and_comments_into_inspeccion(complete_record, inspeccion_form_id, inspeccion_id)
+            if not inspeccion_id:
+                raise self.LKFException({
+                    'msg': f"No se pudo crear la inspeccion: {response_inspeccion.get('json', response_inspeccion)}",
+                    'status_code': response_inspeccion.get('status_code', 400),
+                })
+            self.insert_images_and_comments_into_inspeccion(metadata, inspeccion_form_id, inspeccion_id)
         response = self.create_check_area(complete_record)
-        print('response del check de area', response)
         if response.get('status_code') in [200, 201, 202, 208,]:
             complete_record['status'] = 'received'
             #TODO delete backward compatibility
@@ -10820,7 +11734,6 @@ class Accesos(OcrMixin, AccesosModel):
                 complete_record['status'] = 'error'
                 complete_record['last_error'] = last_error
         res = self.cr_db.save(complete_record)
-        print('status', status)
         return status
 
     def find_check_area_in_rondines(self, check_area_id):
@@ -10860,7 +11773,6 @@ class Accesos(OcrMixin, AccesosModel):
 
         res = self.sync_check_area_to_lkf(complete_record=rec)
         print(f"  [check] resultado sync → status_code={res.get('status_code')} msg={res.get('msg','')}")
-
         check_info = {
             "check_id": _id,
             "status_code": res.get('status_code'),
@@ -10881,7 +11793,7 @@ class Accesos(OcrMixin, AccesosModel):
             "raw_result": res
         }
 
-    def process_check_area_stage(self, check_records):
+    def process_check_area_stage(self, check_records, threading=True):
         """
         Procesa todos los checks en paralelo.
         Cuando terminan, los agrupa por rondin_id.
@@ -10891,44 +11803,45 @@ class Accesos(OcrMixin, AccesosModel):
             return checks_by_rondin
 
         # Tetsting purposes...
-        # self.process_single_check_for_rondin(check_records[0])
+        if not threading:
+            self.process_single_check_for_rondin(check_records[0])
+        else:
+            with ThreadPoolExecutor(max_workers=20) as executor:
+                futures = {
+                    executor.submit(self.process_single_check_for_rondin, rec): rec
+                    for rec in check_records
+                }
 
-        with ThreadPoolExecutor(max_workers=20) as executor:
-            futures = {
-                executor.submit(self.process_single_check_for_rondin, rec): rec
-                for rec in check_records
-            }
+                for future in as_completed(futures):
+                    rec = futures[future]
 
-            for future in as_completed(futures):
-                rec = futures[future]
+                    try:
+                        result = future.result()
+                        rondin_id = result.get('rondin_id') or 'unknown'
 
-                try:
-                    result = future.result()
-                    rondin_id = result.get('rondin_id') or 'unknown'
+                        checks_by_rondin.setdefault(rondin_id, []).append(result['check'])
 
-                    checks_by_rondin.setdefault(rondin_id, []).append(result['check'])
+                        with self.results_lock:
+                            self.results["result"].append(result["raw_result"])
+                            if result["check"]["ok"]:
+                                self.results["success"] += 1
+                            else:
+                                self.results["failed"] += 1
+                                self.results["errors"].append({
+                                    "id": rec.get('_id'),
+                                    "error": result["raw_result"].get("msg")
+                                })
 
-                    with self.results_lock:
-                        self.results["result"].append(result["raw_result"])
-                        if result["check"]["ok"]:
-                            self.results["success"] += 1
-                        else:
+                    except Exception as e:
+                        import traceback
+                        print(f"  [check ERROR] _id={rec.get('_id')} error={e}")
+                        print(traceback.format_exc())
+                        with self.results_lock:
                             self.results["failed"] += 1
                             self.results["errors"].append({
                                 "id": rec.get('_id'),
-                                "error": result["raw_result"].get("msg")
+                                "error": str(e)
                             })
-
-                except Exception as e:
-                    import traceback
-                    print(f"  [check ERROR] _id={rec.get('_id')} error={e}")
-                    print(traceback.format_exc())
-                    with self.results_lock:
-                        self.results["failed"] += 1
-                        self.results["errors"].append({
-                            "id": rec.get('_id'),
-                            "error": str(e)
-                        })
 
         return checks_by_rondin
 
@@ -11159,7 +12072,7 @@ class Accesos(OcrMixin, AccesosModel):
         try:
             metadata = self.lkf_api.get_metadata(form_id=self.BITACORA_RONDINES)
             metadata.update({
-                'id': rondin_id,
+                'id': str(self.get_valid_object_id(rondin_id)),
                 "properties": {
                     "device_properties": {
                         "System": "Script",
@@ -11189,16 +12102,18 @@ class Accesos(OcrMixin, AccesosModel):
             res = self.lkf_api.post_forms_answers(metadata)
         except Exception as e:
             print(f"  [create_bitacora_rondin] EXCEPTION creando bitácora para rondin_id={rondin_id}: {e}")
-            return None
+            # Otro sync concurrente (la app dispara uno por cada check/pausa/reanudación, y
+            # al reconectar se van varios juntos) pudo haberla creado con el mismo _id.
+            return self.get_bitacora_by_id(rondin_id) or None
 
         if res.get('status_code') not in (200, 201, 202):
             print(f"  [create_bitacora_rondin] ERROR creando bitácora para rondin_id={rondin_id}: {res}")
-            return None
+            return self.get_bitacora_by_id(rondin_id) or None
 
         print(f"  [create_bitacora_rondin] bitácora creada para rondin_id={rondin_id}")
         return self.get_bitacora_by_id(rondin_id)
 
-    def sync_rondin_to_lkf(self, rondin_id, rondin_record={}):
+    def sync_rondin_to_lkf(self, rondin_id, rondin_record=None):
         """
         Sincroniza la bitácora del rondín hacia Linkaform ya sea usando checks ya procesados. O
         Actualizar o cerrar el rondin en linkaform.
@@ -11210,6 +12125,12 @@ class Accesos(OcrMixin, AccesosModel):
         """
         print(f"\n  [sync_rondin] rondin_id={rondin_id}")
         status = {}
+        if not rondin_record:
+            # Este sync se disparó solo por un check de área suelto (Stage 3), sin el
+            # documento 'rondin' en el mismo batch. Se lee el estado real en CouchDB antes
+            # de buscar la bitácora: un rondín libre en proceso necesita su inbox=False
+            # para que se le cree la bitácora, y para saber si ya se finalizó (o canceló).
+            rondin_record = self.cr_db.get(rondin_id) or {}
         bitacora_in_lkf = self.get_bitacora_by_id(rondin_id)
         if not bitacora_in_lkf and rondin_record.get('inbox') is False:
             # Rondín iniciado desde la app (libre o desde catálogo): nunca existió una
@@ -11217,9 +12138,12 @@ class Accesos(OcrMixin, AccesosModel):
             bitacora_in_lkf = self.create_bitacora_rondin(rondin_id, rondin_record)
         if not bitacora_in_lkf:
             print(f"  [sync_rondin] ERROR: bitácora no encontrada en LKF para rondin_id={rondin_id}")
-            rondin_record['status'] = 'not_found'
-            rondin_record['last_error'] = 'Rondin record not found on users database.'
-            self.cr_db.save(rondin_record)
+            # Sin _id (rondin_id 'unknown' o doc borrado del dispositivo) el save crearía
+            # un doc nuevo sin type en CouchDB.
+            if rondin_record.get('_id'):
+                rondin_record['status'] = 'not_found'
+                rondin_record['last_error'] = 'Rondin record not found on users database.'
+                self.cr_db.save(rondin_record)
             return {
                 'status_code': 404,
                 'type': 'error',
@@ -11231,13 +12155,6 @@ class Accesos(OcrMixin, AccesosModel):
         incidencia_for_rondin = []
         # Obtiene los checks que se han contestado del rondin de Mongodb
         checks_for_rondin = self.get_rondin_checks(rondin_id)
-
-        if not rondin_record:
-            # Este sync se disparó solo por un check de área suelto (Stage 3), sin el
-            # documento 'rondin' en el mismo batch. Para saber si en realidad ya se
-            # finalizó (o canceló) el rondín -- y no depender de qué documento llegó en
-            # este sync en particular -- hay que leer el estado real y actual en CouchDB.
-            rondin_record = self.cr_db.get(rondin_id) or {}
 
         # Enriquecer checks con checked_at del doc CouchDB (que tiene la hora local real por área)
         couch_dates = {
@@ -11412,7 +12329,7 @@ class Accesos(OcrMixin, AccesosModel):
                 {"$match": {
                     "deleted_at": {"$exists": False},
                     "form_id": self.BITACORA_RONDINES,
-                    "connection_record_id": ObjectId(record_id)
+                    "connection_record_id": self.get_valid_object_id(record_id)
                 }},
                 {"$sort": {"updated_at": -1}},
                 {"$limit": 1},
@@ -11608,7 +12525,8 @@ class Accesos(OcrMixin, AccesosModel):
                 }
             },
         })
-        metadata.update({"id": data.id})
+        # LinkaForm usa este id como _id de mongo, debe ser un ObjectId valido (24 hex)
+        metadata.update({"id": str(self.get_valid_object_id(data.id))})
         if isinstance(data.get('geolocation'), dict):
             metadata.update({'geolocation': [data.get('geolocation').get('long'), data.get('geolocation').get('lat')]})
 
@@ -11709,7 +12627,8 @@ class Accesos(OcrMixin, AccesosModel):
             self.mf['ubicacion']: ubicacion,
             self.mf['nombre_area']: area
         }
-
+        comments = {}
+        media = {}
 
         for item in inspeccion:
             field_id = item.get('field_id')
@@ -11719,44 +12638,66 @@ class Accesos(OcrMixin, AccesosModel):
                 for idx, item in enumerate(value) if isinstance(value, list) else []:
                     value[idx] = item.lower().replace(' ', '_')
             elif field_type == 'radio':
-                value = value.lower().replace(' ', '_')
+                if value:
+                    value = value.lower().replace(' ', '_')
             answers[field_id] = value
+            answers[field_id] = value
+            #sets comments
+            comentario = item.get('comentario',[])
+            if comentario:
+                if type(comentario) == list:
+                    comments[field_id] = [self.set_comment_metadata(x) for x in comentario]
+                else:            
+                    comments[field_id] = [self.set_comment_metadata(comentario), ]
+            #sets media
+            foto = item.get('foto',[])
+            if foto:
+                media[field_id] = [self.set_media_metadata(foto), ]
 
         metadata.update({'answers':answers})
-        res = self.lkf_api.post_forms_answers(metadata)
-        return res
+        if comments:
+            metadata.update({'comments':comments})
+        if media:
+            metadata.update({'media':media})
 
-    def insert_images_and_comments_into_inspeccion(self, record, form_id, record_id):
+        print('va a crear la inpseccion...')
+        res = self.lkf_api.post_forms_answers(metadata)
+        return res, metadata
+
+    def insert_images_and_comments_into_inspeccion(self, metadata, form_id, record_id):
         """
         Insert images and comments into inspeccion
         """
-        images = {}
-        comments = {}
-        data = record.get('record', {})
-        inspection = data.get('inspeccion', [])
-        for question in inspection:
-            if question.get('field_id'):
-                if question.get('foto'):
-                    images.update({
-                        question.get('field_id'): question.get('foto')
-                    })
-                if question.get('comentario'):
-                    comments.update({
-                        question.get('field_id'): question.get('comentario')
-                    })
-
-        if not images and not comments:
+        media = metadata.get('media')
+        comments = metadata.get('comments')
+        if not media and not comments:
             return False
 
-        update_fields = {
-            "images": images,
-            "comments": comments
-        }
-        update_db = self.cr.update_one({
+        query = {
             '_id': ObjectId(record_id),
             'form_id': form_id,
             'deleted_at': {'$exists': False}
-        },{'$set':update_fields})
+        }
+        # Primero se revisa que ya tenga el back guardado. media y comments son
+        # {field_id: [entrada, ...]}, una entrada por usuario/fecha, asi que se
+        # compara por campo y solo se agregan las entradas (por su `data`) que falten.
+        current = self.cr.find_one(query, {'media': 1, 'comments': 1}) or {}
+        push_fields = {}
+        for key, sent in (('media', media), ('comments', comments)):
+            for field_id, entries in (sent or {}).items():
+                saved = (current.get(key) or {}).get(field_id) or []
+                if isinstance(saved, dict):
+                    saved = [saved]
+                saved_data = [x.get('data') for x in saved]
+                missing = [x for x in entries if x.get('data') not in saved_data]
+                if missing:
+                    push_fields[f'{key}.{field_id}'] = {'$each': missing}
+
+        if not push_fields:
+            print('inspeccion ya tiene media y comments, no se actualiza')
+            return True
+
+        update_db = self.cr.update_one(query, {'$push': push_fields})
 
         db_res = update_db.raw_result
         print('db_res_inspeccion=',db_res)
@@ -12511,11 +13452,13 @@ class Accesos(OcrMixin, AccesosModel):
 
         return answers
 
-    def get_record_ubicacion(self, ubicacion=None, area=None, tag_id_area=None):
+    def get_record_ubicacion(self, ubicacion=None, area=None, tag_id_area=None, record_id=None):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.AREAS_DE_LAS_UBICACIONES,
         }
+        if record_id:
+            match_query.update({'_id': self.get_valid_object_id(record_id)})
         if ubicacion:
             match_query.update({
             f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.configuracion_area['ubicacion']}": ubicacion
@@ -12557,12 +13500,20 @@ class Accesos(OcrMixin, AccesosModel):
         res = self.unlist(res)
         return res
 
-    def update_area(self, data):
+    def update_area(self, data, record_id=None):
+        """
+        Actualiza un area de "Areas de las Ubicaciones". Por default la busca por
+        ubicacion+nombre; con record_id la busca por _id, lo que permite renombrarla
+        (el nombre nuevo llega en data['nombre_nueva_area']).
+        """
         ubicacion = data.get('ubicacion', '')
         area = data.get('area', '')
         if not ubicacion:
             return {'status_code': 400, 'type': 'error', 'msg': 'La ubicacion no puede estar vacia.', 'data': {}}
-        area_ubicacion_data = self.get_record_ubicacion(ubicacion=ubicacion, area=area)
+        if record_id:
+            area_ubicacion_data = self.get_record_ubicacion(record_id=record_id)
+        else:
+            area_ubicacion_data = self.get_record_ubicacion(ubicacion=ubicacion, area=area)
         if not area_ubicacion_data:
             return {'status_code': 400, 'type': 'error', 'msg': 'No se encontro el area especificada.', 'data': {}}
         folio = area_ubicacion_data.get('folio', '')
@@ -12576,6 +13527,8 @@ class Accesos(OcrMixin, AccesosModel):
 
         for key, value in area_ubicacion_data.items():
             if key == 'area':
+                if record_id:
+                    value = data.get('nombre_nueva_area') or value
                 answers[self.configuracion_area['area']] = value # type: ignore
             elif key == 'ubicacion':
                 answers[self.UBICACIONES_CAT_OBJ_ID] = {
@@ -12738,7 +13691,7 @@ class Accesos(OcrMixin, AccesosModel):
             },
         })
         if force_id:
-            metadata.update({'id': force_id})
+            metadata.update({'id': str(self.get_valid_object_id(force_id))})
         metadata.update({'answers':answers})
         response = self.lkf_api.post_forms_answers(metadata)
         return response
@@ -12773,12 +13726,19 @@ class Accesos(OcrMixin, AccesosModel):
             self.cr_db.save(record)
             return {'status_code': 400, 'type': 'error', 'msg': msg, 'data': {}}
 
+        # Una foto nueva llega como attachment del doc de couch, con file_path local y sin
+        # file_url. do_attachments la sube y le pone el file_url en el mismo nodo; las que
+        # no se pudieron subir se descartan para no guardar en LKF una ruta file:// del
+        # telefono (update_area conserva entonces la foto que ya tenia el area).
+        self.do_attachments(record)
+        foto_area = [f for f in data_couch.get('area_foto', []) if self.is_valid_url(f.get('file_url', ''))]
+
         data = {
             'ubicacion': ubicacion,
             'area': nombre_area,
             'nombre_nueva_area': nombre_area,
             'tipo_de_area': data_couch.get('tipo_area', ''),
-            'foto_area': data_couch.get('area_foto', []),
+            'foto_area': foto_area,
             'qr_area': data_couch.get('area_tag_id', ''),
         }
 
@@ -12788,9 +13748,17 @@ class Accesos(OcrMixin, AccesosModel):
                 'longitude': record['geolocation'].get('long'),
             }
 
-        # La unica forma confiable de saber si es una edicion es revisar si el area ya
-        # existe (por ubicacion+nombre) -- el campo que manda la app no distingue esto.
-        if self.exists_area(ubicacion, nombre_area):
+        # Edicion: el _id del doc de couch ya existe en Areas de las Ubicaciones (el area
+        # se creo con force_id o la app reusa el _id del catalogo). Se actualiza por _id
+        # porque buscar por nombre falla cuando el usuario renombro el area.
+        if self.get_record_ubicacion(record_id=_id):
+            otra_area = self.get_record_ubicacion(ubicacion=ubicacion, area=nombre_area)
+            if otra_area and str(otra_area.get('_id')) != str(_id):
+                res = {'status_code': 400, 'msg': f'Ya existe otra area "{nombre_area}" en {ubicacion}'}
+            else:
+                res = self.update_area(data, record_id=_id)
+        # Sin _id previo, se revisa si ya existe un area con ese nombre en la ubicacion.
+        elif self.exists_area(ubicacion, nombre_area):
             res = self.update_area(data)
         else:
             # Area nueva: se fuerza que el _id en Mongo coincida con el _id de CouchDB.
@@ -12970,7 +13938,7 @@ class Accesos(OcrMixin, AccesosModel):
             self.process_area_record,
             max_workers=10
         )
-        print(f"[sync_records] Areas procesadas: {len(area_results)}")
+        print(f"[sync_areas] Areas procesadas: {len(area_results)}")
 
         #todo
         if grouped_records.get('incidencia'):
@@ -12978,8 +13946,8 @@ class Accesos(OcrMixin, AccesosModel):
 
         # 1. primero checks
         check_records = grouped_records.get('check_area', [])
-        print(f"\n[sync_records] --- STAGE 1: check_area ({len(check_records)} registros) ---")
-        checks_by_rondin = self.process_check_area_stage(check_records)
+        print(f"\n[sync_areas] --- STAGE 1: check_area ({len(check_records)} registros) ---")
+        checks_by_rondin = self.process_check_area_stage(check_records, threading=True)
         print(f"[sync_records] checks_by_rondin keys: {list(checks_by_rondin.keys())}")
         for rid, cks in checks_by_rondin.items():
             ok = [c for c in cks if c.get('ok')]

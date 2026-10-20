@@ -22,7 +22,7 @@ import xml.etree.ElementTree as ET
 # so this script doesn't need linkaform_api/settings/uts installed just to
 # resolve two path constants.
 MODULES_PATH = '/srv/scripts/addons/modules'
-ADDONS_PATH = '/usr/local/lib/python3.10/site-packages/lkf_addons/addons'
+ADDONS_PATH = '/usr/local/lib/python3.12/site-packages/lkf_addons/addons'
 
 VERSION_RE = re.compile(r'version:\s*\d+')
 SKIP_SUFFIXES = ('_rules.xml', '_workflow.xml', '_data.xml', '_demo.xml')

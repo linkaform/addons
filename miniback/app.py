@@ -18,7 +18,7 @@ from errors import ContainerError, ScriptAmbiguous, ScriptNotFound, ScriptTimeou
 
 app = Sanic('miniback')
 
-# CORS abierto: el front corre en localhost:3000 y esto en localhost:8000.
+# CORS abierto: el front corre en localhost:3010 y esto en localhost:8014.
 # Es una herramienta local, nunca se publica.
 CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',

@@ -49,7 +49,7 @@ class BaseModel(base.LKF_Base):
         En `lkm` están todas las funciones generales de módulos).
         '''
 
-        self.CATALOGO_FORMAS_CAT = self.lkm.catalog_id('catalogo_de_formas')
+        self.CATALOGO_FORMAS_CAT = self.lkm.catalog_id('catalogo_de_items')
         self.CATALOGO_FORMAS_CAT_ID = self.CATALOGO_FORMAS_CAT.get('id')
         self.CATALOGO_FORMAS_CAT_OBJ_ID = self.CATALOGO_FORMAS_CAT.get('obj_id')
 
@@ -123,11 +123,14 @@ class BaseModel(base.LKF_Base):
             'grupo_roles':'6a46f1d3b89f9975dfd0bae8',
             'new_user_complete_name':'638a9a7767c332f5d459fc81',
             'new_user_email':'638a9a7767c332f5d459fc82',
+            'new_user_empleado':'6a30a1b2c3d4e5f607182901',
+            'new_user_empleado_nombre':'6a30a1b2c3d4e5f607182902',
+            'new_user_link':'6a2f1c0e5b3d4a7c9e8f1a02',
             'new_user_id':'638a9a99616398d2e392a9f5',
             'new_user_phone':'67be0c43a31e5161c47f2bba',
             'new_user_position':'67be0c43a31e5161c47f2bbb',
             'new_user_status':'679d023876ad7f5ba642f4ed',
-            'new_user_temp_password':'67be0b7896e72a692b4fa660',
+            'new_user_token':'6a2f1c0e5b3d4a7c9e8f1a01',
             'new_user_username':'6759e4a7a9a6e13c7b26da33',
             'nombre_comercial':'667468e3e577b8b98c852aaa',
             'pagina_web':'66bfd66ecd15883ed163e9b7',
@@ -356,7 +359,9 @@ class BaseModel(base.LKF_Base):
 
         self.envio_correo_fields.update({
             'phone_to': '699f302213e8f8740c465bfc',
-            'tipo_de_notificacion': '699dfe3b82be0dbe0319d38c'
+            'tipo_de_notificacion': '699dfe3b82be0dbe0319d38c',
+            # Radio general/transportista: la regla de correo del workflow exige 'general'.
+            'clase': '6a77cd140ad8005cec5d9700',
         })
 
         self.configuracion_area = {

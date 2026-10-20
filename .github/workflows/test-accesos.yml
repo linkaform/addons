@@ -160,8 +160,8 @@ jobs:
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/secrets/lkf_jwt_key.pub:/etc/ssl/certs/lkf_jwt_key.pub" \
-            -v "${{ github.workspace }}/lkf_addons:/usr/local/lib/python3.10/site-packages/lkf_addons" \
-            -v "${{ github.workspace }}/modules:/usr/local/lib/python3.10/site-packages/lkf_modules" \
+            -v "${{ github.workspace }}/lkf_addons:/usr/local/lib/python3.12/site-packages/lkf_addons" \
+            -v "${{ github.workspace }}/modules:/usr/local/lib/python3.12/site-packages/lkf_modules" \
             -v "${{ github.workspace }}/test:/srv/lkf_test" \
             -v "${{ github.workspace }}/config:/srv/scripts/addons/config" \
             -w /srv/lkf_test \

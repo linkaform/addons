@@ -31,7 +31,7 @@ class OcrMixin:
     # ──────────────────────────────────────────────────────────
 
     def ocr_articulo_perdido(self, image_source: list,
-                            model: str = 'google/gemini-2.5-flash-lite') -> dict:
+                            model: str = 'google/gemini-3.5-flash-lite') -> dict:
         """
         Analiza la foto de un artículo perdido y extrae los campos visibles.
 
@@ -89,7 +89,7 @@ class OcrMixin:
 
     def ocr_paquete(self, image_source: list, fields: dict = {},
                            extra_instructions: str = None,
-                           model: str = 'google/gemini-2.5-flash-lite') -> dict:
+                           model: str = 'google/gemini-3.5-flash-lite') -> dict:
         """
         Extrae los datos de una foto de un paquete para identificar, 
         Proveedor (paqueteria), Remitente, Destinatario.
@@ -102,7 +102,7 @@ class OcrMixin:
             image_source: URL remota o ruta local de la imagen.
             model:        Modelo OpenRouter a usar (opcional).
             MODEL = "anthropic/claude-haiku-4.5"  # excelente OCR, precio razonable
-            MODEL = "google/gemini-2.5-flash"  # un escalón arriba, más caro pero mejor
+            MODEL = "google/gemini-3.5-flash"  # un escalón arriba, más caro pero mejor
 
         Returns:
             dict con:
@@ -186,7 +186,7 @@ class OcrMixin:
         return {'status_code': datos.get('status_code', 200), 'msg': 'OK', 'data': datos}
 
     def ocr_identificacion(self, image_source: str, form_id: int = None,
-                           model: str = 'google/gemini-2.5-flash-lite', 
+                           model: str = 'google/gemini-3.5-flash-lite', 
                            name: str = None, is_employee: bool = False) -> dict:
         """
         Extrae los datos de una identificación (INE, pasaporte, licencia, etc.)
@@ -197,7 +197,7 @@ class OcrMixin:
             form_id:      Si se proporciona, crea el registro en ese formulario.
             model:        Modelo OpenRouter a usar (opcional).
             MODEL = "anthropic/claude-haiku-4.5"  # excelente OCR, precio razonable
-            MODEL = "google/gemini-2.5-flash"  # un escalón arriba, más caro pero mejor
+            MODEL = "google/gemini-3.5-flash"  # un escalón arriba, más caro pero mejor
             name:         Si se indica, valida que la identificación pertenezca a esa persona.
             is_employee:  Si es True, busca a la persona de la identificación en el
                           catálogo de empleados (self.Employee.get_employee_data por
