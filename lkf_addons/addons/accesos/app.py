@@ -3833,6 +3833,7 @@ class Accesos(OcrMixin, AccesosModel):
             'areas_default': [],
             'sin_limite': True,
             'es_default': False,
+            'escritura': True,
             }
 
     def get_areas_modulo(self, locations=None, uso=None,
@@ -3846,9 +3847,12 @@ class Accesos(OcrMixin, AccesosModel):
         configuracion_areas_y_empleados y, sin `locations`, usa las ubicaciones
         del propio empleado; un rol administrativo se lo salta. Sin permisos
         `locations` es obligatorio: no hay de donde inferirlas.
+        `ubicaciones_escritura` son las de `ubicaciones_user` donde el empleado
+        puede crear registros (Permiso != solo_lectura); sin permisos, todas.
         Returns:
         {'ubicaciones_user': [...], 'ubicaciones_default': [...],
-         'ubicaciones_detalle': [{'ubicacion', 'es_default',
+         'ubicaciones_escritura': [...],
+         'ubicaciones_detalle': [{'ubicacion', 'es_default', 'escritura',
                                   'areas': [{'nombre_area', 'es_default'}]}],
          'areas_by_location': [nombre_area, ...]}
         """
@@ -3859,6 +3863,7 @@ class Accesos(OcrMixin, AccesosModel):
         res = {
             'ubicaciones_user': [],
             'ubicaciones_default': [],
+            'ubicaciones_escritura': [],
             'ubicaciones_detalle': [],
             'areas_by_location': [],
             }
@@ -3893,9 +3898,13 @@ class Accesos(OcrMixin, AccesosModel):
             res['ubicaciones_user'].append(location)
             if permiso['es_default']:
                 res['ubicaciones_default'].append(location)
+            escritura = permiso.get('escritura', True)
+            if escritura:
+                res['ubicaciones_escritura'].append(location)
             res['ubicaciones_detalle'].append({
                 'ubicacion': location,
                 'es_default': permiso['es_default'],
+                'escritura': escritura,
                 'areas': [
                     {'nombre_area': area, 'es_default': area in permiso['areas_default']}
                     for area in areas
