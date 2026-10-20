@@ -25,7 +25,11 @@ openpyxl==3.0.10
 pandas
 opencv-python-headless==4.13.0.90
 pdf2image
-pdf2pptx
+# pdf2pptx se instala aparte con --no-deps (fija pymupdf==1.20.1, sin wheel para 3.12)
+pymupdf>=1.24
+python-pptx
+click
+tqdm
 psycopg2==2.9.9
 pydantic==1.10.2
 pyexcel==0.7.0
