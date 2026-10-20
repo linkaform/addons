@@ -177,7 +177,9 @@ def aviso_rama_vieja(cat, domain, rama):
 
 def mostrar_estado(cat):
     actual = dominio_actual()
-    print('cuenta activa : %s' % (actual or '(ninguna)'))
+    account_id = cat[actual].get('account_id', '').strip() if actual and cat.has_section(actual) else ''
+    print('cuenta activa : %s%s' % (actual or '(ninguna)',
+                                    '  (account_id %s)' % account_id if account_id else ''))
     if actual and cat.has_section(actual):
         print('usuario       : %s' % cat[actual].get('username', '?'))
         print('rama esperada : %s' % rama_de(cat, actual))
@@ -194,7 +196,9 @@ def mostrar_estado(cat):
     cols = 4
     filas = -(-len(disp) // cols)
     for r in range(filas):
-        print('  ' + '  '.join('%-22s' % d for d in disp[r::filas]).rstrip())
+        # El "* " marca la cuenta activa; las demas llevan dos espacios para alinear.
+        print(''.join('%-24s' % (('* ' if d == actual else '  ') + d)
+                      for d in disp[r::filas]).rstrip())
 
 
 def main(argv):
