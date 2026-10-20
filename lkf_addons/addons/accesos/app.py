@@ -3397,6 +3397,22 @@ class Accesos(OcrMixin, AccesosModel):
         return res
 
 
+    def _archivos_pase(self, archivos):
+        """ Foto/identificacion de un acompañante como las acepta LinkaForm: el
+        front las manda con file_name "foto"/"identificacion" (sin extension) y
+        LinkaForm las rechaza ("El nombre del archivo no es valido"); en ese
+        caso se usa el nombre del final de la URL. Sin archivos regresa None. """
+        res = []
+        for archivo in archivos or []:
+            if not isinstance(archivo, dict) or not archivo.get('file_url'):
+                continue
+            file_url = archivo['file_url']
+            file_name = archivo.get('file_name') or ''
+            if '.' not in file_name:
+                file_name = file_url.split('?')[0].rstrip('/').rsplit('/', 1)[-1]
+            res.append({'file_name': file_name, 'file_url': file_url})
+        return res or None
+
     def create_multiple_pass_threads(self, answers, acompanantes_grupo, parent_id, requerimientos=None):
         """
         Creates individual passes for each member of acompanantes_grupo in parallel threads.
@@ -3416,6 +3432,12 @@ class Accesos(OcrMixin, AccesosModel):
             pass_answers[self.pase_entrada_fields['link']] = pass_answers[self.pase_entrada_fields['link']].replace(str(parent_id), str(record_id))
             pass_answers[self.pase_entrada_fields['email']] = acompanante.get('email', '')
             pass_answers[self.mf['telefono_pase']] = acompanante.get('telefono', '')
+            #---Foto e identificacion son las del acompanante, no las del titular
+            #   (venian en la copia de answers). Van antes del status: la auto
+            #   activacion puede pedirlas. Sin archivo va None, igual que en el
+            #   titular: LinkaForm no acepta una lista vacia en estos campos.
+            pass_answers[self.pase_entrada_fields['walkin_fotografia']] = self._archivos_pase(acompanante.get('foto'))
+            pass_answers[self.pase_entrada_fields['walkin_identificacion']] = self._archivos_pase(acompanante.get('identificacion'))
             pass_answers[self.pase_entrada_fields['url_padre']] = parent_url
             #---El status no se hereda del titular, el acompanante puede venir sin
             #   datos para que el invitado los complete despues. Misma regla que
@@ -3466,6 +3488,8 @@ class Accesos(OcrMixin, AccesosModel):
                     if child_id:
                         child_url = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{child_id}"
                         url_by_index[idx] = child_url
+                    else:
+                        print(f"Error creating pass for {acompanante.get('nombre')}: {str(result)[:500]}")
                 except Exception as e:
                     print(f"Error creating pass for {acompanante.get('nombre')}: {e}")
 
@@ -3809,6 +3833,7 @@ class Accesos(OcrMixin, AccesosModel):
             'areas_default': [],
             'sin_limite': True,
             'es_default': False,
+            'escritura': True,
             }
 
     def get_areas_modulo(self, locations=None, uso=None,
@@ -3822,9 +3847,12 @@ class Accesos(OcrMixin, AccesosModel):
         configuracion_areas_y_empleados y, sin `locations`, usa las ubicaciones
         del propio empleado; un rol administrativo se lo salta. Sin permisos
         `locations` es obligatorio: no hay de donde inferirlas.
+        `ubicaciones_escritura` son las de `ubicaciones_user` donde el empleado
+        puede crear registros (Permiso != solo_lectura); sin permisos, todas.
         Returns:
         {'ubicaciones_user': [...], 'ubicaciones_default': [...],
-         'ubicaciones_detalle': [{'ubicacion', 'es_default',
+         'ubicaciones_escritura': [...],
+         'ubicaciones_detalle': [{'ubicacion', 'es_default', 'escritura',
                                   'areas': [{'nombre_area', 'es_default'}]}],
          'areas_by_location': [nombre_area, ...]}
         """
@@ -3835,6 +3863,7 @@ class Accesos(OcrMixin, AccesosModel):
         res = {
             'ubicaciones_user': [],
             'ubicaciones_default': [],
+            'ubicaciones_escritura': [],
             'ubicaciones_detalle': [],
             'areas_by_location': [],
             }
@@ -3869,9 +3898,13 @@ class Accesos(OcrMixin, AccesosModel):
             res['ubicaciones_user'].append(location)
             if permiso['es_default']:
                 res['ubicaciones_default'].append(location)
+            escritura = permiso.get('escritura', True)
+            if escritura:
+                res['ubicaciones_escritura'].append(location)
             res['ubicaciones_detalle'].append({
                 'ubicacion': location,
                 'es_default': permiso['es_default'],
+                'escritura': escritura,
                 'areas': [
                     {'nombre_area': area, 'es_default': area in permiso['areas_default']}
                     for area in areas
@@ -9951,6 +9984,11 @@ class Accesos(OcrMixin, AccesosModel):
                 status = status_auto
             else:
                 status = self.access_pass_set_status(new_answers, requerimientos=requerimientos)
+            #---Editar un pase activo (agregar equipo, vehiculo, etc.) no lo regresa a
+            #   proceso: ya se valido al activarse. Solo la fecha lo puede vencer.
+            estatus_previo = str(self.unlist(pass_selected['answers'].get(status_field)) or '').strip().lower()
+            if estatus_previo == 'activo' and status == 'proceso':
+                status = 'activo'
             answers[status_field] = status
 
             print("DEBUG UPDATE_PASS payload a enviar:", answers)
@@ -10030,6 +10068,136 @@ class Accesos(OcrMixin, AccesosModel):
         return [{'file_name': pass_img_file_name, 'file_url': pass_img_file_url}]
 
     # feature: update_pases
+    def _grupo_acompanantes_editado(self, answers, recibidos, parent_id):
+        """ Grupo de acompañantes del titular al editarlo (update_full_pass).
+        Los que ya tienen pase (su qr_code es el final de url_hijo) se conservan
+        con los datos que mande el front; solo los que no tienen pase se crean.
+        Regresa (grupo, por_actualizar): grupo es None si no hay grupo guardado
+        ni acompañantes que crear (el update sigue como antes); por_actualizar
+        son los pases de acompañantes en proceso cuyos datos cambiaron, para
+        _patch_acompanantes_pases. """
+        campo_grupo = self.pase_entrada_fields['acompanantes_grupo']
+        campo_url = self.pase_entrada_fields['url_hijo']
+        campos_datos = {
+            'nombre': self.pase_entrada_fields['nombre_acompanante'],
+            'email': self.pase_entrada_fields['email_acompanante'],
+            'telefono': self.pase_entrada_fields['telefono_acompanante'],
+        }
+        qr_de = lambda fila: (fila.get(campo_url) or '').rstrip('/').rsplit('/', 1)[-1]
+
+        guardado = []
+        if parent_id and ObjectId.is_valid(str(parent_id)):
+            registro = self.cr.find_one(
+                {'_id': ObjectId(str(parent_id))}, {f"answers.{campo_grupo}": 1}) or {}
+            guardado = registro.get('answers', {}).get(campo_grupo) or []
+        qrs_guardados = {qr_de(fila) for fila in guardado} - {''}
+
+        recibidos_por_qr = {}
+        nuevos = []
+        for acompanante in recibidos:
+            qr = acompanante.get('qr_code') or acompanante.get('id') or ''
+            if qr in qrs_guardados:
+                recibidos_por_qr[qr] = acompanante
+            else:
+                nuevos.append(acompanante)
+
+        if not guardado and not nuevos:
+            return None, []
+
+        grupo = []
+        por_actualizar = []
+        for fila in guardado:
+            fila = dict(fila)
+            qr = qr_de(fila)
+            acompanante = recibidos_por_qr.get(qr)
+            # Solo los que siguen en proceso se editan, en el grupo y en su pase:
+            # así los dos quedan con los mismos datos.
+            pase = self._pase_acompanante(qr) if acompanante else {}
+            if pase.get(self.pase_entrada_fields['status_pase']) == 'proceso':
+                cambio = False
+                for llave, campo in campos_datos.items():
+                    if llave in acompanante and (acompanante.get(llave) or '') != (fila.get(campo) or ''):
+                        fila[campo] = acompanante.get(llave) or ''
+                        cambio = True
+                item = self._acompanante_por_actualizar(qr, fila, acompanante, pase, cambio)
+                if item:
+                    por_actualizar.append(item)
+            grupo.append(fila)
+
+        if nuevos and parent_id:
+            grupo += self.create_multiple_pass_threads(answers, nuevos, parent_id)
+            # create_multiple_pass_threads deja en el titular solo los nuevos; se
+            # guarda el grupo completo por si el PATCH de abajo no llega a aplicarse.
+            self.cr.update_one(
+                {'_id': ObjectId(str(parent_id))},
+                {'$set': {f"answers.{campo_grupo}": grupo}}
+            )
+        return grupo, por_actualizar
+
+    # Campos de la visita que los acompañantes heredan del titular al editarlo.
+    CAMPOS_VISITA_ACOMPANANTES = (
+        'tipo_visita_pase', 'fecha_desde_visita', 'fecha_desde_hasta',
+        'config_dia_de_acceso', 'config_dias_acceso', 'config_limitar_acceso',
+    )
+
+    def _heredar_visita_acompanantes(self, parent_id, answers):
+        """ Al editar el titular, sus acompañantes en proceso o activos toman sus
+        fechas y limites de acceso. Sus demas datos (nombre, contacto, foto,
+        estatus) no se tocan. Solo se parchan los pases donde algo cambio. """
+        campos = [self.pase_entrada_fields[k] for k in self.CAMPOS_VISITA_ACOMPANANTES
+                  if self.pase_entrada_fields[k] in answers]
+        if not campos or not parent_id or not ObjectId.is_valid(str(parent_id)):
+            return
+        campo_grupo = self.pase_entrada_fields['acompanantes_grupo']
+        campo_url = self.pase_entrada_fields['url_hijo']
+        campo_status = self.pase_entrada_fields['status_pase']
+        titular = self.cr.find_one(
+            {'_id': ObjectId(str(parent_id))}, {f"answers.{campo_grupo}": 1}) or {}
+        grupo = titular.get('answers', {}).get(campo_grupo) or []
+        qrs = [(f.get(campo_url) or '').rstrip('/').rsplit('/', 1)[-1] for f in grupo]
+        qrs = [ObjectId(qr) for qr in qrs if ObjectId.is_valid(qr)]
+        if not qrs:
+            return
+        projection = {f"answers.{c}": 1 for c in campos + [campo_status]}
+        for pase in self.cr.find({'_id': {'$in': qrs}, 'deleted_at': {'$exists': False}}, projection):
+            guardado = pase.get('answers') or {}
+            if guardado.get(campo_status) not in ('proceso', 'activo'):
+                continue
+            cambios = {c: answers[c] for c in campos if guardado.get(c) != answers[c]}
+            if not cambios:
+                continue
+            try:
+                self.lkf_api.patch_multi_record(answers=cambios, form_id=self.PASE_ENTRADA, record_id=[str(pase['_id'])])
+            except Exception as e:
+                print(f"Error heredando la visita al pase de acompañante {pase['_id']}: {e}")
+
+    def _pase_acompanante(self, qr):
+        """ Estatus y foto guardados del pase de un acompañante (answers). """
+        if not ObjectId.is_valid(qr):
+            return {}
+        campo_status = self.pase_entrada_fields['status_pase']
+        campo_foto = self.pase_entrada_fields['walkin_fotografia']
+        pase = self.cr.find_one(
+            {'_id': ObjectId(qr), 'deleted_at': {'$exists': False}},
+            {f"answers.{campo_status}": 1, f"answers.{campo_foto}": 1}) or {}
+        return pase.get('answers') or {}
+
+    def _acompanante_por_actualizar(self, qr, fila, acompanante, pase, cambio_datos):
+        """ Datos para _patch_acompanantes_pases si cambió el nombre/email/teléfono
+        o la foto del acompañante. La foto solo se toca si el front la manda; si
+        no, se conserva la que ya tiene su pase. """
+        foto_guardada = pase.get(self.pase_entrada_fields['walkin_fotografia']) or []
+        foto = (self._archivos_pase(acompanante.get('foto')) or []) if 'foto' in acompanante else foto_guardada
+        if not cambio_datos and (foto or None) == (foto_guardada or None):
+            return None
+        return {
+            'qr_code': qr,
+            'nombre': fila.get(self.pase_entrada_fields['nombre_acompanante'], ''),
+            'email': fila.get(self.pase_entrada_fields['email_acompanante'], ''),
+            'telefono': fila.get(self.pase_entrada_fields['telefono_acompanante'], ''),
+            'foto': foto,
+        }
+
     def update_full_pass(self, access_pass,folio=None, qr_code=None, location=None):
         answers = {}
         perfil_pase = access_pass.get('perfil_pase', 'Visita General')
@@ -10251,20 +10419,25 @@ class Accesos(OcrMixin, AccesosModel):
             else:
                 answers.update({f"{self.pase_entrada_fields[key]}":value})
 
-        # --- Manejo de acompañantes nuevos ---
-        acompanantes_nuevos = access_pass.get('acompanantes_grupo', []) or []
-        acompanantes_total = len(acompanantes_nuevos)
-
-        if acompanantes_nuevos:
+        # --- Acompañantes ---
+        #   El front manda los acompañantes en proceso (cada uno con el id de su
+        #   pase) y los nuevos que se agreguen; los activos no los manda. Antes se
+        #   creaba un pase por cada uno en cada edicion y el grupo se reemplazaba
+        #   solo con esos: los pases anteriores quedaban sueltos (duplicados) y los
+        #   activos se desligaban del titular. Ahora solo se crean los nuevos y el
+        #   grupo conserva los que ya existian.
+        acompanantes_por_actualizar = []
+        parent_id = qr_code
+        if 'acompanantes_grupo' in access_pass:
             registro_actual = self.get_record_by_folio(
                 folio, self.PASE_ENTRADA, select_columns={'_id': 1}, limit=1
             ) or {}
             parent_id = registro_actual.get('_id') or qr_code
-
-            child_group_nuevo = self.create_multiple_pass_threads(answers, acompanantes_nuevos, parent_id) if parent_id else []
-
-            answers[self.pase_entrada_fields['acompanantes_grupo']] = child_group_nuevo
-            answers[self.pase_entrada_fields['acompanantes']] = acompanantes_total
+            grupo, acompanantes_por_actualizar = self._grupo_acompanantes_editado(
+                answers, access_pass.get('acompanantes_grupo') or [], parent_id)
+            if grupo is not None:
+                answers[self.pase_entrada_fields['acompanantes_grupo']] = grupo
+                answers[self.pase_entrada_fields['acompanantes']] = len(grupo)
 
         if answers or folio:
             metadata = self.lkf_api.get_metadata(form_id=self.PASE_ENTRADA)
@@ -10284,6 +10457,18 @@ class Accesos(OcrMixin, AccesosModel):
                     '_id': qr_code
                 })
             res= self.net.patch_forms_answers(metadata)
+            #---Los acompañantes en proceso que se editaron desde el titular
+            #   tambien se actualizan en su propio pase (igual que update_active_pass).
+            if acompanantes_por_actualizar and res.get('status_code') in (200, 201, 202):
+                try:
+                    requerimientos = self.get_requerimientos_ubicaciones(access_pass.get('ubicacion', []))
+                except Exception as e:
+                    print(f"Error obteniendo requerimientos para acompañantes: {e}")
+                    requerimientos = None
+                self._patch_acompanantes_pases(acompanantes_por_actualizar, requerimientos=requerimientos)
+            #---Fechas y limites de acceso: los acompañantes los heredan del titular.
+            if res.get('status_code') in (200, 201, 202):
+                self._heredar_visita_acompanantes(parent_id, answers)
             link_pass = answers.get(self.pase_entrada_fields['link'])
             if link_pass and res.get('status_code') in (200, 201, 202):
                 res.setdefault('json', {})['link'] = link_pass

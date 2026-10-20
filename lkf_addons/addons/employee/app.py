@@ -76,6 +76,7 @@ class Employee(Base):
         self.employee_fields = {
             'address': '663a7e0fe48382c5b1230902',
             'area_default': '6653f2d49c6d89925dc04b27',
+            'area_permiso': '6ad7eb02fe424836b2b5620d',
             'areas_group': '663cf9d77500019d1359eb9f',
             'cat_timezone': self.f['cat_timezone'],
             'city': '6654187fc85ce22aaf8bb070',
@@ -271,9 +272,12 @@ class Employee(Base):
         get_user_booth.
         El empleado se resuelve por el user_id del jwt y, como llave secundaria,
         por username. El email no se usa: en el back no es unico.
+        `escritura` es True si al menos un item de la ubicacion no esta marcado
+        como Permiso = solo_lectura (vacio cuenta como escritura).
         Returns:
         {ubicacion: {'areas': [...], 'areas_default': [...],
-                     'sin_limite': bool, 'es_default': bool}}
+                     'sin_limite': bool, 'es_default': bool,
+                     'escritura': bool}}
         """
         if user_id is None:
             user_id = self.user.get('user_id')
@@ -308,14 +312,19 @@ class Employee(Base):
                     continue
                 area = self.unlist(area_cat.get(self.f['area']))
                 es_default = item.get(self.f['area_default']) == 'default'
+                solo_lectura = item.get(self.f['area_permiso']) == 'solo_lectura'
                 permiso = permisos.setdefault(location, {
                     'areas': [],
                     'areas_default': [],
                     'sin_limite': False,
                     'es_default': False,
+                    'escritura': False,
                     })
                 if es_default:
                     permiso['es_default'] = True
+                if not solo_lectura:
+                    # basta un item con escritura para poder crear pases en la ubicacion
+                    permiso['escritura'] = True
                 if not area:
                     # ubicacion sin area: acceso a todas las areas de la ubicacion
                     permiso['sin_limite'] = True
