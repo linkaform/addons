@@ -361,9 +361,13 @@ class Items(LKFException):
         elif self.file_exists(search_file_path, file_name, 'xml'):
             json_file = self.lkf.read_template_file(search_file_path, f'{file_name}.xml', file_data)
             json_file = self.lkf.lkf_api.xml_to_json(json_file)
-        elif self.file_exists(file_path, file_name, 'json'):
-            json_file = open('./{}/{}.json'.format(file_path, file_name))
-            json_file = simplejson.load(json_file)
+        elif self.file_exists(modules_path, file_name, 'json') or self.file_exists(file_path, file_name, 'json'):
+            # Igual que con el xml: primero modules/, que es donde viven los items de la
+            # cuenta. Sin el "./" de antes, que con rutas absolutas apuntaba a un lugar
+            # relativo al cwd y nunca encontraba el archivo.
+            json_dir = modules_path if self.file_exists(modules_path, file_name, 'json') else file_path
+            with open('{}/{}.json'.format(json_dir, file_name), encoding='utf-8') as fh:
+                json_file = simplejson.load(fh)
         return json_file
             
 

@@ -46,7 +46,9 @@ class ScriptResource(items.Items):
             if instalable_scripts:
                 detail = instalable_scripts[script_name]
                 if detail.get('properties') and detail['properties']:
-                    properties = self.load_module_template_file(self.path, detail['properties'])
+                    # El archivo de propiedades vive junto al script, subcarpeta incluida.
+                    props_path = '{}/{}'.format(self.path, detail['path']) if detail.get('path') else self.path
+                    properties = self.load_module_template_file(props_path, detail['properties'])
                 image = detail.get('image')
                 script_location = self.file_path_to_load(script_name, detail)
                 try:

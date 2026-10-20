@@ -409,17 +409,16 @@ if __name__ == '__main__':
                         load_form = set_value(input("Load Forms [y/n] (default n):"))
                     if ask_catalog:    
                         load_catalog = set_value(input("Load Catalogs [y/n] (default n):"))
+                        # El demo ya no se pregunta: se pide con la palabra `demo` en la
+                        # linea de comandos. (ask_data y ask_demo estaban cruzados.)
                         if ask_data:
-                            load_demo = set_value(input("Load DEMO data [y/n] (default n):"))
-                        if ask_demo:    
                             load_data = set_value(input("Load DATA [y/n] (default n):"))
                     if ask_script:    
                         load_script = set_value(input("Load Scripts [y/n] (default n):"))
                     if ask_reports:    
                         load_reports = set_value(input("Load Reports [y/n] (default n):"))
                 else:
-                    if load_catalog:
-                        load_demo = set_value(input("Load DEMO data [y/n] (default n):"))
+                    if load_catalog and ask_data:
                         load_data = set_value(input("Load DATA [y/n] (default n):"))
 
                 install = {'all':True}
