@@ -58,8 +58,18 @@ class CatalogResource(items.Items):
             catalog_model = self.load_module_template_file(this_path, catalog_name)
             self.this_path = this_path
             res = self.lkf.install_catalog(self.module, catalog_name, catalog_model, local_path=path, **kwargs)
-            if res.get('status') in ('update', 'create'):
-                print('Installing Catalog: ', catalog_name)
+            # 'unchanged' tambien entra: que el modelo del catalogo no haya cambiado no
+            # quiere decir que su data ya este cargada. El "ya cargado" lo lleva
+            # load_data/load_demo por archivo (ver load_info), asi que re-correr no duplica
+            # lo que esta en True. Antes solo entraba en update/create y un catalogo sin
+            # cambios nunca recibia su data, ni poniendo load_data en false a mano.
+            if res.get('status') in ('update', 'create', 'unchanged'):
+                # Con -id <catalog_id> la carga de data se limita a esos catalogos, para
+                # no recargar la de todos los demas del modulo.
+                item_ids = [str(x) for x in (kwargs.get('item_ids') or [])]
+                if item_ids and str(res.get('item_id')) not in item_ids:
+                    continue
+                print('Installing Catalog: ', catalog_name, '({})'.format(res.get('status')))
                 for file_type, files in detail.items():
                     if file_type == 'data' and self.load_data:
                         self.load_info(files, file_type, res )
