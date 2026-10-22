@@ -220,6 +220,13 @@ class Base(BaseModel):
         if user_data.get(self.f['new_user_status']) != 'activado' or \
                 option not in (self.EMPLEADO_CREAR, self.EMPLEADO_LIGAR):
             return {'skipped': True}
+        # Al restaurar contraseña el registro vuelve a 'activado' y este
+        # workflow puede dispararse otra vez: si el usuario ya tiene un empleado
+        # ligado la fase 2 ya corrio y no se debe repetir.
+        self._ensure_employee_modules()
+        user_id = self.unlist(user_data.get(self.f['new_user_id']))
+        if user_id and self.Employee.get_employee_data(user_id=user_id, active=False):
+            return {'skipped': True}
         employee = None
         if option == self.EMPLEADO_LIGAR:
             employee = self._find_employee_to_link(user_data.get(self.f['new_user_empleado_nombre']))
@@ -228,7 +235,7 @@ class Base(BaseModel):
             user_data.get(self.f['new_user_complete_name']),
             user_data.get(self.f['new_user_email']),
             user_data.get(self.f['new_user_username']),
-            self.unlist(user_data.get(self.f['new_user_id'])))
+            user_id)
         return {'skipped': False}
 
     def _setup_employee_and_access(self, option, employee, name, email, username, user_id):

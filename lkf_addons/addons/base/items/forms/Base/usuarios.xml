@@ -15,7 +15,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <created_at>1788896507.0</created_at>
-    <description>version: 1792192234</description>
+    <description>version: 1792561357</description>
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
@@ -87,6 +87,12 @@
                             <points>None</points>
                             <selected>False</selected>
                             <value>activado</value>
+                        </item>
+                        <item>
+                            <label>Restaurar</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>restaurar</value>
                         </item>
                     </options>
                     <properties>
@@ -529,7 +535,7 @@
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
                     <help_text>None</help_text>
-                    <label>Puesto</label>
+                    <label>Rol</label>
                     <number_type>None</number_type>
                     <options>[]</options>
                     <properties>
@@ -922,5 +928,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1792192234.0</updated_at>
+    <updated_at>1792561357.0</updated_at>
 </lkf>

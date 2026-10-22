@@ -537,5 +537,124 @@
                 </wf_fields>
             </rules>
         </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>6a31c3d5e7f901a2b4c6d8f0</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} &lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;style&gt;
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container-main-clave10 { max-width: 600px; margin: 20px auto; background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #dddddd7d; }
+        .header { text-align: center; padding: 20px; background: #021d49; border-radius: 10px 10px 0 0; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
+        .content { padding: 20px; text-align: center; }
+        .content p { color: #333; font-size: 16px; line-height: 1.5; }
+        .content a { color: #021d49; text-decoration: none; font-weight: bold; }
+        .cta-button { display: inline-block; padding: 12px 20px; margin-top: 15px; margin-bottom: 20px; font-size: 16px; color: #ffffff !important; background: #4CAF50; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .footer { margin-top: 20px; text-align: center; color: #777; font-size: 14px; }
+        .footer a { color: #777; text-decoration: none; font-weight: bold; }
+        .contenedor-principal { background: #F8F9F9; padding-top: 50px; padding-bottom: 50px; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="contenedor-principal"&gt;
+        &lt;div class="container-main-clave10"&gt;
+            &lt;div class="header"&gt;
+                &lt;h1&gt;Restaurar contraseña&lt;/h1&gt;
+            &lt;/div&gt;
+
+            &lt;div class="content"&gt;
+                &lt;p&gt;Se solicitó restaurar la contraseña de tu cuenta de &lt;a href="https://www.clave10.com/" target="_blank"&gt;Clave10&lt;/a&gt;. Crea una contraseña nueva en el siguiente enlace:&lt;/p&gt;
+                &lt;a href="{{ record.answers.6a2f1c0e5b3d4a7c9e8f1a02 }}" target="_blank" class="cta-button"&gt;Restaurar contraseña&lt;/a&gt;
+                &lt;br&gt;
+                &lt;p style="text-align: left; margin: 0;"&gt;&lt;b&gt;Usuario:&lt;/b&gt; {{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/p&gt;
+                &lt;p&gt;El enlace solo puede usarse una vez. Si no solicitaste este cambio, avisa a tu administrador.&lt;/p&gt;
+            &lt;/div&gt;
+
+            &lt;div class="footer"&gt;
+                &lt;p&gt;&amp;copy; 2024 &lt;a href="https://www.clave10.com/" target="_blank"&gt;Clave10&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>638a9a7767c332f5d459fc82</field_id>
+                                <group_id>None</group_id>
+                                <label>Email</label>
+                            </item>
+                        </email_fields>
+                        <emails>[]</emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>{}</pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>False</send_pdf>
+                        <sender>donotreply@clave10.com</sender>
+                        <subject>{% raw %} 🔑 Restaura tu contraseña de Clave10 {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>Se envia el correo de restauracion</name>
+                </item>
+            </actions>
+            <id>6a31c3d5e7f901a2b4c6d8f1</id>
+            <name>Envio de correo de restauracion</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2026-10-21T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2026-10-20T18:00:00.000Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>False</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>679d023876ad7f5ba642f4ed</field_id>
+                                <group>{}</group>
+                                <label>Estatus</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>restaurar</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
     </workflows>
 </lkf>

@@ -68,7 +68,7 @@
                     <field_id>67be0c43a31e5161c47f2bbb</field_id>
                     <group_id>None</group_id>
                     <id>67be0c43a31e5161c47f2bbb</id>
-                    <label>Puesto</label>
+                    <label>Rol</label>
                     <type>text</type>
                 </item>
             </fields_ruled>
@@ -116,6 +116,18 @@
                         <type>select</type>
                     </field>
                     <value>activado</value>
+                </item>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>679d023876ad7f5ba642f4ed</field_id>
+                        <group_id>None</group_id>
+                        <id>679d023876ad7f5ba642f4ed</id>
+                        <label>Estatus</label>
+                        <type>select</type>
+                    </field>
+                    <value>restaurar</value>
                 </item>
             </conditions>
             <element_ids>[]</element_ids>
