@@ -954,7 +954,25 @@ class Accesos(OcrMixin, AccesosModel):
         else:
             self.LKFException('No se encontro los folios correspondiente')
 
+    def can_delete_records(self, form_id):
+        # Mismo criterio que Linkaform: el dueño de la cuenta siempre puede borrar;
+        # los demás, solo si la forma está compartida con "Borrar registros".
+        user_id = self.user.get('user_id') or self.user.get('id')
+        parent_id = self.user.get('parent_id') or self.account_id
+        if not user_id or str(user_id) == str(parent_id):
+            return True
+        response = self.lkf_api.get_form_users(form_id, format_response=False, jwt_settings_key='APIKEY_JWT_KEY')
+        for user in response.get('data') or []:
+            if str(user.get('id')) == str(user_id):
+                return bool(user.get('can_delete_records'))
+        return False
+
+    def get_incidence_permissions(self):
+        return {'can_delete': self.can_delete_records(self.BITACORA_INCIDENCIAS)}
+
     def delete_incidence(self, folio):
+        if not self.can_delete_records(self.BITACORA_INCIDENCIAS):
+            self.LKFException({'title': 'Sin permiso', 'msg': 'No tienes permiso para eliminar incidencias'})
         list_records = []
         if len(folio) > 0:
             for element in folio:
