@@ -954,7 +954,25 @@ class Accesos(OcrMixin, AccesosModel):
         else:
             self.LKFException('No se encontro los folios correspondiente')
 
+    def can_delete_records(self, form_id):
+        # Mismo criterio que Linkaform: el dueño de la cuenta siempre puede borrar;
+        # los demás, solo si la forma está compartida con "Borrar registros".
+        user_id = self.user.get('user_id') or self.user.get('id')
+        parent_id = self.user.get('parent_id') or self.account_id
+        if not user_id or str(user_id) == str(parent_id):
+            return True
+        response = self.lkf_api.get_form_users(form_id, format_response=False, jwt_settings_key='APIKEY_JWT_KEY')
+        for user in response.get('data') or []:
+            if str(user.get('id')) == str(user_id):
+                return bool(user.get('can_delete_records'))
+        return False
+
+    def get_incidence_permissions(self):
+        return {'can_delete': self.can_delete_records(self.BITACORA_INCIDENCIAS)}
+
     def delete_incidence(self, folio):
+        if not self.can_delete_records(self.BITACORA_INCIDENCIAS):
+            self.LKFException({'title': 'Sin permiso', 'msg': 'No tienes permiso para eliminar incidencias'})
         list_records = []
         if len(folio) > 0:
             for element in folio:
@@ -9871,11 +9889,14 @@ class Accesos(OcrMixin, AccesosModel):
                     posicion = posicion_por_qr.get(qr_code_acomp)
                     if posicion is None:
                         continue
-                    nombre = acompanante.get('nombre', '')
-                    email = acompanante.get('email', '')
-                    telefono = acompanante.get('telefono', '')
-                    foto = acompanante.get('foto', [])
                     previo = stored_acompanantes[posicion]
+                    #---Lo que manda el titular se cargo al abrir la pagina; si el
+                    #   acompanante completo su pase despues, viene vacio. Un valor
+                    #   vacio no borra lo que el acompanante ya guardo.
+                    nombre = acompanante.get('nombre') or previo.get('nombre_acompanante', '')
+                    email = acompanante.get('email') or previo.get('email_acompanante', '')
+                    telefono = acompanante.get('telefono') or previo.get('telefono_acompanante', '')
+                    foto = acompanante.get('foto') or []
                     hay_cambio = (
                         nombre != previo.get('nombre_acompanante', '')
                         or email != previo.get('email_acompanante', '')
@@ -9883,7 +9904,7 @@ class Accesos(OcrMixin, AccesosModel):
                     )
                     if hay_cambio:
                         cambios_por_qr[qr_code_acomp] = {'nombre': nombre, 'email': email, 'telefono': telefono}
-                    if hay_cambio or (foto or None) != (previo.get('foto') or None):
+                    if hay_cambio or (foto and foto != previo.get('foto')):
                         acompanantes_a_actualizar.append({
                             'qr_code': qr_code_acomp,
                             'nombre': nombre,
@@ -10026,12 +10047,18 @@ class Accesos(OcrMixin, AccesosModel):
     def _patch_acompanantes_pases(self, acompanantes_a_actualizar, requerimientos=None):
         status_field = self.pase_entrada_fields['status_pase']
         for item in acompanantes_a_actualizar:
+            #---Solo lo que trae valor: un dato vacio (cargado antes de que el
+            #   acompanante completara su pase) no borra lo que ya guardo.
             child_answers = {
-                self.mf['nombre_pase']: item['nombre'],
-                self.pase_entrada_fields['email']: item['email'],
-                self.mf['telefono_pase']: item['telefono'],
-                self.pase_entrada_fields['walkin_fotografia']: item['foto'],
+                field_id: valor for field_id, valor in (
+                    (self.mf['nombre_pase'], item.get('nombre')),
+                    (self.pase_entrada_fields['email'], item.get('email')),
+                    (self.mf['telefono_pase'], item.get('telefono')),
+                    (self.pase_entrada_fields['walkin_fotografia'], item.get('foto')),
+                ) if valor
             }
+            if not child_answers:
+                continue
             #---Ya con los datos del acompanante se revisa si su pase puede activarse
             try:
                 registro = self.cr.find_one({'_id': ObjectId(item['qr_code'])}) or {}
@@ -10039,9 +10066,14 @@ class Accesos(OcrMixin, AccesosModel):
                 if child_stored and child_stored.get(status_field) != 'cancelado':
                     new_child_answers = deepcopy(child_stored)
                     new_child_answers.update(child_answers)
-                    child_answers[status_field] = self._status_auto_activacion(
+                    status = self._status_auto_activacion(
                         new_child_answers, requerimientos=requerimientos
                     ) or self.access_pass_set_status(new_child_answers, requerimientos=requerimientos)
+                    #---Igual que el titular en update_pass: un pase activo no regresa
+                    #   a proceso por editarlo; solo la fecha lo puede vencer.
+                    if child_stored.get(status_field) == 'activo' and status == 'proceso':
+                        status = 'activo'
+                    child_answers[status_field] = status
             except Exception as e:
                 print(f"Error calculando status del pase de acompañante {item.get('qr_code')}: {e}")
             try:
