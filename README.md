@@ -314,7 +314,7 @@ contra tu `lkf-addons`.
 
 ```
 docker compose -f docker/docker-compose.miniback.yml up -d --build
-curl localhost:8000/api/health
+curl localhost:8014/api/health
 ```
 
 Detalles, variables de entorno y limitaciones en [`miniback/README.md`](miniback/README.md).

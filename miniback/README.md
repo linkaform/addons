@@ -114,7 +114,7 @@ que necesitan para resolver `from account_settings import *` y
 No son scripts autonomos: `dispatch()` (`app/middleware/auth.py`) le pega a
 `http://0.0.0.0:$PORT/{modulo}/{endpoint}` **dentro de su propio contenedor**.
 No basta con que `lkf-sanic-app` exista o este levantado con `sleep infinity`:
-la app tiene que estar respondiendo en el puerto 8000 interno.
+la app tiene que estar respondiendo en el puerto `$PORT` interno (8010 en la familia 10; es el default de `SANIC_PORT` en `app/middleware/auth.py`).
 
 Si el contenedor esta caido, la respuesta es **503**, no 400: la peticion
 estaba bien, la dependencia es la que no esta. `/api/health` marca `ok:false`
@@ -163,10 +163,10 @@ Levanta antes ese contenedor con `docker/docker-compose.worktree.yml`. El
 indice se construye dentro del contenedor destino, asi que no hay que montar
 nada mas.
 
-### Si el 8000 esta ocupado
+### Si el 8014 esta ocupado
 
-Si tienes el `infosync-api` real corriendo, ya tiene el 8000. Levanta el
-mini-back en otro puerto y apunta el front ahi:
+Si otro servicio ya usa el 8014 (el puerto del mini-back en la familia 10),
+levanta el mini-back en otro puerto y apunta el front ahi:
 
 ```bash
 MINIBACK_PORT=8015 docker compose -f docker/docker-compose.miniback.yml up -d
