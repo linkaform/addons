@@ -77,108 +77,142 @@
                     <action_settings>{}</action_settings>
                     <configuration>
                         <body>{% raw %} &lt;!DOCTYPE html&gt;
-&lt;html&gt;
+&lt;html lang="es"&gt;
 &lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;style&gt;
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container-main-clave10 {
-            max-width: 600px;
-            margin: 20px auto;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #dddddd7d;
-        }
-        .header {
-            text-align: center;
-            padding: 20px;
-            background: #021d49;
-            border-radius: 10px 10px 0 0;
-        }
-        .header h1 {
-            color: #ffffff;
-            margin: 0;
-            font-size: 24px;
-        }
-        .content {
-            padding: 20px;
-            text-align: center;
-        }
-        .content p {
-            color: #333;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        .content a{
-            color: #021d49;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .cta-button {
-            display: inline-block;
-            padding: 12px 20px;
-            margin-top: 15px;
-            margin-bottom: 20px;
-            font-size: 16px;
-            color: #ffffff !important;
-            background: #4CAF50;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            color: #777;
-            font-size: 14px;
-        }
-        .footer a {
-            color: #777;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .contenedor-principal {
-            background: #F8F9F9;
-            padding-top: 50px;
-            padding-bottom: 50px;
-        }
-    &lt;/style&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+&lt;title&gt;¡Bienvenido a Clave10!&lt;/title&gt;
+&lt;style&gt;
+  @media only screen and (max-width: 620px) {
+    .container { width: 100% !important; }
+    .px { padding-left: 24px !important; padding-right: 24px !important; }
+    .h1 { font-size: 22px !important; line-height: 28px !important; }
+  }
+&lt;/style&gt;
 &lt;/head&gt;
-&lt;body&gt;
-    &lt;div class="contenedor-principal"&gt;
-        &lt;div class="container-main-clave10"&gt;
-            &lt;!-- Encabezado --&gt;
-            &lt;div class="header"&gt;
-                &lt;h1&gt;¡Bienvenido a Clave10! 🎉&lt;/h1&gt;
-            &lt;/div&gt;
+&lt;body style="margin:0; padding:0; background-color:#F1F5F9;"&gt;
 
-            &lt;!-- Contenido --&gt;
-            &lt;div class="content"&gt;
-                &lt;p&gt;¡Nos alegra darte la bienvenida a &lt;a href="https://www.clave10.com/" target="_blank"&gt;Clave10&lt;/a&gt;, tu sistema de seguridad patrimonial! Para activar tu cuenta, crea tu contraseña en el siguiente enlace:&lt;/p&gt;
-                &lt;a href="{{ record.answers.6a2f1c0e5b3d4a7c9e8f1a02 }}" target="_blank" class="cta-button"&gt;Activar Cuenta&lt;/a&gt;
-                &lt;br&gt;
-                &lt;p style="text-align: left; margin: 0;"&gt;Tu usuario es:&lt;/p&gt;
-                &lt;br&gt;
-                &lt;p style="text-align: left; margin: 0;"&gt;&lt;b&gt;Usuario:&lt;/b&gt; {{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/p&gt;
-                
-                &lt;p&gt;Para ayudarte a familiarizarte con la plataforma, hemos preparado un manual de usuario. Puedes revisarlo &lt;a href="https://docs.linkaform.com/Soter/App/index.html" target="_blank" style="color: #021d49; font-weight: bold; text-decoration: none"&gt;aquí&lt;/a&gt;.&lt;/p&gt;
-                &lt;p&gt;Si tienes alguna duda, nuestro equipo está listo para ayudarte.&lt;/p&gt;
-                &lt;p&gt;¡Nos vemos dentro! 🚀&lt;/p&gt;
-            &lt;/div&gt;
+&lt;div style="display:none; max-height:0; overflow:hidden; mso-hide:all;"&gt;
+  Activa tu cuenta y empieza a crear un lugar de trabajo más seguro.
+&lt;/div&gt;
 
-            &lt;!-- Pie de página --&gt;
-            &lt;div class="footer"&gt;
-                &lt;p&gt;&amp;copy; 2024 &lt;a href="https://www.clave10.com/" target="_blank"&gt;Clave10&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
-            &lt;/div&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
+&lt;table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F1F5F9;"&gt;
+  &lt;tr&gt;
+    &lt;td align="center" style="padding:32px 12px;"&gt;
+
+      &lt;table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden;"&gt;
+
+        &lt;!-- Encabezado con logo --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:28px 40px 24px 40px; border-bottom:1px solid #E2E8F0;"&gt;
+            &lt;a href="https://www.clave10.com/" style="text-decoration:none;"&gt;
+              &lt;img src="https://b2.linkaform.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/6ae03b3ffcf5a9e2b0be7279.png" alt="Clave 10" width="150" style="display:block; width:150px; height:auto; border:0;"&gt;
+            &lt;/a&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Bienvenida --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:36px 40px 8px 40px; font-family:Arial, Helvetica, sans-serif;"&gt;
+            &lt;h1 class="h1" style="margin:0 0 16px 0; font-size:24px; line-height:30px; color:#192A4E; font-weight:700; letter-spacing:-0.02em;"&gt;¡Bienvenido a Clave10!&lt;/h1&gt;
+            &lt;p style="margin:0; font-size:16px; line-height:24px; color:#171717;"&gt;
+              ¡Nos alegra darte la bienvenida a Clave10, tu agente inteligente de EHS (Seguridad, Salud y Medio Ambiente)!
+            &lt;/p&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Mensaje principal --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:20px 40px 4px 40px;"&gt;
+            &lt;table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#EFF6FF; border-radius:8px;"&gt;
+              &lt;tr&gt;
+                &lt;td style="border-left:4px solid #2F80ED; border-radius:8px; padding:16px 20px; font-family:Arial, Helvetica, sans-serif; font-size:18px; line-height:26px; font-weight:700; color:#192A4E;"&gt;
+                  Juntos crearemos un lugar de trabajo más seguro.
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            &lt;/table&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Activación --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:24px 40px 4px 40px; font-family:Arial, Helvetica, sans-serif;"&gt;
+            &lt;p style="margin:0 0 20px 0; font-size:16px; line-height:24px; color:#171717;"&gt;
+              Para activar tu cuenta, crea tu contraseña en el siguiente enlace:
+            &lt;/p&gt;
+            &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0"&gt;
+              &lt;tr&gt;
+                &lt;td align="center" bgcolor="#2F80ED" style="border-radius:8px;"&gt;
+                  &lt;a href="{{ record.answers.6a2f1c0e5b3d4a7c9e8f1a02 }}" style="display:inline-block; padding:12px 28px; font-family:Arial, Helvetica, sans-serif; font-size:16px; line-height:24px; font-weight:700; color:#FFFFFF; text-decoration:none; border-radius:8px;"&gt;Activar Cuenta&lt;/a&gt;
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            &lt;/table&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Usuario --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:24px 40px 4px 40px;"&gt;
+            &lt;table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px;"&gt;
+              &lt;tr&gt;
+                &lt;td style="padding:14px 20px; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:20px; color:#475569;"&gt;
+                  Tu usuario es:
+                  &lt;span style="display:block; padding-top:2px; font-size:18px; line-height:26px; font-weight:700; color:#192A4E;"&gt;{{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/span&gt;
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            &lt;/table&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Manual --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:24px 40px 4px 40px; font-family:Arial, Helvetica, sans-serif;"&gt;
+            &lt;p style="margin:0; font-size:16px; line-height:24px; color:#171717;"&gt;
+              Para ayudarte a familiarizarte con la plataforma, hemos preparado un manual de usuario. Puedes revisarlo &lt;a href="https://docs.clave10.com/" style="color:#2F80ED; font-weight:700; text-decoration:underline;"&gt;aquí&lt;/a&gt;.
+            &lt;/p&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Soporte --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:24px 40px 4px 40px; font-family:Arial, Helvetica, sans-serif;"&gt;
+            &lt;p style="margin:0 0 12px 0; font-size:16px; line-height:24px; color:#171717;"&gt;
+              Si tienes alguna duda, nuestro equipo está listo para ayudarte.
+            &lt;/p&gt;
+            &lt;table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #E2E8F0;"&gt;
+              &lt;tr&gt;
+                &lt;td style="padding:14px 0 0 0; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:24px; color:#171717;"&gt;
+                  &lt;span style="color:#64748B;"&gt;Teléfono y WhatsApp:&lt;/span&gt; &lt;a href="tel:+528181922973" style="color:#2F80ED; font-weight:700; text-decoration:none;"&gt;+52 (81) 8192 2973&lt;/a&gt;&lt;br&gt;
+                  &lt;span style="color:#64748B;"&gt;Correo:&lt;/span&gt; &lt;a href="mailto:soporte@clave10.com" style="color:#2F80ED; text-decoration:none;"&gt;soporte@clave10.com&lt;/a&gt;
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            &lt;/table&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Cierre --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:28px 40px 36px 40px; font-family:Arial, Helvetica, sans-serif;"&gt;
+            &lt;p style="margin:0; font-size:16px; line-height:24px; color:#171717;"&gt;
+              ¡Nos vemos dentro!&lt;br&gt;
+              &lt;strong style="color:#192A4E;"&gt;El equipo de Clave10&lt;/strong&gt;
+            &lt;/p&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Pie --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="background-color:#192A4E; padding:18px 40px; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:18px; color:#CBD5E1;"&gt;
+            © 2026 &lt;a href="https://www.clave10.com/" style="color:#FFFFFF; text-decoration:none;"&gt;Clave10&lt;/a&gt;. Todos los derechos reservados.
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+      &lt;/table&gt;
+
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
 &lt;/body&gt;
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>
@@ -545,44 +579,142 @@
                     <action_settings>{}</action_settings>
                     <configuration>
                         <body>{% raw %} &lt;!DOCTYPE html&gt;
-&lt;html&gt;
+&lt;html lang="es"&gt;
 &lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;style&gt;
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
-        .container-main-clave10 { max-width: 600px; margin: 20px auto; background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #dddddd7d; }
-        .header { text-align: center; padding: 20px; background: #021d49; border-radius: 10px 10px 0 0; }
-        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
-        .content { padding: 20px; text-align: center; }
-        .content p { color: #333; font-size: 16px; line-height: 1.5; }
-        .content a { color: #021d49; text-decoration: none; font-weight: bold; }
-        .cta-button { display: inline-block; padding: 12px 20px; margin-top: 15px; margin-bottom: 20px; font-size: 16px; color: #ffffff !important; background: #4CAF50; text-decoration: none; border-radius: 5px; font-weight: bold; }
-        .footer { margin-top: 20px; text-align: center; color: #777; font-size: 14px; }
-        .footer a { color: #777; text-decoration: none; font-weight: bold; }
-        .contenedor-principal { background: #F8F9F9; padding-top: 50px; padding-bottom: 50px; }
-    &lt;/style&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+&lt;title&gt;Restaura tu contraseña de Clave10&lt;/title&gt;
+&lt;style&gt;
+  @media only screen and (max-width: 620px) {
+    .container { width: 100% !important; }
+    .px { padding-left: 24px !important; padding-right: 24px !important; }
+    .h1 { font-size: 22px !important; line-height: 28px !important; }
+  }
+&lt;/style&gt;
 &lt;/head&gt;
-&lt;body&gt;
-    &lt;div class="contenedor-principal"&gt;
-        &lt;div class="container-main-clave10"&gt;
-            &lt;div class="header"&gt;
-                &lt;h1&gt;Restaurar contraseña&lt;/h1&gt;
-            &lt;/div&gt;
+&lt;body style="margin:0; padding:0; background-color:#F1F5F9;"&gt;
 
-            &lt;div class="content"&gt;
-                &lt;p&gt;Se solicitó restaurar la contraseña de tu cuenta de &lt;a href="https://www.clave10.com/" target="_blank"&gt;Clave10&lt;/a&gt;. Crea una contraseña nueva en el siguiente enlace:&lt;/p&gt;
-                &lt;a href="{{ record.answers.6a2f1c0e5b3d4a7c9e8f1a02 }}" target="_blank" class="cta-button"&gt;Restaurar contraseña&lt;/a&gt;
-                &lt;br&gt;
-                &lt;p style="text-align: left; margin: 0;"&gt;&lt;b&gt;Usuario:&lt;/b&gt; {{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/p&gt;
-                &lt;p&gt;El enlace solo puede usarse una vez. Si no solicitaste este cambio, avisa a tu administrador.&lt;/p&gt;
-            &lt;/div&gt;
+&lt;div style="display:none; max-height:0; overflow:hidden; mso-hide:all;"&gt;
+  Crea una contraseña nueva para tu cuenta de Clave10.
+&lt;/div&gt;
 
-            &lt;div class="footer"&gt;
-                &lt;p&gt;&amp;copy; 2024 &lt;a href="https://www.clave10.com/" target="_blank"&gt;Clave10&lt;/a&gt;. Todos los derechos reservados.&lt;/p&gt;
-            &lt;/div&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
+&lt;table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F1F5F9;"&gt;
+  &lt;tr&gt;
+    &lt;td align="center" style="padding:32px 12px;"&gt;
+
+      &lt;table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden;"&gt;
+
+        &lt;!-- Encabezado con logo --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:28px 40px 24px 40px; border-bottom:1px solid #E2E8F0;"&gt;
+            &lt;a href="https://www.clave10.com/" style="text-decoration:none;"&gt;
+              &lt;img src="https://b2.linkaform.com/file/app-linkaform/public-client-126/71202/60b81349bde5588acca320e1/6ae03b3ffcf5a9e2b0be7279.png" alt="Clave 10" width="150" style="display:block; width:150px; height:auto; border:0;"&gt;
+            &lt;/a&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Bienvenida --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:36px 40px 8px 40px; font-family:Arial, Helvetica, sans-serif;"&gt;
+            &lt;h1 class="h1" style="margin:0 0 16px 0; font-size:24px; line-height:30px; color:#192A4E; font-weight:700; letter-spacing:-0.02em;"&gt;Restaura tu contraseña&lt;/h1&gt;
+            &lt;p style="margin:0; font-size:16px; line-height:24px; color:#171717;"&gt;
+              Se solicitó restaurar la contraseña de tu cuenta de Clave10.
+            &lt;/p&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Mensaje principal --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:20px 40px 4px 40px;"&gt;
+            &lt;table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#EFF6FF; border-radius:8px;"&gt;
+              &lt;tr&gt;
+                &lt;td style="border-left:4px solid #2F80ED; border-radius:8px; padding:16px 20px; font-family:Arial, Helvetica, sans-serif; font-size:18px; line-height:26px; font-weight:700; color:#192A4E;"&gt;
+                  Tu información sigue protegida: solo necesitas una contraseña nueva.
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            &lt;/table&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Activación --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:24px 40px 4px 40px; font-family:Arial, Helvetica, sans-serif;"&gt;
+            &lt;p style="margin:0 0 20px 0; font-size:16px; line-height:24px; color:#171717;"&gt;
+              Crea una contraseña nueva en el siguiente enlace:
+            &lt;/p&gt;
+            &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0"&gt;
+              &lt;tr&gt;
+                &lt;td align="center" bgcolor="#2F80ED" style="border-radius:8px;"&gt;
+                  &lt;a href="{{ record.answers.6a2f1c0e5b3d4a7c9e8f1a02 }}" style="display:inline-block; padding:12px 28px; font-family:Arial, Helvetica, sans-serif; font-size:16px; line-height:24px; font-weight:700; color:#FFFFFF; text-decoration:none; border-radius:8px;"&gt;Restaurar contraseña&lt;/a&gt;
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            &lt;/table&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Usuario --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:24px 40px 4px 40px;"&gt;
+            &lt;table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px;"&gt;
+              &lt;tr&gt;
+                &lt;td style="padding:14px 20px; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:20px; color:#475569;"&gt;
+                  Tu usuario es:
+                  &lt;span style="display:block; padding-top:2px; font-size:18px; line-height:26px; font-weight:700; color:#192A4E;"&gt;{{ record.answers.6759e4a7a9a6e13c7b26da33 }}&lt;/span&gt;
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            &lt;/table&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Manual --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:24px 40px 4px 40px; font-family:Arial, Helvetica, sans-serif;"&gt;
+            &lt;p style="margin:0; font-size:16px; line-height:24px; color:#171717;"&gt;
+              El enlace solo puede usarse una vez. Si no solicitaste este cambio, avisa a tu administrador.
+            &lt;/p&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Soporte --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:24px 40px 4px 40px; font-family:Arial, Helvetica, sans-serif;"&gt;
+            &lt;p style="margin:0 0 12px 0; font-size:16px; line-height:24px; color:#171717;"&gt;
+              Si necesitas ayuda, nuestro equipo está listo para atenderte.
+            &lt;/p&gt;
+            &lt;table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #E2E8F0;"&gt;
+              &lt;tr&gt;
+                &lt;td style="padding:14px 0 0 0; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:24px; color:#171717;"&gt;
+                  &lt;span style="color:#64748B;"&gt;Teléfono y WhatsApp:&lt;/span&gt; &lt;a href="tel:+528181922973" style="color:#2F80ED; font-weight:700; text-decoration:none;"&gt;+52 (81) 8192 2973&lt;/a&gt;&lt;br&gt;
+                  &lt;span style="color:#64748B;"&gt;Correo:&lt;/span&gt; &lt;a href="mailto:soporte@clave10.com" style="color:#2F80ED; text-decoration:none;"&gt;soporte@clave10.com&lt;/a&gt;
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            &lt;/table&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Cierre --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="padding:28px 40px 36px 40px; font-family:Arial, Helvetica, sans-serif;"&gt;
+            &lt;p style="margin:0; font-size:16px; line-height:24px; color:#171717;"&gt;
+              Gracias por usar Clave10.&lt;br&gt;
+              &lt;strong style="color:#192A4E;"&gt;El equipo de Clave10&lt;/strong&gt;
+            &lt;/p&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+        &lt;!-- Pie --&gt;
+        &lt;tr&gt;
+          &lt;td class="px" style="background-color:#192A4E; padding:18px 40px; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:18px; color:#CBD5E1;"&gt;
+            © 2026 &lt;a href="https://www.clave10.com/" style="color:#FFFFFF; text-decoration:none;"&gt;Clave10&lt;/a&gt;. Todos los derechos reservados.
+          &lt;/td&gt;
+        &lt;/tr&gt;
+
+      &lt;/table&gt;
+
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
 &lt;/body&gt;
 &lt;/html&gt; {% endraw %}</body>
                         <email_fields>
