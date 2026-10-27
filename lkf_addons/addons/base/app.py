@@ -780,13 +780,15 @@ class Base(BaseModel):
         for module in modules_dict.values():
             submodules = sorted(module['submodules'].values(), key=lambda s: s['order'])
             for s in submodules:
-                s['items'] = sorted(s['items'].values(), key=lambda i: i['order'])
-                # Un submodulo cuyo unico item es 'link' navega directo: la app
-                # espera el route en el submodulo y items vacio.
-                if len(s['items']) == 1 and s['items'][0].get('type') == 'link':
-                    link = s['items'].pop()
-                    if link.get('route'):
-                        s['route'] = link['route']
+                items = sorted(s['items'].values(), key=lambda i: i['order'])
+                # Un item 'link' con route hace que el submodulo navegue directo:
+                # la app espera el route en el submodulo. Los demas items se
+                # quedan (ej. accesos directos del grid de Accesos).
+                link = next((i for i in items if i.get('type') == 'link' and i.get('route')), None)
+                if link:
+                    s['route'] = link['route']
+                    items = [i for i in items if i is not link]
+                s['items'] = items
             module = {**module, 'submodules': submodules}
             # Modulo con un solo submodulo de navegacion directa (ej. Turnos):
             # la app navega desde la card del Home, sin bottom sheet.
