@@ -1732,6 +1732,8 @@ class Accesos(OcrMixin, AccesosModel):
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
         if not area:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar el area de donde se realizara la salida."})
+        if not last_check_out.get('folio'):
+            self.LKFException({"status_code":400, "msg":f"Este pase no tiene una entrada registrada en {location}."})
         if last_check_out.get('ubicacion_entrada') not in self.get_booth_locations(area, location):
             self.LKFException({"status_code":400, "msg":f"Este usuario ingreso en {last_check_out.get('ubicacion_entrada')} y no puede salir en {location}."})
         if last_check_out.get('folio'):
