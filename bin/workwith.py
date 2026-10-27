@@ -204,6 +204,12 @@ def mostrar_estado(cat):
 def main(argv):
     cat = cargar_catalogo()
 
+    # Solo nombres de dominio, uno por linea: lo usa el autocompletado de lkf
+    # (bin/lkf-completion.bash) sin tener que leer accounts.ini, que lleva secretos.
+    if len(argv) > 1 and argv[1] == '--list':
+        print('\n'.join(sorted(dominios(cat), key=str.lower)))
+        return 0
+
     if len(argv) < 2 or argv[1] in ('-h', '--help'):
         if len(argv) < 2:
             mostrar_estado(cat)

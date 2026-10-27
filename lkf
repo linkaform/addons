@@ -332,7 +332,7 @@ _udpate_container(){
 
 _run_tests(){
   echo "the command for was " $1
-  cd ~/clave10-sdk/addons/test/docker
+  cd "$(dirname "$(readlink -f "$0")")/test/docker"
   docker stop lkf-do-test && docker rm lkf-do-test
   docker compose up lkf-do-test
 }
