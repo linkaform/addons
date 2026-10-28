@@ -6468,6 +6468,19 @@ class Accesos(OcrMixin, AccesosModel):
     def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}, limit=20, offset=0, facets=[], desglose=''):
         # desglose='vehiculos' | 'equipos': una fila por vehiculo/equipo (pestañas de
         # Bitácoras), con total y paginación sobre esas filas. Vacío = una por bitácora.
+        #---limit/offset pueden llegar como texto en llamadas directas; se convierten
+        #   y se validan antes de llegar a $skip/$limit
+        try:
+            limit, offset = int(limit), int(offset)
+            paginacion_ok = limit > 0 and offset >= 0
+        except (TypeError, ValueError):
+            paginacion_ok = False
+        if not paginacion_ok:
+            self.LKFException({
+                'title': 'Paginación inválida',
+                'msg': 'limit debe ser un entero mayor a 0 y offset un entero mayor o igual a 0.',
+                'status_code': 400,
+            })
         match_query = self.bitacora_base_match(location, area, prioridades, dateFrom, dateTo, filterDate, dynamic_filters)
         facet_conditions = self.build_facets_match(self.bitacora_search_fields(), facets)
         if facet_conditions:
