@@ -6459,7 +6459,11 @@ class Accesos(OcrMixin, AccesosModel):
                     continue
 
         zona = self.user.get('timezone','America/Monterrey')
-        return self.facet_date_match(match_query, f"answers.{self.mf['fecha_entrada']}", dateFrom, dateTo, filterDate, zona=zona)
+        # En Salidas la fecha que importa es la de salida: quien entró ayer y salió hoy
+        # debe aparecer en las salidas de hoy.
+        status_filtro = match_query.get(f"answers.{self.mf['tipo_registro']}", {}).get('$in', [])
+        campo_fecha = 'fecha_salida' if status_filtro == ['salida'] else 'fecha_entrada'
+        return self.facet_date_match(match_query, f"answers.{self.mf[campo_fecha]}", dateFrom, dateTo, filterDate, zona=zona)
 
     def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}, limit=20, offset=0, facets=[], desglose=''):
         # desglose='vehiculos' | 'equipos': una fila por vehiculo/equipo (pestañas de
