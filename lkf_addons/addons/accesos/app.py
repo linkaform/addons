@@ -8816,7 +8816,6 @@ class Accesos(OcrMixin, AccesosModel):
                 eq[self.cons_f['status_concesion_equipo']] = "devuelto"
                 eq[self.cons_f['cantidad_equipo_devuelto']]  = eq[self.cons_f['cantidad_equipo_concesion']]
                 eq[self.cons_f['cantidad_equipo_pendiente']]  = 0
-                eq[self.cons_f['se_forzo_devolucion']] = "si" if forzar_dev else "no"
 
                 #devolucion de equipos
                 dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
@@ -8837,6 +8836,8 @@ class Accesos(OcrMixin, AccesosModel):
                 dev[self.cons_f['evidencia_entrega']] =  data.get('evidencia',  data.get('evidencia_entrega'))
                 dev[self.cons_f['comentario_entrega']] = data.get('comentario_entrega', data.get('comenario_entrega', data.get('comentarios')))
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
+                if forzar_dev:
+                    dev[self.cons_f['se_forzo_devolucion']] = "sí"
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
         else:
             if not data.get('equipos'):
@@ -8857,7 +8858,6 @@ class Accesos(OcrMixin, AccesosModel):
                             gq[self.cons_f['status_concesion_equipo']] = "devuelto"
                             gq[self.cons_f['cantidad_equipo_devuelto']]  = gq[self.cons_f['cantidad_equipo_concesion']]
                             gq[self.cons_f['cantidad_equipo_pendiente']]  = 0
-                            gq[self.cons_f['se_forzo_devolucion']] = "si" if forzar_dev else "no"
 
                 pendiente_by_move_id[eq['id_movimiento']] = pendiente_by_move_id.get(eq['id_movimiento'],0)
                 cantidad_devuelta = eq['cantidad_devuelta']
@@ -8874,6 +8874,9 @@ class Accesos(OcrMixin, AccesosModel):
                 dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company', data.get('company'))
                 dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
+                # Solo se marca cuando viene del boton "Forzar devolucion"; en una devolucion normal se omite.
+                if forzar_dev:
+                    dev[self.cons_f['se_forzo_devolucion']] = "sí"
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
 
         # # status "se debe de calular que estatus tendra, ya sea abierta, parcial o total"
