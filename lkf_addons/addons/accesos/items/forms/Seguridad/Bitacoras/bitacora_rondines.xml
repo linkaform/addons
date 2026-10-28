@@ -3,11 +3,11 @@
     <advanced_options>
         <active>True</active>
         <folio>
-            <_id>form_121745</_id>
+            <_id>form_126790</_id>
             <config>True</config>
             <inc_by>1</inc_by>
             <manual>False</manual>
-            <next>23</next>
+            <next>427</next>
             <padding_zeros>3</padding_zeros>
             <prefix>%y%m%d-</prefix>
             <required>False</required>
@@ -20,8 +20,8 @@
         <message>¡Su información fue capturada!</message>
         <redirect_url>default</redirect_url>
     </confirmation>
-    <created_at>1736446828.0</created_at>
-    <description>version: 1786036610</description>
+    <created_at>1733177011.0</created_at>
+    <description>version: 1793151957</description>
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
@@ -101,7 +101,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -178,7 +178,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -255,7 +255,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -341,7 +341,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -424,7 +424,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -501,7 +501,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -578,7 +578,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -655,7 +655,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -722,7 +722,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -789,7 +789,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -869,7 +869,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -936,7 +936,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1003,7 +1003,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1070,7 +1070,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1137,7 +1137,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1204,7 +1204,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1308,7 +1308,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1344,10 +1344,7 @@
                         <watermark_enable>False</watermark_enable>
                     </properties>
                     <required>True</required>
-                    <rules>
-                        <item>a851e2ecefa57</item>
-                        <item>25c21d1b1ba89b1</item>
-                    </rules>
+                    <rules>[]</rules>
                     <show_for_rule>True</show_for_rule>
                     <validations>{}</validations>
                     <visible>True</visible>
@@ -1367,7 +1364,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>666718cf50ea4554f2aa1c6d</item>
+                        <item>674e2ac6e3e7c31132939288</item>
                         <item>663e5d44f5b8a7ce8211ed0f</item>
                         <item>6760a908a43b1b0e41abad6b</item>
                         <item>66462b9d7124d1540f962087</item>
@@ -1375,7 +1372,7 @@
                         <item>6750adb2936622aecd075607</item>
                         <item>69df158c24393b4604e5171d</item>
                         <item>6760a9581e31b10a38a22f1f</item>
-                        <item>677ffae5a4818e97bf37f0b4</item>
+                        <item>674e2aab5f53a12feb4a1a01</item>
                         <item>5d810a982628de5556500d55</item>
                         <item>5d810a982628de5556500d56</item>
                     </groups_fields>
@@ -1390,7 +1387,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1479,7 +1476,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1559,7 +1556,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1629,7 +1626,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1699,7 +1696,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1779,7 +1776,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1849,7 +1846,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1919,7 +1916,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1989,7 +1986,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2035,7 +2032,7 @@
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
                         <catalog_field_id>None</catalog_field_id>
-                        <catalog_id>{{ catalog.catalogo_de_items.id }}</catalog_id>
+                        <catalog_id>{{ catalog.catalogo_de_formas.id }}</catalog_id>
                         <field_type>None</field_type>
                         <filters>None</filters>
                         <geofence>None</geofence>
@@ -2055,7 +2052,7 @@
                     <default_value />
                     <descriptor>None</descriptor>
                     <fav>False</fav>
-                    <field_id>{{ catalog.catalogo_de_items.obj_id }}</field_id>
+                    <field_id>{{ catalog.catalogo_de_formas.obj_id }}</field_id>
                     <field_type>catalog</field_type>
                     <grading_criteria>{}</grading_criteria>
                     <group>
@@ -2074,7 +2071,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2119,8 +2116,8 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.catalogo_de_items.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.catalogo_de_items.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.catalogo_de_formas.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.catalogo_de_formas.id }}</catalog_id>
                         <field_type>text</field_type>
                         <filters>None</filters>
                         <geofence>None</geofence>
@@ -2154,7 +2151,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2199,8 +2196,8 @@
                     <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>
-                        <catalog_field_id>{{ catalog.catalogo_de_items.obj_id }}</catalog_field_id>
-                        <catalog_id>{{ catalog.catalogo_de_items.id }}</catalog_id>
+                        <catalog_field_id>{{ catalog.catalogo_de_formas.obj_id }}</catalog_field_id>
+                        <catalog_id>{{ catalog.catalogo_de_formas.id }}</catalog_id>
                         <field_type>integer</field_type>
                         <filters>None</filters>
                         <geofence>None</geofence>
@@ -2234,7 +2231,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2290,10 +2287,10 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>666718d006245c9c3afb346b</item>
+                        <item>674e2ac714fccd655d4a1a71</item>
                         <item>663fb45992f2c5afcfe97ca8</item>
                         <item>69000e4c43078234e5e08390</item>
-                        <item>6780134a6fa4ca2af76d428b</item>
+                        <item>674e2e9b4249da7a348284b9</item>
                         <item>686807d46e41614d708f6fc9</item>
                         <item>686807a7ee7705c5c8eb181a</item>
                         <item>663973809fa65cafa759eb97</item>
@@ -2315,7 +2312,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2399,7 +2396,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2479,7 +2476,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2549,7 +2546,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2637,7 +2634,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2717,7 +2714,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2797,7 +2794,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2877,7 +2874,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2947,7 +2944,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3017,7 +3014,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3087,7 +3084,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3157,7 +3154,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3237,7 +3234,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3317,7 +3314,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3359,14 +3356,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>a851e2ecefa57</rule_id>
-                            <rule_index>0</rule_index>
-                            <rule_type>invisible</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -3391,7 +3381,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3433,14 +3423,7 @@
                     <visible>True</visible>
                 </item>
                 <item>
-                    <affecting_rules>
-                        <item>
-                            <applied>False</applied>
-                            <rule_id>25c21d1b1ba89b1</rule_id>
-                            <rule_index>1</rule_index>
-                            <rule_type>show</rule_type>
-                        </item>
-                    </affecting_rules>
+                    <affecting_rules>[]</affecting_rules>
                     <buttons_ids>[]</buttons_ids>
                     <catalog>None</catalog>
                     <catalog_fields>[]</catalog_fields>
@@ -3465,7 +3448,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3532,7 +3515,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3602,7 +3585,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3672,7 +3655,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3742,7 +3725,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -3787,6 +3770,517 @@
             <page_name>Página 1</page_name>
             <page_type>fields</page_type>
         </item>
+        <item>
+            <page_description>None</page_description>
+            <page_fields>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>6ae151f3fa4fa39885b4e1a4</field_id>
+                    <field_type>group</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>None</group>
+                    <groups_fields>
+                        <item>6ae15368ccc842d6697519a5</item>
+                        <item>6ae15368ccc842d6697519a6</item>
+                        <item>6ae15368ccc842d6697519a7</item>
+                        <item>6ae15368ccc842d6697519a8</item>
+                        <item>6ae15368ccc842d6697519a9</item>
+                        <item>6ae15368ccc842d6697519aa</item>
+                    </groups_fields>
+                    <help_text>None</help_text>
+                    <label>Hallazgos de inspección</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>False</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>0</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>0</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>6ae15368ccc842d6697519a5</field_id>
+                    <field_type>text</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>
+                        <group_id>6ae151f3fa4fa39885b4e1a4</group_id>
+                        <group_set_id>0</group_set_id>
+                    </group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Área</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>False</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>6ae15368ccc842d6697519a6</field_id>
+                    <field_type>text</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>
+                        <group_id>6ae151f3fa4fa39885b4e1a4</group_id>
+                        <group_set_id>0</group_set_id>
+                    </group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Pregunta</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>False</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>6ae15368ccc842d6697519a7</field_id>
+                    <field_type>text</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>
+                        <group_id>6ae151f3fa4fa39885b4e1a4</group_id>
+                        <group_set_id>0</group_set_id>
+                    </group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Respuesta</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>False</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>6ae15368ccc842d6697519a8</field_id>
+                    <field_type>textarea</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>
+                        <group_id>6ae151f3fa4fa39885b4e1a4</group_id>
+                        <group_set_id>0</group_set_id>
+                    </group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Comentario</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>False</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>6ae15368ccc842d6697519a9</field_id>
+                    <field_type>images</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>
+                        <group_id>6ae151f3fa4fa39885b4e1a4</group_id>
+                        <group_set_id>0</group_set_id>
+                    </group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Fotos</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>False</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>
+                            <from_camera>True</from_camera>
+                            <from_draw>True</from_draw>
+                            <from_gallery>True</from_gallery>
+                        </image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>15</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>True</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>
+                            <color>#FFFFFF</color>
+                            <font_size>22</font_size>
+                            <position>left-top</position>
+                            <text_data />
+                            <text_data_array>[]</text_data_array>
+                        </watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+                <item>
+                    <affecting_rules>[]</affecting_rules>
+                    <buttons_ids>[]</buttons_ids>
+                    <catalog>None</catalog>
+                    <catalog_fields>[]</catalog_fields>
+                    <catalog_relation>None</catalog_relation>
+                    <default>False</default>
+                    <default_value />
+                    <descriptor>None</descriptor>
+                    <fav>False</fav>
+                    <field_id>6ae15368ccc842d6697519aa</field_id>
+                    <field_type>text</field_type>
+                    <grading_criteria>{}</grading_criteria>
+                    <group>
+                        <group_id>6ae151f3fa4fa39885b4e1a4</group_id>
+                        <group_set_id>0</group_set_id>
+                    </group>
+                    <groups_fields>[]</groups_fields>
+                    <help_text>None</help_text>
+                    <label>Registro de inspección</label>
+                    <number_type>None</number_type>
+                    <options>[]</options>
+                    <properties>
+                        <body_payload>[]</body_payload>
+                        <color />
+                        <comment />
+                        <custom />
+                        <elements_ids>[]</elements_ids>
+                        <email_configuration>None</email_configuration>
+                        <enable_barcode>False</enable_barcode>
+                        <fieldId>[]</fieldId>
+                        <file_name />
+                        <file_name_array>[]</file_name_array>
+                        <help_text>False</help_text>
+                        <icon>{}</icon>
+                        <image_origin>None</image_origin>
+                        <input_parameter>[]</input_parameter>
+                        <max>None</max>
+                        <max_images_count>5</max_images_count>
+                        <metadata>[]</metadata>
+                        <method />
+                        <mime_types>[]</mime_types>
+                        <min>None</min>
+                        <min_images_count>0</min_images_count>
+                        <multi_selection>False</multi_selection>
+                        <notification>{}</notification>
+                        <number_of_decimals>2</number_of_decimals>
+                        <openChoice>False</openChoice>
+                        <parameters>[]</parameters>
+                        <pfd_print>always</pfd_print>
+                        <pfd_style>Tabla_respuestas</pfd_style>
+                        <selected>None</selected>
+                        <send_email>False</send_email>
+                        <send_record>False</send_record>
+                        <send_to_lkf>False</send_to_lkf>
+                        <service_name />
+                        <update_values>{}</update_values>
+                        <url />
+                        <username>False</username>
+                        <visible_on />
+                        <wait_response>False</wait_response>
+                        <watermark_config>None</watermark_config>
+                        <watermark_enable>False</watermark_enable>
+                    </properties>
+                    <required>False</required>
+                    <rules>[]</rules>
+                    <show_for_rule>True</show_for_rule>
+                    <validations>{}</validations>
+                    <visible>True</visible>
+                </item>
+            </page_fields>
+            <page_name>Página 2</page_name>
+            <page_type>fields</page_type>
+        </item>
     </form_pages>
     <grading>
         <_round>False</_round>
@@ -3801,7 +4295,7 @@
     </notification>
     <process_ids>[]</process_ids>
     <public>False</public>
-    <resource_uri>/api/infosync/form/127957/</resource_uri>
+    <resource_uri>/api/infosync/form/126790/</resource_uri>
     <send_on_foreground>False</send_on_foreground>
     <start_event_id>None</start_event_id>
     <template_conf>
@@ -3836,5 +4330,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1781890575.0</updated_at>
+    <updated_at>1793151957.0</updated_at>
 </lkf>

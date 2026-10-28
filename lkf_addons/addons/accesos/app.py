@@ -11993,6 +11993,81 @@ class Accesos(OcrMixin, AccesosModel):
             incidencias += grupo_incidencias
         return incidencias
 
+    def get_inspeccion_by_url(self, url):
+        """
+        Busca en mongodb el registro de inspeccion al que apunta la url del check.
+        Args:
+            url (str): url_inspeccion del check (.../records/detail/<id>)
+        Returns:
+            inspeccion (dict): form_id, answers, comments, images y media del registro, o {}
+        """
+        match = re.search(r'([0-9a-f]{24})$', url or '')
+        if not match:
+            return {}
+        record = self.cr.find_one(
+            {'_id': ObjectId(match.group(1)), 'deleted_at': {'$exists': False}},
+            {'form_id': 1, 'answers': 1, 'comments': 1, 'images': 1, 'media': 1}
+        )
+        return record or {}
+
+    def _comentario_inspeccion(self, inspeccion, field_id):
+        """
+        Regresa el comentario de una pregunta, ya sea texto plano o la lista nativa de
+        comments de Linkaform ([{data, created_by, created_at, ...}]).
+        """
+        comentario = (inspeccion.get('comments') or {}).get(field_id, '')
+        if isinstance(comentario, list):
+            return '\n'.join(c.get('data', '') for c in comentario if isinstance(c, dict) and c.get('data'))
+        return comentario or ''
+
+    def _fotos_inspeccion(self, inspeccion, field_id):
+        """
+        Regresa las fotos de una pregunta (images de hoy o media nativo) con el formato de
+        un campo de imagenes de Linkaform.
+        """
+        fotos = []
+        for key in ('images', 'media'):
+            for foto in (inspeccion.get(key) or {}).get(field_id, []) or []:
+                if isinstance(foto, dict) and foto.get('file_url'):
+                    fotos.append({'file_name': foto.get('file_name', ''), 'file_url': foto['file_url']})
+        return fotos
+
+    def get_hallazgos_from_checks(self, checks_for_rondin):
+        """
+        Arma los hallazgos (respuestas "no") de las inspecciones ligadas a los checks de
+        area, con el texto de la pregunta en lugar del field_id.
+        Args:
+            checks_for_rondin (dict): Checks retornados por get_rondin_checks()
+        Returns:
+            hallazgos (list): Filas del grupo hallazgos_inspeccion de la bitacora
+        """
+        hallazgos = []
+        preguntas_por_forma = {}
+        for area_name, check in checks_for_rondin.items():
+            url = self.unlist(check.get('url_inspeccion', ''))
+            inspeccion = self.get_inspeccion_by_url(url)
+            if not inspeccion:
+                continue
+
+            form_id = inspeccion.get('form_id')
+            if form_id not in preguntas_por_forma:
+                preguntas_por_forma[form_id] = {
+                    p.get('field_id'): p.get('pregunta', '') for p in self.get_form_question_schema(form_id)
+                }
+
+            for field_id, valor in (inspeccion.get('answers') or {}).items():
+                if not isinstance(valor, str) or valor.lower() != 'no':
+                    continue
+                hallazgos.append({
+                    self.f['hallazgo_area']: area_name,
+                    self.f['hallazgo_pregunta']: preguntas_por_forma[form_id].get(field_id, field_id),
+                    self.f['hallazgo_respuesta']: 'No',
+                    self.f['hallazgo_comentario']: self._comentario_inspeccion(inspeccion, field_id),
+                    self.f['hallazgo_fotos']: self._fotos_inspeccion(inspeccion, field_id),
+                    self.f['hallazgo_url_inspeccion']: url,
+                })
+        return hallazgos
+
     def get_incidencias_from_rondin_record(self, rondin_record):
         """
         Extrae y normaliza las incidencias reportadas a nivel rondín (record.incidencia_rondin
@@ -12970,6 +13045,7 @@ class Accesos(OcrMixin, AccesosModel):
                 incidencia['url_incidencia_bitacora'] = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{incidencia_id}"
         incidencias_list = self.format_incidencias_to_bitacora(bitacora_in_lkf, incidencia_for_rondin)
         answers[self.f['bitacora_rondin_incidencias']] = incidencias_list
+        answers[self.f['hallazgos_inspeccion']] = self.get_hallazgos_from_checks(checks_for_rondin)
 
         # Va a iterar las areas acutales si existe el nombre de la area en el rondin
         # quiere decir que ya previamente se habia inspeccionado, se actualzia el area
@@ -13139,7 +13215,7 @@ class Accesos(OcrMixin, AccesosModel):
             # rebuild completo eso solo inserta filas nuevas y duplicaría el grupo en cada
             # guardado (mismo criterio que el desglose de bitácora de transportistas).
             grupos_completos = {}
-            for grupo_field in (self.f['areas_del_rondin'], self.f['bitacora_rondin_incidencias'], self.f['grupo_comentarios_generales']):
+            for grupo_field in (self.f['areas_del_rondin'], self.f['bitacora_rondin_incidencias'], self.f['grupo_comentarios_generales'], self.f['hallazgos_inspeccion']):
                 if grupo_field in answers:
                     grupos_completos[f'answers.{grupo_field}'] = answers.pop(grupo_field)
             if grupos_completos:
