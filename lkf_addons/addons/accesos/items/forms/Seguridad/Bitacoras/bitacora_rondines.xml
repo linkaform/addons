@@ -4328,14 +4328,14 @@
         <item>
             <_type>single_record</_type>
             <default>True</default>
-            <description>Template para Grupo Afal de bitacora de rondines</description>
-            <id>639</id>
-            <name>Grupo Afal v2 - Bitacora de Rondines</name>
-            <owner>/api/infosync/user/126/</owner>
+            <description>Plantilla para Clave 10 sobre historial de rondines</description>
+            <id>659</id>
+            <name>Clave 10 - Bitácora de rondines</name>
+            <owner>/api/infosync/user/10/</owner>
             <paginate>True</paginate>
-            <pdfName>{% raw %} Bitacora de Rondines - {{record.folio}} {% endraw %} </pdfName>
+            <pdfName>{% raw %} Bitacora de rondines - {{record.folio}} {% endraw %} </pdfName>
             <properties>{}</properties>
-            <resource_uri>/api/infosync/templates/639/</resource_uri>
+            <resource_uri>/api/infosync/templates/659/</resource_uri>
             <script>{}</script>
         </item>
     </templates>
