@@ -15,7 +15,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <created_at>1736440274.0</created_at>
-    <description>version: 1791933906</description>
+    <description>version: 1791935443</description>
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
@@ -70,7 +70,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -126,7 +126,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>
-                        <item>66a83a74de752e12018fbc3c</item>
+                        <item>{{ catalog.ubicaciones.obj_id }}</item>
                         <item>663e5c57f5b8a7ce8211ed0b</item>
                         <item>6769756fc728a0b63b8431ea</item>
                         <item>6810180169eeaca9517baa5b</item>
@@ -153,7 +153,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -237,7 +237,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -317,7 +317,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -400,7 +400,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -483,7 +483,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -566,7 +566,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -636,7 +636,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -706,7 +706,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -776,7 +776,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -865,7 +865,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -935,7 +935,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1005,7 +1005,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1085,7 +1085,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1168,7 +1168,7 @@
                         <custom>0</custom>
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1238,7 +1238,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1331,7 +1331,7 @@
                         <custom>0</custom>
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1407,7 +1407,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1488,6 +1488,18 @@
                             <selected>False</selected>
                             <value>vigencia</value>
                         </item>
+                        <item>
+                            <label>Nueva Visita</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>nueva_visita</value>
+                        </item>
+                        <item>
+                            <label>Completar Pase</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>completar_pase</value>
+                        </item>
                     </options>
                     <properties>
                         <body_payload>[]</body_payload>
@@ -1496,7 +1508,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1565,7 +1577,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1642,7 +1654,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1714,7 +1726,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1784,7 +1796,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1873,7 +1885,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -1943,7 +1955,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2029,7 +2041,7 @@
                             <templates>[]</templates>
                             <timer_config>None</timer_config>
                         </email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2096,7 +2108,7 @@
                         <custom />
                         <elements_ids>[]</elements_ids>
                         <email_configuration>None</email_configuration>
-                        <enable_barcode>None</enable_barcode>
+                        <enable_barcode>False</enable_barcode>
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
@@ -2186,5 +2198,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1791933906.0</updated_at>
+    <updated_at>1791935443.0</updated_at>
 </lkf>
