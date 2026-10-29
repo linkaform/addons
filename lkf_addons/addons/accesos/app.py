@@ -11175,6 +11175,7 @@ class Accesos(OcrMixin, AccesosModel):
             {'$match': match},
             {'$project': {
                 '_id': 1,
+                'folio': 1,
             }},
         ]
         data = self.format_cr(self.cr.aggregate(query))
@@ -11185,7 +11186,7 @@ class Accesos(OcrMixin, AccesosModel):
             }
         }
         if data:
-            record_ids = [record.get('_id') for record in data]
+            folios = [record.get('folio') for record in data if record.get('folio')]
             tz_mexico = pytz.timezone('America/Mexico_City')
             now = datetime.now(tz_mexico)
             fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -11193,13 +11194,32 @@ class Accesos(OcrMixin, AccesosModel):
                 self.mf['fecha_salida']: fecha_hora_str,
                 self.mf['tipo_registro']: 'salida',
             }
-            response = self.lkf_api.patch_multi_record(answers=replace_answers, form_id=self.BITACORA_ACCESOS, record_id=record_ids)
-            if response.get('status_code') in [200, 201, 202]:
-                response['json']['msg'] = f'Salida masiva en {location} ejecutada correctamente.'
-                format_data = response
-            else:
-                print('========== Log:', simplejson.dumps(response, indent=2, default=str))
-                self.LKFException({'title': 'Error', 'msg': 'Hubo un error al actualizar los registros.'})
+            #---Un patch por folio, igual que do_out. Con el lote completo el servidor
+            #   responde 202 en segundo plano y no aplica la salida.
+            def patch_folio(folio):
+                return self.lkf_api.patch_multi_record(answers=deepcopy(replace_answers), form_id=self.BITACORA_ACCESOS, folios=[folio])
+
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                responses = dict(zip(folios, executor.map(patch_folio, folios)))
+
+            #---El status del patch no basta: se confirma en la BD qué visitas siguen abiertas
+            match['folio'] = {'$in': folios}
+            pendientes = [record.get('folio') for record in self.cr.find(match, {'folio': 1})]
+            if pendientes:
+                print('========== Log:', simplejson.dumps({f: responses.get(f) for f in pendientes}, indent=2, default=str))
+                self.LKFException({
+                    'title': 'Error',
+                    'msg': f'No se pudo registrar la salida de {len(pendientes)} de {len(folios)} visitas en {location}: {", ".join(pendientes)}.',
+                    'status_code': 500,
+                })
+            format_data = {
+                "data": folios,
+                "status_code": 200,
+                "json": {
+                    "msg": f'Salida masiva en {location} ejecutada correctamente.',
+                    "total": len(folios),
+                }
+            }
         return format_data
 
     def upload_pdf_as_image(self, id_forma_seleccionada, id_field, pdf_url, convert_all=False):
