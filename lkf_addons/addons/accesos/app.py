@@ -3178,8 +3178,8 @@ class Accesos(OcrMixin, AccesosModel):
                 ics_invitation = True
                 access_pass['fecha_desde_hasta'] = now_datetime_out
 
-        if not  access_pass.get('config_limitar_acceso') or access_pass['config_dia_de_acceso'] == "":
-            access_pass['config_limitar_acceso'] =  1
+        if not access_pass.get('config_limitar_acceso'):
+            access_pass['config_limitar_acceso'] = 1
 
         answers[self.pase_entrada_fields['acompanantes']]= access_pass.get('acompanantes', 0)
         answers[self.pase_entrada_fields['acompanantes_grupo']]= access_pass.get('acompanantes_grupo') or []
