@@ -11155,6 +11155,13 @@ class Accesos(OcrMixin, AccesosModel):
         return ', '.join(ubicaciones_list[:-1]) + ' y ' + ubicaciones_list[-1]
 
     def force_quit_all_persons(self, location: str):
+        #---Sin ubicacion el $match abarcaria las visitas abiertas de toda la cuenta
+        if not location or not str(location).strip():
+            self.LKFException({
+                'title': 'Ubicación requerida',
+                'msg': 'Indica la ubicación para registrar la salida masiva.',
+                'status_code': 400,
+            })
         match = {
             "deleted_at": {"$exists": False},
             "form_id": self.BITACORA_ACCESOS,
