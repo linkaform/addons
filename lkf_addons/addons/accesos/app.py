@@ -8805,6 +8805,11 @@ class Accesos(OcrMixin, AccesosModel):
         fecha = self.today_str(tz_name=self.user.get('timezone'),date_format='datetime')
         status = data.get('status')
         forzar_dev = data.get('forzar_dev', False)
+        # Quien dio click en "Forzar devolucion" es el usuario logueado, no quien_entrega.
+        forzada_por = None
+        if forzar_dev:
+            user = self.lkf_api.get_user_by_id(self.user.get('user_id')) or {}
+            forzada_por = user.get('name') or self.user.get('username') or self.user.get('email')
         if rec['status_concesion'] == "cancelado":
             self.LKFException(f"No es posible devolver o modifcar una concesion  {rec['folio']}")
         if rec['status_concesion'] == "devuelto":
@@ -8849,6 +8854,7 @@ class Accesos(OcrMixin, AccesosModel):
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
                 if forzar_dev:
                     dev[self.cons_f['se_forzo_devolucion']] = "sí"
+                    dev[self.cons_f['devolucion_forzada_por']] = forzada_por
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
         else:
             if not data.get('equipos'):
@@ -8888,6 +8894,7 @@ class Accesos(OcrMixin, AccesosModel):
                 # Solo se marca cuando viene del boton "Forzar devolucion"; en una devolucion normal se omite.
                 if forzar_dev:
                     dev[self.cons_f['se_forzo_devolucion']] = "sí"
+                    dev[self.cons_f['devolucion_forzada_por']] = forzada_por
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
 
         # # status "se debe de calular que estatus tendra, ya sea abierta, parcial o total"
