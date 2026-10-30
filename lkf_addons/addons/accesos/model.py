@@ -537,7 +537,8 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'ubicacion_concesion': f"{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
             '_ubicacion_concesion': self.mf['ubicacion'],
             'tipo_activo':'6aa33c3a8711c7a4f571a738',
-            'se_forzo_devolucion':f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.6aa7b40e6a6d4e42a9d7725e"
+            'se_forzo_devolucion':'6aa7b40e6a6d4e42a9d7725e',
+            'devolucion_forzada_por':'6ae439ff64fea7194190dc33'
         }
 
         self.status_equipo_dict = {
@@ -993,6 +994,13 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             'fecha_hora_incidente_bitacora': '69000e4c43078234e5e08390',
             'area_incidente_bitacora': '69000e4c43078234e5e0838f',
             'comentario_incidente_bitacora': '681145323d9b5fa2e16e35cb',
+            'hallazgos_inspeccion': '6ae151f3fa4fa39885b4e1a4',
+            'hallazgo_area': '6ae15368ccc842d6697519a5',
+            'hallazgo_pregunta': '6ae15368ccc842d6697519a6',
+            'hallazgo_respuesta': '6ae15368ccc842d6697519a7',
+            'hallazgo_comentario': '6ae15368ccc842d6697519a8',
+            'hallazgo_fotos': '6ae15368ccc842d6697519a9',
+            'hallazgo_url_inspeccion': '6ae15368ccc842d6697519aa',
             'url_incidencia_bitacora': '6927eb61d92ecf923b60a0de',
             'id_usuario':'638a9a99616398d2e392a9f5',
             'nombre_area_salida':'663fb45992f2c5afcfe97ca8',

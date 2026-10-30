@@ -1815,6 +1815,8 @@ class Accesos(OcrMixin, AccesosModel):
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar una ubicacion de donde se realizara la salida."})
         if not area:
             self.LKFException({"status_code":400, "msg":f"Se requiere especificar el area de donde se realizara la salida."})
+        if not last_check_out.get('folio'):
+            self.LKFException({"status_code":400, "msg":f"Este pase no tiene una entrada registrada en {location}."})
         if last_check_out.get('ubicacion_entrada') not in self.get_booth_locations(area, location):
             self.LKFException({"status_code":400, "msg":f"Este usuario ingreso en {last_check_out.get('ubicacion_entrada')} y no puede salir en {location}."})
         if last_check_out.get('folio'):
@@ -3259,8 +3261,8 @@ class Accesos(OcrMixin, AccesosModel):
                 ics_invitation = True
                 access_pass['fecha_desde_hasta'] = now_datetime_out
 
-        if not  access_pass.get('config_limitar_acceso') or access_pass['config_dia_de_acceso'] == "":
-            access_pass['config_limitar_acceso'] =  1
+        if not access_pass.get('config_limitar_acceso'):
+            access_pass['config_limitar_acceso'] = 1
 
         answers[self.pase_entrada_fields['acompanantes']]= access_pass.get('acompanantes', 0)
         answers[self.pase_entrada_fields['acompanantes_grupo']]= access_pass.get('acompanantes_grupo') or []
@@ -5935,6 +5937,8 @@ class Accesos(OcrMixin, AccesosModel):
             f"answers.{self.mf['codigo_qr']}":qr,
         }
         if record_id:
+            if not ObjectId.is_valid(record_id):
+                self.LKFException({"status_code":400, "msg":"El registro indicado no es válido."})
             match_query["_id"] = ObjectId(record_id)
         res = self.cr.find(
             match_query,
@@ -5949,7 +5953,10 @@ class Accesos(OcrMixin, AccesosModel):
                 'ubicacion_entrada': f"$answers.{self.AREAS_DE_LAS_UBICACIONES_CAT_OBJ_ID}.{self.mf['ubicacion']}",
                 'status_gafete':f"$answers.{self.bitacora_fields['status_gafete']}"
                 }
-            ).sort('updated_at', -1).limit(1)
+            ).sort([
+                (f"answers.{self.bitacora_fields['fecha_entrada']}", -1),
+                ('_id', -1),
+            ]).limit(1)
         return self.format_cr(res, get_one=True)
         # return self.format_cr_result(self.cr.aggregate(query), get_one=True)
 
@@ -6535,11 +6542,22 @@ class Accesos(OcrMixin, AccesosModel):
                     continue
 
         zona = self.user.get('timezone','America/Monterrey')
-        return self.facet_date_match(match_query, f"answers.{self.mf['fecha_entrada']}", dateFrom, dateTo, filterDate, zona=zona)
+        # En Salidas la fecha que importa es la de salida: quien entró ayer y salió hoy
+        # debe aparecer en las salidas de hoy.
+        status_filtro = match_query.get(f"answers.{self.mf['tipo_registro']}", {}).get('$in', [])
+        campo_fecha = 'fecha_salida' if status_filtro == ['salida'] else 'fecha_entrada'
+        return self.facet_date_match(match_query, f"answers.{self.mf[campo_fecha]}", dateFrom, dateTo, filterDate, zona=zona)
 
     def get_list_bitacora(self, location=None, area=None, prioridades=[], dateFrom='', dateTo='', filterDate="", dynamic_filters={}, limit=20, offset=0, facets=[], desglose=''):
         # desglose='vehiculos' | 'equipos': una fila por vehiculo/equipo (pestañas de
         # Bitácoras), con total y paginación sobre esas filas. Vacío = una por bitácora.
+        #---limit/offset deben ser enteros (no texto ni bool) antes de llegar a $skip/$limit
+        if not (type(limit) is int and limit > 0 and type(offset) is int and offset >= 0):
+            self.LKFException({
+                'title': 'Paginación inválida',
+                'msg': 'limit debe ser un entero mayor a 0 y offset un entero mayor o igual a 0.',
+                'status_code': 400,
+            })
         match_query = self.bitacora_base_match(location, area, prioridades, dateFrom, dateTo, filterDate, dynamic_filters)
         facet_conditions = self.build_facets_match(self.bitacora_search_fields(), facets)
         if facet_conditions:
@@ -8870,6 +8888,11 @@ class Accesos(OcrMixin, AccesosModel):
         fecha = self.today_str(tz_name=self.user.get('timezone'),date_format='datetime')
         status = data.get('status')
         forzar_dev = data.get('forzar_dev', False)
+        # Quien dio click en "Forzar devolucion" es el usuario logueado, no quien_entrega.
+        forzada_por = None
+        if forzar_dev:
+            user = self.lkf_api.get_user_by_id(self.user.get('user_id')) or {}
+            forzada_por = user.get('name') or self.user.get('username') or self.user.get('email')
         if rec['status_concesion'] == "cancelado":
             self.LKFException(f"No es posible devolver o modifcar una concesion  {rec['folio']}")
         if rec['status_concesion'] == "devuelto":
@@ -8892,7 +8915,6 @@ class Accesos(OcrMixin, AccesosModel):
                 eq[self.cons_f['status_concesion_equipo']] = "devuelto"
                 eq[self.cons_f['cantidad_equipo_devuelto']]  = eq[self.cons_f['cantidad_equipo_concesion']]
                 eq[self.cons_f['cantidad_equipo_pendiente']]  = 0
-                eq[self.cons_f['se_forzo_devolucion']] = "si" if forzar_dev else "no"
 
                 #devolucion de equipos
                 dev[self.cons_f['fecha_devolucion_concesion']]  = fecha
@@ -8913,6 +8935,9 @@ class Accesos(OcrMixin, AccesosModel):
                 dev[self.cons_f['evidencia_entrega']] =  data.get('evidencia',  data.get('evidencia_entrega'))
                 dev[self.cons_f['comentario_entrega']] = data.get('comentario_entrega', data.get('comenario_entrega', data.get('comentarios')))
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
+                if forzar_dev:
+                    dev[self.cons_f['se_forzo_devolucion']] = "sí"
+                    dev[self.cons_f['devolucion_forzada_por']] = forzada_por
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
         else:
             if not data.get('equipos'):
@@ -8933,7 +8958,6 @@ class Accesos(OcrMixin, AccesosModel):
                             gq[self.cons_f['status_concesion_equipo']] = "devuelto"
                             gq[self.cons_f['cantidad_equipo_devuelto']]  = gq[self.cons_f['cantidad_equipo_concesion']]
                             gq[self.cons_f['cantidad_equipo_pendiente']]  = 0
-                            gq[self.cons_f['se_forzo_devolucion']] = "si" if forzar_dev else "no"
 
                 pendiente_by_move_id[eq['id_movimiento']] = pendiente_by_move_id.get(eq['id_movimiento'],0)
                 cantidad_devuelta = eq['cantidad_devuelta']
@@ -8950,6 +8974,10 @@ class Accesos(OcrMixin, AccesosModel):
                 dev[self.cons_f['quien_entrega_company']] =  data.get('quien_entrega_company', data.get('company'))
                 dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
+                # Solo se marca cuando viene del boton "Forzar devolucion"; en una devolucion normal se omite.
+                if forzar_dev:
+                    dev[self.cons_f['se_forzo_devolucion']] = "sí"
+                    dev[self.cons_f['devolucion_forzada_por']] = forzada_por
                 record['answers'][self.cons_f['grupo_equipos_devolucion']].append(dev)
 
         # # status "se debe de calular que estatus tendra, ya sea abierta, parcial o total"
@@ -9850,82 +9878,6 @@ class Accesos(OcrMixin, AccesosModel):
             elif action == 'edit':
                 answers[self.mf['grupo_vehiculos']]  = {data.get('set_number',0): ans }
         #TODO UPDATE GAFET
-
-        if not record_id and not folio:
-            self.LKFException({'msg':'Se requiere el folio o el id del registro a editar'})
-        if record_id:
-            res =  self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_ACCESOS, record_id=[record_id,])
-        elif folio:
-             res = self.lkf_api.patch_multi_record( answers = answers, form_id=self.BITACORA_ACCESOS, folios=[folio,])
-        else:
-            self.LKFException({'msg':'Faltan datos para acutalizar pase de entrada'})
-        return res
-
-    def update_bitacora_entrada_many(self, data, record_id=None, folio=None):
-        answers = {}
-        action = data.get('action', 'create')
-        equipos = data.get('equipos', data.get('equipo'))
-        if equipos:
-            for i, equipo in enumerate(equipos):  # Iterar sobre cada equipo
-                tipo = equipo.get('tipo_equipo', '').lower().replace(' ', '_')
-                nombre = equipo.get('nombre_articulo', '')
-                marca = equipo.get('marca_articulo', '')
-                modelo = equipo.get('modelo_articulo', '')
-                color = equipo.get('color_articulo', '')
-                serie = equipo.get('numero_serie', '')
-                ans = {
-                    self.mf['tipo_equipo']: tipo,
-                    self.mf['nombre_articulo']: nombre,
-                    self.mf['marca_articulo']: marca,
-                    self.mf['modelo_articulo']: modelo,
-                    self.mf['color_articulo']: color,
-                    self.mf['numero_serie']: serie,
-                }
-
-                if action == 'create':
-                    # Usar -1 para nuevos registros en 'create'
-                    answers[self.mf['grupo_equipos']] = answers.get(self.mf['grupo_equipos'], {})
-                    answers[self.mf['grupo_equipos']][-1] = ans
-                elif action == 'edit':
-                    # Usar el número de conjunto especificado en 'edit'
-                    set_number = data.get('set_number', 0)
-                    answers[self.mf['grupo_equipos']] = answers.get(self.mf['grupo_equipos'], {})
-                    answers[self.mf['grupo_equipos']][set_number] = ans
-
-        # Procesar los vehículos
-        vehiculos = data.get('vehiculo', [])
-        if vehiculos:
-            for i, vehiculo in enumerate(vehiculos):  # Iterar sobre cada vehículo
-                tipo = vehiculo.get('tipo_vehiculo', vehiculo.get('tipo', ''))
-                marca = vehiculo.get('marca_vehiculo', '')
-                modelo = vehiculo.get('modelo_vehiculo', '')
-                estado = vehiculo.get('nombre_estado', '')
-                placas = vehiculo.get('placas', vehiculo.get('placas_vehiculo', ''))
-                color = vehiculo.get('color', vehiculo.get('color_vehiculo', ''))
-
-                ans = {
-                    self.TIPO_DE_VEHICULO_OBJ_ID: {
-                        self.mf['tipo_vehiculo']: tipo,
-                        self.mf['marca_vehiculo']: marca,
-                        self.mf['modelo_vehiculo']: modelo,
-                    },
-                    self.ESTADO_OBJ_ID: {
-                        self.mf['nombre_estado']: estado,
-                    },
-                    self.mf['placas_vehiculo']: placas,
-                    self.mf['color_vehiculo']: color,
-                }
-
-                if action == 'create':
-                    # Usar -1 para nuevos registros en 'create'
-                    answers[self.mf['grupo_vehiculos']] = answers.get(self.mf['grupo_vehiculos'], {})
-                    answers[self.mf['grupo_vehiculos']][-1] = ans
-                elif action == 'edit':
-                    # Usar el número de conjunto especificado en 'edit'
-                    set_number = data.get('set_number', 0)
-                    answers[self.mf['grupo_vehiculos']] = answers.get(self.mf['grupo_vehiculos'], {})
-                    answers[self.mf['grupo_vehiculos']][set_number] = ans
-                #TODO UPDATE GAFET
 
         if not record_id and not folio:
             self.LKFException({'msg':'Se requiere el folio o el id del registro a editar'})
@@ -11294,6 +11246,13 @@ class Accesos(OcrMixin, AccesosModel):
         return ', '.join(ubicaciones_list[:-1]) + ' y ' + ubicaciones_list[-1]
 
     def force_quit_all_persons(self, location: str):
+        #---Sin ubicacion el $match abarcaria las visitas abiertas de toda la cuenta
+        if not location or not str(location).strip():
+            self.LKFException({
+                'title': 'Ubicación requerida',
+                'msg': 'Indica la ubicación para registrar la salida masiva.',
+                'status_code': 400,
+            })
         match = {
             "deleted_at": {"$exists": False},
             "form_id": self.BITACORA_ACCESOS,
@@ -11307,6 +11266,7 @@ class Accesos(OcrMixin, AccesosModel):
             {'$match': match},
             {'$project': {
                 '_id': 1,
+                'folio': 1,
             }},
         ]
         data = self.format_cr(self.cr.aggregate(query))
@@ -11317,7 +11277,7 @@ class Accesos(OcrMixin, AccesosModel):
             }
         }
         if data:
-            record_ids = [record.get('_id') for record in data]
+            folios = [record.get('folio') for record in data if record.get('folio')]
             tz_mexico = pytz.timezone('America/Mexico_City')
             now = datetime.now(tz_mexico)
             fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -11325,13 +11285,32 @@ class Accesos(OcrMixin, AccesosModel):
                 self.mf['fecha_salida']: fecha_hora_str,
                 self.mf['tipo_registro']: 'salida',
             }
-            response = self.lkf_api.patch_multi_record(answers=replace_answers, form_id=self.BITACORA_ACCESOS, record_id=record_ids)
-            if response.get('status_code') in [200, 201, 202]:
-                response['json']['msg'] = f'Salida masiva en {location} ejecutada correctamente.'
-                format_data = response
-            else:
-                print('========== Log:', simplejson.dumps(response, indent=2, default=str))
-                self.LKFException({'title': 'Error', 'msg': 'Hubo un error al actualizar los registros.'})
+            #---Un patch por folio, igual que do_out. Con el lote completo el servidor
+            #   responde 202 en segundo plano y no aplica la salida.
+            def patch_folio(folio):
+                return self.lkf_api.patch_multi_record(answers=deepcopy(replace_answers), form_id=self.BITACORA_ACCESOS, folios=[folio])
+
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                responses = dict(zip(folios, executor.map(patch_folio, folios)))
+
+            #---El status del patch no basta: se confirma en la BD qué visitas siguen abiertas
+            match['folio'] = {'$in': folios}
+            pendientes = [record.get('folio') for record in self.cr.find(match, {'folio': 1})]
+            if pendientes:
+                print('========== Log:', simplejson.dumps({f: responses.get(f) for f in pendientes}, indent=2, default=str))
+                self.LKFException({
+                    'title': 'Error',
+                    'msg': f'No se pudo registrar la salida de {len(pendientes)} de {len(folios)} visitas en {location}: {", ".join(pendientes)}.',
+                    'status_code': 500,
+                })
+            format_data = {
+                "data": folios,
+                "status_code": 200,
+                "json": {
+                    "msg": f'Salida masiva en {location} ejecutada correctamente.',
+                    "total": len(folios),
+                }
+            }
         return format_data
 
     def upload_pdf_as_image(self, id_forma_seleccionada, id_field, pdf_url, convert_all=False):
@@ -12145,6 +12124,81 @@ class Accesos(OcrMixin, AccesosModel):
                     })
             incidencias += grupo_incidencias
         return incidencias
+
+    def get_inspeccion_by_url(self, url):
+        """
+        Busca en mongodb el registro de inspeccion al que apunta la url del check.
+        Args:
+            url (str): url_inspeccion del check (.../records/detail/<id>)
+        Returns:
+            inspeccion (dict): form_id, answers, comments, images y media del registro, o {}
+        """
+        match = re.search(r'([0-9a-f]{24})$', url or '')
+        if not match:
+            return {}
+        record = self.cr.find_one(
+            {'_id': ObjectId(match.group(1)), 'deleted_at': {'$exists': False}},
+            {'form_id': 1, 'answers': 1, 'comments': 1, 'images': 1, 'media': 1}
+        )
+        return record or {}
+
+    def _comentario_inspeccion(self, inspeccion, field_id):
+        """
+        Regresa el comentario de una pregunta, ya sea texto plano o la lista nativa de
+        comments de Linkaform ([{data, created_by, created_at, ...}]).
+        """
+        comentario = (inspeccion.get('comments') or {}).get(field_id, '')
+        if isinstance(comentario, list):
+            return '\n'.join(c.get('data', '') for c in comentario if isinstance(c, dict) and c.get('data'))
+        return comentario or ''
+
+    def _fotos_inspeccion(self, inspeccion, field_id):
+        """
+        Regresa las fotos de una pregunta (images de hoy o media nativo) con el formato de
+        un campo de imagenes de Linkaform.
+        """
+        fotos = []
+        for key in ('images', 'media'):
+            for foto in (inspeccion.get(key) or {}).get(field_id, []) or []:
+                if isinstance(foto, dict) and foto.get('file_url'):
+                    fotos.append({'file_name': foto.get('file_name', ''), 'file_url': foto['file_url']})
+        return fotos
+
+    def get_hallazgos_from_checks(self, checks_for_rondin):
+        """
+        Arma los hallazgos (respuestas "no") de las inspecciones ligadas a los checks de
+        area, con el texto de la pregunta en lugar del field_id.
+        Args:
+            checks_for_rondin (dict): Checks retornados por get_rondin_checks()
+        Returns:
+            hallazgos (list): Filas del grupo hallazgos_inspeccion de la bitacora
+        """
+        hallazgos = []
+        preguntas_por_forma = {}
+        for area_name, check in checks_for_rondin.items():
+            url = self.unlist(check.get('url_inspeccion', ''))
+            inspeccion = self.get_inspeccion_by_url(url)
+            if not inspeccion:
+                continue
+
+            form_id = inspeccion.get('form_id')
+            if form_id not in preguntas_por_forma:
+                preguntas_por_forma[form_id] = {
+                    p.get('field_id'): p.get('pregunta', '') for p in self.get_form_question_schema(form_id)
+                }
+
+            for field_id, valor in (inspeccion.get('answers') or {}).items():
+                if not isinstance(valor, str) or valor.lower() != 'no':
+                    continue
+                hallazgos.append({
+                    self.f['hallazgo_area']: area_name,
+                    self.f['hallazgo_pregunta']: preguntas_por_forma[form_id].get(field_id, field_id),
+                    self.f['hallazgo_respuesta']: 'No',
+                    self.f['hallazgo_comentario']: self._comentario_inspeccion(inspeccion, field_id),
+                    self.f['hallazgo_fotos']: self._fotos_inspeccion(inspeccion, field_id),
+                    self.f['hallazgo_url_inspeccion']: url,
+                })
+        return hallazgos
 
     def get_incidencias_from_rondin_record(self, rondin_record):
         """
@@ -13123,6 +13177,7 @@ class Accesos(OcrMixin, AccesosModel):
                 incidencia['url_incidencia_bitacora'] = f"{self.settings.config.get('WEB_PROTOCOL','https')}://{self.settings.config.get('WEB_HOST','app.linkaform.com')}/#/records/detail/{incidencia_id}"
         incidencias_list = self.format_incidencias_to_bitacora(bitacora_in_lkf, incidencia_for_rondin)
         answers[self.f['bitacora_rondin_incidencias']] = incidencias_list
+        answers[self.f['hallazgos_inspeccion']] = self.get_hallazgos_from_checks(checks_for_rondin)
 
         # Va a iterar las areas acutales si existe el nombre de la area en el rondin
         # quiere decir que ya previamente se habia inspeccionado, se actualzia el area
@@ -13292,7 +13347,7 @@ class Accesos(OcrMixin, AccesosModel):
             # rebuild completo eso solo inserta filas nuevas y duplicaría el grupo en cada
             # guardado (mismo criterio que el desglose de bitácora de transportistas).
             grupos_completos = {}
-            for grupo_field in (self.f['areas_del_rondin'], self.f['bitacora_rondin_incidencias'], self.f['grupo_comentarios_generales']):
+            for grupo_field in (self.f['areas_del_rondin'], self.f['bitacora_rondin_incidencias'], self.f['grupo_comentarios_generales'], self.f['hallazgos_inspeccion']):
                 if grupo_field in answers:
                     grupos_completos[f'answers.{grupo_field}'] = answers.pop(grupo_field)
             if grupos_completos:
