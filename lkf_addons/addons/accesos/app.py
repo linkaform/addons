@@ -811,6 +811,62 @@ class Accesos(OcrMixin, AccesosModel):
                 return res
         return False
 
+    def assign_unassigned_rondines_on_checkin(self, location, roles, user_id, user_name, user_email=''):
+        """
+        Al iniciar turno, asigna al guardia los rondines que estan programados
+        para alguno de sus roles en esa ubicacion y que todavia no tienen usuario
+        (nacieron sin guardia activo, ver get_and_set_user en bitacora_rondines.py).
+        No se limita por fecha: un rondin pendiente de dias anteriores tambien se
+        asigna; si ya no debe hacerse, tiene que estar en 'cerrado'.
+
+        Nunca interrumpe el check-in: cualquier error se imprime y se regresa [].
+
+        Args:
+            location (str): Ubicacion de la caseta.
+            roles (list): Roles (str) con los que el guardia inicio turno.
+            user_id (int): Id del guardia que hizo check-in.
+            user_name (str): Nombre del guardia.
+            user_email (str, optional): Email del guardia.
+
+        Returns:
+            list: Ids de los rondines asignados.
+        """
+        roles = [rol for rol in (roles or []) if isinstance(rol, str) and rol]
+        if not roles or not location:
+            return []
+        try:
+            query = [
+                {'$match': {
+                    "deleted_at": {"$exists": False},
+                    "form_id": self.BITACORA_RONDINES,
+                    f"answers.{self.f['estatus_del_recorrido']}": 'programado',
+                    #! Los de grupo quedan sin usuario hasta que alguien los inicia (claim_rondin).
+                    f"answers.{self.rondin_keys['tipo_asignacion']}": {"$ne": 'grupo'},
+                    f"answers.{self.CONFIGURACION_RECORRIDOS_OBJ_ID}.{self.Location.f['location']}": location,
+                    f"answers.{self.f['grupo_roles']}.{self.ROL_CATALOG_OBJ_ID}.{self.f['rol']}": {"$in": roles},
+                    #! Sin usuario: no existe, es null o viene vacio.
+                    f"answers.{self.USUARIOS_OBJ_ID}.{self.mf['id_usuario']}": {"$in": [None, [], ['']]},
+                }},
+                {'$project': {'_id': 1}},
+            ]
+            record_ids = [str(rondin['_id']) for rondin in self.format_cr(self.cr.aggregate(query))]
+            if not record_ids:
+                return []
+            answers = {
+                self.USUARIOS_OBJ_ID: {
+                    self.mf['nombre_usuario']: user_name,
+                    self.mf['id_usuario']: [user_id],
+                    self.mf['email_visita_a']: [user_email],
+                }
+            }
+            res = self.lkf_api.patch_multi_record(answers=answers, form_id=self.BITACORA_RONDINES, record_id=record_ids)
+            if res.get('status_code') in [200, 201, 202]:
+                return record_ids
+            print(f"No se pudieron asignar los rondines {record_ids} a user_id={user_id}: {res}")
+        except Exception as e:
+            print(f"Error al asignar rondines pendientes en check-in de user_id={user_id}: {e}")
+        return []
+
     def assets_access_pass(self, location):
         """
         Regresa diccionario con las areas, personas que puede visitar en esa ubicacion y los perfiles
@@ -1380,6 +1436,55 @@ class Accesos(OcrMixin, AccesosModel):
         else:
             return self.LKFException({'title': 'Error en registro de asistencia', 'msg': {'response': response}})
 
+    def require_active_employee(self, user_id, user_name=''):
+        """
+        Solo un empleado activo puede iniciar turno o marcar asistencia, con la caseta
+        abierta o cerrada. El check-out NO usa esta validacion: cerrar un turno no debe
+        depender de que el empleado siga activo.
+
+        Args:
+            user_id (int): Usuario del JWT que intenta iniciar turno.
+            user_name (str, optional): Nombre, solo para el mensaje.
+
+        Returns:
+            dict: El empleado activo (LKFException si no existe).
+        """
+        employee = self.get_employee_data(user_id=user_id, get_one=True)
+        if not employee:
+            msg = f"El usuario {user_name or user_id} no tiene un empleado activo, por lo que no puede iniciar turno ni marcar asistencia."
+            self.LKFException({'title': 'Advertencia', 'msg': msg})
+        return employee
+
+    def get_record_timezone(self, record_id):
+        """
+        Zona horaria con la que se creo un registro (metadato `timezone`). Al editar un
+        registro se respeta esa zona para no provocar saltos aparentes en el tiempo; si el
+        registro no la trae se usa la del JWT.
+        """
+        record = self.get_record_by_id(record_id) if record_id else {}
+        return (record or {}).get('timezone') or self.timezone or 'America/Monterrey'
+
+    def close_guards_attendance(self, user_ids, location, area, fotografia=[], photo_user_id=None):
+        """
+        Cierra el registro de asistencia abierto de cada guardia en user_ids (se busca por
+        created_by_id). La foto de cierre solo se pone en el registro de photo_user_id.
+
+        Returns:
+            str: 'Correcto', o 'Error' si alguno no se pudo actualizar.
+        """
+        status = 'Correcto'
+        for uid in user_ids:
+            record_id = self.search_guard_asistance(location, area, uid)
+            if not record_id:
+                continue
+            asistencia_answers = {self.checkin_fields['checkin_type']: 'cerrar_turno'}
+            if uid == photo_user_id:
+                asistencia_answers[self.f['foto_cierre_turno']] = fotografia
+            res = self.lkf_api.patch_multi_record(answers=asistencia_answers, form_id=self.REGISTRO_ASISTENCIA, record_id=record_id)
+            if res.get('status_code') not in [200, 201, 202]:
+                status = 'Error'
+        return status
+
     def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={}, nombre_suplente="", checkin_id="", roles=[]):
         """
         Se encarga de hacer el check in de un guardia.
@@ -1402,6 +1507,9 @@ class Accesos(OcrMixin, AccesosModel):
         user_id = self.user.get('user_id')
         user = self.lkf_api.get_user_by_id(user_id)
         user_name = user.get('name', '')
+
+        #! Solo un empleado activo puede iniciar turno (caseta abierta o cerrada).
+        employee = self.require_active_employee(user_id, user_name)
 
         #! Roles normales (catalogo, hardcode o localStorage) se aceptan tal
         #! cual, sin validar, para no romper check-in en cuentas/usuarios que
@@ -1430,6 +1538,8 @@ class Accesos(OcrMixin, AccesosModel):
             res = self.update_guards_checkin([{'user_id': user_id, 'name': user_name}], self.last_check_in.get('_id',''), location, area, user, nombre_suplente, fotografia, roles)
             format_res = self.unlist(res)
             if format_res.get('status_code') in [200, 201, 202]:
+                #! Rondines de su rol que quedaron sin guardia se asignan a quien acaba de entrar.
+                self.assign_unassigned_rondines_on_checkin(location, roles, user_id, user_name, self.user.get('email', ''))
                 return format_res
             else:
                 self.LKFException({'title': 'Error al hacer check-in', 'msg': format_res.get('json')})
@@ -1467,17 +1577,13 @@ class Accesos(OcrMixin, AccesosModel):
             msg += f" Es necesario hacer check-out de cualquier caseta antes de querer entrar a una nueva."
             return self.LKFException({'title': 'Advertencia', 'msg': msg})
 
-        #! Se obtiene el empleado actual.
-        employee = self.get_employee_data(user_id=user_id, get_one=True)
-        if not employee:
-            msg = f"No se encontro ningun empleado con id: {user_id}"
-            return self.LKFException({'title': 'Advertencia', 'msg': msg})
+        #! El empleado activo ya se valido al inicio; la hora usa la zona horaria del JWT.
         user_data = self.lkf_api.get_user_by_id(user_id)
-        employee['timezone'] = user_data.get('timezone', 'America/Monterrey')
+        timezone = self.timezone or 'America/Monterrey'
+        employee['timezone'] = timezone
         employee['name'] = employee['worker_name']
         employee['position'] = self.chife_guard
         employee['nombre_suplente'] = nombre_suplente
-        timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         now_datetime = self.today_str(timezone, date_format='datetime')
 
@@ -1541,15 +1647,14 @@ class Accesos(OcrMixin, AccesosModel):
         if resp_create.get('status_code') == 201:
             resp_create['json'].update({'boot_status':{'guard_on_duty':user_data['name']}})
             resp_create.update({'registro_de_asistencia': 'Correcto'})
+            #! Rondines de su rol que quedaron sin guardia se asignan a quien acaba de entrar.
+            self.assign_unassigned_rondines_on_checkin(location, roles, user_id, user_name, self.user.get('email', ''))
         return resp_create
 
     def do_checkout_aux_guard(self, user_id=None, checkin_id=None, location=None, area=None, guards=[], forzar=False, comments=False, fotografia=[]):
         """
         Realiza el checkout de los guardias auxiliares especificados en guards.
         """
-        employee = self.get_employee_data(user_id=user_id, get_one=True)
-        timezone = employee.get('cat_timezone', employee.get('timezone', 'America/Monterrey'))
-        now_datetime = self.today_str(timezone, date_format='datetime')
         last_chekin = {}
 
         # Solo buscamos el último checkin de los guards especificados
@@ -1566,6 +1671,9 @@ class Accesos(OcrMixin, AccesosModel):
         record = self.get_record_by_id(checkin_id)
         checkin_answers = record['answers']
         folio = record['folio']
+        #! Se edita un registro existente: se respeta la zona horaria con la que se creo.
+        timezone = record.get('timezone') or self.timezone or 'America/Monterrey'
+        now_datetime = self.today_str(timezone, date_format='datetime')
 
         # Realiza el checkout solo de los guards especificados
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
@@ -1573,24 +1681,7 @@ class Accesos(OcrMixin, AccesosModel):
         data['answers'] = checkin_answers
         response = self.lkf_api.patch_record(data=data, record_id=checkin_id)
         if response.get('status_code') in [200, 201, 202]:
-            print('entra aquiiiiiiii')
-            if employee:
-                print('employee', employee)
-                print('location', location)
-                print('area', area)
-                record_id = self.search_guard_asistance(location, area, self.unlist(employee.get('usuario_id')))
-                print('record_id', record_id)
-                asistencia_answers = {
-                    self.f['foto_cierre_turno']: fotografia,
-                    self.checkin_fields['checkin_type']: 'cerrar_turno',
-                }
-                print('asistencia_answers', asistencia_answers)
-                res = self.lkf_api.patch_multi_record(answers=asistencia_answers, form_id=self.REGISTRO_ASISTENCIA, record_id=record_id)
-                print('res', res)
-                if res.get('status_code') in [200, 201, 202]:
-                    response.update({'registro_de_asistencia': 'Correcto'})
-                else:
-                    response.update({'registro_de_asistencia': 'Error'})
+            response.update({'registro_de_asistencia': self.close_guards_attendance([user_id], location, area, fotografia, user_id)})
         elif response.get('status_code') == 401:
             return self.LKFException({"title": "Advertencia", "msg":"El guardia NO tiene permisos sobre el formulario de cierre de casetas"})
         return response
@@ -1619,10 +1710,7 @@ class Accesos(OcrMixin, AccesosModel):
         else:
             user_id = self.user.get('user_id')
 
-        employee =  self.get_employee_data(user_id=user_id, get_one=True)
         user_data = self.lkf_api.get_user_by_id(user_id)
-        timezone = user_data.get('timezone', 'America/Monterrey')
-        now_datetime =self.today_str(timezone, date_format='datetime')
         last_chekin = {}
 
         if not checkin_id:
@@ -1636,6 +1724,9 @@ class Accesos(OcrMixin, AccesosModel):
         record = self.get_record_by_id(checkin_id)
         checkin_answers = record['answers']
         folio = record['folio']
+        #! Se edita un registro existente: se respeta la zona horaria con la que se creo.
+        timezone = record.get('timezone') or self.timezone or 'America/Monterrey'
+        now_datetime = self.today_str(timezone, date_format='datetime')
         area = checkin_answers.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID,{}).get(self.f['area'])
         location = checkin_answers.get(self.CONF_AREA_EMPLEADOS_CAT_OBJ_ID,{}).get(self.f['location'])
         rec_guards = checkin_answers.get(self.checkin_fields['guard_group'])
@@ -1647,7 +1738,7 @@ class Accesos(OcrMixin, AccesosModel):
         for guard in rec_guards:
             fecha_cierre_turno = guard.get(self.checkin_fields['checkout_date'])
             guard_id = self.unlist(guard.get(self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID, {}).get(self.mf['id_usuario']))
-            actual_guard_id = self.unlist(employee.get('usuario_id'))
+            actual_guard_id = user_id
             if not fecha_cierre_turno and guards_in > 1 and guard_id == actual_guard_id:
                 resp = self.do_checkout_aux_guard(user_id=guard_id, checkin_id=checkin_id, guards=[actual_guard_id], location=location, area=area, fotografia=fotografia)
                 return resp
@@ -1662,8 +1753,16 @@ class Accesos(OcrMixin, AccesosModel):
             if comments:
                 checkin_answers[self.checkin_fields['commentario_checkin_caseta']] += comments + ' '
             if forzar:
-                checkin_answers[self.checkin_fields['commentario_checkin_caseta']] += f"Cerrado por: {employee.get('worker_name')}"
+                checkin_answers[self.checkin_fields['commentario_checkin_caseta']] += f"Cerrado por: {user_data.get('name', '')}"
                 checkin_answers[self.checkin_fields['forzar_cierre']] = 'forzar'
+
+        #! Guardias que siguen dentro: son a los que este checkout les cierra el turno.
+        open_guard_ids = [
+            self.unlist(guard.get(self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID, {}).get(self.mf['id_usuario']))
+            for guard in rec_guards
+            if not guard.get(self.checkin_fields['checkout_date'])
+        ]
+        closed_user_ids = [uid for uid in open_guard_ids if not guards or uid in guards]
 
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
         checkin_answers = self.check_in_out_employees('out', now_datetime, checkin=checkin_answers, employee_list=guards)
@@ -1674,25 +1773,9 @@ class Accesos(OcrMixin, AccesosModel):
                 self.checkin_fields['fotografia_cierre_turno']: fotografia
             })
 
-        print('user_id usado=', user_id)
-        print('employee timezone=', employee.get('cat_timezone'), employee.get('timezone'))
-        print('timezone final=', timezone)
-        print('now_datetime=', now_datetime)
-
         response = self.lkf_api.patch_record( data=data, record_id=checkin_id)
         if response.get('status_code') in [200, 201, 202]:
-            if employee:
-                record_id = self.search_guard_asistance(location, area, self.unlist(employee.get('usuario_id')))
-                asistencia_answers = {
-                    self.f['foto_cierre_turno']: fotografia,
-                    self.checkin_fields['checkin_type']: 'cerrar_turno',
-                }
-                print('asistencia_answers', asistencia_answers)
-                res = self.lkf_api.patch_multi_record(answers=asistencia_answers, form_id=self.REGISTRO_ASISTENCIA, record_id=record_id)
-                if res.get('status_code') in [200, 201, 202]:
-                    response.update({'registro_de_asistencia': 'Correcto'})
-                else:
-                    response.update({'registro_de_asistencia': 'Error'})
+            response.update({'registro_de_asistencia': self.close_guards_attendance(closed_user_ids, location, area, fotografia, user_id)})
         elif response.get('status_code') == 401:
             return self.LKFException({"title": "Advertencia", "msg":"El guardia NO tiene permisos sobre el formulario de cierre de casetas"})
         return response
@@ -9601,7 +9684,8 @@ class Accesos(OcrMixin, AccesosModel):
 
     def update_guards_checkin(self, data_guard, record_id, location, area, user_data={}, nombre_suplente="", foto_checkin=[], roles=[]):
         response = []
-        timezone = user_data.get('timezone', 'America/Monterrey')
+        #! Se edita el check-in existente: se respeta su zona horaria.
+        timezone = self.get_record_timezone(record_id)
         now_datetime =self.today_str(timezone, date_format='datetime')
         checkin = self.check_in_out_employees(
             'in',
@@ -13821,18 +13905,6 @@ class Accesos(OcrMixin, AccesosModel):
             record['last_error'] = last_error
             self.cr_db.save(record)
         return res
-
-    def delete_old_synced_areas(self, days=3):
-        import time
-        cutoff = time_module.time() - (days * 86400)
-        deleted = 0
-        for record in self.cr_db:
-            if record.get('status') != 'synced':
-                continue
-            if record.get('created_at', 0) < cutoff:
-                self.cr_db.delete(record)
-                deleted += 1
-        return deleted
 
     def group_records_by_type(self, records):
         """
