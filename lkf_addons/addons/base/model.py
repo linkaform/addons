@@ -236,6 +236,19 @@ class BaseModel(base.LKF_Base):
         self.FILTERS = self.lkm.script_id('filters','id')
         self.SCRIPT_INCIDENCIAS = self.lkm.script_id('incidencias','id')
 
+        # Gemelo *_sdk (Sanic) de cada script de arriba: script_id -> script_id_sdk.
+        # El front ya llama varios por su nombre _sdk, y set_item_permits descomparte
+        # todo script que no venga en module_permits, asi que deben ir juntos.
+        self.SCRIPTS_SDK = {
+            self.lkm.script_id(name, 'id'): self.lkm.script_id(f'{name}_sdk', 'id')
+            for name in (
+                'articulos_consecionados', 'articulos_perdidos', 'fallas', 'get_stats',
+                'gafetes_lockers', 'notes', 'paqueteria', 'script_turnos', 'pase_de_acceso',
+                'pase_de_acceso_use_api', 'rondines', 'transportistas', 'offline_services',
+                'ocr_docs', 'menus', 'filters', 'incidencias',
+            )
+        }
+
         self.f.update({
             'duracion_rondin':'6639b47565d8e5c06fe97cf3',
             'duracion_traslado_area':'6760a9581e31b10a38a22f1f',
