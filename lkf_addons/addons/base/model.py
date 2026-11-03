@@ -239,15 +239,19 @@ class BaseModel(base.LKF_Base):
         # Gemelo *_sdk (Sanic) de cada script de arriba: script_id -> script_id_sdk.
         # El front ya llama varios por su nombre _sdk, y set_item_permits descomparte
         # todo script que no venga en module_permits, asi que deben ir juntos.
-        self.SCRIPTS_SDK = {
-            self.lkm.script_id(name, 'id'): self.lkm.script_id(f'{name}_sdk', 'id')
-            for name in (
-                'articulos_consecionados', 'articulos_perdidos', 'fallas', 'get_stats',
-                'gafetes_lockers', 'notes', 'paqueteria', 'script_turnos', 'pase_de_acceso',
-                'pase_de_acceso_use_api', 'rondines', 'transportistas', 'offline_services',
-                'ocr_docs', 'menus', 'filters', 'incidencias',
-            )
-        }
+        # script_id regresa {} si la cuenta no tiene el script (cuentas no-Clave10),
+        # y {} no sirve de llave: solo entran los pares con los dos ids.
+        self.SCRIPTS_SDK = {}
+        for name in (
+            'articulos_consecionados', 'articulos_perdidos', 'fallas', 'get_stats',
+            'gafetes_lockers', 'notes', 'paqueteria', 'script_turnos', 'pase_de_acceso',
+            'pase_de_acceso_use_api', 'rondines', 'transportistas', 'offline_services',
+            'ocr_docs', 'menus', 'filters', 'incidencias',
+        ):
+            script_id = self.lkm.script_id(name, 'id')
+            script_sdk_id = self.lkm.script_id(f'{name}_sdk', 'id')
+            if isinstance(script_id, int) and isinstance(script_sdk_id, int):
+                self.SCRIPTS_SDK[script_id] = script_sdk_id
 
         self.f.update({
             'duracion_rondin':'6639b47565d8e5c06fe97cf3',
