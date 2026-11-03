@@ -72,6 +72,12 @@ RUN chmod a+x /usr/local/bin/lkfaddons
 # linkaform/addons:base ya publicada.
 RUN pip install pillow-heif==1.8.0
 
+# Header X-Clave10 en las peticiones de los scripts (ver lkf_addons/clave10_header.py).
+# sitecustomize corre en todo proceso Python, asi cubre tambien los scripts que no
+# importan lkf_addons.
+RUN printf 'try:\n    import lkf_addons.clave10_header\nexcept Exception:\n    pass\n' \
+    > /usr/local/lib/python3.12/site-packages/sitecustomize.py
+
 
 RUN adduser --home /srv/scripts/ --uid 1000 --disabled-password nonroot
 RUN mkdir -p /srv/scripts/addons/modules
