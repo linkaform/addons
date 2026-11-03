@@ -723,6 +723,40 @@ class Base(BaseModel):
             return ObjectId(clean[:24])
         return ObjectId(hashlib.md5(raw.encode('utf-8')).hexdigest()[:24])
 
+    @staticmethod
+    def _valid_item_id(value):
+        return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+    def _clave10_item_ids(self, item_type):
+        """
+        Ids de formas/catálogos/scripts de Clave10 (todos los menús de module_permits).
+        Solo estos se pueden descompartir.
+        """
+        key = {'form': 'forms', 'catalog': 'catalogs', 'script': 'scripts'}[item_type]
+        ids = set()
+        for config in self.module_permits.values():
+            ids.update(x for x in config.get(key, []) if self._valid_item_id(x))
+        return ids
+
+    def _can_unshare(self, item, item_type, item_needed):
+        """
+        True solo si el item se le compartió directo al usuario, es de Clave10 y sus menús
+        ya no lo piden. Lo que llega por conexión, por grupo o es propio del usuario no se
+        toca: descompartirlo se lo quita a todos los que lo reciben por ahí.
+        """
+        item_id = item.get('id')
+        if not self._valid_item_id(item_id) or item_id in item_needed:
+            return False
+        if item_id not in self._clave10_item_ids(item_type):
+            return False
+        if not self._valid_item_id(item.get('shared_id')):
+            return False
+        if item.get('is_shared_from_connection') or item.get('group_id'):
+            return False
+        if item.get(f'is_my_{item_type}'):
+            return False
+        return True
+
     def set_item_permits(self, user_id, item_needed, item_type):
         """
         Comparte los items necesarios para el usuario.
@@ -746,19 +780,23 @@ class Base(BaseModel):
         user_item = user_item.get('data',[])
         if isinstance(user_item, dict):
             user_item = []
-        user_item = [item for item in user_item ]
-        unshare_items = []
-        for item in user_item:
-            if item['id'] not in item_needed:
-                unshare_items.append(item)
+        user_item = [item for item in user_item if isinstance(item, dict)]
+        unshare_items = [item for item in user_item if self._can_unshare(item, item_type, item_needed)]
 
         if unshare_items:
+            allowed_ids = self._clave10_item_ids(item_type)
             unshare_items_data = []
             for item in unshare_items:
-                unshare_data = {'group_id':None, 'filter_name':None}
-                unshare_data['uri'] = f"/api/infosync/file_shared/{item['shared_id']}/"
-                unshare_data['item_id'] = item['id']
-                unshare_items_data.append(unshare_data)
+                unshare_items_data.append({
+                    'uri': f"/api/infosync/file_shared/{item['shared_id']}/",
+                    'item_id': item['id'],
+                })
+            # Ultima revision antes de mandar: un unshare con id vacio o ajeno a Clave10
+            # puede quitarle el item a toda la cuenta. Si algo no cuadra no se manda nada.
+            for data in unshare_items_data:
+                shared_id = data['uri'].rstrip('/').rsplit('/', 1)[-1]
+                if not shared_id.isdigit() or int(shared_id) <= 0 or data['item_id'] not in allowed_ids:
+                    self.LKFException(f'Unshare invalido para el usuario {user_id}: {data}')
             if unshare_items_data:
                 res = self.lkf_api.share_form(unshare_items_data, unshare=True)
 
@@ -856,12 +894,13 @@ class Base(BaseModel):
             res = getter(user['user_id'])
             if res.get('status_code') == 404:
                 return {**user, 'borrado': True}
-            shared = {item['id']: item.get('name') for item in (res.get('data') or []) if isinstance(item, dict)}
+            items = [item for item in (res.get('data') or []) if isinstance(item, dict)]
+            shared = {item['id']: item.get('name') for item in items}
             missing = sorted(needed[item_type] - set(shared))
             if missing:
                 faltan[item_type] = [{'id': i, 'nombre': nombres[item_type].get(str(i), str(i))} for i in missing]
             # Reaplicar también descomparte esto (igual que el workflow de menús).
-            extra = sorted(set(shared) - needed[item_type])
+            extra = sorted(item['id'] for item in items if self._can_unshare(item, item_type, needed[item_type]))
             if extra:
                 sobran[item_type] = [{'id': i, 'nombre': shared[i] or str(i)} for i in extra]
         return {**user, 'faltan': faltan, 'sobran': sobran}
