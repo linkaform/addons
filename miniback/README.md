@@ -4,7 +4,7 @@ Simula la parte del backend de LinkaForm que corre scripts de addons, para
 poder probar `modules/` desde un front local **sin tener el repo
 `infosync-api`**.
 
-Cuando el back real recibe una peticion a `/api/infosync/scripts/run/`, busca
+Cuando el back real recibe una peticion a `/api/clave10/scripts/run/`, busca
 el contenedor de la cuenta (`account_10_linkaform.addons..latest`) y adentro
 corre `python <script>.py '<record>' '<script_args>' 'False'`. El mini-back
 hace exactamente eso, pero contra el contenedor `lkf-addons` que ya usas para
@@ -12,7 +12,7 @@ desarrollar.
 
 ```
 front (localhost:3010)
-   |  POST /api/infosync/scripts/run/
+   |  POST /api/clave10/scripts/run/
    v
 mini-back (localhost:8014)          <- este servicio
    |
@@ -68,7 +68,7 @@ environment:
 ## Probarlo con curl
 
 ```bash
-curl -s -X POST localhost:8014/api/infosync/scripts/run/ \
+curl -s -X POST localhost:8014/api/clave10/scripts/run/ \
   -H 'Content-Type: application/json' \
   -H "Authorization: Bearer $JWT" \
   -d '{"script_name": "script_turnos.py", "option": "get_user_menu"}'
@@ -81,7 +81,7 @@ curl -s -X POST localhost:8014/api/infosync/scripts/run/ \
 `GET` tambien funciona, util para probar desde el navegador:
 
 ```
-localhost:8014/api/infosync/scripts/run/?script_name=script_turnos.py&option=get_user_menu
+localhost:8014/api/clave10/scripts/run/?script_name=script_turnos.py&option=get_user_menu
 ```
 
 Cada corrida deja en el log el `docker exec` exacto. Copialo y pegalo en una
@@ -187,7 +187,7 @@ LKF_ACCOUNT_ID=10 docker compose -f docker/docker-compose.miniback.yml up -d
 
 | Ruta                                | Que hace                                                  |
 | ----------------------------------- | ---------------------------------------------------------- |
-| `POST/GET /api/infosync/scripts/run/` | Corre el script. Mismo contrato que el back real.         |
+| `POST/GET /api/clave10/scripts/run/` | Corre el script. Mismo contrato que el back real.         |
 | `POST /api/infosync/user_admin/login/` | Proxy transparente a `LKF_UPSTREAM`. El JWT es real.     |
 | `GET /api/health`                     | Estado, contenedor, cuenta y numero de scripts indexados. |
 

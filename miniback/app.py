@@ -98,7 +98,7 @@ async def health(request):
     })
 
 
-@app.route('/api/infosync/scripts/run/', methods=['POST', 'GET', 'OPTIONS'],
+@app.route('/api/clave10/scripts/run/', methods=['POST', 'GET', 'OPTIONS'],
            strict_slashes=False)
 async def scripts_run(request):
     body = get_body(request)
