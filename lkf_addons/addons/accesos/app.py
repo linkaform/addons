@@ -1801,6 +1801,45 @@ class Accesos(OcrMixin, AccesosModel):
             format_resp = [r.get('_id', r.get('id', '')) for r in resp]
         return format_resp
 
+    def _zona_empleado(self):
+        '''
+        Zona horaria con la que se guardan entrada y salida de la bitacora.
+        [1477] Es la misma que usa _do_access para la fecha_entrada, asi entrada
+        y salida quedan en la misma zona y la duracion sale bien aunque la
+        cuenta tenga usuarios en otras zonas.
+        '''
+        employee = self.get_employee_data(email=self.user.get('email'), get_one=True) or {}
+        return employee.get('timezone') or self.user.get('timezone') or 'America/Monterrey'
+
+    def formato_duracion(self, segundos):
+        '''
+        [1477] Duracion legible de una visita: sin segundos y solo las partes
+        que no son cero. Reemplaza al HH:MM:SS, que pasando las 24 h volvia a
+        empezar desde cero (25 h 5 min quedaba como 01:05:30).
+
+            40 s            -> 'Menos de 1 min'
+            25 min          -> '25 min'
+            3 h 25 min      -> '3 h 25 min'
+            25 h 5 min      -> '1 día 1 h 5 min'
+            50 h            -> '2 días 2 h'
+
+        Una duracion negativa (entrada vieja guardada en otra zona) se toma
+        como 0 para no guardar basura: queda 'Menos de 1 min'.
+        '''
+        minutos = int(max(segundos or 0, 0) // 60)
+        if minutos < 1:
+            return 'Menos de 1 min'
+        dias, resto = divmod(minutos, 24 * 60)
+        horas, mins = divmod(resto, 60)
+        partes = []
+        if dias:
+            partes.append(f"{dias} día{'s' if dias != 1 else ''}")
+        if horas:
+            partes.append(f"{horas} h")
+        if mins:
+            partes.append(f"{mins} min")
+        return ' '.join(partes)
+
     def do_out(self, qr, location, area, gafete_id=None, record_id=None):
         '''
             Realiza el cambio de estatus de la forma de bitacora, relacionada a la salida, como parametro
@@ -1822,13 +1861,17 @@ class Accesos(OcrMixin, AccesosModel):
         if last_check_out.get('folio'):
             folio = last_check_out.get('folio',0)
             checkin_date_str = last_check_out.get('checkin_date')
-            checkin_date = self.date_from_str(checkin_date_str)
-            tz_mexico = pytz.timezone('America/Mexico_City')
-            now = datetime.now(tz_mexico)
-            fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
-            duration = time_module.strftime('%H:%M:%S', time_module.gmtime(
-                self.date_2_epoch(fecha_hora_str) - self.date_2_epoch(checkin_date_str)
-            ))
+            # [1477] La salida usa la zona del empleado, igual que la entrada
+            #   (_do_access). Antes era America/Mexico_City fija: con un empleado
+            #   en Cancun la salida quedaba 1 h atras.
+            fecha_hora_str = self.today_str(self._zona_empleado(), date_format='datetime')
+            # [1477] Las dos fechas estan en la misma zona y sin tz: se restan
+            #   directo. La duracion va en formato legible (formato_duracion).
+            segundos = (
+                datetime.strptime(fecha_hora_str, '%Y-%m-%d %H:%M:%S')
+                - datetime.strptime(checkin_date_str, '%Y-%m-%d %H:%M:%S')
+            ).total_seconds()
+            duration = self.formato_duracion(segundos)
             if self.user_in_facility(status_visita=last_check_out.get('status_visita')):
                 answers = {
                     f"{self.mf['tipo_registro']}":'salida',
@@ -11277,38 +11320,46 @@ class Accesos(OcrMixin, AccesosModel):
             }
         }
         if data:
-            folios = [record.get('folio') for record in data if record.get('folio')]
-            tz_mexico = pytz.timezone('America/Mexico_City')
-            now = datetime.now(tz_mexico)
-            fecha_hora_str = now.strftime("%Y-%m-%d %H:%M:%S")
+            # [1477] Se cierra por _id, no por folio: el _id siempre viene en el
+            #   aggregate y el folio no esta garantizado (sin folio la visita se
+            #   quedaba abierta sin avisar). El folio solo se usa para los mensajes.
+            record_ids = [str(record['_id']) for record in data if record.get('_id')]
+            etiquetas = {str(record['_id']): record.get('folio') or str(record['_id']) for record in data if record.get('_id')}
+            # [1477] Hora del empleado, igual que la entrada y que do_out.
+            fecha_hora_str = self.today_str(self._zona_empleado(), date_format='datetime')
             replace_answers = {
                 self.mf['fecha_salida']: fecha_hora_str,
                 self.mf['tipo_registro']: 'salida',
+                # [1477] En un cierre general no se sabe a que hora salio cada
+                #   persona: la duracion se marca como tal en vez de inventarla.
+                self.mf['duracion']: 'Cierre general',
             }
-            #---Un patch por folio, igual que do_out. Con el lote completo el servidor
+            #---Un patch por registro, igual que do_out. Con el lote completo el servidor
             #   responde 202 en segundo plano y no aplica la salida.
-            def patch_folio(folio):
-                return self.lkf_api.patch_multi_record(answers=deepcopy(replace_answers), form_id=self.BITACORA_ACCESOS, folios=[folio])
+            def patch_registro(record_id):
+                return self.lkf_api.patch_multi_record(answers=deepcopy(replace_answers), form_id=self.BITACORA_ACCESOS, record_id=[record_id])
 
             with ThreadPoolExecutor(max_workers=10) as executor:
-                responses = dict(zip(folios, executor.map(patch_folio, folios)))
+                responses = dict(zip(record_ids, executor.map(patch_registro, record_ids)))
 
             #---El status del patch no basta: se confirma en la BD qué visitas siguen abiertas
-            match['folio'] = {'$in': folios}
-            pendientes = [record.get('folio') for record in self.cr.find(match, {'folio': 1})]
+            # [1477] La confirmacion tambien es por _id.
+            match['_id'] = {'$in': [ObjectId(r) for r in record_ids]}
+            pendientes = [str(record.get('_id')) for record in self.cr.find(match, {'_id': 1})]
             if pendientes:
-                print('========== Log:', simplejson.dumps({f: responses.get(f) for f in pendientes}, indent=2, default=str))
+                print('========== Log:', simplejson.dumps({etiquetas.get(p, p): responses.get(p) for p in pendientes}, indent=2, default=str))
                 self.LKFException({
                     'title': 'Error',
-                    'msg': f'No se pudo registrar la salida de {len(pendientes)} de {len(folios)} visitas en {location}: {", ".join(pendientes)}.',
+                    'msg': f'No se pudo registrar la salida de {len(pendientes)} de {len(record_ids)} visitas en {location}: {", ".join(etiquetas.get(p, p) for p in pendientes)}.',
                     'status_code': 500,
                 })
             format_data = {
-                "data": folios,
+                # Se sigue regresando la lista de folios, como antes, para no romper al front.
+                "data": [etiquetas[r] for r in record_ids],
                 "status_code": 200,
                 "json": {
                     "msg": f'Salida masiva en {location} ejecutada correctamente.',
-                    "total": len(folios),
+                    "total": len(record_ids),
                 }
             }
         return format_data
