@@ -15,7 +15,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <created_at>1736440274.0</created_at>
-    <description>version: 1791935443</description>
+    <description>version: 1793742576</description>
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
@@ -391,6 +391,18 @@
                             <points>None</points>
                             <selected>False</selected>
                             <value>fotografia</value>
+                        </item>
+                        <item>
+                            <label>Correo</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>correo</value>
+                        </item>
+                        <item>
+                            <label>Telefono</label>
+                            <points>None</points>
+                            <selected>False</selected>
+                            <value>telefono</value>
                         </item>
                     </options>
                     <properties>
@@ -1149,7 +1161,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -1312,7 +1324,7 @@
                     <number_type>None</number_type>
                     <options>
                         <item>
-                            <label>SÍ</label>
+                            <label>Sí</label>
                             <option>None</option>
                             <selected>False</selected>
                             <value>sí</value>
@@ -2198,5 +2210,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1791935443.0</updated_at>
+    <updated_at>1793742576.0</updated_at>
 </lkf>
