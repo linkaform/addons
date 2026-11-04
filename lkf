@@ -323,6 +323,21 @@ _update(){
   esac
 }
 
+# pull image in the servers, stops all containers using that image for all accounts
+_update_all(){
+  echo 'Running update for image... ' $IMAGE_NAME
+  case $Enviorment in
+    prod)
+      for ip in 70 71 72; do
+        ssh -i ~/.ssh/keys/lkf lkf@10.128.10.$ip stop_container -a $IMAGE_NAME &
+      done
+      wait
+      # env -i ssh -i $HOME/.ssh/keys/$Account_id _lkf_docker_remote@ansible.linkaform.com prod $IMAGE_NAME
+    ;;
+    preprod) echo "not available in preprod atm" >&2; exit 1;;
+  esac
+}
+
 _udpate_container(){
   #TODO, actualizar contenedor de addons corriendo en ambiente de pruebas
   #docker cp stock_utils.py account_9908_linkaform.addons..latest:/usr/local/lib/python3.7/site-packages/lkf_addons/addons/stock/stock_utils.py
@@ -450,6 +465,22 @@ case "$Acction" in
     echo "Restarting addons container of the account: $Account_id"
     echo "Environment: $Enviorment "
     _restart $Service
+  ;;
+  update_all)
+    Enviorment=$Service
+    Account_id=$Branch
+    IMAGE_NAME='addons'
+    if [[ $# -gt 3 ]]; then
+      Enviorment=$2
+      Account_id=$3
+      IMAGE_NAME=$4
+    fi
+    echo 'IMAGE_NAME...' $IMAGE_NAME
+    echo 'Enviorment...' $Enviorment
+    echo 'Account_id...' $Account_id
+    echo "Restarting addons container of the account: $Account_id"
+    echo "Environment: $Enviorment "
+    _update_all
   ;;
   test)
     echo "Loding testing environment . . . . + - / * "
