@@ -181,12 +181,22 @@ async def scripts_run(request):
 @app.route('/api/infosync/user_admin/login/', methods=['POST', 'OPTIONS'],
            strict_slashes=False)
 async def login(request):
+    return await _proxy_login(request, 'infosync')
+
+
+@app.route('/api/clave10/user_admin/login/', methods=['POST', 'OPTIONS'],
+           strict_slashes=False)
+async def login_clave10(request):
+    return await _proxy_login(request, 'clave10')
+
+
+async def _proxy_login(request, prefix):
     """Proxy transparente a LinkaForm.
 
     El login no se simula: se reenvia a produccion para que el JWT que
     devuelve sea real y sirva para que los scripts peguen a la API de verdad.
     """
-    url = '{}/api/infosync/user_admin/login/'.format(settings.UPSTREAM)
+    url = '{}/api/{}/user_admin/login/'.format(settings.UPSTREAM, prefix)
     headers = {}
     for name in ('content-type', 'authorization', 'accept', 'accept-language'):
         if name in request.headers:
