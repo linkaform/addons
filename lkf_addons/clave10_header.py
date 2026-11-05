@@ -1,6 +1,7 @@
 # coding: utf-8
 '''
-Marca con el header X-Clave10 (nombre_script:opcion) cada peticion HTTP que hace un
+Marca con los headers X-Clave10-Script-Name (nombre del script) y
+X-Clave10-Script-Option (opcion, si trae) cada peticion HTTP que hace un
 script de una cuenta Clave10, para que infra sepa en HAProxy que script la mando
 (hoy todo llega como run_script). Se carga desde sitecustomize.py en la imagen, asi
 que aplica a todo proceso Python del contenedor sin tocar los scripts.
@@ -14,7 +15,8 @@ en session.headers, porque linkaform_api reasigna session.headers en cada llamad
 import os, sys, json
 import importlib.abc
 
-HEADER = 'X-Clave10'
+HEADER_NAME = 'X-Clave10-Script-Name'
+HEADER_OPTION = 'X-Clave10-Script-Option'
 
 _value_cache = []
 
@@ -27,7 +29,7 @@ def _script_value():
         option = (payload.get('data') or {}).get('option') or payload.get('option') or ''
     except Exception:
         pass
-    return f'{script}:{option}' if option else script
+    return script, option
 
 
 def _value():
@@ -49,9 +51,12 @@ def _with_header(headers):
     value = _value()
     if not value:
         return headers
+    script, option = value
     headers = dict(headers or {})
-    if not any(k.lower() == HEADER.lower() for k in headers):
-        headers[HEADER] = value
+    if not any(k.lower() == HEADER_NAME.lower() for k in headers):
+        headers[HEADER_NAME] = script
+        if option:
+            headers[HEADER_OPTION] = option
     return headers
 
 
