@@ -7728,6 +7728,17 @@ class Accesos(OcrMixin, AccesosModel):
     def get_pdf_seg(self, qr_code, template_id=None, name_pdf=None):
         return self.lkf_api.get_pdf_record(qr_code, template_id = template_id, name_pdf =name_pdf, send_url=True)
 
+    def get_pdf_incidencia(self, qr_code, name_pdf=None):
+        """
+        PDF de una incidencia con la plantilla v2 ("... Bitácora de incidencias v2").
+        El id de la plantilla cambia por cuenta, por eso se busca por nombre; si la
+        cuenta no la tiene se usa la plantilla por defecto de la forma.
+        """
+        templates = self.lkf_api.get_pdf_templates(self.BITACORA_INCIDENCIAS) or []
+        template_id = next((t.get('id') for t in templates
+                            if (t.get('name') or '').strip().lower().endswith('incidencias v2')), None)
+        return self.lkf_api.get_pdf_record(qr_code, template_id=template_id, name_pdf=name_pdf, send_url=True)
+
     def get_pdf_multi(self, record_ids, name_pdf=''):
         templates = self.lkf_api.get_pdf_templates(self.PASE_ENTRADA) or []
         template_id = next((t.get('id') for t in templates if t.get('_type') == 'multiple-records'), None)
