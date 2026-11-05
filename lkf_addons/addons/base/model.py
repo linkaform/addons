@@ -130,6 +130,7 @@ class BaseModel(base.LKF_Base):
             'new_user_phone':'67be0c43a31e5161c47f2bba',
             'new_user_position':'67be0c43a31e5161c47f2bbb',
             'new_user_status':'679d023876ad7f5ba642f4ed',
+            'new_user_temp_password':'67be0b7896e72a692b4fa660',
             'new_user_token':'6a2f1c0e5b3d4a7c9e8f1a01',
             'new_user_username':'6759e4a7a9a6e13c7b26da33',
             'nombre_comercial':'667468e3e577b8b98c852aaa',

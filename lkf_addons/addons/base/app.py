@@ -195,6 +195,49 @@ class Base(BaseModel):
 
         return None
 
+    def create_user_account(self, user_data):
+        """
+        Alta de usuarios con la forma Usuarios VIEJA (Contraseña Temporal, sin
+        token ni enlace). La usa create_user.py en cuentas que no tienen la forma
+        nueva ni Sanic (hergo). La forma nueva usa create_user_sdk.py en Sanic.
+        """
+        if user_data.get(self.f['new_user_status']) == 'creado':
+            return self.LKFException({'title': 'Advertencia', 'msg': 'Este usuario ya está creado.'})
+
+        complete_name = user_data.get(self.f['new_user_complete_name'])
+        email = user_data.get(self.f['new_user_email'])
+        username = user_data.get(self.f['new_user_username'])
+        phone = user_data.get(self.f['new_user_phone'])
+        password = user_data.get(self.f['new_user_temp_password'])
+        position = user_data.get(self.f['new_user_position'], '')
+
+        body_request = {
+            "first_name": complete_name,
+            "email": email,
+            "username": username,
+            "password": password,
+            "password2": password,
+            "position": position,
+            "phone": phone,
+            "permissions": [],
+            "company": "",
+            "send_welcome": False
+        }
+
+        created_epoch = int(time.time())
+        response = self.lkf_api.create_user(body_request)
+        if response.get('status_code') in [200, 201, 202]:
+            # create_user no regresa el user_id: se busca con get_updated_users
+            # desde justo antes del alta, filtrando por username (unico).
+            # El script corre en runtime "before": se muta user_data (el mismo
+            # dict que self.answers) para que salga como replace_ans.
+            recent_users = self.lkf_api.get_updated_users(created_epoch)
+            new_user_id = next((u.get('id') for u in recent_users if u.get('username') == username), None)
+            if new_user_id:
+                user_data[self.f['new_user_id']] = new_user_id
+                user_data[self.f['new_user_status']] = 'creado'
+        return response
+
     def get_user_by_username(self, username):
         #TODO Checar por que el form id de Usuarios no trae el id correcto
         match_query = {
