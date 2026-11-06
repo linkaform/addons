@@ -284,32 +284,30 @@ class Base(BaseModel):
         """
         errors = []
         owner = f"/api/infosync/user/{user_id}/"
-
-        user_scripts = self.lkf_api.get_user_scripts(user_id, flat=True).get('data', [])
-        if isinstance(user_scripts, dict):
-            user_scripts = []
-        if self.SCRIPT_MENUS and self.SCRIPT_MENUS not in {s['id'] for s in user_scripts}:
-            data_to_share = {
-                "file_shared": f"/api/infosync/get_scripts/{self.SCRIPT_MENUS}/",
-                "owner": owner,
-                "perm": "can_read_item",
-            }
-            res = self.lkf_api.share_script(data_to_share)
-            if res.get('status_code') != 201:
-                errors.append({'script': self.SCRIPT_MENUS, 'res': res})
-
-        user_catalogs = self.lkf_api.get_user_catalog(user_id).get('data', [])
-        if isinstance(user_catalogs, dict):
-            user_catalogs = []
-        if self.MENUS_CATALOG_ID and self.MENUS_CATALOG_ID not in {c['id'] for c in user_catalogs}:
-            data_to_share = {
-                "file_shared": f"/api/infosync/item/{self.MENUS_CATALOG_ID}/",
-                "owner": owner,
-                "perm": "can_read_item",
-            }
-            res = self.lkf_api.share_form(data_to_share)
-            if res.get('status_code') != 201:
-                errors.append({'catalog': self.MENUS_CATALOG_ID, 'res': res})
+        # Mismas protecciones que set_item_permits: lectura confiable, un solo envio
+        # y sin repetir lo mandado en los ultimos PERMISOS_ENVIOS_MIN minutos.
+        recent = self._recent_sends(user_id)
+        sent_keys = []
+        pendientes = (
+            ('script', self.SCRIPT_MENUS, f"/api/infosync/get_scripts/{self.SCRIPT_MENUS}/", self.lkf_api.share_script),
+            ('catalog', self.MENUS_CATALOG_ID, f"/api/infosync/item/{self.MENUS_CATALOG_ID}/", self.lkf_api.share_form),
+        )
+        for item_type, item_id, uri, share in pendientes:
+            if not self._valid_item_id(item_id) or f'share:{item_type}:{item_id}' in recent:
+                continue
+            user_items = self._read_user_items(user_id, item_type)
+            if user_items is None:
+                errors.append({item_type: item_id, 'error': 'no se pudieron leer los permisos del usuario'})
+                continue
+            if item_id in {i.get('id') for i in user_items}:
+                continue
+            res = share({"file_shared": uri, "owner": owner, "perm": "can_read_item"})
+            status = res.get('status_code')
+            if isinstance(status, int) and 200 <= status < 300:
+                sent_keys.append(f'share:{item_type}:{item_id}')
+            else:
+                errors.append({item_type: item_id, 'status_code': status})
+        self._save_sends(user_id, sent_keys)
 
         if errors:
             print('Error al compartir bootstrap de menus', user_id, errors)
