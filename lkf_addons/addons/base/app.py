@@ -1123,16 +1123,17 @@ class Base(BaseModel):
     # por workflow, y solo comparte: el unshare sigue siendo por usuario al guardar su
     # registro. Un trabajo en Mongo guarda el plan y el avance:
     #   plan_mass_share   -> lee lo que le falta a cada usuario (por tandas, solo lectura)
-    #   run_mass_share    -> un PATCH por item con un grupo de usuarios, sin reintentos
+    #   run_mass_share    -> un item por llamada: un PATCH con todos sus usuarios, con
+    #                        intervalo entre items y confirmar=True si son muchos usuarios
     #   verify_mass_share -> despues de MASIVO_VERIFICAR_MIN, una lectura por item
     #   resend_mass_share -> regresa a pendientes lo que siga faltando (manual)
     # La respuesta del PATCH en lote es {} sin estado por usuario: un 2xx solo cuenta
     # como "enviado", lo que vale es la verificacion.
     # ------------------------------------------------------------------------------
     PERMISOS_TRABAJOS_COLL = 'clave10_permisos_trabajos'
-    MASIVO_GRUPO = 20            # usuarios por PATCH
-    MASIVO_PAUSA = 1             # segundos entre PATCH
-    MASIVO_PARALELO_MAX = 3
+    MASIVO_INTERVALO = 60        # segundos minimos entre un item y el siguiente
+    MASIVO_AVISO_USUARIOS = 50   # un item para mas usuarios pide confirmar=True
+    MASIVO_LOCK_SEG = 900        # cubre un PATCH grande (LinkaForm tarda ~2-3 s por usuario)
     MASIVO_LECTURAS_PARALELO = 3
     MASIVO_VERIFICAR_MIN = 10    # un share puede tardar minutos en verse
     MASIVO_PLAN_HORAS = 24       # un plan mas viejo ya no se corre
@@ -1160,7 +1161,7 @@ class Base(BaseModel):
         """Guarda el avance. El estado solo se escribe con estado=True, para no pisar un
         'pausado' que llegue mientras hay un PATCH en curso."""
         fields = {k: job[k] for k in ('por_revisar', 'revisados', 'sin_lectura', 'items',
-                                       'plan_listo_at', 'log') if k in job}
+                                       'plan_listo_at', 'ultimo_envio_at', 'log') if k in job}
         if estado:
             if job.get('estado') != 'pausado' and self._mass_estado_db(job['_id']) == 'pausado':
                 job['estado'] = 'pausado'
@@ -1206,6 +1207,9 @@ class Base(BaseModel):
             'ok': sum(len(i.get('ok') or []) for i in items),
             'faltan': sum(len(i.get('faltan') or []) for i in items),
             'estimado_min': round(pendientes * self.MASIVO_SEG_POR_PAR / 60, 1),
+            'items_pendientes': sum(1 for i in items if i.get('pendientes')),
+            'items_grandes': sorted(f"{i['type']}:{i['id']}" for i in items
+                                    if len(i.get('pendientes') or []) > self.MASIVO_AVISO_USUARIOS),
         }
         if msg:
             res['msg'] = msg
@@ -1213,6 +1217,7 @@ class Base(BaseModel):
             res['detalle'] = sorted([{
                 'item': f"{i['type']}:{i['id']}", 'nombre': i.get('nombre'),
                 'pendientes': len(i.get('pendientes') or []),
+                'grande': len(i.get('pendientes') or []) > self.MASIVO_AVISO_USUARIOS,
                 'enviados': sum(len(e['uids']) for e in i.get('enviados') or []),
                 'saltados': len(i.get('saltados') or []),
                 'ok': len(i.get('ok') or []), 'faltan': i.get('faltan') or [],
@@ -1311,14 +1316,16 @@ class Base(BaseModel):
         except Exception as e:
             return f'error: {str(e)[:150]}'
 
-    def run_mass_share(self, job_id, max_seconds=90, paralelo=1):
+    def run_mass_share(self, job_id, intervalo=None, confirmar=False):
         """
-        Manda los pendientes del plan: un PATCH por item con hasta MASIVO_GRUPO usuarios,
-        `paralelo` PATCH a la vez (tope MASIVO_PARALELO_MAX), pausa entre tandas y sin
-        reintentos. Para antes de max_seconds o si el trabajo se pausa.
+        Manda UN item por llamada: un solo PATCH con todos los usuarios que lo necesitan.
+        Entre un item y otro deben pasar `intervalo` segundos (MASIVO_INTERVALO): si se
+        llama antes, no manda nada y responde cuanto falta; quien llama espera y vuelve a
+        llamar. Un item para mas de MASIVO_AVISO_USUARIOS usuarios solo se manda con
+        confirmar=True. Sin reintentos: el estado real lo da verify_mass_share.
         """
-        paralelo = min(max(int(paralelo or 1), 1), self.MASIVO_PARALELO_MAX)
-        job = self._mass_lock(job_id, max_seconds + 300)
+        intervalo = self.MASIVO_INTERVALO if intervalo is None else max(int(intervalo), 0)
+        job = self._mass_lock(job_id, self.MASIVO_LOCK_SEG)
         if not job:
             return {'error': 'El trabajo no existe o otra corrida lo esta usando.', 'job_id': str(job_id)}
         if job['estado'] not in ('listo', 'corriendo', 'pausado', 'enviado'):
@@ -1331,46 +1338,46 @@ class Base(BaseModel):
             # Llamar run sobre un trabajo pausado es reanudarlo.
             job['estado'] = 'corriendo'
             self._mass_jobs().update_one({'_id': job['_id']}, {'$set': {'estado': 'corriendo'}})
-            t0, ultima = time.time(), 0
-            for key in sorted(job['items']):
-                item = job['items'][key]
-                while item['pendientes']:
-                    if self._mass_estado_db(job_id) == 'pausado':
-                        job['estado'] = 'pausado'
-                        return self._mass_summary(job, msg='Pausado.')
-                    if time.time() - t0 + ultima > max_seconds:
-                        return self._mass_summary(job, msg='Fin de la tanda; vuelve a llamar para seguir.')
-                    grupos = []
-                    for _ in range(paralelo):
-                        if not item['pendientes']:
-                            break
-                        grupo = item['pendientes'][:self.MASIVO_GRUPO]
-                        item['pendientes'] = item['pendientes'][len(grupo):]
-                        ya = self._mass_sent_since(grupo, f"share:{item['type']}:{item['id']}", job['created_at'])
-                        item['saltados'] += [u for u in grupo if u in ya]
-                        grupo = [u for u in grupo if u not in ya]
-                        if grupo:
-                            grupos.append(grupo)
-
-                    def mandar(grupo):
-                        t = time.time()
-                        status = self._mass_patch_share(item['id'], grupo)
-                        return {'uids': grupo, 'at': time.time(), 'status': status,
-                                'segundos': round(time.time() - t, 1)}
-
-                    with ThreadPoolExecutor(max_workers=paralelo) as executor:
-                        envios = list(executor.map(mandar, grupos))
-                    for envio in envios:
-                        item['enviados'].append(envio)
-                        ultima = max(ultima, envio['segundos'])
-                        if self._ok_status(envio['status']):
-                            for uid in envio['uids']:
-                                self._save_sends(uid, [f"share:{item['type']}:{item['id']}"])
-                    self._mass_save(job)
-                    if grupos:
-                        time.sleep(self.MASIVO_PAUSA)
-            job['estado'] = 'enviado'
-            return self._mass_summary(job, msg='Todo enviado. Verifica en al menos 10 minutos.')
+            espera = (job.get('ultimo_envio_at') or 0) + intervalo - time.time()
+            if espera > 0:
+                res = self._mass_summary(job, msg=f'Intervalo entre items: espera {int(espera) + 1} s.')
+                res['espera_seg'] = int(espera) + 1
+                return res
+            key = next((k for k in sorted(job['items']) if job['items'][k]['pendientes']), None)
+            if not key:
+                job['estado'] = 'enviado'
+                return self._mass_summary(job, msg='Todo enviado. Verifica en al menos 10 minutos.')
+            item = job['items'][key]
+            llave = f"share:{item['type']}:{item['id']}"
+            ya = self._mass_sent_since(item['pendientes'], llave, job['created_at'])
+            item['saltados'] += [u for u in item['pendientes'] if u in ya]
+            usuarios = [u for u in item['pendientes'] if u not in ya]
+            if len(usuarios) > self.MASIVO_AVISO_USUARIOS and not confirmar:
+                item['pendientes'] = usuarios
+                res = self._mass_summary(job, msg=(
+                    f"{item['nombre']} va para {len(usuarios)} usuarios (mas de "
+                    f"{self.MASIVO_AVISO_USUARIOS}): vuelve a llamar con confirmar=True."))
+                res['requiere_confirmar'] = key
+                return res
+            item['pendientes'] = []
+            if usuarios:
+                t = time.time()
+                status = self._mass_patch_share(item['id'], usuarios)
+                item['enviados'].append({'uids': usuarios, 'at': time.time(), 'status': status,
+                                         'segundos': round(time.time() - t, 1)})
+                job['ultimo_envio_at'] = time.time()
+                if self._ok_status(status):
+                    for uid in usuarios:
+                        self._save_sends(uid, [llave])
+            quedan = sum(1 for i in job['items'].values() if i['pendientes'])
+            if not quedan:
+                job['estado'] = 'enviado'
+            res = self._mass_summary(job, msg=(
+                f"{item['nombre']}: {len(usuarios)} usuarios en 1 llamada. "
+                + (f'Quedan {quedan} items; siguiente en {intervalo} s.' if quedan
+                   else 'Todo enviado. Verifica en al menos 10 minutos.')))
+            res['espera_seg'] = intervalo if quedan else 0
+            return res
         finally:
             self._mass_save(job, unlock=True, estado=True)
 
