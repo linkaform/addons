@@ -285,7 +285,7 @@ class Base(BaseModel):
         errors = []
         owner = f"/api/infosync/user/{user_id}/"
 
-        user_scripts = self.lkf_api.get_user_scripts(user_id).get('data', [])
+        user_scripts = self.lkf_api.get_user_scripts(user_id, flat=True).get('data', [])
         if isinstance(user_scripts, dict):
             user_scripts = []
         if self.SCRIPT_MENUS and self.SCRIPT_MENUS not in {s['id'] for s in user_scripts}:
@@ -798,59 +798,137 @@ class Base(BaseModel):
             return False
         if item.get(f'is_my_{item_type}'):
             return False
+        # Los catalogos que antes iban en 'always' no se descomparten en esta fase:
+        # a los usuarios existentes se les dejan, solo dejan de darse a los nuevos.
+        if item_type == 'catalog' and item_id in getattr(self, 'catalogos_sin_descompartir', set()):
+            return False
         return True
+
+    # Ultimos envios de permisos por usuario, para que dos guardados seguidos no repitan
+    # los mismos shares/unshares mientras LinkaForm todavia no los refleja.
+    PERMISOS_ENVIOS_COLL = 'clave10_permisos_envios'
+    PERMISOS_ENVIOS_MIN = 15
+
+    def _recent_sends(self, user_id):
+        """Llaves enviadas al usuario en los ultimos PERMISOS_ENVIOS_MIN minutos."""
+        try:
+            doc = self.cr.database[self.PERMISOS_ENVIOS_COLL].find_one({'_id': int(user_id)}) or {}
+        except Exception as e:
+            print(f'No se pudo leer {self.PERMISOS_ENVIOS_COLL}: {e}')
+            return set()
+        limite = time.time() - self.PERMISOS_ENVIOS_MIN * 60
+        return {k for k, ts in (doc.get('envios') or {}).items() if isinstance(ts, (int, float)) and ts >= limite}
+
+    def _save_sends(self, user_id, keys):
+        """Si Mongo falla no se frena el share: solo se pierde la proteccion."""
+        if not keys:
+            return
+        now = time.time()
+        try:
+            self.cr.database[self.PERMISOS_ENVIOS_COLL].update_one(
+                {'_id': int(user_id)},
+                {'$set': {**{f'envios.{k}': now for k in keys}, 'updated_at': now}},
+                upsert=True,
+            )
+        except Exception as e:
+            print(f'No se pudo guardar {self.PERMISOS_ENVIOS_COLL}: {e}')
+
+    def _read_user_items(self, user_id, item_type):
+        """
+        Items compartidos al usuario, o None si la lectura no es confiable (status no 2xx
+        o respuesta que no es lista, como la de un usuario inactivo). Con None no se
+        comparte ni descomparte nada: leer [] por error lo recompartiria todo.
+        """
+        if item_type == 'form':
+            res = self.lkf_api.get_user_forms(user_id)
+        elif item_type == 'catalog':
+            res = self.lkf_api.get_user_catalog(user_id)
+        elif item_type == 'script':
+            res = self.lkf_api.get_user_scripts(user_id, flat=True)
+        else:
+            self.LKFException(f'Item type not found: {item_type}')
+        status = res.get('status_code')
+        data = res.get('data')
+        if not isinstance(status, int) or not 200 <= status < 300 or not isinstance(data, list):
+            return None
+        return [item for item in data if isinstance(item, dict)]
+
+    def _unshare_user_items(self, user_id, item_type, items):
+        """Manda un solo PATCH con los unshares, ya validados contra Clave10."""
+        allowed_ids = self._clave10_item_ids(item_type)
+        unshare_items_data = [{
+            'uri': f"/api/infosync/file_shared/{item['shared_id']}/",
+            'item_id': item['id'],
+        } for item in items]
+        # Ultima revision antes de mandar: un unshare con id vacio o ajeno a Clave10
+        # puede quitarle el item a toda la cuenta. Si algo no cuadra no se manda nada.
+        for data in unshare_items_data:
+            shared_id = data['uri'].rstrip('/').rsplit('/', 1)[-1]
+            if not shared_id.isdigit() or int(shared_id) <= 0 or data['item_id'] not in allowed_ids:
+                self.LKFException(f'Unshare invalido para el usuario {user_id}: {data}')
+        if unshare_items_data:
+            return self.lkf_api.share_form(unshare_items_data, unshare=True)
+        return {}
 
     def set_item_permits(self, user_id, item_needed, item_type):
         """
         Comparte los items necesarios para el usuario.
         Regresa la lista de items que no se pudieron compartir; un share fallido
         no corta los demas.
+
+        Un solo envio por item, sin reintentos ni confirmacion inmediata: un share
+        puede tardar minutos en verse en get_user_*, y reintentar por "aun no aparece"
+        solo multiplica llamadas y duplicados. Solo un status no 2xx cuenta como falla.
         """
-        permissions = 'can_read_item'
         share_data = {
             "owner": f"/api/infosync/user/{user_id}/",
-            "perm": permissions
+            "perm": 'can_read_item',
         }
-        if item_type == 'form':
-            user_item = self.lkf_api.get_user_forms(user_id)
-        elif item_type == 'catalog':
-            user_item = self.lkf_api.get_user_catalog(user_id)
-        elif item_type == 'script':
-            user_item = self.lkf_api.get_user_scripts(user_id)
-        else:
-            self.LKFException('Item type not found: ', item_type)
-        res = {}
-        user_item = user_item.get('data',[])
-        if isinstance(user_item, dict):
-            user_item = []
-        user_item = [item for item in user_item if isinstance(item, dict)]
-        unshare_items = [item for item in user_item if self._can_unshare(item, item_type, item_needed)]
+        failed = []
+        user_item = self._read_user_items(user_id, item_type)
+        if user_item is None:
+            return [{'type': item_type, 'id': None, 'error': 'no se pudieron leer los permisos del usuario'}]
 
+        recent = self._recent_sends(user_id)
+        sent_keys = []
+        unshare_items = [
+            item for item in user_item
+            if self._can_unshare(item, item_type, item_needed) and f"unshare:{item['shared_id']}" not in recent
+        ]
         if unshare_items:
-            allowed_ids = self._clave10_item_ids(item_type)
-            unshare_items_data = []
-            for item in unshare_items:
-                unshare_items_data.append({
-                    'uri': f"/api/infosync/file_shared/{item['shared_id']}/",
-                    'item_id': item['id'],
-                })
-            # Ultima revision antes de mandar: un unshare con id vacio o ajeno a Clave10
-            # puede quitarle el item a toda la cuenta. Si algo no cuadra no se manda nada.
-            for data in unshare_items_data:
-                shared_id = data['uri'].rstrip('/').rsplit('/', 1)[-1]
-                if not shared_id.isdigit() or int(shared_id) <= 0 or data['item_id'] not in allowed_ids:
-                    self.LKFException(f'Unshare invalido para el usuario {user_id}: {data}')
-            if unshare_items_data:
-                res = self.lkf_api.share_form(unshare_items_data, unshare=True)
+            res = self._unshare_user_items(user_id, item_type, unshare_items)
+            if isinstance(res.get('status_code'), int) and 200 <= res['status_code'] < 300:
+                sent_keys += [f"unshare:{item['shared_id']}" for item in unshare_items]
+            # get_user_* muestra un solo share por item: si habia uno duplicado, aparece
+            # hasta quitar el primero. Se vuelve a leer una vez y se quitan los que queden
+            # con otro shared_id directo. Sin bucles.
+            sent = {item['shared_id'] for item in unshare_items}
+            unshared_ids = {item['id'] for item in unshare_items}
+            again = self._read_user_items(user_id, item_type) or []
+            duplicates = [
+                item for item in again
+                if item.get('id') in unshared_ids and item.get('shared_id') not in sent
+                and self._can_unshare(item, item_type, item_needed)
+            ]
+            if duplicates:
+                res = self._unshare_user_items(user_id, item_type, duplicates)
+                if isinstance(res.get('status_code'), int) and 200 <= res['status_code'] < 300:
+                    sent_keys += [f"unshare:{item['shared_id']}" for item in duplicates]
 
         user_item_ids = {item['id'] for item in user_item}
-        items_to_share = item_needed - user_item_ids
-        failed = []
+        items_to_share = {
+            item_id for item_id in item_needed - user_item_ids
+            if f'share:{item_type}:{item_id}' not in recent
+        }
         for item_id in items_to_share:
-            share_data["file_shared"]=  f"/api/infosync/item/{item_id}/"
+            share_data["file_shared"] = f"/api/infosync/item/{item_id}/"
             res = self.lkf_api.share_form(share_data)
-            if res.get('status_code') != 201:
-                failed.append({'type': item_type, 'id': item_id, 'status_code': res.get('status_code')})
+            status = res.get('status_code')
+            if not isinstance(status, int) or not 200 <= status < 300:
+                failed.append({'type': item_type, 'id': item_id, 'status_code': status})
+            else:
+                sent_keys.append(f'share:{item_type}:{item_id}')
+        self._save_sends(user_id, sent_keys)
         return failed
 
     def set_user_permissions(self):
@@ -881,13 +959,30 @@ class Base(BaseModel):
 
         return True
 
+    @staticmethod
+    def _menu_key(menu):
+        """Nombre de menu como llave de module_permits: 'Incidencias / Fallas' -> 'incidencias_/_fallas'."""
+        return (menu or '').lower().replace(' ', '_')
+
+    def _mobile_menus(self, elementos):
+        """Menus que el usuario tiene en la app (plataforma Mobile o both, sin importar mayusculas)."""
+        menus = set()
+        for i in elementos or []:
+            plataformas = i.get('plataforms') or []
+            if isinstance(plataformas, str):
+                plataformas = [plataformas]
+            if any(str(p).strip().lower() in ('mobile', 'both') for p in plataformas):
+                menus.add(self._menu_key(i.get('menu')))
+        menus.discard('')
+        return menus
+
     def _menu_permits_needed(self, elementos):
         """
         Formas/catálogos/scripts que requieren los menús asignados (module_permits de
         base_utils), por tipo: {'form': set, 'catalog': set, 'script': set}.
         """
         needed = {'form': set(), 'catalog': set(), 'script': set()}
-        menus = ['always'] + list({i.get('menu', '').lower().replace(' ', '_') for i in elementos or []})
+        menus = ['always'] + list({self._menu_key(i.get('menu')) for i in elementos or []})
         for menu in menus:
             config = self.module_permits.get(menu, {})
             needed['form'].update(x for x in config.get('forms', []) if x)
@@ -925,7 +1020,7 @@ class Base(BaseModel):
         getters = {
             'form': self.lkf_api.get_user_forms,
             'catalog': self.lkf_api.get_user_catalog,
-            'script': self.lkf_api.get_user_scripts,
+            'script': lambda user_id: self.lkf_api.get_user_scripts(user_id, flat=True),
         }
         nombres = {
             item_type: {str(info.get('id')): name for name, info in (self.lkm.module_data.get(item_type) or {}).items()}

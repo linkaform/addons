@@ -11496,7 +11496,23 @@ class Accesos(OcrMixin, AccesosModel):
             status.update({'data': {'bad_items': bad_items, 'good_items': good_items}})
         return status
 
-    def get_user_catalogs(self):
+    def get_app_menus(self, user_id):
+        """Menus moviles del usuario segun su ultimo registro de CONFIGURACION_MENUS."""
+        records = self._menu_config_records(user_ids=[user_id])
+        if not records:
+            return set()
+        return self._mobile_menus(records[0].get('elementos'))
+
+    def offline_catalog_ids(self, menus):
+        """Catalogos que la app necesita offline para esos menus moviles, sin repetir."""
+        ids = []
+        for menu in sorted(menus):
+            for catalog_id in self.catalogos_offline_por_menu.get(menu, []):
+                if self._valid_item_id(catalog_id) and catalog_id not in ids:
+                    ids.append(catalog_id)
+        return ids
+
+    def get_user_catalogs(self, catalog_ids=None):
 
         dbs = {}
         # Varios nombres de self.f apuntan al mismo field_id; al invertirlo gana el ultimo
@@ -11516,7 +11532,7 @@ class Accesos(OcrMixin, AccesosModel):
         try:
             fields_invertido = {v: k for k, v in self.f.items()}
             fields_invertido.update(labels_fijos)
-            for catalog_id in self.clave10_catalogs:
+            for catalog_id in (self.clave10_catalogs if catalog_ids is None else catalog_ids):
                 item = {}
                 version = "00.00"
                 print('catalog_id', catalog_id)

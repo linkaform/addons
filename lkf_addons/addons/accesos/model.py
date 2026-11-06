@@ -245,6 +245,19 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             self.ROL_CATALOG_ID
         ]
 
+        # Catalogos que la app lee offline (SQLite desde CouchDB), por menu movil de
+        # CONFIGURACION_MENUS. Web no los necesita: los scripts leen con la API key.
+        self.catalogos_offline_por_menu = {
+            'rondines': [self.AREAS_DE_LAS_UBICACIONES_CAT_ID],
+            'bitácoras': [self.AREAS_DE_LAS_UBICACIONES_CAT_ID],
+            'incidencias_/_fallas': [
+                self.AREAS_DE_LAS_UBICACIONES_CAT_ID,
+                self.CONF_AREA_EMPLEADOS_CAT_ID,
+                self.LISTA_FALLAS_CAT_ID,
+            ],
+            'artículos': [self.ACTIVOS_FIJOS_CAT_ID],
+        }
+
         ## Module Fields ##
         '''
         self.mf : Estos son los campos que deseas mantener solo dentro de este modulo.
