@@ -834,8 +834,9 @@ class Base(BaseModel):
     def _read_user_items(self, user_id, item_type):
         """
         Items compartidos al usuario, o None si la lectura no es confiable (status no 2xx
-        o respuesta que no es lista, como la de un usuario inactivo). Con None no se
-        comparte ni descomparte nada: leer [] por error lo recompartiria todo.
+        o respuesta que no es lista). Con None no se comparte ni descomparte nada: leer []
+        por error lo recompartiria todo. Con 0 items LinkaForm responde 200 con
+        {'meta': {'total_count': 0}, 'objects': []} en vez de []: eso si es lista vacia.
         """
         if item_type == 'form':
             res = self.lkf_api.get_user_forms(user_id)
@@ -847,6 +848,8 @@ class Base(BaseModel):
             self.LKFException(f'Item type not found: {item_type}')
         status = res.get('status_code')
         data = res.get('data')
+        if isinstance(data, dict) and isinstance(data.get('objects'), list):
+            data = data['objects']
         if not isinstance(status, int) or not 200 <= status < 300 or not isinstance(data, list):
             return None
         return [item for item in data if isinstance(item, dict)]
