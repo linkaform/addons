@@ -1074,21 +1074,16 @@ class Base(BaseModel):
         """
         Vuelve a compartir los permisos de sus menús a los usuarios indicados, directo
         (sin pasar por el workflow) y sin tocar su registro de CONFIGURACION_MENUS.
-        Al final vuelve a leer lo compartido: LinkaForm puede aceptar un share (201)
-        y no aplicarlo, así que solo es ok si ya no falta nada.
+        No confirma en el momento: un share puede tardar minutos en verse, y leerlo
+        enseguida lo marcaria como falla. ok = LinkaForm acepto los envios (2xx); para
+        revisar si ya se reflejo esta el Diagnostico.
         """
         resultados = []
 
         def aplicar(user):
             self.apply_user_menu_permissions(user['user_id'], user['elementos'])
-            estado = self._menu_permission_status(user)
-            if estado.get('borrado'):
-                return {'user_id': user['user_id'], 'ok': False, 'error': 'Usuario borrado en LinkaForm'}
-            pendientes = [i['nombre'] for items in estado['faltan'].values() for i in items]
-            if pendientes:
-                return {'user_id': user['user_id'], 'ok': False,
-                        'error': f"LinkaForm aceptó los cambios pero siguen faltando {len(pendientes)}: {', '.join(pendientes)}"}
-            return {'user_id': user['user_id'], 'ok': True, 'error': None}
+            return {'user_id': user['user_id'], 'ok': True, 'error': None,
+                    'msg': 'Enviado; puede tardar unos minutos en reflejarse.'}
 
         users = self._menu_config_records(user_ids)
         with ThreadPoolExecutor(max_workers=5) as executor:
