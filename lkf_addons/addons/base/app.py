@@ -938,7 +938,24 @@ class Base(BaseModel):
         user_id = data.get('usuario_id')
         if user_id and isinstance(user_id, list):
             user_id = user_id[0]
+        # Si el usuario tiene varios registros, solo manda el más nuevo (el que leen el
+        # front y la app). Guardar uno viejo no comparte ni descomparte nada.
+        latest = self._latest_menu_record_id(user_id)
+        if self.record_id and latest and str(latest) != str(self.record_id):
+            msg = (f'Registro {self.record_id} no es el más nuevo del usuario {user_id} '
+                   f'({latest}); no se cambian permisos.')
+            print(msg)
+            return {'skipped': True, 'msg': msg}
         return self.apply_user_menu_permissions(user_id, data.get('elementos', []))
+
+    def _latest_menu_record_id(self, user_id):
+        """_id del registro más nuevo de CONFIGURACION_MENUS del usuario, o None."""
+        if not user_id:
+            return None
+        user_field = f"answers.{self.USUARIOS_OBJ_ID}.{self.menu_form_fields['usuario_id']}"
+        match = {"form_id": self.MENUS_FORM, "deleted_at": {"$exists": False}, user_field: int(user_id)}
+        record = next(iter(self.cr.find(match, {"_id": 1}).sort("_id", -1).limit(1)), None)
+        return record['_id'] if record else None
 
     def apply_user_menu_permissions(self, user_id, elementos):
         """
