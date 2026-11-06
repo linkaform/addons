@@ -1118,6 +1118,326 @@ class Base(BaseModel):
                 resultados.append({'user_id': int(uid), 'ok': False, 'error': 'Sin configuración de menús'})
         return resultados
 
+    # ------------------------------------------------------------------------------
+    # Compartir masivo (1509). Solo por llamada directa (consola o Menús admin), nunca
+    # por workflow, y solo comparte: el unshare sigue siendo por usuario al guardar su
+    # registro. Un trabajo en Mongo guarda el plan y el avance:
+    #   plan_mass_share   -> lee lo que le falta a cada usuario (por tandas, solo lectura)
+    #   run_mass_share    -> un PATCH por item con un grupo de usuarios, sin reintentos
+    #   verify_mass_share -> despues de MASIVO_VERIFICAR_MIN, una lectura por item
+    #   resend_mass_share -> regresa a pendientes lo que siga faltando (manual)
+    # La respuesta del PATCH en lote es {} sin estado por usuario: un 2xx solo cuenta
+    # como "enviado", lo que vale es la verificacion.
+    # ------------------------------------------------------------------------------
+    PERMISOS_TRABAJOS_COLL = 'clave10_permisos_trabajos'
+    MASIVO_GRUPO = 20            # usuarios por PATCH
+    MASIVO_PAUSA = 1             # segundos entre PATCH
+    MASIVO_PARALELO_MAX = 3
+    MASIVO_LECTURAS_PARALELO = 3
+    MASIVO_VERIFICAR_MIN = 10    # un share puede tardar minutos en verse
+    MASIVO_PLAN_HORAS = 24       # un plan mas viejo ya no se corre
+    MASIVO_SEG_POR_PAR = 2.5     # para el estimado
+
+    def _mass_jobs(self):
+        return self.cr.database[self.PERMISOS_TRABAJOS_COLL]
+
+    def _mass_job(self, job_id):
+        try:
+            return self._mass_jobs().find_one({'_id': ObjectId(job_id)})
+        except Exception:
+            return None
+
+    def _mass_lock(self, job_id, seconds):
+        """Toma el trabajo para una sola corrida a la vez (dos clics no mandan doble)."""
+        now = time.time()
+        return self._mass_jobs().find_one_and_update(
+            {'_id': ObjectId(job_id), 'lock_hasta': {'$lt': now}},
+            {'$set': {'lock_hasta': now + seconds}},
+            return_document=True,
+        )
+
+    def _mass_save(self, job, unlock=False, estado=False):
+        """Guarda el avance. El estado solo se escribe con estado=True, para no pisar un
+        'pausado' que llegue mientras hay un PATCH en curso."""
+        fields = {k: job[k] for k in ('por_revisar', 'revisados', 'sin_lectura', 'items',
+                                       'plan_listo_at', 'log') if k in job}
+        if estado:
+            if job.get('estado') != 'pausado' and self._mass_estado_db(job['_id']) == 'pausado':
+                job['estado'] = 'pausado'
+            fields['estado'] = job['estado']
+        fields['updated_at'] = time.time()
+        if unlock:
+            fields['lock_hasta'] = 0
+        self._mass_jobs().update_one({'_id': job['_id']}, {'$set': fields})
+
+    def _mass_estado_db(self, job_id):
+        doc = self._mass_jobs().find_one({'_id': ObjectId(job_id)}, {'estado': 1}) or {}
+        return doc.get('estado')
+
+    @staticmethod
+    def _ok_status(status):
+        return isinstance(status, int) and 200 <= status < 300
+
+    def _item_nombres(self):
+        return {
+            item_type: {str(info.get('id')): name for name, info in (self.lkm.module_data.get(item_type) or {}).items()}
+            for item_type in ('form', 'catalog', 'script')
+        }
+
+    def _mass_summary(self, job, detalle=False, msg=None):
+        items = list((job.get('items') or {}).values())
+        envios = [e for i in items for e in i.get('enviados') or []]
+        segundos = [e['segundos'] for e in envios if isinstance(e.get('segundos'), (int, float))]
+        pendientes = sum(len(i.get('pendientes') or []) for i in items)
+        res = {
+            'job_id': str(job['_id']),
+            'estado': job.get('estado'),
+            'usuarios': len(job.get('usuarios') or []),
+            'revisados': job.get('revisados', 0),
+            'por_revisar': len(job.get('por_revisar') or []),
+            'sin_lectura': job.get('sin_lectura') or [],
+            'items': len(items),
+            'pendientes': pendientes,
+            'enviados': sum(len(e['uids']) for e in envios),
+            'saltados': sum(len(i.get('saltados') or []) for i in items),
+            'llamadas': len(envios),
+            'llamadas_fallidas': sum(1 for e in envios if not self._ok_status(e.get('status'))),
+            'seg_por_llamada': round(sum(segundos) / len(segundos), 1) if segundos else None,
+            'ok': sum(len(i.get('ok') or []) for i in items),
+            'faltan': sum(len(i.get('faltan') or []) for i in items),
+            'estimado_min': round(pendientes * self.MASIVO_SEG_POR_PAR / 60, 1),
+        }
+        if msg:
+            res['msg'] = msg
+        if detalle:
+            res['detalle'] = sorted([{
+                'item': f"{i['type']}:{i['id']}", 'nombre': i.get('nombre'),
+                'pendientes': len(i.get('pendientes') or []),
+                'enviados': sum(len(e['uids']) for e in i.get('enviados') or []),
+                'saltados': len(i.get('saltados') or []),
+                'ok': len(i.get('ok') or []), 'faltan': i.get('faltan') or [],
+            } for i in items], key=lambda x: x['item'])
+        return res
+
+    def plan_mass_share(self, job_id=None, user_ids=None, max_seconds=90):
+        """
+        Arma (o sigue armando) el plan: que items le faltan a cada usuario segun sus
+        menus. Solo lectura de LinkaForm, por tandas de max_seconds. Sin job_id crea un
+        trabajo nuevo con user_ids o con toda la cuenta.
+        """
+        if not job_id:
+            users = [u['user_id'] for u in self._menu_config_records(user_ids)]
+            now = time.time()
+            job_id = self._mass_jobs().insert_one({
+                'created_at': now, 'updated_at': now, 'estado': 'planeando', 'lock_hasta': 0,
+                'usuarios': users, 'por_revisar': users, 'revisados': 0, 'sin_lectura': [],
+                'items': {}, 'log': [],
+            }).inserted_id
+        job = self._mass_lock(job_id, max_seconds + 120)
+        if not job:
+            return {'error': 'El trabajo no existe o otra corrida lo esta usando.', 'job_id': str(job_id)}
+        if job['estado'] != 'planeando':
+            self._mass_save(job, unlock=True)
+            return self._mass_summary(job, msg='El plan ya estaba listo.')
+        try:
+            nombres = self._item_nombres()
+            t0 = time.time()
+            while job['por_revisar'] and time.time() - t0 < max_seconds:
+                lote = job['por_revisar'][:self.MASIVO_LECTURAS_PARALELO]
+                records = {u['user_id']: u for u in self._menu_config_records(lote)}
+
+                def revisar(uid):
+                    rec = records.get(uid)
+                    if not rec:
+                        return uid, None
+                    needed = self._menu_permits_needed(rec['elementos'])
+                    faltan = {}
+                    for item_type in ('form', 'catalog', 'script'):
+                        tiene = self._read_user_items(uid, item_type)
+                        if tiene is None:
+                            return uid, None
+                        faltan[item_type] = needed[item_type] - {i.get('id') for i in tiene}
+                    return uid, faltan
+
+                with ThreadPoolExecutor(max_workers=self.MASIVO_LECTURAS_PARALELO) as executor:
+                    resultados = list(executor.map(revisar, lote))
+                for uid, faltan in resultados:
+                    if faltan is None:
+                        job['sin_lectura'].append(uid)
+                        continue
+                    for item_type, ids in faltan.items():
+                        for item_id in ids:
+                            item = job['items'].setdefault(f'{item_type}:{item_id}', {
+                                'type': item_type, 'id': item_id,
+                                'nombre': nombres[item_type].get(str(item_id), str(item_id)),
+                                'pendientes': [], 'enviados': [], 'saltados': [], 'ok': [], 'faltan': [],
+                            })
+                            item['pendientes'].append(uid)
+                job['por_revisar'] = job['por_revisar'][len(lote):]
+                job['revisados'] += len(lote)
+                self._mass_save(job)
+            if not job['por_revisar']:
+                job['estado'] = 'listo'
+                job['plan_listo_at'] = time.time()
+        finally:
+            self._mass_save(job, unlock=True, estado=True)
+        return self._mass_summary(job, detalle=job['estado'] == 'listo')
+
+    def _mass_sent_since(self, user_ids, key, since):
+        """Usuarios a los que ya se les mando ese item (workflow u otro trabajo) desde since."""
+        try:
+            docs = self.cr.database[self.PERMISOS_ENVIOS_COLL].find(
+                {'_id': {'$in': [int(u) for u in user_ids]}, f'envios.{key}': {'$gte': since}}, {'_id': 1})
+            return {d['_id'] for d in docs}
+        except Exception as e:
+            print(f'No se pudo leer {self.PERMISOS_ENVIOS_COLL}: {e}')
+            return set()
+
+    def _mass_patch_share(self, item_id, user_ids):
+        """
+        Un solo PATCH con un item para varios usuarios. Va directo a do_patch: dispatch
+        reintenta hasta 11 veces ante un 502, y en lote eso crearia duplicados.
+        """
+        net = self.lkf_api.network
+        url = self.lkf_api.api_url.form['share_form']['url']
+        data = simplejson.dumps({'objects': [{
+            'owner': f'/api/infosync/user/{u}/',
+            'perm': 'can_read_item',
+            'file_shared': f'/api/infosync/item/{item_id}/',
+        } for u in user_ids]})
+        try:
+            res = net.do_patch(url, data, use_jwt=net.settings.config.get('USE_JWT'))
+            return res.get('status_code')
+        except Exception as e:
+            return f'error: {str(e)[:150]}'
+
+    def run_mass_share(self, job_id, max_seconds=90, paralelo=1):
+        """
+        Manda los pendientes del plan: un PATCH por item con hasta MASIVO_GRUPO usuarios,
+        `paralelo` PATCH a la vez (tope MASIVO_PARALELO_MAX), pausa entre tandas y sin
+        reintentos. Para antes de max_seconds o si el trabajo se pausa.
+        """
+        paralelo = min(max(int(paralelo or 1), 1), self.MASIVO_PARALELO_MAX)
+        job = self._mass_lock(job_id, max_seconds + 300)
+        if not job:
+            return {'error': 'El trabajo no existe o otra corrida lo esta usando.', 'job_id': str(job_id)}
+        if job['estado'] not in ('listo', 'corriendo', 'pausado', 'enviado'):
+            self._mass_save(job, unlock=True)
+            return self._mass_summary(job, msg=f"No se puede correr un trabajo en estado {job['estado']}.")
+        if time.time() - (job.get('plan_listo_at') or 0) > self.MASIVO_PLAN_HORAS * 3600:
+            self._mass_save(job, unlock=True)
+            return self._mass_summary(job, msg='El plan tiene mas de 24 h: arma uno nuevo.')
+        try:
+            # Llamar run sobre un trabajo pausado es reanudarlo.
+            job['estado'] = 'corriendo'
+            self._mass_jobs().update_one({'_id': job['_id']}, {'$set': {'estado': 'corriendo'}})
+            t0, ultima = time.time(), 0
+            for key in sorted(job['items']):
+                item = job['items'][key]
+                while item['pendientes']:
+                    if self._mass_estado_db(job_id) == 'pausado':
+                        job['estado'] = 'pausado'
+                        return self._mass_summary(job, msg='Pausado.')
+                    if time.time() - t0 + ultima > max_seconds:
+                        return self._mass_summary(job, msg='Fin de la tanda; vuelve a llamar para seguir.')
+                    grupos = []
+                    for _ in range(paralelo):
+                        if not item['pendientes']:
+                            break
+                        grupo = item['pendientes'][:self.MASIVO_GRUPO]
+                        item['pendientes'] = item['pendientes'][len(grupo):]
+                        ya = self._mass_sent_since(grupo, f"share:{item['type']}:{item['id']}", job['created_at'])
+                        item['saltados'] += [u for u in grupo if u in ya]
+                        grupo = [u for u in grupo if u not in ya]
+                        if grupo:
+                            grupos.append(grupo)
+
+                    def mandar(grupo):
+                        t = time.time()
+                        status = self._mass_patch_share(item['id'], grupo)
+                        return {'uids': grupo, 'at': time.time(), 'status': status,
+                                'segundos': round(time.time() - t, 1)}
+
+                    with ThreadPoolExecutor(max_workers=paralelo) as executor:
+                        envios = list(executor.map(mandar, grupos))
+                    for envio in envios:
+                        item['enviados'].append(envio)
+                        ultima = max(ultima, envio['segundos'])
+                        if self._ok_status(envio['status']):
+                            for uid in envio['uids']:
+                                self._save_sends(uid, [f"share:{item['type']}:{item['id']}"])
+                    self._mass_save(job)
+                    if grupos:
+                        time.sleep(self.MASIVO_PAUSA)
+            job['estado'] = 'enviado'
+            return self._mass_summary(job, msg='Todo enviado. Verifica en al menos 10 minutos.')
+        finally:
+            self._mass_save(job, unlock=True, estado=True)
+
+    def verify_mass_share(self, job_id, max_seconds=90):
+        """
+        Revisa quien ya tiene cada item, con una lectura por item (item/{id}/get_users).
+        Solo cuenta los envios de hace mas de MASIVO_VERIFICAR_MIN. No reenvia nada.
+        """
+        job = self._mass_lock(job_id, max_seconds + 300)
+        if not job:
+            return {'error': 'El trabajo no existe o otra corrida lo esta usando.', 'job_id': str(job_id)}
+        try:
+            t0 = time.time()
+            limite = time.time() - self.MASIVO_VERIFICAR_MIN * 60
+            esperando = 0
+            for key in sorted(job['items']):
+                item = job['items'][key]
+                revisados = set(item['ok']) | set(item['faltan'])
+                por_revisar = {u for e in item['enviados'] if e['at'] <= limite for u in e['uids']} - revisados
+                esperando += len({u for e in item['enviados'] if e['at'] > limite for u in e['uids']} - revisados)
+                if not por_revisar:
+                    continue
+                if time.time() - t0 > max_seconds:
+                    return self._mass_summary(job, msg='Fin de la tanda; vuelve a llamar para seguir verificando.')
+                res = self.lkf_api.get_form_users(item['id'], format_response=False)
+                if not self._ok_status(res.get('status_code')):
+                    continue
+                data = res.get('data') or []
+                data = [data] if isinstance(data, dict) else data
+                tienen = {u.get('id') for u in data if isinstance(u, dict)}
+                item['ok'] += sorted(u for u in por_revisar if u in tienen)
+                item['faltan'] += sorted(u for u in por_revisar if u not in tienen)
+                self._mass_save(job)
+            pendientes = sum(len(i['pendientes']) for i in job['items'].values())
+            if job['estado'] == 'enviado' and not esperando and not pendientes:
+                job['estado'] = 'terminado'
+            msg = f'{esperando} envios aun no cumplen {self.MASIVO_VERIFICAR_MIN} min.' if esperando else None
+            return self._mass_summary(job, detalle=True, msg=msg)
+        finally:
+            self._mass_save(job, unlock=True, estado=True)
+
+    def resend_mass_share(self, job_id):
+        """Regresa a pendientes lo que la verificacion marco como faltante (decision manual)."""
+        job = self._mass_lock(job_id, 60)
+        if not job:
+            return {'error': 'El trabajo no existe o otra corrida lo esta usando.', 'job_id': str(job_id)}
+        try:
+            for item in job['items'].values():
+                item['pendientes'] += item['faltan']
+                item['faltan'] = []
+            if job['estado'] in ('enviado', 'terminado'):
+                job['estado'] = 'corriendo'
+            job['plan_listo_at'] = time.time()
+            return self._mass_summary(job, detalle=True, msg='Faltantes regresados a pendientes.')
+        finally:
+            self._mass_save(job, unlock=True, estado=True)
+
+    def pause_mass_share(self, job_id):
+        """La corrida en curso se detiene antes del siguiente PATCH."""
+        self._mass_jobs().update_one({'_id': ObjectId(job_id)}, {'$set': {'estado': 'pausado', 'updated_at': time.time()}})
+        job = self._mass_job(job_id)
+        return self._mass_summary(job, msg='Pausado.') if job else {'error': 'El trabajo no existe.'}
+
+    def get_mass_share(self, job_id, detalle=True):
+        job = self._mass_job(job_id)
+        return self._mass_summary(job, detalle=detalle) if job else {'error': 'El trabajo no existe.'}
+
     def _get_user_menu_record(self, user_id):
         query = [
             {"$match": {
