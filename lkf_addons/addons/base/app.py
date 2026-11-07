@@ -1123,8 +1123,9 @@ class Base(BaseModel):
     # por workflow, y solo comparte: el unshare sigue siendo por usuario al guardar su
     # registro. Un trabajo en Mongo guarda el plan y el avance:
     #   plan_mass_share   -> lee lo que le falta a cada usuario (por tandas, solo lectura)
-    #   run_mass_share    -> un item por llamada: un PATCH con todos sus usuarios, con
-    #                        intervalo entre items y confirmar=True si son muchos usuarios
+    #   run_mass_share    -> un item por llamada: un PATCH con sus usuarios (topado por
+    #                        tiempo), con intervalo entre llamadas y confirmar=True si son
+    #                        muchos usuarios
     #   verify_mass_share -> despues de MASIVO_VERIFICAR_MIN, una lectura por item
     #   resend_mass_share -> regresa a pendientes lo que siga faltando (manual)
     # La respuesta del PATCH en lote es {} sin estado por usuario: un 2xx solo cuenta
@@ -1138,6 +1139,15 @@ class Base(BaseModel):
     MASIVO_VERIFICAR_MIN = 10    # un share puede tardar minutos en verse
     MASIVO_PLAN_HORAS = 24       # un plan mas viejo ya no se corre
     MASIVO_SEG_POR_PAR = 2.5     # para el estimado
+    # Tope por tiempo de cada PATCH: el proxy corta a los ~300 s con 502 y LinkaForm deja
+    # el share a medias (procesa usuario por usuario). Lo caro es meter a cada usuario al
+    # _security de CouchDB: un catalogo es 1 base, una forma es 1 base por cada catalogo
+    # que usa. Medido en hergo (11-06): script ~0.1 s/usuario, catalogo ~1.6, forma con
+    # 1 catalogo ~1.7 y con 4 ~5.9.
+    MASIVO_LLAMADA_MAX_SEG = 200
+    MASIVO_SEG_USUARIO = {'script': 0.2, 'catalog': 1.8}
+    MASIVO_SEG_USUARIO_FORMA = (0.3, 1.5)   # base + por cada catalogo de la forma
+    MASIVO_CATALOGOS_DESCONOCIDO = 10       # si no se pudo leer la forma, asumir pesada
 
     def _mass_jobs(self):
         return self.cr.database[self.PERMISOS_TRABAJOS_COLL]
@@ -1316,9 +1326,40 @@ class Base(BaseModel):
         except Exception as e:
             return f'error: {str(e)[:150]}'
 
+    def _mass_form_catalogos(self, form_id):
+        """Cuantos catalogos distintos usa una forma (cada uno es una base de CouchDB)."""
+        try:
+            fields = self.lkf_api.get_form_id_fields(form_id)
+            if isinstance(fields, list) and fields and isinstance(fields[0], dict) and 'fields' in fields[0]:
+                fields = fields[0]['fields']
+            cats = {f['catalog'].get('catalog_id') for f in fields or []
+                    if isinstance(f, dict) and isinstance(f.get('catalog'), dict)}
+            return len({c for c in cats if c})
+        except Exception as e:
+            print(f'No se pudieron leer los catalogos de la forma {form_id}: {e}')
+            return self.MASIVO_CATALOGOS_DESCONOCIDO
+
+    def _mass_seg_por_usuario(self, item):
+        """
+        Segundos por usuario de un PATCH de este item: lo mayor entre el estimado por tipo
+        y lo medido en llamadas 2xx anteriores del mismo item (una que no fue 2xx se corto
+        y no sirve de medida).
+        """
+        if item['type'] == 'form':
+            if 'catalogos' not in item:
+                item['catalogos'] = self._mass_form_catalogos(item['id'])
+            base, por_cat = self.MASIVO_SEG_USUARIO_FORMA
+            est = base + por_cat * item['catalogos']
+        else:
+            est = self.MASIVO_SEG_USUARIO.get(item['type'], 2.0)
+        medidos = [e['segundos'] / len(e['uids']) for e in item.get('enviados') or []
+                   if e.get('uids') and e.get('segundos') and self._ok_status(e.get('status'))]
+        return max([est] + medidos)
+
     def run_mass_share(self, job_id, intervalo=None, confirmar=False):
         """
-        Manda UN item por llamada: un solo PATCH con todos los usuarios que lo necesitan.
+        Manda UN item por llamada: un solo PATCH con los usuarios que lo necesitan, hasta
+        lo que quepa en MASIVO_LLAMADA_MAX_SEG (el resto sale en la siguiente llamada).
         Entre un item y otro deben pasar `intervalo` segundos (MASIVO_INTERVALO): si se
         llama antes, no manda nada y responde cuanto falta; quien llama espera y vuelve a
         llamar. Un item para mas de MASIVO_AVISO_USUARIOS usuarios solo se manda con
@@ -1351,15 +1392,20 @@ class Base(BaseModel):
             llave = f"share:{item['type']}:{item['id']}"
             ya = self._mass_sent_since(item['pendientes'], llave, job['created_at'])
             item['saltados'] += [u for u in item['pendientes'] if u in ya]
-            usuarios = [u for u in item['pendientes'] if u not in ya]
+            pendientes = [u for u in item['pendientes'] if u not in ya]
+            # Tope por tiempo: si el PATCH completo pasaria de MASIVO_LLAMADA_MAX_SEG, va
+            # solo una parte y el resto se queda pendiente para la siguiente llamada.
+            seg_usuario = self._mass_seg_por_usuario(item) if pendientes else 0
+            tope = max(1, int(self.MASIVO_LLAMADA_MAX_SEG // seg_usuario)) if seg_usuario else len(pendientes)
+            usuarios, resto = pendientes[:tope], pendientes[tope:]
             if len(usuarios) > self.MASIVO_AVISO_USUARIOS and not confirmar:
-                item['pendientes'] = usuarios
+                item['pendientes'] = pendientes
                 res = self._mass_summary(job, msg=(
                     f"{item['nombre']} va para {len(usuarios)} usuarios (mas de "
                     f"{self.MASIVO_AVISO_USUARIOS}): vuelve a llamar con confirmar=True."))
                 res['requiere_confirmar'] = key
                 return res
-            item['pendientes'] = []
+            item['pendientes'] = resto
             if usuarios:
                 t = time.time()
                 status = self._mass_patch_share(item['id'], usuarios)
@@ -1373,7 +1419,9 @@ class Base(BaseModel):
             if not quedan:
                 job['estado'] = 'enviado'
             res = self._mass_summary(job, msg=(
-                f"{item['nombre']}: {len(usuarios)} usuarios en 1 llamada. "
+                f"{item['nombre']}: {len(usuarios)} usuarios en 1 llamada"
+                + (f" ({len(resto)} siguen pendientes de este item, tope ~{self.MASIVO_LLAMADA_MAX_SEG} s). "
+                   if resto else ". ")
                 + (f'Quedan {quedan} items; siguiente en {intervalo} s.' if quedan
                    else 'Todo enviado. Verifica en al menos 10 minutos.')))
             res['espera_seg'] = intervalo if quedan else 0
