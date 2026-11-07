@@ -1221,18 +1221,57 @@ class Base(BaseModel):
             'items_grandes': sorted(f"{i['type']}:{i['id']}" for i in items
                                     if len(i.get('pendientes') or []) > self.MASIVO_AVISO_USUARIOS),
         }
+        # Estimado por item con el costo real (tipo y catalogos de la forma), solo si ya se
+        # conoce: aqui no se hacen llamadas a LinkaForm.
+        estimados = {f"{i['type']}:{i['id']}": self._mass_estimado(i) for i in items}
+        if all(e is not None for e in estimados.values()):
+            seg = sum(e['seg'] for e in estimados.values())
+            llamadas = sum(e['llamadas'] for e in estimados.values())
+            res['estimado_min'] = round(seg / 60, 1)
+            res['llamadas_estimadas'] = llamadas
+        res['ultimo_envio_at'] = job.get('ultimo_envio_at')
+        res['created_at'] = job.get('created_at')
         if msg:
             res['msg'] = msg
         if detalle:
             res['detalle'] = sorted([{
-                'item': f"{i['type']}:{i['id']}", 'nombre': i.get('nombre'),
+                'item': f"{i['type']}:{i['id']}", 'tipo': i['type'], 'nombre': i.get('nombre'),
                 'pendientes': len(i.get('pendientes') or []),
                 'grande': len(i.get('pendientes') or []) > self.MASIVO_AVISO_USUARIOS,
                 'enviados': sum(len(e['uids']) for e in i.get('enviados') or []),
+                'llamadas': len(i.get('enviados') or []),
+                'llamadas_fallidas': sum(1 for e in i.get('enviados') or [] if not self._ok_status(e.get('status'))),
+                'segundos': round(sum(e.get('segundos') or 0 for e in i.get('enviados') or []), 1),
                 'saltados': len(i.get('saltados') or []),
                 'ok': len(i.get('ok') or []), 'faltan': i.get('faltan') or [],
-            } for i in items], key=lambda x: x['item'])
+                'catalogos': i.get('catalogos'),
+                'llamadas_estimadas': (estimados[f"{i['type']}:{i['id']}"] or {}).get('llamadas'),
+                'seg_estimados': (estimados[f"{i['type']}:{i['id']}"] or {}).get('seg'),
+            } for i in items], key=lambda x: self._mass_orden(x['item'], job['items']))
         return res
+
+    def _mass_estimado(self, item):
+        """Llamadas y segundos que faltan para un item; None si es forma sin catalogos leidos."""
+        n = len(item.get('pendientes') or [])
+        if not n:
+            return {'llamadas': 0, 'seg': 0}
+        if item['type'] == 'form' and 'catalogos' not in item:
+            return None
+        seg = self._mass_seg_por_usuario(item)
+        tope = max(1, int(self.MASIVO_LLAMADA_MAX_SEG // seg))
+        return {'llamadas': -(-n // tope), 'seg': round(n * seg)}
+
+    def _mass_orden(self, key, items):
+        """Orden de envio: scripts (baratos), catalogos, y al final las formas, de la que
+        usa menos catalogos a la que usa mas."""
+        item = items.get(key) or {}
+        rango = {'script': 0, 'catalog': 1, 'form': 2}.get(item.get('type'), 3)
+        return (rango, item.get('catalogos') or 0, key)
+
+    def list_mass_share(self, limit=5):
+        """Los ultimos trabajos de la cuenta, para que el front retome uno sin terminar."""
+        jobs = self._mass_jobs().find({}).sort('created_at', -1).limit(int(limit))
+        return [self._mass_summary(job) for job in jobs]
 
     def plan_mass_share(self, job_id=None, user_ids=None, max_seconds=90):
         """
@@ -1292,6 +1331,10 @@ class Base(BaseModel):
                 job['revisados'] += len(lote)
                 self._mass_save(job)
             if not job['por_revisar']:
+                # Catalogos de cada forma: dan el estimado y el tope por llamada.
+                for item in job['items'].values():
+                    if item['type'] == 'form' and 'catalogos' not in item:
+                        item['catalogos'] = self._mass_form_catalogos(item['id'])
                 job['estado'] = 'listo'
                 job['plan_listo_at'] = time.time()
         finally:
@@ -1384,7 +1427,8 @@ class Base(BaseModel):
                 res = self._mass_summary(job, msg=f'Intervalo entre items: espera {int(espera) + 1} s.')
                 res['espera_seg'] = int(espera) + 1
                 return res
-            key = next((k for k in sorted(job['items']) if job['items'][k]['pendientes']), None)
+            key = next((k for k in sorted(job['items'], key=lambda k: self._mass_orden(k, job['items']))
+                        if job['items'][k]['pendientes']), None)
             if not key:
                 job['estado'] = 'enviado'
                 return self._mass_summary(job, msg='Todo enviado. Verifica en al menos 10 minutos.')
