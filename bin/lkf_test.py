@@ -200,17 +200,34 @@ def main():
 
     # 3. ruff
     if changed_py:
+        # Bloquea solo errores en lineas que cambiaste: master ya trae ~140 F821
+        # y conflictos sin resolver; revisar archivos completos dejaria rojo
+        # cualquier PR que toque app.py. Lo viejo del archivo sale como aviso.
+        lines = {f"/srv/repo/{r['repo']}/{p}": info["new"]
+                 for r in repos
+                 for p, info in lkf_changes.changed_lines(r["ruta"], r["base"], "HEAD").items()}
         files = [f"/srv/repo/{repo}/{p}" for repo, p in changed_py]
         res = run.docker("/srv/repo", "sh", "-c",
-                         f"command -v ruff >/dev/null || exit 127; ruff check -q --select {RUFF_RULES} \"$@\"",
+                         "command -v ruff >/dev/null || exit 127; "
+                         f"ruff check -q --output-format json --select {RUFF_RULES} \"$@\"",
                          "ruff", *files)
         if res.returncode == 127:
             step("ruff", "aviso", "no esta en la imagen: ./lkf -p build test (requires.txt ya lo trae)")
-        elif res.returncode:
-            step("ruff", "rojo", res.stdout.strip().replace("/srv/repo/", "")[:800])
-            return finish(1)
         else:
-            step("ruff", "ok", RUFF_RULES)
+            try:
+                found = json.loads(res.stdout or "[]")
+            except json.JSONDecodeError:
+                found = [{"filename": "?", "location": {"row": 0}, "code": "ruff", "message": res.stdout[:300]}]
+            mine = [e for e in found if e["location"]["row"] in lines.get(e["filename"], ())]
+            fmt = lambda e: (f"{e['filename'].replace('/srv/repo/', '')}:{e['location']['row']} "
+                             f"{e['code']} {e['message']}")
+            if mine:
+                step("ruff", "rojo", "; ".join(fmt(e) for e in mine)[:800])
+                return finish(1)
+            step("ruff", "ok", f"{RUFF_RULES} en lineas cambiadas")
+            if found:
+                step("ruff (ya en master)", "aviso",
+                     f"{len(found)} en los archivos tocados, fuera de tus lineas; ej. {fmt(found[0])}"[:300])
     else:
         step("ruff", "omitido", "sin .py cambiados")
 
