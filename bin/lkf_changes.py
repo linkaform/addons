@@ -191,7 +191,11 @@ def analyze(repo, name, addons, modules, heads):
 
     base = git(repo, "merge-base", BASE_REF, "HEAD").strip()
     res["base"] = base
-    res["sin_commit"] = bool(git(repo, "status", "--porcelain", "--untracked-files=no").strip())
+    # --ignore-submodules: en addons, workwith deja " M modules" (puntero que no se
+    # commitea) y sdk_testing puede ir distinto; las pruebas montan esos repos
+    # directo, asi que su puntero no cambia lo que se prueba.
+    res["sin_commit"] = bool(git(repo, "status", "--porcelain", "--untracked-files=no",
+                                 "--ignore-submodules=all").strip())
     funciones, sin_tests, rotos, eliminados, sin_funcion = {}, [], [], [], []
 
     def add(fn, why):
