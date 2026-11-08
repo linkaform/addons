@@ -3203,7 +3203,6 @@ class Accesos(OcrMixin, AccesosModel):
             }
         return format_res
 
-    # feature: pases
     def create_access_pass(self, access_pass):
         """
         Crea pase de accesoo
@@ -10189,7 +10188,6 @@ class Accesos(OcrMixin, AccesosModel):
         pass_img_file_url = pass_img_url.get('file_url')
         return [{'file_name': pass_img_file_name, 'file_url': pass_img_file_url}]
 
-    # feature: update_pases
     def _grupo_acompanantes_editado(self, answers, recibidos, parent_id):
         """ Grupo de acompañantes del titular al editarlo (update_full_pass).
         Los que ya tienen pase (su qr_code es el final de url_hijo) se conservan
