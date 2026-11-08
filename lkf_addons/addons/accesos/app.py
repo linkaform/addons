@@ -8275,7 +8275,7 @@ class Accesos(OcrMixin, AccesosModel):
 
     def get_shift_data(self, booth_location=None, booth_area=None, search_default=True):
         """
-        Se obtienen los datos del turno.
+        Se obtienen los datos del turno. (prueba CI, no mergear)
 
         Args:
             booth_location (str, optional): Ubicacion de la caseta. Defaults to None.
