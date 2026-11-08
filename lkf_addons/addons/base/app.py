@@ -40,6 +40,7 @@ import simplejson, importlib
 import hashlib, re, os, time, zipfile, wget, random, shutil, datetime, unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from bson.objectid import ObjectId
+from bson import errors
 from datetime import timedelta
 from couchdb.http import ResourceNotFound
 
@@ -3165,8 +3166,8 @@ class Schedule(Base):
             all_user_ids = []
             assigne_2_group = []
             if 'todos_los_usuarios_que_tengan_el_formulario_compartido' in  asigne_to:
-                fileshare_user_ids = get_form_fileshare(item_id)
-                all_user_ids += convert_usr_id_to_dict(fileshare_user_ids)
+                fileshare_user_ids = self.get_form_fileshare(item_id)
+                all_user_ids += self.convert_usr_id_to_dict(fileshare_user_ids)
             for gset in assigned_users:
                 if gset.get(self.f['asignar_a']) == 'grupo':
                     udata = gset.get(self.GROUP_OBJ_ID,{})

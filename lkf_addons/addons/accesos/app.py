@@ -472,100 +472,6 @@ class Accesos(OcrMixin, AccesosModel):
 
         return res
 
-    def access_pass_google_pass(self, res, access_pass):
-        """
-        Crea google wallet pass del pase de acceso
-        """
-        qrcode_to_google_pass = res.get('json', {}).get('id', '')
-        link_info=access_pass.get('link', "")
-        docs=""
-
-        if link_info:
-            # for index, d in enumerate(link_info["docs"]):
-            #     if(d == "agregarIdentificacion"):
-            #         docs+="iden"
-            #     elif(d == "agregarFoto"):
-            #         docs+="foto"
-            #     if index==0 :
-            #         docs+="-"
-            # link_pass= f"{link_info['link']}?id={res.get('json')['id']}&user={link_info['creado_por_id']}&docs={docs}"
-            id_forma = self.PASE_ENTRADA
-            id_campo = self.pase_entrada_fields['archivo_invitacion']
-
-            address = access_pass.get("address")
-            tema_cita = access_pass.get("tema_cita")
-            descripcion = access_pass.get("descripcion")
-            fecha_desde_visita = access_pass.get("fecha_desde_visita")
-            fecha_desde_hasta = access_pass.get("fecha_desde_hasta")
-            creado_por_email = access_pass.get("link", {}).get("creado_por_email")
-            ubicacion = self.unlist(access_pass.get("ubicaciones"))
-            nombre = access_pass.get("nombre")
-            visita_a = access_pass.get("visita_a")
-            email = access_pass.get("email")
-
-            start_datetime = datetime.strptime(fecha_desde_visita, "%Y-%m-%d %H:%M:%S")
-
-            if not fecha_desde_hasta:
-                stop_datetime = start_datetime + timedelta(hours=1)
-                meeting = [
-                    {
-                        "id": 1,
-                        "start": start_datetime,
-                        "stop": stop_datetime,
-                        "name": tema_cita,
-                        "description": descripcion,
-                        "location": ubicacion,
-                        "allday": False,
-                        "rrule": None,
-                        "alarm_ids": [{"interval": "minutes", "duration": 10, "name": "Reminder"}],
-                        'organizer_name': visita_a,
-                        'organizer_email': creado_por_email,
-                        "attendee_ids": [{"email": email, "nombre": nombre}, {"email": creado_por_email, "nombre": visita_a}],
-                    }
-                ]
-
-                try:
-                    respuesta_ics = self.upload_ics(id_forma, id_campo, meetings=meeting)
-                except Exception as e:
-                    print(f"Error al generar o subir el archivo ICS: {e}")
-                    respuesta_ics = {}
-
-                file_name = respuesta_ics.get('file_name', '')
-                file_url = respuesta_ics.get('file_url', '')
-
-                access_pass_custom={
-                    "link":link_pass,
-                    "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[]),
-                    "archivo_invitacion": [
-                        {
-                            "file_name": f"{file_name}",
-                            "file_url": f"{file_url}"
-                        }
-                    ]
-                }
-            else:
-                access_pass_custom={
-                    "link":link_pass,
-                    "enviar_correo_pre_registro": access_pass.get("enviar_correo_pre_registro",[])
-                }
-
-            data_to_google_pass = {
-                "nombre": access_pass.get("nombre"),
-                "visita_a": access_pass.get("visita_a"),
-                "ubicacion": access_pass.get("ubicaciones"),
-                "address": address.get('address'),
-                "empresa": getattr(self, 'company', ""),
-                "all_data": access_pass
-            }
-
-            google_wallet_pass_url = self.create_class_google_wallet(data=data_to_google_pass, qr_code=qrcode_to_google_pass)
-            access_pass_custom.update({
-                "google_wallet_pass_url": google_wallet_pass_url,
-            })
-
-            res = self.update_pass(access_pass=access_pass_custom, folio=res.get("json")["id"])
-        return res
-
     def access_pass_vista_a(self, visita_a):
         """
         Crea grupo repetitivo de personas que son vistadas para pase de entrada
@@ -3925,16 +3831,6 @@ class Accesos(OcrMixin, AccesosModel):
             res.append(row)
         return res
 
-    def get_access_pass(self, qr_code):
-        # Obtiene el pase de acceso con el código QR.
-
-        match_query = {
-            "deleted_at":{"$exists":False},
-            "form_id": self.CHECKIN_CASETAS,
-            }
-        if _id:
-            match_query.update({"_id":ObjectId(_id)})
-
     def get_attendance_images(self, user_id):
         query = [
             {"$match": {
@@ -5961,7 +5857,7 @@ class Accesos(OcrMixin, AccesosModel):
                 f"answers.{self.f['guard_group']}.{self.CONF_AREA_EMPLEADOS_AP_CAT_OBJ_ID}.{self.f['user_id_jefes']}":user_ids
                 })
         if not unwind_query:
-            return self.LKFException({"msg":f"Algo salio mal al intentar buscar el checkin del los ids: {user_id}"})
+            return self.LKFException({"msg":f"Algo salio mal al intentar buscar el checkin del los ids: {user_ids}"})
         query = [
             {'$match': match_query },
             {'$unwind': f"$answers.{self.f['guard_group']}"},
