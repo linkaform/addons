@@ -7,7 +7,11 @@ mergeado).
 
 Pasos (se detiene en el primero que falla en rojo):
   1. Detectar (bin/lkf_changes.py): funciones cambiadas en addons y modules.
-     Un repo en rama de cuenta -> se detiene (cambia a fix/... o master).
+     modules en rama de cuenta (seguridad, account_126...) -> tu checkout no
+     se toca; se arma un worktree temporal (.lkf-test/modules-wt) con:
+       - la rama de modules que se llame igual que la de addons, si existe
+         (local o en origin): el cambio toca los dos repos y se evalua;
+       - si no, origin/master: no tocaste modules, solo se usa para probar.
   2. Compilar los .py cambiados.                                    bloquea
   3. ruff --select E9,F63,F7,F82 en los .py cambiados.              bloquea
   4. pytest -m unit (todos los unit de sdk_testing).                bloquea
@@ -98,6 +102,37 @@ def sdk_behind(sdk):
     return int(out or 0)
 
 
+def account_branch(repo):
+    """Nombre de la rama si es de cuenta (sin '/', no master); si no, None."""
+    br = sh(["git", "-C", repo, "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+    return br if br and "/" not in br and br not in ("master", "HEAD") else None
+
+
+def sibling_ref(modules, branch):
+    """La rama de modules que se llama igual que la de addons: local, en origin o None."""
+    if not branch or "/" not in branch:
+        return None
+    for ref in (f"refs/heads/{branch}", f"refs/remotes/origin/{branch}"):
+        if sh(["git", "-C", modules, "rev-parse", "-q", "--verify", ref]).returncode == 0:
+            return ref
+    return None
+
+
+def modules_target(addons, modules):
+    """(ref a probar, rama de cuenta) cuando modules esta en rama de cuenta; si no (None, None)."""
+    cuenta = account_branch(modules)
+    if not cuenta:
+        return None, None
+    br = sh(["git", "-C", addons, "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+    return sibling_ref(modules, br) or "origin/master", cuenta
+
+
+def modules_sha(addons, modules):
+    """SHA de modules que se prueba (ver modules_target)."""
+    ref, _ = modules_target(addons, modules)
+    return sh(["git", "-C", modules, "rev-parse", ref or "HEAD"]).stdout.strip()
+
+
 def result_path(addons, sha_a, sha_m):
     return os.path.join(addons, ".lkf-test", f"{sha_a[:8]}_{sha_m[:8]}.json")
 
@@ -113,7 +148,7 @@ def do_publish(out):
 
 
 def publish_saved(a):
-    shas = [sh(["git", "-C", r, "rev-parse", "HEAD"]).stdout.strip() for r in (a.addons, a.modules)]
+    shas = [sh(["git", "-C", a.addons, "rev-parse", "HEAD"]).stdout.strip(), modules_sha(a.addons, a.modules)]
     path = result_path(a.addons, *shas)
     if not os.path.exists(path):
         print(f"x no hay resultado para {shas[0][:8]} / {shas[1][:8]}: corre ./lkf test primero")
@@ -137,6 +172,35 @@ def main():
     a = ap.parse_args()
     if a.publicar:
         return publish_saved(a)
+
+    real_modules = a.modules
+    if not account_branch(real_modules):
+        return run_all(a, None)
+    sh(["git", "-C", real_modules, "fetch", "-q", "origin"])
+    ref, cuenta = modules_target(a.addons, real_modules)
+    tmp = os.path.join(a.addons, ".lkf-test", "modules-wt")
+    sh(["git", "-C", real_modules, "worktree", "remove", "--force", tmp])
+    sh(["git", "-C", real_modules, "worktree", "prune"])
+    created = None
+    if ref.startswith("refs/heads/"):        # rama hermana local: se usa tal cual
+        cmd = ["worktree", "add", "-q", tmp, ref[len("refs/heads/"):]]
+    elif ref.startswith("refs/remotes/"):    # solo en origin: rama local que la sigue
+        created = ref[len("refs/remotes/origin/"):]
+        cmd = ["worktree", "add", "-q", "--track", "-b", created, tmp, ref]
+    else:                                    # sin rama hermana: origin/master
+        cmd = ["worktree", "add", "-q", "--detach", tmp, "origin/master"]
+    res = sh(["git", "-C", real_modules, *cmd])
+    if res.returncode:
+        print(f"x no se pudo preparar modules ({ref}) en un worktree: {res.stderr.strip()}")
+        return 2
+    a.modules = tmp
+    try:
+        return run_all(a, cuenta if ref == "origin/master" else None, note=(cuenta, ref))
+    finally:
+        sh(["git", "-C", real_modules, "worktree", "remove", "--force", tmp])
+
+
+def run_all(a, cuenta, note=None):
     run = Runner(a)
     steps, t0 = [], time.time()
 
@@ -146,15 +210,25 @@ def main():
         steps.append({"paso": name, "estado": state, "detalle": detail})
 
     # 1. detectar
-    for r in (a.addons, a.modules):
-        sh(["git", "-C", r, "fetch", "-q", "origin", "master"])
+    sh(["git", "-C", a.addons, "fetch", "-q", "origin", "master"])
     heads = {"addons": "HEAD", "modules": "HEAD"}
-    repos = [
-        lkf_changes.analyze(a.addons, "addons", a.addons, a.modules, heads),
-        lkf_changes.analyze(a.modules, "modules", a.addons, a.modules, heads),
-    ]
+    repos = [lkf_changes.analyze(a.addons, "addons", a.addons, a.modules, heads)]
+    if cuenta:
+        sha = sh(["git", "-C", a.modules, "rev-parse", "HEAD"]).stdout.strip()
+        repos.append({"repo": "modules", "ruta": a.modules, "ok": True, "rama": f"origin/master (tu checkout: {cuenta})",
+                      "sha": sha, "base": sha, "sin_commit": False, "funciones": {}, "sin_tests": [],
+                      "rotos": [], "eliminados": [], "sin_funcion": []})
+    else:
+        sh(["git", "-C", a.modules, "fetch", "-q", "origin", "master"])
+        repos.append(lkf_changes.analyze(a.modules, "modules", a.addons, a.modules, heads))
     lkf_changes.print_human(repos)
     print()
+    if note and cuenta:
+        step("modules", "aviso", f"tu checkout esta en '{note[0]}' (rama de cuenta) y no hay rama "
+             f"'{repos[0]['rama']}' en modules: no se evalua y se prueba con origin/master")
+    elif note:
+        step("modules", "aviso", f"tu checkout esta en '{note[0]}' (rama de cuenta): se evalua la rama "
+             f"hermana {note[1].replace('refs/remotes/', '').replace('refs/heads/', '')} en un worktree temporal")
     for r in repos:
         if not r["ok"]:
             print(f"✗ {r['repo']} {r['error']}.")
