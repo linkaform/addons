@@ -903,7 +903,7 @@ class Accesos(OcrMixin, AccesosModel):
             envios = config_modulo.get('envios',[])
             perfiles = config_modulo.get('tipos',[])
         except:
-            Perfiles = []
+            perfiles = []
             envios = []
             requerimientos = []
         res = {
