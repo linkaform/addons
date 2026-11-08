@@ -63,6 +63,18 @@ def description(result):
     return txt[:139]
 
 
+def no_functions(r):
+    """Texto de la celda cuando un repo no tiene funciones detectadas: por que."""
+    names = lambda paths: ", ".join(f"`{p.rsplit('/', 1)[-1]}`" for p in paths)
+    if r["sin_funcion"]:
+        return f"ninguna: solo comentarios o código fuera de funciones ({names(r['sin_funcion'])})"
+    if r["sin_tests"]:
+        return f"ninguna: solo archivos que no son .py ({names(r['sin_tests'])})"
+    if r["eliminados"]:
+        return f"ninguna: solo archivos eliminados ({names(r['eliminados'])})"
+    return "— (sin cambios)"
+
+
 def body(result, me, brothers):
     v = result["veredicto"]
     head = {"verde": "✅ **lkf-test: verde**", "rojo": "❌ **lkf-test: rojo**",
@@ -75,7 +87,7 @@ def body(result, me, brothers):
     lines.append("| Repo | Rama | SHA | Funciones detectadas |")
     lines.append("|---|---|---|---|")
     for r in result["repos"]:
-        fns = ", ".join(f"`{f}`" for f in r["funciones"]) or "—"
+        fns = ", ".join(f"`{f}`" for f in r["funciones"]) or no_functions(r)
         lines.append(f"| {r['repo']} | `{r['rama']}` | `{r['sha'][:8]}` | {fns} |")
     lines += ["", "| Paso | | Detalle |", "|---|---|---|"]
     for p in result["pasos"]:
