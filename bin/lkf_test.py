@@ -157,7 +157,10 @@ def main():
     print()
     for r in repos:
         if not r["ok"]:
-            print(f"✗ {r['repo']}: {r['error']}")
+            print(f"✗ {r['repo']} {r['error']}.")
+            if r.get("ayuda"):
+                print("\n" + r["ayuda"])
+            print("\nNo se corrieron pruebas ni se publico nada.")
             return 2
         if r["sin_commit"]:
             step(f"{r['repo']}: sin commit", "aviso", "lo no commiteado no cuenta para el status")

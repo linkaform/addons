@@ -173,9 +173,15 @@ def analyze(repo, name, addons, modules, heads):
     res["sha"] = git(repo, "rev-parse", "HEAD").strip()
     if "/" not in branch and branch != "master":
         res["ok"] = False
-        res["error"] = (
-            f"rama '{branch}' es de cuenta (sin '/'); cambia a tu fix/... o feat/... "
-            "(o a master si no tocaste este repo)"
+        res["error"] = f"esta en '{branch}', una rama de cuenta: ahi no se puede probar un cambio"
+        where = "modules" if name == "modules" else "."
+        res["ayuda"] = (
+            f"Crea primero una rama nueva para tu cambio, desde master:\n"
+            f"    git -C {where} checkout -b fix/<folio> origin/master\n"
+            f"Formato: fix/<folio> o feat/<folio> (ej. fix/1520), siempre con '/'.\n"
+            f"Si tu cambio toca addons y modules, usa el mismo nombre de rama en los dos.\n"
+            f"Si no tocaste {name}, basta con dejarlo en master:\n"
+            f"    git -C {where} checkout master"
         )
         return res
     if git(repo, "rev-parse", "--verify", "-q", BASE_REF, check=False) is None:
