@@ -14073,6 +14073,19 @@ class Accesos(OcrMixin, AccesosModel):
         unique_records = {}
         for rec in record_list:
             unique_records[rec.get('_id')] = rec
+        # Reintento de la app: las areas en error no entran al query de arriba (solo
+        # "synced"), asi que el boton Reintentar no hacia nada. Se agregan solo las que la
+        # app pidio por _id, y solo areas: rondines y checks no se reintentan aqui porque
+        # repetirlos puede duplicar bitacoras.
+        for app_rec in app_records or []:
+            _id = app_rec.get('_id') if isinstance(app_rec, dict) else None
+            if not _id or _id in unique_records:
+                continue
+            rec = self.cr_db.get(_id)
+            if rec and rec.get('type') == 'area' and rec.get('status') == 'error' \
+                    and rec.get('status_user') == 'completed':
+                print(f"[sync_records] Reintento de area en error: {_id}")
+                unique_records[_id] = rec
         record_list = list(unique_records.values())
         print(f"[sync_records] Total registros a procesar (duplicados): {len(record_list)}")
         if not record_list:
