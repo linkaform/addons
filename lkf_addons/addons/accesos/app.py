@@ -13604,7 +13604,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         return answers
 
-    def get_record_ubicacion(self, ubicacion=None, area=None, tag_id_area=None, record_id=None):
+    def get_record_ubicacion(self, ubicacion=None, area=None, tag_id_area=None, record_id=None, ignore_case=False):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.AREAS_DE_LAS_UBICACIONES,
@@ -13617,7 +13617,7 @@ class Accesos(OcrMixin, AccesosModel):
             })
         if area:
             match_query.update({
-            f"answers.{self.configuracion_area['area']}": area
+            f"answers.{self.configuracion_area['area']}": self._filtro_nombre_area(area, ignore_case)
             })
         if tag_id_area:
             match_query.update({
@@ -13761,13 +13761,23 @@ class Accesos(OcrMixin, AccesosModel):
             res.pop('updated_at', None)
         return res if res else {}
 
-    def exists_area(self, ubicacion, area):
+    @staticmethod
+    def _filtro_nombre_area(area, ignore_case=False):
+        """
+        Filtro de Mongo para el nombre del area. Con ignore_case compara sin importar
+        mayusculas ni espacios de las orillas ("Cepillado" == " CEPILLADO ").
+        """
+        if not ignore_case or not isinstance(area, str):
+            return area
+        return {'$regex': r'^\s*' + re.escape(area.strip()) + r'\s*$', '$options': 'i'}
+
+    def exists_area(self, ubicacion, area, ignore_case=False):
         query = [
             {'$match': {
                 "deleted_at":{"$exists":False},
                 "form_id": self.AREAS_DE_LAS_UBICACIONES,
                 f"answers.{self.UBICACIONES_CAT_OBJ_ID}.{self.configuracion_area['ubicacion']}": ubicacion,
-                f"answers.{self.configuracion_area['area']}": area
+                f"answers.{self.configuracion_area['area']}": self._filtro_nombre_area(area, ignore_case)
             }},
             {'$project': {
                 '_id': 1,
@@ -13778,9 +13788,12 @@ class Accesos(OcrMixin, AccesosModel):
         return True if res else False
 
     def create_new_area(self, data, force_id=None):
-        exists_area = self.exists_area(data.get('ubicacion', {}), data.get('nombre_nueva_area', ''))
-        if exists_area:
-            return {'status_code': 208, 'type': 'success', 'msg': 'El area ya existe. Solo se actualizo la informacion rellenada.', 'data': {}}
+        ubicacion = data.get('ubicacion', {})
+        nombre_area = data.get('nombre_nueva_area', '')
+        # Si ya existe es error, no exito: antes regresaba 208 y el doc de la app quedaba
+        # como sincronizado sin que se creara nada.
+        if self.exists_area(ubicacion, nombre_area, ignore_case=True):
+            return {'status_code': 400, 'type': 'error', 'msg': f'Ya existe un area "{nombre_area}" en {ubicacion}', 'data': {}}
         contact_details = self.get_contact_details(data.get('ubicacion', {}))
         answers = {
             self.mf['nombre_area']: data.get('nombre_nueva_area'),
@@ -13903,15 +13916,19 @@ class Accesos(OcrMixin, AccesosModel):
         # Edicion: el _id del doc de couch ya existe en Areas de las Ubicaciones (el area
         # se creo con force_id o la app reusa el _id del catalogo). Se actualiza por _id
         # porque buscar por nombre falla cuando el usuario renombro el area.
+        # El nombre se compara sin importar mayusculas ni espacios de las orillas.
         if self.get_record_ubicacion(record_id=_id):
-            otra_area = self.get_record_ubicacion(ubicacion=ubicacion, area=nombre_area)
+            otra_area = self.get_record_ubicacion(ubicacion=ubicacion, area=nombre_area, ignore_case=True)
             if otra_area and str(otra_area.get('_id')) != str(_id):
-                res = {'status_code': 400, 'msg': f'Ya existe otra area "{nombre_area}" en {ubicacion}'}
+                res = {'status_code': 400, 'msg': f'Ya existe otra area "{otra_area.get("area")}" en {ubicacion}'}
             else:
                 res = self.update_area(data, record_id=_id)
-        # Sin _id previo, se revisa si ya existe un area con ese nombre en la ubicacion.
-        elif self.exists_area(ubicacion, nombre_area):
-            res = self.update_area(data)
+        # _id nuevo con un nombre que ya existe en la ubicacion: es un duplicado. Antes se
+        # actualizaba el area existente, lo que sobrescribia el area de otro usuario (o
+        # fallaba con "You don't have the form shared" si no podia editarla). La app,
+        # para configurar un area existente, ya reusa el _id del catalogo y cae arriba.
+        elif otra_area := self.get_record_ubicacion(ubicacion=ubicacion, area=nombre_area, ignore_case=True):
+            res = {'status_code': 400, 'msg': f'Ya existe un area "{otra_area.get("area")}" en {ubicacion}'}
         else:
             # Area nueva: se fuerza que el _id en Mongo coincida con el _id de CouchDB.
             res = self.create_new_area(data, force_id=_id)
