@@ -1321,8 +1321,33 @@ class Accesos(OcrMixin, AccesosModel):
 
         return {'accesos': resultados}
 
-    def do_attendance(self, asistencia_answers):
+    def parse_geolocation(self, geolocation=None):
+        """
+        Normaliza la ubicacion que manda el cliente a [lat, long], el orden que usa
+        Linkaform en la metadata del registro. Acepta {lat, long}, {latitude, longitude}
+        o [lat, long]. Regresa None si no llega o si es 0,0 (la app lo manda cuando el
+        telefono no tiene ubicacion); asi no se pisa la metadata con un punto falso.
+        """
+        if isinstance(geolocation, dict):
+            lat = geolocation.get('lat', geolocation.get('latitude'))
+            lng = geolocation.get('long', geolocation.get('lng', geolocation.get('longitude')))
+        elif isinstance(geolocation, (list, tuple)) and len(geolocation) == 2:
+            lat, lng = geolocation
+        else:
+            return None
+        try:
+            lat, lng = float(lat), float(lng)
+        except (TypeError, ValueError):
+            return None
+        if (lat == 0 and lng == 0) or not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
+            return None
+        return [lat, lng]
+
+    def do_attendance(self, asistencia_answers, geolocation=None):
         metadata = self.lkf_api.get_metadata(form_id=self.REGISTRO_ASISTENCIA)
+        geolocation = self.parse_geolocation(geolocation)
+        if geolocation:
+            metadata['geolocation'] = geolocation
         metadata.update({
             "properties": {
                 "device_properties":{
@@ -1391,7 +1416,7 @@ class Accesos(OcrMixin, AccesosModel):
                 status = 'Error'
         return status
 
-    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={}, nombre_suplente="", checkin_id="", roles=[]):
+    def do_checkin(self, location, area, employee_list=[], fotografia=[], check_in_manual={}, nombre_suplente="", checkin_id="", roles=[], geolocation=None):
         """
         Se encarga de hacer el check in de un guardia.
 
@@ -1403,10 +1428,18 @@ class Accesos(OcrMixin, AccesosModel):
             check_in_manual (dict, optional): Datos del check in manual. Defaults to {}.
             nombre_suplente (str, optional): Nombre del suplente. Defaults to "".
             checkin_id (str, optional): ID del check in. Defaults to "".
+            geolocation (dict|list, optional): Ubicacion del dispositivo. Si no llega se
+                toma del payload del script (data.geolocation), para no tener que tocar
+                script_turnos.py en cada rama de cuenta.
 
         Returns:
             dict: Resultado del check in.
         """
+        if geolocation is None:
+            payload = getattr(self, 'data', None)
+            payload = payload.get('data') if isinstance(payload, dict) else None
+            geolocation = payload.get('geolocation') if isinstance(payload, dict) else None
+        geolocation = self.parse_geolocation(geolocation)
 
         #! Se verifica si la caseta esta abierta.
         is_caseta_open = self.is_boot_available(location, area)
@@ -1441,7 +1474,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         #! Si la caseta esta abierta se actualizan los guardias solamente.
         if is_caseta_open:
-            res = self.update_guards_checkin([{'user_id': user_id, 'name': user_name}], self.last_check_in.get('_id',''), location, area, user, nombre_suplente, fotografia, roles)
+            res = self.update_guards_checkin([{'user_id': user_id, 'name': user_name}], self.last_check_in.get('_id',''), location, area, user, nombre_suplente, fotografia, roles, geolocation=geolocation)
             format_res = self.unlist(res)
             if format_res.get('status_code') in [200, 201, 202]:
                 #! Rondines de su rol que quedaron sin guardia se asignan a quien acaba de entrar.
@@ -1491,6 +1524,8 @@ class Accesos(OcrMixin, AccesosModel):
         employee['position'] = self.chife_guard
         employee['nombre_suplente'] = nombre_suplente
         data = self.lkf_api.get_metadata(self.CHECKIN_CASETAS)
+        if geolocation:
+            data['geolocation'] = geolocation
         now_datetime = self.today_str(timezone, date_format='datetime')
 
         #! Se obtiene la informacion formateada para hacer el check in.
@@ -1547,7 +1582,7 @@ class Accesos(OcrMixin, AccesosModel):
                 self.f['nombre_guardia_suplente']: nombre_suplente
             })
 
-        registro_de_asistencia = self.do_attendance(asistencia_answers)
+        registro_de_asistencia = self.do_attendance(asistencia_answers, geolocation=geolocation)
 
         resp_create = self.lkf_api.post_forms_answers(data)
         if resp_create.get('status_code') == 201:
@@ -9659,7 +9694,7 @@ class Accesos(OcrMixin, AccesosModel):
 
         return this_user
 
-    def update_guards_checkin(self, data_guard, record_id, location, area, user_data={}, nombre_suplente="", foto_checkin=[], roles=[]):
+    def update_guards_checkin(self, data_guard, record_id, location, area, user_data={}, nombre_suplente="", foto_checkin=[], roles=[], geolocation=None):
         response = []
         #! Se edita el check-in existente: se respeta su zona horaria.
         timezone = self.get_record_timezone(record_id)
@@ -9710,7 +9745,7 @@ class Accesos(OcrMixin, AccesosModel):
                     self.f['nombre_guardia_suplente']: nombre_suplente
                 })
 
-            registro_de_asistencia = self.do_attendance(asistencia_answers)
+            registro_de_asistencia = self.do_attendance(asistencia_answers, geolocation=geolocation)
 
             data = self.lkf_api.patch_multi_record( answers = answers, form_id=self.CHECKIN_CASETAS, record_id=[record_id])
             data.update({'registro_de_asistencia': 'Correcto'})
@@ -12679,7 +12714,9 @@ class Accesos(OcrMixin, AccesosModel):
         # LinkaForm usa este id como _id de mongo, debe ser un ObjectId valido (24 hex)
         metadata.update({"id": str(self.get_valid_object_id(data.id))})
         if isinstance(data.get('geolocation'), dict):
-            metadata.update({'geolocation': [data.get('geolocation').get('long'), data.get('geolocation').get('lat')]})
+            geo = self.parse_geolocation(data.get('geolocation'))
+            if geo:
+                metadata.update({'geolocation': geo})
 
         metadata['start_date'] = record.get('checked_at', data.get('created_at', metadata['start_timestamp']))
         metadata['start_timestamp'] = self.get_epoch(metadata['start_date'] )
@@ -12763,7 +12800,9 @@ class Accesos(OcrMixin, AccesosModel):
             },
         })
         if isinstance(data.get('geolocation'), dict):
-            metadata.update({'geolocation': [data.get('geolocation').get('long'), data.get('geolocation').get('lat')]})
+            geo = self.parse_geolocation(data.get('geolocation'))
+            if geo:
+                metadata.update({'geolocation': geo})
 
         metadata['start_date'] = record.get('checked_at', data.get('created_at', metadata['start_timestamp']))
         metadata['start_timestamp'] = self.get_epoch(metadata['start_date'] )
@@ -13715,6 +13754,11 @@ class Accesos(OcrMixin, AccesosModel):
                 pass
 
         metadata = self.lkf_api.get_metadata(form_id=self.AREAS_DE_LAS_UBICACIONES)
+        #! Si la app mando ubicacion nueva, reemplaza la del area.
+        geo_nueva = self.parse_geolocation(getattr(self, 'geolocation_area', None))
+        if geo_nueva:
+            answers[self.area_update['geolocalizacion_area_ubicacion']] = {'latitude': geo_nueva[0], 'longitude': geo_nueva[1]} # type: ignore
+            metadata['geolocation'] = geo_nueva
         metadata.update({
             'properties': {
                 "device_properties":{
@@ -13907,11 +13951,11 @@ class Accesos(OcrMixin, AccesosModel):
             'qr_area': data_couch.get('area_tag_id', ''),
         }
 
-        if record.get('geolocation'):
-            self.geolocation_area = {
-                'latitude': record['geolocation'].get('lat'),
-                'longitude': record['geolocation'].get('long'),
-            }
+        # La app manda {lat: 0, long: 0} cuando el telefono no tuvo ubicacion: se ignora
+        # para no guardar un punto falso (el mapa oculta los 0,0).
+        geo_area = self.parse_geolocation(record.get('geolocation'))
+        if geo_area:
+            self.geolocation_area = {'latitude': geo_area[0], 'longitude': geo_area[1]}
 
         # Edicion: el _id del doc de couch ya existe en Areas de las Ubicaciones (el area
         # se creo con force_id o la app reusa el _id del catalogo). Se actualiza por _id
