@@ -1,0 +1,1477 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.informe_de_servicio.id }}</form_id>
+    <id>66b44661c98cdbaa76a07f00</id>
+    <workflows>
+        <item>
+            <actions>
+                <item>
+                    <_id>66b44661c98cdbaa76a07ef9</_id>
+                    <action_id>7</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <script>
+                            <created_at>2024-08-08T04:14:41.577363</created_at>
+                            <deleted_at>None</deleted_at>
+                            <end_date>None</end_date>
+                            <id>{{ script.calcula_gastos.id }}</id>
+                            <is_fileShared>False</is_fileShared>
+                            <itype>script</itype>
+                            <name>{{ script.calcula_gastos.name }}</name>
+                            <start_date>2024-08-08T04:14:41.575875</start_date>
+                            <updated_at>2024-08-08T04:14:42.676776</updated_at>
+                        </script>
+                        <user>SCRIPT_OWNER</user>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>66b44661c98cdbaa76a07efa</id>
+            <name>Calcula gastos y kilometraje</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-08-08T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-08-08T04:15:04.158Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>before</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>[]</triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>66b518dc05c931c9c61955c4</_id>
+                    <action_id>4</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <assignTo>
+                            <item>
+                                <field_id>RECORD_USER</field_id>
+                                <label>Usuario que contesta</label>
+                                <push_notification>False</push_notification>
+                                <send_mail>False</send_mail>
+                            </item>
+                        </assignTo>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>66b518dc05c931c9c61955c8</id>
+            <name>Asignar inbox a usuario (Horas trabajadas)</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-08-09T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-08-08T19:12:14.846Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>True</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>any</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66b517d1269286e0777f9ba5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del servicio</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>pendiente</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66b517d1269286e0777f9ba5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del servicio</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>en_proceso</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>672eb9e4664514d6f465058c</_id>
+                    <action_id>4</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <assignTo>
+                            <item>
+                                <catalog_field_id>670f50c7f522b590fbfd91eb</catalog_field_id>
+                                <field_id>638a9a7767c332f5d459fc82</field_id>
+                                <field_type>catalog</field_type>
+                                <group_type>Catálogo</group_type>
+                                <label>Email</label>
+                                <push_notification>True</push_notification>
+                                <send_mail>True</send_mail>
+                            </item>
+                        </assignTo>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>672eb9e4664514d6f4650594</id>
+            <name>Asignar a usuario</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-11-09T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-11-09T01:10:37.388Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>False</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>672eb5efd1134f9aca98da36</field_id>
+                                <group>{}</group>
+                                <label>Tipo de asignacion programada</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>asignado</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>672eb9e4664514d6f465058d</_id>
+                    <action_id>4</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <assignTo>
+                            <item>
+                                <catalog_field_id>670f50c7f522b590fbfd91eb</catalog_field_id>
+                                <field_id>638a9a7767c332f5d459fc82</field_id>
+                                <field_type>catalog</field_type>
+                                <group_type>Catálogo</group_type>
+                                <label>Email</label>
+                                <push_notification>True</push_notification>
+                                <send_mail>False</send_mail>
+                            </item>
+                        </assignTo>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>672eb9e4664514d6f4650597</id>
+            <name>Reasignar servicio a usuario</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2024-11-09T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2024-11-09T01:10:37.388Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>False</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>672eb5efd1134f9aca98da36</field_id>
+                                <group>{}</group>
+                                <label>Tipo de asignacion programada</label>
+                                <type>radio</type>
+                            </trigger_field>
+                            <value>reasignado</value>
+                        </item>
+                        <item>
+                            <condition>has_changed=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.usuarios.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.usuarios.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters />
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>638a9a7767c332f5d459fc81</field_id>
+                                <group>{}</group>
+                                <label>Nombre</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>null</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68c1fbdf91169546cc71ee8c</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Estimado/a {{record.answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252}}: &lt;br&gt;  &lt;br&gt; 
+
+Adjunto encontrará el informe técnico correspondiente a la falla reportada: &lt;i&gt;{{record.answers.66748944d422d002d557d5be}}.&lt;/i&gt; &lt;br&gt;&lt;br&gt;
+
+Este documento incluye las siguientes secciones: información del equipo, daños encontrados, trabajos realizados y recomendaciones.  &lt;br&gt; 
+Agradecemos la revisión del documento y quedamos atentos a cualquier observación o requerimiento adicional. &lt;br&gt;  &lt;br&gt; 
+
+Atentamente, &lt;br&gt; 
+ECUAIRE S.A.S. &lt;br&gt;
+&lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_15667.thumbnail" width="107" height="32"&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>6736a4474e4a559a6c120f7d</field_id>
+                                <group_id>None</group_id>
+                                <label>Correo electronico que recibirá el informe</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>66bfd647cd15883ed163e9b5</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 1</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>68c050237fcf44c0212517e0</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 2</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>68c050237fcf44c0212517e1</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 3</label>
+                            </item>
+                        </email_fields>
+                        <emails>
+                            <item>dvasquez@ecuaire.com</item>
+                            <item>supervisor.taller@ecuaire.com</item>
+                            <item>supervisor.campo@ecuaire.com</item>
+                            <item>jefe.serviciotecnico@ecuaire.com</item>
+                        </emails>
+                        <embed_company_picture>False</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Ecuaire plantilla de informe de servicio para cliente</description>
+                            <id>464</id>
+                            <name>Ecuaire - Informe de Servicio Cliente</name>
+                            <owner>/api/infosync/user/15667/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/464/</resource_uri>
+                        </pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Envío de Informe Técnico –  {{record.answers.66748944d422d002d557d5be}}| Modelo: {{record.answers.670f507af522b590fbfd918c.66beb11907981d4509575056}}| Serie: {{record.answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325}} | Horómetro: {{record.answers.66748944d422d002d557d5bc}} {% endraw %}</subject>
+                        <timer_config>
+                            <expiration>{}</expiration>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>68c1fbdf91169546cc71ee99</id>
+            <name>Enviar correo a Cliente / Facturables - Reparacion</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-09-11T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-09-10T19:11:11.048Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66b517d1269286e0777f9ba5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del servicio</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>terminado</value>
+                        </item>
+                        <item>
+                            <condition>iexact=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.tipos_de_orden_de_servicio.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.tipos_de_orden_de_servicio.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters />
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>66b25f54eab1ff476202bac0</field_id>
+                                <group>{}</group>
+                                <label>Tipo de orden</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>Facturable</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6887ed5a6071ff2cc0a82fe6</field_id>
+                                <group>{}</group>
+                                <label>Tipo de OT</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>reparación</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68c20cfbd6abd3ad2a2b2286</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Estimado/a {{record.answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252}}: &lt;br&gt;  &lt;br&gt; 
+
+Adjunto encontrará el informe técnico correspondiente a la falla reportada: &lt;i&gt;{{record.answers.66748944d422d002d557d5be}}.&lt;/i&gt; &lt;br&gt;&lt;br&gt;
+
+Este documento incluye las siguientes secciones: información del equipo, daños encontrados, trabajos realizados y recomendaciones.  &lt;br&gt; 
+Agradecemos la revisión del documento y quedamos atentos a cualquier observación o requerimiento adicional. &lt;br&gt;  &lt;br&gt; 
+
+Atentamente, &lt;br&gt; 
+ECUAIRE S.A.S. &lt;br&gt;
+&lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_15667.thumbnail" width="107" height="32"&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>6736a4474e4a559a6c120f7d</field_id>
+                                <group_id>None</group_id>
+                                <label>Correo electronico que recibirá el informe</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>66bfd647cd15883ed163e9b5</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 1</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>68c050237fcf44c0212517e0</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 2</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>68c050237fcf44c0212517e1</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 3</label>
+                            </item>
+                        </email_fields>
+                        <emails>
+                            <item>dvasquez@ecuaire.com</item>
+                            <item>supervisor.taller@ecuaire.com</item>
+                            <item>supervisor.campo@ecuaire.com</item>
+                            <item>jefe.serviciotecnico@ecuaire.com</item>
+                        </emails>
+                        <embed_company_picture>False</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Ecuaire plantilla de informe de servicio para cliente</description>
+                            <id>464</id>
+                            <name>Ecuaire - Informe de Servicio Cliente</name>
+                            <owner>/api/infosync/user/15667/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/464/</resource_uri>
+                        </pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Envío de Informe Técnico –  {{record.answers.66748944d422d002d557d5be}}| Modelo: {{record.answers.670f507af522b590fbfd918c.66beb11907981d4509575056}}| Serie: {{record.answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325}} | Horómetro: {{record.answers.66748944d422d002d557d5bc}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>68c20cfbd6abd3ad2a2b229b</id>
+            <name>Enviar correo a Cliente / Interna - Reparacion</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-09-11T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-09-10T22:44:19.681Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66b517d1269286e0777f9ba5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del servicio</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>terminado</value>
+                        </item>
+                        <item>
+                            <condition>iexact=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.tipos_de_orden_de_servicio.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.tipos_de_orden_de_servicio.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters />
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>66b25f54eab1ff476202bac0</field_id>
+                                <group>{}</group>
+                                <label>Tipo de orden</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>Interna</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6887ed5a6071ff2cc0a82fe6</field_id>
+                                <group>{}</group>
+                                <label>Tipo de OT</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>reparación</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68c20cfbd6abd3ad2a2b2287</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Estimado/a {{record.answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252}}: &lt;br&gt;  &lt;br&gt; 
+
+Adjunto encontrará el informe técnico correspondiente a la falla reportada: &lt;i&gt;{{record.answers.66748944d422d002d557d5be}}.&lt;/i&gt; &lt;br&gt;&lt;br&gt;
+
+Este documento incluye las siguientes secciones: información del equipo, daños encontrados, trabajos realizados y recomendaciones.  &lt;br&gt; 
+Agradecemos la revisión del documento y quedamos atentos a cualquier observación o requerimiento adicional. &lt;br&gt;  &lt;br&gt; 
+
+Atentamente, &lt;br&gt; 
+ECUAIRE S.A.S. &lt;br&gt;
+&lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_15667.thumbnail" width="107" height="32"&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>6736a4474e4a559a6c120f7d</field_id>
+                                <group_id>None</group_id>
+                                <label>Correo electronico que recibirá el informe</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>66bfd647cd15883ed163e9b5</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 1</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>68c050237fcf44c0212517e0</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 2</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>68c050237fcf44c0212517e1</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 3</label>
+                            </item>
+                        </email_fields>
+                        <emails>
+                            <item>dvasquez@ecuaire.com</item>
+                            <item>supervisor.mantenimiento@ecuaire.com</item>
+                            <item>soportealcliente@ecuaire.com</item>
+                            <item>jefe.serviciotecnico@ecuaire.com</item>
+                        </emails>
+                        <embed_company_picture>False</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Ecuaire plantilla de informe de servicio para cliente</description>
+                            <id>464</id>
+                            <name>Ecuaire - Informe de Servicio Cliente</name>
+                            <owner>/api/infosync/user/15667/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/464/</resource_uri>
+                        </pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Envío de Informe Técnico –  {{record.answers.66748944d422d002d557d5be}}| Modelo: {{record.answers.670f507af522b590fbfd918c.66beb11907981d4509575056}}| Serie: {{record.answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325}} | Horómetro: {{record.answers.66748944d422d002d557d5bc}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>68c20cfbd6abd3ad2a2b229e</id>
+            <name>Enviar correo a Cliente / Facturables - Mantenimiento</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-09-11T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-09-10T22:44:19.681Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66b517d1269286e0777f9ba5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del servicio</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>terminado</value>
+                        </item>
+                        <item>
+                            <condition>iexact=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.tipos_de_orden_de_servicio.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.tipos_de_orden_de_servicio.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters />
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>66b25f54eab1ff476202bac0</field_id>
+                                <group>{}</group>
+                                <label>Tipo de orden</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>Facturable</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6887ed5a6071ff2cc0a82fe6</field_id>
+                                <group>{}</group>
+                                <label>Tipo de OT</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>mantenimiento</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68c20cfbd6abd3ad2a2b2288</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Estimado/a {{record.answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252}}: &lt;br&gt;  &lt;br&gt; 
+
+Adjunto encontrará el informe técnico correspondiente a la falla reportada: &lt;i&gt;{{record.answers.66748944d422d002d557d5be}}.&lt;/i&gt; &lt;br&gt;&lt;br&gt;
+
+Este documento incluye las siguientes secciones: información del equipo, daños encontrados, trabajos realizados y recomendaciones.  &lt;br&gt; 
+Agradecemos la revisión del documento y quedamos atentos a cualquier observación o requerimiento adicional. &lt;br&gt;  &lt;br&gt; 
+
+Atentamente, &lt;br&gt; 
+ECUAIRE S.A.S. &lt;br&gt;
+&lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_15667.thumbnail" width="107" height="32"&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>6736a4474e4a559a6c120f7d</field_id>
+                                <group_id>None</group_id>
+                                <label>Correo electronico que recibirá el informe</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>66bfd647cd15883ed163e9b5</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 1</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>68c050237fcf44c0212517e0</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 2</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>68c050237fcf44c0212517e1</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 3</label>
+                            </item>
+                        </email_fields>
+                        <emails>
+                            <item>dvasquez@ecuaire.com</item>
+                            <item>supervisor.mantenimiento@ecuaire.com</item>
+                            <item>soportealcliente@ecuaire.com</item>
+                            <item>jefe.serviciotecnico@ecuaire.com</item>
+                        </emails>
+                        <embed_company_picture>False</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Ecuaire plantilla de informe de servicio para cliente</description>
+                            <id>464</id>
+                            <name>Ecuaire - Informe de Servicio Cliente</name>
+                            <owner>/api/infosync/user/15667/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/464/</resource_uri>
+                        </pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Envío de Informe Técnico –  {{record.answers.66748944d422d002d557d5be}}| Modelo: {{record.answers.670f507af522b590fbfd918c.66beb11907981d4509575056}}| Serie: {{record.answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325}} | Horómetro: {{record.answers.66748944d422d002d557d5bc}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>68c20cfbd6abd3ad2a2b22a1</id>
+            <name>Enviar correo a Cliente / Interna - Mantenimiento</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-09-11T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-09-10T22:44:19.681Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66b517d1269286e0777f9ba5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del servicio</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>terminado</value>
+                        </item>
+                        <item>
+                            <condition>iexact=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.tipos_de_orden_de_servicio.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.tipos_de_orden_de_servicio.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters />
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>66b25f54eab1ff476202bac0</field_id>
+                                <group>{}</group>
+                                <label>Tipo de orden</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>Interna</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>6887ed5a6071ff2cc0a82fe6</field_id>
+                                <group>{}</group>
+                                <label>Tipo de OT</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>mantenimiento</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68c20cfbd6abd3ad2a2b2289</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Estimado/a {{record.answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252}}: &lt;br&gt;  &lt;br&gt; 
+
+Adjunto encontrará el informe técnico correspondiente a la falla reportada: &lt;i&gt;{{record.answers.66748944d422d002d557d5be}}.&lt;/i&gt; &lt;br&gt;&lt;br&gt;
+
+Este documento incluye las siguientes secciones: información del equipo, daños encontrados, trabajos realizados y recomendaciones.  &lt;br&gt; 
+Agradecemos la revisión del documento y quedamos atentos a cualquier observación o requerimiento adicional. &lt;br&gt;  &lt;br&gt; 
+
+Atentamente, &lt;br&gt; 
+ECUAIRE S.A.S. &lt;br&gt;
+&lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_15667.thumbnail" width="107" height="32"&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>6736a4474e4a559a6c120f7d</field_id>
+                                <group_id>None</group_id>
+                                <label>Correo electronico que recibirá el informe</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>66bfd647cd15883ed163e9b5</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 1</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>68c050237fcf44c0212517e0</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 2</label>
+                            </item>
+                            <item>
+                                <catalog_field_id>670f50c71f4102516864159d</catalog_field_id>
+                                <field_id>68c050237fcf44c0212517e1</field_id>
+                                <group_id>None</group_id>
+                                <label>Email Cliente 3</label>
+                            </item>
+                        </email_fields>
+                        <emails>
+                            <item>dvasquez@ecuaire.com</item>
+                            <item>jefe.garantias@ecuaire.com</item>
+                            <item>supervisor.garantias@ecuaire.com</item>
+                        </emails>
+                        <embed_company_picture>False</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Ecuaire plantilla de informe de servicio para cliente</description>
+                            <id>464</id>
+                            <name>Ecuaire - Informe de Servicio Cliente</name>
+                            <owner>/api/infosync/user/15667/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/464/</resource_uri>
+                        </pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Envío de Informe Técnico –  {{record.answers.66748944d422d002d557d5be}}| Modelo: {{record.answers.670f507af522b590fbfd918c.66beb11907981d4509575056}}| Serie: {{record.answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325}} | Horómetro: {{record.answers.66748944d422d002d557d5bc}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>68c20cfbd6abd3ad2a2b22a4</id>
+            <name>Enviar correo a Cliente / Garantia - Reparacion o Mantenimiento</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-09-11T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-09-10T22:44:19.681Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66b517d1269286e0777f9ba5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del servicio</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>terminado</value>
+                        </item>
+                        <item>
+                            <condition>iexact=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.tipos_de_orden_de_servicio.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.tipos_de_orden_de_servicio.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters />
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>66b25f54eab1ff476202bac0</field_id>
+                                <group>{}</group>
+                                <label>Tipo de orden</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>Garantía</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68c20cfbd6abd3ad2a2b228a</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Estimado/a {{record.answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252}}: &lt;br&gt;  &lt;br&gt; 
+
+Adjunto encontrará el informe técnico correspondiente a la falla reportada: &lt;i&gt;{{record.answers.66748944d422d002d557d5be}}.&lt;/i&gt; &lt;br&gt;&lt;br&gt;
+
+Este documento incluye las siguientes secciones: información del equipo, daños encontrados, trabajos realizados y recomendaciones.  &lt;br&gt; 
+Agradecemos la revisión del documento y quedamos atentos a cualquier observación o requerimiento adicional. &lt;br&gt;  &lt;br&gt; 
+
+Atentamente, &lt;br&gt; 
+ECUAIRE S.A.S. &lt;br&gt;
+&lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_15667.thumbnail" width="107" height="32"&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>6736a4474e4a559a6c120f7d</field_id>
+                                <group_id>None</group_id>
+                                <label>Correo electronico que recibirá el informe</label>
+                            </item>
+                        </email_fields>
+                        <emails>
+                            <item>coordinador.servicios.uio@ecuaire.com</item>
+                        </emails>
+                        <embed_company_picture>False</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Ecuaire plantilla de informe de servicio para cliente</description>
+                            <id>464</id>
+                            <name>Ecuaire - Informe de Servicio Cliente</name>
+                            <owner>/api/infosync/user/15667/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/464/</resource_uri>
+                        </pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Envío de Informe Técnico –  {{record.answers.66748944d422d002d557d5be}}| Modelo: {{record.answers.670f507af522b590fbfd918c.66beb11907981d4509575056}}| Serie: {{record.answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325}} | Horómetro: {{record.answers.66748944d422d002d557d5bc}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>68c20cfbd6abd3ad2a2b22a7</id>
+            <name>Enviar correo a Cliente / Facturable - Reparacion o Mantenimiento creado por Tecnicos Quito</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-09-11T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-09-10T22:44:19.681Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>
+                        <item>
+                            <asset_id>16393</asset_id>
+                            <catalog_id>None</catalog_id>
+                            <connection_id>None</connection_id>
+                            <email>mpadilla@ecuaire.com</email>
+                            <form_field>None</form_field>
+                            <form_id>None</form_id>
+                            <group_id>None</group_id>
+                            <name>PADILLA REYES MARCO ALBERTO</name>
+                            <rtype>user</rtype>
+                            <rules>[]</rules>
+                            <username>None</username>
+                        </item>
+                        <item>
+                            <asset_id>16362</asset_id>
+                            <catalog_id>None</catalog_id>
+                            <connection_id>None</connection_id>
+                            <email>roger.celi@ecuaire.com</email>
+                            <form_field>None</form_field>
+                            <form_id>None</form_id>
+                            <group_id>None</group_id>
+                            <name>CELI VELEZ CHARVER ROGER</name>
+                            <rtype>user</rtype>
+                            <rules>[]</rules>
+                            <username>None</username>
+                        </item>
+                    </user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66b517d1269286e0777f9ba5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del servicio</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>terminado</value>
+                        </item>
+                        <item>
+                            <condition>iexact=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.tipos_de_orden_de_servicio.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.tipos_de_orden_de_servicio.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters />
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>66b25f54eab1ff476202bac0</field_id>
+                                <group>{}</group>
+                                <label>Tipo de orden</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>Facturable</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>68c20cfbd6abd3ad2a2b228b</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} Estimado/a {{record.answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252}}: &lt;br&gt;  &lt;br&gt; 
+
+Adjunto encontrará el informe técnico correspondiente a la falla reportada: &lt;i&gt;{{record.answers.66748944d422d002d557d5be}}.&lt;/i&gt; &lt;br&gt;&lt;br&gt;
+
+Este documento incluye las siguientes secciones: información del equipo, daños encontrados, trabajos realizados y recomendaciones.  &lt;br&gt; 
+Agradecemos la revisión del documento y quedamos atentos a cualquier observación o requerimiento adicional. &lt;br&gt;  &lt;br&gt; 
+
+Atentamente, &lt;br&gt; 
+ECUAIRE S.A.S. &lt;br&gt;
+&lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_15667.thumbnail" width="107" height="32"&gt; {% endraw %}</body>
+                        <email_fields>
+                            <item>
+                                <field_id>6736a4474e4a559a6c120f7d</field_id>
+                                <group_id>None</group_id>
+                                <label>Correo electronico que recibirá el informe</label>
+                            </item>
+                        </email_fields>
+                        <emails>
+                            <item>coordinador.servicios.uio@ecuaire.com</item>
+                        </emails>
+                        <embed_company_picture>False</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Ecuaire plantilla de informe de servicio para cliente</description>
+                            <id>464</id>
+                            <name>Ecuaire - Informe de Servicio Cliente</name>
+                            <owner>/api/infosync/user/15667/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/464/</resource_uri>
+                        </pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>OWNER_EMAIL</sender>
+                        <subject>{% raw %} Envío de Informe Técnico –  {{record.answers.66748944d422d002d557d5be}}| Modelo: {{record.answers.670f507af522b590fbfd918c.66beb11907981d4509575056}}| Serie: {{record.answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325}} | Horómetro: {{record.answers.66748944d422d002d557d5bc}} {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>None</name>
+                </item>
+            </actions>
+            <id>68c20cfbd6abd3ad2a2b22aa</id>
+            <name>Enviar correo a Cliente / Interna - Reparacion o Mantenimiento creado por Tecnicos Quito</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2025-09-11T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2025-09-10T22:44:19.681Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>
+                        <item>
+                            <asset_id>16393</asset_id>
+                            <catalog_id>None</catalog_id>
+                            <connection_id>None</connection_id>
+                            <email>mpadilla@ecuaire.com</email>
+                            <form_field>None</form_field>
+                            <form_id>None</form_id>
+                            <group_id>None</group_id>
+                            <name>PADILLA REYES MARCO ALBERTO</name>
+                            <rtype>user</rtype>
+                            <rules>[]</rules>
+                            <username>None</username>
+                        </item>
+                        <item>
+                            <asset_id>16362</asset_id>
+                            <catalog_id>None</catalog_id>
+                            <connection_id>None</connection_id>
+                            <email>roger.celi@ecuaire.com</email>
+                            <form_field>None</form_field>
+                            <form_id>None</form_id>
+                            <group_id>None</group_id>
+                            <name>CELI VELEZ CHARVER ROGER</name>
+                            <rtype>user</rtype>
+                            <rules>[]</rules>
+                            <username>None</username>
+                        </item>
+                    </user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66b517d1269286e0777f9ba5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del servicio</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>terminado</value>
+                        </item>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>
+                                    <catalog_field_id>{{ catalog.tipos_de_orden_de_servicio.obj_id }}</catalog_field_id>
+                                    <catalog_id>{{ catalog.tipos_de_orden_de_servicio.id }}</catalog_id>
+                                    <field_type>text</field_type>
+                                    <filters />
+                                    <geofence>None</geofence>
+                                    <last>True</last>
+                                    <related_catalog>{}</related_catalog>
+                                    <view_fields>[]</view_fields>
+                                    <view_index>1</view_index>
+                                </catalog>
+                                <field_id>66b25f54eab1ff476202bac0</field_id>
+                                <group>{}</group>
+                                <label>Tipo de orden</label>
+                                <type>catalog-select</type>
+                            </trigger_field>
+                            <value>Interna</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+        <item>
+            <actions>
+                <item>
+                    <_id>6aad56bd83ceda14cfd30cf5</_id>
+                    <action_id>5</action_id>
+                    <action_settings>{}</action_settings>
+                    <configuration>
+                        <body>{% raw %} El informe de servicio con folio {{record.folio}} y número de orden {{record.answers.672e8edfd2f1f131c66505d9}} se ha terminado &lt;br&gt;&lt;br&gt;
+Cliente: {{record.answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252}}&lt;br&gt;
+Equipo: {{record.answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325}}&lt;br&gt;
+Falla reportada: {{record.answers.66748944d422d002d557d5be}}&lt;br&gt;&lt;br&gt;
+
+Más información en archivo adjunto. &lt;br&gt;&lt;br&gt;
+
+Atentamente, &lt;br&gt; 
+ECUAIRE S.A.S. &lt;br&gt;
+&lt;img src="https://f001.backblazeb2.com/file/lkf-media/company_pictures/company_pic_15667.thumbnail" width="107" height="32"&gt; {% endraw %}</body>
+                        <email_fields>[]</email_fields>
+                        <emails>
+                            <item>wlara@ecuaire.com</item>
+                        </emails>
+                        <embed_company_picture>True</embed_company_picture>
+                        <fields_attached>[]</fields_attached>
+                        <pdf_template>
+                            <_type>single_record</_type>
+                            <description>Template de Ecuaire informe de servicio</description>
+                            <id>449</id>
+                            <name>Ecuaire - Informe de Servicio</name>
+                            <owner>/api/infosync/user/15667/</owner>
+                            <paginate>True</paginate>
+                            <properties>{}</properties>
+                            <resource_uri>/api/infosync/templates/449/</resource_uri>
+                        </pdf_template>
+                        <resend>RESEND</resend>
+                        <send_attachments>False</send_attachments>
+                        <send_pdf>True</send_pdf>
+                        <sender>RECORD_USER</sender>
+                        <subject>{% raw %} Informe de servicio {{record.answers.672e8edfd2f1f131c66505d9}} de {{record.answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252}} Terminado {% endraw %}</subject>
+                        <timer_config>
+                            <seconds_to_expire>None</seconds_to_expire>
+                        </timer_config>
+                    </configuration>
+                    <name>Envia a Wilmer Lara</name>
+                </item>
+            </actions>
+            <id>6aad56be83ceda14cfd30d17</id>
+            <name>Envia correo servicio terminado</name>
+            <rules>
+                <metadata>
+                    <connection>[]</connection>
+                    <date>
+                        <period>
+                            <month>1</month>
+                            <selected>False</selected>
+                            <year>2014</year>
+                        </period>
+                        <range>
+                            <end>2026-09-19T06:00:00.000Z</end>
+                            <selected>False</selected>
+                            <start>2026-09-18T14:41:57.296Z</start>
+                        </range>
+                    </date>
+                    <grading>{}</grading>
+                    <user>[]</user>
+                </metadata>
+                <record>
+                    <created>True</created>
+                    <deleted>False</deleted>
+                    <edited>True</edited>
+                    <run_multiple_times>False</run_multiple_times>
+                    <runtime>after</runtime>
+                </record>
+                <wf_fields>
+                    <operator>all</operator>
+                    <triggers>
+                        <item>
+                            <condition>in=</condition>
+                            <form_id>None</form_id>
+                            <other_value>None</other_value>
+                            <prefix>answer</prefix>
+                            <trigger_field>
+                                <catalog>{}</catalog>
+                                <field_id>66b517d1269286e0777f9ba5</field_id>
+                                <group>{}</group>
+                                <label>Estatus del servicio</label>
+                                <type>select</type>
+                            </trigger_field>
+                            <value>terminado</value>
+                        </item>
+                    </triggers>
+                </wf_fields>
+            </rules>
+        </item>
+    </workflows>
+</lkf>

@@ -1,0 +1,763 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.care_inspection_oportunidades_comerciales_tecnico.id }}</form_id>
+    <id>670db57c510ec7b7dcd9aef6</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>668309d89331539409abace1</field_id>
+                        <group_id>None</group_id>
+                        <id>668309d89331539409abace1</id>
+                        <label>¿El equipo está registrado en la base de datos?</label>
+                        <type>radio</type>
+                    </field>
+                    <value>sí</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.activos_fijos.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>670f507af522b590fbfd918c</id>
+                    <label>Seleccione Equipo</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66beb1b507981d4509575057</field_id>
+                    <group_id>None</group_id>
+                    <id>66beb1b507981d4509575057</id>
+                    <label>Categoria</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66c192ef89463aa27fc1818b</field_id>
+                    <group_id>None</group_id>
+                    <id>66c192ef89463aa27fc1818b</id>
+                    <label>Nombre del equipo</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66beb10007981d4509575054</field_id>
+                    <group_id>None</group_id>
+                    <id>66beb10007981d4509575054</id>
+                    <label>Marca</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66beb11907981d4509575056</field_id>
+                    <group_id>None</group_id>
+                    <id>66beb11907981d4509575056</id>
+                    <label>Modelo</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>6646393c3fa8b818265d0325</field_id>
+                    <group_id>None</group_id>
+                    <id>6646393c3fa8b818265d0325</id>
+                    <label>Número de serie - Chasis</label>
+                    <type>catalog-select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar equipos registrados</name>
+            <operator>and</operator>
+            <rule_id>15be1fb4234925f4</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>668309d89331539409abace1</field_id>
+                        <group_id>None</group_id>
+                        <id>668309d89331539409abace1</id>
+                        <label>¿El equipo está registrado en la base de datos?</label>
+                        <type>radio</type>
+                    </field>
+                    <value>no</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22a</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22a</id>
+                    <label>Especifique Equipo</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22b</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22b</id>
+                    <label>Especifique Marca</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22c</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22c</id>
+                    <label>Especifique Modelo</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22d</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22d</id>
+                    <label>Especifique Serie</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar equipos No registrados</name>
+            <operator>and</operator>
+            <rule_id>244f1bcefd02593</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>667da18cb8c88bca5ab4f295</field_id>
+                        <group_id>None</group_id>
+                        <id>667da18cb8c88bca5ab4f295</id>
+                        <label>Lugar de trabajo</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>667da18cb8c88bca5ab4f295</field_id>
+                        <group_id>None</group_id>
+                        <id>667da18cb8c88bca5ab4f295</id>
+                        <label>Lugar de trabajo</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.usuarios.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>670f50c7f522b590fbfd91eb</id>
+                    <label>Usuario asignado</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>670f50c7f522b590fbfd91eb</catalog_id>
+                    <field_id>638a9a7767c332f5d459fc81</field_id>
+                    <group_id>None</group_id>
+                    <id>638a9a7767c332f5d459fc81</id>
+                    <label>Nombre</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>672eb5efd1134f9aca98da36</field_id>
+                    <group_id>None</group_id>
+                    <id>672eb5efd1134f9aca98da36</id>
+                    <label>Tipo de asignacion programada</label>
+                    <type>radio</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar campos siempre</name>
+            <operator>or</operator>
+            <rule_id>ca917ef12f62554</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>66b517d1269286e0777f9ba5</field_id>
+                        <group_id>None</group_id>
+                        <id>66b517d1269286e0777f9ba5</id>
+                        <label>Estatus del servicio</label>
+                        <type>select</type>
+                    </field>
+                    <value>terminado</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>670f50c71f4102516864159d</catalog_id>
+                    <field_id>6687f2f37b2c023e187d6252</field_id>
+                    <group_id>None</group_id>
+                    <id>6687f2f37b2c023e187d6252</id>
+                    <label>Razón Social</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d9925729284f1f84e4fd9</field_id>
+                    <group_id>None</group_id>
+                    <id>667d9925729284f1f84e4fd9</id>
+                    <label>Placas de producto, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d9997729284f1f84e4fdb</field_id>
+                    <group_id>None</group_id>
+                    <id>667d9997729284f1f84e4fdb</id>
+                    <label>Historial de servicio, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d9997729284f1f84e4fdd</field_id>
+                    <group_id>None</group_id>
+                    <id>667d9997729284f1f84e4fdd</id>
+                    <label>Anális de aceite, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b27d7fd9cfd81ef002ba97</field_id>
+                    <group_id>None</group_id>
+                    <id>66b27d7fd9cfd81ef002ba97</id>
+                    <label>MATRIS, Tech Tool y otras heramientas de servicio, lectura</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b27d7fd9cfd81ef002ba99</field_id>
+                    <group_id>None</group_id>
+                    <id>66b27d7fd9cfd81ef002ba99</id>
+                    <label>Nivel de aceite el motor, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b27d7fd9cfd81ef002ba9a</field_id>
+                    <group_id>None</group_id>
+                    <id>66b27d7fd9cfd81ef002ba9a</id>
+                    <label>Nivel del refirigerante, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b27d7fd9cfd81ef002ba9b</field_id>
+                    <group_id>None</group_id>
+                    <id>66b27d7fd9cfd81ef002ba9b</id>
+                    <label>Nivel del aceite  hidráulico, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b27d7fd9cfd81ef002ba9c</field_id>
+                    <group_id>None</group_id>
+                    <id>66b27d7fd9cfd81ef002ba9c</id>
+                    <label>Control del nivel del aceite  de la caja de engrane de giro</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b27d7fd9cfd81ef002ba9d</field_id>
+                    <group_id>None</group_id>
+                    <id>66b27d7fd9cfd81ef002ba9d</id>
+                    <label>Nivel del aceite  de la caja de engrane de oruga, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b27d7fd9cfd81ef002ba9e</field_id>
+                    <group_id>None</group_id>
+                    <id>66b27d7fd9cfd81ef002ba9e</id>
+                    <label>Fugas, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2815bf10b475b0e780410</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2815bf10b475b0e780410</id>
+                    <label>Tubos y mangueras, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2815bf10b475b0e780411</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2815bf10b475b0e780411</id>
+                    <label>Grietas, soldaduras, piezas ausentes, dañadas o desgastadas, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2815bf10b475b0e780412</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2815bf10b475b0e780412</id>
+                    <label>Pegatinas, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2815bf10b475b0e780413</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2815bf10b475b0e780413</id>
+                    <label>Uniones roscadas, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2815bf10b475b0e780414</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2815bf10b475b0e780414</id>
+                    <label>Espejos, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2815bf10b475b0e780415</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2815bf10b475b0e780415</id>
+                    <label>Limpieza, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2815bf10b475b0e780416</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2815bf10b475b0e780416</id>
+                    <label>Equipos de seguridad, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2815bf10b475b0e780417</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2815bf10b475b0e780417</id>
+                    <label>Manuales, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2815bf10b475b0e780418</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2815bf10b475b0e780418</id>
+                    <label>Conformidad de la maquina, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d9132</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d9132</id>
+                    <label>Prueba de conducción y control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d9133</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d9133</id>
+                    <label>Prueba de estado</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d9134</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d9134</id>
+                    <label>Velocidad de los cilindros, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d9135</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d9135</id>
+                    <label>Deslizamiento de los cilindros hidráulicos, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d9136</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d9136</id>
+                    <label>Velocidad de giro, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d9137</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d9137</id>
+                    <label>Giro por inercia a la izquierda y a la derecha, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d9138</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d9138</id>
+                    <label>Juego de cojinete de giro, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d9139</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d9139</id>
+                    <label>Velocidad de traslación, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d913a</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d913a</id>
+                    <label>Velocidad de marchas de las orugas, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d913b</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d913b</id>
+                    <label>Prestaciones de avance en línea recta, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>670db1ba510ec7b7dcd9adb9</field_id>
+                    <group_id>None</group_id>
+                    <id>670db1ba510ec7b7dcd9adb9</id>
+                    <label>Lubricación, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2828bb5e78ce40a3d913c</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2828bb5e78ce40a3d913c</id>
+                    <label>Sistema de lubricación automática, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2836e491e2966cd780392</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2836e491e2966cd780392</id>
+                    <label>Motor, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2836e491e2966cd780393</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2836e491e2966cd780393</id>
+                    <label>Punto de congelación del refrigerante, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2836e491e2966cd780394</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2836e491e2966cd780394</id>
+                    <label>Filtro de aire, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2836e491e2966cd780395</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2836e491e2966cd780395</id>
+                    <label>Enfriadores, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2836e491e2966cd780396</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2836e491e2966cd780396</id>
+                    <label>Ventilador de refrigeración, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2836e491e2966cd780397</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2836e491e2966cd780397</id>
+                    <label>Fijaciones de motor, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2836e491e2966cd780398</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2836e491e2966cd780398</id>
+                    <label>Condición de la correa, comprobación</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2836e491e2966cd780399</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2836e491e2966cd780399</id>
+                    <label>Régimen del motor, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2836e491e2966cd78039a</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2836e491e2966cd78039a</id>
+                    <label>Sistema de gases de escape, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2836e491e2966cd78039b</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2836e491e2966cd78039b</id>
+                    <label>Rendimiento del motor, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2accc832e0003e210e9b1</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2accc832e0003e210e9b1</id>
+                    <label>Batería, comprobación</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2ad318049f0f1727b02e2</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2ad318049f0f1727b02e2</id>
+                    <label>Nivel de electrolito de la batería, comprobación</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2ae3b05c6d495867803aa</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2ae3b05c6d495867803aa</id>
+                    <label>Conectores, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2ae3b05c6d495867803ab</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2ae3b05c6d495867803ab</id>
+                    <label>Mazos de cables, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2ae3b05c6d495867803ac</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2ae3b05c6d495867803ac</id>
+                    <label>Interruptores y selenoides, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2ae3b05c6d495867803ae</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2ae3b05c6d495867803ae</id>
+                    <label>Caje de engranajes de oruga , control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2ae3b05c6d495867803af</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2ae3b05c6d495867803af</id>
+                    <label>Motor de orugas, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2ae3b05c6d495867803b0</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2ae3b05c6d495867803b0</id>
+                    <label>Motor de giro, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2ae3b05c6d495867803b2</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2ae3b05c6d495867803b2</id>
+                    <label>Estabilizador y hoja, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2aef38c3f72d97f23a67e</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2aef38c3f72d97f23a67e</id>
+                    <label>Asiento del operador, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2aef38c3f72d97f23a67f</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2aef38c3f72d97f23a67f</id>
+                    <label>Correa del asiento, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2aef38c3f72d97f23a680</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2aef38c3f72d97f23a680</id>
+                    <label>Puertas y ventanas de la cabina, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2aef38c3f72d97f23a681</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2aef38c3f72d97f23a681</id>
+                    <label>Puertas de servicio, capós y cubiertas, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2aef38c3f72d97f23a682</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2aef38c3f72d97f23a682</id>
+                    <label>Prefiltro de la cabina, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66b2aef38c3f72d97f23a683</field_id>
+                    <group_id>None</group_id>
+                    <id>66b2aef38c3f72d97f23a683</id>
+                    <label>Filtro principal de cabina, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ce1ffcc5c4d148311aded3</field_id>
+                    <group_id>None</group_id>
+                    <id>66ce1ffcc5c4d148311aded3</id>
+                    <label>Cilindros, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>670db31f46556ceac7323a05</field_id>
+                    <group_id>None</group_id>
+                    <id>670db31f46556ceac7323a05</id>
+                    <label>Motores, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ce1ffcc5c4d148311aded4</field_id>
+                    <group_id>None</group_id>
+                    <id>66ce1ffcc5c4d148311aded4</id>
+                    <label>Acoplamiento rápido de implemento, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ce1ffcc5c4d148311aded5</field_id>
+                    <group_id>None</group_id>
+                    <id>66ce1ffcc5c4d148311aded5</id>
+                    <label>Cabina hidráulica elevada, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ce1ffcc5c4d148311aded6</field_id>
+                    <group_id>None</group_id>
+                    <id>66ce1ffcc5c4d148311aded6</id>
+                    <label>Bombas, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ce1ffcc5c4d148311aded7</field_id>
+                    <group_id>None</group_id>
+                    <id>66ce1ffcc5c4d148311aded7</id>
+                    <label>Válvulas , control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ce1ffcc5c4d148311aded8</field_id>
+                    <group_id>None</group_id>
+                    <id>66ce1ffcc5c4d148311aded8</id>
+                    <label>Mangueras hidráulicas, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ce1ffcc5c4d148311aded9</field_id>
+                    <group_id>None</group_id>
+                    <id>66ce1ffcc5c4d148311aded9</id>
+                    <label>Juego entre pasadores y casquillos, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ce1ffcc5c4d148311adeda</field_id>
+                    <group_id>None</group_id>
+                    <id>66ce1ffcc5c4d148311adeda</id>
+                    <label>Juego de la cuchara, control</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66ce1ffcc5c4d148311adedb</field_id>
+                    <group_id>None</group_id>
+                    <id>66ce1ffcc5c4d148311adedb</id>
+                    <label>Sistema de suspensión de la pluma, control</label>
+                    <type>radio</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requerir campos al Terminar</name>
+            <operator>and</operator>
+            <rule_id>e74cda12381b7a</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

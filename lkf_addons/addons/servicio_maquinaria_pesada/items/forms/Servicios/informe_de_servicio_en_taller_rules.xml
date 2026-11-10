@@ -1,0 +1,309 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.informe_de_servicio_en_taller.id }}</form_id>
+    <id>66b4ffe1dd1b6a3b1cf62168</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>668309d89331539409abace1</field_id>
+                        <group_id>None</group_id>
+                        <id>668309d89331539409abace1</id>
+                        <label>¿El equipo está registrado en la base de datos?</label>
+                        <type>radio</type>
+                    </field>
+                    <value>sí</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.activos_fijos.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>670f507af522b590fbfd918c</id>
+                    <label>Seleccione Equipo</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66beb1b507981d4509575057</field_id>
+                    <group_id>None</group_id>
+                    <id>66beb1b507981d4509575057</id>
+                    <label>Categoria</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66c192ef89463aa27fc1818b</field_id>
+                    <group_id>None</group_id>
+                    <id>66c192ef89463aa27fc1818b</id>
+                    <label>Nombre del equipo</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66beb10007981d4509575054</field_id>
+                    <group_id>None</group_id>
+                    <id>66beb10007981d4509575054</id>
+                    <label>Marca</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66beb11907981d4509575056</field_id>
+                    <group_id>None</group_id>
+                    <id>66beb11907981d4509575056</id>
+                    <label>Modelo</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>6646393c3fa8b818265d0325</field_id>
+                    <group_id>None</group_id>
+                    <id>6646393c3fa8b818265d0325</id>
+                    <label>Número de serie - Chasis</label>
+                    <type>catalog-select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar equipos registrados</name>
+            <operator>and</operator>
+            <rule_id>1a54ff31aa746d</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>668309d89331539409abace1</field_id>
+                        <group_id>None</group_id>
+                        <id>668309d89331539409abace1</id>
+                        <label>¿El equipo está registrado en la base de datos?</label>
+                        <type>radio</type>
+                    </field>
+                    <value>no</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22a</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22a</id>
+                    <label>Especifique Equipo</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22b</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22b</id>
+                    <label>Especifique Marca</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22c</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22c</id>
+                    <label>Especifique Modelo</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22d</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22d</id>
+                    <label>Especifique Serie</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar equipos No registrados</name>
+            <operator>and</operator>
+            <rule_id>1d0be436072476</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>667da18cb8c88bca5ab4f295</field_id>
+                        <group_id>None</group_id>
+                        <id>667da18cb8c88bca5ab4f295</id>
+                        <label>Lugar de trabajo</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>667da18cb8c88bca5ab4f295</field_id>
+                        <group_id>None</group_id>
+                        <id>667da18cb8c88bca5ab4f295</id>
+                        <label>Lugar de trabajo</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>a00000000000000000000004</field_id>
+                    <group_id>None</group_id>
+                    <id>a00000000000000000000004</id>
+                    <label>Subtotal Compras locales</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>a00000000000000000000005</field_id>
+                    <group_id>None</group_id>
+                    <id>a00000000000000000000005</id>
+                    <label>Subtotal Otros gastos</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>000000000000000000000006</field_id>
+                    <group_id>None</group_id>
+                    <id>000000000000000000000006</id>
+                    <label>Total Gastos</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>a00000000000000000000008</field_id>
+                    <group_id>None</group_id>
+                    <id>a00000000000000000000008</id>
+                    <label>Saldo</label>
+                    <type>decimal</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.usuarios.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>670f50c7f522b590fbfd91eb</id>
+                    <label>Usuario Asignado</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>670f50c7f522b590fbfd91eb</catalog_id>
+                    <field_id>638a9a7767c332f5d459fc81</field_id>
+                    <group_id>None</group_id>
+                    <id>638a9a7767c332f5d459fc81</id>
+                    <label>Nombre</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>672eb5efd1134f9aca98da36</field_id>
+                    <group_id>None</group_id>
+                    <id>672eb5efd1134f9aca98da36</id>
+                    <label>Tipo de asignacion programada</label>
+                    <type>radio</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar campos rellenados por script</name>
+            <operator>or</operator>
+            <rule_id>99c6ea21ed15ba</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>6686ebc5e9dfa385bfabad81</field_id>
+                        <group_id>6675b286b258d3517a03e8c7</group_id>
+                        <id>6686ebc5e9dfa385bfabad81</id>
+                        <label>Tipo de gasto</label>
+                        <type>select</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>a00000000000000000000007</field_id>
+                    <group_id>None</group_id>
+                    <id>a00000000000000000000007</id>
+                    <label>Anticipo recibido</label>
+                    <type>decimal</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requerir anticipo</name>
+            <operator>and</operator>
+            <rule_id>22ba23c993d1e89</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>66b517d1269286e0777f9ba5</field_id>
+                        <group_id>None</group_id>
+                        <id>66b517d1269286e0777f9ba5</id>
+                        <label>Estatus del servicio</label>
+                        <type>select</type>
+                    </field>
+                    <value>terminado</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>670f50c71f4102516864159d</catalog_id>
+                    <field_id>6687f2f37b2c023e187d6252</field_id>
+                    <group_id>None</group_id>
+                    <id>6687f2f37b2c023e187d6252</id>
+                    <label>Razón Social</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667489b66e98a08e9d03e954</field_id>
+                    <group_id>None</group_id>
+                    <id>667489b66e98a08e9d03e954</id>
+                    <label>Daños encontrados</label>
+                    <type>textarea</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requerir campos al terminar</name>
+            <operator>and</operator>
+            <rule_id>22f5a2d4361655</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>

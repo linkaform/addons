@@ -1,0 +1,939 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lkf>
+    <form_id>{{ form.entrada_y_salida_de_equipos.id }}</form_id>
+    <id>66e0dd5506f6978acdcb64f0</id>
+    <rules>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>668309d89331539409abace1</field_id>
+                        <group_id>None</group_id>
+                        <id>668309d89331539409abace1</id>
+                        <label>¿El equipo está registrado en la base de datos?</label>
+                        <type>radio</type>
+                    </field>
+                    <value>no</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22a</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22a</id>
+                    <label>Especifique Equipo</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22b</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22b</id>
+                    <label>Especifique Marca</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22c</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22c</id>
+                    <label>Especifique Modelo</label>
+                    <type>text</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66830c302315146a39b4f22d</field_id>
+                    <group_id>None</group_id>
+                    <id>66830c302315146a39b4f22d</id>
+                    <label>Especifique Serie</label>
+                    <type>text</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostrar equipos no registrados</name>
+            <operator>and</operator>
+            <rule_id>1ed1dc91f6f1a13</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>iexact=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>668309d89331539409abace1</field_id>
+                        <group_id>None</group_id>
+                        <id>668309d89331539409abace1</id>
+                        <label>¿El equipo está registrado en la base de datos?</label>
+                        <type>radio</type>
+                    </field>
+                    <value>sí</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.activos_fijos.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>670f507af522b590fbfd918c</id>
+                    <label>Seleccione Equipo</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66beb1b507981d4509575057</field_id>
+                    <group_id>None</group_id>
+                    <id>66beb1b507981d4509575057</id>
+                    <label>Categoria</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66c192ef89463aa27fc1818b</field_id>
+                    <group_id>None</group_id>
+                    <id>66c192ef89463aa27fc1818b</id>
+                    <label>Nombre del equipo</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66beb10007981d4509575054</field_id>
+                    <group_id>None</group_id>
+                    <id>66beb10007981d4509575054</id>
+                    <label>Marca</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>66beb11907981d4509575056</field_id>
+                    <group_id>None</group_id>
+                    <id>66beb11907981d4509575056</id>
+                    <label>Modelo</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>670f507af522b590fbfd918c</catalog_id>
+                    <field_id>6646393c3fa8b818265d0325</field_id>
+                    <group_id>None</group_id>
+                    <id>6646393c3fa8b818265d0325</id>
+                    <label>Número de serie - Chasis</label>
+                    <type>catalog-select</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Mostar equipos registrados</name>
+            <operator>and</operator>
+            <rule_id>7a0c0524b62200</rule_id>
+            <rule_type>show</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>is__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>667da18cb8c88bca5ab4f295</field_id>
+                        <group_id>None</group_id>
+                        <id>667da18cb8c88bca5ab4f295</id>
+                        <label>Lugar de trabajo</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+                <item>
+                    <condition>not__empty=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>667da18cb8c88bca5ab4f295</field_id>
+                        <group_id>None</group_id>
+                        <id>667da18cb8c88bca5ab4f295</id>
+                        <label>Lugar de trabajo</label>
+                        <type>radio</type>
+                    </field>
+                    <value> </value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>{{ catalog.usuarios.obj_id}}</field_id>
+                    <group_id>None</group_id>
+                    <id>670f50c7f522b590fbfd91eb</id>
+                    <label>Usuario Asignado</label>
+                    <type>catalog</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>638a9a7767c332f5d459fc81</field_id>
+                    <group_id>None</group_id>
+                    <id>638a9a7767c332f5d459fc81</id>
+                    <label>Nombre</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>672eb5efd1134f9aca98da36</field_id>
+                    <group_id>None</group_id>
+                    <id>672eb5efd1134f9aca98da36</id>
+                    <label>Tipo de asignacion programada</label>
+                    <type>radio</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Ocultar campos rellenados por script</name>
+            <operator>or</operator>
+            <rule_id>13bfe67e64827</rule_id>
+            <rule_type>invisible</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+        <item>
+            <conditions>
+                <item>
+                    <condition>in=</condition>
+                    <field>
+                        <catalog_id>None</catalog_id>
+                        <field_id>66b517d1269286e0777f9ba5</field_id>
+                        <group_id>None</group_id>
+                        <id>66b517d1269286e0777f9ba5</id>
+                        <label>Estatus del servicio</label>
+                        <type>select</type>
+                    </field>
+                    <value>terminado</value>
+                </item>
+            </conditions>
+            <element_ids>[]</element_ids>
+            <empty>False</empty>
+            <fields_ruled>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>6687f2f37b2c023e187d6252</field_id>
+                    <group_id>None</group_id>
+                    <id>6687f2f37b2c023e187d6252</id>
+                    <label>Razón Social</label>
+                    <type>catalog-select</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667489b66e98a08e9d03e956</field_id>
+                    <group_id>None</group_id>
+                    <id>667489b66e98a08e9d03e956</id>
+                    <label>Equipo antes de ser atendido</label>
+                    <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66748a1e9f72ef0ecee66b7e</field_id>
+                    <group_id>None</group_id>
+                    <id>66748a1e9f72ef0ecee66b7e</id>
+                    <label>Placa del equipo</label>
+                    <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66748a1e9f72ef0ecee66b7f</field_id>
+                    <group_id>None</group_id>
+                    <id>66748a1e9f72ef0ecee66b7f</id>
+                    <label>Imagen general (lado A)</label>
+                    <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66748a1e9f72ef0ecee66b80</field_id>
+                    <group_id>None</group_id>
+                    <id>66748a1e9f72ef0ecee66b80</id>
+                    <label>Imagen general (lado B)</label>
+                    <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66748a1e9f72ef0ecee66b81</field_id>
+                    <group_id>None</group_id>
+                    <id>66748a1e9f72ef0ecee66b81</id>
+                    <label>Imagen posterior</label>
+                    <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66748a1e9f72ef0ecee66b82</field_id>
+                    <group_id>None</group_id>
+                    <id>66748a1e9f72ef0ecee66b82</id>
+                    <label>Imagen horómetro</label>
+                    <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>66748a1e9f72ef0ecee66b83</field_id>
+                    <group_id>None</group_id>
+                    <id>66748a1e9f72ef0ecee66b83</id>
+                    <label>Imagen horómetro digital (panel)</label>
+                    <type>images</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6712a5b1d9503d12dfe9</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6712a5b1d9503d12dfe9</id>
+                    <label>Nivel aceite de motor</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d680eea96bd83914e4f76</field_id>
+                    <group_id>None</group_id>
+                    <id>667d680eea96bd83914e4f76</id>
+                    <label>Nivel de aceite hidráulico</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d680eea96bd83914e4f77</field_id>
+                    <group_id>None</group_id>
+                    <id>667d680eea96bd83914e4f77</id>
+                    <label>Nivel de aceite reductor giro</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d680eea96bd83914e4f78</field_id>
+                    <group_id>None</group_id>
+                    <id>667d680eea96bd83914e4f78</id>
+                    <label>Nivel de refrigerante motor</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d680eea96bd83914e4f79</field_id>
+                    <group_id>None</group_id>
+                    <id>667d680eea96bd83914e4f79</id>
+                    <label>Nivel aceite M/F derecha</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d680eea96bd83914e4f7a</field_id>
+                    <group_id>None</group_id>
+                    <id>667d680eea96bd83914e4f7a</id>
+                    <label>Nivel aceite M/F izquierda</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d680eea96bd83914e4f7b</field_id>
+                    <group_id>None</group_id>
+                    <id>667d680eea96bd83914e4f7b</id>
+                    <label>Nivel de agua Batería</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d680eea96bd83914e4f7c</field_id>
+                    <group_id>None</group_id>
+                    <id>667d680eea96bd83914e4f7c</id>
+                    <label>Nivel de agua limpiabrisas</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df94</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df94</id>
+                    <label>Vidrios</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df95</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df95</id>
+                    <label>Asiento</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df96</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df96</id>
+                    <label>Cinturón de seguridad</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df97</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df97</id>
+                    <label>Pito</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df98</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df98</id>
+                    <label>Control de bloqueo</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df99</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df99</id>
+                    <label>Controles de implementos</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df9a</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df9a</id>
+                    <label>Controles de tracción</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df9b</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df9b</id>
+                    <label>Presión de aceite motor</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df9c</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df9c</id>
+                    <label>Luces de alarma</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df9d</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df9d</id>
+                    <label>Indicadores</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d68ebf0b9fb980e12df9e</field_id>
+                    <group_id>None</group_id>
+                    <id>667d68ebf0b9fb980e12df9e</id>
+                    <label>Horómetro</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6929fa49988259b4f27a</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6929fa49988259b4f27a</id>
+                    <label>Aire acondicionado</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6929fa49988259b4f27b</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6929fa49988259b4f27b</id>
+                    <label>Luces externas de servicio</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6929fa49988259b4f27c</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6929fa49988259b4f27c</id>
+                    <label>Radio</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d69ba60340ece540904fa</field_id>
+                    <group_id>None</group_id>
+                    <id>667d69ba60340ece540904fa</id>
+                    <label>Placa de serie</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d69ba60340ece540904fc</field_id>
+                    <group_id>None</group_id>
+                    <id>667d69ba60340ece540904fc</id>
+                    <label>Pintura</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d69ba60340ece540904fd</field_id>
+                    <group_id>None</group_id>
+                    <id>667d69ba60340ece540904fd</id>
+                    <label>Guardas laterales</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d69ba60340ece540904fe</field_id>
+                    <group_id>None</group_id>
+                    <id>667d69ba60340ece540904fe</id>
+                    <label>Guardas inferiores</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d69ba60340ece540904ff</field_id>
+                    <group_id>None</group_id>
+                    <id>667d69ba60340ece540904ff</id>
+                    <label>Tapa de motor</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fe0</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fe0</id>
+                    <label>Bomba 1</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fe1</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fe1</id>
+                    <label>Bomba 2</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fe2</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fe2</id>
+                    <label>Bomba 3</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fe3</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fe3</id>
+                    <label>Grupo de válvulas</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fe4</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fe4</id>
+                    <label>Tanque hidráulico</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fe5</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fe5</id>
+                    <label>Mangueras</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fe6</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fe6</id>
+                    <label>Cañerías</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fe7</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fe7</id>
+                    <label>Motor de giro tornamesa</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fe8</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fe8</id>
+                    <label>Repartidor flujo central</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fe9</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fe9</id>
+                    <label>Cilindro pluma derecho</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fea</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fea</id>
+                    <label>Cilindro pluma izquierdo</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4feb</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4feb</id>
+                    <label>Cilindro brazo</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6a8360baf75d774e4fec</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6a8360baf75d774e4fec</id>
+                    <label>Cilindro cucharón</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6ac0d45b5146340904f7</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6ac0d45b5146340904f7</id>
+                    <label>Placa de serie Motor</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88b9</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88b9</id>
+                    <label>Válvula blowby</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88ba</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88ba</id>
+                    <label>Motor de arranque</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88bb</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88bb</id>
+                    <label>Sistema de combustible</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88bc</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88bc</id>
+                    <label>Sistema de escape</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88bd</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88bd</id>
+                    <label>Radiador</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88be</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88be</id>
+                    <label>Fugas de aceite</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88bf</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88bf</id>
+                    <label>Fugas de combustible</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88c0</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88c0</id>
+                    <label>Fugas de refrigerante</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88c1</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88c1</id>
+                    <label>Presencia de humo</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88c2</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88c2</id>
+                    <label>Ajuste de bandas</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6b5de5fd4813428d88c3</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6b5de5fd4813428d88c3</id>
+                    <label>Estado de poleas</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6bd88db1bc632a12df90</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6bd88db1bc632a12df90</id>
+                    <label>Motor tracción derecho</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6bd88db1bc632a12df91</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6bd88db1bc632a12df91</id>
+                    <label>Motor tracción izquierdo</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6bd88db1bc632a12df92</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6bd88db1bc632a12df92</id>
+                    <label>Reductor derecho</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6bd88db1bc632a12df93</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6bd88db1bc632a12df93</id>
+                    <label>Reductor izquierdo</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6bd88db1bc632a12df94</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6bd88db1bc632a12df94</id>
+                    <label>Tensor derecho</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6bd88db1bc632a12df95</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6bd88db1bc632a12df95</id>
+                    <label>Tensor izquierdo</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6c731e0c733f6d54c19d</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6c731e0c733f6d54c19d</id>
+                    <label>Estructura general</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6c731e0c733f6d54c19e</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6c731e0c733f6d54c19e</id>
+                    <label>Estado de la pluma</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6c731e0c733f6d54c19f</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6c731e0c733f6d54c19f</id>
+                    <label>Estado del brazo</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6c731e0c733f6d54c1a0</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6c731e0c733f6d54c1a0</id>
+                    <label>Sistema pivote de cucharón</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6c731e0c733f6d54c1a1</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6c731e0c733f6d54c1a1</id>
+                    <label>Pines/bocines chásis-pluma</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6c731e0c733f6d54c1a2</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6c731e0c733f6d54c1a2</id>
+                    <label>Pines/bocines pluma-brazo</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6c731e0c733f6d54c1a3</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6c731e0c733f6d54c1a3</id>
+                    <label>Pines/bocines pivote (mono)</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6c731e0c733f6d54c1a4</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6c731e0c733f6d54c1a4</id>
+                    <label>Pines/bocines cucharón</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6c731e0c733f6d54c1a5</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6c731e0c733f6d54c1a5</id>
+                    <label>Cinta tornamesa</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6c731e0c733f6d54c1a6</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6c731e0c733f6d54c1a6</id>
+                    <label>Guardas inferiores</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6cd104be7c446354c19d</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6cd104be7c446354c19d</id>
+                    <label>Estado cucharón</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6cd104be7c446354c19e</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6cd104be7c446354c19e</id>
+                    <label>Soporte de uña cucharón</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6cd104be7c446354c19f</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6cd104be7c446354c19f</id>
+                    <label>Uñas</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6cd104be7c446354c1a0</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6cd104be7c446354c1a0</id>
+                    <label>Cuchillas</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6cd104be7c446354c1a1</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6cd104be7c446354c1a1</id>
+                    <label>Respaldo laterales</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6d75408041bcb909055d</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6d75408041bcb909055d</id>
+                    <label>Rodillos superiores izquierda</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6d75408041bcb909055e</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6d75408041bcb909055e</id>
+                    <label>Rodillos superiores derecha</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6d75408041bcb909055f</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6d75408041bcb909055f</id>
+                    <label>Rodillos inferiores izquierda</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6d75408041bcb9090560</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6d75408041bcb9090560</id>
+                    <label>Rodillos inferiores derecha</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6d75408041bcb9090561</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6d75408041bcb9090561</id>
+                    <label>Rueda guía izquierda</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6d75408041bcb9090562</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6d75408041bcb9090562</id>
+                    <label>Rueda guía derecha</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6d75408041bcb9090563</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6d75408041bcb9090563</id>
+                    <label>Cilindro templador izquierda</label>
+                    <type>radio</type>
+                </item>
+                <item>
+                    <catalog_id>None</catalog_id>
+                    <field_id>667d6d75408041bcb9090564</field_id>
+                    <group_id>None</group_id>
+                    <id>667d6d75408041bcb9090564</id>
+                    <label>Cilindro templador derecha</label>
+                    <type>radio</type>
+                </item>
+            </fields_ruled>
+            <group_conditions>{}</group_conditions>
+            <name>Requerir campos al terminar</name>
+            <operator>and</operator>
+            <rule_id>21fb22ddb21961</rule_id>
+            <rule_type>required</rule_type>
+            <user_conditions>{}</user_conditions>
+        </item>
+    </rules>
+</lkf>
