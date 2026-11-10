@@ -154,12 +154,12 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
         start_end_hrs_trabajadas = ('iniciar_actividad', 'terminar_actividad')
         start_end_ida = ('iniciar_ida', 'terminar_ida')
         start_end_regreso = ('iniciar_regreso', 'terminar_regreso')
-        if status_hrs_trabajadas in start_end_hrs_trabajadas and self.current_record['answers'].get('6736968ee7be2602ca566376') == 'online':
-            self.calculates_dates_group('c00000000000000000000003', status_hrs_trabajadas, start_end_hrs_trabajadas[0], start_end_hrs_trabajadas[1], self.f['field_id_inicio_actividad'], self.f['field_id_fin_actividad'])
+        if status_hrs_trabajadas in start_end_hrs_trabajadas and self.current_record['answers'].get(self.f['modo_registro_horas']) == 'online':
+            self.calculates_dates_group(self.f['grupo_horas_trabajadas'], status_hrs_trabajadas, start_end_hrs_trabajadas[0], start_end_hrs_trabajadas[1], self.f['field_id_inicio_actividad'], self.f['field_id_fin_actividad'])
         elif status_hrs_trabajadas in start_end_ida:
-            self.calculates_dates_group('c00000000000000000000021', status_hrs_trabajadas, start_end_ida[0], start_end_ida[1], self.f['field_id_iniciar_ida'], self.f['field_id_terminar_ida'])
+            self.calculates_dates_group(self.f['grupo_traslado_ida'], status_hrs_trabajadas, start_end_ida[0], start_end_ida[1], self.f['field_id_iniciar_ida'], self.f['field_id_terminar_ida'])
         elif status_hrs_trabajadas in start_end_regreso:
-            self.calculates_dates_group('c00000000000000000000022', status_hrs_trabajadas, start_end_regreso[0], start_end_regreso[1], self.f['field_id_iniciar_regreso'], self.f['field_id_terminar_regreso'])
+            self.calculates_dates_group(self.f['grupo_traslado_regreso'], status_hrs_trabajadas, start_end_regreso[0], start_end_regreso[1], self.f['field_id_iniciar_regreso'], self.f['field_id_terminar_regreso'])
 
     def calcula_gastos(self):
         opts, fields_subtotales, with_kilometraje, with_status = self.get_optios_and_fields_subtotales()
@@ -187,9 +187,9 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
 
 
         """
-        Si la forma es Informe de servicio (119972) hay que pegar la fecha de actualizacion en el campo que corresponda
+        Si la forma es Informe de servicio hay que pegar la fecha de actualizacion en el campo que corresponda
         """
-        if with_status and self.current_record['answers'].get('6736968ee7be2602ca566376') == 'online':
+        if with_status and self.current_record['answers'].get(self.f['modo_registro_horas']) == 'online':
             self.add_fecha_field()
 
 
@@ -201,8 +201,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
     # ---- update_reasignado.py ----
 
     def update_reasignado(self):
-        no_orden = self.answers.get('672e8edfd2f1f131c66505d9')
-        id_forma = self.unlist( self.answers.get('672eb39a4d20582177b00a05', {}).get('672eb39a4d20582177b00a07') )
+        no_orden = self.answers.get(self.f['numero_orden'])
+        id_forma = self.unlist( self.answers.get(self.FORMULARIOS_CAT_OBJ_ID, {}).get(self.f['id_formulario']) )
         print(f'-- No de orden = {no_orden} ID de la Forma = {id_forma}')
 
         # Se debe tener el folio y el id de la forma donde se buscara el registro
@@ -220,8 +220,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
         print('\n\n++ ++ record_found =',record_found)
 
         record_found['answers'].update({
-            '670f50c7f522b590fbfd91eb': self.answers.get('670f50c7f522b590fbfd91eb', {}), # usuario_asignado
-            '672eb5efd1134f9aca98da36': self.answers.get('672eb5efd1134f9aca98da36') # tipo_de_asignacion
+            self.USUARIOS_CAT_OBJ_ID: self.answers.get(self.USUARIOS_CAT_OBJ_ID, {}), # usuario_asignado
+            self.f['tipo_asignacion']: self.answers.get(self.f['tipo_asignacion']) # tipo_de_asignacion
         })
 
         resp_update = self.lkf_api.patch_record(record_found)
@@ -232,9 +232,9 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
     #---Query
     def get_query_informe_servicio_gastos(self, date_from = None, date_to = None):
         match_query = { 
-            "form_id": {'$in': [119972, 120422]},
+            "form_id": {'$in': [self.INFORME_SERVICIO, self.INFORME_SERVICIO_TALLER]},
             "deleted_at":{"$exists":False},
-            "answers.6675b286b258d3517a03e8c7": {
+            f"answers.{self.f['field_group_gastos']}": {
                 "$exists": True,
                 "$ne": [],
             }
@@ -260,23 +260,23 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
                 }
             }},
             {"$match": match_query},
-            {"$unwind": "$answers.6675b286b258d3517a03e8c7"},
+            {"$unwind": f"$answers.{self.f['field_group_gastos']}"},
             {"$project": {
                 "_id":1,
                 "folio":"$folio",
-                "num_odt":"$answers.672e8edfd2f1f131c66505d9",
+                "num_odt":f"$answers.{self.f['numero_orden']}",
                 "tecnico": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.666a160967bcb9e23b1cc967.66707634e674c20724d85969.62c5ff407febce07043024dd" },
-                        "then": { "$arrayElemAt": ["$answers.666a160967bcb9e23b1cc967.66707634e674c20724d85969.62c5ff407febce07043024dd", 0] },
-                        "else": "$answers.666a160967bcb9e23b1cc967.66707634e674c20724d85969.62c5ff407febce07043024dd"
+                        "if": { "$isArray": f"$answers.{self.f['tecnicos_asignados']}.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.f['tecnicos_asignados']}.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}", 0] },
+                        "else": f"$answers.{self.f['tecnicos_asignados']}.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}"
                     }
                 },
-                "tipo_gasto":"$answers.6675b286b258d3517a03e8c7.6686ebc5e9dfa385bfabad81",
-                "monto":"$answers.6675b286b258d3517a03e8c7.a00000000000000000000001",
+                "tipo_gasto":f"$answers.{self.f['field_group_gastos']}.{self.f['field_select_tipo_gasto']}",
+                "monto":f"$answers.{self.f['field_group_gastos']}.{self.f['field_monto_gasto']}",
                 "comprobante": {
                     "$arrayElemAt": [
-                        "$answers.6675b286b258d3517a03e8c7.6686ebc5e9dfa385bfabad83.file_url",
+                        f"$answers.{self.f['field_group_gastos']}.{self.f['comprobante_gasto']}.file_url",
                         0
                     ]
                 }
@@ -302,9 +302,9 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
     #---Query
     def get_query_comercial(self, date_from = None, date_to = None):
         match_query = { 
-            "form_id": {'$in': [120576,124648,124649]},
+            "form_id": {'$in': [self.CARE_INSPECTION_CSR, self.GESTION_COMERCIAL_POSTVENTA, self.GESTION_COMERCIAL_VENTAS]},
             "deleted_at":{"$exists":False},
-            "answers.6675b286b258d3517a03e8c7": {
+            f"answers.{self.f['field_group_gastos']}": {
                 "$exists": True,
                 "$ne": [],
             }
@@ -331,15 +331,15 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
                 }
             }},
             {"$match": match_query},
-            {"$unwind": "$answers.6675b286b258d3517a03e8c7"},
+            {"$unwind": f"$answers.{self.f['field_group_gastos']}"},
             {"$project": {
                 "_id":1,
                 "folio":"$folio",
-                "tipo_gasto":"$answers.6675b286b258d3517a03e8c7.6686ebc5e9dfa385bfabad81",
-                "monto":"$answers.6675b286b258d3517a03e8c7.a00000000000000000000001",
+                "tipo_gasto":f"$answers.{self.f['field_group_gastos']}.{self.f['field_select_tipo_gasto']}",
+                "monto":f"$answers.{self.f['field_group_gastos']}.{self.f['field_monto_gasto']}",
                 "comprobante": {
                     "$arrayElemAt": [
-                        "$answers.6675b286b258d3517a03e8c7.6686ebc5e9dfa385bfabad83.file_url",
+                        f"$answers.{self.f['field_group_gastos']}.{self.f['comprobante_gasto']}.file_url",
                         0
                     ]
                 }
@@ -389,8 +389,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             codigo_empleado = ''
             set_tecnico = item_record.get('set_tecnico','')
             if len(set_tecnico) > 0:
-                tecnico = set_tecnico[0].get('66707634e674c20724d85969',{}).get('62c5ff407febce07043024dd','')
-                codigo_empleado = set_tecnico[0].get('66707634e674c20724d85969',{}).get('670f585bf844ff7bc357b1dc','')
+                tecnico = set_tecnico[0].get(self.EMPLEADOS_CAT_OBJ_ID,{}).get(self.f['nombre_completo'],'')
+                codigo_empleado = set_tecnico[0].get(self.EMPLEADOS_CAT_OBJ_ID,{}).get(self.f['codigo_empleado'],'')
 
             dic_base['tecnico'] = tecnico
 
@@ -408,8 +408,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_traslado) > 0:
                 for item_set in set_horas_traslado:
                     dic_item = dic_base.copy()  
-                    date_start = item_set.get('c00000000000000000000001','')
-                    date_end = item_set.get('c00000000000000000000002','')
+                    date_start = item_set.get(self.f['field_id_iniciar_ida'],'')
+                    date_end = item_set.get(self.f['field_id_terminar_ida'],'')
 
                     if date_start and date_end:
                         date_start = date_start.replace("/", "-")
@@ -441,8 +441,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_trabajadas) > 0:
                 for item_set in set_horas_trabajadas:
                     dic_item = dic_base.copy()  
-                    date_start = item_set.get('c00000000000000000000004','')
-                    date_end = item_set.get('c00000000000000000000005','')
+                    date_start = item_set.get(self.f['field_id_inicio_actividad'],'')
+                    date_end = item_set.get(self.f['field_id_fin_actividad'],'')
 
                     if date_start and date_end:
 
@@ -475,8 +475,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_regreso) > 0:
                 for item_set in set_horas_regreso:
                     dic_item = dic_base.copy()  
-                    date_start = item_set.get('c00000000000000000000006','')
-                    date_end = item_set.get('c00000000000000000000007','')
+                    date_start = item_set.get(self.f['field_id_iniciar_regreso'],'')
+                    date_end = item_set.get(self.f['field_id_terminar_regreso'],'')
 
                     if date_start and date_end:
 
@@ -539,8 +539,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_traslado) > 0:
                 for item_set in set_horas_traslado:
                     dic_item = dic_base.copy() 
-                    date_start = item_set.get('c00000000000000000000001','')
-                    date_end = item_set.get('c00000000000000000000002','')
+                    date_start = item_set.get(self.f['field_id_iniciar_ida'],'')
+                    date_end = item_set.get(self.f['field_id_terminar_ida'],'')
 
                     if date_start and date_end:
                         date_start = date_start.replace("/", "-")
@@ -571,8 +571,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_trabajadas) > 0:
                 for item_set in set_horas_trabajadas:
                     dic_item = dic_base.copy() 
-                    date_start = item_set.get('c00000000000000000000004','')
-                    date_end = item_set.get('c00000000000000000000005','')
+                    date_start = item_set.get(self.f['field_id_inicio_actividad'],'')
+                    date_end = item_set.get(self.f['field_id_fin_actividad'],'')
 
                     if date_start and date_end:
 
@@ -604,8 +604,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_regreso) > 0:
                 for item_set in set_horas_regreso:
                     dic_item = dic_base.copy() 
-                    date_start = item_set.get('c00000000000000000000006','')
-                    date_end = item_set.get('c00000000000000000000007','')
+                    date_start = item_set.get(self.f['field_id_iniciar_regreso'],'')
+                    date_end = item_set.get(self.f['field_id_terminar_regreso'],'')
 
                     if date_start and date_end:
 
@@ -721,8 +721,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_traslado) > 0:
                 for item_set in set_horas_traslado:
                     dic_item = dic_base.copy()
-                    date_start = item_set.get('c00000000000000000000001','')
-                    date_end = item_set.get('c00000000000000000000002','')
+                    date_start = item_set.get(self.f['field_id_iniciar_ida'],'')
+                    date_end = item_set.get(self.f['field_id_terminar_ida'],'')
 
                     if date_start and date_end:
                         date_start = date_start.replace("/", "-")
@@ -753,8 +753,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_trabajadas) > 0:
                 for item_set in set_horas_trabajadas:
                     dic_item = dic_base.copy()
-                    date_start = item_set.get('c00000000000000000000004','')
-                    date_end = item_set.get('c00000000000000000000005','')
+                    date_start = item_set.get(self.f['field_id_inicio_actividad'],'')
+                    date_end = item_set.get(self.f['field_id_fin_actividad'],'')
 
                     if date_start and date_end:
 
@@ -786,8 +786,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_regreso) > 0:
                 for item_set in set_horas_regreso:
                     dic_item = dic_base.copy()
-                    date_start = item_set.get('c00000000000000000000006','')
-                    date_end = item_set.get('c00000000000000000000007','')
+                    date_start = item_set.get(self.f['field_id_iniciar_regreso'],'')
+                    date_end = item_set.get(self.f['field_id_terminar_regreso'],'')
 
                     if date_start and date_end:
 
@@ -849,8 +849,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_traslado) > 0:
                 for item_set in set_horas_traslado:
                     dic_item = dic_base.copy()
-                    date_start = item_set.get('c00000000000000000000001','')
-                    date_end = item_set.get('c00000000000000000000002','')
+                    date_start = item_set.get(self.f['field_id_iniciar_ida'],'')
+                    date_end = item_set.get(self.f['field_id_terminar_ida'],'')
 
                     if date_start and date_end:
                         date_start = date_start.replace("/", "-")
@@ -881,8 +881,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_trabajadas) > 0:
                 for item_set in set_horas_trabajadas:
                     dic_item = dic_base.copy()
-                    date_start = item_set.get('c00000000000000000000004','')
-                    date_end = item_set.get('c00000000000000000000005','')
+                    date_start = item_set.get(self.f['field_id_inicio_actividad'],'')
+                    date_end = item_set.get(self.f['field_id_fin_actividad'],'')
 
                     if date_start and date_end:
 
@@ -914,8 +914,8 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             if len(set_horas_regreso) > 0:
                 for item_set in set_horas_regreso:
                     dic_item = dic_base.copy()
-                    date_start = item_set.get('c00000000000000000000006','')
-                    date_end = item_set.get('c00000000000000000000007','')
+                    date_start = item_set.get(self.f['field_id_iniciar_regreso'],'')
+                    date_end = item_set.get(self.f['field_id_terminar_regreso'],'')
 
                     if date_start and date_end:
 
@@ -949,7 +949,7 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
     #---- Query
     def get_query_informe_servicio_hours(self, date_from, date_to, num_order):
         match_query = { 
-            "form_id": 119972,
+            "form_id": self.INFORME_SERVICIO,
             "deleted_at": {"$exists": False},
         }
         if date_from!='':
@@ -962,7 +962,7 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field='update_at_ajustada'))
 
         if num_order!='':
-            match_query.update({"answers.672e8edfd2f1f131c66505d9":num_order})
+            match_query.update({f"answers.{self.f['numero_orden']}":num_order})
 
         query = [
             { "$addFields": {
@@ -979,30 +979,30 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
                 "_id":1,
                 "folio":"$folio",
                 "update_at_ajustada":"$update_at_ajustada",
-                "no_orden":"$answers.672e8edfd2f1f131c66505d9",
+                "no_orden":f"$answers.{self.f['numero_orden']}",
                 "cliente": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252" },
-                        "then": { "$arrayElemAt": ["$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252", 0] },
-                        "else": "$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252"
+                        "if": { "$isArray": f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}", 0] },
+                        "else": f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}"
                     }
                 },
-                "option_data":"$answers.668309d89331539409abace1",
+                "option_data":f"$answers.{self.f['equipo_registrado']}",
                 "chasis_catalog": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325" },
-                        "then": { "$arrayElemAt": ["$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325", 0] },
-                        "else": "$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325"
+                        "if": { "$isArray": f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}", 0] },
+                        "else": f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}"
                     }
                 },
-                "chasis_text":"$answers.66830c302315146a39b4f22d",
-                "trabajo_realizado":"$answers.667489b66e98a08e9d03e955",
-                "fecha_apertura":"$answers.666a160967bcb9e23b1cc963",
-                "trabajo_atencion":"$answers.666a160967bcb9e23b1cc964",
-                "set_horas_traslado":"$answers.c00000000000000000000021",
-                "set_horas_trabajadas":"$answers.c00000000000000000000003",
-                "set_horas_regreso":"$answers.c00000000000000000000022",
-                "set_tecnico":"$answers.666a160967bcb9e23b1cc967",
+                "chasis_text":f"$answers.{self.f['especifique_serie']}",
+                "trabajo_realizado":f"$answers.{self.f['detalle_trabajos_realizados']}",
+                "fecha_apertura":f"$answers.{self.f['fecha_apertura']}",
+                "trabajo_atencion":f"$answers.{self.f['fecha_atencion']}",
+                "set_horas_traslado":f"$answers.{self.f['grupo_traslado_ida']}",
+                "set_horas_trabajadas":f"$answers.{self.f['grupo_horas_trabajadas']}",
+                "set_horas_regreso":f"$answers.{self.f['grupo_traslado_regreso']}",
+                "set_tecnico":f"$answers.{self.f['tecnicos_asignados']}",
             }},
             {"$sort": {"folio":1}}
         ]
@@ -1012,7 +1012,7 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
 
     def get_query_care_inspection(self, date_from, date_to):
         match_query = { 
-            "form_id": 120576,
+            "form_id": self.CARE_INSPECTION_CSR,
             "deleted_at": {"$exists": False},
         }
         if date_from!='':
@@ -1040,40 +1040,40 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
                 "folio":"$folio",
                 "cliente": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252" },
-                        "then": { "$arrayElemAt": ["$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252", 0] },
-                        "else": "$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252"
+                        "if": { "$isArray": f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}", 0] },
+                        "else": f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}"
                     }
                 },
                 "tecnico": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.66707634e674c20724d85969.62c5ff407febce07043024dd" },
-                        "then": { "$arrayElemAt": ["$answers.66707634e674c20724d85969.62c5ff407febce07043024dd", 0] },
-                        "else": "$answers.66707634e674c20724d85969.62c5ff407febce07043024dd"
+                        "if": { "$isArray": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}", 0] },
+                        "else": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}"
                     }
                 },
                 "codigo_empleado": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc" },
-                        "then": { "$arrayElemAt": ["$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc", 0] },
-                        "else": "$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc"
+                        "if": { "$isArray": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}", 0] },
+                        "else": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}"
                     }
                 },
-                "option_data":"$answers.668309d89331539409abace1",
+                "option_data":f"$answers.{self.f['equipo_registrado']}",
                 "chasis_catalog": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325" },
-                        "then": { "$arrayElemAt": ["$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325", 0] },
-                        "else": "$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325"
+                        "if": { "$isArray": f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}", 0] },
+                        "else": f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}"
                     }
                 },
-                "chasis_text":"$answers.66830c302315146a39b4f22d",
-                "trabajo_realizado":"$answers.6679a8fa580fa539a803e908",
-                "fecha_apertura":"$answers.666a160967bcb9e23b1cc963",
-                "trabajo_atencion":"$answers.666a160967bcb9e23b1cc964",
-                "set_horas_traslado":"$answers.c00000000000000000000021",
-                "set_horas_trabajadas":"$answers.c00000000000000000000003",
-                "set_horas_regreso":"$answers.c00000000000000000000022",
+                "chasis_text":f"$answers.{self.f['especifique_serie']}",
+                "trabajo_realizado":f"$answers.{self.f['comentarios_generales']}",
+                "fecha_apertura":f"$answers.{self.f['fecha_apertura']}",
+                "trabajo_atencion":f"$answers.{self.f['fecha_atencion']}",
+                "set_horas_traslado":f"$answers.{self.f['grupo_traslado_ida']}",
+                "set_horas_trabajadas":f"$answers.{self.f['grupo_horas_trabajadas']}",
+                "set_horas_regreso":f"$answers.{self.f['grupo_traslado_regreso']}",
             }},
             {"$sort": {"folio":1}}
         ]
@@ -1083,7 +1083,7 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
 
     def get_query_entrada_salida_equipos(self, date_from, date_to, num_order):
         match_query = { 
-            "form_id": 120574,
+            "form_id": self.ENTRADA_SALIDA_EQUIPOS,
             "deleted_at": {"$exists": False},
         }
         if date_from!='':
@@ -1096,7 +1096,7 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             match_query.update(self.get_date_query(date_from=date_from, date_to=date_to, date_field='update_at_ajustada'))
 
         if num_order!='':
-            match_query.update({"answers.672e8edfd2f1f131c66505d9":num_order})
+            match_query.update({f"answers.{self.f['numero_orden']}":num_order})
 
         query = [
             { "$addFields": {
@@ -1112,42 +1112,42 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             {"$project": {
                 "_id":1,
                 "folio":"$folio",
-                "no_orden":"$answers.672e8edfd2f1f131c66505d9",
+                "no_orden":f"$answers.{self.f['numero_orden']}",
                 "cliente": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252" },
-                        "then": { "$arrayElemAt": ["$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252", 0] },
-                        "else": "$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252"
+                        "if": { "$isArray": f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}", 0] },
+                        "else": f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}"
                     }
                 },
                 "tecnico": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.66707634e674c20724d85969.62c5ff407febce07043024dd" },
-                        "then": { "$arrayElemAt": ["$answers.66707634e674c20724d85969.62c5ff407febce07043024dd", 0] },
-                        "else": "$answers.66707634e674c20724d85969.62c5ff407febce07043024dd"
+                        "if": { "$isArray": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}", 0] },
+                        "else": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}"
                     }
                 },
                 "codigo_empleado": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc" },
-                        "then": { "$arrayElemAt": ["$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc", 0] },
-                        "else": "$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc"
+                        "if": { "$isArray": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}", 0] },
+                        "else": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}"
                     }
                 },
-                "option_data":"$answers.668309d89331539409abace1",
+                "option_data":f"$answers.{self.f['equipo_registrado']}",
                 "chasis_catalog": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325" },
-                        "then": { "$arrayElemAt": ["$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325", 0] },
-                        "else": "$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325"
+                        "if": { "$isArray": f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}", 0] },
+                        "else": f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}"
                     }
                 },
-                "chasis_text":"$answers.66830c302315146a39b4f22d",
-                "trabajo_realizado":"$answers.6679a8fa580fa539a803e908",
-                "fecha_apertura":"$answers.666a160967bcb9e23b1cc963",
-                "trabajo_atencion":"$answers.666a160967bcb9e23b1cc964",
-                "date_from":"$answers.c00000000000000000000001",
-                "date_to":"$answers.c00000000000000000000002",
+                "chasis_text":f"$answers.{self.f['especifique_serie']}",
+                "trabajo_realizado":f"$answers.{self.f['comentarios_generales']}",
+                "fecha_apertura":f"$answers.{self.f['fecha_apertura']}",
+                "trabajo_atencion":f"$answers.{self.f['fecha_atencion']}",
+                "date_from":f"$answers.{self.f['field_id_iniciar_ida']}",
+                "date_to":f"$answers.{self.f['field_id_terminar_ida']}",
             }},
             {"$sort": {"folio":1}}
         ]
@@ -1157,7 +1157,7 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
 
     def get_query_gestion_post_venta(self, date_from, date_to):
         match_query = { 
-            "form_id": 124648,
+            "form_id": self.GESTION_COMERCIAL_POSTVENTA,
             "deleted_at": {"$exists": False},
         }
         if date_from!='':
@@ -1185,41 +1185,41 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
                 "folio":"$folio",
                 "cliente": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252" },
-                        "then": { "$arrayElemAt": ["$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252", 0] },
-                        "else": "$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252"
+                        "if": { "$isArray": f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}", 0] },
+                        "else": f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}"
                     }
                 },
                 "tecnico": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.66707634e674c20724d85969.62c5ff407febce07043024dd" },
-                        "then": { "$arrayElemAt": ["$answers.66707634e674c20724d85969.62c5ff407febce07043024dd", 0] },
-                        "else": "$answers.66707634e674c20724d85969.62c5ff407febce07043024dd"
+                        "if": { "$isArray": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}", 0] },
+                        "else": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}"
                     }
                 },
                 "codigo_empleado": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc" },
-                        "then": { "$arrayElemAt": ["$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc", 0] },
-                        "else": "$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc"
+                        "if": { "$isArray": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}", 0] },
+                        "else": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}"
                     }
                 },
-                "option_data":"$answers.668309d89331539409abace1",
+                "option_data":f"$answers.{self.f['equipo_registrado']}",
                 "chasis_catalog": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325" },
-                        "then": { "$arrayElemAt": ["$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325", 0] },
-                        "else": "$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325"
+                        "if": { "$isArray": f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}", 0] },
+                        "else": f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}"
                     }
                 },
-                "chasis_text":"$answers.66830c302315146a39b4f22d",
-                "trabajo_realizado":"$answers.673e734f94d1ef23abb279ed",
-                "fecha_apertura":"$answers.666a160967bcb9e23b1cc963",
-                "trabajo_atencion":"$answers.666a160967bcb9e23b1cc964",
-                "resumen_gestion":"$answers.670dc8de391a088440159491",
-                "set_horas_traslado":"$answers.c00000000000000000000021",
-                "set_horas_trabajadas":"$answers.c00000000000000000000003",
-                "set_horas_regreso":"$answers.c00000000000000000000022",
+                "chasis_text":f"$answers.{self.f['especifique_serie']}",
+                "trabajo_realizado":f"$answers.{self.f['trabajo_a_realizar']}",
+                "fecha_apertura":f"$answers.{self.f['fecha_apertura']}",
+                "trabajo_atencion":f"$answers.{self.f['fecha_atencion']}",
+                "resumen_gestion":f"$answers.{self.f['resumen_gestion']}",
+                "set_horas_traslado":f"$answers.{self.f['grupo_traslado_ida']}",
+                "set_horas_trabajadas":f"$answers.{self.f['grupo_horas_trabajadas']}",
+                "set_horas_regreso":f"$answers.{self.f['grupo_traslado_regreso']}",
             }},
             {"$sort": {"folio":1}}
         ]
@@ -1229,7 +1229,7 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
 
     def get_query_gestion_ventas(self, date_from, date_to):
         match_query = { 
-            "form_id": 124649,
+            "form_id": self.GESTION_COMERCIAL_VENTAS,
             "deleted_at": {"$exists": False},
         }
         if date_from!='':
@@ -1258,41 +1258,41 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
                 "update_at_ajustada":"$update_at_ajustada",
                 "cliente": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252" },
-                        "then": { "$arrayElemAt": ["$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252", 0] },
-                        "else": "$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252"
+                        "if": { "$isArray": f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}", 0] },
+                        "else": f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}"
                     }
                 },
                 "tecnico": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.66707634e674c20724d85969.62c5ff407febce07043024dd" },
-                        "then": { "$arrayElemAt": ["$answers.66707634e674c20724d85969.62c5ff407febce07043024dd", 0] },
-                        "else": "$answers.66707634e674c20724d85969.62c5ff407febce07043024dd"
+                        "if": { "$isArray": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}", 0] },
+                        "else": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['nombre_completo']}"
                     }
                 },
                 "codigo_empleado": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc" },
-                        "then": { "$arrayElemAt": ["$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc", 0] },
-                        "else": "$answers.66707634e674c20724d85969.670f585bf844ff7bc357b1dc"
+                        "if": { "$isArray": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}", 0] },
+                        "else": f"$answers.{self.EMPLEADOS_CAT_OBJ_ID}.{self.f['codigo_empleado']}"
                     }
                 },
-                "option_data":"$answers.668309d89331539409abace1",
+                "option_data":f"$answers.{self.f['equipo_registrado']}",
                 "chasis_catalog": {
                     "$cond": {
-                        "if": { "$isArray": "$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325" },
-                        "then": { "$arrayElemAt": ["$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325", 0] },
-                        "else": "$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325"
+                        "if": { "$isArray": f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}" },
+                        "then": { "$arrayElemAt": [f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}", 0] },
+                        "else": f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}"
                     }
                 },
-                "chasis_text":"$answers.66830c302315146a39b4f22d",
-                "trabajo_realizado":"$answers.673e734f94d1ef23abb279ed",
-                "fecha_apertura":"$answers.666a160967bcb9e23b1cc963",
-                "trabajo_atencion":"$answers.666a160967bcb9e23b1cc964",
-                "resumen_gestion":"$answers.670dc8de391a088440159491",
-                "set_horas_traslado":"$answers.c00000000000000000000021",
-                "set_horas_trabajadas":"$answers.c00000000000000000000003",
-                "set_horas_regreso":"$answers.c00000000000000000000022",
+                "chasis_text":f"$answers.{self.f['especifique_serie']}",
+                "trabajo_realizado":f"$answers.{self.f['trabajo_a_realizar']}",
+                "fecha_apertura":f"$answers.{self.f['fecha_apertura']}",
+                "trabajo_atencion":f"$answers.{self.f['fecha_atencion']}",
+                "resumen_gestion":f"$answers.{self.f['resumen_gestion']}",
+                "set_horas_traslado":f"$answers.{self.f['grupo_traslado_ida']}",
+                "set_horas_trabajadas":f"$answers.{self.f['grupo_horas_trabajadas']}",
+                "set_horas_regreso":f"$answers.{self.f['grupo_traslado_regreso']}",
             }},
             {"$sort": {"folio":1}}
         ]
@@ -1319,24 +1319,24 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
         company_name = information.get('dicClient',{}).get('razon_social','')
 
         dic_create = {
-            '672e8edfd2f1f131c66505d8' : date, 
-            '672e8e711d0c3f0eb0650570':contac,
-            '672e8e711d0c3f0eb0650571':phone,
-            '673e734f94d1ef23abb279ed':job,
-            '672eb39a4d20582177b00a05':{
-                '672eb39a4d20582177b00a06':checklist,
+            self.f['fecha_servicio'] : date, 
+            self.f['nombre_contacto']:contac,
+            self.f['celular_contacto']:phone,
+            self.f['trabajo_a_realizar']:job,
+            self.FORMULARIOS_CAT_OBJ_ID:{
+                self.f['tipo_de_informe']:checklist,
             },
-            '672eadbd8064d180dab0097e':'pendiente',
-            '672e8edfd2f1f131c66505d9':order,
-            '670f50c7f522b590fbfd91eb':{
-                '638a9a7767c332f5d459fc81':user,
-                '638a9a7767c332f5d459fc82':[user_email],
-                '663bc4c79b8046ce89e97cf4':[user_job],
+            self.f['estatus']:'pendiente',
+            self.f['numero_orden']:order,
+            self.USUARIOS_CAT_OBJ_ID:{
+                self.f['nombre_usuario']:user,
+                self.f['email_usuario']:[user_email],
+                self.f['puesto_usuario']:[user_job],
             },
-            '670f50c71f4102516864159d':{
-                '6687f2f37b2c023e187d6252':name_client,
-                '667468e3e577b8b98c852aab':[ruc_client],
-                '667468e3e577b8b98c852aaa':[company_name],
+            self.CLIENTES_CAT_OBJ_ID:{
+                self.f['razon_social']:name_client,
+                self.f['ruc']:[ruc_client],
+                self.f['nombre_comercial']:[company_name],
             }
         }
 
@@ -1355,16 +1355,16 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             status = information.get('dicItem',{}).get('status','')
             estado = information.get('dicItem',{}).get('estado','')
             dic_answers = {
-                '668309d89331539409abace1':'sí',
-                '670f507af522b590fbfd918c':{
-                    '6646393c3fa8b818265d0325':chasis,
-                    '66beb10007981d4509575054':[marca],
-                    '66beb11907981d4509575056':[modelo],
-                    '66beb1b507981d4509575057':[categoria],
-                    '66c192ef89463aa27fc1818b':[nombre],
-                    '66c1758989463aa27fc1816e':[motor_1],
-                    '6646393c3fa8b818265d0329':[status],
-                    '66c1940b89463aa27fc1818c':[estado],
+                self.f['equipo_registrado']:'sí',
+                self.ACTIVOS_FIJOS_CAT_OBJ_ID:{
+                    self.f['chasis']:chasis,
+                    self.f['marca']:[marca],
+                    self.f['modelo']:[modelo],
+                    self.f['categoria']:[categoria],
+                    self.f['nombre_equipo']:[nombre],
+                    self.f['horometro_motor_1']:[motor_1],
+                    self.f['activo_estatus']:[status],
+                    self.f['estado_equipo']:[estado],
                 }
             }
             dic_create.update(dic_answers)
@@ -1376,16 +1376,16 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             serie = information.get('inputTextSerie','')
 
             dic_answers = {
-                '668309d89331539409abace1':'no',
-                '66830c302315146a39b4f22a':item,
-                '66830c302315146a39b4f22b':brand,
-                '66830c302315146a39b4f22c':model,
-                '66830c302315146a39b4f22d':serie,
+                self.f['equipo_registrado']:'no',
+                self.f['especifique_equipo']:item,
+                self.f['especifique_marca']:brand,
+                self.f['especifique_modelo']:model,
+                self.f['especifique_serie']:serie,
             }
             dic_create.update(dic_answers)
 
         #----Creation record
-        metadata = self.lkf_api.get_metadata(125650)
+        metadata = self.lkf_api.get_metadata(self.PROGRAMACION_SERVICIOS)
         metadata['answers'] = dic_create
         resp_create = self.lkf_api.post_forms_answers_list(metadata)
         status_request = '400'
@@ -1409,27 +1409,27 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
             "skip":0
         }
 
-        catalog_clientes = self.lkf_api.search_catalog( 124722, mango_query)
+        catalog_clientes = self.lkf_api.search_catalog(self.CLIENTES_CAT_ID, mango_query)
         for item in catalog_clientes:
-           razon_social = item.get('6687f2f37b2c023e187d6252','')
-           nombre_comercial = item.get('667468e3e577b8b98c852aaa','')
-           ruc = item.get('667468e3e577b8b98c852aab','')
+           razon_social = item.get(self.f['razon_social'],'')
+           nombre_comercial = item.get(self.f['nombre_comercial'],'')
+           ruc = item.get(self.f['ruc'],'')
            dic_response['catalog_client'].append({
                 'razon_social':razon_social,
                 'nombre_comercial':nombre_comercial,
                 'ruc':ruc,
             })
 
-        catalog_equipos = self.lkf_api.search_catalog( 124709, mango_query)
+        catalog_equipos = self.lkf_api.search_catalog(self.ACTIVOS_FIJOS_CAT_ID, mango_query)
         for item in catalog_equipos:
-            chasis = item.get('6646393c3fa8b818265d0325','')
-            status = item.get('672eadbd8064d180dab0097e','')
-            marca = item.get('66beb10007981d4509575054','')
-            modelo = item.get('66beb11907981d4509575056','')
-            categoria = item.get('66beb1b507981d4509575057','')
-            motor_1 = item.get('66c1758989463aa27fc1816e','')
-            nombre_equipo = item.get('66c192ef89463aa27fc1818b','')
-            estado = item.get('66c1940b89463aa27fc1818c','')
+            chasis = item.get(self.f['chasis'],'')
+            status = item.get(self.f['estatus'],'')
+            marca = item.get(self.f['marca'],'')
+            modelo = item.get(self.f['modelo'],'')
+            categoria = item.get(self.f['categoria'],'')
+            motor_1 = item.get(self.f['horometro_motor_1'],'')
+            nombre_equipo = item.get(self.f['nombre_equipo'],'')
+            estado = item.get(self.f['estado_equipo'],'')
             dic_response['catalog_items'].append({
                 'chasis':chasis,
                 'status':status,
@@ -1441,20 +1441,20 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
                 'estado':estado,
             })
 
-        catalog_checklist = self.lkf_api.search_catalog(125652, mango_query)
+        catalog_checklist = self.lkf_api.search_catalog(self.FORMULARIOS_CAT_ID, mango_query)
         for item in catalog_checklist:
-            checklist = item.get('672eb39a4d20582177b00a06','')
-            id_check = item.get('672eb39a4d20582177b00a07',0)
+            checklist = item.get(self.f['tipo_de_informe'],'')
+            id_check = item.get(self.f['id_formulario'],0)
             dic_response['catalog_checklist'].append({
                 'checklist':checklist,
                 'id_check':id_check,
             })
 
-        catalog_usuarios = self.lkf_api.search_catalog(124723, mango_query)
+        catalog_usuarios = self.lkf_api.search_catalog(self.USUARIOS_CAT_ID, mango_query)
         for item in catalog_usuarios:
-            nombre = item.get('638a9a7767c332f5d459fc81','')
-            email = item.get('638a9a7767c332f5d459fc82','')
-            puesto = item.get('663bc4c79b8046ce89e97cf4','')
+            nombre = item.get(self.f['nombre_usuario'],'')
+            email = item.get(self.f['email_usuario'],'')
+            puesto = item.get(self.f['puesto_usuario'],'')
             dic_response['catalog_usuarios'].append({
                 'nombre':nombre,
                 'email':email,
@@ -1466,33 +1466,33 @@ class ServicioMaquinariaPesada(ServicioMaquinariaPesadaModel):
     #---Query
     def get_query_events(self, gestor = None , cliente = None):
         match_query = { 
-            "form_id": 125650,
+            "form_id": self.PROGRAMACION_SERVICIOS,
             "deleted_at":{"$exists":False},
         }
         if gestor and '--' not in  gestor:
-            match_query.update({"answers.670f50c7f522b590fbfd91eb.638a9a7767c332f5d459fc81": gestor})
+            match_query.update({f"answers.{self.USUARIOS_CAT_OBJ_ID}.{self.f['nombre_usuario']}": gestor})
 
         if cliente and '--' not in cliente:
-            match_query.update({"answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252":cliente })
+            match_query.update({f"answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}":cliente })
 
         query = [
             {"$match": match_query},
             {"$project": {
                 "_id":1,
                 "folio":"$folio",
-                "fecha_servicio":"$answers.672e8edfd2f1f131c66505d8",
-                "cliente":"$answers.670f50c71f4102516864159d.6687f2f37b2c023e187d6252",
-                "contacto":"$answers.672e8e711d0c3f0eb0650570",
-                "celular":"$answers.672e8e711d0c3f0eb0650571",
-                "check_equipo":"$answers.668309d89331539409abace1",
-                "catalog_serie":"$answers.670f507af522b590fbfd918c.6646393c3fa8b818265d0325",
-                "input_equipo":"$answers.66830c302315146a39b4f22a",
-                "input_marca":"$answers.66830c302315146a39b4f22b",
-                "input_modelo":"$answers.66830c302315146a39b4f22c",
-                "input_serie":"$answers.66830c302315146a39b4f22d",
-                "trabajo_area":"$answers.673e734f94d1ef23abb279ed",
-                "check_list":"$answers.672eb39a4d20582177b00a05.672eb39a4d20582177b00a06",
-                "status":"$answers.672eadbd8064d180dab0097e",
+                "fecha_servicio":f"$answers.{self.f['fecha_servicio']}",
+                "cliente":f"$answers.{self.CLIENTES_CAT_OBJ_ID}.{self.f['razon_social']}",
+                "contacto":f"$answers.{self.f['nombre_contacto']}",
+                "celular":f"$answers.{self.f['celular_contacto']}",
+                "check_equipo":f"$answers.{self.f['equipo_registrado']}",
+                "catalog_serie":f"$answers.{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.{self.f['chasis']}",
+                "input_equipo":f"$answers.{self.f['especifique_equipo']}",
+                "input_marca":f"$answers.{self.f['especifique_marca']}",
+                "input_modelo":f"$answers.{self.f['especifique_modelo']}",
+                "input_serie":f"$answers.{self.f['especifique_serie']}",
+                "trabajo_area":f"$answers.{self.f['trabajo_a_realizar']}",
+                "check_list":f"$answers.{self.FORMULARIOS_CAT_OBJ_ID}.{self.f['tipo_de_informe']}",
+                "status":f"$answers.{self.f['estatus']}",
             }},
             {"$sort": {"fecha_servicio":1}}
         ]

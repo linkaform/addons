@@ -385,7 +385,11 @@ def save_file(tree, module_name, item_type, file_name):
     except OSError as e:
         # Handle the error in case of any other OS related issues
         msg = f"Error creating directory {file_path} msg: {e}"
-        raise(msg)
+        if isinstance(e, PermissionError):
+            msg += (f" | the process runs as uid {os.getuid()} and cannot write there; "
+                    "the folder belongs to another user. Run the command with "
+                    "`docker exec -u $(id -u) ...` (the owner of the modules folder)")
+        raise OSError(msg) from e
     print('saving file on .... ', f'{file_path}/{file_name}')
     tree.write(f'{file_path}/{file_name}', encoding="utf-8", xml_declaration=True)
     return True

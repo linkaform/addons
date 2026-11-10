@@ -1,4 +1,4 @@
 # coding: utf-8
 from lkf_addons.items.form_resource import FormResource
 
-install_order = []
+install_order = ['entrada_y_salida_de_equipos']

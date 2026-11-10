@@ -1,4 +1,4 @@
 # coding: utf-8
 
 
-depends = ['base']
+depends = ['base', 'location', 'employee', 'activo_fijo']
