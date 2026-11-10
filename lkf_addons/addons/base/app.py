@@ -776,7 +776,8 @@ class Base(BaseModel):
         """
         key = {'form': 'forms', 'catalog': 'catalogs', 'script': 'scripts'}[item_type]
         ids = set()
-        for config in self.module_permits.values():
+        configs = list(self.module_permits.values()) + list(getattr(self, 'key_permits', {}).values())
+        for config in configs:
             ids.update(x for x in config.get(key, []) if self._valid_item_id(x))
         return ids
 
@@ -1002,8 +1003,12 @@ class Base(BaseModel):
         """
         needed = {'form': set(), 'catalog': set(), 'script': set()}
         menus = ['always'] + list({self._menu_key(i.get('menu')) for i in elementos or []})
-        for menu in menus:
-            config = self.module_permits.get(menu, {})
+        configs = [self.module_permits.get(menu, {}) for menu in menus]
+        # Permisos por key (key_permits de base_utils): solo los de las keys asignadas.
+        key_permits = getattr(self, 'key_permits', {})
+        keys = {self.unlist(i.get('key')) for i in elementos or [] if i.get('key')}
+        configs += [key_permits[k] for k in keys if k in key_permits]
+        for config in configs:
             needed['form'].update(x for x in config.get('forms', []) if x)
             needed['catalog'].update(x for x in config.get('catalogs', []) if x)
             needed['script'].update(x for x in config.get('scripts', []) if x)
