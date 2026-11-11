@@ -7519,7 +7519,7 @@ class Accesos(OcrMixin, AccesosModel):
                     'habilitar_identificacion':f"$answers.{self.pase_entrada_fields['habilitar_identificacion']}",
                     'habilitar_fotografia':f"$answers.{self.pase_entrada_fields['habilitar_fotografia']}",
                     'url_padre':f"$answers.{self.pase_entrada_fields['url_padre']}",
-                    'created_by':"$user_name"
+                    'created_by': {'$ifNull': ['$created_by_name', '$user_name']}
                 }
             },
         ]
