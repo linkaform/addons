@@ -4204,6 +4204,19 @@ class Accesos(OcrMixin, AccesosModel):
             }
         return res
 
+    def _size_vehiculos_con_tipo(self, vehiculos):
+        """
+        Cuenta los vehiculos del grupo que tienen tipo. Los vehiculos sin tipo son
+        renglones vacios del grupo y get_list_bitacora (desglose='vehiculos') los
+        excluye; el contador de vehiculos dentro debe usar la misma regla (TB-099).
+        """
+        tipo = f"$$v.{self.TIPO_DE_VEHICULO_OBJ_ID}.{self.mf['tipo_vehiculo']}"
+        return {'$size': {'$filter': {
+            'input': vehiculos,
+            'as': 'v',
+            'cond': {'$not': [{'$in': [{'$ifNull': [tipo, None]}, ["", None]]}]},
+        }}}
+
     def get_page_stats(self, booth_area, location, page='', month=None, year=None, dateFrom='', dateTo='', filterDate='', dynamic_filters=None):
         timezone = pytz.timezone(self.user.get('timezone', 'America/Mexico_City'))
         today = datetime.now(timezone).strftime("%Y-%m-%d")
@@ -4241,7 +4254,7 @@ class Accesos(OcrMixin, AccesosModel):
                             }
                         }
                     },
-                    'total_vehiculos_dentro': {'$sum': {'$size': '$vehiculos'}},
+                    'total_vehiculos_dentro': {'$sum': self._size_vehiculos_con_tipo('$vehiculos')},
                     'gafetes_info': {
                         '$push': {
                             'id_gafete':'$id_gafete',
@@ -4411,7 +4424,7 @@ class Accesos(OcrMixin, AccesosModel):
                         '$sum': {
                             '$cond': {
                                 'if': {'$eq': ['$status_visita', 'entrada']},
-                                'then': {'$size': '$vehiculos'},
+                                'then': self._size_vehiculos_con_tipo('$vehiculos'),
                                 'else': 0
                             }
                         }
@@ -4451,7 +4464,7 @@ class Accesos(OcrMixin, AccesosModel):
                         '$sum': {
                             '$cond': {
                                 'if': {'$eq': ['$status_visita', 'entrada']},
-                                'then': {'$size': '$vehiculos'},
+                                'then': self._size_vehiculos_con_tipo('$vehiculos'),
                                 'else': 0
                             }
                         }
