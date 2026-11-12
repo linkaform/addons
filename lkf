@@ -38,7 +38,7 @@ _usage(){
       echo "      $APP test todo               Corre todos los tests (modo viejo)"
       echo "      $APP workwith <domain_name>  Elige la cuenta activa y deja modules/ en su rama"
       echo "      $APP workwith                Muestra la cuenta actual y los dominios disponibles"
-      echo "      $APP workon <local|preprod|prod>  Elige el environment activo"
+      echo "      $APP workon <local|preprod|prod|sbx-dev0|sbx-preprod|sbx-josepato0>  Elige el environment activo"
       echo "      $APP workon                  Muestra el environment actual y los disponibles"
       echo "      $APP branches [plan|create|status]  Copia cada rama account_<id> de modules/ a una rama con el nombre del dominio"
       echo "      $APP setup                   Instala los git hooks del repo (una vez por clon)"

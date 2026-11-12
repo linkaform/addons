@@ -9,7 +9,7 @@ def _env_activo():
         current_env_file = os.path.join(SECRETS_PATH, 'current_env')
         if os.path.exists(current_env_file):
             env = open(current_env_file, encoding='utf-8').read().strip()
-    return env if env in ('local', 'preprod', 'prod') else 'prod'
+    return env if env in ('local', 'preprod', 'prod', 'sbx-dev0', 'sbx-preprod', 'sbx-josepato0') else 'prod'
 
 ENV = _env_activo()
 
@@ -30,6 +30,43 @@ elif ENV == 'preprod':
     HOST = 'preprod.linkaform.com'
     PROTOCOL = 'https'
     COUCH_ENV = 'dev'
+
+elif ENV == 'sbx-dev0':
+    mongo_hosts = 'sbx-dev0.linkaform.com:27017'
+    HOST = 'sbx-dev0.linkaform.com'
+    PROTOCOL = 'https'
+    COUCH_ENV = 'dev'
+    COUCH_DEV_HOST = 'sbx-dev0-couchdb.linkaform.com'
+    COUCH_DEV_PROTOCOL = 'https'
+    COUCH_DEV_PORT = 443
+
+elif ENV == 'sbx-preprod':
+    mongo_hosts = 'sbx-preprod.linkaform.com:27017'
+    HOST = 'sbx-preprod.linkaform.com'
+    PROTOCOL = 'https'
+    COUCH_ENV = 'dev'
+    COUCH_DEV_HOST = 'sbx-preprod-couchdb.linkaform.com'
+    COUCH_DEV_PROTOCOL = 'https'
+    COUCH_DEV_PORT = 443
+
+elif ENV == 'sbx-josepato0':
+    mongo_hosts = 'sbx-josepato0.linkaform.com:27017'
+    HOST = 'sbx-josepato0.linkaform.com'
+    PROTOCOL = 'https'
+    COUCH_ENV = 'dev'
+    COUCH_DEV_HOST = 'sbx-josepato0-couchdb.linkaform.com'
+    COUCH_DEV_PROTOCOL = 'https'
+    COUCH_DEV_PORT = 443
+
+# Couch dev: los sandboxes lo exponen por dominio (sbx-<entorno>-couchdb), detras del
+# mismo proxy, en https/443. El resto de environments usa el default de linkaform_api.
+COUCH_DEV_CFG = {}
+if ENV.startswith('sbx-'):
+    COUCH_DEV_CFG = {
+        'COUCH_DEV_PROTOCOL': COUCH_DEV_PROTOCOL,
+        'COUCH_DEV_HOST': COUCH_DEV_HOST,
+        'COUCH_DEV_PORT': COUCH_DEV_PORT,
+    }
 
 MAX_POOL_SIZE = 1000
 WAIT_QUEUE_TIMEOUT = 1000
@@ -52,6 +89,8 @@ config.update({
         'AIRFLOW_HOST' : 'airflow.linkaform.com',
 
     })
+
+config.update(COUCH_DEV_CFG)
 
 def update_settings(settings):
     global config

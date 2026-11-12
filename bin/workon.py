@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # coding: utf-8
-"""workon: elige el environment activo (local | preprod | prod).
+"""workon: elige el environment activo (local | preprod | prod | sbx-*).
 
 El puntero vive en secrets/current_env, igual que la cuenta activa vive en
 secrets/current_domain. config/enviorment.py lo lee al arrancar, asi que cambiar de
 environment ya no requiere editar codigo ni reconstruir nada: basta correr esto y
 volver a lanzar el script.
 
-    ./lkf workon <local|preprod|prod>
+    ./lkf workon <local|preprod|prod|sbx-dev0|sbx-preprod|sbx-josepato0>
     ./lkf workon            # muestra el environment actual y los disponibles
 
 La variable de entorno LKF_ENV, si esta puesta, gana sobre el archivo. Sirve para un
@@ -22,7 +22,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRETS = os.path.join(REPO, 'secrets')
 CURRENT_ENV = os.path.join(SECRETS, 'current_env')
 
-ENVS = ('local', 'preprod', 'prod')
+ENVS = ('local', 'preprod', 'prod', 'sbx-dev0', 'sbx-preprod', 'sbx-josepato0')
 # Si el puntero falta o trae basura se cae aqui, nunca en prod.
 DEFAULT_ENV = 'local'
 
@@ -32,6 +32,9 @@ DESTINOS = {
     'local': '192.168.100.30:8080',
     'preprod': 'preprod.linkaform.com',
     'prod': 'app.linkaform.com',
+    'sbx-dev0': 'sbx-dev0.linkaform.com',
+    'sbx-preprod': 'sbx-preprod.linkaform.com',
+    'sbx-josepato0': 'sbx-josepato0.linkaform.com',
 }
 
 
@@ -53,7 +56,7 @@ def env_es_override():
 
 
 def descripcion(env):
-    return '%-8s -> %s' % (env, DESTINOS.get(env, '?'))
+    return '%-14s -> %s' % (env, DESTINOS.get(env, '?'))
 
 
 def mostrar_estado():
