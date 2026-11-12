@@ -32,11 +32,15 @@ _locks = {t['name']: asyncio.Lock() for t in settings.TARGETS}
 
 
 async def _find(target):
-    """Lista los .py bajo <modules_path>/*/items/scripts/** del destino."""
+    """Lista los .py bajo <modules_path>/*/items/{scripts,reports}/** del destino.
+
+    Los reportes (p. ej. asistencia_report.py) viven en items/reports y el
+    front los llama igual que a un script, por nombre.
+    """
     cmd = [
         'docker', 'exec', target['container'],
         'find', target['modules_path'],
-        '-path', '*/items/scripts/*',
+        '(', '-path', '*/items/scripts/*', '-o', '-path', '*/items/reports/*', ')',
         '-name', '*.py',
     ]
     try:
