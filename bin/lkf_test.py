@@ -14,7 +14,8 @@ Pasos (se detiene en el primero que falla en rojo):
        - si no, origin/master: no tocaste modules, solo se usa para probar.
   2. Compilar los .py cambiados.                                    bloquea
   3. ruff --select E9,F63,F7,F82 en los .py cambiados.              bloquea
-  4. pytest -m unit (todos los unit de sdk_testing).                bloquea
+  4. pytest -m unit (todos los unit de sdk_testing, una corrida;   bloquea
+     el resultado se reporta por seccion: accesos/notas, ...).
   5. pytest --target=<funciones> -m "not unit" (integration/prod_test de las
      funciones cambiadas) contra la cuenta activa, que debe ser la 10
      (./lkf workwith seguridad). Si no es la 10 queda PENDIENTE.     bloquea
@@ -76,6 +77,14 @@ class Runner:
             if not d.startswith(("_", ".")) and os.path.isfile(os.path.join(self.sdk, d, "pytest.ini"))
         )
 
+    def sections(self, suite):
+        """Subcarpetas de una suite (accesos/notas, accesos/fallas, ...)."""
+        path = os.path.join(self.sdk, suite)
+        return sorted(
+            d for d in os.listdir(path)
+            if not d.startswith(("_", ".")) and os.path.isdir(os.path.join(path, d))
+        )
+
     def pytest(self, suite, *args):
         res = self.docker(
             f"/srv/lkf_test/sdk_testing/{suite}",
@@ -94,6 +103,30 @@ class Runner:
             return int(res.stdout.strip().splitlines()[-1])
         except (ValueError, IndexError):
             return None
+
+
+UNIT_STATES = {"PASSED": "passed", "FAILED": "failed", "ERROR": "error",
+               "SKIPPED": "skipped", "XFAIL": "xfailed", "XPASS": "xpassed"}
+
+
+def unit_by_section(out):
+    """{seccion: {"passed": n, "failed": n, ...}} desde el resumen de `pytest -rA`.
+
+    Lineas: "PASSED notas/x_test.py::test_y", "FAILED notas/x.py::t - msg",
+    "SKIPPED [1] notas/x.py:12: razon". La seccion es la primera carpeta.
+    """
+    secs = {}
+    for line in out.splitlines():
+        word, _, rest = line.partition(" ")
+        if word not in UNIT_STATES:
+            continue
+        if word == "SKIPPED":
+            rest = rest.split("] ", 1)[-1].split(":", 1)[0]
+        path = rest.split("::", 1)[0].split(" ", 1)[0]
+        sec = path.split("/", 1)[0] if "/" in path else "(raiz)"
+        counts = secs.setdefault(sec, {})
+        counts[UNIT_STATES[word]] = counts.get(UNIT_STATES[word], 0) + 1
+    return secs
 
 
 def sdk_behind(sdk):
@@ -308,14 +341,25 @@ def run_all(a, cuenta, note=None):
     else:
         step("ruff", "omitido", "sin .py cambiados")
 
-    # 4. unit
+    # 4. unit: una sola corrida por suite (cada corrida paga ~15 s de arranque
+    # de Accesos) y el resultado se reparte por seccion con el resumen -rA.
     for suite in run.suites():
-        code, summary, out = run.pytest(suite, "-m", "unit")
-        if code not in (0, 5):
+        code, summary, out = run.pytest(suite, "-m", "unit", "-rA")
+        secciones = unit_by_section(out)
+        if code not in (0, 5) and not secciones:
             step(f"unit {suite}", "rojo", summary)
             print(out[-3000:])
             return finish(1)
-        step(f"unit {suite}", "ok", summary)
+        for sec, counts in sorted(secciones.items()):
+            detail = ", ".join(f"{n} {k}" for k, n in counts.items())
+            state = "rojo" if counts.get("failed") or counts.get("error") else "ok"
+            step(f"unit {suite}/{sec}", state, detail)
+        sin_unit = [d for d in run.sections(suite) if d not in secciones]
+        if sin_unit:
+            step(f"unit {suite}", "omitido", "sin unitarios: " + ", ".join(sin_unit))
+        if code not in (0, 5):
+            print(out.split("short test summary info")[0][-3000:])
+            return finish(1)
 
     # 5. target (integration / prod_test)
     if not targets:
