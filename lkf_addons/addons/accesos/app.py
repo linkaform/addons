@@ -1992,7 +1992,7 @@ class Accesos(OcrMixin, AccesosModel):
             {'$match': {
                 "deleted_at": {"$exists": False},
                 "form_id": self.CONF_AREA_EMPLEADOS,
-                f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id,
+                **self._get_match_user_id(f"{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id),
             }},
             {'$unwind': f"$answers.{self.Employee.f['roles_grupo']}"},
             {'$project': {
@@ -5225,7 +5225,7 @@ class Accesos(OcrMixin, AccesosModel):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_ACCESOS,
-            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}":self.user['user_id'],
+            **self._get_match_user_id(f"{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}", self.user['user_id']),
         }
         query = [
             {'$match': match_query },
@@ -5728,7 +5728,7 @@ class Accesos(OcrMixin, AccesosModel):
         if names:
             match_query.update(self._get_match_q(self.f['worker_name'], names))
         if user_id:
-            match_query.update(self._get_match_q(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
+            match_query.update(self._get_match_user_id(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
         if username:
             match_query.update(self._get_match_q(self.f['username'], username))
         if email:
