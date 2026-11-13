@@ -14,7 +14,11 @@ Pasos (se detiene en el primero que falla en rojo):
        - si no, origin/master: no tocaste modules, solo se usa para probar.
   2. Compilar los .py cambiados.                                    bloquea
   3. ruff --select E9,F63,F7,F82 en los .py cambiados.              bloquea
-  4. pytest -m unit (todos los unit de sdk_testing).                bloquea
+  4. pytest -m unit de las secciones tocadas, una corrida por suite. bloquea
+     Cada seccion lista en unit/c10_triggers.py (C10_TRIGGERS) las funciones
+     que la disparan: si cambia una, corren TODOS los unitarios de la
+     seccion. Ante la duda corren todas (ver unit_plan). Resultado por
+     seccion: accesos/notas, ...
   5. pytest --target=<funciones> -m "not unit" (integration/prod_test de las
      funciones cambiadas) contra la cuenta activa, que debe ser la 10
      (./lkf workwith seguridad). Si no es la 10 queda PENDIENTE.     bloquea
@@ -27,6 +31,7 @@ repo con cambios. Si algun SHA no esta pusheado, haz push y luego
 `--no-publicar` corre sin tocar GitHub.
 """
 import argparse
+import ast
 import json
 import os
 import subprocess
@@ -41,6 +46,7 @@ IMAGE = "linkaform/lkf_test:develop"
 SP = "/usr/local/lib/python3.12/site-packages"
 TEST_ACCOUNT = 10
 RUFF_RULES = "E9,F63,F7,F82"
+TRIGGERS_FILE = "c10_triggers.py"
 
 
 def sh(cmd, **kw):
@@ -76,6 +82,19 @@ class Runner:
             if not d.startswith(("_", ".")) and os.path.isfile(os.path.join(self.sdk, d, "pytest.ini"))
         )
 
+    def unit_sections(self, suite):
+        """{seccion: C10_TRIGGERS (set) o None} de las secciones con unitarios en unit/."""
+        out = {}
+        for d in sorted(os.listdir(os.path.join(self.sdk, suite))):
+            unit = os.path.join(self.sdk, suite, d, "unit")
+            if d.startswith(("_", ".")) or not os.path.isdir(unit):
+                continue
+            if not any(f.endswith(".py") and (f.startswith("test_") or f.endswith("_test.py"))
+                       for _, _, files in os.walk(unit) for f in files):
+                continue
+            out[d] = read_triggers(os.path.join(unit, TRIGGERS_FILE))
+        return out
+
     def pytest(self, suite, *args):
         res = self.docker(
             f"/srv/lkf_test/sdk_testing/{suite}",
@@ -94,6 +113,91 @@ class Runner:
             return int(res.stdout.strip().splitlines()[-1])
         except (ValueError, IndexError):
             return None
+
+
+UNIT_STATES = {"PASSED": "passed", "FAILED": "failed", "ERROR": "error",
+               "SKIPPED": "skipped", "XFAIL": "xfailed", "XPASS": "xpassed"}
+
+
+def unit_by_section(out):
+    """{seccion: {"passed": n, "failed": n, ...}} desde el resumen de `pytest -rA`.
+
+    Lineas: "PASSED notas/x_test.py::test_y", "FAILED notas/x.py::t - msg",
+    "SKIPPED [1] notas/x.py:12: razon". La seccion es la primera carpeta.
+    """
+    secs = {}
+    for line in out.splitlines():
+        word, _, rest = line.partition(" ")
+        if word not in UNIT_STATES:
+            continue
+        if word == "SKIPPED":
+            rest = rest.split("] ", 1)[-1].split(":", 1)[0]
+        path = rest.split("::", 1)[0].split(" ", 1)[0]
+        sec = path.split("/", 1)[0] if "/" in path else "(raiz)"
+        counts = secs.setdefault(sec, {})
+        counts[UNIT_STATES[word]] = counts.get(UNIT_STATES[word], 0) + 1
+    return secs
+
+
+def read_triggers(path):
+    """La lista C10_TRIGGERS de un c10_triggers.py (sin importarlo); None si no hay."""
+    try:
+        with open(path) as fh:
+            tree = ast.parse(fh.read())
+    except (OSError, SyntaxError):
+        return None
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "C10_TRIGGERS" for t in node.targets):
+            try:
+                return set(ast.literal_eval(node.value))
+            except ValueError:
+                return None
+    return None
+
+
+def module_of(path):
+    """Modulo de un archivo cambiado: lkf_addons/addons/accesos/app.py y
+    accesos/items/scripts/... -> accesos."""
+    parts = path.split("/")
+    return parts[2] if parts[:2] == ["lkf_addons", "addons"] and len(parts) > 2 else parts[0]
+
+
+def unit_plan(suite, suites, triggers, changed, sueltos):
+    """(secciones a correr, avisos) de los unitarios de una suite.
+
+    triggers: {seccion: C10_TRIGGERS o None}, de Runner.unit_sections.
+    changed: {funcion: rutas de lkf_changes ("app.py", "x.py (eliminada)", ...)}.
+    sueltos: .py cambiados fuera de cualquier funcion.
+
+    Corren las secciones cuya lista trae alguna funcion cambiada. Si hay duda
+    se corren todas (secciones = None): una funcion del modulo que no esta en
+    ninguna lista, una de un modulo sin suite propia (base, ...), un .py
+    cambiado fuera de una funcion, o ninguna funcion cambiada.
+    """
+    avisos, todo, secs = [], False, set()
+    sin_lista = sorted(s for s, t in triggers.items() if t is None)
+    if sin_lista:
+        avisos.append(f"sin {TRIGGERS_FILE} (solo corren cuando corre todo): " + ", ".join(sin_lista))
+    if not changed and not sueltos:
+        return None, avisos
+    for fn, whys in sorted(changed.items()):
+        mods = {module_of(w.split(" (", 1)[0]) for w in whys}
+        hit = {s for s, t in triggers.items() if t and fn in t}
+        if hit and all(w.endswith("(eliminada)") for w in whys):
+            avisos.append(f"{fn} ya no existe y sigue en C10_TRIGGERS de: " + ", ".join(sorted(hit)))
+        if hit:
+            secs |= hit
+        elif suite in mods:
+            avisos.append(f"{fn} no esta en ningun C10_TRIGGERS de {suite}: corren todas las secciones")
+            todo = True
+        elif not mods & set(suites):
+            avisos.append(f"{fn} es de {', '.join(sorted(mods))} (sin suite propia): corren todas las secciones")
+            todo = True
+    for p in sueltos:
+        if module_of(p) == suite or module_of(p) not in suites:
+            avisos.append(f"{p}: cambio fuera de una funcion, corren todas las secciones")
+            todo = True
+    return (None if todo else sorted(secs)), avisos
 
 
 def sdk_behind(sdk):
@@ -308,14 +412,38 @@ def run_all(a, cuenta, note=None):
     else:
         step("ruff", "omitido", "sin .py cambiados")
 
-    # 4. unit
+    # 4. unit: solo las secciones cuyo C10_TRIGGERS trae una funcion cambiada
+    # (ver unit_plan), en una sola corrida por suite (cada corrida paga ~15 s
+    # de arranque de Accesos); el resultado se reparte por seccion con -rA.
+    changed = {}
+    for r in repos:
+        for fn, whys in r["funciones"].items():
+            changed.setdefault(fn, set()).update(whys)
+    sueltos = [p for r in repos for p in r["sin_funcion"]]
     for suite in run.suites():
-        code, summary, out = run.pytest(suite, "-m", "unit")
-        if code not in (0, 5):
+        triggers = run.unit_sections(suite)
+        secs, avisos = unit_plan(suite, run.suites(), triggers, changed, sueltos)
+        for msg in avisos:
+            step(f"unit {suite}", "aviso", msg)
+        if secs == []:
+            step(f"unit {suite}", "omitido", "ninguna seccion tocada")
+            continue
+        code, summary, out = run.pytest(suite, "-m", "unit", "-rA", *[f"{s}/" for s in secs or []])
+        secciones = unit_by_section(out)
+        if code not in (0, 5) and not secciones:
             step(f"unit {suite}", "rojo", summary)
             print(out[-3000:])
             return finish(1)
-        step(f"unit {suite}", "ok", summary)
+        for sec, counts in sorted(secciones.items()):
+            detail = ", ".join(f"{n} {k}" for k, n in counts.items())
+            state = "rojo" if counts.get("failed") or counts.get("error") else "ok"
+            step(f"unit {suite}/{sec}", state, detail)
+        no_aplica = [s for s in triggers if secs is not None and s not in secs]
+        if no_aplica:
+            step(f"unit {suite}", "omitido", "no aplica: " + ", ".join(no_aplica))
+        if code not in (0, 5):
+            print(out.split("short test summary info")[0][-3000:])
+            return finish(1)
 
     # 5. target (integration / prod_test)
     if not targets:
