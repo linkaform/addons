@@ -26,8 +26,9 @@ Pasos (se detiene en el primero que falla en rojo):
   4. pytest -m unit de las secciones tocadas, por back y suite.     bloquea
      Cada seccion lista en unit/c10_triggers.py (C10_TRIGGERS) las funciones
      que la disparan: si cambia una, corren TODOS los unitarios de la
-     seccion. Ante la duda corren todas (ver unit_plan). En Sanic, un test
-     que usa un metodo que Sanic no tiene sale SKIPPED y se avisa.
+     seccion. Ante la duda corren todas (ver unit_plan); en Sanic no: solo
+     las secciones con trigger. Un test que usa un metodo que Sanic no tiene
+     sale SKIPPED y se avisa.
   5. pytest --target=<funciones> -m "not unit" (integration/prod_test de las
      funciones cambiadas, cada back con las suyas) contra la cuenta activa,
      que debe ser la 10 (./lkf workwith seguridad). Si no, PENDIENTE. bloquea
@@ -204,7 +205,7 @@ def module_of(path):
     return parts[0]
 
 
-def unit_plan(suite, suites, triggers, changed, sueltos):
+def unit_plan(suite, suites, triggers, changed, sueltos, solo_triggers=False):
     """(secciones a correr, avisos) de los unitarios de una suite.
 
     triggers: {seccion: C10_TRIGGERS o None}, de Runner.unit_sections.
@@ -215,13 +216,17 @@ def unit_plan(suite, suites, triggers, changed, sueltos):
     se corren todas (secciones = None): una funcion del modulo que no esta en
     ninguna lista, una de un modulo sin suite propia (base, ...), un .py
     cambiado fuera de una funcion, o ninguna funcion cambiada.
+
+    solo_triggers (back sanic): la duda no corre todo, solo avisa. Sanic aun no
+    tiene todo lo de addons (falta buscador facets, auto-activacion...): correr
+    todas las secciones dejaria rojo cualquier PR por secciones que no toco.
     """
     avisos, todo, secs = [], False, set()
     sin_lista = sorted(s for s, t in triggers.items() if t is None)
     if sin_lista:
         avisos.append(f"sin {TRIGGERS_FILE} (solo corren cuando corre todo): " + ", ".join(sin_lista))
     if not changed and not sueltos:
-        return None, avisos
+        return ([] if solo_triggers else None), avisos
     for fn, whys in sorted(changed.items()):
         mods = {module_of(w.split(" (", 1)[0]) for w in whys}
         hit = {s for s, t in triggers.items() if t and fn in t}
@@ -239,6 +244,9 @@ def unit_plan(suite, suites, triggers, changed, sueltos):
         if module_of(p) == suite or module_of(p) not in suites:
             avisos.append(f"{p}: cambio fuera de una funcion, corren todas las secciones")
             todo = True
+    if solo_triggers and todo:
+        avisos = [a.replace("corren todas las secciones", "sin seccion, en Sanic no se corren las demas") for a in avisos]
+        todo = False
     return (None if todo else sorted(secs)), avisos
 
 
@@ -520,7 +528,8 @@ def run_all(a, paths, notes, work):
         sueltos = [p for r in by_back[back] for p in r["sin_funcion"]]
         for suite in run.suites():
             triggers = run.unit_sections(suite)
-            secs, avisos = unit_plan(suite, run.suites(), triggers, changed_fns, sueltos)
+            secs, avisos = unit_plan(suite, run.suites(), triggers, changed_fns, sueltos,
+                                     solo_triggers=(back == "sanic"))
             for msg in avisos:
                 step(f"unit {tag}{suite}", "aviso", msg)
             if secs == []:
