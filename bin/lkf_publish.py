@@ -1,11 +1,11 @@
 """Publica el resultado de ./lkf test en GitHub.
 
-Por cada repo (addons, modules) que tenga cambios y PR abierto:
+Por cada repo (addons, modules, lkf-sanic-apps, sdk-modules-sanic) con cambios:
   - commit status `lkf-test` sobre su SHA (verde / rojo / pendiente). Es el
     check que exige el ruleset de master. Atado al SHA: un push nuevo lo deja
     sin status hasta volver a correr ./lkf test.
   - un comentario en el PR (uno solo; se edita en cada corrida) con las
-    funciones detectadas, los pasos y el link al PR hermano del otro repo.
+    funciones detectadas, los pasos y el link a los PRs hermanos de los otros repos.
 
 Requisitos: `gh` autenticado con permiso de escritura, y el SHA ya pusheado
 (si no, ./lkf test guarda el resultado y luego `./lkf test --publicar`).
@@ -82,7 +82,7 @@ def body(result, me, brothers):
     lines = [MARKER, f"{head} · {result['segundos']} s", ""]
     if brothers:
         lines.append("**Va junto con:** " + ", ".join(f"{b['gh']}#{b['pr']['number']}" for b in brothers))
-        lines.append("Corrida conjunta: el código local de los dos repos se probó junto.")
+        lines.append("Corrida conjunta: el código local de esos repos se probó junto.")
         lines.append("")
     lines.append("| Repo | Rama | SHA | Funciones detectadas |")
     lines.append("|---|---|---|---|")

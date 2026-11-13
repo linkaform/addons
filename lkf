@@ -34,7 +34,7 @@ _usage(){
       echo "      $APP build <base|dev|local|prod|preprod>   Build container for preprod enviorment"
       echo "      $APP restart <preprod|prod> <account_id>  [depricated] use update"
       echo "      $APP update <preprod|prod> <account_id>  Update a given account addons containers image on given environment"
-      echo "      $APP test                    Prueba el cambio actual (addons + modules)"
+      echo "      $APP test                    Prueba el cambio actual (addons, modules y Sanic)"
       echo "      $APP test todo               Corre todos los tests (modo viejo)"
       echo "      $APP workwith <domain_name>  Elige la cuenta activa y deja modules/ en su rama"
       echo "      $APP workwith                Muestra la cuenta actual y los dominios disponibles"
@@ -484,8 +484,8 @@ case "$Acction" in
     _update_all
   ;;
   test)
-    # Corre en el HOST: necesita git real de addons y modules. Prueba el cambio
-    # actual (addons + modules vs origin/master) en la imagen lkf_test; ver
+    # Corre en el HOST: necesita git real de los repos. Prueba el cambio
+    # actual (addons, modules y Sanic vs origin/master) en docker; ver
     # bin/lkf_test.py. "./lkf test todo" conserva la corrida vieja de todo.
     if [[ "$Service" == "todo" ]]; then
       echo "Loding testing environment . . . . + - / * "
