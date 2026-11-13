@@ -14,10 +14,11 @@ Pasos (se detiene en el primero que falla en rojo):
        - si no, origin/master: no tocaste modules, solo se usa para probar.
   2. Compilar los .py cambiados.                                    bloquea
   3. ruff --select E9,F63,F7,F82 en los .py cambiados.              bloquea
-  4. pytest -m unit de las secciones tocadas, una corrida por suite. bloquea
-     Cada seccion lista en unit/c10_triggers.py (C10_TRIGGERS) las funciones
-     que la disparan: si cambia una, corren TODOS los unitarios de la
-     seccion. Ante la duda corren todas (ver unit_plan). Resultado por
+  4. pytest -m unit de unit/test_unit_cases.py de las secciones      bloquea
+     tocadas, una corrida por suite. Cada test_unit_cases.py trae los
+     unitarios principales de la seccion (maximo 10) y en C10_TRIGGERS las
+     funciones que la disparan. Los demas archivos de unit/ no corren aqui.
+     Ante la duda corren todas las secciones (ver unit_plan). Resultado por
      seccion: accesos/notas, ...
   5. pytest --target=<funciones> -m "not unit" (integration/prod_test de las
      funciones cambiadas) contra la cuenta activa, que debe ser la 10
@@ -46,7 +47,7 @@ IMAGE = "linkaform/lkf_test:develop"
 SP = "/usr/local/lib/python3.12/site-packages"
 TEST_ACCOUNT = 10
 RUFF_RULES = "E9,F63,F7,F82"
-TRIGGERS_FILE = "c10_triggers.py"
+TRIGGERS_FILE = "test_unit_cases.py"
 
 
 def sh(cmd, **kw):
@@ -140,7 +141,7 @@ def unit_by_section(out):
 
 
 def read_triggers(path):
-    """La lista C10_TRIGGERS de un c10_triggers.py (sin importarlo); None si no hay."""
+    """La lista C10_TRIGGERS de un test_unit_cases.py (sin importarlo); None si no hay."""
     try:
         with open(path) as fh:
             tree = ast.parse(fh.read())
@@ -177,7 +178,8 @@ def unit_plan(suite, suites, triggers, changed, sueltos):
     avisos, todo, secs = [], False, set()
     sin_lista = sorted(s for s, t in triggers.items() if t is None)
     if sin_lista:
-        avisos.append(f"sin {TRIGGERS_FILE} (solo corren cuando corre todo): " + ", ".join(sin_lista))
+        avisos.append(f"sin {TRIGGERS_FILE} con C10_TRIGGERS (./lkf test no corre sus unitarios): "
+                      + ", ".join(sin_lista))
     if not changed and not sueltos:
         return None, avisos
     for fn, whys in sorted(changed.items()):
@@ -412,9 +414,10 @@ def run_all(a, cuenta, note=None):
     else:
         step("ruff", "omitido", "sin .py cambiados")
 
-    # 4. unit: solo las secciones cuyo C10_TRIGGERS trae una funcion cambiada
-    # (ver unit_plan), en una sola corrida por suite (cada corrida paga ~15 s
-    # de arranque de Accesos); el resultado se reparte por seccion con -rA.
+    # 4. unit: el test_unit_cases.py de las secciones cuyo C10_TRIGGERS trae
+    # una funcion cambiada (ver unit_plan), en una sola corrida por suite
+    # (cada corrida paga ~15 s de arranque de Accesos); el resultado se
+    # reparte por seccion con -rA.
     changed = {}
     for r in repos:
         for fn, whys in r["funciones"].items():
@@ -425,10 +428,13 @@ def run_all(a, cuenta, note=None):
         secs, avisos = unit_plan(suite, run.suites(), triggers, changed, sueltos)
         for msg in avisos:
             step(f"unit {suite}", "aviso", msg)
-        if secs == []:
+        if secs is None:
+            secs = sorted(s for s, t in triggers.items() if t is not None)
+        if not secs:
             step(f"unit {suite}", "omitido", "ninguna seccion tocada")
             continue
-        code, summary, out = run.pytest(suite, "-m", "unit", "-rA", *[f"{s}/" for s in secs or []])
+        code, summary, out = run.pytest(
+            suite, "-m", "unit", "-rA", *[f"{s}/unit/{TRIGGERS_FILE}" for s in secs])
         secciones = unit_by_section(out)
         if code not in (0, 5) and not secciones:
             step(f"unit {suite}", "rojo", summary)
@@ -438,7 +444,7 @@ def run_all(a, cuenta, note=None):
             detail = ", ".join(f"{n} {k}" for k, n in counts.items())
             state = "rojo" if counts.get("failed") or counts.get("error") else "ok"
             step(f"unit {suite}/{sec}", state, detail)
-        no_aplica = [s for s in triggers if secs is not None and s not in secs]
+        no_aplica = [s for s, t in triggers.items() if t is not None and s not in secs]
         if no_aplica:
             step(f"unit {suite}", "omitido", "no aplica: " + ", ".join(no_aplica))
         if code not in (0, 5):
