@@ -1,32 +1,41 @@
 #!/usr/bin/env python3
-"""`./lkf test`: corre las pruebas del cambio actual en addons + modules.
+"""`./lkf test`: corre las pruebas del cambio actual en addons, modules y Sanic.
 
-Corre en el HOST y lanza pytest en la imagen linkaform/lkf_test:develop con el
-codigo local de los dos repos montado (el cambio completo, aunque nada este
-mergeado).
+Corre en el HOST y lanza pytest en docker con el codigo local de los repos
+montado (el cambio completo, aunque nada este mergeado). Se puede correr desde
+addons o desde lkf-sanic-apps (su ./lkf test llama a este archivo).
+
+Repos (Sanic es opcional: si ../lkf-sanic-apps no existe se omite):
+  addons + modules                        back "addons": imagen linkaform/lkf_test:develop
+  lkf-sanic-apps + sdk-modules-sanic      back "sanic":  imagen linkaform/sanic-app:test
+                                          (cd lkf-sanic-apps && ./lkf build test)
+La suite es la misma (sdk_testing); con LKF_BACK=sanic los tests reciben la
+clase de Sanic en vez de la de addons (test/sdk_testing/lkf_back.py). Cada back
+corre solo si alguno de sus repos tiene cambios (sin cambios en ningun repo:
+corre addons, como antes).
 
 Pasos (se detiene en el primero que falla en rojo):
-  1. Detectar (bin/lkf_changes.py): funciones cambiadas en addons y modules.
-     modules en rama de cuenta (seguridad, account_126...) -> tu checkout no
-     se toca; se arma un worktree temporal (.lkf-test/modules-wt) con:
-       - la rama de modules que se llame igual que la de addons, si existe
-         (local o en origin): el cambio toca los dos repos y se evalua;
-       - si no, origin/master: no tocaste modules, solo se usa para probar.
+  1. Detectar (bin/lkf_changes.py): funciones cambiadas en cada repo.
+     modules / sdk-modules-sanic en rama de cuenta (seguridad, hergo...) ->
+     tu checkout no se toca; se arma un worktree temporal (.lkf-test/<repo>-wt):
+       - la rama que se llame igual que tu rama de trabajo (la de addons o
+         la de lkf-sanic-apps), si existe (local o en origin): se evalua;
+       - si no, origin/master: no lo tocaste, solo se usa para probar.
   2. Compilar los .py cambiados.                                    bloquea
   3. ruff --select E9,F63,F7,F82 en los .py cambiados.              bloquea
-  4. pytest -m unit de las secciones tocadas, una corrida por suite. bloquea
+  4. pytest -m unit de las secciones tocadas, por back y suite.     bloquea
      Cada seccion lista en unit/c10_triggers.py (C10_TRIGGERS) las funciones
      que la disparan: si cambia una, corren TODOS los unitarios de la
-     seccion. Ante la duda corren todas (ver unit_plan). Resultado por
-     seccion: accesos/notas, ...
+     seccion. Ante la duda corren todas (ver unit_plan). En Sanic, un test
+     que usa un metodo que Sanic no tiene sale SKIPPED y se avisa.
   5. pytest --target=<funciones> -m "not unit" (integration/prod_test de las
-     funciones cambiadas) contra la cuenta activa, que debe ser la 10
-     (./lkf workwith seguridad). Si no es la 10 queda PENDIENTE.     bloquea
+     funciones cambiadas, cada back con las suyas) contra la cuenta activa,
+     que debe ser la 10 (./lkf workwith seguridad). Si no, PENDIENTE. bloquea
   Funciones cambiadas sin ningun test con su target -> aviso.
 
-El resultado se guarda en .lkf-test/<sha_addons>_<sha_modules>.json y se
-publica (bin/lkf_publish.py): status lkf-test + comentario en el PR de cada
-repo con cambios. Si algun SHA no esta pusheado, haz push y luego
+El resultado se guarda en .lkf-test/<shas>.json y se publica
+(bin/lkf_publish.py): status lkf-test + comentario en el PR de cada repo con
+cambios. Si algun SHA no esta pusheado, haz push y luego
 `./lkf test --publicar`, que sube el resultado guardado sin volver a correr.
 `--no-publicar` corre sin tocar GitHub.
 """
@@ -34,6 +43,7 @@ import argparse
 import ast
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -42,11 +52,15 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import lkf_changes  # noqa: E402
 import lkf_publish  # noqa: E402
 
-IMAGE = "linkaform/lkf_test:develop"
+IMAGE = {"addons": "linkaform/lkf_test:develop", "sanic": "linkaform/sanic-app:test"}
 SP = "/usr/local/lib/python3.12/site-packages"
+SANIC = "/srv/lkf-sanic-app"
 TEST_ACCOUNT = 10
 RUFF_RULES = "E9,F63,F7,F82"
 TRIGGERS_FILE = "c10_triggers.py"
+REPOS = ("addons", "modules", "lkf-sanic-apps", "sdk-modules-sanic")
+CHILD = {"modules": "addons", "sdk-modules-sanic": "lkf-sanic-apps"}   # repo de modulos -> su repo
+BACK = lkf_changes.BACK
 
 
 def sh(cmd, **kw):
@@ -54,26 +68,45 @@ def sh(cmd, **kw):
 
 
 class Runner:
-    def __init__(self, a):
-        self.addons, self.modules, self.sdk, self.env = a.addons, a.modules, a.sdk, a.env_from
+    def __init__(self, a, paths):
+        self.sdk, self.env, self.paths = a.sdk, a.env_from, paths
         api = os.path.join(os.path.dirname(self.env), "linkaform_api", "linkaform_api")
-        self.mounts = [
+        repo_mounts = [(p, f"/srv/repo/{name}") for name, p in paths.items()]
+        self.mounts = {"addons": [
             (os.path.join(self.env, "secrets/lkf_jwt_key.pub"), "/etc/ssl/certs/lkf_jwt_key.pub"),
             (api, f"{SP}/linkaform_api"),
-            (os.path.join(self.addons, "lkf_addons"), f"{SP}/lkf_addons"),
-            (self.modules, f"{SP}/lkf_modules"),
+            (os.path.join(paths["addons"], "lkf_addons"), f"{SP}/lkf_addons"),
+            (paths["modules"], f"{SP}/lkf_modules"),
             (self.sdk, "/srv/lkf_test/sdk_testing"),
             (os.path.join(self.env, "config"), "/srv/scripts/addons/config"),
             (os.path.join(self.env, "secrets"), "/srv/scripts/addons/secrets"),
-            (self.addons, "/srv/repo/addons"),
-            (self.modules, "/srv/repo/modules"),
-        ]
+            *repo_mounts,
+        ]}
+        if "lkf-sanic-apps" in paths:
+            # Igual que lkf-sanic-app en el docker-compose de clave10-sdk.
+            sanic = paths["lkf-sanic-apps"]
+            self.mounts["sanic"] = [
+                (os.path.join(sanic, "addons"), f"{SP}/lkf_addons"),
+                (api, f"{SP}/linkaform_api"),
+                (os.path.join(sanic, "app"), f"{SANIC}/app"),
+                (paths["sdk-modules-sanic"], f"{SANIC}/app/modules"),
+                (os.path.join(sanic, "app", "config"), f"{SANIC}/config"),
+                (os.path.join(sanic, "secrets"), f"{SANIC}/secrets"),
+                (os.path.join(self.env, "secrets"), "/srv/addons/secrets"),
+                (paths["modules"], "/srv/repo/modules"),   # accesos_testing.py (lkf_back.py)
+                (self.sdk, "/srv/lkf_test/sdk_testing"),
+            ]
 
-    def docker(self, workdir, *cmd):
+    def docker(self, workdir, *cmd, back="addons"):
         args = ["docker", "run", "--rm", "-w", workdir]
-        for src, dst in self.mounts:
+        if back == "sanic":
+            args += ["-e", "LKF_BACK=sanic", "-e", "USE_LOCAL_SETTINGS=1"]
+        for src, dst in self.mounts[back]:
             args += ["-v", f"{os.path.realpath(src)}:{dst}"]
-        return sh(args + [IMAGE, *cmd])
+        return sh(args + [IMAGE[back], *cmd])
+
+    def has_image(self, back):
+        return sh(["docker", "image", "inspect", IMAGE[back]]).returncode == 0
 
     def suites(self):
         """Carpetas de sdk_testing con pytest.ini propio (accesos, ...)."""
@@ -95,10 +128,11 @@ class Runner:
             out[d] = read_triggers(os.path.join(unit, TRIGGERS_FILE))
         return out
 
-    def pytest(self, suite, *args):
+    def pytest(self, back, suite, *args):
         res = self.docker(
             f"/srv/lkf_test/sdk_testing/{suite}",
             "pytest", "-p", "no:cacheprovider", "-p", "no:warnings", "-q", "-o", "log_cli=false", *args,
+            back=back,
         )
         tail = [l for l in res.stdout.strip().splitlines() if l.strip()]
         return res.returncode, (tail[-1] if tail else res.stderr.strip()[-300:]), res.stdout
@@ -113,6 +147,9 @@ class Runner:
             return int(res.stdout.strip().splitlines()[-1])
         except (ValueError, IndexError):
             return None
+
+
+FALTA_SANIC = re.compile(r"^SKIPPED \[\d+\] .*?: falta en sanic: (\w+)", re.M)
 
 
 UNIT_STATES = {"PASSED": "passed", "FAILED": "failed", "ERROR": "error",
@@ -156,10 +193,15 @@ def read_triggers(path):
 
 
 def module_of(path):
-    """Modulo de un archivo cambiado: lkf_addons/addons/accesos/app.py y
-    accesos/items/scripts/... -> accesos."""
+    """Modulo de un archivo cambiado: lkf_addons/addons/accesos/app.py (addons),
+    addons/accesos/service.py (lkf-sanic-apps) y accesos/items/scripts/...
+    (modules, sdk-modules-sanic) -> accesos."""
     parts = path.split("/")
-    return parts[2] if parts[:2] == ["lkf_addons", "addons"] and len(parts) > 2 else parts[0]
+    if parts[:2] == ["lkf_addons", "addons"] and len(parts) > 2:
+        return parts[2]
+    if parts[0] == "addons" and len(parts) > 2:
+        return parts[1]
+    return parts[0]
 
 
 def unit_plan(suite, suites, triggers, changed, sueltos):
@@ -206,39 +248,63 @@ def sdk_behind(sdk):
     return int(out or 0)
 
 
+def branch_of(repo):
+    return sh(["git", "-C", repo, "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+
+
 def account_branch(repo):
     """Nombre de la rama si es de cuenta (sin '/', no master); si no, None."""
-    br = sh(["git", "-C", repo, "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+    br = branch_of(repo)
     return br if br and "/" not in br and br not in ("master", "HEAD") else None
 
 
-def sibling_ref(modules, branch):
-    """La rama de modules que se llama igual que la de addons: local, en origin o None."""
+def sibling_ref(repo, branch):
+    """La rama de `repo` que se llama igual que la de trabajo: local, en origin o None."""
     if not branch or "/" not in branch:
         return None
     for ref in (f"refs/heads/{branch}", f"refs/remotes/origin/{branch}"):
-        if sh(["git", "-C", modules, "rev-parse", "-q", "--verify", ref]).returncode == 0:
+        if sh(["git", "-C", repo, "rev-parse", "-q", "--verify", ref]).returncode == 0:
             return ref
     return None
 
 
-def modules_target(addons, modules):
-    """(ref a probar, rama de cuenta) cuando modules esta en rama de cuenta; si no (None, None)."""
-    cuenta = account_branch(modules)
+def layout(a):
+    """{repo: ruta} de los repos que existen (Sanic es opcional)."""
+    paths = {"addons": a.addons, "modules": a.modules,
+             "lkf-sanic-apps": a.sanic, "sdk-modules-sanic": a.sanic_modules}
+    return {k: v for k, v in paths.items() if v and os.path.exists(os.path.join(v, ".git"))}
+
+
+def work_branch(paths):
+    """La rama de trabajo (con '/'): la de addons o, si no, la de lkf-sanic-apps."""
+    for name in ("addons", "lkf-sanic-apps"):
+        if name in paths and "/" in branch_of(paths[name]):
+            return branch_of(paths[name])
+    return None
+
+
+def child_target(paths, name, work):
+    """(ref a probar, rama de cuenta) si el repo de modulos esta en rama de cuenta; si no (None, None)."""
+    cuenta = account_branch(paths[name])
     if not cuenta:
         return None, None
-    br = sh(["git", "-C", addons, "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
-    return sibling_ref(modules, br) or "origin/master", cuenta
+    return sibling_ref(paths[name], work) or "origin/master", cuenta
 
 
-def modules_sha(addons, modules):
-    """SHA de modules que se prueba (ver modules_target)."""
-    ref, _ = modules_target(addons, modules)
-    return sh(["git", "-C", modules, "rev-parse", ref or "HEAD"]).stdout.strip()
+def tested_shas(paths):
+    """SHA que se prueba de cada repo (ver child_target), en el orden de REPOS."""
+    work = work_branch(paths)
+    out = []
+    for name in REPOS:
+        if name not in paths:
+            continue
+        ref = child_target(paths, name, work)[0] if name in CHILD else None
+        out.append(sh(["git", "-C", paths[name], "rev-parse", ref or "HEAD"]).stdout.strip())
+    return out
 
 
-def result_path(addons, sha_a, sha_m):
-    return os.path.join(addons, ".lkf-test", f"{sha_a[:8]}_{sha_m[:8]}.json")
+def result_path(addons, shas):
+    return os.path.join(addons, ".lkf-test", "_".join(x[:8] for x in shas) + ".json")
 
 
 def do_publish(out):
@@ -251,11 +317,11 @@ def do_publish(out):
         print(f"  {m}")
 
 
-def publish_saved(a):
-    shas = [sh(["git", "-C", a.addons, "rev-parse", "HEAD"]).stdout.strip(), modules_sha(a.addons, a.modules)]
-    path = result_path(a.addons, *shas)
+def publish_saved(a, paths):
+    shas = tested_shas(paths)
+    path = result_path(a.addons, shas)
     if not os.path.exists(path):
-        print(f"x no hay resultado para {shas[0][:8]} / {shas[1][:8]}: corre ./lkf test primero")
+        print(f"x no hay resultado para {' / '.join(x[:8] for x in shas)}: corre ./lkf test primero")
         return 2
     with open(path) as fh:
         out = json.load(fh)
@@ -266,46 +332,65 @@ def publish_saved(a):
 
 def main():
     here = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    ap = argparse.ArgumentParser(description="Pruebas del cambio actual (addons + modules)")
+    sanic = os.path.join(os.path.dirname(here), "lkf-sanic-apps")
+    ap = argparse.ArgumentParser(description="Pruebas del cambio actual (addons, modules y Sanic)")
     ap.add_argument("--addons", default=here)
     ap.add_argument("--modules", default=os.path.join(here, "modules"))
+    ap.add_argument("--sanic", default=sanic, help="repo lkf-sanic-apps (si no existe, se omite Sanic)")
+    ap.add_argument("--sanic-modules", default=os.path.join(sanic, "app", "modules"))
     ap.add_argument("--sdk", default=os.path.join(here, "test", "sdk_testing"))
     ap.add_argument("--env-from", default=here, help="addons de donde salen config/ y secrets/")
     ap.add_argument("--publicar", action="store_true", help="solo publica el resultado guardado de los SHAs actuales")
     ap.add_argument("--no-publicar", action="store_true", help="corre sin publicar en GitHub")
     a = ap.parse_args()
+    paths = layout(a)
     if a.publicar:
-        return publish_saved(a)
+        return publish_saved(a, paths)
 
-    real_modules = a.modules
-    if not account_branch(real_modules):
-        return run_all(a, None)
-    sh(["git", "-C", real_modules, "fetch", "-q", "origin"])
-    ref, cuenta = modules_target(a.addons, real_modules)
-    tmp = os.path.join(a.addons, ".lkf-test", "modules-wt")
-    sh(["git", "-C", real_modules, "worktree", "remove", "--force", tmp])
-    sh(["git", "-C", real_modules, "worktree", "prune"])
-    created = None
-    if ref.startswith("refs/heads/"):        # rama hermana local: se usa tal cual
-        cmd = ["worktree", "add", "-q", tmp, ref[len("refs/heads/"):]]
-    elif ref.startswith("refs/remotes/"):    # solo en origin: rama local que la sigue
-        created = ref[len("refs/remotes/origin/"):]
-        cmd = ["worktree", "add", "-q", "--track", "-b", created, tmp, ref]
-    else:                                    # sin rama hermana: origin/master
-        cmd = ["worktree", "add", "-q", "--detach", tmp, "origin/master"]
-    res = sh(["git", "-C", real_modules, *cmd])
-    if res.returncode:
-        print(f"x no se pudo preparar modules ({ref}) en un worktree: {res.stderr.strip()}")
-        return 2
-    a.modules = tmp
+    work = work_branch(paths)
+    notes, worktrees = {}, []
     try:
-        return run_all(a, cuenta if ref == "origin/master" else None, note=(cuenta, ref))
+        for name in CHILD:
+            if name not in paths or not account_branch(paths[name]):
+                continue
+            real = paths[name]
+            sh(["git", "-C", real, "fetch", "-q", "origin"])
+            ref, cuenta = child_target(paths, name, work)
+            tmp = os.path.join(a.addons, ".lkf-test", f"{name}-wt")
+            sh(["git", "-C", real, "worktree", "remove", "--force", tmp])
+            sh(["git", "-C", real, "worktree", "prune"])
+            if ref.startswith("refs/heads/"):        # rama hermana local: se usa tal cual
+                cmd = ["worktree", "add", "-q", tmp, ref[len("refs/heads/"):]]
+            elif ref.startswith("refs/remotes/"):    # solo en origin: rama local que la sigue
+                cmd = ["worktree", "add", "-q", "--track", "-b", ref[len("refs/remotes/origin/"):], tmp, ref]
+            else:                                    # sin rama hermana: origin/master
+                cmd = ["worktree", "add", "-q", "--detach", tmp, "origin/master"]
+            res = sh(["git", "-C", real, *cmd])
+            if res.returncode:
+                print(f"x no se pudo preparar {name} ({ref}) en un worktree: {res.stderr.strip()}")
+                return 2
+            worktrees.append((real, tmp))
+            paths[name] = tmp
+            notes[name] = (cuenta, ref)
+        return run_all(a, paths, notes, work)
     finally:
-        sh(["git", "-C", real_modules, "worktree", "remove", "--force", tmp])
+        for real, tmp in worktrees:
+            sh(["git", "-C", real, "worktree", "remove", "--force", tmp])
 
 
-def run_all(a, cuenta, note=None):
-    run = Runner(a)
+CODE_PREFIX = {"addons": "lkf_addons/", "lkf-sanic-apps": "addons/"}
+
+
+def changed(r):
+    """El repo trae cambios que prueba sdk_testing (no tooling como lkf, docker/, bin/)."""
+    if any(r[k] for k in ("funciones", "rotos", "eliminados", "sin_funcion")):
+        return True
+    prefix = CODE_PREFIX.get(r["repo"], "")
+    return any(p.startswith(prefix) for p in r["sin_tests"])
+
+
+def run_all(a, paths, notes, work):
+    run = Runner(a, paths)
     steps, t0 = [], time.time()
 
     def step(name, state, detail=""):
@@ -314,25 +399,27 @@ def run_all(a, cuenta, note=None):
         steps.append({"paso": name, "estado": state, "detalle": detail})
 
     # 1. detectar
-    sh(["git", "-C", a.addons, "fetch", "-q", "origin", "master"])
-    heads = {"addons": "HEAD", "modules": "HEAD"}
-    repos = [lkf_changes.analyze(a.addons, "addons", a.addons, a.modules, heads)]
-    if cuenta:
-        sha = sh(["git", "-C", a.modules, "rev-parse", "HEAD"]).stdout.strip()
-        repos.append({"repo": "modules", "ruta": a.modules, "ok": True, "rama": f"origin/master (tu checkout: {cuenta})",
-                      "sha": sha, "base": sha, "sin_commit": False, "funciones": {}, "sin_tests": [],
-                      "rotos": [], "eliminados": [], "sin_funcion": []})
-    else:
-        sh(["git", "-C", a.modules, "fetch", "-q", "origin", "master"])
-        repos.append(lkf_changes.analyze(a.modules, "modules", a.addons, a.modules, heads))
+    heads = {k: "HEAD" for k in paths}
+    repos = []
+    for name, path in paths.items():
+        cuenta, ref = notes.get(name, (None, None))
+        if ref == "origin/master":   # rama de cuenta sin rama hermana: no se evalua
+            sha = sh(["git", "-C", path, "rev-parse", "HEAD"]).stdout.strip()
+            repos.append({"repo": name, "ruta": path, "ok": True, "rama": f"origin/master (tu checkout: {cuenta})",
+                          "sha": sha, "base": sha, "sin_commit": False, "funciones": {}, "sin_tests": [],
+                          "rotos": [], "eliminados": [], "sin_funcion": []})
+            continue
+        sh(["git", "-C", path, "fetch", "-q", "origin", "master"])
+        repos.append(lkf_changes.analyze(path, name, paths, heads))
     lkf_changes.print_human(repos)
     print()
-    if note and cuenta:
-        step("modules", "aviso", f"tu checkout esta en '{note[0]}' (rama de cuenta) y no hay rama "
-             f"'{repos[0]['rama']}' en modules: no se evalua y se prueba con origin/master")
-    elif note:
-        step("modules", "aviso", f"tu checkout esta en '{note[0]}' (rama de cuenta): se evalua la rama "
-             f"hermana {note[1].replace('refs/remotes/', '').replace('refs/heads/', '')} en un worktree temporal")
+    for name, (cuenta, ref) in notes.items():
+        if ref == "origin/master":
+            step(name, "aviso", f"tu checkout esta en '{cuenta}' (rama de cuenta) y no hay rama "
+                 f"'{work or CHILD[name]}' en {name}: no se evalua y se prueba con origin/master")
+        else:
+            step(name, "aviso", f"tu checkout esta en '{cuenta}' (rama de cuenta): se evalua la rama "
+                 f"hermana {ref.replace('refs/remotes/', '').replace('refs/heads/', '')} en un worktree temporal")
     for r in repos:
         if not r["ok"]:
             print(f"✗ {r['repo']} {r['error']}.")
@@ -349,6 +436,9 @@ def run_all(a, cuenta, note=None):
         for p in lkf_changes.changed_lines(r["ruta"], r["base"], "HEAD")
         if p.endswith(".py") and os.path.exists(os.path.join(r["ruta"], p))
     ]
+    # Que back corre: el de los repos con cambios; sin cambios en ninguno, addons.
+    backs = [b for b in ("addons", "sanic") if any(changed(r) for r in repos if BACK[r["repo"]] == b)] or ["addons"]
+    by_back = {b: [r for r in repos if BACK[r["repo"]] == b] for b in backs}
 
     behind = sdk_behind(a.sdk)
     if behind:
@@ -364,7 +454,7 @@ def run_all(a, cuenta, note=None):
             "publicable": not any(r["sin_commit"] for r in repos),
         }
         os.makedirs(os.path.join(a.addons, ".lkf-test"), exist_ok=True)
-        path = result_path(a.addons, repos[0]["sha"], repos[1]["sha"])
+        path = result_path(a.addons, [r["sha"] for r in repos])
         with open(path, "w") as fh:
             json.dump(out, fh, indent=2, ensure_ascii=False)
         print(f"\n== {verdict.upper()} ({out['segundos']} s)  -> {os.path.relpath(path, a.addons)}")
@@ -379,7 +469,7 @@ def run_all(a, cuenta, note=None):
         return finish(1)
     step("compilar", "ok", f"{len(changed_py)} .py cambiados")
 
-    # 3. ruff
+    # 3. ruff (en la imagen de addons para todos los repos: es analisis estatico)
     if changed_py:
         # Bloquea solo errores en lineas que cambiaste: master ya trae ~140 F821
         # y conflictos sin resolver; revisar archivos completos dejaria rojo
@@ -412,76 +502,94 @@ def run_all(a, cuenta, note=None):
     else:
         step("ruff", "omitido", "sin .py cambiados")
 
-    # 4. unit: solo las secciones cuyo C10_TRIGGERS trae una funcion cambiada
-    # (ver unit_plan), en una sola corrida por suite (cada corrida paga ~15 s
-    # de arranque de Accesos); el resultado se reparte por seccion con -rA.
-    changed = {}
-    for r in repos:
-        for fn, whys in r["funciones"].items():
-            changed.setdefault(fn, set()).update(whys)
-    sueltos = [p for r in repos for p in r["sin_funcion"]]
-    for suite in run.suites():
-        triggers = run.unit_sections(suite)
-        secs, avisos = unit_plan(suite, run.suites(), triggers, changed, sueltos)
-        for msg in avisos:
-            step(f"unit {suite}", "aviso", msg)
-        if secs == []:
-            step(f"unit {suite}", "omitido", "ninguna seccion tocada")
-            continue
-        code, summary, out = run.pytest(suite, "-m", "unit", "-rA", *[f"{s}/" for s in secs or []])
-        secciones = unit_by_section(out)
-        if code not in (0, 5) and not secciones:
-            step(f"unit {suite}", "rojo", summary)
-            print(out[-3000:])
-            return finish(1)
-        for sec, counts in sorted(secciones.items()):
-            detail = ", ".join(f"{n} {k}" for k, n in counts.items())
-            state = "rojo" if counts.get("failed") or counts.get("error") else "ok"
-            step(f"unit {suite}/{sec}", state, detail)
-        no_aplica = [s for s in triggers if secs is not None and s not in secs]
-        if no_aplica:
-            step(f"unit {suite}", "omitido", "no aplica: " + ", ".join(no_aplica))
-        if code not in (0, 5):
-            print(out.split("short test summary info")[0][-3000:])
-            return finish(1)
+    pending = False
+    if "sanic" in backs and not run.has_image("sanic"):
+        step("sanic", "pendiente", f"falta la imagen {IMAGE['sanic']}: cd lkf-sanic-apps && ./lkf build test")
+        backs.remove("sanic")
+        pending = True
 
-    # 5. target (integration / prod_test)
+    # 4. unit: solo las secciones cuyo C10_TRIGGERS trae una funcion cambiada
+    # (ver unit_plan), en una sola corrida por suite y back (cada corrida paga
+    # ~15 s de arranque de Accesos); el resultado se reparte por seccion con -rA.
+    for back in backs:
+        tag = "" if back == "addons" else "sanic "
+        changed_fns = {}
+        for r in by_back[back]:
+            for fn, whys in r["funciones"].items():
+                changed_fns.setdefault(fn, set()).update(whys)
+        sueltos = [p for r in by_back[back] for p in r["sin_funcion"]]
+        for suite in run.suites():
+            triggers = run.unit_sections(suite)
+            secs, avisos = unit_plan(suite, run.suites(), triggers, changed_fns, sueltos)
+            for msg in avisos:
+                step(f"unit {tag}{suite}", "aviso", msg)
+            if secs == []:
+                step(f"unit {tag}{suite}", "omitido", "ninguna seccion tocada")
+                continue
+            code, summary, out = run.pytest(back, suite, "-m", "unit", "-rA", *[f"{s}/" for s in secs or []])
+            secciones = unit_by_section(out)
+            if code not in (0, 5) and not secciones:
+                step(f"unit {tag}{suite}", "rojo", summary)
+                print(out[-3000:])
+                return finish(1)
+            for sec, counts in sorted(secciones.items()):
+                detail = ", ".join(f"{n} {k}" for k, n in counts.items())
+                state = "rojo" if counts.get("failed") or counts.get("error") else "ok"
+                step(f"unit {tag}{suite}/{sec}", state, detail)
+            faltan = sorted(set(FALTA_SANIC.findall(out)))
+            if faltan:
+                step(f"unit {tag}{suite}", "aviso", "falta en sanic (tests saltados): " + ", ".join(faltan))
+            no_aplica = [s for s in triggers if secs is not None and s not in secs]
+            if no_aplica:
+                step(f"unit {tag}{suite}", "omitido", "no aplica: " + ", ".join(no_aplica))
+            if code not in (0, 5):
+                print(out.split("short test summary info")[0][-3000:])
+                return finish(1)
+
+    # 5. target (integration / prod_test), cada back con sus funciones
     if not targets:
         step("target", "omitido", "sin funciones cambiadas")
-        return finish(0)
+        return finish(3 if pending else 0)
+
     def covered(out):
         for line in out.splitlines():
             if line.startswith("LKF_TARGETS_CUBIERTOS="):
                 return {t for t in line.split("=", 1)[1].split(",") if t}
         return set()
 
-    pending, all_covered, plan = False, set(), {}
-    for suite in run.suites():
-        _, _, out = run.pytest(suite, "--collect-only", f"--target={','.join(targets)}")
-        all_covered |= covered(out)
-        code, _, out = run.pytest(suite, "--collect-only", f"--target={','.join(targets)}", "-m", "not unit")
-        plan[suite] = code
-    no_tests = [fn for fn in targets if fn not in all_covered]
-    if no_tests:
-        step("sin tests", "aviso", ", ".join(no_tests))
-
-    account = run.active_account()
-    for suite in run.suites():
-        if plan[suite] == 5:
-            step(f"target {suite}", "omitido", "sin integration/prod_test para estas funciones")
+    account = None
+    for back in backs:
+        tag = "" if back == "addons" else "sanic "
+        fns = sorted({fn for r in by_back[back] for fn in r["funciones"]})
+        if not fns:
             continue
-        if account != TEST_ACCOUNT:
-            step(f"target {suite}", "pendiente",
-                 f"cuenta activa {account}, se requiere {TEST_ACCOUNT}: ./lkf workwith seguridad")
-            pending = True
-            continue
-        code, summary, out = run.pytest(
-            suite, f"--target={','.join(targets)}", "-m", "not unit", "--allow-prod-integration")
-        if code not in (0, 5):
-            step(f"target {suite}", "rojo", summary)
-            print(out[-3000:])
-            return finish(1)
-        step(f"target {suite}", "ok", summary)
+        all_covered, plan = set(), {}
+        for suite in run.suites():
+            _, _, out = run.pytest(back, suite, "--collect-only", f"--target={','.join(fns)}")
+            all_covered |= covered(out)
+            code, _, out = run.pytest(back, suite, "--collect-only", f"--target={','.join(fns)}", "-m", "not unit")
+            plan[suite] = code
+        no_tests = [fn for fn in fns if fn not in all_covered]
+        if no_tests:
+            step(f"sin tests {tag}".strip(), "aviso", ", ".join(no_tests))
+        for suite in run.suites():
+            if plan[suite] == 5:
+                step(f"target {tag}{suite}", "omitido", "sin integration/prod_test para estas funciones")
+                continue
+            if account is None:
+                account = run.active_account()
+            if account != TEST_ACCOUNT:
+                step(f"target {tag}{suite}", "pendiente",
+                     f"cuenta activa {account}, se requiere {TEST_ACCOUNT}: ./lkf workwith seguridad")
+                pending = True
+                continue
+            code, summary, out = run.pytest(
+                back, suite, f"--target={','.join(fns)}", "-m", "not unit", "--allow-prod-integration")
+            if code not in (0, 5):
+                step(f"target {tag}{suite}", "rojo", summary)
+                print(out[-3000:])
+                return finish(1)
+            step(f"target {tag}{suite}", "ok", summary)
     return finish(3 if pending else 0)
 
 
