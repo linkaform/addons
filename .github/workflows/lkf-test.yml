@@ -1,0 +1,87 @@
+name: lkf-test
+
+# Check lkf-test de los PRs a master del back: corre bin/lkf_test.py --ci
+# (detector + compilar + ruff + unitarios de addons y Sanic) contra preprod.
+# La integracion todavia no corre aqui (./lkf test en local).
+#
+# Este mismo archivo lo llaman modules, lkf-sanic-apps y sdk-modules-sanic
+# (workflow_call, con secrets: inherit): un PR de cualquiera de los cuatro
+# prueba el cambio completo, tomando de los demas repos la rama que se llame
+# igual que la del PR (o master).
+#
+# Secrets (de la org o del repo): PREPROD_USERNAME y PREPROD_APIKEY, la cuenta
+# de pruebas en preprod. Los PRs desde forks no los reciben y salen en rojo.
+on:
+  pull_request:
+    branches: [master]
+  workflow_call:
+    secrets:
+      PREPROD_USERNAME:
+        required: false
+      PREPROD_APIKEY:
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lkf-test-${{ github.repository }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  lkf-test:
+    name: lkf-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      WS: ${{ github.workspace }}/ws
+      PR_REPO: ${{ github.event.repository.name }}
+      PR_BRANCH: ${{ github.head_ref }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Clonar addons (rama del PR o master)
+        run: |
+          mkdir -p "$WS"
+          git clone -q --filter=blob:none --no-checkout https://github.com/linkaform/addons.git "$WS/addons"
+          cd "$WS/addons"
+          if [ "$PR_REPO" = addons ]; then
+            git fetch -q origin "refs/pull/$PR_NUMBER/head"
+            git checkout -q -B "$PR_BRANCH" FETCH_HEAD
+          elif git rev-parse -q --verify "refs/remotes/origin/$PR_BRANCH" >/dev/null; then
+            git checkout -q -B "$PR_BRANCH" "origin/$PR_BRANCH"
+          else
+            git checkout -q master
+          fi
+          echo "addons: $(git rev-parse --abbrev-ref HEAD) $(git rev-parse --short HEAD)"
+
+      - name: Clonar los demas repos y preparar preprod
+        env:
+          PREPROD_USERNAME: ${{ secrets.PREPROD_USERNAME }}
+          PREPROD_APIKEY: ${{ secrets.PREPROD_APIKEY }}
+        run: bash "$WS/addons/bin/lkf_ci_setup.sh" "$WS"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Imagen linkaform/lkf_test:develop
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.WS }}/addons/test/docker
+          file: ${{ env.WS }}/addons/test/docker/Dockerfile
+          target: develop
+          tags: linkaform/lkf_test:develop
+          load: true
+          cache-from: type=gha,scope=lkf_test
+          cache-to: type=gha,scope=lkf_test,mode=max
+
+      - name: Imagen linkaform/sanic-app:test
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.WS }}/lkf-sanic-apps/docker
+          file: ${{ env.WS }}/lkf-sanic-apps/docker/Dockerfile.test
+          tags: linkaform/sanic-app:test
+          load: true
+          cache-from: type=gha,scope=sanic_test
+          cache-to: type=gha,scope=sanic_test,mode=max
+
+      - name: ./lkf test --ci
+        run: python3 "$WS/addons/bin/lkf_test.py" --ci
