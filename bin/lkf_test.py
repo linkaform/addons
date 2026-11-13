@@ -425,8 +425,9 @@ def run_all(a, paths, notes, work):
     print()
     for name, (cuenta, ref) in notes.items():
         if ref == "origin/master":
-            step(name, "aviso", f"tu checkout esta en '{cuenta}' (rama de cuenta) y no hay rama "
-                 f"'{work or CHILD[name]}' en {name}: no se evalua y se prueba con origin/master")
+            falta = f"no hay rama '{work}' en {name}" if work else "no estas en una rama de trabajo"
+            step(name, "aviso", f"tu checkout esta en '{cuenta}' (rama de cuenta) y {falta}: "
+                 "no se evalua y se prueba con origin/master")
         else:
             step(name, "aviso", f"tu checkout esta en '{cuenta}' (rama de cuenta): se evalua la rama "
                  f"hermana {ref.replace('refs/remotes/', '').replace('refs/heads/', '')} en un worktree temporal")
