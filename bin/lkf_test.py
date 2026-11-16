@@ -35,11 +35,17 @@ Pasos (se detiene en el primero que falla en rojo):
      que debe ser la 10 (./lkf workwith seguridad). Si no, PENDIENTE. bloquea
   Funciones cambiadas sin ningun test con su target -> aviso.
 
-El resultado se guarda en .lkf-test/<shas>.json y se publica
-(bin/lkf_publish.py): status lkf-test + comentario en el PR de cada repo con
-cambios. Si algun SHA no esta pusheado, haz push y luego
-`./lkf test --publicar`, que sube el resultado guardado sin volver a correr.
-`--no-publicar` corre sin tocar GitHub.
+El resultado se guarda en .lkf-test/<shas>.json. El check `lkf-test` del PR
+lo pone GitHub Actions (.github/workflows/lkf-test.yml, que corre esto mismo
+con --ci); en local ya no se publica nada salvo que se pida:
+`./lkf test --publicar` sube el resultado guardado (status + comentario,
+bin/lkf_publish.py) sin volver a correr.
+
+--ci (GitHub Actions): pasos 1 a 4 contra preprod; la integracion (paso 5) no
+corre en CI todavia. Pendiente cuenta como rojo, no publica con gh y escribe
+el resumen en $GITHUB_STEP_SUMMARY. El codigo sale de lo que el workflow
+clono: la rama del PR y, en los demas repos, la rama que se llame igual o
+master.
 """
 import argparse
 import ast
@@ -327,6 +333,23 @@ def do_publish(out):
         print(f"  {m}")
 
 
+def ci_summary(out):
+    """Resumen en Markdown para la pagina del job ($GITHUB_STEP_SUMMARY)."""
+    dest = os.environ.get("GITHUB_STEP_SUMMARY")
+    if not dest:
+        return
+    icon = {"ok": "✅", "rojo": "❌", "pendiente": "⏳", "aviso": "⚠️", "omitido": "➖"}
+    cell = lambda s: str(s).replace("|", "\\|").replace("\n", " ")
+    lines = [f"## lkf-test: {out['veredicto']} ({out['segundos']} s)", ""]
+    for r in out["repos"]:
+        fns = ", ".join(sorted(r["funciones"])) or "ninguna"
+        lines.append(f"- **{r['repo']}** `{r['rama']}` {r['sha'][:8]}: {cell(fns)}")
+    lines += ["", "| | Paso | Detalle |", "|---|---|---|"]
+    lines += [f"| {icon[s['estado']]} | {cell(s['paso'])} | {cell(s['detalle'])} |" for s in out["pasos"]]
+    with open(dest, "a") as fh:
+        fh.write("\n".join(lines) + "\n")
+
+
 def publish_saved(a, paths):
     shas = tested_shas(paths)
     path = result_path(a.addons, shas)
@@ -351,7 +374,8 @@ def main():
     ap.add_argument("--sdk", default=os.path.join(here, "test", "sdk_testing"))
     ap.add_argument("--env-from", default=here, help="addons de donde salen config/ y secrets/")
     ap.add_argument("--publicar", action="store_true", help="solo publica el resultado guardado de los SHAs actuales")
-    ap.add_argument("--no-publicar", action="store_true", help="corre sin publicar en GitHub")
+    ap.add_argument("--no-publicar", action="store_true", help="(sin efecto: ya no se publica por default)")
+    ap.add_argument("--ci", action="store_true", help="modo GitHub Actions: sin integracion ni publicacion")
     a = ap.parse_args()
     paths = layout(a)
     if a.publicar:
@@ -451,11 +475,14 @@ def run_all(a, paths, notes, work):
     backs = [b for b in ("addons", "sanic") if any(changed(r) for r in repos if BACK[r["repo"]] == b)] or ["addons"]
     by_back = {b: [r for r in repos if BACK[r["repo"]] == b] for b in backs}
 
-    behind = sdk_behind(a.sdk)
+    behind = 0 if a.ci else sdk_behind(a.sdk)
     if behind:
         step("sdk_testing", "aviso", f"{behind} commits atras de origin/master: corres tests viejos")
 
     def finish(code):
+        if a.ci and code == 3:   # en CI no hay "luego": lo que no se pudo correr es rojo
+            step("ci", "rojo", "quedo un paso pendiente; en CI cuenta como rojo")
+            code = 1
         verdict = {0: "verde", 1: "rojo", 3: "pendiente"}[code]
         # pytest corre sobre el arbol de trabajo; el status va sobre HEAD. Con
         # cambios sin commit lo probado no es lo commiteado: no se publica.
@@ -469,8 +496,11 @@ def run_all(a, paths, notes, work):
         with open(path, "w") as fh:
             json.dump(out, fh, indent=2, ensure_ascii=False)
         print(f"\n== {verdict.upper()} ({out['segundos']} s)  -> {os.path.relpath(path, a.addons)}")
-        if not a.no_publicar:
-            do_publish(out)
+        if a.ci:
+            ci_summary(out)
+        else:
+            print("el check lkf-test del PR lo pone GitHub Actions; "
+                  "para subir este resultado a mano: ./lkf test --publicar")
         return code
 
     # 2. compilar
@@ -563,6 +593,9 @@ def run_all(a, paths, notes, work):
                 return finish(1)
 
     # 5. target (integration / prod_test), cada back con sus funciones
+    if a.ci:
+        step("target", "omitido", "la integracion todavia no corre en CI: ./lkf test en local")
+        return finish(3 if pending else 0)
     if not targets:
         step("target", "omitido", "sin funciones cambiadas")
         return finish(3 if pending else 0)
