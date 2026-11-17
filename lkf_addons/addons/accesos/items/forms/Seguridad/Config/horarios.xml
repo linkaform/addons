@@ -54,7 +54,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Nombre con el que se identifica el turno, por ejemplo Matutino o Nocturno.</help_text>
                     <label>Nombre Horario</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -69,7 +69,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -121,7 +121,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Hora en que inicia el turno. Contra esta hora se calculan los retardos.</help_text>
                     <label>Hora Entrada</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -136,7 +136,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -188,7 +188,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Hora en que termina el turno.</help_text>
                     <label>Hora Salida</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -203,7 +203,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -255,7 +255,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Minutos después de la hora de entrada en los que el guardia todavía llega a tiempo. Ejemplo: 15 = puede llegar hasta las 8:15 sin retardo.</help_text>
                     <label>Tolerancia Retardo</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -270,7 +270,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -322,7 +322,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Minutos después de la hora de entrada hasta los que la llegada cuenta como retardo. Si llega después, cuenta como falta por retardo. Ejemplo: 120 = después de las 10:00 ya es falta.</help_text>
                     <label>Retardo Maximo</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -337,7 +337,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -389,7 +389,7 @@
                     <grading_criteria>{}</grading_criteria>
                     <group>None</group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Minutos antes de la hora de entrada en los que el guardia ya puede iniciar turno y que se le asigne este horario. Ejemplo: 120 = desde las 6:00 puede iniciar el turno de las 8:00; antes de eso no se toma este horario.</help_text>
                     <label>Ingreso Maximo</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -404,7 +404,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -459,7 +459,7 @@
                         <item>666718cb1bdffb6d8fc908d6</item>
                         <item>663e5c57f5b8a7ce8211ed0b</item>
                     </groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Ubicaciones donde aplica este horario.</help_text>
                     <label>Aplica para las siguientes Ubicaciones</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -474,7 +474,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
