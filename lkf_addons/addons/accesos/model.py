@@ -248,10 +248,12 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
         # Catalogos que la app lee offline (SQLite desde CouchDB), por menu movil de
         # CONFIGURACION_MENUS. Web no los necesita: los scripts leen con la API key.
         self.catalogos_offline_por_menu = {
-            'rondines': [self.AREAS_DE_LAS_UBICACIONES_CAT_ID],
+            # lista_de_incidentes: tipos de incidencia (Nueva Incidencia y CheckAreaModal)
+            'rondines': [self.AREAS_DE_LAS_UBICACIONES_CAT_ID, self.LISTA_INCIDENCIAS_CAT_ID],
             'bitácoras': [self.AREAS_DE_LAS_UBICACIONES_CAT_ID],
             'incidencias_/_fallas': [
                 self.AREAS_DE_LAS_UBICACIONES_CAT_ID,
+                self.LISTA_INCIDENCIAS_CAT_ID,
                 self.CONF_AREA_EMPLEADOS_CAT_ID,
                 self.LISTA_FALLAS_CAT_ID,
             ],
