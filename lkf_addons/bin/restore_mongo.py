@@ -20,8 +20,16 @@ De donde sale cada dato:
     ./lkf restore-mongo --dry-run    # muestra el plan sin llamar a nadie
     ./lkf restore-mongo [account_id]
 
-Pasos: verifica origen y destino -> BORRA la base en el sandbox -> mongodump | mongorestore
-(sin answer_version, form_answer_archived, Tableau, download_history, pacos, report_answer).
+Pasos: verifica origen y destino -> eliges collections -> BORRA la base en el sandbox ->
+mongodump | mongorestore.
+
+Collections: por defecto se omiten las pesadas (answer_version, form_answer_archived, Tableau,
+download_history, pacos, report_answer). Con terminal interactiva se abre un menu para
+marcar/desmarcar cada una (se muestran con su tamano); tu ultima seleccion se recuerda por
+cuenta en secrets/restore_mongo.json (local, no se versiona). Sin menu:
+
+    --exclude a,b     omite esas collections          --include c   restaura c aunque este
+    --no-menu / -y    no preguntar: usa flags > ultima seleccion > defaults
 
 --with-admin copia ademas la base `admin` de produccion (usuarios y permisos). Eso exige
 una credencial administrativa que el endpoint no entrega: ponla en accounts.ini como
@@ -140,6 +148,10 @@ def resolver(args):
         'dst_url': 'https://%s.linkaform.com' % env,
         'dst_mongo': '%s.linkaform.com:27017' % env,
         'admin': admin,
+        'secrets': secrets,
+        'prefs': cargar_prefs(secrets, account_id),
+        'include': lista(args.include),
+        'exclude': lista(args.exclude),
     }
 
 
@@ -186,6 +198,133 @@ def copiar(src, dst, db, extra, etiqueta, authdb):
         raise Error('%s fallo (mongodump=%s, mongorestore=%s).' % (etiqueta, rc_dump, rc_rest))
 
 
+PREFS_FILE = 'restore_mongo.json'
+
+
+def lista(valores):
+    """['a,b', 'c'] -> ['a', 'b', 'c']"""
+    return [x.strip() for v in (valores or []) for x in v.split(',') if x.strip()]
+
+
+def cargar_prefs(secrets, account_id):
+    try:
+        with open(os.path.join(secrets, PREFS_FILE), encoding='utf-8') as fh:
+            return json.load(fh).get(str(account_id), {})
+    except (OSError, ValueError):
+        return {}
+
+
+def guardar_prefs(secrets, account_id, excluded, known):
+    path = os.path.join(secrets, PREFS_FILE)
+    try:
+        with open(path, encoding='utf-8') as fh:
+            data = json.load(fh)
+    except (OSError, ValueError):
+        data = {}
+    data[str(account_id)] = {'excluded': sorted(excluded), 'known': sorted(known)}
+    try:
+        with open(path, 'w', encoding='utf-8') as fh:
+            json.dump(data, fh, indent=2, sort_keys=True)
+            fh.write('\n')
+    except OSError as e:
+        print('  (no pude guardar tu seleccion en %s: %s)' % (path, e))
+
+
+def exclusion_base(p):
+    """Exclusion de partida, sin red: ultima seleccion guardada o defaults; luego flags."""
+    prefs = p['prefs']
+    excluded = set(prefs['excluded']) if 'excluded' in prefs else set(EXCLUDED)
+    excluded |= set(p['exclude'])
+    excluded -= set(p['include'])
+    return excluded
+
+
+def fmt_size(n):
+    if n is None:
+        return '?'
+    for unit in ('B', 'KB', 'MB', 'GB'):
+        if n < 1024 or unit == 'GB':
+            return '%.1f%s' % (n, unit) if unit != 'B' else '%d%s' % (n, unit)
+        n /= 1024.0
+
+
+def listar_collections(host, user, pwd, db):
+    """[(nombre, bytes|None)] ordenado por nombre. Si no hay permiso de stats, bytes=None."""
+    from pymongo import MongoClient
+    from pymongo.errors import PyMongoError
+    try:
+        c = MongoClient(uri(user, pwd, host, db), serverSelectionTimeoutMS=10000)
+        out = []
+        for name in sorted(c[db].list_collection_names()):
+            try:
+                size = c[db].command('collStats', name).get('size')
+            except PyMongoError:
+                size = None
+            out.append((name, size))
+        c.close()
+    except PyMongoError as e:
+        raise Error('No pude listar las collections de %s: %s' % (db, e))
+    return out
+
+
+def parse_seleccion(texto, total):
+    """'1 3-5' -> {1,3,4,5}; None si algo no se entiende."""
+    idx = set()
+    for tok in texto.replace(',', ' ').split():
+        try:
+            if '-' in tok:
+                a, b = tok.split('-', 1)
+                a, b = int(a), int(b)
+                rango = range(min(a, b), max(a, b) + 1)
+            else:
+                rango = [int(tok)]
+        except ValueError:
+            return None
+        if any(i < 1 or i > total for i in rango):
+            return None
+        idx.update(rango)
+    return idx
+
+
+def menu_collections(db, colls, excluded):
+    """Menu de texto. Marcadas = se restauran. Devuelve el set excluido, o None si cancela."""
+    nombres = [n for n, _ in colls]
+    marcadas = {n for n in nombres if n not in excluded}
+    defaults = {n for n in nombres if n not in EXCLUDED}
+    ancho = max([len(n) for n in nombres] + [10])
+    while True:
+        print('\nCollections de %s   [x] se restaura   [ ] se omite\n' % db)
+        for i, (n, size) in enumerate(colls, 1):
+            print('  %3d  [%s] %-*s  %s' % (i, 'x' if n in marcadas else ' ', ancho, n,
+                                           fmt_size(size)))
+        total = sum(s or 0 for n, s in colls if n in marcadas)
+        print('\n  %d de %d marcadas, ~%s a copiar' % (len(marcadas), len(nombres),
+                                                      fmt_size(total)))
+        print('  numero o rango (3 5-7) alterna | a todas | n ninguna | d defaults | '
+              'Enter confirma | q cancela')
+        resp = input('> ').strip().lower()
+        if resp == '':
+            if not marcadas:
+                print('  Desmarcaste todo: no habria nada que restaurar.')
+                continue
+            return set(nombres) - marcadas
+        if resp == 'q':
+            return None
+        if resp == 'a':
+            marcadas = set(nombres)
+        elif resp == 'n':
+            marcadas = set()
+        elif resp == 'd':
+            marcadas = set(defaults)
+        else:
+            sel = parse_seleccion(resp, len(nombres))
+            if sel is None:
+                print('  No entendi "%s".' % resp)
+                continue
+            for i in sel:
+                marcadas ^= {nombres[i - 1]}
+
+
 def main(argv):
     ap = argparse.ArgumentParser(prog='lkf restore-mongo')
     ap.add_argument('account_id', nargs='?', help='cuenta a copiar (default: la de workwith)')
@@ -193,6 +332,12 @@ def main(argv):
                     help='mongo de produccion de origen (default: %s)' % PROD_MONGO)
     ap.add_argument('--with-admin', action='store_true',
                     help='copia tambien la base admin (requiere mongo_user/mongo_password)')
+    ap.add_argument('--exclude', action='append', metavar='COL[,COL]',
+                    help='omite estas collections (repetible)')
+    ap.add_argument('--include', action='append', metavar='COL[,COL]',
+                    help='restaura estas collections aunque esten excluidas (repetible)')
+    ap.add_argument('--no-menu', action='store_true',
+                    help='no abrir el menu de collections (usa flags > ultima seleccion > defaults)')
     ap.add_argument('--check', action='store_true',
                     help='pide las claves y hace ping a origen y destino; no borra nada')
     ap.add_argument('--dry-run', action='store_true', help='solo muestra el plan, sin red')
@@ -207,8 +352,9 @@ def main(argv):
     print('  base     : %s  (se BORRA en el destino y se restaura)' % p['db'])
     print('  admin    : %s' % ('se copia (credencial de accounts.ini)' if p['admin']
                               else 'no se copia'))
-    print('  excluye  : %s' % ', '.join(EXCLUDED))
+    print('  omite    : %s' % (', '.join(sorted(exclusion_base(p))) or '(nada)'))
     if args.dry_run:
+        print('  (el menu de collections se abre al correr de verdad, no en dry-run)')
         print('\n(dry-run: no se llamo a nadie ni se toco nada)')
         return 0
 
@@ -219,8 +365,35 @@ def main(argv):
     dst_pwd = pedir_clave(p['dst_url'], p['username'], p['apikey'], 'destino')
     n = verificar(p['dst_mongo'], p['user'], dst_pwd, p['db'], 'destino')
     print('  destino OK  (%d colecciones en %s)' % (n, p['db']))
+
+    print('\n  listando collections de %s ...' % p['db'])
+    colls = listar_collections(p['src_mongo'], p['user'], src_pwd, p['db'])
+    nombres = {n for n, _ in colls}
+    desconocidas = (set(p['include']) | set(p['exclude'])) - nombres
+    if desconocidas:
+        print('  (no existen en el origen y se ignoran: %s)' % ', '.join(sorted(desconocidas)))
+    excluded = exclusion_base(p) & nombres
+    nuevas = nombres - set(p['prefs'].get('known', nombres))
+    if nuevas:
+        print('  (collections nuevas desde tu ultima seleccion, quedan marcadas: %s)'
+              % ', '.join(sorted(nuevas)))
+    interactivo = sys.stdin.isatty() and not args.yes and not args.no_menu
+    if interactivo:
+        elegido = menu_collections(p['db'], colls, excluded)
+        if elegido is None:
+            print('Cancelado.')
+            return 1
+        excluded = elegido
+        if not args.check:
+            guardar_prefs(p['secrets'], p['account_id'], excluded, nombres)
+    if len(excluded) >= len(nombres):
+        raise Error('No queda ninguna collection por restaurar.')
+    incluidas = [(n, sz) for n, sz in colls if n not in excluded]
+    print('\n  se restauran %d collections (~%s); se omiten: %s'
+          % (len(incluidas), fmt_size(sum(sz or 0 for _, sz in incluidas)),
+             ', '.join(sorted(excluded)) or '(ninguna)'))
     if args.check:
-        print('\n(check: todo responde; no se toco nada)')
+        print('\n(check: todo responde; no se toco nada ni se guardo la seleccion)')
         return 0
 
     if not args.yes:
@@ -248,7 +421,7 @@ def main(argv):
 
         print('3/4 restaurando %s' % p['db'])
         copiar((p['src_mongo'], p['user'], s_cfg), (p['dst_mongo'], p['user'], d_cfg), p['db'],
-               ['--excludeCollection=%s' % c for c in EXCLUDED], p['db'], p['db'])
+               ['--excludeCollection=%s' % c for c in sorted(excluded)], p['db'], p['db'])
 
         if p['admin']:
             print('4/4 copiando la base admin')
