@@ -10,7 +10,7 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <created_at>1794521198.0</created_at>
-    <description>version: 1794521936</description>
+    <description>version: 1794959472</description>
     <edit_public_records>False</edit_public_records>
     <edit_registers>True</edit_registers>
     <element_ids>[]</element_ids>
@@ -614,7 +614,7 @@
                         <item>62c5ff407febce07043024dd</item>
                         <item>638a9a99616398d2e392a9f5</item>
                     </groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Una fila por cada rol que se necesita en esta caseta y turno. Para programar a guardias específicos, agrega una fila por guardia con Cantidad 1.</help_text>
                     <label>Plazas</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -629,7 +629,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -848,7 +848,7 @@
                         <group_set_id>0</group_set_id>
                     </group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Cuántas personas de este rol se necesitan en la caseta durante el turno.</help_text>
                     <label>Cantidad</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -863,7 +863,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -933,7 +933,7 @@
                         <group_set_id>0</group_set_id>
                     </group>
                     <groups_fields>[]</groups_fields>
-                    <help_text>None</help_text>
+                    <help_text>Opcional. Guardia que debe cubrir una de las plazas de esta fila. Si quieres asignar a varios guardias del mismo rol, captura una fila por guardia con Cantidad 1.</help_text>
                     <label>Guardia Programado</label>
                     <number_type>None</number_type>
                     <options>[]</options>
@@ -948,7 +948,7 @@
                         <fieldId>[]</fieldId>
                         <file_name />
                         <file_name_array>[]</file_name_array>
-                        <help_text>False</help_text>
+                        <help_text>True</help_text>
                         <icon>{}</icon>
                         <image_origin>None</image_origin>
                         <input_parameter>[]</input_parameter>
@@ -1181,5 +1181,5 @@
         <seconds_to_expire>None</seconds_to_expire>
         <welcome_text>None</welcome_text>
     </timer_config>
-    <updated_at>1794521936.0</updated_at>
+    <updated_at>1794959472.0</updated_at>
 </lkf>

@@ -1992,7 +1992,7 @@ class Accesos(OcrMixin, AccesosModel):
             {'$match': {
                 "deleted_at": {"$exists": False},
                 "form_id": self.CONF_AREA_EMPLEADOS,
-                f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id,
+                **self._get_match_user_id(f"{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id),
             }},
             {'$unwind': f"$answers.{self.Employee.f['roles_grupo']}"},
             {'$project': {
@@ -5225,7 +5225,7 @@ class Accesos(OcrMixin, AccesosModel):
         match_query = {
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_ACCESOS,
-            f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}":self.user['user_id'],
+            **self._get_match_user_id(f"{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}", self.user['user_id']),
         }
         query = [
             {'$match': match_query },
@@ -5310,8 +5310,21 @@ class Accesos(OcrMixin, AccesosModel):
                 'alertas': format_alerts,
                 'requisitos': format_grupo_requisitos,
             })
+        data = data or {}
+        data['new_user_username'] = self._get_my_username()
         # print(simplejson.dumps(data, indent=4))
         return data
+
+    def _get_my_username(self):
+        """Username de login del usuario (Empleados), para el header y Mi perfil.
+        No depende de Configuración Accesos: los usuarios del flujo de menús
+        no tienen registro ahí."""
+        try:
+            emp = self.Employee.get_employee_data(user_id=self.user['user_id'], get_one=True, active=False)
+        except Exception as e:
+            print('get_my_username error', e)
+            return ''
+        return self.unlist((emp or {}).get('new_user_username') or '') or ''
 
     def _flatten_scalar(self, value):
         """Quita capas de lista anidadas hasta llegar a un valor plano (no lista)."""
@@ -5728,7 +5741,7 @@ class Accesos(OcrMixin, AccesosModel):
         if names:
             match_query.update(self._get_match_q(self.f['worker_name'], names))
         if user_id:
-            match_query.update(self._get_match_q(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
+            match_query.update(self._get_match_user_id(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
         if username:
             match_query.update(self._get_match_q(self.f['username'], username))
         if email:

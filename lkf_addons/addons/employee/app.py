@@ -160,6 +160,38 @@ class Employee(Base):
             candidates.append([candidates[-1]])
         return {f"answers.{field_id}": {'$in': candidates}}
 
+    def _user_id_variants(self, user_id):
+        """
+        Un user_id como numero y como texto. Al editar un registro desde la web,
+        LinkaForm puede guardar el user_id de un catalogo como texto ("16783")
+        aunque el JWT y el resto de los registros lo traen como numero (16783).
+        """
+        variants = []
+        for value in (user_id if isinstance(user_id, list) else [user_id]):
+            if value in (None, ''):
+                continue
+            for v in (value, str(value).strip()):
+                if isinstance(v, str) and v.isdigit():
+                    variants += [v, int(v)]
+                elif v not in (None, ''):
+                    variants.append(v)
+        return list(dict.fromkeys(variants))
+
+    def _get_match_user_id(self, field_id, user_id, max_depth=20):
+        """
+        Match de un campo user_id sin importar si quedo guardado como numero o
+        como texto, ni que tan anidado en listas (ver _get_match_q_nested).
+        Si user_id es una lista no se anida, para no inflar el $in.
+        """
+        variants = self._user_id_variants(user_id)
+        depth = 1 if isinstance(user_id, list) else max_depth
+        candidates = list(variants)
+        level = list(variants)
+        for _ in range(depth):
+            level = [[v] for v in level]
+            candidates += level
+        return {f"answers.{field_id}": {'$in': candidates}}
+
     def get_employee_data(self, name=None, user_id=None, username=None, email=None, phone=None, get_one=False, active=True):
         match_query = {
             "deleted_at":{"$exists":False},
@@ -170,7 +202,7 @@ class Employee(Base):
         if name:
             match_query.update(self._get_match_q(self.f['worker_name'], name))
         if user_id:
-            match_query.update(self._get_match_q(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
+            match_query.update(self._get_match_user_id(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
         if username:
             match_query.update(self._get_match_q(self.f['username'], username))
         if email:
@@ -213,7 +245,7 @@ class Employee(Base):
             "deleted_at":{"$exists":False},
             "form_id": self.CONF_AREA_EMPLEADOS,
             }
-        match_query.update(self._get_match_q_nested(f"{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
+        match_query.update(self._get_match_user_id(f"{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
 
         unwind = {'$unwind': f"$answers.{self.f['areas_group']}"}
         query= [
@@ -287,7 +319,7 @@ class Employee(Base):
         identidades = []
         if user_id:
             identidades.append(
-                {f"answers.{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id})
+                self._get_match_user_id(f"{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
         if username:
             identidades.append(
                 {f"answers.{self.EMPLOYEE_OBJ_ID}.{self.f['new_user_username']}": username})
@@ -340,7 +372,7 @@ class Employee(Base):
             {"$match": {
                 "deleted_at": {"$exists":False},
                 "form_id": self.MENUS_FORM,
-                f"answers.{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}": user_id
+                **self._get_match_user_id(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id),
             }},
             {"$project": {
                 "_id": 0,
@@ -360,7 +392,7 @@ class Employee(Base):
             "deleted_at":{"$exists":False},
             "form_id": self.EMPLEADOS,
             }
-        match_query.update(self._get_match_q(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
+        match_query.update(self._get_match_user_id(f"{self.USUARIOS_OBJ_ID}.{self.employee_fields['user_id_id']}", user_id))
         query = [
             {'$match': match_query },
             {'$match': {
@@ -387,7 +419,7 @@ class Employee(Base):
             }
         if user_id:
             field_id = f"{self.EMPLOYEE_OBJ_ID}.{self.employee_fields['user_id_id']}"
-            match_query.update(self._get_match_q(field_id, user_id))
+            match_query.update(self._get_match_user_id(field_id, user_id))
         unwind = {'$unwind': f"$answers.{self.f['areas_group']}"}
         query= [
             {'$match': match_query },

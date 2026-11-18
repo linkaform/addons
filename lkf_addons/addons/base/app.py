@@ -237,6 +237,9 @@ class Base(BaseModel):
             if new_user_id:
                 user_data[self.f['new_user_id']] = new_user_id
                 user_data[self.f['new_user_status']] = 'creado'
+            # La contraseña ya quedo en el usuario de LinkaForm: no se guarda en el
+            # registro (sale en replace_ans y en el log del script).
+            user_data.pop(self.f['new_user_temp_password'], None)
         return response
 
     def get_user_by_username(self, username):
