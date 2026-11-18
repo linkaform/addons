@@ -11452,7 +11452,10 @@ class Accesos(OcrMixin, AccesosModel):
         return status
 
     def get_app_menus(self, user_id):
-        """Menus moviles del usuario segun su ultimo registro de CONFIGURACION_MENUS."""
+        """Menus moviles del usuario segun su ultimo registro de CONFIGURACION_MENUS.
+        La cuenta padre no tiene registro de menus y tiene acceso a todo: le tocan todos."""
+        if str(user_id) == str(self.account_id):
+            return set(self.catalogos_offline_por_menu)
         records = self._menu_config_records(user_ids=[user_id])
         if not records:
             return set()
