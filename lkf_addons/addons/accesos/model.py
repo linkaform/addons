@@ -553,7 +553,15 @@ class AccesosModel(Employee, Location, Vehiculo, Base):
             '_ubicacion_concesion': self.mf['ubicacion'],
             'tipo_activo':'6aa33c3a8711c7a4f571a738',
             'se_forzo_devolucion':'6aa7b40e6a6d4e42a9d7725e',
-            'devolucion_forzada_por':'6ae439ff64fea7194190dc33'
+            'devolucion_forzada_por':'6ae439ff64fea7194190dc33',
+            # Agregados 2026-11 (reporte de concesionados). Opcionales: los registros
+            # anteriores no los traen.
+            'empresa_concesion': '6afebfb2212240c549ff9872',
+            'guardia_entrega_concesion': '6afebfb2212240c549ff9873',
+            'plazo_devolucion': f"{self.ACTIVOS_FIJOS_CAT_OBJ_ID}.6afeb86f7ac0963b3cc0a414",
+            '_plazo_devolucion': '6afeb86f7ac0963b3cc0a414',  # horas; mismo id en la forma y el catálogo Activos Fijos
+            'fecha_limite_devolucion': '6afec078bd8d0a8795b09bec',
+            'recibio_devolucion': '6afec2f16b7ce990218fe1e3',
         }
 
         self.status_equipo_dict = {

@@ -2348,6 +2348,22 @@ class Accesos(OcrMixin, AccesosModel):
         else:
             answers[self.cons_f['tipo_persona_solicita']] = 'otro'
 
+        # Guardia que entrega: el usuario logueado. Empresa: la que capture el guardia
+        # (visitantes); para empleados, la empresa de la cuenta.
+        answers[self.cons_f['guardia_entrega_concesion']] = self._nombre_usuario_logueado()
+        if not answers.get(self.cons_f['empresa_concesion']) and data_articles.get('persona_nombre_concesion'):
+            answers[self.cons_f['empresa_concesion']] = self._empresa_cuenta()
+
+        # Plazo de devolución de cada equipo, de la forma Activos Fijos, y fecha desde la
+        # que cuenta (la de la concesión; si no viene, ahora).
+        nombres = [e.get('nombre_equipo') for e in equipos if e.get('nombre_equipo')]
+        plazos = {}
+        for a in (self.get_more_info_conscessioned_articles(nombres) if nombres else []):
+            nombre, horas = self.unlist(a.get('article_name')), self._horas_plazo(a.get('article_plazo'))
+            if nombre and horas and nombre not in plazos:
+                plazos[nombre] = horas
+        inicio = self._fecha_concesion_dt(data_articles.get('fecha_concesion'))
+
         answers[self.cons_f['grupo_equipos']] = []
         # Solo se guardan en el equipo los campos del grupo "equipos en prestamo";
         # cualquier otro id quedaria en Mongo pero LKF no lo mostraria.
@@ -2385,6 +2401,18 @@ class Accesos(OcrMixin, AccesosModel):
                         eq[catalog_id][field_id] = value
                 else:
                     eq[self.cons_f[key]] = value
+
+            # Plazo (detalle del catálogo, junto al costo) y fecha límite de devolución.
+            # La fecha límite la puede mandar el front (el guardia la cambió); si no, se calcula.
+            plazo = plazos.get(equipo.get('nombre_equipo')) or self.PLAZO_DEVOLUCION_DEFAULT
+            catalog_id, field_id = self.cons_f['plazo_devolucion'].split('.')
+            eq[catalog_id] = eq.get(catalog_id, {})
+            eq[catalog_id][field_id] = [plazo,]
+            limite = self._fecha_concesion_dt(equipo.get('fecha_limite_devolucion')) if equipo.get('fecha_limite_devolucion') else None
+            if limite and limite <= inicio:
+                self.LKFException(f"La fecha límite de devolución de {equipo.get('nombre_equipo', 'un equipo')} debe ser posterior a la fecha de la concesión.")
+            limite = limite or inicio + timedelta(hours=plazo)
+            eq[self.cons_f['fecha_limite_devolucion']] = limite.strftime('%Y-%m-%d %H:%M:%S')
             answers[self.cons_f['grupo_equipos']].append(eq)
         metadata = self.lkf_api.get_metadata(form_id=self.CONCESSIONED_ARTICULOS)
         metadata.update({
@@ -2400,6 +2428,44 @@ class Accesos(OcrMixin, AccesosModel):
         })
         metadata.update({'answers':answers})
         return self.lkf_api.post_forms_answers(metadata)
+
+    # Horas para regresar un equipo que no tiene plazo en Activos Fijos
+    PLAZO_DEVOLUCION_DEFAULT = 24
+
+    def _nombre_usuario_logueado(self):
+        """Nombre del usuario que hace la petición (guardia que entrega / recibe)."""
+        user = self.lkf_api.get_user_by_id(self.user.get('user_id')) or {}
+        return user.get('name') or self.user.get('username') or self.user.get('email')
+
+    def _empresa_cuenta(self):
+        """Nombre de la empresa de la cuenta: la del empleado dueño de la cuenta."""
+        try:
+            parent_id = self.user.get('parent_id') or self.account_id
+            employee = self.Employee.get_employee_data(user_id=parent_id, get_one=True) or {}
+            return self.unlist(employee.get('company', '')) or ''
+        except Exception as e:
+            print('No se pudo obtener la empresa de la cuenta', e)
+            return ''
+
+    def _horas_plazo(self, value):
+        """Plazo en horas (> 0) o None."""
+        try:
+            horas = float(self.unlist(value))
+        except (TypeError, ValueError):
+            return None
+        if horas <= 0:
+            return None
+        return int(horas) if horas.is_integer() else horas
+
+    def _fecha_concesion_dt(self, value):
+        """'YYYY-MM-DD HH:MM[:SS]' → datetime; si no viene o no se entiende, ahora en la zona del usuario."""
+        for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M'):
+            try:
+                return datetime.strptime(str(value).strip(), fmt)
+            except (TypeError, ValueError):
+                continue
+        ahora = self.today_str(tz_name=self.user.get('timezone') or 'America/Monterrey', date_format='datetime')
+        return datetime.strptime(ahora, '%Y-%m-%d %H:%M:%S')
 
     def create_article_lost(self, data_articles):
         #---Define Metadata
@@ -7654,6 +7720,8 @@ class Accesos(OcrMixin, AccesosModel):
                 "article_name": f"$answers.{self.cons_f['_nombre_equipo']}",
                 "article_image": f"$answers.{self.cons_f['_imagen_equipo_concesion']}",
                 "article_cost": f"$answers.{self.cons_f['_costo_equipo_concesion']}",
+                # Horas para regresarlo; vacío si el equipo no tiene plazo capturado
+                "article_plazo": f"$answers.{self.cons_f['_plazo_devolucion']}",
                 "tipo_activo": f"$answers.{self.cons_f['tipo_activo']}"
             }}
         ]
@@ -8899,10 +8967,9 @@ class Accesos(OcrMixin, AccesosModel):
         status = data.get('status')
         forzar_dev = data.get('forzar_dev', False)
         # Quien dio click en "Forzar devolucion" es el usuario logueado, no quien_entrega.
-        forzada_por = None
-        if forzar_dev:
-            user = self.lkf_api.get_user_by_id(self.user.get('user_id')) or {}
-            forzada_por = user.get('name') or self.user.get('username') or self.user.get('email')
+        # El guardia que recibe es el usuario logueado (va en cada devolución, en "Recibió").
+        recibio = self._nombre_usuario_logueado()
+        forzada_por = recibio if forzar_dev else None
         if rec['status_concesion'] == "cancelado":
             self.LKFException(f"No es posible devolver o modifcar una concesion  {rec['folio']}")
         if rec['status_concesion'] == "devuelto":
@@ -8945,6 +9012,7 @@ class Accesos(OcrMixin, AccesosModel):
                 dev[self.cons_f['evidencia_entrega']] =  data.get('evidencia',  data.get('evidencia_entrega'))
                 dev[self.cons_f['comentario_entrega']] = data.get('comentario_entrega', data.get('comenario_entrega', data.get('comentarios')))
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
+                dev[self.cons_f['recibio_devolucion']] = recibio
                 if forzar_dev:
                     dev[self.cons_f['se_forzo_devolucion']] = "sí"
                     dev[self.cons_f['devolucion_forzada_por']] = forzada_por
@@ -8985,6 +9053,7 @@ class Accesos(OcrMixin, AccesosModel):
                 dev[self.cons_f['entregado_por']] =  data.get('entregado_por')
                 dev[self.cons_f['identificacion_entrega']] = data.get('identificacion_entrega')
                 # Solo se marca cuando viene del boton "Forzar devolucion"; en una devolucion normal se omite.
+                dev[self.cons_f['recibio_devolucion']] = recibio
                 if forzar_dev:
                     dev[self.cons_f['se_forzo_devolucion']] = "sí"
                     dev[self.cons_f['devolucion_forzada_por']] = forzada_por

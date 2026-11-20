@@ -7,8 +7,8 @@
         <redirect_url>default</redirect_url>
     </confirmation>
     <description />
-    <_rev>28-30da21a7e5e5885596ed51b32d289471</_rev>
-    <updated_at>2024-07-30T00:58:37.991737+00:00Z</updated_at>
+    <_rev>30-bc7a75361b8170ae60a750d1b7d97ac5</_rev>
+    <updated_at>2026-11-20T08:42:13.167474+00:00Z</updated_at>
     <sync>
         <element_request>{}</element_request>
         <input_parameters>[]</input_parameters>
@@ -724,16 +724,16 @@
                     <field_id>6aa33c3a8711c7a4f571a738</field_id>
                     <options>
                         <item>
-                            <selected>False</selected>
-                            <label>Unico</label>
-                            <value>unico</value>
                             <points>None</points>
+                            <selected>False</selected>
+                            <value>unico</value>
+                            <label>Unico</label>
                         </item>
                         <item>
-                            <selected>False</selected>
-                            <label>Stock</label>
-                            <value>stock</value>
                             <points>None</points>
+                            <selected>False</selected>
+                            <value>stock</value>
+                            <label>Stock</label>
                         </item>
                     </options>
                     <label>Tipo</label>
@@ -743,6 +743,18 @@
                         <orientation>vertical</orientation>
                         <custom>None</custom>
                     </properties>
+                </item>
+                <item>
+                    <field_type>integer</field_type>
+                    <required>False</required>
+                    <field_id>6afeb86f7ac0963b3cc0a414</field_id>
+                    <properties>
+                        <number_of_decimals>2</number_of_decimals>
+                        <size>small</size>
+                        <step>1</step>
+                        <custom>None</custom>
+                    </properties>
+                    <label>Plazo de devolucion (horas)</label>
                 </item>
             </page_fields>
             <page_name>Página 1</page_name>
