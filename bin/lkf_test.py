@@ -29,7 +29,8 @@ Pasos (se detiene en el primero que falla en rojo):
      funciones que la disparan. Los demas archivos de unit/ no corren aqui.
      Ante la duda corren todas las secciones (ver unit_plan); en Sanic no:
      solo las que tienen trigger. Si lo cambiado no toca ninguna funcion
-     (XML de formas, catalogos, bin/...) no corre ninguno. Un test que usa un metodo que Sanic no
+     (XML de formas, catalogos, bin/...) no corre ninguno, salvo que se
+     toque el propio runner (RUNNER): ahi corren todas, para probarlo. Un test que usa un metodo que Sanic no
      tiene sale SKIPPED y se avisa.
   5. pytest --target=<funciones> -m "not unit" (integration/prod_test de las
      funciones cambiadas, cada back con las suyas) contra la cuenta activa,
@@ -67,6 +68,7 @@ SANIC = "/srv/lkf-sanic-app"
 TEST_ACCOUNT = 10
 RUFF_RULES = "E9,F63,F7,F82"
 TRIGGERS_FILE = "test_unit_cases.py"
+RUNNER = ("bin/lkf_test.py", "bin/lkf_changes.py")   # de addons: si cambian, corren todos los unitarios
 REPOS = ("addons", "modules", "lkf-sanic-apps", "sdk-modules-sanic")
 CHILD = {"modules": "addons", "sdk-modules-sanic": "lkf-sanic-apps"}   # repo de modulos -> su repo
 BACK = lkf_changes.BACK
@@ -213,13 +215,14 @@ def module_of(path):
     return parts[0]
 
 
-def unit_plan(suite, suites, triggers, changed, sueltos, solo_triggers=False, sin_diff=False):
+def unit_plan(suite, suites, triggers, changed, sueltos, solo_triggers=False, sin_diff=False, runner=()):
     """(secciones a correr, avisos) de los unitarios de una suite.
 
     triggers: {seccion: C10_TRIGGERS o None}, de Runner.unit_sections.
     changed: {funcion: rutas de lkf_changes ("app.py", "x.py (eliminada)", ...)}.
     sueltos: .py cambiados fuera de cualquier funcion (o eliminados).
     sin_diff: ningun repo trae cambios (./lkf test en master).
+    runner: archivos de RUNNER cambiados; corren todas las secciones.
 
     Corren las secciones cuya lista trae alguna funcion cambiada. Si hay duda
     se corren todas (secciones = None): una funcion del modulo que no esta en
@@ -237,7 +240,10 @@ def unit_plan(suite, suites, triggers, changed, sueltos, solo_triggers=False, si
     if sin_lista:
         avisos.append(f"sin {TRIGGERS_FILE} con C10_TRIGGERS (./lkf test no corre sus unitarios): "
                       + ", ".join(sin_lista))
-    if not changed and not sueltos:
+    for p in runner:
+        avisos.append(f"{p} cambio: corren todas las secciones para probarlo")
+        todo = True
+    if not changed and not sueltos and not todo:
         if sin_diff:
             return ([] if solo_triggers else None), avisos
         avisos.append("lo cambiado no toca ninguna funcion (XML, catalogos, bin/...): ningun unitario aplica")
@@ -479,6 +485,8 @@ def run_all(a, paths, notes, work):
         if p.endswith(".py") and os.path.exists(os.path.join(r["ruta"], p))
     ]
     sin_diff = not any(lkf_changes.changed_lines(r["ruta"], r["base"], "HEAD") for r in repos)
+    runner = sorted(p for r in repos if r["repo"] == "addons"
+                    for p in lkf_changes.changed_lines(r["ruta"], r["base"], "HEAD") if p in RUNNER)
     # Que back corre: el de los repos con cambios; sin cambios en ninguno, addons.
     backs = [b for b in ("addons", "sanic") if any(changed(r) for r in repos if BACK[r["repo"]] == b)] or ["addons"]
     by_back = {b: [r for r in repos if BACK[r["repo"]] == b] for b in backs}
@@ -571,7 +579,8 @@ def run_all(a, paths, notes, work):
         for suite in run.suites():
             triggers = run.unit_sections(suite)
             secs, avisos = unit_plan(suite, run.suites(), triggers, changed_fns, sueltos,
-                                     solo_triggers=(back == "sanic"), sin_diff=sin_diff)
+                                     solo_triggers=(back == "sanic"), sin_diff=sin_diff,
+                                     runner=runner if back == "addons" else ())
             for msg in avisos:
                 step(f"unit {tag}{suite}", "aviso", msg)
             if secs is None:
