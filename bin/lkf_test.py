@@ -106,7 +106,10 @@ class Runner:
             ]
 
     def docker(self, workdir, *cmd, back="addons"):
-        args = ["docker", "run", "--rm", "-w", workdir]
+        # Sin __pycache__: el contenedor corre como root y dejaria .pyc de root en
+        # los repos montados; en el worktree de modules eso impide borrarlo y la
+        # siguiente corrida truena con "modules-wt ya existe".
+        args = ["docker", "run", "--rm", "-w", workdir, "-e", "PYTHONDONTWRITEBYTECODE=1"]
         if back == "sanic":
             args += ["-e", "LKF_BACK=sanic", "-e", "USE_LOCAL_SETTINGS=1"]
         for src, dst in self.mounts[back]:
