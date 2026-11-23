@@ -5568,6 +5568,31 @@ class Accesos(OcrMixin, AccesosModel):
         ]
         return {r['_id']: r['total'] for r in self.cr.aggregate(query)}
 
+    def get_ultimo_ingreso_many(self, qr_codes):
+        """ Ultimo ingreso por pase en una sola consulta: {qr_code: {fecha_entrada, fecha_salida}}.
+        Los que no tienen ingresos no aparecen."""
+        if not qr_codes:
+            return {}
+        qr_field = f"answers.{self.mf['codigo_qr']}"
+        entrada_field = f"answers.{self.mf['fecha_entrada']}"
+        query = [
+            {'$match': {
+                "deleted_at": {"$exists": False},
+                "form_id": self.BITACORA_ACCESOS,
+                qr_field: {"$in": list(qr_codes)},
+            }},
+            {'$sort': {entrada_field: -1}},
+            {'$group': {
+                '_id': f"${qr_field}",
+                'fecha_entrada': {'$first': f"${entrada_field}"},
+                'fecha_salida': {'$first': f"$answers.{self.mf['fecha_salida']}"},
+            }},
+        ]
+        return {
+            r['_id']: {'fecha_entrada': r.get('fecha_entrada') or "", 'fecha_salida': r.get('fecha_salida') or ""}
+            for r in self.cr.aggregate(query)
+        }
+
     def get_pases_padre_many(self, padre_ids):
         """ Datos del pase padre de varios pases en una sola consulta: {padre_id: {...}}."""
         padre_ids = [i for i in set(padre_ids) if i and ObjectId.is_valid(i)]
@@ -7631,9 +7656,13 @@ class Accesos(OcrMixin, AccesosModel):
         records = self.format_cr(result.get('records', []))
         self._hidratar_acompanantes(records)
         ingresos = self.get_count_ingresos_many([x.get('_id') for x in records])
+        ultimos_ingresos = self.get_ultimo_ingreso_many([x.get('_id') for x in records])
         padres = self.get_pases_padre_many([self.extraer_id_padre(x) for x in records if x.get('url_padre')])
         for x in records:
             x['total_entradas'] = ingresos.get(x.get('_id'), 0)
+            ultimo_ingreso = ultimos_ingresos.get(x.get('_id'), {})
+            x['ultima_entrada'] = ultimo_ingreso.get('fecha_entrada', "")
+            x['ultima_salida'] = ultimo_ingreso.get('fecha_salida', "")
             visita_a =[]
             v = x.pop('visita_a_nombre') if x.get('visita_a_nombre') else []
             d = x.get('visita_a_departamento',[])
