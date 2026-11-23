@@ -11,6 +11,14 @@ name: lkf-test
 #
 # Secrets (de la org o del repo): PREPROD_USERNAME y PREPROD_APIKEY, la cuenta
 # de pruebas en preprod. Los PRs desde forks no los reciben y salen en rojo.
+#
+# Imagenes: se bajan de GHCR (las publica lkf-test-images.yml) con el tag que
+# da bin/lkf_ci_images.sh. Si el PR cambia el Dockerfile o requires.txt ese tag
+# no existe y se construyen aqui, como antes (leen la cache que deja master).
+#
+# A mano (Actions > lkf-test > Run workflow): prueba una rama sin abrir PR. Se
+# escribe la rama (ej. fix/1520) y cada repo toma la que se llame igual o
+# master, como en un PR. Vacio: la rama elegida en "Use workflow from".
 on:
   pull_request:
     branches: [master]
@@ -20,12 +28,18 @@ on:
         required: false
       PREPROD_APIKEY:
         required: false
+  workflow_dispatch:
+    inputs:
+      rama:
+        description: "Rama a probar (ej. fix/1520); vacio = la de 'Use workflow from'"
+        required: false
+        default: ""
 
 permissions:
   contents: read
 
 concurrency:
-  group: lkf-test-${{ github.repository }}-${{ github.event.pull_request.number }}
+  group: lkf-test-${{ github.repository }}-${{ github.event.pull_request.number || inputs.rama || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -36,7 +50,7 @@ jobs:
     env:
       WS: ${{ github.workspace }}/ws
       PR_REPO: ${{ github.event.repository.name }}
-      PR_BRANCH: ${{ github.head_ref }}
+      PR_BRANCH: ${{ github.head_ref || inputs.rama || github.ref_name }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - name: Clonar addons (rama del PR o master)
@@ -44,7 +58,7 @@ jobs:
           mkdir -p "$WS"
           git clone -q --filter=blob:none --no-checkout https://github.com/linkaform/addons.git "$WS/addons"
           cd "$WS/addons"
-          if [ "$PR_REPO" = addons ]; then
+          if [ "$PR_REPO" = addons ] && [ -n "$PR_NUMBER" ]; then
             git fetch -q origin "refs/pull/$PR_NUMBER/head"
             git checkout -q -B "$PR_BRANCH" FETCH_HEAD
           elif git rev-parse -q --verify "refs/remotes/origin/$PR_BRANCH" >/dev/null; then
@@ -60,9 +74,34 @@ jobs:
           PREPROD_APIKEY: ${{ secrets.PREPROD_APIKEY }}
         run: bash "$WS/addons/bin/lkf_ci_setup.sh" "$WS"
 
-      - uses: docker/setup-buildx-action@v3
+      - name: Tags de las imagenes
+        id: tags
+        run: bash "$WS/addons/bin/lkf_ci_images.sh" "$WS"
 
-      - name: Imagen linkaform/lkf_test:develop
+      - name: Bajar imagenes publicadas
+        id: pull
+        env:
+          REGISTRY: ghcr.io/linkaform
+          LKF_TEST_TAG: ${{ steps.tags.outputs.lkf_test }}
+          SANIC_TAG: ${{ steps.tags.outputs.sanic }}
+        run: |
+          # pull <imagen publicada> <nombre local> <output>: hit si la bajo.
+          pull() {
+            if docker pull -q "$1"; then
+              docker tag "$1" "$2"
+              echo "$3=hit" >> "$GITHUB_OUTPUT"
+            else
+              echo "::notice::$1 no esta publicada: se construye"
+            fi
+          }
+          pull "$REGISTRY/lkf_test:$LKF_TEST_TAG" linkaform/lkf_test:develop lkf_test
+          pull "$REGISTRY/sanic-app:$SANIC_TAG" linkaform/sanic-app:test sanic
+
+      - uses: docker/setup-buildx-action@v3
+        if: steps.pull.outputs.lkf_test != 'hit' || steps.pull.outputs.sanic != 'hit'
+
+      - name: Construir linkaform/lkf_test:develop
+        if: steps.pull.outputs.lkf_test != 'hit'
         uses: docker/build-push-action@v6
         with:
           context: ${{ env.WS }}/addons/test/docker
@@ -71,9 +110,9 @@ jobs:
           tags: linkaform/lkf_test:develop
           load: true
           cache-from: type=gha,scope=lkf_test
-          cache-to: type=gha,scope=lkf_test,mode=max
 
-      - name: Imagen linkaform/sanic-app:test
+      - name: Construir linkaform/sanic-app:test
+        if: steps.pull.outputs.sanic != 'hit'
         uses: docker/build-push-action@v6
         with:
           context: ${{ env.WS }}/lkf-sanic-apps/docker
@@ -81,7 +120,6 @@ jobs:
           tags: linkaform/sanic-app:test
           load: true
           cache-from: type=gha,scope=sanic_test
-          cache-to: type=gha,scope=sanic_test,mode=max
 
       - name: ./lkf test --ci
         run: python3 "$WS/addons/bin/lkf_test.py" --ci

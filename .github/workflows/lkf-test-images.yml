@@ -1,0 +1,88 @@
+name: lkf-test-images
+
+# Construye y publica en GHCR las imagenes con que corre lkf-test, para que los
+# PRs las bajen en vez de construirlas (~7 min por PR):
+#   ghcr.io/linkaform/lkf_test:<hash> y :develop      (addons/test/docker)
+#   ghcr.io/linkaform/sanic-app:<hash> y :test        (lkf-sanic-apps/docker/Dockerfile.test)
+# <hash> sale de bin/lkf_ci_images.sh. Los paquetes son publicos: no llevan
+# codigo ni secrets (todo eso se monta al correr), y asi los bajan los PRs de
+# modules, lkf-sanic-apps y sdk-modules-sanic sin permisos extra.
+#
+# Corre al mergear cambios de test/docker a master, cada lunes (sanic-app:develop
+# y los .tar.gz de linkaform_api / backblaze_utils cambian por su lado) y a mano.
+# Un cambio a Dockerfile.test en lkf-sanic-apps no dispara este workflow: hasta
+# la siguiente corrida, lkf-test la construye.
+on:
+  push:
+    branches: [master]
+    paths:
+      - test/docker/**
+      - bin/lkf_ci_images.sh
+      - .github/workflows/lkf-test-images.yml
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: lkf-test-images
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io/linkaform
+
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      WS: ${{ github.workspace }}/ws
+    steps:
+      - name: Clonar addons y lkf-sanic-apps (master)
+        run: |
+          mkdir -p "$WS"
+          git clone -q --depth 1 https://github.com/linkaform/addons.git "$WS/addons"
+          git clone -q --depth 1 https://github.com/linkaform/lkf-sanic-apps.git "$WS/lkf-sanic-apps"
+
+      - name: Tags
+        id: tags
+        run: bash "$WS/addons/bin/lkf_ci_images.sh" "$WS"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: lkf_test
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.WS }}/addons/test/docker
+          file: ${{ env.WS }}/addons/test/docker/Dockerfile
+          target: develop
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/lkf_test:${{ steps.tags.outputs.lkf_test }}
+            ${{ env.REGISTRY }}/lkf_test:develop
+          labels: org.opencontainers.image.source=https://github.com/linkaform/addons
+          cache-from: type=gha,scope=lkf_test
+          cache-to: type=gha,scope=lkf_test,mode=max
+
+      - name: sanic-app:test
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.WS }}/lkf-sanic-apps/docker
+          file: ${{ env.WS }}/lkf-sanic-apps/docker/Dockerfile.test
+          pull: true
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/sanic-app:${{ steps.tags.outputs.sanic }}
+            ${{ env.REGISTRY }}/sanic-app:test
+          labels: org.opencontainers.image.source=https://github.com/linkaform/addons
+          cache-from: type=gha,scope=sanic_test
+          cache-to: type=gha,scope=sanic_test,mode=max
