@@ -15,6 +15,10 @@ name: lkf-test
 # Imagenes: se bajan de GHCR (las publica lkf-test-images.yml) con el tag que
 # da bin/lkf_ci_images.sh. Si el PR cambia el Dockerfile o requires.txt ese tag
 # no existe y se construyen aqui, como antes (leen la cache que deja master).
+#
+# A mano (Actions > lkf-test > Run workflow): prueba una rama sin abrir PR. Se
+# escribe la rama (ej. fix/1520) y cada repo toma la que se llame igual o
+# master, como en un PR. Vacio: la rama elegida en "Use workflow from".
 on:
   pull_request:
     branches: [master]
@@ -24,12 +28,18 @@ on:
         required: false
       PREPROD_APIKEY:
         required: false
+  workflow_dispatch:
+    inputs:
+      rama:
+        description: "Rama a probar (ej. fix/1520); vacio = la de 'Use workflow from'"
+        required: false
+        default: ""
 
 permissions:
   contents: read
 
 concurrency:
-  group: lkf-test-${{ github.repository }}-${{ github.event.pull_request.number }}
+  group: lkf-test-${{ github.repository }}-${{ github.event.pull_request.number || inputs.rama || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -40,7 +50,7 @@ jobs:
     env:
       WS: ${{ github.workspace }}/ws
       PR_REPO: ${{ github.event.repository.name }}
-      PR_BRANCH: ${{ github.head_ref }}
+      PR_BRANCH: ${{ github.head_ref || inputs.rama || github.ref_name }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - name: Clonar addons (rama del PR o master)
@@ -48,7 +58,7 @@ jobs:
           mkdir -p "$WS"
           git clone -q --filter=blob:none --no-checkout https://github.com/linkaform/addons.git "$WS/addons"
           cd "$WS/addons"
-          if [ "$PR_REPO" = addons ]; then
+          if [ "$PR_REPO" = addons ] && [ -n "$PR_NUMBER" ]; then
             git fetch -q origin "refs/pull/$PR_NUMBER/head"
             git checkout -q -B "$PR_BRANCH" FETCH_HEAD
           elif git rev-parse -q --verify "refs/remotes/origin/$PR_BRANCH" >/dev/null; then
