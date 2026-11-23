@@ -28,7 +28,8 @@ Pasos (se detiene en el primero que falla en rojo):
      unitarios principales de la seccion (maximo 10) y en C10_TRIGGERS las
      funciones que la disparan. Los demas archivos de unit/ no corren aqui.
      Ante la duda corren todas las secciones (ver unit_plan); en Sanic no:
-     solo las que tienen trigger. Un test que usa un metodo que Sanic no
+     solo las que tienen trigger. Si lo cambiado no toca ninguna funcion
+     (XML de formas, catalogos, bin/...) no corre ninguno. Un test que usa un metodo que Sanic no
      tiene sale SKIPPED y se avisa.
   5. pytest --target=<funciones> -m "not unit" (integration/prod_test de las
      funciones cambiadas, cada back con las suyas) contra la cuenta activa,
@@ -212,17 +213,20 @@ def module_of(path):
     return parts[0]
 
 
-def unit_plan(suite, suites, triggers, changed, sueltos, solo_triggers=False):
+def unit_plan(suite, suites, triggers, changed, sueltos, solo_triggers=False, sin_diff=False):
     """(secciones a correr, avisos) de los unitarios de una suite.
 
     triggers: {seccion: C10_TRIGGERS o None}, de Runner.unit_sections.
     changed: {funcion: rutas de lkf_changes ("app.py", "x.py (eliminada)", ...)}.
-    sueltos: .py cambiados fuera de cualquier funcion.
+    sueltos: .py cambiados fuera de cualquier funcion (o eliminados).
+    sin_diff: ningun repo trae cambios (./lkf test en master).
 
     Corren las secciones cuya lista trae alguna funcion cambiada. Si hay duda
     se corren todas (secciones = None): una funcion del modulo que no esta en
-    ninguna lista, una de un modulo sin suite propia (base, ...), un .py
-    cambiado fuera de una funcion, o ninguna funcion cambiada.
+    ninguna lista, una de un modulo sin suite propia (base, ...) o un .py
+    cambiado fuera de una funcion. Sin ningun cambio tambien corren todas,
+    como prueba general; con cambios que no tocan funciones (XML de formas,
+    catalogos, bin/...) no corre ninguna: ningun unitario los prueba.
 
     solo_triggers (back sanic): la duda no corre todo, solo avisa. Sanic aun no
     tiene todo lo de addons (falta buscador facets, auto-activacion...): correr
@@ -234,7 +238,10 @@ def unit_plan(suite, suites, triggers, changed, sueltos, solo_triggers=False):
         avisos.append(f"sin {TRIGGERS_FILE} con C10_TRIGGERS (./lkf test no corre sus unitarios): "
                       + ", ".join(sin_lista))
     if not changed and not sueltos:
-        return ([] if solo_triggers else None), avisos
+        if sin_diff:
+            return ([] if solo_triggers else None), avisos
+        avisos.append("lo cambiado no toca ninguna funcion (XML, catalogos, bin/...): ningun unitario aplica")
+        return [], avisos
     for fn, whys in sorted(changed.items()):
         mods = {module_of(w.split(" (", 1)[0]) for w in whys}
         hit = {s for s, t in triggers.items() if t and fn in t}
@@ -471,6 +478,7 @@ def run_all(a, paths, notes, work):
         for p in lkf_changes.changed_lines(r["ruta"], r["base"], "HEAD")
         if p.endswith(".py") and os.path.exists(os.path.join(r["ruta"], p))
     ]
+    sin_diff = not any(lkf_changes.changed_lines(r["ruta"], r["base"], "HEAD") for r in repos)
     # Que back corre: el de los repos con cambios; sin cambios en ninguno, addons.
     backs = [b for b in ("addons", "sanic") if any(changed(r) for r in repos if BACK[r["repo"]] == b)] or ["addons"]
     by_back = {b: [r for r in repos if BACK[r["repo"]] == b] for b in backs}
@@ -559,11 +567,11 @@ def run_all(a, paths, notes, work):
         for r in by_back[back]:
             for fn, whys in r["funciones"].items():
                 changed_fns.setdefault(fn, set()).update(whys)
-        sueltos = [p for r in by_back[back] for p in r["sin_funcion"]]
+        sueltos = [p for r in by_back[back] for p in r["sin_funcion"] + r["eliminados"]]
         for suite in run.suites():
             triggers = run.unit_sections(suite)
             secs, avisos = unit_plan(suite, run.suites(), triggers, changed_fns, sueltos,
-                                     solo_triggers=(back == "sanic"))
+                                     solo_triggers=(back == "sanic"), sin_diff=sin_diff)
             for msg in avisos:
                 step(f"unit {tag}{suite}", "aviso", msg)
             if secs is None:
