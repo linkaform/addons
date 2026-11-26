@@ -2001,7 +2001,13 @@ class Accesos(OcrMixin, AccesosModel):
             }},
         ]
         data = self.format_cr(self.cr.aggregate(query))
-        return [x['rol'] for x in data if x.get('rol')]
+        return sorted([x['rol'] for x in data if x.get('rol')], key=self._orden_alfabetico)
+
+    @staticmethod
+    def _orden_alfabetico(valor):
+        """Llave para ordenar textos A-Z sin importar mayusculas ni acentos."""
+        texto = valor if isinstance(valor, str) else str(valor)
+        return unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode().lower()
 
     def catalogos_pase_location(self):
         """
@@ -2052,7 +2058,8 @@ class Accesos(OcrMixin, AccesosModel):
         options = {}
         catalog_id = self.ROL_CATALOG_ID
         form_id = self.BITACORA_RONDINES
-        return self.catalogo_view(catalog_id, form_id, options)
+        roles = self.catalogo_view(catalog_id, form_id, options)
+        return sorted(roles, key=self._orden_alfabetico) if isinstance(roles, list) else roles
 
     def catalogo_incidencias(self, cat="", sub_cat=""):
         # selector = {} #Aqui filtras igual que con mongo de que answers.tal.tal: name_hotel
