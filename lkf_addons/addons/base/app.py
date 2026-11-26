@@ -1563,6 +1563,137 @@ class Base(BaseModel):
         data = self.format_cr(self.cr.aggregate(query), get_one=True, labels_off=True)
         return data
 
+    # ------------------------------------------------------------------
+    # Menús por rol (2611-1649)
+    # El rol del usuario sale de su empleado (grupo Roles de
+    # configuracion_areas_y_empleados); los menús de cada rol viven en la
+    # forma configuracion_menus_rol. Reaplicar lo hace el front usuario por
+    # usuario con save_user_menu_items (dispara el workflow de permisos).
+    # ------------------------------------------------------------------
+
+    def _menus_rol_catalog_names(self):
+        """Nombres del catálogo `rol`, sin repetir."""
+        data = self.lkf_api.search_catalog(self.ROL_CAT_ID, {"selector": {}, "limit": 10000}) or []
+        names = {(item.get(self.f['rol']) or '').strip() for item in data}
+        return sorted(n for n in names if n)
+
+    def _menus_rol_keys_by_rol(self):
+        """Keys de menú guardadas por rol; si un rol tiene varios registros gana el más nuevo."""
+        if not self.MENUS_ROL_FORM:
+            return {}
+        query = [
+            {"$match": {"form_id": self.MENUS_ROL_FORM, "deleted_at": {"$exists": False}}},
+            {"$sort": {"_id": -1}},
+            {"$project": {
+                "_id": 1,
+                "rol": f"$answers.{self.ROL_CAT_OBJ_ID}.{self.f['rol']}",
+                "elementos": f"$answers.{self.menu_form_fields['elementos']}",
+            }},
+        ]
+        keys_by_rol = {}
+        for record in self.cr.aggregate(query):
+            rol = record.get('rol')
+            if isinstance(rol, list):
+                rol = rol[0] if rol else None
+            if not rol or rol in keys_by_rol:
+                continue
+            keys = []
+            for elemento in record.get('elementos') or []:
+                item = elemento.get(self.MENUS_CATALOG_OBJ_ID) or {}
+                key = item.get(self.menu_form_fields['key'])
+                key = key[0] if isinstance(key, list) and key else key
+                if key and key not in keys:
+                    keys.append(key)
+            keys_by_rol[rol] = {"record_id": str(record['_id']), "item_keys": keys}
+        return keys_by_rol
+
+    def _menus_rol_user_ids_by_rol(self):
+        """
+        user_ids por rol según el empleado (configuracion_areas_y_empleados).
+        El obj_id del catálogo que envuelve al rol cambia entre cuentas, así
+        que se busca el campo `rol` dentro de cualquier valor del item.
+        """
+        acc = self.Accesos
+        query = [
+            {"$match": {
+                "form_id": acc.CONF_AREA_EMPLEADOS,
+                "deleted_at": {"$exists": False},
+                f"answers.{acc.Employee.f['roles_grupo']}.0": {"$exists": True},
+            }},
+            {"$project": {
+                "_id": 0,
+                "user_id": f"$answers.{acc.EMPLOYEE_OBJ_ID}.{acc.employee_fields['user_id_id']}",
+                "roles": f"$answers.{acc.Employee.f['roles_grupo']}",
+            }},
+        ]
+        users_by_rol = {}
+        for record in self.cr.aggregate(query):
+            user_id = record.get('user_id')
+            if isinstance(user_id, list):
+                user_id = user_id[0] if user_id else None
+            try:
+                user_id = int(user_id)
+            except (TypeError, ValueError):
+                continue
+            for item in record.get('roles') or []:
+                for value in (item or {}).values():
+                    rol = value.get(self.f['rol']) if isinstance(value, dict) else None
+                    if rol:
+                        users = users_by_rol.setdefault(rol, [])
+                        if user_id not in users:
+                            users.append(user_id)
+        return users_by_rol
+
+    def list_menu_roles(self):
+        """
+        Roles con sus menús y sus usuarios (por empleado), para la pestaña
+        Roles de Configuración › Menús.
+        """
+        if not self.MENUS_ROL_FORM:
+            return {"error": "Falta instalar la forma Configuracion Menus Rol del módulo base."}
+        keys_by_rol = self._menus_rol_keys_by_rol()
+        users_by_rol = self._menus_rol_user_ids_by_rol()
+        names = set(self._menus_rol_catalog_names()) | set(keys_by_rol) | set(users_by_rol)
+        roles = []
+        for rol in sorted(names, key=lambda n: n.lower()):
+            saved = keys_by_rol.get(rol)
+            roles.append({
+                "rol": rol,
+                "configured": bool(saved),
+                "item_keys": saved["item_keys"] if saved else [],
+                "user_ids": sorted(users_by_rol.get(rol, [])),
+            })
+        return roles
+
+    def save_rol_menu_items(self, rol, item_keys):
+        """Reemplaza los menús de un rol (forma configuracion_menus_rol). No toca a los usuarios."""
+        if not self.MENUS_ROL_FORM:
+            return {"error": "Falta instalar la forma Configuracion Menus Rol del módulo base."}
+        rol = (rol or '').strip()
+        if not rol:
+            return {"error": "Falta el rol."}
+        details_menus = self.get_format_user_menus(filter_keys=item_keys) if item_keys else []
+        elementos = [{
+            f"{self.MENUS_CATALOG_OBJ_ID}": {
+                self.menu_form_fields['menu']: menu['menu'],
+                self.menu_form_fields['seccion']: menu['seccion'],
+                self.menu_form_fields['elemento']: menu['elemento'],
+                self.menu_form_fields['key']: [menu['key']],
+                self.menu_form_fields['plataforms']: [menu['plataforms']],
+            }
+        } for menu in details_menus]
+
+        metadata = self.lkf_api.get_metadata(form_id=self.MENUS_ROL_FORM)
+        metadata['answers'] = {
+            self.ROL_CAT_OBJ_ID: {self.f['rol']: rol},
+            self.menu_form_fields['elementos']: elementos,
+        }
+        existing = self._menus_rol_keys_by_rol().get(rol)
+        if existing:
+            metadata['_id'] = existing['record_id']
+            return self.net.patch_forms_answers(metadata)
+        return self.lkf_api.post_forms_answers(metadata)
+
     def get_menus_x_users(self, user_ids=None):
         """
         Trae usuarios con registro en CONFIGURACION_ACCESOS (legacy) y sus

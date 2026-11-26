@@ -176,6 +176,8 @@ class BaseModel(base.LKF_Base):
         self.MENUS_CATALOG_ID = self.MENUS_CATALOG.get('id')
         self.MENUS_CATALOG_OBJ_ID = self.MENUS_CATALOG.get('obj_id')
         self.MENUS_FORM = self.lkm.form_id('configuracion_menus','id')
+        # Menús por rol (2611-1649): un registro por rol del catálogo `rol`.
+        self.MENUS_ROL_FORM = self.lkm.form_id('configuracion_menus_rol','id')
 
         self.menu_form_fields = {
             "username": "6759e4a7a9a6e13c7b26da33",
